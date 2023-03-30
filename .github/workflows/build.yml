@@ -1,0 +1,42 @@
+---
+name: build
+
+on:
+  pull_request:
+    branches: [master]
+env:
+  PYTHON_VERSION: '3.10'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pre-commit/action@v2.0.0
+
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: env.PYTHON_VERSION
+
+      - name: Install core dependencies
+        run: |
+          python3 -m pip install --upgrade pip poetry
+          poetry config virtualenvs.create false
+          poetry install
+
+      - name: Test
+        env:
+          CI: 1
+        run: pytest tests
+
+      - uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./coverage.xml
+
+      - name: Build package
+        run: poetry build

@@ -1,0 +1,79 @@
+---
+repos:
+  - repo: https://github.com/PyCQA/autoflake
+    rev: v2.0.0
+    hooks:
+      - id: autoflake
+        args:
+          - --remove-all-unused-imports
+          - --ignore-init-module-imports
+          - --remove-unused-variables
+          - --in-place
+
+  - repo: https://github.com/timothycrosley/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+        additional_dependencies: [toml]
+        args: ["--profile", "black"]
+
+  - repo: https://github.com/psf/black
+    rev: 23.1.0
+    hooks:
+      - id: black
+
+  - repo: https://github.com/PyCQA/flake8
+    rev: 6.0.0
+    hooks:
+      - id: flake8
+        additional_dependencies:
+          - flake8-bugbear
+          - flake8-print
+          - pep8-naming
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: debug-statements
+      - id: trailing-whitespace
+      - id: check-builtin-literals
+      - id: end-of-file-fixer
+      - id: check-ast
+      - id: check-docstring-first
+
+  - repo: https://github.com/frnhr/pre-commit-nocommit
+    rev: 0.0.1
+    hooks:
+      - id: check-nocommit
+
+  - repo: https://github.com/adrienverge/yamllint.git
+    rev: v1.30.0
+    hooks:
+      - id: yamllint
+        args: [-d, "{extends: relaxed, rules: {line-length: {max: 120}, new-lines: disable}}"]
+
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.3.1
+    hooks:
+    - id: pyupgrade
+      exclude: ^cognite/client/_proto.*$
+      args:
+          - --py310-plus
+
+  - repo: https://github.com/ikamensh/flynt/
+    rev: '0.77'
+    hooks:
+      - id: flynt
+
+  - hooks:
+      - id: version-match-check
+        name: version-match-check
+        entry: poetry run python scripts/check_version_match.py
+        language: system
+        pass_filenames: false
+    repo: local
+
+  - repo: https://github.com/asottile/yesqa
+    rev: v1.4.0
+    hooks:
+    -   id: yesqa

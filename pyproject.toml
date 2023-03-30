@@ -1,0 +1,42 @@
+[tool.poetry]
+name = "cognite-gql-pygen"
+version = "0.1.0"
+description = "Cognite graphQL Python generation SDK"
+readme = "README.md"
+authors = ["Cognite <support@cognite.com>"]
+
+packages = [{ include="cognite", from="." }]
+
+[tool.black]
+line-length = 120
+target_version = ['py310']
+include = '\.py$'
+
+[tool.isort]
+line_length=120                # corresponds to -w  flag
+multi_line_output=3            # corresponds to -m  flag
+include_trailing_comma=true    # corresponds to -tc flag
+skip_glob = '^((?!py$).)*$'    # this makes sort all Python files
+known_third_party = []
+
+[tool.poetry.scripts]
+cogpygen = "cognite.gqlpygen.main:main"
+
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pydantic = ">=1.10"
+typer = {version = "*", extras = ["all"] }
+
+[tool.poetry.dev-dependencies]
+twine = "*"
+pre-commit = "*"
+toml = "*"
+python-dotenv = "*"
+pytest = "*"
+pytest-cov = "*"
+
+
+[build-system]
+requires = ["poetry>=1.0"]
+build-backend = "poetry.masonry.api"
