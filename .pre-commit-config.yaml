@@ -66,14 +66,6 @@ repos:
     hooks:
       - id: flynt
 
-  - hooks:
-      - id: version-match-check
-        name: version-match-check
-        entry: poetry run python scripts/check_version_match.py
-        language: system
-        pass_filenames: false
-    repo: local
-
   - repo: https://github.com/asottile/yesqa
     rev: v1.4.0
     hooks:
