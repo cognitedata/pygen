@@ -11,7 +11,7 @@ def hello(name: str = typer.Argument(..., help="Your name so I can great you."))
 
 @app.command()
 def goodbye(name: str = ""):
-    print(f"Bye{f' {name}' if name else ''}!")
+    click.echo(f"Bye{f' {name}' if name else ''}!")
 
 
 def main():

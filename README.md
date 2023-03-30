@@ -6,7 +6,7 @@ This is the Cognite GraphQL Python Generator, `gqlpygen`, which is a CLI for aut
 from `.graphql` to interact with Cognite Data Fusion's (CDF) Flexible Data Models (FDM). It also supports other cases,
 such as generating `.graphql` from `pydantic` classes.
 
-**[DISCLAIMER!]** This project is in a highly experimental no guarantees are made for consistency between versions. The 
+**[DISCLAIMER!]** This project is in a highly experimental no guarantees are made for consistency between versions. The
 project may also become deprecated if the experimentation turns out to be a dead end.
 
 ## Installation

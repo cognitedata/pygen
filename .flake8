@@ -12,3 +12,5 @@ ignore =
     W503,
     # Error suffix in exception names (exceptions)
     N818,
+    # Error for call in function argument, typer uses this to provide docs.
+    B008

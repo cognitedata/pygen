@@ -26,6 +26,7 @@ repos:
     rev: 6.0.0
     hooks:
       - id: flake8
+        exclude: ^scripts/
         additional_dependencies:
           - flake8-bugbear
           - flake8-print
