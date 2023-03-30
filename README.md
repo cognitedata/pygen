@@ -1,5 +1,7 @@
 Cognite GraphQL Python Generator
 ==========================
+[![build](https://github.com/cognitedata/cognite-gql-pygen/actions/workflows/release.yaml/badge.svg)](https://github.com/cognitedata/cognite-gql-pygen/actions/workflows/release.yaml)
+[![GitHub](https://img.shields.io/github/license/cognitedata/cognite-gql-pygen)](https://github.com/cognitedata/cognite-gql-pygen/blob/master/LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
 This is the Cognite GraphQL Python Generator, `gqlpygen`, which is a CLI for automatically generating Python SDK code
@@ -29,4 +31,4 @@ cogpygen --help
 Wondering about upcoming or previous changes to the SDK? Take a look at the [CHANGELOG](https://github.com/cognitedata/cognite-gql-pygen/blob/master/CHANGELOG.md).
 
 ## Contributing
-Want to contribute? Check out [CONTRIBUTING](https://github.com/cognitedata/cognite-sdk-python/blob/master/CONTRIBUTING.md).
+Want to contribute? Check out [CONTRIBUTING](https://github.com/cognitedata/cognite-gqlpygen/blob/master/CONTRIBUTING.md).
