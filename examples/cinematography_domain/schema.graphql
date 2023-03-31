@@ -1,0 +1,14 @@
+# THIS FILE IS AUTO-GENERATED!
+# Use fdm/bin/schema_render.sh to update it.
+
+
+type Movie {
+  title: String!
+  director: Person
+  actors: [Person]
+  producers: [Person]
+}
+
+type Person {
+  name: String!
+}

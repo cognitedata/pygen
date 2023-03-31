@@ -13,6 +13,10 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.1.1]
+
+Added `fdm` package.
+
 ## [0.1.0]
 
 Initial commit.

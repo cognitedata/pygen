@@ -1,0 +1,14 @@
+cognite:
+  project:
+  tenant_id:
+  cdf_cluster:
+  client_id:
+fdm:
+  space:
+  datamodel:
+  schema_version:
+  max_tries: 5
+
+local:
+  schema_file: path/to/schema.graphql
+  schema_module: python.path.to.your_domain.schema

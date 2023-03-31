@@ -2,7 +2,12 @@
 max-line-length = 121
 per-file-ignores =
     # Ignore F401 "Module imported but unused" only for __init__ files
-    __init__.py:F401
+    */__init__.py:F401
+    # N815: "variable ... should not be mixedCase", we wanna follow the naming in FDM
+    cognite/fdm/*:N815
+    # T201,T203: "print found" and "pprint" found
+    examples/cinematography_domain/*:T201,T203
+
 ignore =
     # Whitespace before ':'
     E203,
@@ -14,3 +19,6 @@ ignore =
     N818,
     # Error for call in function argument, typer uses this to provide docs.
     B008
+
+# Pydantic @validator makes a method a classmethod
+classmethod-decorators=classmethod,validator
