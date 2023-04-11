@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 PWD = Path().absolute()
 
-CONFIG_FILE = os.environ.get("FDM_CONFIG", PWD / "config.yaml")
+CONFIG_FILE = os.environ.get("DM_CLIENTS_CONFIG", PWD / "config.yaml")
 
 __all__ = [
     "CONFIG",
@@ -17,7 +17,7 @@ __all__ = [
 ]
 
 test_config = {
-    "fdm": {
+    "dm_clients": {
         "max_tries": 1,
     }
 }

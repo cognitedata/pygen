@@ -5,10 +5,10 @@ from typing import TYPE_CHECKING, Dict, Generic, Iterable, List, Optional, Type,
 from cachelib import BaseCache
 from cognite.client import ClientConfig
 
-from cognite.fdm.cdf.client_fdm_v3 import CogniteClientFdmV3, EdgesAPI, NodesAPI
-from cognite.fdm.config import CONFIG
+from cognite.dm_clients.cdf.client_dm_v3 import CogniteClientDmV3, EdgesAPI, NodesAPI
+from cognite.dm_clients.config import CONFIG
 
-from ..cdf.client_fdm_v3 import ViewsAPI
+from ..cdf.client_dm_v3 import ViewsAPI
 from .domain_model import DomainModel
 
 if TYPE_CHECKING:
@@ -46,13 +46,13 @@ class DomainClient(Generic[DomainModelT]):
         self.schema = schema
         self._domain_model_api_class = domain_model_api_class
         self.cache: BaseCache = cache
-        self._client = CogniteClientFdmV3(config)
+        self._client = CogniteClientDmV3(config)
         self._client._config.headers["cdf-version"] = "alpha"
         if space_id is None:
-            space_id = CONFIG["fdm"]["space"]
+            space_id = CONFIG["dm_clients"]["space"]
         self.space_id = space_id
-        self._data_model = data_model or CONFIG["fdm"].get("datamodel")
-        self.schema_version = schema_version or CONFIG["fdm"].get("schema_version")
+        self._data_model = data_model or CONFIG["dm_clients"].get("datamodel")
+        self.schema_version = schema_version or CONFIG["dm_clients"].get("schema_version")
         if self.schema_version is None:
             raise NotImplementedError("Please specify the schema version")
             # TODO find latest version of the data model
@@ -137,17 +137,17 @@ class DomainClient(Generic[DomainModelT]):
 def get_empty_domain_client():
     from cachelib import SimpleCache
 
-    from cognite.fdm.cdf.get_client import get_client_config
-    from cognite.fdm.config import CONFIG
-    from cognite.fdm.general_domain.domain_model_api import DomainModelAPI
-    from cognite.fdm.general_domain.schema import Schema
+    from cognite.dm_clients.cdf.get_client import get_client_config
+    from cognite.dm_clients.config import CONFIG
+    from cognite.dm_clients.domain_modeling.domain_model_api import DomainModelAPI
+    from cognite.dm_clients.domain_modeling.schema import Schema
 
     return DomainClient(
         schema=Schema(),
         domain_model_api_class=DomainModelAPI,
         cache=SimpleCache(),
         config=get_client_config(),
-        space_id=CONFIG["fdm"]["space"],
-        data_model=CONFIG["fdm"]["datamodel"],
-        schema_version=CONFIG["fdm"]["schema_version"],
+        space_id=CONFIG["dm_clients"]["space"],
+        data_model=CONFIG["dm_clients"]["datamodel"],
+        schema_version=CONFIG["dm_clients"]["schema_version"],
     )

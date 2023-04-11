@@ -13,13 +13,17 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.1.3]
+
+Changed package name from `fdm` to `dm_clients`.
+
 ## [0.1.2]
 
-Support for `Timestamp` and `JSONObject` types.
+Added support for `Timestamp` and `JSONObject` types.
 
 ## [0.1.1]
 
-Added `fdm` package.
+Added `dm_clients` package.
 
 ## [0.1.0]
 

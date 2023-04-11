@@ -9,7 +9,7 @@ SCHEMA_MODULE=$(cat "$CONFIG" | extract 'schema_module')
 
 cat <<'EOF' > "$SCHEMA_FILE"
 # THIS FILE IS AUTO-GENERATED!
-# Use fdm/bin/schema_render.sh to update it.
+# Use `dm_clients schema render` to update it, see `dm_clients --help` for more information.
 
 
 EOF

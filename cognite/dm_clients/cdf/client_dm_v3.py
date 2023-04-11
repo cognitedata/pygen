@@ -13,16 +13,16 @@ from pydantic import parse_obj_as
 from requests import Response
 from retry import retry
 
-from cognite.fdm.cdf.data_classes_fdm_v3 import Container, DataModel, Edge, Node, Space, View
-from cognite.fdm.cdf.get_client import get_client_config
-from cognite.fdm.config import CONFIG
+from cognite.dm_clients.cdf.data_classes_dm_v3 import Container, DataModel, Edge, Node, Space, View
+from cognite.dm_clients.cdf.get_client import get_client_config
+from cognite.dm_clients.config import CONFIG
 
 logger = logging.getLogger(__name__)
 
 
 HttpVerbT = Literal["GET", "PUT", "DELETE", "POST"]
 
-_MAX_TRIES = int(CONFIG["fdm"].get("max_tries", 15))
+_MAX_TRIES = int(CONFIG["dm_clients"].get("max_tries", 15))
 
 
 class DataModelStorageAPI(APIClient):
@@ -471,7 +471,7 @@ class EdgesAPI(DataModelStorageAPI):
         self._post_to_endpoint(payload, "/delete")
 
 
-class CogniteClientFdmV3(CogniteClient):
+class CogniteClientDmV3(CogniteClient):
     def __init__(self, config: ClientConfig):
         # config.headers["cdf-version"] = "alpha"
         super().__init__(config)
@@ -493,6 +493,6 @@ class CogniteClientFdmV3(CogniteClient):
         ).json()
 
 
-def get_cognite_client_fdm_v3() -> CogniteClientFdmV3:
+def get_cognite_client_dm_v3() -> CogniteClientDmV3:
     client_config = get_client_config()
-    return CogniteClientFdmV3(client_config)
+    return CogniteClientDmV3(client_config)

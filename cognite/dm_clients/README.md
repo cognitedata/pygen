@@ -1,8 +1,8 @@
-# Non-GraphQL FDM API
+# Non-GraphQL DM API
 
-This is an experimental module which wraps non-GraphQL API for FDM.
+This is an experimental module which wraps non-GraphQL API for DM.
 
-It provides a simplified set of features for interacting with FDM in an intuitive way and without needing to work with
+It provides a simplified set of features for interacting with DM in an intuitive way and without needing to work with
 the underlying data structures.
 
 **[DISCLAIMER!]** This project is in a highly experimental no guarantees are made for consistency between versions. The
@@ -11,51 +11,51 @@ project may also become deprecated if the experimentation turns out to be a dead
 
 ## Motivation
 
-Uploading some data into a FDM data model was cumbersome when interacting directly with the FDM API.
+Uploading some data into a DM data model was cumbersome when interacting directly with the DM API.
 
 
 ## Concepts
 
-`fdm` package takes Python code as the "source of truth". So a normal workflow is like this:
+`dm_clients` package takes Python code as the "source of truth". So a normal workflow is like this:
 
 1. Define use case models in Python (in a "schema" module).
 2. Use CLI from this package to generate GraphQL schema.
-3. Use CLI from this package to upload this schema to FDM.
-4. Populate and manipulate data items / instances in FDM using a `DomainClient` provided in this package.
+3. Use CLI from this package to upload this schema to DM.
+4. Populate and manipulate data items / instances in DM using a `DomainClient` provided in this package.
 
 
 > Note: This might change in the future: as `gqlpygen` module evolves we should be able to dynamically create Python
-> data types from existing GraphQL schemas in FDM.
+> data types from existing GraphQL schemas in DM.
 
 
 ## Future
 
 Uncertain. No guarantees are made about maintenance of this project. Contributions, however, are very welcome!
 
-With the (future) arrival of GraphQL mutations in FDM, this package might become obsolete.
+With the (future) arrival of GraphQL mutations in DM, this package might become obsolete.
 
 
 ## Glossary
 
- * FDM - Flexible Data Model, data service by Cognite. For our purposes, it is "the API".
- * `fdm` - this package
- * Space - FDM object, a high-level container for all things in FDM. Like a namespace. Subordinate only to CDF project.
+ * DM - CDF Data Modeling, data service by Cognite. For our purposes, it is "the API".
+ * `dm_clients` - this package
+ * Space - DM object, a high-level container for all things in DM. Like a namespace. Subordinate only to CDF project.
  * Data Model - Often used interchangeably with "Schema", a set of Domain Models (a.k.a. schema types) that together
    help model a use case.
  * Domain - knowledge domain, similar to use case (though we can have multiple use cases that use a single Domain,
    like several clients in a very similar business)
- * Domain Model - an `fdm` term - often used interchangeably with "schema type" - a single class of objects with all
-   its fields, e.g. "pump" or "generator".
- * Item - an `fdm` term - an instance of a Domain Model, e.g. generator "G42".
- * Instance - an FDM term - a data entity, either a Node or an Edge (see below).
- * Node - an FDM term - a data entity, can contain multiple fields.
- * Edge - an FDM term - a data entity that connects two nodes (directionally).
- * DomainAPI - an `fdm` term - a top-level Python class for a Domain. It provides easy access to various DomainModelAPIs
-   (see below).
- * DomainModelAPI - an `fdm` term - a Python class (or class instance) which provides management over a single Domain
-   Model, e.g. create new pumps, delete a pump, list all pumps...
- * DomainClient - an `fdm` term - a Python class (or class instance) which serves as a namespace for easy acces to all
-   DomainModelAPIs in a use case.
+ * Domain Model - a `dm_clients` term - often used interchangeably with "schema type" - a single class of objects with
+   all its fields, e.g. "pump" or "generator".
+ * Item - a `dm_clients` term - an instance of a Domain Model, e.g. generator "G42".
+ * Instance - a DM term - a data entity, either a Node or an Edge (see below).
+ * Node - a DM term - a data entity, can contain multiple fields.
+ * Edge - a DM term - a data entity that connects two nodes (directionally).
+ * DomainAPI - a `dm_clients` term - a top-level Python class for a Domain. It provides easy access to various
+   DomainModelAPIs (see below).
+ * DomainModelAPI - a `dm_clients` term - a Python class (or class instance) which provides management over a single
+   DomainModel, e.g. create new pumps, delete a pump, list all pumps...
+ * DomainClient - a `dm_clients` term - a Python class (or class instance) which serves as a namespace for easy access
+   to all DomainModelAPIs in a use case.
 
 
 ## Installation
@@ -63,11 +63,11 @@ With the (future) arrival of GraphQL mutations in FDM, this package might become
 1. `pip install cognite-gql-pygen`
 2. Create a `config.yaml` file (exact name not important), see [config.example.yaml](./config.example.yaml).
    - > TODO: Then need for `config.yaml` should be removed...
-3. Define `FDM_CONFIG` env variable to contain the full path to `config.yaml` file.
+3. Define `DM_CLIENTS_CONFIG` env variable to contain the full path to `config.yaml` file.
 4. Test if it works:
    ```
    $ python
-   >>> from cognite.fdm.general_domain.domain_client import get_empty_domain_client
+   >>> from cognite.dm_clients.domain_modeling.domain_client import get_empty_domain_client
    >>> c = get_empty_domain_client()
    >>> c._client.spaces.list()
    [Space(space="...
@@ -111,16 +111,16 @@ Required features of a schema module:
 
 GraphQL schema file is committed to this repo, so this step is not required, but it is here for completeness.
 
-Execute `fdm schema render`. This will update the schema file (defined in `config.yaml`) according to Python code in
+Execute `dm_clients schema render`. This will update the schema file (defined in `config.yaml`) according to Python code in
 the schema module.
 
 
 ##### Step 2: Upload Schema
 
-Authenticate against CDF by running `fdm signin`. The authentication data is cached on the filesystem
+Authenticate against CDF by running `dm_clients signin`. The authentication data is cached on the filesystem
 locally, so this is needed rarely (every few? days).
 
-Execute `fdm schema publish`. This will upload the schema to CDF / FDM.
+Execute `dm_clients schema publish`. This will upload the schema to CDF / DM.
 
 > Note: Depending on the changes made to the schema, you might be required to update the schema version in config.yaml.
 > This happens when the changes are not backwards-compatible, e.g. deleting a field.
@@ -158,13 +158,13 @@ Timeseries, etc.)
 
 Pros:
 
- * Simplifies interaction with FDM API
+ * Simplifies interaction with DM API
  * Uses Pydantic to validate the items before sending then to the API.
 
 Drawbacks and Limitations:
 
- * Not all features of FDM are supported.
-   * `fdm` is only tested to work within a single space.
+ * Not all features of DM are supported.
+   * `dm_clients` is only tested to work within a single space.
      * Across-space relationships are in principle possible, but some work would be needed to implement it.
    * Nodes (and consequently items) work with properties from only one view.
      * No hard barriers to implementing this in the future.
@@ -203,10 +203,10 @@ See [TODO](#todo) above.
 ### Project Structure
 
 Important modules:
- * `cognite/fdm/cdf`
-    * general-purpose FDM client (nothing specific to PowerOps in here)
+ * `cognite/dm_clients/cdf`
+    * general-purpose DM client (nothing specific to PowerOps in here)
     * inspired by https://github.com/cognitedata/tech-demo-powerops/ :]
- * `cognite/fdm/general_domain`
+ * `cognite/dm_clients/domain_modeling`
     * base classes for use cases, "boilerplate"
  * `examples/cinematography_domain`
     * a toy example use case with minimal code

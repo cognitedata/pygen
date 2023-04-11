@@ -6,8 +6,8 @@ from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Dict, Generic, Iterable, List, Optional, Tuple, Type, TypeVar, get_args
 from uuid import uuid4
 
-from cognite.fdm.cdf.client_fdm_v3 import EdgesAPI, NodesAPI
-from cognite.fdm.cdf.data_classes_fdm_v3 import Node, View
+from cognite.dm_clients.cdf.client_dm_v3 import EdgesAPI, NodesAPI
+from cognite.dm_clients.cdf.data_classes_dm_v3 import Node, View
 
 from .domain_client import DomainClient
 from .domain_model import DomainModel
@@ -28,7 +28,7 @@ DomainModelT = TypeVar("DomainModelT", bound=DomainModel)
 
 class DomainModelAPI(Generic[DomainModelT]):
     """
-    Node is an instance of a type in FDM, i.e. an instance of a subclass of DomainModel,
+    Node is an instance of a type in DM, i.e. an instance of a subclass of DomainModel,
     e.g: a single plant, a single pump...
     Caution: Naming is not terribly consistent inside cdf package!
     """
@@ -73,7 +73,7 @@ class DomainModelAPI(Generic[DomainModelT]):
             if not item.externalId:
                 item.externalId = f"{type(item).__name__}_{uuid4().hex[:16]}"  # TODO configurable rnd hash length
 
-            # FDM doesn't like empty lists, making sure they are replaced with None:
+            # DM doesn't like empty lists, making sure they are replaced with None:
             # TODO this ^ was true for v2, check again for v3
             for attr in o2m_attrs:
                 val = getattr(item, attr)

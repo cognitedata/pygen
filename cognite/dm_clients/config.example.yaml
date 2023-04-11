@@ -3,7 +3,7 @@ cognite:
   tenant_id:
   cdf_cluster:
   client_id:
-fdm:
+dm_clients:
   space:
   datamodel:
   schema_version:

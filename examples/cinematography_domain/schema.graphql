@@ -1,15 +1,14 @@
 # THIS FILE IS AUTO-GENERATED!
-# Use fdm/bin/schema_render.sh to update it.
+# Use `dm_clients schema render` to update it, see `dm_clients --help` for more information.
 
 
 type Movie {
   title: String!
-  release: Timestamp
   director: Person
   actors: [Person]
   producers: [Person]
+  release: Timestamp
   meta: JSONObject
-  data: JSONObject
 }
 
 type Person {

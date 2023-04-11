@@ -7,8 +7,8 @@ import strawberry
 from strawberry.experimental.pydantic import UnregisteredTypeException
 from strawberry.schema.config import StrawberryConfig
 
-from cognite.fdm.general_domain.domain_model import DomainModel
-from cognite.fdm.misc import to_snake
+from cognite.dm_clients.domain_modeling.domain_model import DomainModel
+from cognite.dm_clients.misc import to_snake
 
 from ..custom_types import SCALARS
 from ..custom_types._scalars import *  # noqa
@@ -33,26 +33,26 @@ class Schema(Generic[DomainModelT]):
 
     def as_str(self) -> str:
         """
-        Removing things that FDM does not need:
+        Removing things that DM does not need:
          * `schema { query: ... }`
          * `scalar ...`
         """
         raw_schema = self._strawberry_schema().as_str()
         raw_lines = raw_schema.splitlines()
         # Loop over all the lines *backwards* and remove what we don't need.
-        fdm_lines: List[str] = []
+        dm_lines: List[str] = []
         for line in raw_lines[::-1]:
             if line.startswith("scalar "):
-                if fdm_lines:
-                    fdm_lines.pop()
+                if dm_lines:
+                    dm_lines.pop()
                 continue
             if line.startswith("schema {"):
-                fdm_lines.pop()
-                fdm_lines.pop()
-                fdm_lines.pop()
+                dm_lines.pop()
+                dm_lines.pop()
+                dm_lines.pop()
                 continue
-            fdm_lines.append(line)
-        return "\n".join(fdm_lines[::-1])
+            dm_lines.append(line)
+        return "\n".join(dm_lines[::-1])
 
     def register_type(
         self, lowercase_type_name: Optional[Union[str, Type[DomainModelT]]] = None, root_type: bool = False
@@ -91,7 +91,7 @@ class Schema(Generic[DomainModelT]):
 
         if isinstance(lowercase_type_name, type):
             # decorator was used without attributes, so lowercase_name is actually a DomainModel class
-            cls_ = cast(Type[DomainModelT], lowercase_type_name)
+            cls_ = lowercase_type_name
             lowercase_type_name = to_snake(cls_.__name__)
             return _register_type(cls_)
 

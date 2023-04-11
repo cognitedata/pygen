@@ -4,8 +4,8 @@ import logging
 from concurrent.futures import ThreadPoolExecutor
 from typing import Iterable, List, Sequence, Type
 
-from cognite.fdm.cdf.client_fdm_v3 import EdgesAPI
-from cognite.fdm.cdf.data_classes_fdm_v3 import Edge, RelationReference, View
+from cognite.dm_clients.cdf.client_dm_v3 import EdgesAPI
+from cognite.dm_clients.cdf.data_classes_dm_v3 import Edge, RelationReference, View
 
 from .domain_model import DomainModel
 

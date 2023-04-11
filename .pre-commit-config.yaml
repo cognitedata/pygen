@@ -57,7 +57,7 @@ repos:
     rev: v3.3.1
     hooks:
     - id: pyupgrade
-      exclude: ^(cognite/client/_proto.*)|(cognite/fdm/.*)|(examples/.*)$
+      exclude: ^(cognite/client/_proto.*)|(cognite/dm_clients/.*)|(examples/.*)$
       # ^^ Correctly updates thing like `Optional[]` with `| None` but Pydantic chokes on this on Python<3.10 :(
       args:
           - --py39-plus
@@ -93,5 +93,3 @@ repos:
           - pytest
         language_version: python3.10
         entry: bash -c 'MYPYPATH=.:examples mypy "$@"' --
-        args:
-          - --explicit-package-bases

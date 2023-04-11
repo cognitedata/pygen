@@ -8,8 +8,8 @@ import logging
 import sys
 from typing import List, Optional
 
-from cognite.fdm.custom_types import JSONObject, Timestamp
-from cognite.fdm.general_domain import DomainModel, Schema
+from cognite.dm_clients.custom_types import JSONObject, Timestamp
+from cognite.dm_clients.domain_modeling import DomainModel, Schema
 
 logger = logging.getLogger(__name__)
 

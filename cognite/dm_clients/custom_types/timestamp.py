@@ -5,7 +5,7 @@ import re
 from contextlib import suppress
 from datetime import datetime
 from math import floor
-from typing import TYPE_CHECKING, Annotated, TypeVar
+from typing import TypeVar
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +18,7 @@ __all__ = [
 TimestampParsable = TypeVar("TimestampParsable", str, datetime)
 
 
-class _Timestamp(str):
+class Timestamp(str):
     """
     String in the format 'YYYY-MM-DDTHH:MM:SS[.millis][Z|time zone]' with optional milliseconds having precision
     of 1-3 decimal digits and optional timezone with format ±HH:MM, ±HHMM, ±HH or Z, where Z represents UTC, Year
@@ -106,7 +106,7 @@ class _Timestamp(str):
         raise ValueError(f"Cannot parse Timestamp: {value}")
 
     @classmethod
-    def validate(cls, value: TimestampParsable) -> _Timestamp:
+    def validate(cls, value: TimestampParsable) -> Timestamp:
         str_value: str
         datetime_value: datetime
 
@@ -134,13 +134,3 @@ class _Timestamp(str):
 
     def datetime(self) -> datetime:
         return Timestamp._parse_str(self)
-
-
-# Keeping mypy and strawberry and pydantic happy:
-
-_Timestamp.__name__ = "Timestamp"
-
-if TYPE_CHECKING:
-    Timestamp = Annotated[TimestampParsable, _Timestamp]
-else:
-    Timestamp = _Timestamp

@@ -34,7 +34,7 @@ def render():
 @schema_app.command()
 def publish():
     """
-    Uploads the GraphQL schema file to FDM.
+    Uploads the GraphQL schema file to DM.
     Takes configuration from config.yaml.
     """
     _run(Path(__file__).parent / "bin/schema_publish.sh")

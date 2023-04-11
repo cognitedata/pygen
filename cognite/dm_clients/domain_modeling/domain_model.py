@@ -6,7 +6,7 @@ from typing import Dict, Optional, Type, get_args
 import strawberry
 from pydantic import Extra
 
-from cognite.fdm.cdf.data_classes_fdm_v3 import DataModelBase
+from cognite.dm_clients.cdf.data_classes_dm_v3 import DataModelBase
 
 __all__ = [
     "DomainModel",
@@ -21,9 +21,9 @@ class DomainModel(DataModelBase):
     Base class for all models in schema_types.py
 
     A bit of nomenclature: instances of DomainModel we call "items".
-    This is pretty much because all other words I can think of have been taken by FDM >:]
+    This is pretty much because all other words I can think of have been taken by DM >:]
 
-    Even this is confusing... A data model in FDM is a collection of domain models.
+    Even this is confusing... A data model in DM is a collection of domain models.
     """
 
     externalId: strawberry.Private[Optional[str]] = None
@@ -39,7 +39,7 @@ class DomainModel(DataModelBase):
     def get_one_to_many_attrs(cls) -> Dict[str, Type[DomainModel]]:
         """
         Get attributes which describe one-to-many relationships.
-        These attributes usually require additional considerations with FDM.
+        These attributes usually require additional considerations with DM.
         """
         attrs = {}
         props: Dict[str, dict] = cls.schema()["properties"]

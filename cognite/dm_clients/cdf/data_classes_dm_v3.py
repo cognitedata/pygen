@@ -111,7 +111,7 @@ class Edge(DataModelBase):
     lastUpdatedTime: Optional[int] = None
     deletedTime: Optional[int] = None
     properties: Optional[dict] = None  # TODO much structure here, nested spaces, view-or-container, then properties
-    # TODO Edge.properties not fully supported yet by FDM and not implemented in this library!
+    # TODO Edge.properties not fully supported yet by DM and not implemented in this library!
 
 
 class ExternalIdStr(ConstrainedStr):
