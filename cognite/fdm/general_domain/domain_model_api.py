@@ -243,7 +243,7 @@ class DomainModelAPI(Generic[DomainModelT]):
         retrieved_instances = self._retrieve_full(retrieved_nodes)
         return [*cached_items, *retrieved_instances]  # TODO maintain order according to external_ids
 
-    # TODO maybe implement delete_by_ext_ids? Note delete_realted_items.
+    # TODO maybe implement delete_by_ext_ids? Note delete_related_items.
 
     def delete(self, items: Iterable[DomainModelT], delete_related_items: bool = False) -> None:
         if not items:

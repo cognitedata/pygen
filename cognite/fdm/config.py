@@ -32,4 +32,4 @@ except FileNotFoundError:
         CONFIG = test_config
     else:
         logger.error("config.yaml not found. Please see README.md to setup information.")
-        exit(1)
+        sys.exit(1)

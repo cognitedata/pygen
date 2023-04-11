@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-. fdm/bin/_functions.sh "$1"
+. "${0%/*}/_functions.sh" "$1"
 
 
 SCHEMA_FILE=$(cat "$CONFIG" | extract 'schema_file')

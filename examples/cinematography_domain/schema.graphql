@@ -4,9 +4,12 @@
 
 type Movie {
   title: String!
+  release: Timestamp
   director: Person
   actors: [Person]
   producers: [Person]
+  meta: JSONObject
+  data: JSONObject
 }
 
 type Person {

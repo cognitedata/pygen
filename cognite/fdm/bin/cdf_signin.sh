@@ -1,7 +1,8 @@
 #!/bin/bash
 set -e
 
-. fdm/bin/_functions.sh "$1"
+. "${0%/*}/_functions.sh" "$1"
+
 
 CDF_CLUSTER=$(cat "$CONFIG" | extract 'cdf_cluster')
 PROJECT=$(cat "$CONFIG" | extract 'project')

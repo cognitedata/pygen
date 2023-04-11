@@ -4,9 +4,14 @@ This is a minimal example schema.
 
 from __future__ import annotations
 
+import logging
+import sys
 from typing import List, Optional
 
+from cognite.fdm.custom_types import JSONObject, Timestamp
 from cognite.fdm.general_domain import DomainModel, Schema
+
+logger = logging.getLogger(__name__)
 
 cine_schema: Schema[DomainModel] = Schema()
 
@@ -22,6 +27,8 @@ class Movie(DomainModel):
     director: Optional[Person] = None
     actors: Optional[List[Optional[Person]]] = []
     producers: Optional[List[Optional[Person]]] = []
+    release: Optional[Timestamp] = None
+    meta: Optional[JSONObject] = None
 
 
 # Keep at the end of file:
@@ -30,4 +37,4 @@ cine_schema.close()
 
 # Render the schema to stdout when executed directly:
 if __name__ == "__main__":
-    print(cine_schema.as_str())
+    sys.stdout.write(cine_schema.as_str())
