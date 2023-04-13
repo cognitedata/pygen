@@ -6,7 +6,7 @@ from cachelib import BaseCache
 from cognite.client import ClientConfig
 
 from cognite.dm_clients.cdf.client_dm_v3 import CogniteClientDmV3, EdgesAPI, NodesAPI
-from cognite.dm_clients.config import CONFIG
+from cognite.dm_clients.config import settings
 
 from ..cdf.client_dm_v3 import ViewsAPI
 from .domain_model import DomainModel
@@ -49,10 +49,10 @@ class DomainClient(Generic[DomainModelT]):
         self._client = CogniteClientDmV3(config)
         self._client._config.headers["cdf-version"] = "alpha"
         if space_id is None:
-            space_id = CONFIG["dm_clients"]["space"]
+            space_id = settings.dm_clients.space
         self.space_id = space_id
-        self._data_model = data_model or CONFIG["dm_clients"].get("datamodel")
-        self.schema_version = schema_version or CONFIG["dm_clients"].get("schema_version")
+        self._data_model = data_model or settings.dm_clients.get("datamodel")
+        self.schema_version = schema_version or settings.dm_clients.get("schema_version")
         if self.schema_version is None:
             raise NotImplementedError("Please specify the schema version")
             # TODO find latest version of the data model
@@ -138,7 +138,7 @@ def get_empty_domain_client():
     from cachelib import SimpleCache
 
     from cognite.dm_clients.cdf.get_client import get_client_config
-    from cognite.dm_clients.config import CONFIG
+    from cognite.dm_clients.config import settings
     from cognite.dm_clients.domain_modeling.domain_model_api import DomainModelAPI
     from cognite.dm_clients.domain_modeling.schema import Schema
 
@@ -147,7 +147,7 @@ def get_empty_domain_client():
         domain_model_api_class=DomainModelAPI,
         cache=SimpleCache(),
         config=get_client_config(),
-        space_id=CONFIG["dm_clients"]["space"],
-        data_model=CONFIG["dm_clients"]["datamodel"],
-        schema_version=CONFIG["dm_clients"]["schema_version"],
+        space_id=settings.dm_clients.space,
+        data_model=settings.dm_clients.datamodel,
+        schema_version=settings.dm_clients.schema_version,
     )

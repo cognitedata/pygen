@@ -61,10 +61,21 @@ With the (future) arrival of GraphQL mutations in DM, this package might become 
 ## Installation
 
 1. `pip install cognite-gql-pygen`
-2. Create a `config.yaml` file (exact name not important), see [config.example.yaml](./config.example.yaml).
-   - > TODO: Then need for `config.yaml` should be removed...
-3. Define `DM_CLIENTS_CONFIG` env variable to contain the full path to `config.yaml` file.
-4. Test if it works:
+2. Create a `settings.toml` file, see [settings.toml](./settings.toml) for a template.
+   * this step is optional, all settings can be specified in code or via env variables
+   * `settings.toml` should contain only things which are safe to commit to git
+   * also create `.secrets.toml` and put sensitive settings here
+      * the structure of both files (`settings.toml` and `.secrets.toml`) is the same, and the values are merged together
+      * example `.secrets.toml`:
+        ```toml
+        [cognite]
+        client_secret = "the secret goes here"
+        ```
+    * `.secrets.toml` is in `.gitignore`, `settings.toml` is not
+      * hint: if you don't want to commit any settings, it's ok to put everything in `.secrets.toml`
+    * settings (including secrets) are handled by [Dynaconf](https://www.dynaconf.com/)
+       * it is simple to override these settings via env variables, e.g. `export DM_CLIENTS__COGNITE__TENANT_ID = ...`
+3. Test if it works:
    ```
    $ python
    >>> from cognite.dm_clients.domain_modeling.domain_client import get_empty_domain_client
@@ -72,7 +83,7 @@ With the (future) arrival of GraphQL mutations in DM, this package might become 
    >>> c._client.spaces.list()
    [Space(space="...
    ```
-5. Install CDF CLI client
+4. Install CDF CLI client
    - [setup instructions](https://docs.cognite.com/cdf/cli/)
    - But basically:
      ```

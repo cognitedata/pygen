@@ -1,0 +1,16 @@
+[cognite]
+  project = "cdf-project-name"
+  tenant_id = "tenant-id"
+  cdf_cluster = "cdf-cluster"
+  client_id = "client-app-id"
+  # client_secret = "very secret client secret"  # put this in .secrets.toml!!
+
+[dm_clients]
+  space = "dm_space_id"
+  datamodel = "datamodel_name"
+  schema_version = 1
+  max_tries = 5
+
+[local]
+  schema_file = "path/to/your_domain/schema.graphql"
+  schema_module = "python.path.to.your_domain.schema"

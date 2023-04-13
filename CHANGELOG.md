@@ -13,6 +13,10 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.1.4]
+
+Changed configuration / settings from a static `config.yaml` to dynaconf and `settings.toml`.
+
 ## [0.1.3]
 
 Changed package name from `fdm` to `dm_clients`.

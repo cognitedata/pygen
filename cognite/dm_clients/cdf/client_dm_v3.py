@@ -15,14 +15,14 @@ from retry import retry
 
 from cognite.dm_clients.cdf.data_classes_dm_v3 import Container, DataModel, Edge, Node, Space, View
 from cognite.dm_clients.cdf.get_client import get_client_config
-from cognite.dm_clients.config import CONFIG
+from cognite.dm_clients.config import settings
 
 logger = logging.getLogger(__name__)
 
 
 HttpVerbT = Literal["GET", "PUT", "DELETE", "POST"]
 
-_MAX_TRIES = int(CONFIG["dm_clients"].get("max_tries", 15))
+_MAX_TRIES = int(settings.get("dm_clients.max_tries", 15))
 
 
 class DataModelStorageAPI(APIClient):

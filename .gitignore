@@ -50,5 +50,5 @@ test-report.xml
 .tox/
 .python-version
 
-
-config*.yaml
+# Ignore dynaconf secret files
+.secrets.*
