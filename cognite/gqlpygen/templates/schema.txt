@@ -1,0 +1,30 @@
+"""
+This is a minimal example schema.
+"""
+
+from __future__ import annotations
+
+import logging
+import sys
+from typing import List, Optional
+
+from cognite.dm_clients.custom_types import JSONObject, Timestamp
+from cognite.dm_clients.domain_modeling import DomainModel, Schema
+
+logger = logging.getLogger(__name__)
+
+{{ schema_name }}: Schema[DomainModel] = Schema()
+
+{% for model in models %}
+@{{ schema_name }}.register_type{% if model.is_root_node %}(root_type=True){% endif %}
+class {{ model.name }}(DomainModel):
+    {% for field in model.fields %}{{ field.name }}: {{ field.type_hint }}
+    {% endfor %}
+{% endfor %}
+# Keep at the end of file:
+{{ schema_name }}.close()
+
+
+# Render the schema to stdout when executed directly:
+if __name__ == "__main__":
+    sys.stdout.write({{ schema_name }}.as_str())

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cognite-gql-pygen"
-version = "0.1.4"
+version = "0.2.0"
 description = "Cognite graphQL Python generation SDK"
 readme = "README.md"
 authors = ["Cognite <support@cognite.com>"]
@@ -19,9 +19,10 @@ multi_line_output=3            # corresponds to -m  flag
 include_trailing_comma=true    # corresponds to -tc flag
 skip_glob = '^((?!py$).)*$'    # this makes sort all Python files
 known_third_party = []
+src_paths = [".", "examples"]
 
 [tool.poetry.scripts]
-cogpygen = "cognite.gqlpygen.main:main"
+dm = "cognite.gqlpygen.main:main"
 dm_clients = "cognite.dm_clients.main:main"
 
 
@@ -40,6 +41,8 @@ cachelib = "^0.10.2"
 retry = "^0.9.2"
 loguru = "^0.6.0"
 dynaconf = "^3.1.12"
+graphql-core = ">=3.2"
+Jinja2 = ">=3.1"
 
 [tool.poetry.dev-dependencies]
 twine = "*"
@@ -68,6 +71,7 @@ check_untyped_defs = true
 #disallow_any_generics = true
 #no_implicit_reexport = true
 #disallow_untyped_defs = true
+
 
 [tool.pydantic-mypy]
 init_forbid_extra = true

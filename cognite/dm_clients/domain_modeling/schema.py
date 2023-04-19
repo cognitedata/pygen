@@ -17,6 +17,10 @@ DomainModelT = TypeVar("DomainModelT", bound=DomainModel)
 
 
 logger = logging.getLogger(__name__)
+AUTO_GENERATED_COMMENT = """# THIS FILE IS AUTO-GENERATED!
+# Use `dm_clients schema render` to update it, see `dm_clients --help` for more information.
+
+"""
 
 
 class Schema(Generic[DomainModelT]):
@@ -52,6 +56,8 @@ class Schema(Generic[DomainModelT]):
                 dm_lines.pop()
                 continue
             dm_lines.append(line)
+
+        dm_lines.append(AUTO_GENERATED_COMMENT)
         return "\n".join(dm_lines[::-1])
 
     def register_type(

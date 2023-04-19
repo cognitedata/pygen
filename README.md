@@ -4,19 +4,23 @@ Cognite GraphQL Python Generator
 [![GitHub](https://img.shields.io/github/license/cognitedata/cognite-gql-pygen)](https://github.com/cognitedata/cognite-gql-pygen/blob/master/LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
-This is the Cognite GraphQL Python Generator, `gqlpygen`, which is a CLI for automatically generating Python SDK code
-from `.graphql` to interact with Cognite Data Fusion's (CDF) Flexible Data Models (DM). It also supports other cases,
-such as generating `.graphql` from `pydantic` classes.
+This is the Cognite GraphQL Python Generator, `gqlpyden`. The purpose of this package is to help developers to
+work with Cognite Data Fusion's (CDF) Data Models (DM) in Python.
 
 **[DISCLAIMER!]** This project is in a highly experimental no guarantees are made for consistency between versions. The
 project may also become deprecated if the experimentation turns out to be a dead end.
 
 
-### DM Non-GraphQl API
+The core functionality is to provide a Python client that match a data model. This enables the developer the following
+benefits
 
-This package also contains `cognite.dm_clients` which is a simplified wrapper for non-GraphQL endpoints in DM API v3.
+* Client side validation of the data before writing it to CDF.
+* Autocompletion matching the data model in the integrated developer environment (IDE). This is important as it enables:
+  * Discoverability of data model through Python.
+  * Reduced typing errors in development.
+* Keeping the language domain specific for the developer. Instead of working with generic concepts such as instances,
+  nodes, edges, the developer can work with the concepts in the data model.
 
-See [dm_clients/README.md](cognite/dm_clients/README.md) for more details.
 
 ## Installation
 
@@ -24,14 +28,57 @@ To install this package:
 ```bash
 $ pip install cognite-gql-pygen
 ```
+
 ## Usage
 
-Currently (v0.1.0), there is no functionality, just some demo functions:
+The goal of the package is to have representations of all the types in a given data model with API calls to *.list()*,
+*.create()*, *.delete()*, and *.retrieve()* individuals for each type.
 
-Type the following command for help.
+![image](https://user-images.githubusercontent.com/60234212/232307167-0379c4ec-3b7a-4978-bfe7-d059e917e63f.png)
+
+
+You can specify the data models either as a `.graphql` schema or a `pydantic` classes in a `.py` file. Then, you can
+use the CLI to automatically generate the other representation as well as the `client.py` file which creates
+the API and the convenience method get_[client_name]_client().
+
+To generate from a `.graphql` schema you use the following command.
+
 ```bash
-cogpygen --help
+dm topython 'PATH_TO_SCHEMA' --name "Cine"
 ```
+
+This will create a `schema.py` and a `client.py` file in the directory you are running the command.
+
+To generate from `schema.py` use the following command
+
+```bash
+dm togql 'PATH_TO_FILE'
+```
+
+This will create the `schema.graphql` and a `client.py` file in the directory you are running the command.
+
+Note the `schema.py` file must follow a specific structure, see [examples/cinematography_domain](https://github.com/cognitedata/cognite-gql-pygen/blob/main/examples/cinematography_domain/schema.py) for an example.
+The overall structure is as follows:
+
+1. Instantiate a new schema with the line, `myschema: Schema[DomainModel] = Schema()`
+2. Register all you Types with `@myschema.register_type`
+3. Close the schema with `myschema.close()`
+
+To get a concrete example is available in [examples/cinematography_domain](https://github.com/cognitedata/cognite-gql-pygen/blob/main/examples/cinematography_domain),
+it consists of four files.
+
+* `schema.graphql` The schema defined in GraphQL language.
+* `schema.py` The schema defined in `pydantic` classes.
+* `client.py` Which sets up the client for the data model.
+* `usage.py` Demonstrates the usage of the client.
+
+
+### DM Non-GraphQl API
+
+The API developed is based on the non-GraphQL endpoints in Data Model API v3. There is a simplified wrapper which is available
+in `cognite.dm_clients`.
+
+See [dm_clients/README.md](cognite/dm_clients/README.md) for more details.__
 
 
 ## Changelog
