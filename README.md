@@ -4,7 +4,7 @@ Cognite GraphQL Python Generator
 [![GitHub](https://img.shields.io/github/license/cognitedata/cognite-gql-pygen)](https://github.com/cognitedata/cognite-gql-pygen/blob/master/LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
-This is the Cognite GraphQL Python Generator, `gqlpyden`. The purpose of this package is to help developers to
+This is the Cognite GraphQL Python Generator, `gqlpygen`. The purpose of this package is to help developers to
 work with Cognite Data Fusion's (CDF) Data Models (DM) in Python.
 
 **[DISCLAIMER!]** This project is in a highly experimental no guarantees are made for consistency between versions. The
