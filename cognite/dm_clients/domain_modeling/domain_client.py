@@ -98,7 +98,7 @@ class DomainClient(Generic[DomainModelT]):
                 return domain_model_api
         raise ValueError(f"No DomainModelAPI registered for {domain_model}")
 
-    def create(self, items: Iterable[DomainModelT], ext_id_prefix: str = "") -> List[DomainModelT]:
+    def apply(self, items: Iterable[DomainModelT], ext_id_prefix: str = "") -> List[DomainModelT]:
         """
         Given a list of nodes, figure out which DomainModelAPI to call and do it.
         Used by DomainModelAPI instances to create nested instances (without needing figure out the nested type).
@@ -112,7 +112,7 @@ class DomainClient(Generic[DomainModelT]):
                 f"Mixed domain models not supported in DomainClient.create! Got: {','.join(str(t) for t in types)}."
             )
         domain_model_api = self.get_api_for_item(items[0])
-        return domain_model_api.create(items, ext_id_prefix=ext_id_prefix)
+        return domain_model_api.apply(items, ext_id_prefix=ext_id_prefix)
 
     def delete(self, items: Iterable[DomainModelT], delete_related_items: bool = False):
         """

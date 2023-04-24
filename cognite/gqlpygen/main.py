@@ -17,7 +17,9 @@ app = typer.Typer()
 @app.command("topython", help="Input a .graphql schema to create pydantic schema.")
 def to_python(
     graphql_schema: Path = typer.Argument(..., help="GraphQL schema to convert"),
-    name: str = typer.Argument("MySchema", help="Name of the client and schema, expected to be in pascal case."),
+    name: str = typer.Option(
+        "MySchema", "--name", help="Name of the client and schema, expected to be in pascal case."
+    ),
 ):
     schema_raw = graphql_schema.read_text()
     client_name = to_client_name(name)

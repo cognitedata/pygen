@@ -41,7 +41,7 @@ def _upload_data(client: CineClient) -> None:
             meta=JSONObject({"run_time": 121}),
         ),
     ]
-    client.movie.create(movies)
+    client.movie.apply(movies)
 
 
 def _main() -> None:

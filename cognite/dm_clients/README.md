@@ -149,9 +149,9 @@ A few general notes:
      * e.g. if the model class is names `MyModel`, the API will be accessible at `my_domain_client.my_model`.
  * Most methods on `DomainModelAPI` take a list of items.
    * When creating a single item, remember to wrap it in a list!
- * To update an existing item, use `create()`.
+ * To update an existing item, use `apply()`.
    * But make sure that the `externalId` of the item is populated (otherwise the API will create a new item).
- * Items with missing `externalId` will get one randomly-generated when passed to `create()`.
+ * Items with missing `externalId` will get one randomly-generated when passed to `apply()`.
 
 
 ### Low-level API

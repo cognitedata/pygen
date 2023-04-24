@@ -82,7 +82,7 @@ class DomainModelAPI(Generic[DomainModelT]):
 
         return list(items)
 
-    def create(self, items: Iterable[DomainModelT], ext_id_prefix: str = "") -> List[DomainModelT]:
+    def apply(self, items: Iterable[DomainModelT], ext_id_prefix: str = "") -> List[DomainModelT]:
         """
         Send provided nodes to the API.
         This is a multy-step job:
@@ -123,7 +123,7 @@ class DomainModelAPI(Generic[DomainModelT]):
             )
 
         created_nodes = [_make_node(_strip_items(item.dict(by_alias=True, exclude_defaults=False))) for item in items]
-        self.nodes_api.create(self.view, nodes=created_nodes)
+        self.nodes_api.apply(self.view, nodes=created_nodes)
 
         self._create_related_o2m_edges(pending_edges)
 
@@ -149,7 +149,7 @@ class DomainModelAPI(Generic[DomainModelT]):
                     # TODO check that it's actually "Optional" and not something else!
                     subitem_type = type_args[0]
 
-                new_subitems: List[DomainModel] = self.domain_client.create(
+                new_subitems: List[DomainModel] = self.domain_client.apply(
                     [attr_value],
                     ext_id_prefix=f"{item.externalId}__",
                 )
@@ -186,7 +186,7 @@ class DomainModelAPI(Generic[DomainModelT]):
                 # clear the attribute value:
                 setattr(item, attr, None)
 
-                created_subitems = self.domain_client.create(attr_value, ext_id_prefix=f"{item.externalId}__")
+                created_subitems = self.domain_client.apply(attr_value, ext_id_prefix=f"{item.externalId}__")
                 for subitem in created_subitems:
                     pending_edges[attr].append((attr, item.externalId, subitem.externalId))
         return items, pending_edges
@@ -202,7 +202,7 @@ class DomainModelAPI(Generic[DomainModelT]):
                 attr, start_ext_id, end_ext_id = pending_edge
                 end_ext_ids_by_start[start_ext_id].append(end_ext_id)
             for start_ext_id, end_ext_ids in end_ext_ids_by_start.items():
-                self.relationships.create(
+                self.relationships.apply(
                     attribute=attr,
                     start_ext_id=start_ext_id,
                     end_ext_ids=[ext_id for ext_id in end_ext_ids],

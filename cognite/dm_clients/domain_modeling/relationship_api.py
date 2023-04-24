@@ -36,7 +36,7 @@ class RelationshipAPI:
         self.schema_version = schema_version
         self.space_id = space_id
 
-    def create(self, attribute: str, start_ext_id: str, end_ext_ids: Iterable[str]) -> None:
+    def apply(self, attribute: str, start_ext_id: str, end_ext_ids: Iterable[str]) -> None:
         """
         Crete an Edge on a particular attribute of the `self.model_type` type of instance.
         Additionally:
@@ -63,7 +63,7 @@ class RelationshipAPI:
 
         with ThreadPoolExecutor(max_workers=2) as pool:
             pool.submit(self.delete, edges_to_delete)
-            pool.submit(self.edges_api.create, edges_to_create)
+            pool.submit(self.edges_api.apply, edges_to_create)
 
     def list(self, attributes: Sequence[str] = (), from_ext_ids: Sequence[str] = (), limit=1000) -> List[Edge]:
         """

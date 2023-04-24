@@ -82,7 +82,7 @@ class Node(DataModelBase):
         The API endpoints `retrieve` and `list` return nodes with props nested under "{view.externalID}/{view.version}"
         (which is in turn nested under space_id).
         This validator strips the "/{view.version}" part of that key. This makes it the same format which API expects
-        on the `create` endpoint. This makes working with Nodes a bit simpler.
+        on the `apply` endpoint. This makes working with Nodes a bit simpler.
         """
         with suppress(IndexError, KeyError, ValueError, TypeError):
             space = list(value.keys())[0]

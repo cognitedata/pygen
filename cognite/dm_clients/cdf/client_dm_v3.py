@@ -90,7 +90,7 @@ class SpacesAPI(DataModelStorageAPI):
 
     @staticmethod
     def _payload_items(spaces: Iterable[Space]) -> dict:
-        """API payload for `create` endpoint."""
+        """API payload for `apply` endpoint."""
         return {"items": [space.dict() for space in spaces]}
 
     @staticmethod
@@ -106,7 +106,7 @@ class SpacesAPI(DataModelStorageAPI):
             return []
         return self._parse(self._post_to_endpoint(self._payload_space_ids(_ext_ids), "/byids"))
 
-    def create(self, spaces: Iterable[Space]) -> List[Space]:
+    def apply(self, spaces: Iterable[Space]) -> List[Space]:
         _spaces = list(spaces)
         if not _spaces:
             return []
@@ -132,7 +132,7 @@ class DataModelAPI(DataModelStorageAPI):
 
     @staticmethod
     def _payload_items(data_models: Iterable[DataModel]) -> dict:
-        """API payload for `create` endpoint."""
+        """API payload for `apply` endpoint."""
         return {"items": [data_model.dict() for data_model in data_models]}
 
     @staticmethod
@@ -158,7 +158,7 @@ class DataModelAPI(DataModelStorageAPI):
             return []
         return self._parse(self._post_to_endpoint(self._payload_ext_ids(space_id, _ext_ids), "/byids"))
 
-    def create(self, data_models: Iterable[DataModel]) -> List[DataModel]:
+    def apply(self, data_models: Iterable[DataModel]) -> List[DataModel]:
         _data_models = list(data_models)
         if not _data_models:
             return []
@@ -188,7 +188,7 @@ class ViewsAPI(DataModelStorageAPI):
 
     @staticmethod
     def _payload_items(views: Iterable[View]) -> dict:
-        """API payload for `create` endpoint."""
+        """API payload for `apply` endpoint."""
         return {"items": [view.dict() for view in views]}
 
     @staticmethod
@@ -212,7 +212,7 @@ class ViewsAPI(DataModelStorageAPI):
             return []
         return self._parse(self._post_to_endpoint(self._payload_ext_ids(space_id, _ext_ids, version), "/byids"))
 
-    def create(self, views: Iterable[View]) -> List[View]:
+    def apply(self, views: Iterable[View]) -> List[View]:
         _views = list(views)
         if not _views:
             return []
@@ -248,7 +248,7 @@ class ContainersAPI(DataModelStorageAPI):
 
     @staticmethod
     def _payload_items(containers: Iterable[Container]) -> dict:
-        """API payload for `create` endpoint."""
+        """API payload for `apply` endpoint."""
         return {"items": [container.dict() for container in containers]}
 
     @staticmethod
@@ -264,7 +264,7 @@ class ContainersAPI(DataModelStorageAPI):
             return []
         return self._parse(self._post_to_endpoint(self._payload_ext_ids(space_id, _ext_ids), "/byids"))
 
-    def create(self, containers: Iterable[Container]) -> List[Container]:
+    def apply(self, containers: Iterable[Container]) -> List[Container]:
         _containers = list(containers)
         if not _containers:
             return []
@@ -290,7 +290,7 @@ class NodesAPI(DataModelStorageAPI):
     def _payload_item(space: str, external_id: str) -> dict:
         """
         Part of payloads that references a node by its externalId.
-        Used in retrieve, create, and delete.
+        Used in retrieve, apply, and delete.
         """
         return {
             "instanceType": "node",
@@ -302,7 +302,7 @@ class NodesAPI(DataModelStorageAPI):
     def _payload_view_source(view: View) -> dict:
         """
         Part of payloads that references a source view.
-        Used in list, retrieve, and create.
+        Used in list, retrieve, and apply.
         """
         return {
             "source": {
@@ -331,7 +331,7 @@ class NodesAPI(DataModelStorageAPI):
         }
         return self._parse(self._post_to_endpoint(payload, "/byids"))
 
-    def create(self, view: View, nodes: Iterable[Node]) -> None:
+    def apply(self, view: View, nodes: Iterable[Node]) -> None:
         _nodes = list(nodes)
         if not _nodes:
             return
@@ -374,7 +374,7 @@ class EdgesAPI(DataModelStorageAPI):
     def _payload_item(space: str, external_id: str) -> dict:
         """
         Part of payloads that references an edge by its externalId.
-        Used in retrieve, create, and delete.
+        Used in retrieve, apply, and delete.
         """
         return {
             "instanceType": "edge",
@@ -445,7 +445,7 @@ class EdgesAPI(DataModelStorageAPI):
         payload = {"items": [self._payload_item(space, ext_id) for ext_id in _ext_ids]}
         return self._parse(self._post_to_endpoint(payload, "/byids"))
 
-    def create(self, edges: Iterable[Edge]) -> None:
+    def apply(self, edges: Iterable[Edge]) -> None:
         _edges = list(edges)
         if not _edges:
             return
