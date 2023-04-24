@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Dict, Generic, List, Optional, Type, TypeVar, Union, cast, get_args
+from typing import Dict, Generic, List, Optional, Type, TypeVar, Union, cast, get_args, get_type_hints
 
 import strawberry
 from strawberry.experimental.pydantic import UnregisteredTypeException
@@ -113,12 +113,12 @@ class Schema(Generic[DomainModelT]):
 
         # all field names on our DomainModel:
         field_names = [key for key in cls.__fields__ if key not in {"externalId"}]
+        cls_annotations = get_type_hints(cls)
 
         # find any custom scalar fields (e.g: Timestamp, JSONObject), they need special consideration:
         scalar_fields = {}
         for field_name in field_names:
-            field = cls.__fields__[field_name]
-            field_type = field.annotation
+            field_type = cls_annotations[field_name]
             # find out if there is a custom scalar in this field's annotation:
             while type_args := get_args(field_type):
                 field_type = type_args[0]
