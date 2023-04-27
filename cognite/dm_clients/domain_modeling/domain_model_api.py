@@ -97,7 +97,8 @@ class DomainModelAPI(Generic[DomainModelT]):
         if not items:
             return []
 
-        self.domain_client.cache.delete_many(*[item.externalId for item in items if item.externalId])
+        with self.domain_client._cache_lock:
+            self.domain_client.cache.delete_many(*[item.externalId for item in items if item.externalId])
 
         items = self._create_related_o2o_nodes(items)
         items, pending_edges = self._create_related_o2m_items(items)
@@ -215,8 +216,8 @@ class DomainModelAPI(Generic[DomainModelT]):
         retrieve that same instance very soon, it often just isn't present in the response. After some time (seconds,
         sometimes minutes?) the new node appears in CDF.
         """
-
-        self.domain_client.cache.set_many({item.externalId: item for item in items if item.externalId})
+        with self.domain_client._cache_lock:
+            self.domain_client.cache.set_many({item.externalId: item for item in items if item.externalId})
 
     def _get_from_cache(self, external_ids: Iterable[str]) -> Tuple[List[DomainModelT], List[str]]:
         cached_items: List[DomainModelT] = []
@@ -267,7 +268,8 @@ class DomainModelAPI(Generic[DomainModelT]):
 
         external_ids = list({item.externalId for item in items if item.externalId})
         self.nodes_api.delete(self.space_id, external_ids)
-        self.domain_client.cache.delete_many(*external_ids)
+        with self.domain_client._cache_lock:
+            self.domain_client.cache.delete_many(*external_ids)
 
     def _retrieve_full(self, nodes: Iterable[Node]) -> List[DomainModelT]:
         """

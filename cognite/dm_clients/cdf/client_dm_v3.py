@@ -482,9 +482,6 @@ class CogniteClientDmV3(CogniteClient):
         self.nodes = NodesAPI(self._config, api_version=self._API_VERSION, cognite_client=self)
         self.edges = EdgesAPI(self._config, api_version=self._API_VERSION, cognite_client=self)
 
-    def post(self, *args, **kwargs):
-        return super().post(*args, **kwargs)
-
     def graph(self, space: str, datamodel: str, version: str, query: str):
         return self.post(
             f"/api/v1/projects/{self.config.project}/userapis"

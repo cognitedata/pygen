@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from threading import Lock
 from typing import TYPE_CHECKING, Dict, Generic, Iterable, List, Optional, Type, TypeVar
 
 from cachelib import BaseCache
@@ -46,6 +47,7 @@ class DomainClient(Generic[DomainModelT]):
         self.schema = schema
         self._domain_model_api_class = domain_model_api_class
         self.cache: BaseCache = cache
+        self._cache_lock: Lock = Lock()
         self._client = CogniteClientDmV3(config)
         self._client._config.headers["cdf-version"] = "alpha"
         if space_id is None:

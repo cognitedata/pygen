@@ -45,7 +45,7 @@ the API and the convenience method get_[client_name]_client().
 To generate from a `.graphql` schema you use the following command.
 
 ```bash
-dm topython 'PATH_TO_SCHEMA' --name "Cine"
+dm topython 'PATH_TO_SCHEMA'
 ```
 
 This will create a `schema.py` and a `client.py` file in the directory you are running the command.
@@ -56,7 +56,10 @@ To generate from `schema.py` use the following command
 dm togql 'PATH_TO_FILE'
 ```
 
-This will create the `schema.graphql` and a `client.py` file in the directory you are running the command.
+This will load the python module and create a `schema.graphql` file in the directory you are running the command.
+
+`PATH_TO_FILE` can be either a path to a `.py` file or a Python dot-notation to a package
+(e.g. `my_project.schema_module` make sure that the package in which case the module must be in Python path).
 
 Note the `schema.py` file must follow a specific structure, see [examples/cinematography_domain](https://github.com/cognitedata/cognite-gql-pygen/blob/main/examples/cinematography_domain/schema.py) for an example.
 The overall structure is as follows:
@@ -72,6 +75,13 @@ it consists of four files.
 * `schema.py` The schema defined in `pydantic` classes.
 * `client.py` Which sets up the client for the data model.
 * `usage.py` Demonstrates the usage of the client.
+
+
+### Settings File
+
+`dm togql` and `dm topython` take their defaults form `settings.toml` if present. See
+[settings.toml](./cognite/dm_clients/settings.toml) for an example, section `[local]` is relevant for `togql` and
+`topython` commands.
 
 
 ### DM Non-GraphQl API
