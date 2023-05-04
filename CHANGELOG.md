@@ -13,7 +13,19 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## [0.4.0] - 26-04-25
+
+## [0.4.1] - 03-05-23
+
+### Added
+
+* Support for adding relationships via `.connect`
+
+### Changed
+
+* Optimised use of cache internally.
+
+
+## [0.4.0] - 26-04-23
 
 ### Added
 

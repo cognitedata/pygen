@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any, Dict, Generic, Iterable, List, Optional, Tuple, Type, TypeVar, get_args
+from typing import Any, Dict, Generic, Iterable, List, Optional, Set, Tuple, Type, TypeVar, get_args
 from uuid import uuid4
 
 from cognite.dm_clients.cdf.client_dm_v3 import EdgesAPI, NodesAPI
@@ -11,14 +11,14 @@ from cognite.dm_clients.cdf.data_classes_dm_v3 import Node, View
 
 from .domain_client import DomainClient
 from .domain_model import DomainModel
-from .relationship_api import RelationshipAPI
+from .relationship_api import RelationshipAPI, RelationshipProxy
 
 __all__ = [
     "DomainModelAPI",
 ]
 
 
-_PendingEdgeT = Tuple[str, str, str]
+_PendingEdgeT = Tuple[str, str, str]  # attr, start_ext_id, end_ext_id
 
 logger = logging.getLogger(__name__)
 
@@ -50,10 +50,12 @@ class DomainModelAPI(Generic[DomainModelT]):
         self.relationships = RelationshipAPI(
             edges_api,
             domain_model,
+            self,
             view,
             schema_version,
             space_id,
         )
+        self.connect = RelationshipProxy(self)
         # TODO it would make more sense to pass RelationshipAPI directly instead of EdgesAPI
         self.domain_client = domain_client
         self.space_id = space_id
@@ -92,6 +94,11 @@ class DomainModelAPI(Generic[DomainModelT]):
           3. Create nodes.
           4. Create edges for those one-to-many relationships.
         """
+        if ref_items := [item for item in items if item._reference]:
+            raise ValueError(
+                f"References passed into {type(self).__name__}.apply(): {[item.externalId for item in ref_items]}"
+            )
+
         items = self._prepare_items(items, ext_id_prefix)
 
         if not items:
@@ -104,12 +111,24 @@ class DomainModelAPI(Generic[DomainModelT]):
         items, pending_edges = self._create_related_o2m_items(items)
 
         def _strip_items(item_data: dict) -> dict:
-            return {key: val for key, val in item_data.items() if val is not None}
+            o2m_attr = self.domain_model.get_one_to_many_attrs()
+            return {key: val for key, val in item_data.items() if val is not None and key not in o2m_attr}
+
+        def _make_ref(item_data: dict) -> dict:
+            """Represents one-to-one relationships in CDF DM."""
+            return {
+                "space": self.space_id,  # TODO item.space_id ?
+                "externalId": item_data["externalId"],
+            }
 
         def _properties_data(data: dict) -> dict:
             """strip out reserved keys"""
             reserved_keys = {"externalId"}
-            return {key: val for key, val in data.items() if key not in reserved_keys}
+            return {
+                key: _make_ref(val) if key in self.domain_model.get_one_to_one_attrs() else val
+                for key, val in data.items()
+                if key not in reserved_keys
+            }
 
         def _make_node(data: dict) -> Node:
             return Node(
@@ -128,8 +147,8 @@ class DomainModelAPI(Generic[DomainModelT]):
 
         self._create_related_o2m_edges(pending_edges)
 
-        full_items = self._retrieve_full(created_nodes)
-        return full_items
+        self._cache_created_items(items)
+        return items
 
     def _create_related_o2o_nodes(self, items: List[DomainModelT]) -> List[DomainModelT]:
         """
@@ -150,17 +169,8 @@ class DomainModelAPI(Generic[DomainModelT]):
                     # TODO check that it's actually "Optional" and not something else!
                     subitem_type = type_args[0]
 
-                new_subitems: List[DomainModel] = self.domain_client.apply(
-                    [attr_value],
-                    ext_id_prefix=f"{item.externalId}__",
-                )
-                if not new_subitems:
-                    raise ValueError("attr_value empty, but it should have been created just now.")  # keeps mypy happy
-                attr_value = new_subitems[0]
-
-                # replace nested objects with externalId references:
-                ref_to_subitem = {"space": self.space_id, "externalId": attr_value.externalId}
-                setattr(item, attr, ref_to_subitem)
+                if not attr_value._reference:
+                    self.domain_client.apply([attr_value], ext_id_prefix=f"{item.externalId}__")
         return items
 
     def _create_related_o2m_items(
@@ -183,12 +193,10 @@ class DomainModelAPI(Generic[DomainModelT]):
                 # We need to:
                 #   1. create related nodes
                 #   2. (after everything else is created) create Edge instances that point to those related nodes
-
-                # clear the attribute value:
-                setattr(item, attr, None)
-
-                created_subitems = self.domain_client.apply(attr_value, ext_id_prefix=f"{item.externalId}__")
-                for subitem in created_subitems:
+                all_subitems = attr_value
+                full_subitems = [subitem for subitem in all_subitems if not subitem._reference]
+                self.domain_client.apply(full_subitems, ext_id_prefix=f"{item.externalId}__")
+                for subitem in all_subitems:
                     pending_edges[attr].append((attr, item.externalId, subitem.externalId))
         return items, pending_edges
 
@@ -216,19 +224,66 @@ class DomainModelAPI(Generic[DomainModelT]):
         retrieve that same instance very soon, it often just isn't present in the response. After some time (seconds,
         sometimes minutes?) the new node appears in CDF.
         """
-        with self.domain_client._cache_lock:
-            self.domain_client.cache.set_many({item.externalId: item for item in items if item.externalId})
+        for item in (item_ for item_ in items if item_.externalId and not item_._reference):
+            # replace related items with reference dicts
+            # ... one-to-many:
+            o2m_subitems: Dict[str, Iterable[DomainModelT]] = {}
+            for attr in item.get_one_to_many_attrs():
+                o2m_subitems[attr] = getattr(item, attr, None) or []
+                if o2m_subitems[attr]:
+                    self._cache_created_items(o2m_subitems[attr])
+                    setattr(
+                        item,
+                        attr,
+                        [{"space": self.space_id, "externalId": subitem.externalId} for subitem in o2m_subitems[attr]],
+                    )
+            # ... one-to-one:
+            o2o_subitems: Dict[str, Optional[DomainModelT]] = {}
+            for attr in item.get_one_to_one_attrs():
+                subitem = getattr(item, attr, None)
+                o2o_subitems[attr] = subitem
+                if subitem is not None:
+                    self._cache_created_items([subitem])
+                    setattr(item, attr, {"space": self.space_id, "externalId": subitem.externalId})
+            # save to cache:
+            if item.externalId:
+                self.domain_client.cache.set(item.externalId, item)
+            # restore replaced attributes:
+            for attr in o2m_subitems:
+                setattr(item, attr, o2m_subitems[attr])
+            for attr in o2o_subitems:
+                setattr(item, attr, o2o_subitems[attr])
 
     def _get_from_cache(self, external_ids: Iterable[str]) -> Tuple[List[DomainModelT], List[str]]:
         cached_items: List[DomainModelT] = []
-        uncached_external_ids: List[str] = []
+        uncached_external_ids: Set[str] = set()
         for external_id in external_ids:
+            # retrieve item from cache:
             cached_instance: DomainModelT = self.domain_client.cache.get(external_id)
             if cached_instance is not None:
-                cached_items.append(cached_instance)
+                # retrieve related items from cache:
+                # ... one-to-many:
+                for attr in cached_instance.get_one_to_many_attrs():
+                    subitem_ext_ids = [ref["externalId"] for ref in getattr(cached_instance, attr, None) or []]
+                    cached_subs, uncached_sub_ids = self._get_from_cache(subitem_ext_ids)
+                    if uncached_sub_ids:
+                        uncached_external_ids.add(external_id)
+                        break
+                    setattr(cached_instance, attr, cached_subs)
+                # ... one-to-one:
+                for attr in cached_instance.get_one_to_one_attrs():
+                    subitem_ext_id = (getattr(cached_instance, attr, None) or {}).get("externalId")
+                    cached_subs, uncached_sub_ids = self._get_from_cache([subitem_ext_id] if subitem_ext_id else [])
+                    if uncached_sub_ids:
+                        uncached_external_ids.add(external_id)
+                        break
+                    setattr(cached_instance, attr, cached_subs[0] if cached_subs else None)
+                # consider this item "cached" only if all its subitems are also cached:
+                if cached_instance.externalId not in uncached_external_ids:
+                    cached_items.append(cached_instance)
             else:
-                uncached_external_ids.append(external_id)
-        return cached_items, uncached_external_ids
+                uncached_external_ids.add(external_id)
+        return cached_items, list(uncached_external_ids)
 
     def list(self, limit=25, resolve_relationships=True) -> List[DomainModelT]:
         nodes = self.nodes_api.list(self.view, limit=limit)
@@ -273,7 +328,7 @@ class DomainModelAPI(Generic[DomainModelT]):
 
     def _retrieve_full(self, nodes: Iterable[Node]) -> List[DomainModelT]:
         """
-        For every node, make a fully DomainModel item, including all nested (related) objects.
+        For every node, make a full DomainModel item, including all nested (related) objects.
         """
         full_items: Dict[str, DomainModelT]
         uncached_nodes: List[Node]
@@ -336,7 +391,8 @@ class DomainModelAPI(Generic[DomainModelT]):
             full_items[item.externalId] = item
 
         items = list(full_items.values())
-        self._cache_created_items(items)
+        with self.domain_client._cache_lock:
+            self._cache_created_items(items)
         return items
 
     def _retrieve_wo_rels(self, nodes: Iterable[Node]) -> List[DomainModelT]:

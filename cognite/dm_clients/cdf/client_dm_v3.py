@@ -47,7 +47,6 @@ class DataModelStorageAPI(APIClient):
         """
         follow_cursor = data.get("limit") is None
         data = data.copy()
-        logger.debug(f"{method} to {url}, data:\n{pformat(data)}")
         response = self._make_request(method, url, data)
         response.raise_for_status()
         result = response.json()
@@ -61,6 +60,7 @@ class DataModelStorageAPI(APIClient):
         with suppress(KeyError):
             del result["nextCursor"]
             del result["cursor"]
+        logger.debug(f"{method} to {url}\ndata:\n{pformat(data)}\nresult:\n{pformat(result)}")
         return result
 
     def _make_request(

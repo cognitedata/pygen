@@ -4,7 +4,8 @@ import logging
 from typing import Dict, Optional, Type, get_args
 
 import strawberry
-from pydantic import Extra
+from pydantic import Extra, PrivateAttr
+from typing_extensions import Self
 
 from cognite.dm_clients.cdf.data_classes_dm_v3 import DataModelBase
 
@@ -27,13 +28,30 @@ class DomainModel(DataModelBase):
     """
 
     externalId: strawberry.Private[Optional[str]] = None
-    # Private ^ means the field will not be exposed in GraphQL schema
-    # Used here because actual objects (returned from the API) have these fields. These are "implicit" field.
+    _reference: strawberry.Private[bool] = PrivateAttr(False)
+    # strawberry.Private ^ means the field will not be exposed in GraphQL schema
+    # Used on externalID because actual objects (returned from the API) have these fields. These are "implicit" field.
+    # PrivateAttr is telling pydantic to allow the use of this as a regular (non-pydantic) attribute.
 
     class Config:
         extra = Extra.forbid
         #  ^ raises exception if extra fields are passed to the constructor. Very useful for development.
         arbitrary_types_allowed = True
+
+    def __init__(self, *args, _reference: bool = False, **kwargs):
+        if _reference:
+            for field_name, field in self.__fields__.items():
+                if field.required and field_name not in kwargs:
+                    kwargs[field_name] = field.type_()
+        super().__init__(*args, **kwargs)
+        self._reference = _reference
+
+    def as_reference(self) -> Self:
+        return type(self)(externalId=self.externalId, _reference=True)
+
+    @classmethod
+    def ref(cls, externalId: str):  # noqa: N803
+        return cls(externalId=externalId, _reference=True)
 
     @classmethod
     def get_one_to_many_attrs(cls) -> Dict[str, Type[DomainModel]]:
