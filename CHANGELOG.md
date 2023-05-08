@@ -13,6 +13,12 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.4.3] - 05-05-23
+
+### Fixed
+
+* Set the license of the package in poetry build.
+
 
 ## [0.4.2] - 05-05-23
 

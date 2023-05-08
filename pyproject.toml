@@ -1,9 +1,10 @@
 [tool.poetry]
 name = "cognite-gql-pygen"
-version = "0.4.2"
+version = "0.4.3"
 description = "Cognite graphQL Python generation SDK"
 readme = "README.md"
 authors = ["Cognite <support@cognite.com>"]
+license = "Apache-2.0"
 
 packages = [{ include="cognite", from="." }]
 exclude = ["cognite/dm_clients/*.toml"]
