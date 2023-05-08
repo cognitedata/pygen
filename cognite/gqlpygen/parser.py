@@ -7,6 +7,9 @@ from cognite.gqlpygen.data_classes import DomainModel, DomainModels, Field
 
 GRAPHQL_TO_PYTHON_TYPE_MAP = {
     "String": "str",
+    "Float": "float",
+    "Integer": "int",
+    "Boolean": "bool",
 }
 
 

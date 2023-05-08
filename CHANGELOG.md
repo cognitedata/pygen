@@ -14,6 +14,13 @@ Changes are grouped as follows
 - `Security` in case of vulnerabilities.
 
 
+## [0.4.2] - 05-05-23
+
+### Added
+
+* Support for basic built-in types for the parser (`bool`, `int`, `float`, with `str` from before)
+
+
 ## [0.4.1] - 03-05-23
 
 ### Added
