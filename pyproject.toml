@@ -33,7 +33,7 @@ pydantic = ">=1.10"
 typer = {version = "*", extras = ["all"] }
 PyYAML = "^6.0"
 arrow = "^1.2.2"
-cognite-sdk = {version = ">5.9.0, <7", extras = ["pandas"]}
+cognite-sdk = {version = ">5.9.0", extras = ["pandas"]}
 msal = "^1.16.0"
 numpy = "^1.23.2"
 strawberry-graphql = "^0.156.4"
