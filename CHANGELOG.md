@@ -13,6 +13,13 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.4.4] - 09-05-23
+
+### Added
+
+* Added compatibility with cognite-sdk 6.x.x
+
+
 ## [0.4.3] - 05-05-23
 
 ### Fixed
