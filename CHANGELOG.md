@@ -13,6 +13,13 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.4.5] - 10-05-23
+
+### Improved
+
+* Items that are references are now showing this in __repr__ and __str__.
+
+
 ## [0.4.4] - 09-05-23
 
 ### Added
