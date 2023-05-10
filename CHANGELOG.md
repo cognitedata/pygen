@@ -13,6 +13,7 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+
 ## [0.4.5] - 10-05-23
 
 ### Improved
