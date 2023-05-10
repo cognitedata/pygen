@@ -46,6 +46,12 @@ class DomainModel(DataModelBase):
         super().__init__(*args, **kwargs)
         self._reference = _reference
 
+    def __repr_args__(self):
+        if self._reference:
+            return [(key, getattr(self, key)) for key in ("externalId", "_reference")]
+        else:
+            return super().__repr_args__()
+
     def as_reference(self) -> Self:
         return type(self)(externalId=self.externalId, _reference=True)
 
