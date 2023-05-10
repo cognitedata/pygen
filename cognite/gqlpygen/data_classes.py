@@ -9,6 +9,9 @@ from cognite.dm_clients.misc import to_snake
 
 BUILTIN_TYPES = {
     "str",
+    "float",
+    "int",
+    "bool",
     "Timestamp",
     "JSONObject",
 }

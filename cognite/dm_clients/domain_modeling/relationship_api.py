@@ -2,12 +2,17 @@ from __future__ import annotations
 
 import logging
 from concurrent.futures import ThreadPoolExecutor
-from typing import Iterable, List, Sequence, Type
+from functools import partial
+from typing import TYPE_CHECKING, Callable, Iterable, List, Sequence, Type, cast
 
 from cognite.dm_clients.cdf.client_dm_v3 import EdgesAPI
 from cognite.dm_clients.cdf.data_classes_dm_v3 import Edge, RelationReference, View
 
 from .domain_model import DomainModel
+
+if TYPE_CHECKING:
+    from . import DomainModelAPI
+
 
 logger = logging.getLogger(__name__)
 
@@ -26,19 +31,45 @@ class RelationshipAPI:
         self,
         edges_api: EdgesAPI,
         model_type: Type[DomainModel],
+        domain_model_api: DomainModelAPI,
         view: View,
         schema_version: int,
         space_id: str,
     ):
         self.edges_api = edges_api
         self.model_type = model_type
+        self.domain_model_api = domain_model_api
         self.view = view
         self.schema_version = schema_version
         self.space_id = space_id
 
+    def add(self, attribute: str, start_ext_id: str, end_ext_ids: Iterable[str]) -> None:
+        """
+        Create one or more Edge instances on a particular attribute of the `self.model_type` type of instance.
+        """
+        edge_type_ext_id = f"{self.model_type.__name__}.{attribute}"
+        edges = [
+            Edge(
+                externalId=f"{start_ext_id}.{attribute}__{end_ext_id}",
+                space=self.space_id,
+                version=str(self.schema_version),
+                type=RelationReference(space=self.space_id, externalId=edge_type_ext_id),
+                startNode=RelationReference(space=self.space_id, externalId=start_ext_id),
+                endNode=RelationReference(space=self.space_id, externalId=end_ext_id),
+            )
+            for end_ext_id in end_ext_ids
+        ]
+        self.edges_api.apply(edges)
+        with self.domain_model_api.domain_client._cache_lock:
+            start_item = self.domain_model_api.domain_client.cache.get(start_ext_id)
+            if start_item is not None:
+                value = getattr(start_item, attribute, [])
+                value.extend([{"space": self.space_id, "externalId": end_ext_id} for end_ext_id in end_ext_ids])
+                self.domain_model_api.domain_client.cache.set(start_ext_id, start_item)
+
     def apply(self, attribute: str, start_ext_id: str, end_ext_ids: Iterable[str]) -> None:
         """
-        Crete an Edge on a particular attribute of the `self.model_type` type of instance.
+        Crete one or more Edge instances on a particular attribute of the `self.model_type` type of instance.
         Additionally:
          * delete obsolete edges
          * don't create duplicate edges (if some exist from before)
@@ -86,3 +117,24 @@ class RelationshipAPI:
 
     def delete(self, items: Iterable[Edge]) -> None:
         self.edges_api.delete(self.space_id, list({edge.externalId for edge in items}))
+
+
+ProxyAddRelationshipT = Callable[[str, Iterable[str]], None]
+
+
+class RelationshipProxy:
+    """
+    Proxy for nicer relationship syntax.
+    Instead of:
+      client.movie.relationships.add("actors", "the_movie", ["some", "actors"])
+    we can do:
+      client.movie.connect.actors("the_movie", ["some", "actors"])
+    """
+
+    def __init__(self, domain_model_api: DomainModelAPI):
+        self.domain_model_api = domain_model_api
+
+    def __getattr__(self, item: str) -> ProxyAddRelationshipT:
+        if item in self.domain_model_api.domain_model.get_one_to_many_attrs():
+            return cast(ProxyAddRelationshipT, partial(self.domain_model_api.relationships.add, item))
+        raise AttributeError(f"'{self.domain_model_api.domain_model.__name__}' model has no attribute '{item}'")

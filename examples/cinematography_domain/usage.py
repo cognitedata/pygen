@@ -9,6 +9,7 @@ from cognite.dm_clients.custom_types import JSONObject, Timestamp
 
 
 def _delete_data(client: CineClient) -> None:
+    print("Deleting Movie and Person data.")
     client.person.delete(client.person.list(resolve_relationships=False))
     client.movie.delete(client.movie.list(resolve_relationships=False))
 
@@ -30,18 +31,42 @@ def _upload_data(client: CineClient) -> None:
         ),
         Movie(
             externalId="movie2",
-            title="Star Wars: Episode IV – A New Hope",
-            release=Timestamp("1977-05-25T00:00:00-06"),
-            director=Person(externalId="person4", name="George Lucas"),
+            title="Thor",
+            release=Timestamp("2011-04-17T00:00:00+10"),
+            director=Person(externalId="person4", name="Kenneth Branagh"),
             actors=[
-                Person(externalId="person5", name="Mark Hamill"),
-                Person(externalId="person6", name="Harrison Ford"),
-                Person(externalId="person7", name="Carrie Fisher"),
+                Person(externalId="person5", name="Chris Hemsworth"),
+                Person(externalId="person6", name="Natalie Portman"),
+                Person(externalId="person7", name="Tom Hiddleston"),
             ],
-            meta=JSONObject({"run_time": 121}),
+            meta=JSONObject({"run_time": 114}),
         ),
     ]
     client.movie.apply(movies)
+
+    # add another movie, showing the use of _reference
+    ragnarok = Movie(
+        externalId="movie3",
+        title="Thor: Ragnarok",
+        release=Timestamp("2017-10-10T00:00:00-08"),
+        director=Person(externalId="person8", name="Taika Waititi"),
+        actors=[
+            # These persons already exist. We need not fill all fields
+            # only externalId and set _reference=True.
+            # Note: we could instead fill all fields instead (just "name" in
+            # this example), and the API would update the fields. By using
+            # _reference=True, we don't update those field, only create the relations
+            Person.ref(externalId="person5"),
+            Person.ref(externalId="person7"),
+            Person(externalId="person9", name="Cate Blanchett"),
+        ],
+        meta=JSONObject({"run_time": 130}),
+    )
+    client.movie.apply([ragnarok])
+
+    # add a relationship knowing only external_id values (first create another actor):
+    client.person.apply([Person(externalId="person10", name="Tessa Thompson")])
+    client.movie.connect.actors("movie3", ["person10"])
 
 
 def _main() -> None:

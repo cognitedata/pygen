@@ -138,7 +138,7 @@ Execute `dm upload`. This will upload the schema to CDF / DM.
 
 ### Manipulate Items
 
-See in [examples/cinematography_domain/__main__.py](../../examples/cinematography_domain/__main__.py) for a simple
+See in [examples/cinematography_domain/usage.py](../../examples/cinematography_domain/usage.py) for a simple
 usage example.
 
 A few general notes:

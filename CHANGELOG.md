@@ -13,7 +13,39 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## [0.4.0] - 26-04-25
+## [0.4.4] - 09-05-23
+
+### Added
+
+* Added compatibility with cognite-sdk 6.x.x
+
+
+## [0.4.3] - 05-05-23
+
+### Fixed
+
+* Set the license of the package in poetry build.
+
+
+## [0.4.2] - 05-05-23
+
+### Added
+
+* Support for basic built-in types for the parser (`bool`, `int`, `float`, with `str` from before)
+
+
+## [0.4.1] - 03-05-23
+
+### Added
+
+* Support for adding relationships via `.connect`
+
+### Changed
+
+* Optimised use of cache internally.
+
+
+## [0.4.0] - 26-04-23
 
 ### Added
 

@@ -10,7 +10,6 @@ GRAPHQL_TO_PYTHON_TYPE_MAP = {
     "Int": "int",
     "Float": "float",
     "Boolean": "bool",
-    "ID": "str",
 }
 
 
@@ -48,4 +47,3 @@ def _parse_field(field: dict) -> Field:
         is_required=is_required,
         is_named_type=is_named_type,
     )
-
