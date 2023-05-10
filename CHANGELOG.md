@@ -16,6 +16,10 @@ Changes are grouped as follows
 
 ## [0.4.5] - 10-05-23
 
+### Fixed
+
+* Support for nested types
+
 ### Improved
 
 * Items that are references are now showing this in __repr__ and __str__.
