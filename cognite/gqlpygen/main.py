@@ -14,7 +14,7 @@ from packaging import version
 from cognite.dm_clients.config import settings
 from cognite.dm_clients.domain_modeling.schema import Schema
 from cognite.gqlpygen.generator import to_client_sdk
-from cognite.gqlpygen.misc import to_client_name, to_schema_name
+from cognite.gqlpygen.misc import to_schema_name
 
 app = typer.Typer()
 
@@ -70,9 +70,7 @@ def to_python(
     ),
 ):
     schema_raw = graphql_schema.read_text()
-    client_name = to_client_name(name)
-    schema_name = to_schema_name(name)
-    sdk = to_client_sdk(schema_raw, client_name, schema_name)
+    sdk = to_client_sdk(schema_raw, domain_name=name)
     output_dir = (output_dir or graphql_schema.parent).absolute()
     output_dir.mkdir(exist_ok=True)
 

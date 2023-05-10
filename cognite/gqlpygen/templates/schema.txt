@@ -1,5 +1,5 @@
 """
-This is a minimal example schema.
+This file is auto-generated using `dm topython` CLI tool.
 """
 
 from __future__ import annotations

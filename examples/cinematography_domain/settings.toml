@@ -1,0 +1,6 @@
+# local settings, used by topython and togql commands:
+
+[local]
+  name = "Cine"
+  graphql_schema = "schema.graphql"
+  schema_module = "schema.py"

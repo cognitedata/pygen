@@ -18,7 +18,7 @@ DomainModelT = TypeVar("DomainModelT", bound=DomainModel)
 
 logger = logging.getLogger(__name__)
 AUTO_GENERATED_COMMENT = """# THIS FILE IS AUTO-GENERATED!
-# Use `dm_clients schema render` to update it, see `dm_clients --help` for more information.
+# Use `dm togql` to update it, see `dm --help` for more information.
 
 """
 

@@ -1,22 +1,24 @@
+"""
+This file is auto-generated using `dm topython` CLI tool.
+"""
+
 from __future__ import annotations
 
 from typing import Optional
 
 from cachelib import BaseCache, SimpleCache
+from cognite.client import ClientConfig
 
 from cognite.dm_clients.cdf.get_client import get_client_config
+from cognite.dm_clients.config import settings
 from cognite.dm_clients.domain_modeling import DomainClient, DomainModelAPI
 
 from .schema import {% for model in models %}{{ model.name }}, {% endfor %}{{ schema_name }}
 
 
 class {{ client_name_camel }}(DomainClient):
-    """
-    Domain-specific client class for the entire domain.
-    This class can contain any domain-specific logic, but is entirely optional. The attributes below (`actor` and
-    `movie`) are create in the base class, and here we have only added type annotations so that IntelliSense can work.
-    """
-    {% for  model in models %}
+    """Domain-specific client class for the '{{ domain_name }}'."""
+    {% for model in models %}
     {{ model.name_snake }}: DomainModelAPI[{{ model.name }}]{% endfor %}
 
 
@@ -25,8 +27,20 @@ def get_{{ client_name_snake }}(
     space_id: Optional[str] = None,
     data_model: Optional[str] = None,
     schema_version: Optional[int] = None,
+    config: Optional[ClientConfig] = None,
 ) -> {{ client_name_camel }}:
     """Quick way of instantiating a {{ client_name_camel }} with sensible defaults for development."""
-    cache = SimpleCache() if cache is None else cache
-    config = get_client_config()
-    return {{ client_name_camel }}({{ schema_name }}, DomainModelAPI, cache, config, space_id, data_model, schema_version)
+    cache = cache if cache is not None else SimpleCache()
+    config = config if config is not None else get_client_config()
+    space_external_id = space_id or settings.dm_clients.space
+    data_model = data_model or settings.dm_clients.datamodel
+    schema_version = schema_version or settings.dm_clients.schema_version
+    return {{ client_name_camel }}(
+        {{ schema_name }},
+        DomainModelAPI,
+        cache,
+        config,
+        space_external_id,
+        data_model,
+        schema_version,
+    )

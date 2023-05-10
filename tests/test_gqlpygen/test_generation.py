@@ -23,19 +23,14 @@ def generate_client_sdk_from_graphql_data():
 
     yield pytest.param(
         input_schema,
-        "CineClient",
-        "cine_schema",
+        "Cine",
         {"client.py": client, "schema.py": schema},
         id="Cinematography example",
     )
 
 
-@pytest.mark.parametrize(
-    "graphql_schema, client_name, schema_name, expected", list(generate_client_sdk_from_graphql_data())
-)
-def test_generate_client_sdk_from_graphql(
-    graphql_schema: str, client_name: str, schema_name: str, expected: dict[str, str]
-):
-    actual = to_client_sdk(graphql_schema, client_name, schema_name)
+@pytest.mark.parametrize("graphql_schema, domain_name, expected", list(generate_client_sdk_from_graphql_data()))
+def test_generate_client_sdk_from_graphql(graphql_schema: str, domain_name: str, expected: dict[str, str]):
+    actual = to_client_sdk(graphql_schema, domain_name)
 
     assert actual == expected

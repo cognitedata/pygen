@@ -18,7 +18,7 @@ class Scenario(DomainModel):
 
 expected = """
 # THIS FILE IS AUTO-GENERATED!
-# Use `dm_clients schema render` to update it, see `dm_clients --help` for more information.
+# Use `dm togql` to update it, see `dm --help` for more information.
 
 
 type Case {

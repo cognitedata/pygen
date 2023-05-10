@@ -3,10 +3,11 @@ from __future__ import annotations
 from jinja2 import Environment, PackageLoader, select_autoescape
 
 from cognite.dm_clients.misc import to_snake
+from cognite.gqlpygen.misc import to_client_name, to_schema_name
 from cognite.gqlpygen.parser import parse_graphql
 
 
-def to_client_sdk(schema_raw: str, client_name: str, schema_name: str) -> dict[str, str]:
+def to_client_sdk(schema_raw: str, domain_name: str) -> dict[str, str]:
     """
     Converts a GraphQL schema to a client-side SDK.
 
@@ -24,8 +25,11 @@ def to_client_sdk(schema_raw: str, client_name: str, schema_name: str) -> dict[s
         autoescape=select_autoescape(),
     )
 
+    client_name = to_client_name(domain_name)
+    schema_name = to_schema_name(domain_name)
     client = env.get_template("client.txt")
     client_py = client.render(
+        domain_name=domain_name,
         client_name_snake=to_snake(client_name),
         client_name_camel=client_name,
         schema_name=schema_name,
