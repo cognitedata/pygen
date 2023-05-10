@@ -19,6 +19,7 @@ Changes are grouped as follows
 ### Fixed
 
 * Support for nested types
+* Typo for `Int` built-in type, was incorrecly `Integer`
 
 ### Improved
 
