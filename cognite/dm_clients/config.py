@@ -1,3 +1,5 @@
+import os
+
 from dynaconf import Dynaconf
 
 __all__ = ["settings"]
@@ -6,7 +8,7 @@ __all__ = ["settings"]
 settings = Dynaconf(
     envvar_prefix="DM_CLIENTS",
     ignore_unknown_envvars=True,
-    settings_files=["settings.toml", ".secrets.toml"],
+    settings_files=os.environ.get("SETTINGS_FILES_FOR_DYNACONF", "settings.toml;.secrets.toml"),
     merge_enabled=True,
 )
 
