@@ -17,6 +17,7 @@ def parse_graphql_test_data():
             Field(name="producers", type="Person", is_list=True, is_named_type=True),
             Field(name="release", type="Timestamp", is_named_type=True),
             Field(name="meta", type="JSONObject", is_named_type=True),
+            Field(name="genres", type="str", is_list=True, is_named_type=True, is_required=True),
         ],
     )
     yield pytest.param(input_schema, [person, movie], id="Person & Movie")

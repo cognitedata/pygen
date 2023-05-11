@@ -21,6 +21,7 @@ def _upload_data(client: CineClient) -> None:
         Movie(
             externalId="movie1",
             title="Casablanca",
+            genres=["drama"],
             release="1942-11-26T11:12:13Z",  # type: ignore[arg-type]
             director=Person(externalId="person1", name="Michael Curtiz"),
             actors=[
@@ -32,6 +33,7 @@ def _upload_data(client: CineClient) -> None:
         Movie(
             externalId="movie2",
             title="Thor",
+            genres=["action", "fantasy"],
             release=Timestamp("2011-04-17T00:00:00+10"),
             director=Person(externalId="person4", name="Kenneth Branagh"),
             actors=[
@@ -48,6 +50,7 @@ def _upload_data(client: CineClient) -> None:
     ragnarok = Movie(
         externalId="movie3",
         title="Thor: Ragnarok",
+        genres=["action", "fantasy"],
         release=Timestamp("2017-10-10T00:00:00-08"),
         director=Person(externalId="person8", name="Taika Waititi"),
         actors=[
@@ -87,6 +90,7 @@ def _main() -> None:
         print(movie.title)
         print(f"  - released: {movie.release.datetime().date() if movie.release else 'N/A'}")
         print(f"  - directed by: {movie.director.name if movie.director else 'N/A'}")
+        print(f"  - genres: {', '.join(movie.genres)}")
         actors = cast(List[Person], movie.actors or [])  # to keep mypy happy *
         print("  * starring *")
         for actor in actors:

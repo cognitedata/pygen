@@ -7,8 +7,8 @@ from cognite.gqlpygen.data_classes import DomainModel, DomainModels, Field
 
 GRAPHQL_TO_PYTHON_TYPE_MAP = {
     "String": "str",
+    "Int": "int",
     "Float": "float",
-    "Integer": "int",
     "Boolean": "bool",
 }
 
@@ -28,12 +28,15 @@ def _parse_field(field: dict) -> Field:
     is_required = False
     is_list = False
     field_type = field["type"]
-    if field_type["kind"] == "non_null_type":
-        is_required = True
-        field_type = field_type["type"]
-    if field_type["kind"] == "list_type":
-        is_list = True
-        field_type = field_type["type"]
+    while True:
+        if field_type["kind"] == "non_null_type":
+            is_required = True
+            field_type = field_type["type"]
+        elif field_type["kind"] == "list_type":
+            is_list = True
+            field_type = field_type["type"]
+        else:
+            break
     is_named_type = field_type["kind"] == "named_type"
     type_name = field_type["name"]["value"]
 

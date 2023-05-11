@@ -29,6 +29,7 @@ class Movie(DomainModel):
     producers: Optional[List[Optional[Person]]] = []
     release: Optional[Timestamp] = None
     meta: Optional[JSONObject] = None
+    genres: List[str]
 
 
 # Keep at the end of file:
