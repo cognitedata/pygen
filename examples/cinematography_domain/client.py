@@ -14,7 +14,7 @@ class CineClient(DomainClient):
     """
     Domain-specific client class for the entire domain.
     This class can contain any domain-specific logic, but is entirely optional. The attributes below (`actor` and
-    `movie`) are create in the base class, and here we have only added type annotations so that IntelliSense can work.
+    `movie`) are created in the base class, and here we have only added type annotations so that IntelliSense can work.
     """
 
     movie: DomainModelAPI[Movie]

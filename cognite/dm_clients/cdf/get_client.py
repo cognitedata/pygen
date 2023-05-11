@@ -45,8 +45,7 @@ class CogniteConfig(BaseSettings):
 
 
 def get_cognite_config() -> CogniteConfig:
-    cognite_config = CogniteConfig(**settings.cognite)
-    return cognite_config
+    return CogniteConfig(**settings.cognite)
 
 
 def get_client_config(config: Optional[CogniteConfig] = None) -> ClientConfig:

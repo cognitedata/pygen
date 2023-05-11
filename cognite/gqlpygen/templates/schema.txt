@@ -21,7 +21,7 @@ class {{ model.name }}(DomainModel):
     {% for field in model.fields %}{{ field.name }}: {{ field.type_hint }}
     {% endfor %}
 {% endfor %}
-# Keep at the end of file:
+# Keep at the end of the file:
 {{ schema_name }}.close()
 
 

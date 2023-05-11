@@ -60,6 +60,8 @@ class DomainClient(Generic[DomainModelT]):
             # TODO find latest version of the data model
         self._api_map: Dict[Type[DomainModelT], str] = {}
 
+        # -------------------------
+        # Todo why are these recreated? they already exists in self._client
         nodes_api = NodesAPI(
             self._client.config,
             self._client._API_VERSION,
@@ -73,6 +75,7 @@ class DomainClient(Generic[DomainModelT]):
 
         views_api = ViewsAPI(config, self._client._API_VERSION, self._client)
         views = {view.externalId: view for view in views_api.list(self.space_id)}
+        # ------------------------
 
         api_args = {
             "nodes_api": nodes_api,

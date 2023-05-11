@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cognite-gql-pygen"
-version = "0.4.5"
+version = "0.5.0"
 description = "Cognite graphQL Python generation SDK"
 readme = "README.md"
 authors = ["Cognite <support@cognite.com>"]
@@ -55,6 +55,7 @@ python-dotenv = "*"
 pytest = "*"
 pytest-cov = "*"
 pytest-mock = "*"
+faker = "*"
 
 [tool.pytest.ini_options]
 filterwarnings = [
