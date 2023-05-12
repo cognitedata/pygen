@@ -1,0 +1,12 @@
+type Foo {
+    name: String
+}
+
+type Bar {
+    name: String
+    foo: Foo
+}
+
+type Baz {
+    bar: Bar
+}

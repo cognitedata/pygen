@@ -3,6 +3,7 @@ import importlib.util
 import inspect
 import subprocess
 import sys
+from contextlib import suppress
 from pathlib import Path
 from typing import Optional
 
@@ -77,7 +78,10 @@ def to_python(
     for name, content in sdk.items():
         output = output_dir / name
         output.write_text(content)
-        click.echo(f"Wrote file '{output.relative_to(Path.cwd())}'")
+        with suppress(ValueError):
+            # Will raise a ValueError of output is not relative to cwd.
+            output = output.relative_to(Path.cwd())
+        click.echo(f"Wrote file '{output}'")
 
 
 @app.command(
@@ -101,7 +105,7 @@ def to_gql(
         help="Name of the client and schema, expected to be in pascal case.",
     ),
 ):
-    if str(schema_module).endswith(".py"):
+    if schema_module.suffix == ".py":
         click.echo(f"Got file '{schema_module}', trying to import it...")
         module_name = schema_module.stem
         spec = importlib.util.spec_from_file_location(module_name, schema_module)

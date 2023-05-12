@@ -9,6 +9,7 @@ type Movie {
   producers: [Person]
   release: Timestamp
   meta: JSONObject
+  genres: [String!]!
 }
 
 type Person {

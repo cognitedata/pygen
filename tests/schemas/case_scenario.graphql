@@ -1,0 +1,13 @@
+# THIS FILE IS AUTO-GENERATED!
+# Use `dm togql` to update it, see `dm --help` for more information.
+
+
+type Case {
+  scenario: Scenario
+  start_time: String!
+  end_time: String!
+}
+
+type Scenario {
+  name: String!
+}
