@@ -17,16 +17,16 @@ cine_schema: Schema[DomainModel] = Schema()
 
 
 @cine_schema.register_type
-class Person(DomainModel):
+class PersonSimple(DomainModel):
     name: str
 
 
 @cine_schema.register_type(root_type=True)
-class Movie(DomainModel):
+class MovieSimple(DomainModel):
     title: str
-    director: Optional[Person] = None
-    actors: Optional[List[Optional[Person]]] = []
-    producers: Optional[List[Optional[Person]]] = []
+    director: Optional[PersonSimple] = None
+    actors: Optional[List[Optional[PersonSimple]]] = []
+    producers: Optional[List[Optional[PersonSimple]]] = []
     release: Optional[Timestamp] = None
     meta: Optional[JSONObject] = None
     genres: List[str]

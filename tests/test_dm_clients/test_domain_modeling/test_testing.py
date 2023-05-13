@@ -2,13 +2,13 @@ from faker import Faker
 
 from cognite.pygen.dm_clients.domain_modeling.testing import ApplyResponse, create_test_client_factory
 from examples.cinematography_domain.client import CineClient
-from examples.cinematography_domain.schema import Person, cine_schema
+from examples.cinematography_domain.schema import PersonSimple, cine_schema
 
 
 def test_create_test_client():
     # Arrange
     fake = Faker()
-    person = Person(name=fake.first_name())
+    person = PersonSimple(name=fake.first_name())
     response = ApplyResponse(external_id="Person", was_modified=True)
     responses = [[response.dict(by_alias=True)]]
 

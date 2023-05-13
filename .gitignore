@@ -54,3 +54,4 @@ test-report.xml
 .secrets.*
 tests/test_gqlpygen/tmp
 playground/
+data_models/

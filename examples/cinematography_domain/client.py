@@ -7,7 +7,7 @@ from cachelib import BaseCache, SimpleCache
 from cognite.pygen.dm_clients.cdf.get_client import get_client_config
 from cognite.pygen.dm_clients.domain_modeling import DomainClient, DomainModelAPI
 
-from .schema import Movie, Person, cine_schema
+from .schema import MovieSimple, PersonSimple, cine_schema
 
 
 class CineClient(DomainClient):
@@ -17,8 +17,8 @@ class CineClient(DomainClient):
     `movie`) are created in the base class, and here we have only added type annotations so that IntelliSense can work.
     """
 
-    movie: DomainModelAPI[Movie]
-    person: DomainModelAPI[Person]
+    movie_simple: DomainModelAPI[MovieSimple]
+    person_simple: DomainModelAPI[PersonSimple]
 
 
 def get_cine_client(

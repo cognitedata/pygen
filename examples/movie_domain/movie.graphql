@@ -1,0 +1,92 @@
+# Enums are currently not supported by CDF.
+#enum Genre {
+#    Action
+#    Adult
+#    Adventure
+#    Animation
+#    Biography
+#    Comedy
+#    Crime
+#    Documentary
+#    Drama
+#    Family
+#    Fantasy
+#    Film Noir
+#    Game Show
+#    Horror
+#    Musical
+#    Mystery
+#    Reality_TV
+#    Romance
+#    Sci_Fi
+#    Short
+#    Sport
+#    Talk_Show
+#    Thriller
+#    Western
+#}
+
+type Person {
+    name: String!
+    birthYear: Int
+    roles: [Role]
+}
+interface Nomination{
+    name: String!
+    year: Int!
+}
+
+type BestDirector implements Nomination {
+    name: String!
+    year: Int!
+}
+
+type BestLeadingActor implements Nomination {
+    name: String!
+    year: Int!
+}
+
+type BestLeadingActress implements Nomination {
+    name: String!
+    year: Int!
+}
+
+# Union is currently not supported by CDF.
+#union BestActor = BestLeadingActor | BestLeadingActress
+
+interface Role{
+    movies: [Movie]
+    wonOscar: Boolean
+    nomination: [Nomination]
+    person: Person
+}
+
+type Actor implements Role {
+    movies: [Movie]
+    wonOscar: Boolean
+    nomination: [Nomination]
+    person: Person
+}
+
+type Director implements Role {
+    movies: [Movie]
+    wonOscar: Boolean
+    nomination: [Nomination]
+    person: Person
+}
+
+type Rating {
+    score: TimeSeries
+    votes: TimeSeries
+}
+
+type Movie{
+    title: String!
+#    genres: [Genre!]!
+    actors: [Actor]
+    directors: [Director]
+    releaseYear: Int
+    rating: Rating
+    runTimeMinutes: Float
+    meta: JSONObject
+}

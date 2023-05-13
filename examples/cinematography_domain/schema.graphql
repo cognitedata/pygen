@@ -2,16 +2,16 @@
 # Use `dm_clients schema render` to update it, see `dm_clients --help` for more information.
 
 
-type Movie {
+type MovieSimple {
   title: String!
-  director: Person
-  actors: [Person]
-  producers: [Person]
+  director: PersonSimple
+  actors: [PersonSimple]
+  producers: [PersonSimple]
   release: Timestamp
   meta: JSONObject
   genres: [String!]!
 }
 
-type Person {
+type PersonSimple {
   name: String!
 }
