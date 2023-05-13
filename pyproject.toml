@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cognite-gql-pygen"
-version = "0.6.0"
+version = "0.7.0"
 description = "Cognite graphQL Python generation SDK"
 readme = "README.md"
 authors = ["Cognite <support@cognite.com>"]
@@ -34,7 +34,7 @@ typer = {version = "*", extras = ["all"] }
 PyYAML = "^6.0"
 arrow = "^1.2.2"
 cognite-sdk = {version = ">5.9.0", extras = ["pandas"]}
-msal = "^1.16.0"
+msal = ">=1.16.0"
 numpy = "^1.23.2"
 strawberry-graphql = "^0.156.4"
 docopt = "^0.6.2"
@@ -45,7 +45,7 @@ dynaconf = "^3.1.12"
 graphql-core = ">=3.2"
 Jinja2 = ">=3.1"
 packaging = ">=21.3"
-typing-extensions = "^4.5.0"
+typing-extensions = ">=4.4.0"
 
 [tool.poetry.dev-dependencies]
 twine = "*"

@@ -13,11 +13,17 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## [0.6.0] - 10-05-23
+## [0.7.0] - 13-05-23
 
 ### Fix
 
-* Less strict `packaging` versioning (>=21) to support usage in pyodide runtime.
+* Less strict versioning of other packages to support usage in streamlit pyodide runtime.
+
+## [0.6.0] - 13-05-23
+
+### Fix
+
+* Less strict `packaging` versioning (>=21) to support usage in streamlit pyodide runtime.
 
 ## [0.5.0] - 10-05-23
 
