@@ -23,11 +23,11 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Install core dependencies
+      - name: Install dependencies
         run: |
           python3 -m pip install --upgrade pip poetry
           poetry config virtualenvs.create false
-          poetry install
+          poetry install -E all
 
       - name: Test
         env:
