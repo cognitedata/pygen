@@ -11,7 +11,13 @@ from faker import Faker
 from cognite.dm_clients.domain_modeling import DomainModel, Schema
 from cognite.dm_clients.domain_modeling.domain_client import DomainClient, DomainModelT
 from cognite.dm_clients.misc import to_pascal
-from cognite.gqlpygen.main import to_python
+
+try:
+    from cognite.gqlpygen.main import to_python
+except ImportError:
+    _has_cli = False
+else:
+    _has_cli = True
 from tests.constants import REPO_ROOT, TestSchemas
 
 
@@ -63,6 +69,7 @@ def create_instances(schema: Schema) -> dict[str, DomainModelT]:
     return instances
 
 
+@pytest.mark.full
 def test_domain_client(local_tmp_path):
     graphql_file = TestSchemas.foobar
 

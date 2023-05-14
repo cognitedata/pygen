@@ -20,9 +20,19 @@ benefits
 
 ## Installation
 
-To install this package:
+### Without any optional dependencies
+
+To install this package without CLI support:
 ```bash
-$ pip install cognite-gql-pygen
+pip install cognite-gql-pygen
+```
+
+### With optional dependencies
+
+* `cli` This includes CLI support such that you can run the package from the command line.
+
+```bash
+pip install cognite-gql-pygen[cli]
 ```
 
 ## Usage
@@ -33,7 +43,7 @@ The goal of the package is to have representations of all the types in a given d
 ![image](https://user-images.githubusercontent.com/60234212/234041823-f72a27e3-6450-4f05-99dc-50e87f762d0f.png)
 
 
-
+### With CLI
 You can specify the data models either as a `.graphql` schema or a `pydantic` classes in a `.py` file. Then, you can
 use the CLI to automatically generate the other representation as well as the `client.py` file which creates
 the API and the convenience method get_[client_name]_client().
@@ -71,6 +81,28 @@ it consists of four files.
 * `schema.py` The schema defined in `pydantic` classes.
 * `client.py` Which sets up the client for the data model.
 * `usage.py` Demonstrates the usage of the client.
+
+### Without CLI
+You can run this package directly in Python code. This can be useful, for example, a notebook.
+When you run the function `to_client_sdk` you get a `PythonSDK` object back which has the `pydantic`
+classes in a `PythonSDK.schema` and the client in the `PythonSDK.client`.
+
+
+```python
+from cognite.gqlpygen import to_client_sdk
+my_schema = """type Case {
+  scenario: Scenario
+  start_time: String!
+  end_time: String!
+ }
+
+type Scenario {
+  name: String!
+}
+"""
+sdk = to_client_sdk(my_schema, "MyClient", "my_schema")
+print(sdk.schema)
+```
 
 
 ### Settings File

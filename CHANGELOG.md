@@ -13,6 +13,15 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.8.0] - 14-05-23
+
+### Improved
+
+* Split dependencies into required and optional.
+* Removed all unused dependencies.
+* Updated documentation to reflect non-CLI usage.
+
+
 ## [0.7.0] - 13-05-23
 
 ### Fix

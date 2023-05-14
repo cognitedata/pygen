@@ -2,7 +2,7 @@ import pytest
 
 from cinematography_domain.schema import cine_schema
 from cognite.dm_clients.domain_modeling import DomainModel, Schema
-from cognite.gqlpygen.generator import to_client_sdk
+from cognite.gqlpygen.generator import PythonSDK, to_client_sdk
 from tests.constants import CINEMATOGRAPHY
 
 
@@ -25,7 +25,7 @@ def generate_client_sdk_from_graphql_data():
         input_schema,
         "CineClient",
         "cine_schema",
-        {"client.py": client, "schema.py": schema},
+        PythonSDK(client, schema),
         id="Cinematography example",
     )
 

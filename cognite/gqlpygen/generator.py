@@ -1,12 +1,20 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 from jinja2 import Environment, PackageLoader, select_autoescape
 
 from cognite.dm_clients.misc import to_snake
 from cognite.gqlpygen.parser import parse_graphql
 
 
-def to_client_sdk(schema_raw: str, client_name: str, schema_name: str) -> dict[str, str]:
+@dataclass
+class PythonSDK:
+    client: str
+    schema: str
+
+
+def to_client_sdk(schema_raw: str, client_name: str, schema_name: str) -> PythonSDK:
     """
     Converts a GraphQL schema to a client-side SDK.
 
@@ -41,8 +49,7 @@ def to_client_sdk(schema_raw: str, client_name: str, schema_name: str) -> dict[s
         schema_name=schema_name,
         models=ordered,
     )
-
-    return {"client.py": _clean_rendered_template(client_py), "schema.py": _clean_rendered_template(schema_py)}
+    return PythonSDK(_clean_rendered_template(client_py), _clean_rendered_template(schema_py))
 
 
 def _clean_rendered_template(rendered_template: str) -> str:
