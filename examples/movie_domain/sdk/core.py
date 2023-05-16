@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import inspect
-from typing import Any, ForwardRef, Mapping, Optional, Sequence
+from typing import Any, ForwardRef, Iterable, Mapping, Optional, Sequence
 
 from pydantic import BaseModel, constr
 from pydantic.utils import DUNDER_ATTRIBUTES
@@ -30,28 +30,19 @@ class CircularModel(DomainModel):
                 domain_fields.add(field_name)
         return domain_fields
 
-    def dict(
+    def _iter(
         self,
-        *,
-        include: Optional[set[int | str] | Mapping[int | str, Any]] = None,
-        exclude: Optional[Any] = None,
+        to_dict: bool = False,
         by_alias: bool = False,
-        skip_defaults: Optional[bool] = None,
+        include: Optional[set[int | str] | Mapping[int | str, Any]] = None,
+        exclude: Optional[set[int | str] | Mapping[int | str, Any]] = None,
         exclude_unset: bool = False,
         exclude_defaults: bool = False,
         exclude_none: bool = False,
-    ) -> dict[str, any]:
-        exclude = exclude or set()
+    ) -> Iterable[tuple]:
         domain_fields = self._domain_fields()
-
-        return super().dict(
-            include=include,
-            exclude=exclude | domain_fields,
-            by_alias=by_alias,
-            skip_defaults=skip_defaults,
-            exclude_unset=exclude_unset,
-            exclude_defaults=exclude_defaults,
-            exclude_none=exclude_none,
+        yield from super()._iter(
+            to_dict, by_alias, include, exclude | domain_fields, exclude_unset, exclude_defaults, exclude_none
         )
 
     def __repr_args__(self) -> Sequence[tuple[str | None, Any]]:
