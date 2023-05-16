@@ -33,6 +33,10 @@ class MovieModel:
     best_actress: list[BestLeadingActress]
 
 
+def to_id(raw: str) -> str:
+    return raw.lower().replace(" ", "_")
+
+
 def load() -> MovieModel:
     movie_df = pd.read_csv(_this_file / "movies.csv")
     person_df = pd.read_csv(_this_file / "persons.csv")
@@ -40,15 +44,20 @@ def load() -> MovieModel:
     relation_df = pd.read_csv(_this_file / "relation_role_movies.csv")
     nomination_df = pd.read_csv(_this_file / "nominations.csv")
 
-    movies = [Movie(**entry) for entry in movie_df.to_dict(orient="records")]
-    persons = {entry["name"]: Person(**entry) for entry in person_df.to_dict(orient="records")}
+    movies = [
+        Movie(**entry, external_id=f"movie:{to_id(entry['title'])}") for entry in movie_df.to_dict(orient="records")
+    ]
+    persons = {
+        entry["name"]: Person(**entry, external_id=f"person:{to_id(entry['name'])}")
+        for entry in person_df.to_dict(orient="records")
+    }
     actors = [
-        Actor(**entry, person=persons[entry["person_name"]])
+        Actor(**entry, person=persons[entry["person_name"]], external_id=f"actor:{to_id(entry['person_name'])}")
         for entry in role_df.to_dict(orient="records")
         if entry["role"] == "actor"
     ]
     directors = [
-        Director(**entry, person=persons[entry["person_name"]])
+        Director(**entry, person=persons[entry["person_name"]], external_id=f"director:{to_id(entry['person_name'])}")
         for entry in role_df.to_dict(orient="records")
         if entry["role"] == "director"
     ]
@@ -68,12 +77,14 @@ def load() -> MovieModel:
         for entry in nomination_df.to_dict(orient="records"):
             if entry["person"] != role.person.name:
                 continue
-            NominationClass = {  # noqa
-                "Best Director": BestDirector,
-                "Best Actor in a Leading Role": BestLeadingActor,
-                "Best Actress in a Leading Role": BestLeadingActress,
+            NominationClass, prefix = {  # noqa
+                "Best Director": (BestDirector, "director:"),
+                "Best Actor in a Leading Role": (BestLeadingActor, "leadingactor:"),
+                "Best Actress in a Leading Role": (BestLeadingActress, "leadingactress"),
             }[entry["name"]]
-            nomination = NominationClass(**entry)
+            nomination = NominationClass(
+                **entry, external_id=f"{prefix}{to_id(entry['person'])}:{to_id(entry['movie'])}"
+            )
             nominations.append(nomination)
             all_nominations.append(nomination)
         role.nomination = nominations

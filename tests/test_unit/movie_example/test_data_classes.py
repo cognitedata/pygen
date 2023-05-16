@@ -8,6 +8,6 @@ def test_dump_circular_model(movie_model: MovieModel):
 
 
 def test_repr_circular_model(movie_model: MovieModel):
-    a_movie = movie_model.movies[0]
+    an_actor = movie_model.actors[0]
 
-    repr(a_movie)
+    repr(an_actor)

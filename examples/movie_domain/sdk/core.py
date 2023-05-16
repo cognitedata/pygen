@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import inspect
 from collections import UserList
-from typing import Any, Collection, Mapping, Optional, Sequence, Type, TypeVar, overload
+from typing import Any, Collection, ForwardRef, Mapping, Optional, Sequence, Type, TypeVar, overload
 
 import pandas as pd
 from pydantic import BaseModel, constr
@@ -17,9 +17,14 @@ class CircularModel(DomainModel):
     def _domain_fields(self) -> set[str]:
         domain_fields = set()
         for field_name, field in self.__fields__.items():
+            is_forward_ref = isinstance(field.type_, ForwardRef)
             is_domain = inspect.isclass(field.type_) and issubclass(field.type_, DomainModel)
-            is_list_domain = field.sub_fields and any(issubclass(sub.type_, DomainModel) for sub in field.sub_fields)
-            if is_domain or is_list_domain:
+            is_list_domain = (
+                (not is_forward_ref)
+                and field.sub_fields
+                and any(issubclass(sub.type_, DomainModel) for sub in field.sub_fields)
+            )
+            if is_forward_ref or is_domain or is_list_domain:
                 domain_fields.add(field_name)
         return domain_fields
 
