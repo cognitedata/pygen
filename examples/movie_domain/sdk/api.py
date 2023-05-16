@@ -1,4 +1,4 @@
-from movie_domain.sdk.core import TypeAPI
+from .core import TypeAPI
 
 
 class DirectorAPI(TypeAPI):
@@ -9,5 +9,25 @@ class MovieAPI(TypeAPI):
     ...
 
 
-class NominationAPI(TypeAPI):
+class ActorsAPI(TypeAPI):
+    ...
+
+
+class BestDirectorAPI(TypeAPI):
+    ...
+
+
+class BestLeadingActorAPI(TypeAPI):
+    ...
+
+
+class BestLeadingActressAPI(TypeAPI):
+    ...
+
+
+class RatingsAPI(TypeAPI):
+    ...
+
+
+class PersonsAPI(TypeAPI):
     ...

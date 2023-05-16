@@ -1,5 +1,5 @@
-from movie_domain.sdk.core import TypeList
-from movie_domain.sdk.data_classes import (
+from .core import TypeList
+from .data_classes import (
     Actor,
     BestDirector,
     BestLeadingActor,
@@ -14,40 +14,40 @@ from movie_domain.sdk.data_classes import (
 
 
 class PersonList(TypeList):
-    _RESOURCE = Person
+    _NODE = Person
 
 
 class NominationList(TypeList):
-    _RESOURCE = Nomination
+    _NODE = Nomination
 
 
 class BestDirectorList(TypeList):
-    _RESOURCE = BestDirector
+    _NODE = BestDirector
 
 
 class BestLeadingActorList(TypeList):
-    _RESOURCE = BestLeadingActor
+    _NODE = BestLeadingActor
 
 
 class BestLeadingActressList(TypeList):
-    _RESOURCE = BestLeadingActress
+    _NODE = BestLeadingActress
 
 
 class RoleList(TypeList):
-    _RESOURCE = Role
+    _NODE = Role
 
 
 class ActorList(TypeList):
-    _RESOURCE = Actor
+    _NODE = Actor
 
 
 class DirectorList(TypeList):
-    _RESOURCE = Director
+    _NODE = Director
 
 
 class RatingList(TypeList):
-    _RESOURCE = Rating
+    _NODE = Rating
 
 
 class MovieList(TypeList):
-    _RESOURCE = Movie
+    _NODE = Movie
