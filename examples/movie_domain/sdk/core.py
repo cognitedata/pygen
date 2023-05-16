@@ -1,10 +1,8 @@
 from __future__ import annotations
 
 import inspect
-from collections import UserList
-from typing import Any, Collection, ForwardRef, Mapping, Optional, Sequence, Type, TypeVar, overload
+from typing import Any, ForwardRef, Mapping, Optional, Sequence
 
-import pandas as pd
 from pydantic import BaseModel, constr
 from pydantic.utils import DUNDER_ATTRIBUTES
 
@@ -74,53 +72,3 @@ class CircularModel(DomainModel):
 
 class TimeSeries(DomainModel):
     name: str
-
-
-class TypeList(UserList):
-    _NODE: Type[DomainModel]
-
-    def __init__(self, nodes: Collection[Type[DomainModel]]):
-        if any(not isinstance(node, self._NODE) for node in nodes):
-            raise TypeError(
-                f"All nodes for class {type(self).__name__} must be of type " f"{type(self._NODE).__name__}."
-            )
-        super().__init__(nodes)
-
-    def dump(self) -> list[dict[str, Any]]:
-        return [node.dict(exclude_unset=True) for node in self.data]
-
-    def to_pandas(self) -> pd.DataFrame:
-        return pd.DataFrame(self.dump())
-
-    def _repr_html_(self) -> str:
-        return self.to_pandas()._repr_html_()
-
-
-T_TypeNode = TypeVar("T_TypeNode", bound=DomainModel)
-T_TypeNodeList = TypeVar("T_TypeNodeList", bound=TypeList)
-
-
-class TypeAPI:
-    def __init__(self, class_type: Type[T_TypeNode], class_list: Type[T_TypeNodeList]):
-        self.class_type = class_type
-        self.class_list = class_list
-
-    def list(self, limit: int) -> T_TypeNodeList:
-        ...
-
-    def apply(self, node: T_TypeNode, propagation_limit: int = 1):
-        ...
-
-    @overload
-    def retrieve(self, external_id: str) -> T_TypeNode:
-        ...
-
-    @overload
-    def retrieve(self, external_id: Sequence[str]) -> T_TypeNodeList:
-        ...
-
-    def retrieve(self, external_id: str | Sequence[str]) -> T_TypeNode | TypeList:
-        ...
-
-    def delete(self, node_external_id: str | T_TypeNode | T_TypeNodeList, propagation_limit: int = 0):
-        ...

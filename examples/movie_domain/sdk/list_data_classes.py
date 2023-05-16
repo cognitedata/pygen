@@ -1,4 +1,4 @@
-from .core import TypeList
+from .core_list import TypeList
 from .data_classes import (
     Actor,
     BestDirector,

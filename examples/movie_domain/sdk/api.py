@@ -1,4 +1,4 @@
-from .core import TypeAPI
+from .core_api import TypeAPI
 
 
 class DirectorAPI(TypeAPI):
