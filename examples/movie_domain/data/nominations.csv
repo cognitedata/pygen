@@ -1,9 +1,9 @@
-ame, year, person, movie, role
-Best Actor in a Leading Role, 2001, Russell Crowe, Gladiator, actor
-Best Director, 1958, Sidney Lumet, 12 Angry Men, director
-Best Director, 2001, Ridley Scott, Gladiator, director
-Best Director, 2010, Quentin Tarantino, Inglourious Basterds, director
-Best Director, 1995, Quentin Tarantino, Pulp Fiction, director
-Best Actor in a Leading Role, 1995, John Travolta, Pulp Fiction, actor
-Best Actress in a Leading Role, 1997, Frances McDormand, Fargo, actor
-Best Director, 1997, Joel Coen, Fargo, director
+name,year,person,movie,role
+Best Actor in a Leading Role,2001,Russell Crowe,Gladiator,actor
+Best Director,1958,Sidney Lumet,12 Angry Men,director
+Best Director,2001,Ridley Scott,Gladiator,director
+Best Director,2010,Quentin Tarantino,Inglourious Basterds,director
+Best Director,1995,Quentin Tarantino,Pulp Fiction,director
+Best Actor in a Leading Role,1995,John Travolta,Pulp Fiction,actor
+Best Actress in a Leading Role,1997,Frances McDormand,Fargo,actor
+Best Director,1997, Joel Coen,Fargo,director
