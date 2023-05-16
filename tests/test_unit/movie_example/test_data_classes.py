@@ -11,6 +11,11 @@ def pulp_fiction_movie(movie_model) -> Movie:
     return next(movie for movie in movie_model.movies if movie.title == "Pulp Fiction")
 
 
+@pytest.fixture()
+def local_client(movie_model) -> MovieClientLocal:
+    return MovieClientLocal(movie_model, MovieClient())
+
+
 def test_dump_circular_model(movie_model: MovieModel):
     a_movie = movie_model.movies[0]
 
@@ -23,10 +28,8 @@ def test_repr_circular_model(movie_model: MovieModel):
     repr(an_actor)
 
 
-def test_local_movie_client(movie_model):
-    client = MovieClientLocal(movie_model, MovieClient())
-
-    client.movies.list()
+def test_local_movie_client(local_client):
+    local_client.movies.list()
 
 
 def test_traverse_circular_model_depth_0(pulp_fiction_movie: Movie):

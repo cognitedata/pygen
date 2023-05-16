@@ -19,7 +19,7 @@ class TypeList(UserList):
         super().__init__(nodes)
 
     def dump(self) -> list[dict[str, Any]]:
-        return [node.dict(exclude_unset=True) for node in self.data]
+        return [node.dict() for node in self.data]
 
     def to_pandas(self) -> pd.DataFrame:
         return pd.DataFrame(self.dump())

@@ -50,6 +50,14 @@ class CircularModel(DomainModel):
             exclude_defaults,
             exclude_none,
         )
+        for field in domain_fields:
+            if value := getattr(self, field):
+                if isinstance(value, list):
+                    yield field, [v.external_id if isinstance(v, DomainModel) else v for v in value]
+                else:
+                    yield field, value.external_id
+            else:
+                yield field, None
 
     def __repr_args__(self) -> Sequence[tuple[str | None, Any]]:
         """
@@ -70,8 +78,8 @@ class CircularModel(DomainModel):
                     output.append((k, v.external_id))
         return output
 
-    def traverse(self, depth: int = 0):
-        return self._traverse(depth, {})
+    def traverse(self, depth: int = 0, tmp_cache: dict = None):
+        return self._traverse(depth, tmp_cache or {})
 
     def _traverse(self, depth: int, cache: dict[str, Any]):
         if self.external_id in cache:

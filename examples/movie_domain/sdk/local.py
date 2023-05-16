@@ -13,7 +13,8 @@ class TypeLocal:
         self._data = data
 
     def list(self, propagation_limit: int = 0, limit: int = 25) -> T_TypeNodeList:
-        return self.class_list(self._data)
+        tmp_cache = {}
+        return self.class_list([node.traverse(propagation_limit, tmp_cache) for node in self._data])
 
     def apply(self, node: T_TypeNode, propagation_limit: int = 0):
         ...
@@ -29,7 +30,10 @@ class TypeLocal:
     def retrieve(self, external_id: str | Sequence[str], propagation_limit: int = 0) -> T_TypeNode | T_TypeNodeList:
         is_singular = isinstance(external_id, str)
         id_set = {external_id} if is_singular else set(external_id)
-        selected_nodes = [node for node in self._data if node.externalId in id_set]
+        tmp_cache = {}
+        selected_nodes = [
+            node.traverse(propagation_limit, tmp_cache) for node in self._data if node.externalId in id_set
+        ]
         return selected_nodes[0] if is_singular else self.class_list(selected_nodes)
 
     def delete(self, node_external_id: str | T_TypeNode | T_TypeNodeList, propagation_limit: int = 0):
