@@ -42,7 +42,13 @@ class CircularModel(DomainModel):
     ) -> Iterable[tuple]:
         domain_fields = self._domain_fields()
         yield from super()._iter(
-            to_dict, by_alias, include, exclude | domain_fields, exclude_unset, exclude_defaults, exclude_none
+            to_dict,
+            by_alias,
+            include,
+            (exclude or set()) | domain_fields,
+            exclude_unset,
+            exclude_defaults,
+            exclude_none,
         )
 
     def __repr_args__(self) -> Sequence[tuple[str | None, Any]]:
@@ -63,6 +69,29 @@ class CircularModel(DomainModel):
                 elif hasattr(v, "external_id"):
                     output.append((k, v.external_id))
         return output
+
+    def traverse(self, depth: int = 0):
+        return self._traverse(depth, {})
+
+    def _traverse(self, depth: int, cache: dict[str, Any]):
+        if self.external_id in cache:
+            return cache[self.external_id]
+
+        cache[self.external_id] = self.copy()
+        if depth == 0:
+            return cache[self.external_id]
+
+        for domain_field in self._domain_fields():
+            value = getattr(self, domain_field)
+            if value is None:
+                value = None
+            elif isinstance(value, list):
+                value = [entry._traverse(depth=depth - 1, cache=cache) for entry in value]
+            else:
+                value = value._traverse(depth=depth - 1, cache=cache)
+            setattr(cache[self.external_id], domain_field, value)
+
+        return cache[self.external_id]
 
 
 class TimeSeries(DomainModel):
