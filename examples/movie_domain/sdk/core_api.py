@@ -11,21 +11,21 @@ class TypeAPI:
         self.class_list = class_list
         self._data = data
 
-    def list(self, limit: int = 25) -> T_TypeNodeList:
+    def list(self, propagation_limit: int = 0, limit: int = 25) -> T_TypeNodeList:
         return self.class_list(self._data)
 
-    def apply(self, node: T_TypeNode, propagation_limit: int = 1):
+    def apply(self, node: T_TypeNode, propagation_limit: int = 0):
         ...
 
     @overload
-    def retrieve(self, external_id: str) -> T_TypeNode:
+    def retrieve(self, external_id: str, propagation_limit: int = 0) -> T_TypeNode:
         ...
 
     @overload
-    def retrieve(self, external_id: Sequence[str]) -> T_TypeNodeList:
+    def retrieve(self, external_id: Sequence[str], propagation_limit: int = 0) -> T_TypeNodeList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> T_TypeNode | T_TypeNodeList:
+    def retrieve(self, external_id: str | Sequence[str], propagation_limit: int = 0) -> T_TypeNode | T_TypeNodeList:
         is_singular = isinstance(external_id, str)
         id_set = {external_id} if is_singular else set(external_id)
         selected_nodes = [node for node in self._data if node.externalId in id_set]

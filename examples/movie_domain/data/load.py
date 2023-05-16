@@ -29,8 +29,8 @@ class MovieModel:
     roles: list[Role]
     nomination: list[Nomination]
     best_directors: list[BestDirector]
-    best_actors: list[BestLeadingActor]
-    best_actress: list[BestLeadingActress]
+    best_leading_actors: list[BestLeadingActor]
+    best_leading_actress: list[BestLeadingActress]
 
 
 def to_id(raw: str) -> str:
