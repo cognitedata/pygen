@@ -1,6 +1,6 @@
 from typing import Sequence, Type, overload
 
-from movie_domain.sdk.core_list import T_TypeNode, T_TypeNodeList
+from .core_list import T_TypeNode, T_TypeNodeList
 
 
 class TypeAPI:

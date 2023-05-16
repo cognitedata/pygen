@@ -14,7 +14,7 @@ def test_repr_circular_model(movie_model: MovieModel):
     repr(an_actor)
 
 
-def test_local_movie_client():
-    client = MovieClient()
+def test_local_movie_client(movie_model):
+    client = MovieClient(movie_model)
 
     client.movies.list()

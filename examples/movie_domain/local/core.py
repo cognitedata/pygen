@@ -11,20 +11,16 @@ class DomainModel(BaseModel):
     external_id: Optional[constr(min_length=1, max_length=255)] = None
 
 
-def _is_subclass(class_type: Any, _class: Any) -> bool:
-    return inspect.isclass(class_type) and issubclass(class_type, _class)
-
-
 class CircularModel(DomainModel):
     def _domain_fields(self) -> set[str]:
         domain_fields = set()
         for field_name, field in self.__fields__.items():
             is_forward_ref = isinstance(field.type_, ForwardRef)
-            is_domain = _is_subclass(field.type_, DomainModel)
+            is_domain = inspect.isclass(field.type_) and issubclass(field.type_, DomainModel)
             is_list_domain = (
                 (not is_forward_ref)
                 and field.sub_fields
-                and any(_is_subclass(sub.type_, DomainModel) for sub in field.sub_fields)
+                and any(issubclass(sub.type_, DomainModel) for sub in field.sub_fields)
             )
             if is_forward_ref or is_domain or is_list_domain:
                 domain_fields.add(field_name)
