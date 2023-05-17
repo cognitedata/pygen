@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pandas as pd
 
+from examples.movie_domain.sdk.core import NumericDataPoint, TimeSeries
 from examples.movie_domain.sdk.data_classes import (
     Actor,
     BestDirector,
@@ -14,6 +15,7 @@ from examples.movie_domain.sdk.data_classes import (
     Movie,
     Nomination,
     Person,
+    Rating,
     Role,
 )
 
@@ -23,6 +25,7 @@ _this_file = Path(__file__).resolve().parent
 @dataclass
 class MovieModel:
     movies: list[Movie]
+    ratings: list[Rating]
     persons: list[Person]
     directors: list[Director]
     actors: list[Actor]
@@ -43,9 +46,27 @@ def load() -> MovieModel:
     role_df = pd.read_csv(_this_file / "roles.csv")
     relation_df = pd.read_csv(_this_file / "relation_role_movies.csv")
     nomination_df = pd.read_csv(_this_file / "nominations.csv")
+    rating_df = pd.read_csv(_this_file / "ratings.csv")
+    rating_df["Date"] = pd.to_datetime(rating_df["Date"], format="%d/%m/%Y").apply(
+        lambda x: x.strftime("%Y-%m-%dT%H:%M:%SZ")
+    )
+    rating_df.set_index("Date", inplace=True)
+
+    ratings = {}
+    for movie_title, sub_df in rating_df.groupby("Movie Title"):
+        votes = [NumericDataPoint(timestamp=t, value=v) for (t, v) in sub_df["Number of Votes"].items()]
+        score = [NumericDataPoint(timestamp=t, value=v) for (t, v) in sub_df["IMDb Rating"].items()]
+        movie_id = to_id(str(movie_title))
+        rating = Rating(
+            external_id=f"rating:{movie_id}",
+            score=TimeSeries(external_id=f"rating:{movie_id}", name=f"{movie_title} Rating", data_points=score),
+            votes=TimeSeries(external_id=f"vote_count:{movie_id}", name=f"{movie_title} Vote Count", data_points=votes),
+        )
+        ratings[movie_title] = rating
 
     movies = [
-        Movie(**entry, external_id=f"movie:{to_id(entry['title'])}") for entry in movie_df.to_dict(orient="records")
+        Movie(**entry, external_id=f"movie:{to_id(entry['title'])}", rating=ratings[entry["title"]])
+        for entry in movie_df.to_dict(orient="records")
     ]
     persons = {
         entry["name"]: Person(**entry, external_id=f"person:{to_id(entry['name'])}")
@@ -102,6 +123,7 @@ def load() -> MovieModel:
 
     return MovieModel(
         movies,
+        list(ratings.values()),
         list(persons.values()),
         directors,
         actors,

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import inspect
-from typing import Any, ForwardRef, Iterable, Mapping, Optional, Sequence
+from typing import Any, ForwardRef, Iterable, Mapping, Optional, Sequence, Union
 
 from pydantic import BaseModel, constr
 from pydantic.utils import DUNDER_ATTRIBUTES
@@ -92,13 +92,35 @@ class CircularModel(DomainModel):
             if value is None:
                 value = None
             elif isinstance(value, list):
-                value = [entry.traverse(depth=depth - 1, cache=tmp_cache) for entry in value]
+                value = [entry.traverse(depth=depth - 1, tmp_cache=tmp_cache) for entry in value]
             else:
-                value = value.traverse(depth=depth - 1, cache=tmp_cache)
+                value = value.traverse(depth=depth - 1, tmp_cache=tmp_cache)
             setattr(tmp_cache[self.external_id], domain_field, value)
 
         return tmp_cache[self.external_id]
 
 
+class DataPoint(BaseModel):
+    timestamp: str
+
+
+class NumericDataPoint(DataPoint):
+    value: float
+
+
+class StringDataPoint(DataPoint):
+    value: str
+
+
 class TimeSeries(DomainModel):
-    name: str
+    id: Optional[int]
+    name: Optional[str]
+    is_string: bool = False
+    metadata: dict = {}
+    unit: Optional[str]
+    asset_id: Optional[int]
+    is_step: bool = False
+    description: Optional[str]
+    security_categories: Optional[str]
+    dataset_id: Optional[int]
+    data_points: Union[list[NumericDataPoint], list[StringDataPoint]]

@@ -44,7 +44,7 @@ class MovieClientLocal:
     def __init__(self, data, client: MovieClient):
         self.movies = TypeLocal(client.movies.class_type, client.movies.class_list, data.movies)
         self.persons = TypeLocal(client.persons.class_type, client.persons.class_list, data.persons)
-        self.ratings = TypeLocal(client.ratings.class_type, client.ratings.class_list)
+        self.ratings = TypeLocal(client.ratings.class_type, client.ratings.class_list, data.ratings)
         self.best_directors = TypeLocal(
             client.best_directors.class_type,
             client.best_directors.class_list,
