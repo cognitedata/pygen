@@ -78,28 +78,26 @@ class CircularModel(DomainModel):
                     output.append((k, v.external_id))
         return output
 
-    def traverse(self, depth: int = 0, tmp_cache: dict = None):
-        return self._traverse(depth, tmp_cache or {})
+    def traverse(self, depth: int = 0, tmp_cache: dict[str, Any] = None):
+        tmp_cache = tmp_cache or {}
+        if self.external_id in tmp_cache:
+            return tmp_cache[self.external_id]
 
-    def _traverse(self, depth: int, cache: dict[str, Any]):
-        if self.external_id in cache:
-            return cache[self.external_id]
-
-        cache[self.external_id] = self.copy()
+        tmp_cache[self.external_id] = self.copy()
         if depth == 0:
-            return cache[self.external_id]
+            return tmp_cache[self.external_id]
 
         for domain_field in self._domain_fields():
             value = getattr(self, domain_field)
             if value is None:
                 value = None
             elif isinstance(value, list):
-                value = [entry._traverse(depth=depth - 1, cache=cache) for entry in value]
+                value = [entry.traverse(depth=depth - 1, cache=tmp_cache) for entry in value]
             else:
-                value = value._traverse(depth=depth - 1, cache=cache)
-            setattr(cache[self.external_id], domain_field, value)
+                value = value.traverse(depth=depth - 1, cache=tmp_cache)
+            setattr(tmp_cache[self.external_id], domain_field, value)
 
-        return cache[self.external_id]
+        return tmp_cache[self.external_id]
 
 
 class TimeSeries(DomainModel):

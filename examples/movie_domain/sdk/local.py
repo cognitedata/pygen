@@ -40,37 +40,26 @@ class TypeLocal:
         ...
 
 
-class NominationAPI:
-    def __init__(self, data, client: MovieClient):
-        self.best_directors = TypeLocal(
-            client.nominations.best_directors.class_type,
-            client.nominations.best_directors.class_list,
-            data.best_directors,
-        )
-        self.best_leading_actor = TypeLocal(
-            client.nominations.best_leading_actor.class_type,
-            client.nominations.best_leading_actor.class_list,
-            data.best_leading_actors,
-        )
-
-        self.best_leading_actress = TypeLocal(
-            client.nominations.best_leading_actress.class_type,
-            client.nominations.best_leading_actress.class_list,
-            data.best_leading_actress,
-        )
-
-
-class RolesAPI:
-    def __init__(self, data, client: MovieClient):
-        self.actors = TypeLocal(client.roles.actors.class_type, client.roles.actors.class_list, data.actors)
-        self.directors = TypeLocal(client.roles.directors.class_type, client.roles.directors.class_list, data.directors)
-
-
 class MovieClientLocal:
     def __init__(self, data, client: MovieClient):
         self.movies = TypeLocal(client.movies.class_type, client.movies.class_list, data.movies)
         self.persons = TypeLocal(client.persons.class_type, client.persons.class_list, data.persons)
-        self.nominations = NominationAPI(data, client)
-        self.roles = RolesAPI(data, client)
-        # Todo Add ratings
         self.ratings = TypeLocal(client.ratings.class_type, client.ratings.class_list)
+        self.best_directors = TypeLocal(
+            client.best_directors.class_type,
+            client.best_directors.class_list,
+            data.best_directors,
+        )
+        self.best_leading_actor = TypeLocal(
+            client.best_leading_actor.class_type,
+            client.best_leading_actor.class_list,
+            data.best_leading_actors,
+        )
+
+        self.best_leading_actress = TypeLocal(
+            client.best_leading_actress.class_type,
+            client.best_leading_actress.class_list,
+            data.best_leading_actress,
+        )
+        self.actors = TypeLocal(client.actors.class_type, client.actors.class_list, data.actors)
+        self.directors = TypeLocal(client.directors.class_type, client.directors.class_list, data.directors)
