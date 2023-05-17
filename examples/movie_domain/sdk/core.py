@@ -26,7 +26,10 @@ class CircularModel(DomainModel):
                 and field.sub_fields
                 and any(_is_subclass(sub.type_, DomainModel) for sub in field.sub_fields)
             )
-            if is_forward_ref or is_domain or is_list_domain:
+            is_list_forward_ref = field.sub_fields and any(
+                isinstance(sub.type_, ForwardRef) for sub in field.sub_fields
+            )
+            if is_forward_ref or is_domain or is_list_domain or is_list_forward_ref:
                 domain_fields.add(field_name)
         return domain_fields
 
@@ -51,13 +54,14 @@ class CircularModel(DomainModel):
             exclude_none,
         )
         for field in domain_fields:
-            if value := getattr(self, field):
-                if isinstance(value, list):
-                    yield field, [v.external_id if isinstance(v, DomainModel) else v for v in value]
-                else:
-                    yield field, value.external_id
-            else:
-                yield field, None
+            yield field, None
+            # if value := getattr(self, field):
+            #     if isinstance(value, list):
+            #         yield field, [v.external_id if hasattr(v, "external_id") else v for v in value]
+            #     else:
+            #         yield field, value.external_id if hasattr(value, "external_id") else value
+            # else:
+            #     yield field, None
 
     def __repr_args__(self) -> Sequence[tuple[str | None, Any]]:
         """
@@ -94,7 +98,9 @@ class CircularModel(DomainModel):
             elif isinstance(value, list):
                 value = [entry.traverse(depth=depth - 1, tmp_cache=tmp_cache) for entry in value]
             else:
-                value = value.traverse(depth=depth - 1, tmp_cache=tmp_cache)
+                value = (
+                    value.traverse(depth=depth - 1, tmp_cache=tmp_cache) if hasattr(value, "traverse") else value.copy()
+                )
             setattr(tmp_cache[self.external_id], domain_field, value)
 
         return tmp_cache[self.external_id]

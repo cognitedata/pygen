@@ -26,10 +26,7 @@ class TypeAPI:
         ...
 
     def retrieve(self, external_id: str | Sequence[str], propagation_limit: int = 0) -> T_TypeNode | T_TypeNodeList:
-        is_singular = isinstance(external_id, str)
-        id_set = {external_id} if is_singular else set(external_id)
-        selected_nodes = [node for node in self._data if node.externalId in id_set]
-        return selected_nodes[0] if is_singular else self.class_list(selected_nodes)
+        ...
 
     def delete(self, node_external_id: str | T_TypeNode | T_TypeNodeList, propagation_limit: int = 0):
         ...

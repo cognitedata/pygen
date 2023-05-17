@@ -17,7 +17,7 @@ class TypeLocal:
         return self.class_list([node.traverse(propagation_limit, tmp_cache) for node in self._data])
 
     def apply(self, node: T_TypeNode, propagation_limit: int = 0):
-        ...
+        print(f"Created/Updated node {node.external_id} to graph and all nodes {propagation_limit} step away.")  # noqa
 
     @overload
     def retrieve(self, external_id: str, propagation_limit: int = 0) -> T_TypeNode:
@@ -32,12 +32,16 @@ class TypeLocal:
         id_set = {external_id} if is_singular else set(external_id)
         tmp_cache = {}
         selected_nodes = [
-            node.traverse(propagation_limit, tmp_cache) for node in self._data if node.externalId in id_set
+            node.traverse(propagation_limit, tmp_cache) if propagation_limit >= 0 else node
+            for node in self._data
+            if node.external_id in id_set
         ]
         return selected_nodes[0] if is_singular else self.class_list(selected_nodes)
 
     def delete(self, node_external_id: str | T_TypeNode | T_TypeNodeList, propagation_limit: int = 0):
-        ...
+        print(  # noqa
+            f"Deleted node {node_external_id.external_id} from graph and all nodes {propagation_limit} step away."
+        )
 
 
 class MovieClientLocal:

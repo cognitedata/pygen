@@ -69,3 +69,16 @@ def test_traverse_circular_model_depth_2(pulp_fiction_movie: Movie):
 
     # Act and Assert
     assert pulp_fiction_movie.traverse(depth=1) == output
+
+
+def test_retrieve_movie(local_client: MovieClientLocal, pulp_fiction_movie: Movie):
+    pulp_fiction = local_client.movies.retrieve(pulp_fiction_movie.external_id, propagation_limit=2)
+
+    assert pulp_fiction.actors is not None
+    assert pulp_fiction.actors[0].person is not None
+
+
+def test_retrieve_person_zero_propagation(local_client: MovieClientLocal):
+    quentin = local_client.persons.retrieve("person:quentin_tarantino")
+
+    assert quentin.roles is None
