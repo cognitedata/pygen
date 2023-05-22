@@ -57,7 +57,7 @@ repos:
     rev: v3.3.1
     hooks:
     - id: pyupgrade
-      exclude: ^(cognite/client/_proto.*)|(cognite/dm_clients/.*)|(examples/.*)|(tests/test_dm_clients/.*)$
+      exclude: ^(cognite/client/_proto.*)|(cognite/pygen/dm_clients/.*)|(examples/.*)|(tests/test_dm_clients/.*)$
       # ^^ Correctly updates thing like `Optional[]` with `| None` but Pydantic chokes on this on Python<3.10 :(
       args:
           - --py39-plus

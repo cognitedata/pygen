@@ -19,6 +19,8 @@ ignore =
     N818,
     # Error for call in function argument, typer uses this to provide docs.
     B008
+    # Allow mixedCase
+    N815
 
 # Pydantic @validator makes a method a classmethod
 classmethod-decorators=classmethod,validator
