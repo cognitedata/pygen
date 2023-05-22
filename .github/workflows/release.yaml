@@ -41,8 +41,9 @@ jobs:
       - name: Build package
         run: poetry build
 
-      - name: Release to PyPI
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-        run: twine upload --verbose dist/* || echo 'Version exists'
+        # Comment in when you want to release.
+      #- name: Release to PyPI
+        #env:
+        #  TWINE_USERNAME: __token__
+        #  TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        #run: twine upload --verbose dist/* || echo 'Version exists'
