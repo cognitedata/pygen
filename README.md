@@ -7,11 +7,11 @@ Cognite GraphQL Python Generator
 This is the Cognite GraphQL Python Generator, `pygen`. The purpose of this package is to help developers to
 work with Cognite Data Fusion's (CDF) Data Models (DM) in Python.
 
-**[DISCLAIMER!]** This project is in a highly experimental no guarantees are made for consistency between versions. The
-project may also become deprecated if the experimentation turns out to be a dead end.
+**[DISCLAIMER!]** This project is in a highly experimental state and no guarantees are made for consistency between
+versions. The project may also become deprecated if the experimentation turns out to be a dead end.
 
 
-The core functionality is to provide a Python client that matches a data model. This enables the developer the following
+The core functionality is to provide a Python client that matches a data model. This enables the developer for the following
 benefits
 
 * Client side validation of the data before writing it to CDF.
@@ -125,7 +125,7 @@ See [dm_clients/README.md](cognite/pygen/dm_clients/README.md) for more details.
 
 
 ## Changelog
-Wondering about upcoming or previous changes to the SDK? Take a look at the [CHANGELOG](https://github.com/cognitedata/pygen/blob/master/CHANGELOG.md).
+Wondering about previous changes to the SDK? Take a look at the [CHANGELOG](https://github.com/cognitedata/pygen/blob/master/CHANGELOG.md).
 
 ## Contributing
 Want to contribute? Check out [CONTRIBUTING](https://github.com/cognitedata/pygen/blob/master/CONTRIBUTING.md).

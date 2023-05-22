@@ -20,6 +20,7 @@ Changes are grouped as follows
 
 * Package name from `cognite-gql-pygen` to `pygen`.
 * Moved `dm_client` into the main `pygen` package.
+* CLI command going from `dm` to `pygen` for consistency.
 
 
 ## [0.8.0] - 14-05-23
