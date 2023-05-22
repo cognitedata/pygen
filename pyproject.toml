@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cognite-pygen"
-version = "0.8.0"
+version = "0.9.0"
 description = "Cognite GraphQL Python Generation SDK"
 readme = "README.md"
 authors = ["Cognite <support@cognite.com>"]
