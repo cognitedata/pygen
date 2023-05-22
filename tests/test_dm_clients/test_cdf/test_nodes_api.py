@@ -1,7 +1,7 @@
 import pytest
 
-from cognite.dm_clients.cdf.client_dm_v3 import NodesAPI
-from cognite.dm_clients.cdf.data_classes_dm_v3 import Node
+from cognite.pygen.dm_clients.cdf.client_dm_v3 import NodesAPI
+from cognite.pygen.dm_clients.cdf.data_classes_dm_v3 import Node
 from tests.test_dm_clients.test_cdf._utils import *  # noqa
 
 

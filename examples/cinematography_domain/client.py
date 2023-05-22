@@ -4,8 +4,8 @@ from typing import Optional
 
 from cachelib import BaseCache, SimpleCache
 
-from cognite.dm_clients.cdf.get_client import get_client_config
-from cognite.dm_clients.domain_modeling import DomainClient, DomainModelAPI
+from cognite.pygen.dm_clients.cdf.get_client import get_client_config
+from cognite.pygen.dm_clients.domain_modeling import DomainClient, DomainModelAPI
 
 from .schema import Movie, Person, cine_schema
 

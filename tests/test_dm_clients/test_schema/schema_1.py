@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Optional
 
-from cognite.dm_clients.domain_modeling import DomainModel
+from cognite.pygen.dm_clients.domain_modeling import DomainModel
 from tests.constants import TestSchemas
 
 

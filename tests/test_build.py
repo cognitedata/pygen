@@ -1,6 +1,6 @@
 import toml
 
-from cognite.gqlpygen import version
+from cognite.pygen import version
 from tests.constants import REPO_ROOT
 
 

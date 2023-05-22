@@ -76,7 +76,7 @@ With the (future) arrival of GraphQL mutations in DM, this package might become 
 3. Test if it works:
    ```
    $ python
-   >>> from cognite.dm_clients.domain_modeling.domain_client import get_empty_domain_client
+   >>> from cognite.pygen.dm_clients.domain_modeling.domain_client import get_empty_domain_client
    >>> c = get_empty_domain_client()
    >>> c._client.spaces.list()
    [Space(space="...

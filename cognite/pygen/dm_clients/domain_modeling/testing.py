@@ -11,10 +11,10 @@ from cognite.client.testing import monkeypatch_cognite_client
 from pydantic import BaseModel, Field
 from requests.models import Response
 
-from cognite.dm_clients.cdf.data_classes_dm_v3 import View
-from cognite.dm_clients.domain_modeling import DomainClient, DomainModelAPI, Schema
-from cognite.dm_clients.domain_modeling.schema import DomainModelT
-from cognite.dm_clients.misc import to_camel
+from cognite.pygen.dm_clients.cdf.data_classes_dm_v3 import View
+from cognite.pygen.dm_clients.domain_modeling import DomainClient, DomainModelAPI, Schema
+from cognite.pygen.dm_clients.domain_modeling.schema import DomainModelT
+from cognite.pygen.dm_clients.misc import to_camel
 
 
 class Config:

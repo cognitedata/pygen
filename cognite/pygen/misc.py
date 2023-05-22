@@ -1,6 +1,6 @@
 from typing import Optional
 
-from cognite.dm_clients.misc import to_pascal, to_snake
+from cognite.pygen.dm_clients.misc import to_pascal, to_snake
 
 
 def to_client_name(name: Optional[str]) -> str:

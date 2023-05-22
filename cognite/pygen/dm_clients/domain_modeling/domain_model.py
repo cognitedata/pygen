@@ -7,7 +7,7 @@ import strawberry
 from pydantic import Extra, PrivateAttr
 from typing_extensions import Self
 
-from cognite.dm_clients.cdf.data_classes_dm_v3 import DataModelBase
+from cognite.pygen.dm_clients.cdf.data_classes_dm_v3 import DataModelBase
 
 __all__ = [
     "DomainModel",

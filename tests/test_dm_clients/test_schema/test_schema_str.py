@@ -1,6 +1,6 @@
 import pytest
 
-from cognite.dm_clients.domain_modeling import DomainModel, Schema
+from cognite.pygen.dm_clients.domain_modeling import DomainModel, Schema
 
 
 @pytest.fixture

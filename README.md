@@ -1,10 +1,10 @@
 Cognite GraphQL Python Generator
 ==========================
-[![build](https://github.com/cognitedata/cognite-gql-pygen/actions/workflows/release.yaml/badge.svg)](https://github.com/cognitedata/cognite-gql-pygen/actions/workflows/release.yaml)
-[![GitHub](https://img.shields.io/github/license/cognitedata/cognite-gql-pygen)](https://github.com/cognitedata/cognite-gql-pygen/blob/master/LICENSE)
+[![build](https://github.com/cognitedata/pygen/actions/workflows/release.yaml/badge.svg)](https://github.com/cognitedata/pygen/actions/workflows/release.yaml)
+[![GitHub](https://img.shields.io/github/license/cognitedata/pygen)](https://github.com/cognitedata/pygen/blob/master/LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
-This is the Cognite GraphQL Python Generator, `gqlpygen`. The purpose of this package is to help developers to
+This is the Cognite GraphQL Python Generator, `pygen`. The purpose of this package is to help developers to
 work with Cognite Data Fusion's (CDF) Data Models (DM) in Python.
 
 **[DISCLAIMER!]** This project is in a highly experimental no guarantees are made for consistency between versions. The
@@ -28,7 +28,7 @@ benefits
 
 To install this package without CLI support:
 ```bash
-pip install cognite-gql-pygen
+pip install cognite-pygen
 ```
 
 ### With optional dependencies
@@ -36,7 +36,7 @@ pip install cognite-gql-pygen
 * `cli` This includes CLI support such that you can run the package from the command line.
 
 ```bash
-pip install cognite-gql-pygen[cli]
+pip install cognite-pygen[cli]
 ```
 
 ## Usage
@@ -55,7 +55,7 @@ the API and the convenience method get_[client_name]_client().
 To generate from a `.graphql` schema you use the following command.
 
 ```bash
-dm topython 'PATH_TO_SCHEMA'
+pygen topython 'PATH_TO_SCHEMA'
 ```
 
 This will create a `schema.py` and a `client.py` file in the directory you are running the command.
@@ -63,7 +63,7 @@ This will create a `schema.py` and a `client.py` file in the directory you are r
 To generate from `schema.py` use the following command
 
 ```bash
-dm togql 'PATH_TO_FILE'
+pygen togql 'PATH_TO_FILE'
 ```
 
 This will load the python module and create a `schema.graphql` file in the directory you are running the command.
@@ -71,14 +71,14 @@ This will load the python module and create a `schema.graphql` file in the direc
 `PATH_TO_FILE` can be either a path to a `.py` file or a Python dot-notation to a package
 (e.g. `my_project.schema_module` make sure that the package in which case the module must be in Python path).
 
-Note the `schema.py` file must follow a specific structure, see [examples/cinematography_domain](https://github.com/cognitedata/cognite-gql-pygen/blob/main/examples/cinematography_domain/schema.py) for an example.
+Note the `schema.py` file must follow a specific structure, see [examples/cinematography_domain](https://github.com/cognitedata/cognite-pygen/blob/main/examples/cinematography_domain/schema.py) for an example.
 The overall structure is as follows:
 
 1. Instantiate a new schema with the line, `myschema: Schema[DomainModel] = Schema()`
 2. Register all you Types with `@myschema.register_type`
 3. Close the schema with `myschema.close()`
 
-To get a concrete example is available in [examples/cinematography_domain](https://github.com/cognitedata/cognite-gql-pygen/blob/main/examples/cinematography_domain),
+To get a concrete example is available in [examples/cinematography_domain](https://github.com/cognitedata/cognite-pygen/blob/main/examples/cinematography_domain),
 it consists of four files.
 
 * `schema.graphql` The schema defined in GraphQL language.
@@ -93,7 +93,7 @@ classes in a `PythonSDK.schema` and the client in the `PythonSDK.client`.
 
 
 ```python
-from cognite.gqlpygen import to_client_sdk
+from cognite.pygen import to_client_sdk
 my_schema = """type Case {
   scenario: Scenario
   start_time: String!
@@ -111,7 +111,7 @@ print(sdk.schema)
 
 ### Settings File
 
-`dm togql` and `dm topython` take their defaults form `settings.toml` if present. See
+`gypen togql` and `pygen topython` take their defaults form `settings.toml` if present. See
 [settings.toml](./cognite/dm_clients/settings.toml) for an example, section `[local]` is relevant for `togql` and
 `topython` commands.
 
@@ -119,13 +119,13 @@ print(sdk.schema)
 ### DM Non-GraphQl API
 
 The API developed is based on the non-GraphQL endpoints in Data Model API v3. There is a simplified wrapper which is available
-in `cognite.dm_clients`.
+in `cognite.pygen.dm_clients`.
 
-See [dm_clients/README.md](cognite/dm_clients/README.md) for more details.__
+See [dm_clients/README.md](cognite/pygen/dm_clients/README.md) for more details.__
 
 
 ## Changelog
-Wondering about upcoming or previous changes to the SDK? Take a look at the [CHANGELOG](https://github.com/cognitedata/cognite-gql-pygen/blob/master/CHANGELOG.md).
+Wondering about upcoming or previous changes to the SDK? Take a look at the [CHANGELOG](https://github.com/cognitedata/pygen/blob/master/CHANGELOG.md).
 
 ## Contributing
-Want to contribute? Check out [CONTRIBUTING](https://github.com/cognitedata/cognite-gqlpygen/blob/master/CONTRIBUTING.md).
+Want to contribute? Check out [CONTRIBUTING](https://github.com/cognitedata/pygen/blob/master/CONTRIBUTING.md).

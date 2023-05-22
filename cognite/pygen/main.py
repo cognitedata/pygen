@@ -28,10 +28,10 @@ except ImportError:
 else:
     _has_packaging = True
 
-from cognite.dm_clients.config import settings
-from cognite.dm_clients.domain_modeling.schema import Schema
-from cognite.gqlpygen.generator import to_client_sdk
-from cognite.gqlpygen.misc import to_client_name, to_schema_name
+from cognite.pygen.dm_clients.config import settings
+from cognite.pygen.dm_clients.domain_modeling.schema import Schema
+from cognite.pygen.generator import to_client_sdk
+from cognite.pygen.misc import to_client_name, to_schema_name
 
 
 def _hide_pw(secret: str, value: Optional[str] = None) -> str:
@@ -61,7 +61,7 @@ def _check_cdf_cli() -> None:
         )
         sys.exit(1)
     if not _has_packaging:
-        raise ImportError("packaging is required for this feature, install with `pip install cognite-gql-pygen[cli]")
+        raise ImportError("packaging is required for this feature, install with `pip install cognite-pygen[cli]")
     min_version = version.Version("2.0.0")
     installed_version = version.parse(cdf_version_proc.stdout.decode())
     if installed_version < min_version:

@@ -5,8 +5,8 @@ from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 from typing import TYPE_CHECKING, Callable, Iterable, List, Sequence, Type, cast
 
-from cognite.dm_clients.cdf.client_dm_v3 import EdgesAPI
-from cognite.dm_clients.cdf.data_classes_dm_v3 import Edge, RelationReference, View
+from cognite.pygen.dm_clients.cdf.client_dm_v3 import EdgesAPI
+from cognite.pygen.dm_clients.cdf.data_classes_dm_v3 import Edge, RelationReference, View
 
 from .domain_model import DomainModel
 

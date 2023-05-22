@@ -13,9 +13,9 @@ from pydantic import parse_obj_as
 from requests import Response
 from retry import retry
 
-from cognite.dm_clients.cdf.data_classes_dm_v3 import Container, DataModel, Edge, Node, Space, View
-from cognite.dm_clients.cdf.get_client import get_client_config
-from cognite.dm_clients.config import settings
+from cognite.pygen.dm_clients.cdf.data_classes_dm_v3 import Container, DataModel, Edge, Node, Space, View
+from cognite.pygen.dm_clients.cdf.get_client import get_client_config
+from cognite.pygen.dm_clients.config import settings
 
 logger = logging.getLogger(__name__)
 

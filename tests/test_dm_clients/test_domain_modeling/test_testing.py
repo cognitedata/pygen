@@ -1,6 +1,6 @@
 from faker import Faker
 
-from cognite.dm_clients.domain_modeling.testing import ApplyResponse, create_test_client_factory
+from cognite.pygen.dm_clients.domain_modeling.testing import ApplyResponse, create_test_client_factory
 from examples.cinematography_domain.client import CineClient
 from examples.cinematography_domain.schema import Person, cine_schema
 
