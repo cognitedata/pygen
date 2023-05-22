@@ -5,7 +5,7 @@ from collections.abc import Iterator
 from dataclasses import dataclass
 from dataclasses import field as dfield
 
-from cognite.dm_clients.misc import to_snake
+from cognite.pygen.dm_clients.misc import to_snake
 
 BUILTIN_TYPES = {
     "str",

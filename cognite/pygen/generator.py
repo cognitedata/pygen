@@ -4,8 +4,8 @@ from dataclasses import dataclass
 
 from jinja2 import Environment, PackageLoader, select_autoescape
 
-from cognite.dm_clients.misc import to_snake
-from cognite.gqlpygen.parser import parse_graphql
+from cognite.pygen.dm_clients.misc import to_snake
+from cognite.pygen.parser import parse_graphql
 
 
 @dataclass
@@ -28,7 +28,7 @@ def to_client_sdk(schema_raw: str, client_name: str, schema_name: str) -> Python
 
     # Create client.py
     env = Environment(
-        loader=PackageLoader("cognite.gqlpygen", "templates"),
+        loader=PackageLoader("cognite.pygen", "templates"),
         autoescape=select_autoescape(),
     )
 

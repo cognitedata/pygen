@@ -2,7 +2,7 @@ from pathlib import Path
 
 import toml
 
-from cognite.gqlpygen import version
+from cognite.pygen import version
 
 with (Path(__file__).parent.parent / "pyproject.toml").open() as fh:
     pyproject_toml = toml.load(fh)

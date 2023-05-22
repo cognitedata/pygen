@@ -6,8 +6,8 @@ from typing import TYPE_CHECKING, Dict, Generic, Iterable, List, Optional, Type,
 from cachelib import BaseCache
 from cognite.client import ClientConfig
 
-from cognite.dm_clients.cdf.client_dm_v3 import CogniteClientDmV3, EdgesAPI, NodesAPI
-from cognite.dm_clients.config import settings
+from cognite.pygen.dm_clients.cdf.client_dm_v3 import CogniteClientDmV3, EdgesAPI, NodesAPI
+from cognite.pygen.dm_clients.config import settings
 
 from ..cdf.client_dm_v3 import ViewsAPI
 from .domain_model import DomainModel
@@ -142,10 +142,10 @@ class DomainClient(Generic[DomainModelT]):
 def get_empty_domain_client():
     from cachelib import SimpleCache
 
-    from cognite.dm_clients.cdf.get_client import get_client_config
-    from cognite.dm_clients.config import settings
-    from cognite.dm_clients.domain_modeling.domain_model_api import DomainModelAPI
-    from cognite.dm_clients.domain_modeling.schema import Schema
+    from cognite.pygen.dm_clients.cdf.get_client import get_client_config
+    from cognite.pygen.dm_clients.config import settings
+    from cognite.pygen.dm_clients.domain_modeling.domain_model_api import DomainModelAPI
+    from cognite.pygen.dm_clients.domain_modeling.schema import Schema
 
     return DomainClient(
         schema=Schema(),

@@ -24,7 +24,7 @@ Uploading some data into a DM data model was cumbersome when interacting directl
 4. Populate and manipulate data items / instances in DM using a `DomainClient` provided in this package.
 
 
-> Note: This might change in the future: as `gqlpygen` module evolves we should be able to dynamically create Python
+> Note: This might change in the future: as `pygen` module evolves we should be able to dynamically create Python
 > data types from existing GraphQL schemas in DM.
 
 
@@ -76,7 +76,7 @@ With the (future) arrival of GraphQL mutations in DM, this package might become 
 3. Test if it works:
    ```
    $ python
-   >>> from cognite.dm_clients.domain_modeling.domain_client import get_empty_domain_client
+   >>> from cognite.pygen.dm_clients.domain_modeling.domain_client import get_empty_domain_client
    >>> c = get_empty_domain_client()
    >>> c._client.spaces.list()
    [Space(space="...

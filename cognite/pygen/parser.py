@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import graphql
 
-from cognite.dm_clients.misc import to_pascal
-from cognite.gqlpygen.data_classes import DomainModel, DomainModels, Field
+from cognite.pygen.data_classes import DomainModel, DomainModels, Field
+from cognite.pygen.dm_clients.misc import to_pascal
 
 GRAPHQL_TO_PYTHON_TYPE_MAP = {
     "String": "str",

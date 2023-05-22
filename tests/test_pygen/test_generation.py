@@ -1,8 +1,8 @@
 import pytest
 
 from cinematography_domain.schema import cine_schema
-from cognite.dm_clients.domain_modeling import DomainModel, Schema
-from cognite.gqlpygen.generator import PythonSDK, to_client_sdk
+from cognite.pygen.dm_clients.domain_modeling import DomainModel, Schema
+from cognite.pygen.generator import PythonSDK, to_client_sdk
 from tests.constants import CINEMATOGRAPHY
 
 

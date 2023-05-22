@@ -8,16 +8,17 @@ from pathlib import Path
 import pytest
 from faker import Faker
 
-from cognite.dm_clients.domain_modeling import DomainModel, Schema
-from cognite.dm_clients.domain_modeling.domain_client import DomainClient, DomainModelT
-from cognite.dm_clients.misc import to_pascal
+from cognite.pygen.dm_clients.domain_modeling import DomainModel, Schema
+from cognite.pygen.dm_clients.domain_modeling.domain_client import DomainClient, DomainModelT
+from cognite.pygen.dm_clients.misc import to_pascal
 
 try:
-    from cognite.gqlpygen.main import to_python
+    from cognite.pygen.main import to_python
 except ImportError:
     _has_cli = False
 else:
     _has_cli = True
+
 from tests.constants import REPO_ROOT, TestSchemas
 
 

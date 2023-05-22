@@ -13,6 +13,16 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+
+## [0.9.0] - 22-05-23
+
+### Changed
+
+* Package name from `cognite-gql-pygen` to `pygen`.
+* Moved `dm_client` into the main `pygen` package.
+* CLI command going from `dm` to `pygen` for consistency.
+
+
 ## [0.8.0] - 14-05-23
 
 ### Improved

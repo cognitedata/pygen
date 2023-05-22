@@ -1,7 +1,7 @@
 import pytest
 
-from cognite.gqlpygen.data_classes import DomainModel, Field
-from cognite.gqlpygen.parser import parse_graphql
+from cognite.pygen.data_classes import DomainModel, Field
+from cognite.pygen.parser import parse_graphql
 from tests.constants import CINEMATOGRAPHY
 
 
