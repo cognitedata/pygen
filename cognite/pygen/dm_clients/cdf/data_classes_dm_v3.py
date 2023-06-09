@@ -35,7 +35,7 @@ class View(DataModelBase):
     description: Optional[str] = None
     filter: Optional[dict] = None
     implements: Optional[List[dict]] = None
-    properties: dict  # for simplicity, we require this dict to exist, even though the API doesn't
+    properties: Optional[dict] = None
 
 
 class DataModel(DataModelBase):

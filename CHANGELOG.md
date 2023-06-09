@@ -13,6 +13,12 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.9.1] - 09-06-23
+
+### Fixed
+
+* Allow properties to be optional in dms API.
+
 
 ## [0.9.0] - 22-05-23
 
