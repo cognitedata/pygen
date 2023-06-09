@@ -38,7 +38,7 @@ class DomainClient(Generic[DomainModelT]):
         domain_model_api_class: Type[DomainModelAPI],
         cache: BaseCache,
         config: ClientConfig,
-        space_id: Optional[str] = None,
+        space: Optional[str] = None,
         data_model: Optional[str] = None,
         schema_version: Optional[int] = None,
         # TODO ^ some of these args are redundant.
@@ -50,9 +50,9 @@ class DomainClient(Generic[DomainModelT]):
         self._cache_lock: Lock = Lock()
         self._client = CogniteClientDmV3(config)
         self._client._config.headers["cdf-version"] = "alpha"
-        if space_id is None:
-            space_id = settings.dm_clients.space
-        self.space_id = space_id
+        if space is None:
+            space = settings.dm_clients.space
+        self.space = space
         self._data_model = data_model or settings.dm_clients.get("datamodel")
         self.schema_version = schema_version or settings.dm_clients.get("schema_version")
         if self.schema_version is None:
@@ -74,14 +74,14 @@ class DomainClient(Generic[DomainModelT]):
         )
 
         views_api = ViewsAPI(config, self._client._API_VERSION, self._client)
-        views = {view.externalId: view for view in views_api.list(self.space_id)}
+        views = {view.externalId: view for view in views_api.list(self.space)}
         # ------------------------
 
         api_args = {
             "nodes_api": nodes_api,
             "edges_api": edges_api,
             "domain_client": self,
-            "space_id": self.space_id,
+            "space": self.space,
             "schema_version": self.schema_version,
             "api_version": self._client._API_VERSION,
         }
@@ -136,7 +136,7 @@ class DomainClient(Generic[DomainModelT]):
         domain_model_api.delete(items, delete_related_items)
 
     def graph(self, query: str):
-        return self._client.graph(self.space_id, self._data_model, str(self.schema_version), query)
+        return self._client.graph(self.space, self._data_model, str(self.schema_version), query)
 
 
 def get_empty_domain_client():

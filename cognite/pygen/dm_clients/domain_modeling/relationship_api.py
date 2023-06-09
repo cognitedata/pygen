@@ -21,7 +21,7 @@ class RelationshipAPI:
     """
     This is a wrapper for EdgesAPI which simplifies its use, specifically:
      * constructs `edge.type` values (from model_type, and attribute),
-     * works with a single space_id,
+     * works with a single space,
      * simplifies creation of Edge instances (does not require them to be created outside).
 
     This class is considered "internal". DomainModelAPI uses it, so it should not be necessary to use it directly.
@@ -34,14 +34,14 @@ class RelationshipAPI:
         domain_model_api: DomainModelAPI,
         view: View,
         schema_version: int,
-        space_id: str,
+        space: str,
     ):
         self.edges_api = edges_api
         self.model_type = model_type
         self.domain_model_api = domain_model_api
         self.view = view
         self.schema_version = schema_version
-        self.space_id = space_id
+        self.space = space
 
     def add(self, attribute: str, start_ext_id: str, end_ext_ids: Iterable[str]) -> None:
         """
@@ -51,11 +51,11 @@ class RelationshipAPI:
         edges = [
             Edge(
                 externalId=f"{start_ext_id}.{attribute}__{end_ext_id}",
-                space=self.space_id,
+                space=self.space,
                 version=str(self.schema_version),
-                type=RelationReference(space=self.space_id, externalId=edge_type_ext_id),
-                startNode=RelationReference(space=self.space_id, externalId=start_ext_id),
-                endNode=RelationReference(space=self.space_id, externalId=end_ext_id),
+                type=RelationReference(space=self.space, externalId=edge_type_ext_id),
+                startNode=RelationReference(space=self.space, externalId=start_ext_id),
+                endNode=RelationReference(space=self.space, externalId=end_ext_id),
             )
             for end_ext_id in end_ext_ids
         ]
@@ -64,7 +64,7 @@ class RelationshipAPI:
             start_item = self.domain_model_api.domain_client.cache.get(start_ext_id)
             if start_item is not None:
                 value = getattr(start_item, attribute, [])
-                value.extend([{"space": self.space_id, "externalId": end_ext_id} for end_ext_id in end_ext_ids])
+                value.extend([{"space": self.space, "externalId": end_ext_id} for end_ext_id in end_ext_ids])
                 self.domain_model_api.domain_client.cache.set(start_ext_id, start_item)
 
     def apply(self, attribute: str, start_ext_id: str, end_ext_ids: Iterable[str]) -> None:
@@ -78,11 +78,11 @@ class RelationshipAPI:
         edges = [
             Edge(
                 externalId=f"{start_ext_id}.{attribute}__{end_ext_id}",
-                space=self.space_id,
+                space=self.space,
                 version=str(self.schema_version),
-                type=RelationReference(space=self.space_id, externalId=edge_type_ext_id),
-                startNode=RelationReference(space=self.space_id, externalId=start_ext_id),
-                endNode=RelationReference(space=self.space_id, externalId=end_ext_id),
+                type=RelationReference(space=self.space, externalId=edge_type_ext_id),
+                startNode=RelationReference(space=self.space, externalId=start_ext_id),
+                endNode=RelationReference(space=self.space, externalId=end_ext_id),
             )
             for end_ext_id in end_ext_ids
         ]
@@ -116,7 +116,7 @@ class RelationshipAPI:
         return edges
 
     def delete(self, items: Iterable[Edge]) -> None:
-        self.edges_api.delete(self.space_id, list({edge.externalId for edge in items}))
+        self.edges_api.delete(self.space, list({edge.externalId for edge in items}))
 
 
 ProxyAddRelationshipT = Callable[[str, Iterable[str]], None]

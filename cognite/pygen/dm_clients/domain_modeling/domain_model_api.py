@@ -40,7 +40,7 @@ class DomainModelAPI(Generic[DomainModelT]):
         nodes_api: NodesAPI,
         edges_api: EdgesAPI,
         domain_client: DomainClient,
-        space_id: str,
+        space: str,
         schema_version: int,
         api_version: Optional[str] = None,
     ):
@@ -53,12 +53,12 @@ class DomainModelAPI(Generic[DomainModelT]):
             self,
             view,
             schema_version,
-            space_id,
+            space,
         )
         self.connect = RelationshipProxy(self)
         # TODO it would make more sense to pass RelationshipAPI directly instead of EdgesAPI
         self.domain_client = domain_client
-        self.space_id = space_id
+        self.space = space
         self.schema_version = schema_version
         self.api_version = api_version
 
@@ -117,7 +117,7 @@ class DomainModelAPI(Generic[DomainModelT]):
         def _make_ref(item_data: dict) -> dict:
             """Represents one-to-one relationships in CDF DM."""
             return {
-                "space": self.space_id,  # TODO item.space_id ?
+                "space": self.space,  # TODO item.space ?
                 "externalId": item_data["externalId"],
             }
 
@@ -133,10 +133,10 @@ class DomainModelAPI(Generic[DomainModelT]):
         def _make_node(data: dict) -> Node:
             return Node(
                 version=str(self.schema_version),
-                space=self.space_id,
+                space=self.space,
                 externalId=data["externalId"],
                 properties={
-                    self.space_id: {
+                    self.space: {
                         f"{self.view.externalId}/{self.view.version}": _properties_data(data),
                     },
                 },
@@ -235,7 +235,7 @@ class DomainModelAPI(Generic[DomainModelT]):
                     setattr(
                         item,
                         attr,
-                        [{"space": self.space_id, "externalId": subitem.externalId} for subitem in o2m_subitems[attr]],
+                        [{"space": self.space, "externalId": subitem.externalId} for subitem in o2m_subitems[attr]],
                     )
             # ... one-to-one:
             o2o_subitems: Dict[str, Optional[DomainModelT]] = {}
@@ -244,7 +244,7 @@ class DomainModelAPI(Generic[DomainModelT]):
                 o2o_subitems[attr] = subitem
                 if subitem is not None:
                     self._cache_created_items([subitem])
-                    setattr(item, attr, {"space": self.space_id, "externalId": subitem.externalId})
+                    setattr(item, attr, {"space": self.space, "externalId": subitem.externalId})
             # save to cache:
             if item.externalId:
                 self.domain_client.cache.set(item.externalId, item)
@@ -322,7 +322,7 @@ class DomainModelAPI(Generic[DomainModelT]):
                 self.domain_client.delete(subitems, delete_related_items=True)
 
         external_ids = list({item.externalId for item in items if item.externalId})
-        self.nodes_api.delete(self.space_id, external_ids)
+        self.nodes_api.delete(self.space, external_ids)
         with self.domain_client._cache_lock:
             self.domain_client.cache.delete_many(*external_ids)
 
