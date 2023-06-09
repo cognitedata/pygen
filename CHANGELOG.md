@@ -14,6 +14,13 @@ Changes are grouped as follows
 - `Security` in case of vulnerabilities.
 
 
+## [0.9.1] - 09-06-23
+
+### Fixed
+
+* Updated patch version of Pydantic, a fix was needed for typing-extensions 4.6 on Pythpn 3.9
+
+
 ## [0.9.0] - 22-05-23
 
 ### Changed
