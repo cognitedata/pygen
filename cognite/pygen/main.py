@@ -7,10 +7,10 @@ from contextlib import suppress
 from pathlib import Path
 from typing import Optional
 
-import click
 import toml
 
 try:
+    import click
     import typer
 except ImportError:
     _has_typer = False
