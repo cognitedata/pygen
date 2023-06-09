@@ -58,7 +58,7 @@ With the (future) arrival of GraphQL mutations in DM, this package might become 
 
 ## Installation
 
-1. `pip install cognite-gql-pygen`
+1. `pip install cognite-pygen`
 2. Create a `settings.toml` file, see [settings.toml](./settings.toml) for a template.
    * this step is optional, all settings can be specified in code or via env variables
    * `settings.toml` should contain only things which are safe to commit to git
