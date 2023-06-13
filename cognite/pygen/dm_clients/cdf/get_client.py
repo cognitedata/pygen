@@ -45,35 +45,35 @@ class CogniteConfig(BaseSettings):
 
 
 def get_cognite_config() -> CogniteConfig:
-    return CogniteConfig(**settings.cognite)
+    return CogniteConfig(**settings.get("cognite", {}))
 
 
-def get_client_config(config: Optional[CogniteConfig] = None) -> ClientConfig:
-    if config is None:
-        config = get_cognite_config()
+def get_client_config(cognite_config: Optional[CogniteConfig] = None) -> ClientConfig:
+    if cognite_config is None:
+        cognite_config = get_cognite_config()
 
     credentials: Union[OAuthClientCredentials, OAuthInteractive]
-    if config.client_id and config.client_secret:
+    if cognite_config.client_id and cognite_config.client_secret:
         credentials = OAuthClientCredentials(
-            token_url=f"https://login.microsoftonline.com/{config.tenant_id}/oauth2/v2.0/token",
-            client_id=config.client_id,
-            client_secret=config.client_secret,
-            scopes=config.scopes,
+            token_url=f"https://login.microsoftonline.com/{cognite_config.tenant_id}/oauth2/v2.0/token",
+            client_id=cognite_config.client_id,
+            client_secret=cognite_config.client_secret,
+            scopes=cognite_config.scopes,
         )
-    elif config.client_id and config.authority_uri:
+    elif cognite_config.client_id and cognite_config.authority_uri:
         credentials = OAuthInteractive(
-            authority_url=config.authority_uri,
-            client_id=config.client_id,
-            scopes=config.scopes,
-            redirect_port=config.port,
-            token_cache_path=config.token_cache_path,  # type: ignore
+            authority_url=cognite_config.authority_uri,
+            client_id=cognite_config.client_id,
+            scopes=cognite_config.scopes,
+            redirect_port=cognite_config.port,
+            token_cache_path=cognite_config.token_cache_path,  # type: ignore
         )
     else:
         raise ValueError("Missing authentication details for CDF")
     return ClientConfig(
-        client_name=config.client_name,
-        project=config.project,
-        base_url=config.base_url,
+        client_name=cognite_config.client_name,
+        project=cognite_config.project,
+        base_url=cognite_config.base_url,
         credentials=credentials,
     )
 

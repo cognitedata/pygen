@@ -135,7 +135,7 @@ if _has_typer:
             sys.modules[module_name] = module
             spec.loader.exec_module(module)  # type:ignore[union-attr]
         else:
-            module_name = settings.local.get("schema_module", default=schema_module.stem)
+            module_name = settings.get("local.pschema_module", default=schema_module.stem)
             click.echo(f"Got module '{schema_module}', trying to import it...")
             module = importlib.import_module(module_name)
         click.echo("Import successful")

@@ -7,9 +7,9 @@ from cachelib import BaseCache
 from cognite.client import ClientConfig
 
 from cognite.pygen.dm_clients.cdf.client_dm_v3 import CogniteClientDmV3, EdgesAPI, NodesAPI
-from cognite.pygen.dm_clients.config import settings
 
 from ..cdf.client_dm_v3 import ViewsAPI
+from ..cdf.get_client import CogniteConfig
 from .domain_model import DomainModel
 
 if TYPE_CHECKING:
@@ -50,11 +50,9 @@ class DomainClient(Generic[DomainModelT]):
         self._cache_lock: Lock = Lock()
         self._client = CogniteClientDmV3(config)
         self._client._config.headers["cdf-version"] = "alpha"
-        if space is None:
-            space = settings.dm_clients.space
         self.space = space
-        self._data_model = data_model or settings.dm_clients.get("datamodel")
-        self.schema_version = schema_version or settings.dm_clients.get("schema_version")
+        self._data_model = data_model
+        self.schema_version = schema_version
         if self.schema_version is None:
             raise NotImplementedError("Please specify the schema version")
             # TODO find latest version of the data model
@@ -139,7 +137,13 @@ class DomainClient(Generic[DomainModelT]):
         return self._client.graph(self.space, self._data_model, str(self.schema_version), query)
 
 
-def get_empty_domain_client():
+def get_empty_domain_client(
+    cache: Optional[BaseCache] = None,
+    cognite_config: Optional[CogniteConfig] = None,
+    space: Optional[str] = None,
+    datamodel: Optional[str] = None,
+    schema_version: Optional[int] = None,
+):
     from cachelib import SimpleCache
 
     from cognite.pygen.dm_clients.cdf.get_client import get_client_config
@@ -150,9 +154,9 @@ def get_empty_domain_client():
     return DomainClient(
         schema=Schema(),
         domain_model_api_class=DomainModelAPI,
-        cache=SimpleCache(),
-        config=get_client_config(),
-        space=settings.dm_clients.space,
-        data_model=settings.dm_clients.datamodel,
-        schema_version=settings.dm_clients.schema_version,
+        cache=cache or SimpleCache(),
+        config=get_client_config(cognite_config),
+        space=space or settings.get("dm_clients.space"),
+        data_model=datamodel or settings.get("dm_clients.datamodel"),
+        schema_version=schema_version or settings.get("dm_clients.schema_version"),
     )
