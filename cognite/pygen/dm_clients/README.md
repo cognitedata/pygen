@@ -60,19 +60,19 @@ With the (future) arrival of GraphQL mutations in DM, this package might become 
 
 1. `pip install cognite-pygen`
 2. Create a `settings.toml` file, see [settings.toml](./settings.toml) for a template.
-   * this step is optional, all settings can be specified in code or via env variables
-   * `settings.toml` should contain only things which are safe to commit to git
-   * also create `.secrets.toml` and put sensitive settings here
-      * the structure of both files (`settings.toml` and `.secrets.toml`) is the same, and the values are merged together
-      * example `.secrets.toml`:
+   * This step is optional, all settings can be specified in code or via env variables.
+   * `settings.toml` should contain only things which are safe to commit to git.
+   * Also create `.secrets.toml` and put sensitive settings here.
+      * the structure of both files (`settings.toml` and `.secrets.toml`) is the same, and the values are merged together.
+      * Example `.secrets.toml`:
         ```toml
         [cognite]
         client_secret = "the secret goes here"
         ```
-    * `.secrets.toml` is in `.gitignore`, `settings.toml` is not
-      * hint: if you don't want to commit any settings, it's ok to put everything in `.secrets.toml`
-    * settings (including secrets) are handled by [Dynaconf](https://www.dynaconf.com/)
-       * it is simple to override these settings via env variables, e.g. `export DM_CLIENTS__COGNITE__TENANT_ID = ...`
+    * `.secrets.toml` is in `.gitignore`, `settings.toml` is not.
+      * Hint: if you don't want to commit any settings, it's ok to put everything in `.secrets.toml`.
+    * Settings (including secrets) are handled by [Dynaconf](https://www.dynaconf.com/).
+       * It is simple to override these settings via env variables, e.g. `export SETTINGS__COGNITE__TENANT_ID = ...`.
 3. Test if it works:
    ```
    $ python
@@ -115,22 +115,23 @@ Required features of a schema module:
 
 > Before proceeding, make sure that `settings.toml` and / or `.secrets.toml` is populated with credentials and
 > configuration.
+> Alternatively, provide the required credentials and related values in the CLI, see `pygen --help` for details.
 
 
 ##### Step 1: Render Schema
 
 GraphQL schema file is committed to this repo, so this step is not required, but it is here for completeness.
 
-Execute `dm togql`. This will update the schema file (defined in `settings.toml`) according to Python code in
+Execute `pygen togql`. This will update the schema file (defined in `settings.toml`) according to Python code in
 the schema module.
 
 
 ##### Step 2: Upload Schema
 
-Authenticate against CDF by running `dm signin`. The authentication data is cached on the filesystem
+Authenticate against CDF by running `pygen signin`. The authentication data is cached on the filesystem
 locally, so this is needed rarely (every few? days).
 
-Execute `dm upload`. This will upload the schema to CDF / DM.
+Execute `pygen upload`. This will upload the schema to CDF / DM.
 
 > Note: Depending on the changes made to the schema, you might be required to update the schema version in config.yaml.
 > This happens when the changes are not backwards-compatible, e.g. deleting a field.
@@ -189,7 +190,7 @@ Drawbacks and Limitations:
 
  * Add support for retrieving items via graphql endpoint.
  * Expand unit test coverage
- * Test use on Windows, particularly `dm signin` and `dm upload`
+ * Test use on Windows, particularly `pygen signin` and `pygen upload`
  * Lots of TODOs in the code
 
 
