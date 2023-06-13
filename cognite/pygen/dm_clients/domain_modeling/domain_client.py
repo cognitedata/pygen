@@ -152,7 +152,7 @@ def get_empty_domain_client():
         domain_model_api_class=DomainModelAPI,
         cache=SimpleCache(),
         config=get_client_config(),
-        space_id=settings.dm_clients.space,
+        space=settings.dm_clients.space,
         data_model=settings.dm_clients.datamodel,
         schema_version=settings.dm_clients.schema_version,
     )

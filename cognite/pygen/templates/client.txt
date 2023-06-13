@@ -22,7 +22,7 @@ class {{ client_name_camel }}(DomainClient):
 
 def get_{{ client_name_snake }}(
     cache: Optional[BaseCache] = None,
-    space_id: Optional[str] = None,
+    space: Optional[str] = None,
     data_model: Optional[str] = None,
     schema_version: Optional[int] = None,
 ) -> {{ client_name_camel }}:
