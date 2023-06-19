@@ -84,9 +84,9 @@ class SpacesAPI(DataModelStorageAPI):
         return f"{super().url}/models/spaces"
 
     @staticmethod
-    def _payload_space_ids(space_ids: Iterable[str]) -> dict:
+    def _payload_spaces(spaces: Iterable[str]) -> dict:
         """API payload for `list` and `delete` endpoints."""
-        return {"items": [{"space": space_id} for space_id in space_ids]}
+        return {"items": [{"space": space} for space in spaces]}
 
     @staticmethod
     def _payload_items(spaces: Iterable[Space]) -> dict:
@@ -104,7 +104,7 @@ class SpacesAPI(DataModelStorageAPI):
         _ext_ids = list(external_ids)
         if not _ext_ids:
             return []
-        return self._parse(self._post_to_endpoint(self._payload_space_ids(_ext_ids), "/byids"))
+        return self._parse(self._post_to_endpoint(self._payload_spaces(_ext_ids), "/byids"))
 
     def apply(self, spaces: Iterable[Space]) -> List[Space]:
         _spaces = list(spaces)
@@ -116,7 +116,7 @@ class SpacesAPI(DataModelStorageAPI):
         _ext_ids = list(external_ids)
         if not _ext_ids:
             return
-        self._post_to_endpoint(self._payload_space_ids(_ext_ids), "/delete")
+        self._post_to_endpoint(self._payload_spaces(_ext_ids), "/delete")
 
 
 # DataModelAPI not currently used, but included here for completeness.
@@ -126,9 +126,9 @@ class DataModelAPI(DataModelStorageAPI):
         return f"{super().url}/models/datamodels"
 
     @staticmethod
-    def _payload_ext_ids(space_id: str, external_ids: Iterable[str]) -> dict:
+    def _payload_ext_ids(space: str, external_ids: Iterable[str]) -> dict:
         """API payload for `list` and `delete` endpoints."""
-        return {"items": [{"space": space_id, "externalId": ext_id} for ext_id in external_ids]}
+        return {"items": [{"space": space, "externalId": ext_id} for ext_id in external_ids]}
 
     @staticmethod
     def _payload_items(data_models: Iterable[DataModel]) -> dict:
@@ -149,14 +149,14 @@ class DataModelAPI(DataModelStorageAPI):
     def _parse(result: dict) -> List[DataModel]:
         return parse_obj_as(List[DataModel], result["items"])
 
-    def list(self, space_id: str, limit: int = 1000) -> List[DataModel]:
-        return self._parse(self._get_from_endpoint({"space": space_id, "limit": limit}, ""))
+    def list(self, space: str, limit: int = 1000) -> List[DataModel]:
+        return self._parse(self._get_from_endpoint({"space": space, "limit": limit}, ""))
 
-    def retrieve(self, space_id: str, external_ids: Iterable[str]) -> List[DataModel]:
+    def retrieve(self, space: str, external_ids: Iterable[str]) -> List[DataModel]:
         _ext_ids = list(external_ids)
         if not _ext_ids:
             return []
-        return self._parse(self._post_to_endpoint(self._payload_ext_ids(space_id, _ext_ids), "/byids"))
+        return self._parse(self._post_to_endpoint(self._payload_ext_ids(space, _ext_ids), "/byids"))
 
     def apply(self, data_models: Iterable[DataModel]) -> List[DataModel]:
         _data_models = list(data_models)
@@ -178,9 +178,9 @@ class ViewsAPI(DataModelStorageAPI):
         return f"{super().url}/models/views"
 
     @staticmethod
-    def _payload_ext_ids(space_id: str, external_ids: Iterable[str], version: Optional[int] = None) -> dict:
+    def _payload_ext_ids(space: str, external_ids: Iterable[str], version: Optional[int] = None) -> dict:
         """API payload for `list` and `delete` endpoints."""
-        items = [{"space": space_id, "externalId": ext_id} for ext_id in external_ids]
+        items = [{"space": space, "externalId": ext_id} for ext_id in external_ids]
         if version is not None:
             for item in items:
                 item["version"] = f"{version}"
@@ -202,15 +202,15 @@ class ViewsAPI(DataModelStorageAPI):
     def _parse(result: dict) -> List[View]:
         return parse_obj_as(List[View], result["items"])
 
-    def list(self, space_id: str, version: Optional[int] = None, limit: int = 1000) -> List[View]:
-        views = self._parse(self._get_from_endpoint({"space": space_id, "limit": limit, "allVersions": True}, ""))
+    def list(self, space: str, version: Optional[int] = None, limit: int = 1000) -> List[View]:
+        views = self._parse(self._get_from_endpoint({"space": space, "limit": limit, "allVersions": True}, ""))
         return [view for view in views if version is None or view.version == f"{version}"]
 
-    def retrieve(self, space_id: str, external_ids: Iterable[str], version: Optional[int] = None) -> List[View]:
+    def retrieve(self, space: str, external_ids: Iterable[str], version: Optional[int] = None) -> List[View]:
         _ext_ids = list(external_ids)
         if not _ext_ids:
             return []
-        return self._parse(self._post_to_endpoint(self._payload_ext_ids(space_id, _ext_ids, version), "/byids"))
+        return self._parse(self._post_to_endpoint(self._payload_ext_ids(space, _ext_ids, version), "/byids"))
 
     def apply(self, views: Iterable[View]) -> List[View]:
         _views = list(views)
@@ -224,13 +224,13 @@ class ViewsAPI(DataModelStorageAPI):
             return
         self._post_to_endpoint(self._payload_delete(_views), "/delete")
 
-    def delete(self, space_id: str, version: str, external_ids: Iterable[str]) -> None:
+    def delete(self, space: str, version: str, external_ids: Iterable[str]) -> None:
         _ext_ids = list(external_ids)
         if not _ext_ids:
             return
         views = parse_obj_as(
             List[View],
-            [{"space": space_id, "version": version, "externalId": ext_id} for ext_id in _ext_ids],
+            [{"space": space, "version": version, "externalId": ext_id} for ext_id in _ext_ids],
         )
         self.delete_views(views)
 
@@ -242,9 +242,9 @@ class ContainersAPI(DataModelStorageAPI):
         return f"{super().url}/models/containers"
 
     @staticmethod
-    def _payload_ext_ids(space_id: str, external_ids: Iterable[str]) -> dict:
+    def _payload_ext_ids(space: str, external_ids: Iterable[str]) -> dict:
         """API payload for `list` and `delete` endpoints."""
-        return {"items": [{"space": space_id, "externalId": ext_id} for ext_id in external_ids]}
+        return {"items": [{"space": space, "externalId": ext_id} for ext_id in external_ids]}
 
     @staticmethod
     def _payload_items(containers: Iterable[Container]) -> dict:
@@ -255,14 +255,14 @@ class ContainersAPI(DataModelStorageAPI):
     def _parse(result: dict) -> List[Container]:
         return parse_obj_as(List[Container], result["items"])
 
-    def list(self, space_id: str, limit: int = 1000) -> List[Container]:
-        return self._parse(self._get_from_endpoint({"space": space_id, "limit": limit}, ""))
+    def list(self, space: str, limit: int = 1000) -> List[Container]:
+        return self._parse(self._get_from_endpoint({"space": space, "limit": limit}, ""))
 
-    def retrieve(self, space_id: str, external_ids: Iterable[str]) -> List[Container]:
+    def retrieve(self, space: str, external_ids: Iterable[str]) -> List[Container]:
         _ext_ids = list(external_ids)
         if not _ext_ids:
             return []
-        return self._parse(self._post_to_endpoint(self._payload_ext_ids(space_id, _ext_ids), "/byids"))
+        return self._parse(self._post_to_endpoint(self._payload_ext_ids(space, _ext_ids), "/byids"))
 
     def apply(self, containers: Iterable[Container]) -> List[Container]:
         _containers = list(containers)
@@ -270,11 +270,11 @@ class ContainersAPI(DataModelStorageAPI):
             return []
         return self._parse(self._post_to_endpoint(self._payload_items(_containers), ""))
 
-    def delete(self, space_id: str, external_ids: Iterable[str]) -> None:
+    def delete(self, space: str, external_ids: Iterable[str]) -> None:
         _ext_ids = list(external_ids)
         if not _ext_ids:
             return
-        self._post_to_endpoint(self._payload_ext_ids(space_id, _ext_ids), "/delete")
+        self._post_to_endpoint(self._payload_ext_ids(space, _ext_ids), "/delete")
 
 
 class NodesAPI(DataModelStorageAPI):

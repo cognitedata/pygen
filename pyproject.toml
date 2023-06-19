@@ -54,7 +54,7 @@ cli = ["packaging", "typer"]
 docs = ["mkdocs", "mkdocs-jupyter", "mkdocs-material-extensions", "mkdocs-git-revision-date-localized-plugin", "mkdocs-git-authors-plugin", "mkdocs-gitbook"]
 all = ["packaging", "typer"]
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 twine = "*"
 pre-commit = "*"
 python-dotenv = "*"

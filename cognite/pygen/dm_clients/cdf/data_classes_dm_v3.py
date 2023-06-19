@@ -80,7 +80,7 @@ class Node(DataModelBase):
     def discard_view_version_in_props(cls, value: dict) -> dict:
         """
         The API endpoints `retrieve` and `list` return nodes with props nested under "{view.externalID}/{view.version}"
-        (which is in turn nested under space_id).
+        (which is in turn nested under space).
         This validator strips the "/{view.version}" part of that key. This makes it the same format which API expects
         on the `apply` endpoint. This makes working with Nodes a bit simpler.
         """

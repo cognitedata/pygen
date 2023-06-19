@@ -23,11 +23,11 @@ class CineClient(DomainClient):
 
 def get_cine_client(
     cache: Optional[BaseCache] = None,
-    space_id: Optional[str] = None,
+    space: Optional[str] = None,
     data_model: Optional[str] = None,
     schema_version: Optional[int] = None,
 ) -> CineClient:
     """Quick way of instantiating a CineClient with sensible defaults for development."""
     cache = SimpleCache() if cache is None else cache
     config = get_client_config()
-    return CineClient(cine_schema, DomainModelAPI, cache, config, space_id, data_model, schema_version)
+    return CineClient(cine_schema, DomainModelAPI, cache, config, space, data_model, schema_version)

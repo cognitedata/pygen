@@ -94,7 +94,7 @@ def create_test_client_factory(
             domain_model_api_class=DomainModelAPI,
             cache=SimpleCache(),
             config=config,
-            space_id=Config.space,
+            space=Config.space,
             data_model=Config.data_model,
             schema_version=Config.version,
         )
