@@ -4,8 +4,9 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import pandas as pd
-from examples.movie_domain.sdk.core import NumericDataPoint, TimeSeries
-from examples.movie_domain.sdk.data_classes import (
+
+from examples.movie_domain.client.data_classes.core import NumericDataPoint, TimeSeries
+from examples.movie_domain.client.data_classes.data_classes import (
     Actor,
     BestDirector,
     BestLeadingActor,

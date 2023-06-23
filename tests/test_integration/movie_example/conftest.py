@@ -1,5 +1,6 @@
 import pytest
-from examples.movie_domain.sdk import MovieClient
+
+from examples.movie_domain.client import MovieClient
 
 
 @pytest.fixture()

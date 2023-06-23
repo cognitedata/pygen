@@ -1,4 +1,5 @@
-from . import api, data_classes, list_data_classes
+from ._api import api
+from .data_classes import data_classes, list_data_classes
 
 
 class MovieClient:
