@@ -61,12 +61,8 @@ pytest = "*"
 pytest-cov = "*"
 pytest-mock = "*"
 faker = "*"
-mkdocs = "*"
-mkdocs-jupyter = "*"
-mkdocs-material-extensions = "*"
-mkdocs-git-revision-date-localized-plugin = "*"
-mkdocs-git-authors-plugin = "*"
-mkdocs-gitbook = "*"
+pandas = "*"
+
 
 [tool.pytest.ini_options]
 filterwarnings = [
