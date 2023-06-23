@@ -1,8 +1,8 @@
 import pytest
 
 from examples.movie_domain.client.data_classes.data_classes import Movie
-from examples.movie_domain.client.local import MovieClientLocal
 from examples.movie_domain.data.load import MovieModel
+from examples.movie_domain.local.local import MovieClientLocal
 from movie_domain.client import MovieClient
 
 
