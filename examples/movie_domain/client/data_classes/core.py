@@ -1,30 +1,52 @@
 from __future__ import annotations
 
 import inspect
-from typing import Any, ForwardRef, Iterable, Mapping, Optional, Sequence, Union
+from datetime import datetime
+from typing import Any, ForwardRef, Iterable, Mapping, Optional, Sequence, TypeVar, Union
 
+from cognite.client import data_modeling as dm
 from pydantic import BaseModel, constr
 from pydantic.utils import DUNDER_ATTRIBUTES
 
 
-class DomainModel(BaseModel):
-    external_id: Optional[constr(min_length=1, max_length=255)] = None
+class DomainModelCore(BaseModel):
+    space: constr(min_length=1, max_length=255)
+    external_id: constr(min_length=1, max_length=255)
+
+
+class DomainModel(DomainModelCore):
+    version: str
+    last_updated_time: datetime
+    created_time: datetime
+    deleted_time: Optional[datetime]
+
+    @classmethod
+    def from_node(cls, node: dm.Node) -> T_TypeNode:
+        data = node.dump(camel_case=False)
+        return cls(**data, **{k: v for prop in node.properties.values() for k, v in prop.items()})
+
+
+T_TypeNode = TypeVar("T_TypeNode", bound=DomainModel)
+
+
+class DomainModelApply(DomainModelCore):
+    existing_version: int
 
 
 def _is_subclass(class_type: Any, _class: Any) -> bool:
     return inspect.isclass(class_type) and issubclass(class_type, _class)
 
 
-class CircularModel(DomainModel):
+class CircularModelCore(DomainModelCore):
     def _domain_fields(self) -> set[str]:
         domain_fields = set()
         for field_name, field in self.__fields__.items():
             is_forward_ref = isinstance(field.type_, ForwardRef)
-            is_domain = _is_subclass(field.type_, DomainModel)
+            is_domain = _is_subclass(field.type_, DomainModelCore)
             is_list_domain = (
                 (not is_forward_ref)
                 and field.sub_fields
-                and any(_is_subclass(sub.type_, DomainModel) for sub in field.sub_fields)
+                and any(_is_subclass(sub.type_, DomainModelCore) for sub in field.sub_fields)
             )
             is_list_forward_ref = field.sub_fields and any(
                 isinstance(sub.type_, ForwardRef) for sub in field.sub_fields
@@ -106,6 +128,14 @@ class CircularModel(DomainModel):
         return tmp_cache[self.external_id]
 
 
+class CircularModel(CircularModelCore, DomainModel):
+    ...
+
+
+class CircularModelApply(CircularModelCore, DomainModelApply):
+    ...
+
+
 class DataPoint(BaseModel):
     timestamp: str
 
@@ -118,7 +148,7 @@ class StringDataPoint(DataPoint):
     value: str
 
 
-class TimeSeries(DomainModel):
+class TimeSeries(DomainModelCore):
     id: Optional[int]
     name: Optional[str]
     is_string: bool = False

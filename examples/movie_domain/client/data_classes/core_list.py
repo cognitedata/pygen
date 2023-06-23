@@ -5,13 +5,13 @@ from typing import Any, Collection, Type, TypeVar
 
 import pandas as pd
 
-from .core import DomainModel
+from .core import DomainModelApply, DomainModelCore, T_TypeNode
 
 
 class TypeList(UserList):
-    _NODE: Type[DomainModel]
+    _NODE: Type[T_TypeNode]
 
-    def __init__(self, nodes: Collection[Type[DomainModel]]):
+    def __init__(self, nodes: Collection[Type[DomainModelCore]]):
         # if any(not isinstance(node, self._NODE) for node in nodes):
         # raise TypeError(
         #     f"All nodes for class {type(self).__name__} must be of type " f"{type(self._NODE).__name__}."
@@ -28,5 +28,5 @@ class TypeList(UserList):
         return self.to_pandas()._repr_html_()
 
 
-T_TypeNode = TypeVar("T_TypeNode", bound=DomainModel)
+T_TypeApplyNode = TypeVar("T_TypeApplyNode", bound=DomainModelApply)
 T_TypeNodeList = TypeVar("T_TypeNodeList", bound=TypeList)
