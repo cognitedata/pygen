@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import pandas as pd
-
 from examples.movie_domain.sdk.core import NumericDataPoint, TimeSeries
 from examples.movie_domain.sdk.data_classes import (
     Actor,

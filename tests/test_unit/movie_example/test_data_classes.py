@@ -1,9 +1,9 @@
 import pytest
-
-from examples.movie_domain.data.load import MovieModel
 from examples.movie_domain.sdk.data_classes import Movie
 from examples.movie_domain.sdk.local import MovieClientLocal
 from movie_domain.sdk import MovieClient
+
+from examples.movie_domain.data.load import MovieModel
 
 
 @pytest.fixture()

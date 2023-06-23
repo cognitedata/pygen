@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from cognite.dm_clients.cdf.get_client import get_cognite_client
+from cognite.pygen.dm_clients.cdf.get_client import get_cognite_client
 
 DATABASE_NAME = "movie"
 

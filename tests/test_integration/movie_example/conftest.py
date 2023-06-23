@@ -1,5 +1,4 @@
 import pytest
-
 from examples.movie_domain.sdk import MovieClient
 
 
