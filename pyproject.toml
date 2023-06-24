@@ -55,6 +55,7 @@ pytest = "*"
 pytest-cov = "*"
 pytest-mock = "*"
 faker = "*"
+toml = "*"
 pandas = "*"
 
 
