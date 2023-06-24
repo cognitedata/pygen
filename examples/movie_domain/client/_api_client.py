@@ -3,7 +3,6 @@ from __future__ import annotations
 import getpass
 from pathlib import Path
 
-import toml
 from cognite.client import ClientConfig, CogniteClient
 from cognite.client.credentials import OAuthClientCredentials
 
@@ -13,21 +12,7 @@ from ._api.persons import PersonsAPI
 class MovieClient:
     def __init__(self, config: ClientConfig | None = None):
         client = CogniteClient(config)
-        # self.movies = api.MovieAPI(
-        #     data_classes.Movie,
-        #     list_data_classes.MovieList,
-        # )
         self.persons = PersonsAPI(client)
-        # self.ratings = api.RatingsAPI(data_classes.Rating, list_data_classes.RatingList)
-        # self.actors = api.ActorsAPI(data_classes.Actor, list_data_classes.ActorList)
-        # self.directors = api.DirectorAPI(data_classes.Director, list_data_classes.DirectorList)
-        # self.best_directors = api.BestDirectorAPI(data_classes.BestDirector, list_data_classes.BestDirectorList)
-        # self.best_leading_actor = api.BestLeadingActorAPI(
-        #     data_classes.BestLeadingActor, list_data_classes.BestLeadingActorList
-        # )
-        # self.best_leading_actress = api.BestLeadingActressAPI(
-        #     data_classes.BestLeadingActress, list_data_classes.BestLeadingActressList
-        # )
 
     @classmethod
     def azure_project(
@@ -51,4 +36,6 @@ class MovieClient:
 
     @classmethod
     def from_toml(cls, file_path: Path | str) -> MovieClient:
+        import toml
+
         return cls.azure_project(**toml.load(file_path)["cognite"])
