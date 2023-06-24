@@ -1,5 +1,7 @@
 import re
 
+import inflect
+
 
 def to_camel(string: str) -> str:
     """Convert snake_case_name to camelCaseName."""
@@ -47,3 +49,37 @@ def to_snake(string: str) -> str:
     """
     words = re.findall(r"[A-Z]?[a-z]+|[A-Z]+(?=[A-Z][a-z]|\d|\W|$)|\d+", string)
     return "_".join(map(str.lower, words))
+
+
+# These are words which are not pluralized as we want to by inflect
+# Fox example, "person" becomes "people" instead of "persons", which is more grammatically correct, however,
+# "persons" is more consistent with the rest of the API.
+_S_EXCEPTIONS = {"person", "persons"}
+
+
+class _Inflect:
+    _engine = None
+
+    @classmethod
+    def engine(cls):
+        if cls._engine is None:
+            cls._engine = inflect.engine()
+        return cls._engine
+
+
+def as_plural(noun: str) -> str:
+    """Pluralize a noun.
+    >>> as_plural('person')
+    'persons'
+    """
+    return f"{noun}s" if noun.lower() in _S_EXCEPTIONS else _Inflect.engine().plural_noun(noun)
+
+
+def as_singular(noun: str) -> str:
+    """Singularize a noun.
+    >>> as_singular('persons')
+    'person'
+    >>> as_singular('Roles')
+    'Role'
+    """
+    return noun[:-1] if noun.lower() in _S_EXCEPTIONS else _Inflect.engine().singular_noun(noun)

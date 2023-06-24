@@ -4,8 +4,19 @@ import pytest
 from cognite.client import data_modeling as dm
 
 from cognite import pygen
-from cognite.pygen._core.create import properties_to_fields, properties_to_sources
+from cognite.pygen._core.create import properties_to_fields, properties_to_sources, property_to_edge_api
 from tests.constants import MovieSDKFiles
+
+
+def test_create_view_api_classes(person_view: dm.View):
+    # Arrange
+    expected = MovieSDKFiles.persons_api.read_text()
+
+    # Act
+    actual = pygen.view_to_api(person_view, sdk_name="movie_domain")
+
+    # Assert
+    assert actual == expected
 
 
 def test_create_view_data_classes(person_view: dm.View):
@@ -14,6 +25,19 @@ def test_create_view_data_classes(person_view: dm.View):
 
     # Act
     actual = pygen.view_to_data_classes(person_view)
+
+    # Assert
+    assert actual == expected
+
+
+def test_property_to_edge_api(person_view: dm.View):
+    # Arrange
+    expected = "\n".join(MovieSDKFiles.persons_api.read_text().split("\n")[14:40])
+
+    # Act
+    actual = property_to_edge_api(
+        person_view.properties["roles"], view_name="Person", view_space="IntegrationTestsImmutable"
+    )
 
     # Assert
     assert actual == expected

@@ -18,19 +18,14 @@ class PersonRolesAPI:
 
     def retrieve(self, external_id: str | Sequence[str]) -> dm.EdgeList:
         f = dm.filters
+        is_edge_type = f.Equals(["edge", "type"], {"space": "IntegrationTestsImmutable", "externalId": "Person.roles"})
         if isinstance(external_id, str):
-            is_edge_type = f.Equals(
-                ["edge", "type"], {"space": "IntegrationTestsImmutable", "externalId": "Person.roles"}
-            )
             is_person = f.Equals(
                 ["edge", "startNode"], {"space": "IntegrationTestsImmutable", "externalId": external_id}
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_person))
 
         else:
-            is_edge_type = f.Equals(
-                ["edge", "type"], {"space": "IntegrationTestsImmutable", "externalId": "Person.roles"}
-            )
             is_persons = f.In(
                 ["edge", "startNode"],
                 [{"space": "IntegrationTestsImmutable", "externalId": ext_id} for ext_id in external_id],

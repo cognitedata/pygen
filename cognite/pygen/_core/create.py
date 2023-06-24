@@ -8,16 +8,17 @@ from typing import Literal
 from cognite.client import data_modeling as dm
 from jinja2 import Environment, PackageLoader, select_autoescape
 
-from cognite.pygen.ulits.text import to_snake
+from cognite.pygen._core import view_functions
+from cognite.pygen.ulits.text import as_plural, as_singular, to_snake
+
+_env = Environment(
+    loader=PackageLoader("cognite.pygen._core", "templates"),
+    autoescape=select_autoescape(),
+)
 
 
 def view_to_data_classes(view: dm.View) -> str:
-    env = Environment(
-        loader=PackageLoader("cognite.pygen._core", "templates"),
-        autoescape=select_autoescape(),
-    )
-
-    type_data = env.get_template("type_data.py.jinja")
+    type_data = _env.get_template("type_data.py.jinja")
     fields = properties_to_fields(view.properties.values())
     sources = properties_to_sources(view.properties.values())
 
@@ -33,8 +34,37 @@ def view_to_data_classes(view: dm.View) -> str:
     )
 
 
-def view_to_api(view: dm.View) -> str:
-    ...
+def view_to_api(view: dm.View, sdk_name: str) -> str:
+    edges_apis = [
+        property_to_edge_api(prop, view.name, view.space)
+        for prop in view_functions.one_to_many_properties(view.properties.values())
+    ]
+    type_api = _env.get_template("type_api.py.jinja")
+
+    return (
+        type_api.render(
+            sdk_name=sdk_name,
+            view_name=view.name,
+            view_space=view.space,
+            view_plural=as_plural(view.name),
+            edge_apis="\n\n".join(edges_apis),
+        )
+        + "\n"
+    )
+
+
+def property_to_edge_api(prop: dm.ConnectionDefinition, view_name: str, view_space: str) -> str:
+    edge_api = _env.get_template("edge_api.py.jinja")
+    if isinstance(prop, dm.SingleHopConnectionDefinition):
+        return edge_api.render(
+            view_name=view_name,
+            view_space=view_space,
+            view_plural=as_plural(view_name),
+            edge_name=as_singular(prop.name),
+            edge_plural=prop.name,
+            type_ext_id=prop.type.external_id,
+        )
+    raise NotImplementedError(f"Edge API for type={type(prop)} is not implemented")
 
 
 @dataclass
