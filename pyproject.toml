@@ -28,17 +28,10 @@ pygen = "cognite.pygen.main:main"
 
 [tool.poetry.dependencies]
 python = "^3.9"
+cognite-sdk = {version = ">=6.4.8"}
 pydantic = ">=1.10"
-graphql-core = ">=3.2"
 Jinja2 = ">=3.1"
-cognite-sdk = {version = ">6.0"}
-msal = ">=1.16.0"
-retry = ">=0.9.2"
-strawberry-graphql = "^0.156.4"
-cachelib = ">=0.10.2"
-typing-extensions = ">=4.4.0"
-dynaconf = {version=">=3.1.12"}
-toml = {version=">=0.10"}
+toml = ">=0.10"
 
 packaging = {version=">=21.3", optional=true}
 typer = {version = ">=0.9", extras = ["rich"], optional=true }
@@ -51,6 +44,7 @@ mkdocs-gitbook = {version="*", optional=true}
 
 [tool.poetry.extras]
 cli = ["packaging", "typer"]
+docs = ["mkdocs", "mkdocs-jupyter", "mkdocs-material-extensions", "mkdocs-git-revision-date-localized-plugin", "mkdocs-git-authors-plugin", "mkdocs-gitbook"]
 all = ["packaging", "typer"]
 
 [tool.poetry.dev-dependencies]

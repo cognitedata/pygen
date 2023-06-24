@@ -1,6 +1,6 @@
 import toml
 
-from cognite.pygen import version
+from cognite import pygen
 from tests.constants import REPO_ROOT
 
 
@@ -10,9 +10,9 @@ def test_matching_versions():
 
     version_in_pyproject_toml = pyproject_toml["tool"]["poetry"]["version"]
 
-    assert version.__version__ == version_in_pyproject_toml, (
+    assert pygen.__version__ == version_in_pyproject_toml, (
         f"Version in pyproject.toml ({version_in_pyproject_toml}) does not match version in "
-        f"cognite/gpqpygen/version ({version.__version__})"
+        f"cognite/pygen/version ({pygen.__version__})"
     )
 
 
