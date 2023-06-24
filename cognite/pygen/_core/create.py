@@ -43,6 +43,11 @@ def view_to_api(view: dm.View, sdk_name: str) -> str:
         property_to_edge_helper(prop, view.name)
         for prop in view_functions.one_to_many_properties(view.properties.values())
     ]
+    edge_snippets = [
+        property_to_edge_snippets(prop, view.name)
+        for prop in view_functions.one_to_many_properties(view.properties.values())
+    ]
+
     type_api = _env.get_template("type_api.py.jinja")
 
     return (
@@ -55,6 +60,12 @@ def view_to_api(view: dm.View, sdk_name: str) -> str:
             view_plural=as_plural(view.name),
             edge_apis="\n\n".join(edges_apis),
             edge_helpers="\n".join(edges_helpers),
+            edge_retrieve=(" " * 12).join(snippet.retrieve for snippet in edge_snippets),
+            edge_list=(" " * 8).join(snippet.list for snippet in edge_snippets),
+            init_edge_apis=(" " * 8).join(snippet.init for snippet in edge_snippets),
+            set_retrieve_singular=(" " * 12).join(snippet.set_singular for snippet in edge_snippets),
+            set_retrieve_plural=(" " * 12).join(snippet.set_plural for snippet in edge_snippets),
+            set_list_plural=(" " * 8).join(snippet.set_plural for snippet in edge_snippets),
         )
         + "\n"
     )
@@ -81,6 +92,28 @@ def property_to_edge_helper(prop: dm.ConnectionDefinition, view_name: str) -> st
             view_name=view_name,
             view_plural=as_plural(view_name),
         )
+    raise NotImplementedError(f"Edge API for type={type(prop)} is not implemented")
+
+
+@dataclass
+class EdgeSnippets:
+    init: str
+    set_singular: str
+    set_plural: str
+    retrieve: str
+    list: str
+
+
+def property_to_edge_snippets(prop: dm.ConnectionDefinition, view_name: str) -> EdgeSnippets:
+    if isinstance(prop, dm.SingleHopConnectionDefinition):
+        return EdgeSnippets(
+            f"self.{prop.name} = {view_name}{prop.name.title()}API(client)",
+            f"{view_name.lower()}.{prop.name} = [edge.end_node.external_id for edge in edges]",
+            f"self._set_{prop.name}({as_plural(view_name.lower())}, edges)",
+            f"edges = self.{prop.name}.retrieve(external_id)",
+            f"edges = self.{prop.name}.list(limit=-1)",
+        )
+
     raise NotImplementedError(f"Edge API for type={type(prop)} is not implemented")
 
 

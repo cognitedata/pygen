@@ -24,7 +24,7 @@ class {{ view_plural.title() }}API(TypeAPI[{{ view_name }}, {{ view_name }}Apply
             class_apply_type={{ view_name }}Apply,
             class_list={{ view_name }}List,
         )
-        self.roles = PersonRolesAPI(client)
+        {{ init_edge_apis }}
 
     def apply(self, {{ view_name.lower() }}: {{ view_name }}Apply, replace: bool = False) -> dm.InstancesApplyResult:
         return self._client.data_modeling.instances.apply(nodes={{ view_name.lower() }}.to_node(), replace=replace)
@@ -46,20 +46,20 @@ class {{ view_plural.title() }}API(TypeAPI[{{ view_name }}, {{ view_name }}Apply
     def retrieve(self, external_id: str | Sequence[str]) -> {{ view_name }} | {{ view_name }}List:
         if isinstance(external_id, str):
             {{ view_name.lower() }} = self._retrieve(("{{ view_space }}", external_id))
-            edges = self.roles.retrieve(external_id)
-            {{ view_name.lower() }}.roles = [edge.end_node.external_id for edge in edges]
+            {{ edge_retrieve }}
+            {{ set_retrieve_singular }}
             return {{ view_name.lower() }}
         else:
             {{ view_plural.lower() }} = self._retrieve([("{{ view_space }}", ext_id) for ext_id in external_id])
-            edges = self.roles.retrieve(external_id)
-            self._set_roles({{ view_plural.lower() }}, edges)
+            {{ edge_retrieve }}
+            {{  set_retrieve_plural }}
             return {{ view_plural.lower() }}
 
     def list(self, limit: int = INSTANCES_LIST_LIMIT_DEFAULT) -> {{ view_name }}List:
         {{ view_plural.lower() }} = self._list(limit=limit)
 
-        edges = self.roles.list(limit=-1)
-        self._set_roles({{ view_plural.lower() }}, edges)
+        {{ edge_list }}
+        {{ set_list_plural }}
         return {{ view_plural.lower() }}
 
 {{ edge_helpers }}

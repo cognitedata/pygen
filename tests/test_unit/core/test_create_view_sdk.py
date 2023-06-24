@@ -5,10 +5,12 @@ from cognite.client import data_modeling as dm
 
 from cognite import pygen
 from cognite.pygen._core.create import (
+    EdgeSnippets,
     properties_to_fields,
     properties_to_sources,
     property_to_edge_api,
     property_to_edge_helper,
+    property_to_edge_snippets,
 )
 from tests.constants import MovieSDKFiles
 
@@ -54,6 +56,23 @@ def test_property_to_edge_helper(person_view: dm.View):
 
     # Act
     actual = property_to_edge_helper(person_view.properties["roles"], view_name="Person")
+
+    # Assert
+    assert actual == expected
+
+
+def test_property_to_edge_snippets(person_view: dm.View):
+    # Arrange
+    expected = EdgeSnippets(
+        "self.roles = PersonRolesAPI(client)",
+        "person.roles = [edge.end_node.external_id for edge in edges]",
+        "self._set_roles(persons, edges)",
+        "edges = self.roles.retrieve(external_id)",
+        "edges = self.roles.list(limit=-1)",
+    )
+
+    # Act
+    actual = property_to_edge_snippets(person_view.properties["roles"], view_name="Person")
 
     # Assert
     assert actual == expected
