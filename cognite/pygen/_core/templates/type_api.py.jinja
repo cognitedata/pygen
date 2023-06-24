@@ -7,7 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client._constants import INSTANCES_LIST_LIMIT_DEFAULT
 
-from {{ sdk_name }}.client.data_classes.persons import {{ view_name }}, {{ view_name }}Apply, {{ view_name }}List
+from {{ sdk_name }}.client.data_classes.{{ view_plural.lower() }} import {{ view_name }}, {{ view_name }}Apply, {{ view_name }}List
 
 from ._core import TypeAPI
 
@@ -19,7 +19,7 @@ class {{ view_plural.title() }}API(TypeAPI[{{ view_name }}, {{ view_name }}Apply
     def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,
-            sources=dm.ViewId("{{ view_space }}", "Person", "2"),
+            sources=dm.ViewId("{{ view_space }}", "{{ view_ext_id }}", "{{ view_version }}"),
             class_type={{ view_name }},
             class_apply_type={{ view_name }}Apply,
             class_list={{ view_name }}List,

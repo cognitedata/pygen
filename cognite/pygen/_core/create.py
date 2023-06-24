@@ -46,6 +46,8 @@ def view_to_api(view: dm.View, sdk_name: str) -> str:
             sdk_name=sdk_name,
             view_name=view.name,
             view_space=view.space,
+            view_ext_id=view.external_id,
+            view_version=view.version,
             view_plural=as_plural(view.name),
             edge_apis="\n\n".join(edges_apis),
         )

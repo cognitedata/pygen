@@ -4,9 +4,7 @@ class {{ view_name }}{{ edge_plural.title() }}API:
 
     def retrieve(self, external_id: str | Sequence[str]) -> dm.EdgeList:
         f = dm.filters
-        is_edge_type = f.Equals(
-            ["edge", "type"], {"space": "{{ view_space }}", "externalId": "{{ type_ext_id }}"}
-        )
+        is_edge_type = f.Equals(["edge", "type"], {"space": "{{ view_space }}", "externalId": "{{ type_ext_id }}"})
         if isinstance(external_id, str):
             is_{{ view_name.lower() }} = f.Equals(
                 ["edge", "startNode"], {"space": "{{ view_space }}", "externalId": external_id}

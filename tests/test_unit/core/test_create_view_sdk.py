@@ -32,7 +32,7 @@ def test_create_view_data_classes(person_view: dm.View):
 
 def test_property_to_edge_api(person_view: dm.View):
     # Arrange
-    expected = "\n".join(MovieSDKFiles.persons_api.read_text().split("\n")[14:40])
+    expected = "\n".join(MovieSDKFiles.persons_api.read_text().split("\n")[14:38])
 
     # Act
     actual = property_to_edge_api(
