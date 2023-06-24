@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from typing import ClassVar, List, Optional
+from typing import ClassVar, Optional
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from .core import CircularModelApply, DomainModel, TypeList
-from .ids import RoleId
 
 __all__ = ["Person", "PersonApply", "PersonList"]
 
@@ -22,7 +21,7 @@ class PersonApply(CircularModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
     name: str
     birth_year: Optional[int] = None
-    roles: List[RoleId] = []
+    roles: list[str] = []
 
     def to_node(self) -> dm.NodeApply:
         return dm.NodeApply(

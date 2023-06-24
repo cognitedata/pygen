@@ -18,9 +18,7 @@ class {{ view_name }}(DomainModel):
 
 class {{ view_name }}Apply(CircularModelApply):
     space: ClassVar[str] = "{{ view_space }}"
-    name: str
-    birth_year: Optional[int] = None
-    roles: List[RoleId] = []
+    {{ write_fields }}
 
     def to_node(self) -> dm.NodeApply:
         return dm.NodeApply(
