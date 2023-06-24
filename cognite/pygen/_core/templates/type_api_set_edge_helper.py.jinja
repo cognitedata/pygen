@@ -1,0 +1,10 @@
+    @staticmethod
+    def _set_roles({{ view_plural.lower() }}: Sequence[{{ view_name }}], role_edges: Sequence[dm.Edge]):
+        edges_by_start_node: Dict[Tuple, List] = defaultdict(list)
+        for edge in role_edges:
+            edges_by_start_node[edge.start_node.as_tuple()].append(edge)
+
+        for {{ view_name.lower() }} in {{ view_plural.lower() }}:
+            node_id = {{ view_name.lower() }}.id_tuple()
+            if node_id in edges_by_start_node:
+                {{ view_name.lower() }}.roles = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]

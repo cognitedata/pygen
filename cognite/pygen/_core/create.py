@@ -39,6 +39,10 @@ def view_to_api(view: dm.View, sdk_name: str) -> str:
         property_to_edge_api(prop, view.name, view.space)
         for prop in view_functions.one_to_many_properties(view.properties.values())
     ]
+    edges_helpers = [
+        property_to_edge_helper(prop, view.name)
+        for prop in view_functions.one_to_many_properties(view.properties.values())
+    ]
     type_api = _env.get_template("type_api.py.jinja")
 
     return (
@@ -50,6 +54,7 @@ def view_to_api(view: dm.View, sdk_name: str) -> str:
             view_version=view.version,
             view_plural=as_plural(view.name),
             edge_apis="\n\n".join(edges_apis),
+            edge_helpers="\n".join(edges_helpers),
         )
         + "\n"
     )
@@ -65,6 +70,16 @@ def property_to_edge_api(prop: dm.ConnectionDefinition, view_name: str, view_spa
             edge_name=as_singular(prop.name),
             edge_plural=prop.name,
             type_ext_id=prop.type.external_id,
+        )
+    raise NotImplementedError(f"Edge API for type={type(prop)} is not implemented")
+
+
+def property_to_edge_helper(prop: dm.ConnectionDefinition, view_name: str) -> str:
+    helper = _env.get_template("type_api_set_edge_helper.py.jinja")
+    if isinstance(prop, dm.SingleHopConnectionDefinition):
+        return helper.render(
+            view_name=view_name,
+            view_plural=as_plural(view_name),
         )
     raise NotImplementedError(f"Edge API for type={type(prop)} is not implemented")
 
