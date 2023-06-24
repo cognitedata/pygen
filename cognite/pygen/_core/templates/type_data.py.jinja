@@ -8,18 +8,16 @@ from pydantic import Field
 from .core import CircularModelApply, DomainModel, TypeList
 from .ids import RoleId
 
-__all__ = ["Person", "PersonApply", "PersonList"]
+__all__ = ["{{ view_name }}", "{{ view_name }}Apply", "{{ view_name }}List"]
 
 
-class Person(DomainModel):
-    space: ClassVar[str] = "IntegrationTestsImmutable"
-    name: Optional[str] = None
-    birth_year: Optional[int] = Field(None, alias="birthYear")
-    roles: list[str] = []
+class {{ view_name }}(DomainModel):
+    space: ClassVar[str] = "{{ view_space }}"
+    {{ read_fields }}
 
 
-class PersonApply(CircularModelApply):
-    space: ClassVar[str] = "IntegrationTestsImmutable"
+class {{ view_name }}Apply(CircularModelApply):
+    space: ClassVar[str] = "{{ view_space }}"
     name: str
     birth_year: Optional[int] = None
     roles: List[RoleId] = []
@@ -38,5 +36,5 @@ class PersonApply(CircularModelApply):
         )
 
 
-class PersonList(TypeList[Person]):
-    _NODE = Person
+class {{ view_name }}List(TypeList[{{ view_name }}]):
+    _NODE = {{ view_name }}
