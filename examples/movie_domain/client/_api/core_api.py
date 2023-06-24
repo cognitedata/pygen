@@ -4,6 +4,7 @@ from typing import Generic, Sequence, Type, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
+from cognite.client._constants import INSTANCES_LIST_LIMIT_DEFAULT
 
 from ..data_classes.core_list import T_TypeApplyNode, T_TypeNode, T_TypeNodeList
 
@@ -23,23 +24,29 @@ class TypeAPI(Generic[T_TypeNode, T_TypeApplyNode, T_TypeNodeList]):
         self.class_apply_type = class_apply_type
         self.class_list = class_list
 
-    def _apply(self, node: T_TypeNode, traversal_count: int = 0):
+    def _apply(self, node: T_TypeNode):
         raise NotImplementedError()
 
     @overload
-    def _retrieve(self, external_id: str, traversal_count: int = 0) -> T_TypeNode:
+    def _retrieve(self, external_id: str) -> T_TypeNode:
         ...
 
     @overload
-    def _retrieve(self, external_id: Sequence[str], traversal_count: int = 0) -> T_TypeNodeList:
+    def _retrieve(self, external_id: Sequence[str]) -> T_TypeNodeList:
         ...
 
-    def _retrieve(self, external_id: str | Sequence[str], traversal_count: int = 0) -> T_TypeNode | T_TypeNodeList:
-        raise NotImplementedError()
+    def _retrieve(
+        self, nodes: dm.NodeId | Sequence[dm.NodeId] | tuple[str, str] | Sequence[tuple[str, str]]
+    ) -> T_TypeNode | T_TypeNodeList:
+        is_multiple = isinstance(nodes, Sequence) and not isinstance(nodes, str)
+        instances = self._client.data_modeling.instances.retrieve(nodes=nodes, sources=self.sources)
+        if is_multiple:
+            return self.class_list([self.class_type.from_node(node) for node in instances.nodes])
+        return self.class_type.from_node(instances.nodes[0])
 
     def _delete(self, node_external_id: str | T_TypeNode | T_TypeNodeList, traversal_count: int = 0):
         raise NotImplementedError()
 
-    def _list(self, traversal_count: int = 0, limit: int = 25) -> T_TypeNodeList:
+    def _list(self, limit: int = INSTANCES_LIST_LIMIT_DEFAULT) -> T_TypeNodeList:
         nodes = self._client.data_modeling.instances.list("node", sources=self.sources, limit=limit)
         return self.class_list([self.class_type.from_node(node) for node in nodes])
