@@ -9,7 +9,7 @@ from cognite.client import data_modeling as dm
 from jinja2 import Environment, PackageLoader, select_autoescape
 
 from cognite.pygen._core import view_functions
-from cognite.pygen.ulits.text import as_plural, as_singular, to_snake
+from cognite.pygen.utils.text import as_plural, as_singular, to_snake
 
 _env = Environment(
     loader=PackageLoader("cognite.pygen._core", "templates"),
@@ -57,7 +57,8 @@ def view_to_api(view: dm.View, sdk_name: str) -> str:
             view_space=view.space,
             view_ext_id=view.external_id,
             view_version=view.version,
-            view_plural=as_plural(view.name),
+            view_snake_plural=as_plural(view.name),
+            view_pascal_plural=as_plural(view.name).title(),
             edge_apis="\n\n".join(edges_apis),
             edge_helpers="\n".join(edges_helpers),
             edge_retrieve=(" " * 12).join(snippet.retrieve for snippet in edge_snippets),

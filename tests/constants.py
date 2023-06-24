@@ -15,10 +15,12 @@ class TestSchemas:
 
 class MovieSDKFiles:
     client_dir = movie_sdk / "client"
+    data_classes = client_dir / "data_classes"
+    persons_data = data_classes / "persons.py"
 
-    persons_data = client_dir / "data_classes" / "persons.py"
-    persons_api = client_dir / "_api" / "persons.py"
+    api = client_dir / "_api"
+    persons_api = api / "persons.py"
     client = client_dir / "_api_client.py"
     client_init = client_dir / "__init__.py"
-    data_init = client_dir / "data_classes" / "__init__.py"
-    api_init = client_dir / "api_classes" / "__init__.py"
+    data_init = data_classes / "__init__.py"
+    api_init = api / "__init__.py"
