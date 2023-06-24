@@ -28,7 +28,7 @@ def view_to_data_classes(view: dm.View) -> str:
             view_space=view.space,
             read_fields="\n    ".join(f.as_type_hint("read") for f in fields),
             write_fields="\n    ".join(f.as_type_hint("write") for f in fields),
-            sources=sources,
+            sources=f',\n{" "*16}'.join(sources),
         )
         + "\n"
     )

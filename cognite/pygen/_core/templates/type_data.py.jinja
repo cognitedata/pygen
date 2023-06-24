@@ -25,13 +25,7 @@ class {{ view_name }}Apply(CircularModelApply):
             external_id=self.external_id,
             existing_version=self.existing_version,
             sources=[
-                dm.NodeOrEdgeData(
-                    source=dm.ContainerId("IntegrationTestsImmutable", "Person"),
-                    properties={
-                        "name": self.name,
-                        "birthYear": self.birth_year,
-                    },
-                ),
+                {{ sources }}
             ],
         )
 
