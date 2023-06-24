@@ -31,8 +31,8 @@ python = "^3.9"
 cognite-sdk = {version = ">=6.4.8"}
 pydantic = ">=1.10"
 Jinja2 = ">=3.1"
-toml = ">=0.10"
 
+toml = {version=">=0.10", optional=true}
 packaging = {version=">=21.3", optional=true}
 typer = {version = ">=0.9", extras = ["rich"], optional=true }
 mkdocs =  {version="*", optional=true}
@@ -43,9 +43,9 @@ mkdocs-git-authors-plugin = {version="*", optional=true}
 mkdocs-gitbook = {version="*", optional=true}
 
 [tool.poetry.extras]
-cli = ["packaging", "typer"]
+cli = ["packaging", "typer", "toml"]
 docs = ["mkdocs", "mkdocs-jupyter", "mkdocs-material-extensions", "mkdocs-git-revision-date-localized-plugin", "mkdocs-git-authors-plugin", "mkdocs-gitbook"]
-all = ["packaging", "typer"]
+all = ["packaging", "typer", "toml"]
 
 [tool.poetry.dev-dependencies]
 twine = "*"
