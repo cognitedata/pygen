@@ -42,15 +42,9 @@ class BestDirectorsAPI(TypeAPI[BestDirector, BestDirectorApply, BestDirectorList
 
     def retrieve(self, external_id: str | Sequence[str]) -> BestDirector | BestDirectorList:
         if isinstance(external_id, str):
-            best_director = self._retrieve(("IntegrationTestsImmutable", external_id))
-
-            return best_director
+            return self._retrieve(("IntegrationTestsImmutable", external_id))
         else:
-            best_directors = self._retrieve([("IntegrationTestsImmutable", ext_id) for ext_id in external_id])
-
-            return best_directors
+            return self._retrieve([("IntegrationTestsImmutable", ext_id) for ext_id in external_id])
 
     def list(self, limit: int = INSTANCES_LIST_LIMIT_DEFAULT) -> BestDirectorList:
-        best_directors = self._list(limit=limit)
-
-        return best_directors
+        return self._list(limit=limit)
