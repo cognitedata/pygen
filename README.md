@@ -7,7 +7,7 @@ Cognite GraphQL Python Generator
 This is the Cognite GraphQL Python Generator, `pygen`. The purpose of this package is to help developers to
 work with Cognite Data Fusion's (CDF) Data Models (DM) in Python.
 
-**[DISCLAIMER!]** This project is in a highly experimental state and no guarantees are made for consistency between
+**[DISCLAIMER!]** This project is in a highly experimental state, and no guarantees are made for consistency between
 versions. The project may also become deprecated if the experimentation turns out to be a dead end.
 
 
