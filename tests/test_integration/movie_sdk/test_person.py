@@ -1,10 +1,10 @@
 import movie_domain.client.data_classes.persons
-from examples.movie_domain.client import MovieClient
-from examples.movie_domain.client import data_classes as movie
+from movie_domain.client import MovieClient
+from movie_domain.client import data_classes as movie
 
 
 def test_person_list(movie_client: MovieClient):
-    people = movie_client.persons.list(traversal_count=0, limit=-1)
+    people = movie_client.persons.list(limit=-1)
 
     assert isinstance(people, movie_domain.client.data_classes.persons.PersonList)
     assert all(isinstance(role, movie.RoleId) for person in people for role in person.roles)

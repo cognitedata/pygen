@@ -66,7 +66,8 @@ addopts = "--doctest-modules"
 markers = [
     "full: Requiers all optional dependencies to run.",
 ]
-
+pythonpath = [".", "examples"]
+testpaths = ["tests", "cognite/pygen"]
 
 [build-system]
 requires = ["poetry-core>=1.3"]

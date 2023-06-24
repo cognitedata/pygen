@@ -6,7 +6,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client._constants import INSTANCES_LIST_LIMIT_DEFAULT
 
-from ..data_classes.core import T_TypeApplyNode, T_TypeNode, T_TypeNodeList
+from movie_domain.client.data_classes.core import T_TypeApplyNode, T_TypeNode, T_TypeNodeList
 
 
 class TypeAPI(Generic[T_TypeNode, T_TypeApplyNode, T_TypeNodeList]):
@@ -35,7 +35,11 @@ class TypeAPI(Generic[T_TypeNode, T_TypeApplyNode, T_TypeNodeList]):
     def _retrieve(
         self, nodes: dm.NodeId | Sequence[dm.NodeId] | tuple[str, str] | Sequence[tuple[str, str]]
     ) -> T_TypeNode | T_TypeNodeList:
-        is_multiple = isinstance(nodes, Sequence) and not isinstance(nodes, str)
+        is_multiple = (
+            isinstance(nodes, Sequence)
+            and not isinstance(nodes, str)
+            and not (isinstance(nodes, tuple) and isinstance(nodes[0], str))
+        )
         instances = self._client.data_modeling.instances.retrieve(nodes=nodes, sources=self.sources)
         if is_multiple:
             return self.class_list([self.class_type.from_node(node) for node in instances.nodes])
