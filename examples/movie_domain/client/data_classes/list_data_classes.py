@@ -5,11 +5,11 @@ from .data_classes import (  # Actor,; BestDirector,; BestLeadingActor,; BestLea
 )
 
 
-class PersonList(TypeList):
+class PersonList(TypeList[Person]):
     _NODE = Person
 
 
-class PersonApplyList(TypeList):
+class PersonApplyList(TypeList[PersonApply]):
     _NODE = PersonApply
 
 

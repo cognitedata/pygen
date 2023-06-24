@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import inspect
+import types
 from datetime import datetime
 from typing import Any, ForwardRef, Iterable, Mapping, Optional, Sequence, TypeVar, Union
 
@@ -13,6 +14,9 @@ class DomainModelCore(BaseModel):
     space: constr(min_length=1, max_length=255)
     external_id: constr(min_length=1, max_length=255)
 
+    def id_tuple(self) -> tuple[str, str]:
+        return self.space, self.external_id
+
 
 class DomainModel(DomainModelCore):
     version: str
@@ -24,6 +28,14 @@ class DomainModel(DomainModelCore):
     def from_node(cls, node: dm.Node) -> T_TypeNode:
         data = node.dump(camel_case=False)
         return cls(**data, **{k: v for prop in node.properties.values() for k, v in prop.items()})
+
+    @classmethod
+    def one_to_many_fields(cls) -> list[str]:
+        return [
+            field_name
+            for field_name, field in cls.__fields__.items()
+            if isinstance(field.outer_type_, types.GenericAlias)
+        ]
 
 
 T_TypeNode = TypeVar("T_TypeNode", bound=DomainModel)

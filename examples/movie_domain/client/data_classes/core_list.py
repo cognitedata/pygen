@@ -1,14 +1,14 @@
 from __future__ import annotations
 
 from collections import UserList
-from typing import Any, Collection, Type, TypeVar
+from typing import Any, Collection, Generic, Type, TypeVar
 
 import pandas as pd
 
 from .core import DomainModelApply, DomainModelCore, T_TypeNode
 
 
-class TypeList(UserList):
+class TypeList(UserList, Generic[T_TypeNode]):
     _NODE: Type[T_TypeNode]
 
     def __init__(self, nodes: Collection[Type[DomainModelCore]]):

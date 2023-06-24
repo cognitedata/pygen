@@ -104,3 +104,14 @@ def test_person_from_node():
 
     # Assert
     assert person.name == "Christoph Waltz"
+
+
+def test_person_one_to_many_fields():
+    # Arrange
+    expected = ["roles"]
+
+    # Act
+    actual = movie.Person.one_to_many_fields()
+
+    # Assert
+    assert actual == expected
