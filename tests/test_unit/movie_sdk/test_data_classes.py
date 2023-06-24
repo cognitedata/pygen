@@ -43,7 +43,7 @@ def test_person_apply_to_node_apply():
         "person:christoph_waltz",
         sources=[
             dm.NodeOrEdgeData(
-                source=dm.ViewId("IntegrationTestsImmutable", "Person", "2"),
+                source=dm.ContainerId("IntegrationTestsImmutable", "Person"),
                 properties={"name": "Christoph Waltz", "birthYear": 1956},
             )
         ],

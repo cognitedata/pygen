@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from typing import ClassVar, List, Optional
+from typing import ClassVar, Optional
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from .core import CircularModelApply, DomainModel, TypeList
-from .ids import RoleId
 
 __all__ = ["{{ view_name }}", "{{ view_name }}Apply", "{{ view_name }}List"]
 
@@ -27,9 +26,12 @@ class {{ view_name }}Apply(CircularModelApply):
             existing_version=self.existing_version,
             sources=[
                 dm.NodeOrEdgeData(
-                    source=dm.ViewId("IntegrationTestsImmutable", "Person", "2"),
-                    properties={"name": self.name, "birthYear": self.birth_year},
-                )
+                    source=dm.ContainerId("IntegrationTestsImmutable", "Person"),
+                    properties={
+                        "name": self.name,
+                        "birthYear": self.birth_year,
+                    },
+                ),
             ],
         )
 

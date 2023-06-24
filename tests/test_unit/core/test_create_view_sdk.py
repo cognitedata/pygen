@@ -4,7 +4,7 @@ import pytest
 from cognite.client import data_modeling as dm
 
 from cognite import pygen
-from cognite.pygen._core.create import properties_to_fields
+from cognite.pygen._core.create import properties_to_fields, properties_to_sources
 from tests.constants import MovieSDKFiles
 
 
@@ -40,9 +40,28 @@ def test_create_view_data_classes(person_view: dm.View):
         ),
     ],
 )
-def test_create_read_properties(field_type: Literal["read", "write"], expected: list[str], person_view):
+def test_create_fields(field_type: Literal["read", "write"], expected: list[str], person_view):
     # Act
-    actual = properties_to_fields(person_view.properties.values(), field_type)
+    actual = properties_to_fields(person_view.properties.values())
+
+    # Assert
+    assert [f.as_type_hint(field_type) for f in actual] == expected
+
+
+def test_create_sources(person_view: dm.View):
+    # Arrange
+    expected = [
+        """dm.NodeOrEdgeData(
+                    source=dm.ContainerId("IntegrationTestsImmutable", "Person"),
+                    properties={
+                        "name": self.name,
+                        "birthYear": self.birth_year,
+                    },
+                ),"""
+    ]
+
+    # Act
+    actual = properties_to_sources(person_view.properties.values())
 
     # Assert
     assert actual == expected

@@ -30,9 +30,12 @@ class PersonApply(CircularModelApply):
             existing_version=self.existing_version,
             sources=[
                 dm.NodeOrEdgeData(
-                    source=dm.ViewId("IntegrationTestsImmutable", "Person", "2"),
-                    properties={"name": self.name, "birthYear": self.birth_year},
-                )
+                    source=dm.ContainerId("IntegrationTestsImmutable", "Person"),
+                    properties={
+                        "name": self.name,
+                        "birthYear": self.birth_year,
+                    },
+                ),
             ],
         )
 
