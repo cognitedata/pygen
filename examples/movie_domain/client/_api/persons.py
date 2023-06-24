@@ -7,7 +7,6 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client._constants import INSTANCES_LIST_LIMIT_DEFAULT
 
-from movie_domain.client.data_classes.ids import RoleId
 from movie_domain.client.data_classes.persons import Person, PersonApply, PersonList
 
 from ._core import TypeAPI
@@ -76,7 +75,7 @@ class PersonsAPI(TypeAPI[Person, PersonApply, PersonList]):
         if isinstance(external_id, str):
             person = self._retrieve(("IntegrationTestsImmutable", external_id))
             edges = self.roles.retrieve(external_id)
-            person.roles = [RoleId.from_direct_relation(edge.end_node) for edge in edges]
+            person.roles = [edge.end_node.external_id for edge in edges]
             return person
         else:
             persons = self._retrieve([("IntegrationTestsImmutable", ext_id) for ext_id in external_id])
@@ -100,4 +99,4 @@ class PersonsAPI(TypeAPI[Person, PersonApply, PersonList]):
         for person in persons:
             node_id = person.id_tuple()
             if node_id in edges_by_start_node:
-                person.roles = [RoleId.from_direct_relation(edge.end_node) for edge in edges_by_start_node[node_id]]
+                person.roles = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
