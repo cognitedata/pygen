@@ -2,17 +2,20 @@ from __future__ import annotations
 
 import inspect
 import types
+from abc import abstractmethod
 from datetime import datetime
-from typing import Any, ForwardRef, Iterable, Mapping, Optional, Sequence, TypeVar, Union
+from typing import Any, ClassVar, ForwardRef, Iterable, Mapping, Optional, Sequence, TypeVar, Union
 
 from cognite.client import data_modeling as dm
-from pydantic import BaseModel, constr
+from pydantic import BaseModel, Extra, constr
 from pydantic.utils import DUNDER_ATTRIBUTES
+
+ExternalId = constr(min_length=1, max_length=255)
 
 
 class DomainModelCore(BaseModel):
-    space: constr(min_length=1, max_length=255)
-    external_id: constr(min_length=1, max_length=255)
+    space: ClassVar[str]
+    external_id: ExternalId
 
     def id_tuple(self) -> tuple[str, str]:
         return self.space, self.external_id
@@ -42,7 +45,21 @@ T_TypeNode = TypeVar("T_TypeNode", bound=DomainModel)
 
 
 class DomainModelApply(DomainModelCore):
-    existing_version: int
+    existing_version: Optional[int] = None
+
+    @abstractmethod
+    def to_node(self) -> dm.NodeApply:
+        raise NotImplementedError()
+
+    class Config:
+        extra = Extra.forbid
+
+
+class DomainModelApplyResult(DomainModelCore):
+    version: str
+    was_modified: bool
+    last_updated_time: datetime
+    created_time: datetime
 
 
 def _is_subclass(class_type: Any, _class: Any) -> bool:

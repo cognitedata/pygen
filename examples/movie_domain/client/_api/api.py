@@ -39,6 +39,17 @@ from .core_api import TypeAPI
 
 
 class PersonsAPI(TypeAPI[data_classes.Person, data_classes.PersonApply, list_data_classes.PersonList]):
+    def apply(self, person: data_classes.PersonApply, replace: bool = False) -> dm.InstancesApplyResult:
+        return self._client.data_modeling.instances.apply(nodes=person.to_node(), replace=replace)
+
+    def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
+        if isinstance(external_id, str):
+            return self._client.data_modeling.instances.delete(nodes=(data_classes.PersonApply.space, external_id))
+        else:
+            return self._client.data_modeling.instances.delete(
+                nodes=[(data_classes.PersonApply.space, id) for id in external_id]
+            )
+
     @overload
     def retrieve(self, external_id: str) -> data_classes.Person:
         ...

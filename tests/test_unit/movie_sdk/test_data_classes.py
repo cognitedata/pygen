@@ -115,3 +115,24 @@ def test_person_one_to_many_fields():
 
     # Assert
     assert actual == expected
+
+
+def test_person_apply_to_node_apply():
+    # Arrange
+    person = movie.PersonApply(name="Christoph Waltz", birth_year=1956, external_id="person:christoph_waltz")
+    expected = dm.NodeApply(
+        "IntegrationTestsImmutable",
+        "person:christoph_waltz",
+        sources=[
+            dm.NodeOrEdgeData(
+                source=dm.ViewId("IntegrationTestsImmutable", "Person", "2"),
+                properties={"name": "Christoph Waltz", "birthYear": 1956},
+            )
+        ],
+    )
+
+    # Act
+    actual = person.to_node()
+
+    # Assert
+    assert actual == expected

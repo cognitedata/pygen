@@ -1,8 +1,13 @@
+from .core import DomainModelApplyResult
 from .core_list import TypeList
 from .data_classes import (  # Actor,; BestDirector,; BestLeadingActor,; BestLeadingActress,; Director,; Movie,; Nomination,; Rating,; Role,
     Person,
     PersonApply,
 )
+
+
+class DomainApplyResultList(TypeList[DomainModelApplyResult]):
+    _NODE = DomainModelApplyResult
 
 
 class PersonList(TypeList[Person]):

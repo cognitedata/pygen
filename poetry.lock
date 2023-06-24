@@ -284,14 +284,14 @@ colorama = {version = "*", markers = "platform_system == \"Windows\""}
 
 [[package]]
 name = "cognite-sdk"
-version = "6.4.7"
+version = "6.4.8"
 description = "Cognite Python SDK"
 category = "main"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "cognite_sdk-6.4.7-py3-none-any.whl", hash = "sha256:a5b098adf389c434d9a840a8a26066138b701db8ceca619b3bbfa44d5207d957"},
-    {file = "cognite_sdk-6.4.7.tar.gz", hash = "sha256:bef3d12c6534b3d6dffa55745456b35a2046f3352baf508a51f882c17b683b45"},
+    {file = "cognite_sdk-6.4.8-py3-none-any.whl", hash = "sha256:71911dc6616a5f68f786239813333e288cfa6c8be97c5191fbc019b56e9cab6d"},
+    {file = "cognite_sdk-6.4.8.tar.gz", hash = "sha256:e9915af61ce75333c611896e06cf88bcd9dd074c5e4ae898a546797818b12c85"},
 ]
 
 [package.dependencies]

@@ -24,9 +24,14 @@ def test_person_retrieve_multiple(movie_client: MovieClient):
     assert all(isinstance(role, movie.RoleId) for person in people for role in person.roles)
 
 
-# def test_type_retrieve(movie_client: MovieClient):
-#     expected = None
-#
-#     pulp_fiction = movie_client.movies.retrieve("Pulp Fiction")
-#
-#     assert pulp_fiction == expected
+def test_person_apply_and_delete(movie_client: MovieClient):
+    # Arrange
+    person = movie.PersonApply(external_id="person:anders", name="Anders", birth_year=0)
+
+    # Act
+    try:
+        result = movie_client.persons.apply(person)
+
+        assert len(result.nodes) == 1
+    finally:
+        movie_client.persons.delete(person.external_id)

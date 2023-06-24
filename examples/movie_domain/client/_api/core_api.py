@@ -24,9 +24,6 @@ class TypeAPI(Generic[T_TypeNode, T_TypeApplyNode, T_TypeNodeList]):
         self.class_apply_type = class_apply_type
         self.class_list = class_list
 
-    def _apply(self, node: T_TypeNode):
-        raise NotImplementedError()
-
     @overload
     def _retrieve(self, external_id: str) -> T_TypeNode:
         ...
