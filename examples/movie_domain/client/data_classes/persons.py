@@ -5,7 +5,7 @@ from typing import ClassVar, List, Optional
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import CircularModelApply, DomainModel, TypeList
+from .core import CircularModelApply, DomainModel, TypeList
 from .ids import RoleId
 
 __all__ = ["Person", "PersonApply", "PersonList"]

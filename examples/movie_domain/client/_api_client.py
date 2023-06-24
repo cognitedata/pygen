@@ -5,12 +5,8 @@ from pathlib import Path
 
 import toml
 from cognite.client import ClientConfig, CogniteClient
-from cognite.client import data_modeling as dm
 from cognite.client.credentials import OAuthClientCredentials
 
-import movie_domain.client.data_classes.persons
-
-from . import data_classes
 from ._api.persons import PersonsAPI
 
 
@@ -21,13 +17,7 @@ class MovieClient:
         #     data_classes.Movie,
         #     list_data_classes.MovieList,
         # )
-        self.persons = PersonsAPI(
-            client,
-            dm.ViewId("IntegrationTestsImmutable", "Person", "2"),
-            data_classes.Person,
-            data_classes.PersonApply,
-            movie_domain.client.data_classes.persons.PersonList,
-        )
+        self.persons = PersonsAPI(client)
         # self.ratings = api.RatingsAPI(data_classes.Rating, list_data_classes.RatingList)
         # self.actors = api.ActorsAPI(data_classes.Actor, list_data_classes.ActorList)
         # self.directors = api.DirectorAPI(data_classes.Director, list_data_classes.DirectorList)
