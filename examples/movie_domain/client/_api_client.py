@@ -10,8 +10,8 @@ from cognite.client.credentials import OAuthClientCredentials
 
 import movie_domain.client.data_classes.persons
 
-from ._api import api
-from .data_classes import data_classes
+from . import data_classes
+from ._api.persons import PersonsAPI
 
 
 class MovieClient:
@@ -21,7 +21,7 @@ class MovieClient:
         #     data_classes.Movie,
         #     list_data_classes.MovieList,
         # )
-        self.persons = api.PersonsAPI(
+        self.persons = PersonsAPI(
             client,
             dm.ViewId("IntegrationTestsImmutable", "Person", "2"),
             data_classes.Person,
@@ -43,17 +43,18 @@ class MovieClient:
     def azure_project(
         cls, tenant_id: str, client_id: str, client_secret: str, cdf_cluster: str, project: str
     ) -> MovieClient:
+        base_url = f"https://{cdf_cluster}.cognitedata.com/"
         credentials = OAuthClientCredentials(
             token_url=f"https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/token",
             client_id=client_id,
             client_secret=client_secret,
-            scopes=[f"https://{cdf_cluster}.cognitedata.com/.default"],
+            scopes=[f"{base_url}.default"],
         )
         config = ClientConfig(
             project=project,
             credentials=credentials,
             client_name=getpass.getuser(),
-            base_url=f"https://{cdf_cluster}.cognitedata.com/",
+            base_url=base_url,
         )
 
         return cls(config)
