@@ -57,7 +57,17 @@ def _to_python_type(type_: dm.DirectRelationReference | dm.PropertyType, is_null
         return "list[str]"
     if isinstance(type_, (dm.Int32, dm.Int64)):
         out_type = "int"
-    elif isinstance(type_, (dm.Text)):
+    elif isinstance(type_, dm.Boolean):
+        out_type = "bool"
+    elif isinstance(type_, (dm.Float32, dm.Float64)):
+        out_type = "float"
+    elif isinstance(type_, dm.Date):
+        out_type = "date"
+    elif isinstance(type_, dm.Timestamp):
+        out_type = "datetime"
+    elif isinstance(type_, dm.Json):
+        out_type = "dict"
+    elif isinstance(type_, dm.Text):
         out_type = "str"
     else:
         raise ValueError(f"Unknown type {type_}")
