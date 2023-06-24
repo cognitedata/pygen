@@ -8,8 +8,10 @@ from cognite.client import ClientConfig, CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.credentials import OAuthClientCredentials
 
+import movie_domain.client.data_classes.persons
+
 from ._api import api
-from .data_classes import data_classes, list_data_classes
+from .data_classes import data_classes
 
 
 class MovieClient:
@@ -24,7 +26,7 @@ class MovieClient:
             dm.ViewId("IntegrationTestsImmutable", "Person", "2"),
             data_classes.Person,
             data_classes.PersonApply,
-            list_data_classes.PersonList,
+            movie_domain.client.data_classes.persons.PersonList,
         )
         # self.ratings = api.RatingsAPI(data_classes.Rating, list_data_classes.RatingList)
         # self.actors = api.ActorsAPI(data_classes.Actor, list_data_classes.ActorList)

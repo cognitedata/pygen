@@ -6,7 +6,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client._constants import INSTANCES_LIST_LIMIT_DEFAULT
 
-from ..data_classes.core_list import T_TypeApplyNode, T_TypeNode, T_TypeNodeList
+from ..data_classes._core import T_TypeApplyNode, T_TypeNode, T_TypeNodeList
 
 
 class TypeAPI(Generic[T_TypeNode, T_TypeApplyNode, T_TypeNodeList]):
@@ -40,9 +40,6 @@ class TypeAPI(Generic[T_TypeNode, T_TypeApplyNode, T_TypeNodeList]):
         if is_multiple:
             return self.class_list([self.class_type.from_node(node) for node in instances.nodes])
         return self.class_type.from_node(instances.nodes[0])
-
-    def _delete(self, node_external_id: str | T_TypeNode | T_TypeNodeList, traversal_count: int = 0):
-        raise NotImplementedError()
 
     def _list(self, limit: int = INSTANCES_LIST_LIMIT_DEFAULT) -> T_TypeNodeList:
         nodes = self._client.data_modeling.instances.list("node", sources=self.sources, limit=limit)

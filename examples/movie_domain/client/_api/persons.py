@@ -6,59 +6,30 @@ from typing import Sequence, overload
 from cognite.client import data_modeling as dm
 from cognite.client._constants import INSTANCES_LIST_LIMIT_DEFAULT
 
-from ..data_classes import data_classes, ids, list_data_classes
-from .core_api import TypeAPI
-
-#
-# class DirectorAPI(TypeAPI):
-#     ...
-#
-#
-# class MovieAPI(TypeAPI):
-#     ...
-#
-#
-# class ActorsAPI(TypeAPI):
-#     ...
-#
-#
-# class BestDirectorAPI(TypeAPI):
-#     ...
-#
-#
-# class BestLeadingActorAPI(TypeAPI):
-#     ...
-#
-#
-# class BestLeadingActressAPI(TypeAPI):
-#     ...
-#
-#
-# class RatingsAPI(TypeAPI):
-#     ...
+from ..data_classes.ids import RoleId
+from ..data_classes.persons import Person, PersonApply, PersonList
+from ._core import TypeAPI
 
 
-class PersonsAPI(TypeAPI[data_classes.Person, data_classes.PersonApply, list_data_classes.PersonList]):
-    def apply(self, person: data_classes.PersonApply, replace: bool = False) -> dm.InstancesApplyResult:
+class PersonsAPI(TypeAPI[Person, PersonApply, PersonList]):
+    def apply(self, person: PersonApply, replace: bool = False) -> dm.InstancesApplyResult:
         return self._client.data_modeling.instances.apply(nodes=person.to_node(), replace=replace)
 
     def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(data_classes.PersonApply.space, external_id))
+            return self._client.data_modeling.instances.delete(nodes=(PersonApply.space, external_id))
         else:
-            return self._client.data_modeling.instances.delete(
-                nodes=[(data_classes.PersonApply.space, id) for id in external_id]
-            )
+            return self._client.data_modeling.instances.delete(nodes=[(PersonApply.space, id) for id in external_id])
 
     @overload
-    def retrieve(self, external_id: str) -> data_classes.Person:
+    def retrieve(self, external_id: str) -> Person:
         ...
 
     @overload
-    def retrieve(self, external_id: Sequence[str]) -> list_data_classes.PersonList:
+    def retrieve(self, external_id: Sequence[str]) -> PersonList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> data_classes.Person | list_data_classes.PersonList:
+    def retrieve(self, external_id: str | Sequence[str]) -> Person | PersonList:
         f = dm.filters
         if isinstance(external_id, str):
             person = self._retrieve(("IntegrationTestsImmutable", external_id))
@@ -69,7 +40,7 @@ class PersonsAPI(TypeAPI[data_classes.Person, data_classes.PersonApply, list_dat
                 ["edge", "startNode"], {"space": "IntegrationTestsImmutable", "externalId": external_id}
             )
             edges = self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_person))
-            person.roles = [ids.RoleId.from_direct_relation(edge.end_node) for edge in edges]
+            person.roles = [RoleId.from_direct_relation(edge.end_node) for edge in edges]
             return person
         else:
             persons = self._retrieve([("IntegrationTestsImmutable", id) for id in external_id])
@@ -86,12 +57,10 @@ class PersonsAPI(TypeAPI[data_classes.Person, data_classes.PersonApply, list_dat
             for person in persons:
                 node_id = person.id_tuple()
                 if node_id in edges_by_start_node:
-                    person.roles = [
-                        ids.RoleId.from_direct_relation(edge.end_node) for edge in edges_by_start_node[node_id]
-                    ]
+                    person.roles = [RoleId.from_direct_relation(edge.end_node) for edge in edges_by_start_node[node_id]]
             return persons
 
-    def list(self, limit: int = INSTANCES_LIST_LIMIT_DEFAULT) -> list_data_classes.PersonList:
+    def list(self, limit: int = INSTANCES_LIST_LIMIT_DEFAULT) -> PersonList:
         persons = self._list(limit=limit)
 
         f = dm.filters
@@ -104,6 +73,6 @@ class PersonsAPI(TypeAPI[data_classes.Person, data_classes.PersonApply, list_dat
         for person in persons:
             node_id = person.id_tuple()
             if node_id in edges_by_start_node:
-                person.roles = [ids.RoleId.from_direct_relation(edge.end_node) for edge in edges_by_start_node[node_id]]
+                person.roles = [RoleId.from_direct_relation(edge.end_node) for edge in edges_by_start_node[node_id]]
 
         return persons

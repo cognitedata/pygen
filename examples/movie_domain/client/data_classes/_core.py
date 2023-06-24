@@ -3,9 +3,24 @@ from __future__ import annotations
 import inspect
 import types
 from abc import abstractmethod
+from collections import UserList
 from datetime import datetime
-from typing import Any, ClassVar, ForwardRef, Iterable, Mapping, Optional, Sequence, TypeVar, Union
+from typing import (
+    Any,
+    ClassVar,
+    Collection,
+    ForwardRef,
+    Generic,
+    Iterable,
+    Mapping,
+    Optional,
+    Sequence,
+    Type,
+    TypeVar,
+    Union,
+)
 
+import pandas as pd
 from cognite.client import data_modeling as dm
 from pydantic import BaseModel, Extra, constr
 from pydantic.utils import DUNDER_ATTRIBUTES
@@ -189,3 +204,43 @@ class TimeSeries(DomainModelCore):
     security_categories: Optional[str]
     dataset_id: Optional[int]
     data_points: Union[list[NumericDataPoint], list[StringDataPoint]]
+
+
+class TypeList(UserList, Generic[T_TypeNode]):
+    _NODE: Type[T_TypeNode]
+
+    def __init__(self, nodes: Collection[Type[DomainModelCore]]):
+        # if any(not isinstance(node, self._NODE) for node in nodes):
+        # raise TypeError(
+        #     f"All nodes for class {type(self).__name__} must be of type " f"{type(self._NODE).__name__}."
+        # )
+        super().__init__(nodes)
+
+    def dump(self) -> list[dict[str, Any]]:
+        return [node.dict() for node in self.data]
+
+    def to_pandas(self) -> pd.DataFrame:
+        return pd.DataFrame(self.dump())
+
+    def _repr_html_(self) -> str:
+        return self.to_pandas()._repr_html_()
+
+
+T_TypeApplyNode = TypeVar("T_TypeApplyNode", bound=DomainModelApply)
+T_TypeNodeList = TypeVar("T_TypeNodeList", bound=TypeList)
+
+
+class Identifier(BaseModel):
+    _instance_type: ClassVar[str] = "node"
+    space: constr(min_length=1, max_length=255)
+    external_id: constr(min_length=1, max_length=255)
+
+    @classmethod
+    def from_direct_relation(cls, relation: dm.DirectRelationReference) -> T_Identifier:
+        return cls(space=relation.space, external_id=relation.external_id)
+
+    def __str__(self):
+        return f"{self.space}/{self.external_id}"
+
+
+T_Identifier = TypeVar("T_Identifier", bound=Identifier)

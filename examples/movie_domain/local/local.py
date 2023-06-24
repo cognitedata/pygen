@@ -3,7 +3,8 @@ from __future__ import annotations
 from typing import Sequence, Type, overload
 
 from ..client import MovieClient
-from ..client.data_classes.core_list import T_TypeNode, T_TypeNodeList
+from ..client.data_classes._core import T_TypeNodeList
+from ..client.data_classes.core_list import T_TypeNode
 
 
 class TypeLocal:

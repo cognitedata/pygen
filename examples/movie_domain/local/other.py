@@ -1,41 +1,3 @@
-from __future__ import annotations
-
-from typing import ClassVar, List, Optional
-
-from cognite.client import data_modeling as dm
-from pydantic import Field
-
-from .core import CircularModel, CircularModelApply
-from .ids import RoleId
-
-
-class Person(CircularModel):
-    space: ClassVar[str] = "IntegrationTestsImmutable"
-    name: Optional[str] = None
-    birth_year: Optional[int] = Field(None, alias="birthYear")
-    roles: list[RoleId] = []
-
-
-class PersonApply(CircularModelApply):
-    space: ClassVar[str] = "IntegrationTestsImmutable"
-    name: str
-    birth_year: Optional[int] = None
-    roles: List[RoleId] = []
-
-    def to_node(self) -> dm.NodeApply:
-        return dm.NodeApply(
-            space=self.space,
-            external_id=self.external_id,
-            existing_version=self.existing_version,
-            sources=[
-                dm.NodeOrEdgeData(
-                    source=dm.ViewId("IntegrationTestsImmutable", "Person", "2"),
-                    properties={"name": self.name, "birthYear": self.birth_year},
-                )
-            ],
-        )
-
-
 # class Nomination(CircularModelCore):
 #     name: str
 #     year: int
@@ -90,3 +52,66 @@ class PersonApply(CircularModelApply):
 # Actor.update_forward_refs()
 # Director.update_forward_refs()
 # Person.update_forward_refs()
+
+# class NominationList(TypeList):
+#     _NODE = Nomination
+#
+#
+# class BestDirectorList(TypeList):
+#     _NODE = BestDirector
+#
+#
+# class BestLeadingActorList(TypeList):
+#     _NODE = BestLeadingActor
+#
+#
+# class BestLeadingActressList(TypeList):
+#     _NODE = BestLeadingActress
+#
+#
+# class RoleList(TypeList):
+#     _NODE = Role
+#
+#
+# class ActorList(TypeList):
+#     _NODE = Actor
+#
+#
+# class DirectorList(TypeList):
+#     _NODE = Director
+#
+#
+# class RatingList(TypeList):
+#     _NODE = Rating
+#
+#
+# class MovieList(TypeList):
+#     _NODE = Movie
+
+#
+# class DirectorAPI(TypeAPI):
+#     ...
+#
+#
+# class MovieAPI(TypeAPI):
+#     ...
+#
+#
+# class ActorsAPI(TypeAPI):
+#     ...
+#
+#
+# class BestDirectorAPI(TypeAPI):
+#     ...
+#
+#
+# class BestLeadingActorAPI(TypeAPI):
+#     ...
+#
+#
+# class BestLeadingActressAPI(TypeAPI):
+#     ...
+#
+#
+# class RatingsAPI(TypeAPI):
+#     ...

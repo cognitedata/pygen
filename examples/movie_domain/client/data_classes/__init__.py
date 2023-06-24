@@ -1,5 +1,4 @@
-from .data_classes import Person, PersonApply
 from .ids import RoleId
-from .list_data_classes import PersonApplyList, PersonList
+from .persons import Person, PersonApply, PersonList
 
-__all__ = ["Person", "PersonList", "PersonApply", "PersonApplyList", "RoleId"]
+__all__ = ["Person", "PersonApply", "RoleId", "PersonList"]
