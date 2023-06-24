@@ -1,11 +1,11 @@
 import toml
 
 from cognite import pygen
-from tests.constants import REPO_ROOT
+from tests.constants import repo_root
 
 
 def test_matching_versions():
-    with (REPO_ROOT / "pyproject.toml").open() as fh:
+    with (repo_root / "pyproject.toml").open() as fh:
         pyproject_toml = toml.load(fh)
 
     version_in_pyproject_toml = pyproject_toml["tool"]["poetry"]["version"]
@@ -22,8 +22,8 @@ def remove_top_lines(text: str, lines: int) -> str:
 
 def test_index_matching_readme():
     # Arrange
-    readme = (REPO_ROOT / "README.md").read_text()
-    index = (REPO_ROOT / "docs" / "index.md").read_text()
+    readme = (repo_root / "README.md").read_text()
+    index = (repo_root / "docs" / "index.md").read_text()
 
     # Assert
     assert remove_top_lines(readme, 5) == remove_top_lines(index, 1)
