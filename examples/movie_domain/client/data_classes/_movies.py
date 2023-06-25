@@ -10,6 +10,7 @@ from ._core import CircularModelApply, DomainModel, TypeList
 if TYPE_CHECKING:
     from ._actors import ActorApply
     from ._directors import DirectorApply
+    from ._ratings import RatingApply
 
 __all__ = ["Movie", "MovieApply", "MovieList"]
 
@@ -29,7 +30,7 @@ class MovieApply(CircularModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
     title: str
     release_year: Optional[int] = None
-    rating: Optional[str] = None
+    rating: Optional[Union[str, "RatingApply"]] = None
     run_time_minutes: Optional[float] = None
     meta: Optional[dict] = None
     actors: list[Union[str, "ActorApply"]] = []

@@ -10,6 +10,7 @@ from ._core import CircularModelApply, DomainModel, TypeList
 if TYPE_CHECKING:
     from ._movies import MovieApply
     from ._nominations import NominationApply
+    from ._persons import PersonApply
 
 __all__ = ["Director", "DirectorApply", "DirectorList"]
 
@@ -25,7 +26,7 @@ class Director(DomainModel):
 class DirectorApply(CircularModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
     won_oscar: Optional[bool] = None
-    person: Optional[str] = None
+    person: Optional[Union[str, "PersonApply"]] = None
     movies: list[Union[str, "MovieApply"]] = []
     nomination: list[Union[str, "NominationApply"]] = []
 
