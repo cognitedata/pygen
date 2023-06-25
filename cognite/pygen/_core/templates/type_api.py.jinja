@@ -27,7 +27,8 @@ class {{ view_plural_pascal }}API(TypeAPI[{{ view_name }}, {{ view_name }}Apply,
         {{ init_edge_apis }}{% endif %}
 
     def apply(self, {{ view_snake }}: {{ view_name }}Apply, replace: bool = False) -> dm.InstancesApplyResult:
-        return self._client.data_modeling.instances.apply(nodes={{ view_snake }}.to_node(), replace=replace)
+        instances = {{ view_snake }}.to_instances_apply()
+        return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
     def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):

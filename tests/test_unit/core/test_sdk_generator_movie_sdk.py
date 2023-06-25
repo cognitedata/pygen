@@ -56,7 +56,7 @@ def test_property_to_edge_api(sdk_generator: SDKGenerator, person_view: dm.View)
 
 def test_property_to_edge_helper(sdk_generator: SDKGenerator, person_view: dm.View):
     # Arrange
-    expected = "\n".join(MovieSDKFiles.persons_api.read_text().split("\n")[87:97])
+    expected = "\n".join(MovieSDKFiles.persons_api.read_text().split("\n")[88:98])
 
     # Act
     actual = sdk_generator.property_to_edge_helper(person_view.properties["roles"], view_name="Person")
