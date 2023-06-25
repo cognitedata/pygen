@@ -1,10 +1,10 @@
-        for role in self.roles:
-            edge = self._create_role_edge(role)
+        for {{ edge_snake }} in self.{{ edge_snake_plural }}:
+            edge = self._create_{{edge_snake}}_edge({{ edge_snake }})
             if edge.external_id not in cache:
                 edges.append(edge)
                 cache.add(edge.external_id)
 
-            if isinstance(role, CircularModelApply):
-                instances = role._to_instances_apply(cache)
+            if isinstance({{ edge_snake }}, CircularModelApply):
+                instances = {{ edge_snake }}._to_instances_apply(cache)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)

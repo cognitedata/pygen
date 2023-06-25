@@ -166,7 +166,12 @@ __all__ = [
         add_snippets = []
         for prop in properties:
             if isinstance(prop, dm.SingleHopConnectionDefinition):
-                add_snippets.append(add_edges.render())
+                add_snippets.append(
+                    add_edges.render(
+                        edge_snake=to_snake(prop.name, singularize=True),
+                        edge_snake_plural=to_snake(prop.name, pluralize=True),
+                    )
+                )
             elif isinstance(prop, dm.MappedPropertyDefinition) and isinstance(prop.type, ViewDirectRelation):
                 raise NotImplementedError(f"Add edges for type={type(prop)} is not implemented")
 
