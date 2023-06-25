@@ -156,7 +156,15 @@ __all__ = [
                     )
                 )
             elif isinstance(prop, dm.MappedPropertyDefinition) and isinstance(prop.type, ViewDirectRelation):
-                raise NotImplementedError()
+                create_methods.append(
+                    create_edge.render(
+                        edge_snake=to_snake(prop.name, singularize=True),
+                        # Todo Avoid assuming that nodes and edges are in the same space.
+                        space=prop.type.source.space,
+                        edge_pascal=to_pascal(prop.name, singularize=True),
+                        type_ext_id=f"{prop.container.external_id}.{prop.name}",
+                    )
+                )
         return create_methods
 
     def properties_to_add_edges(
@@ -173,7 +181,12 @@ __all__ = [
                     )
                 )
             elif isinstance(prop, dm.MappedPropertyDefinition) and isinstance(prop.type, ViewDirectRelation):
-                raise NotImplementedError(f"Add edges for type={type(prop)} is not implemented")
+                add_snippets.append(
+                    add_edges.render(
+                        edge_snake=to_snake(prop.name, singularize=True),
+                        edge_snake_plural=to_snake(prop.name, pluralize=True),
+                    )
+                )
 
         return add_snippets
 
