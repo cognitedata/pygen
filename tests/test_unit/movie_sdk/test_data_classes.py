@@ -3,7 +3,7 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Properties
 
 from movie_domain.client import data_classes as movie
-from movie_domain.client.data_classes.serializations import unpack_properties
+from movie_domain.client.data_classes._core import unpack_properties
 
 
 def test_person_from_node():

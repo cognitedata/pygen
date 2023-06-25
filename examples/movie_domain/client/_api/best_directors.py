@@ -6,7 +6,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client._constants import INSTANCES_LIST_LIMIT_DEFAULT
 
-from movie_domain.client.data_classes.best_directors import BestDirector, BestDirectorApply, BestDirectorList
+from movie_domain.client.data_classes import BestDirector, BestDirectorApply, BestDirectorList
 
 from ._core import TypeAPI
 

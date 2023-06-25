@@ -7,7 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client._constants import INSTANCES_LIST_LIMIT_DEFAULT
 
-from {{ sdk_name }}.client.data_classes.{{ view_plural_snake }} import {{ view_name }}, {{ view_name }}Apply, {{ view_name }}List
+from {{ sdk_name }}.client.data_classes import {{ view_name }}, {{ view_name }}Apply, {{ view_name }}List
 
 from ._core import TypeAPI
 
