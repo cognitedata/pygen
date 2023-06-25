@@ -145,10 +145,18 @@ __all__ = [
         create_edge = self._env.get_template("type_data_create_edge.py.jinja")
         create_methods = []
         for prop in properties:
-            if isinstance(prop, dm.SingleHopConnectionDefinition) or (
-                isinstance(prop, dm.MappedPropertyDefinition) and isinstance(prop.type, ViewDirectRelation)
-            ):
-                create_methods.append(create_edge.render())
+            if isinstance(prop, dm.SingleHopConnectionDefinition):
+                create_methods.append(
+                    create_edge.render(
+                        edge_snake=to_snake(prop.name, singularize=True),
+                        # Todo Avoid assuming that nodes and edges are in the same space.
+                        space=prop.source.space,
+                        edge_pascal=to_pascal(prop.name, singularize=True),
+                        type_ext_id=prop.type.external_id,
+                    )
+                )
+            elif isinstance(prop, dm.MappedPropertyDefinition) and isinstance(prop.type, ViewDirectRelation):
+                raise NotImplementedError()
         return create_methods
 
     def properties_to_add_edges(

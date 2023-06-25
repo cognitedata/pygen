@@ -1,15 +1,15 @@
-    def _create_role_edge(self, role: Union[str, "RoleApply"]) -> dm.EdgeApply:
-        if isinstance(role, str):
-            end_node_ext_id = role
+    def _create_{{ edge_snake }}_edge(self, {{ edge_snake }}: Union[str, "{{ edge_pascal }}Apply"]) -> dm.EdgeApply:
+        if isinstance({{ edge_snake }}, str):
+            end_node_ext_id = {{ edge_snake }}
         elif isinstance(role, CircularModelApply):
-            end_node_ext_id = role.external_id
+            end_node_ext_id = {{ edge_snake }}.external_id
         else:
-            raise TypeError(f"Expected str or RoleApply, got {type(role)}")
+            raise TypeError(f"Expected str or {{ edge_pascal }}Apply, got {type({{ edge_snake }})}")
 
         return dm.EdgeApply(
-            space="IntegrationTestsImmutable",
+            space="{{ space }}",
             external_id=f"{self.external_id}:{end_node_ext_id}",
-            type=dm.DirectRelationReference("IntegrationTestsImmutable", "Person.roles"),
+            type=dm.DirectRelationReference("{{ space }}", "{{ type_ext_id }}"),
             start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference("IntegrationTestsImmutable", end_node_ext_id),
+            end_node=dm.DirectRelationReference("{{ space }}", end_node_ext_id),
         )

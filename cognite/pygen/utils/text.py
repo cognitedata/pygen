@@ -3,27 +3,35 @@ import re
 import inflect
 
 
-def to_camel(string: str, pluralize: bool = False) -> str:
+def to_camel(string: str, pluralize: bool = False, singularize: bool = False) -> str:
     """Convert snake_case_name to camelCaseName.
     >>> to_camel("a_b")
     'aB'
     >>> to_camel('camel_case', pluralize=True)
     'camelCases'
+    >>> to_camel('best_directors', singularize=True)
+    'bestDirector'
     """
     string_split = string.split("_")
-    if pluralize:
+    if pluralize and singularize:
+        raise ValueError("Cannot pluralize and singularize at the same time")
+    elif pluralize:
         string_split[-1] = as_plural(string_split[-1])
+    elif singularize:
+        string_split[-1] = as_singular(string_split[-1])
     return string_split[0] + "".join(word.capitalize() for word in string_split[1:])
 
 
-def to_pascal(string: str, pluralize=False) -> str:
+def to_pascal(string: str, pluralize=False, singularize: bool = False) -> str:
     """Convert snake_case_name to PascalCaseName.
     >>> to_pascal("a_b")
     'AB'
     >>> to_pascal('camel_case', pluralize=True)
     'CamelCases'
+    >>> to_pascal('best_directors', singularize=True)
+    'BestDirector'
     """
-    camel = to_camel(string, pluralize)
+    camel = to_camel(string, pluralize, singularize)
     return f"{camel[0].upper()}{camel[1:]}" if camel else ""
 
 
