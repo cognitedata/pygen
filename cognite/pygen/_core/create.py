@@ -56,7 +56,7 @@ def view_to_api(view: dm.View, sdk_name: str) -> str:
         view_plural_snake=view_plural_snake,
         view_plural_pascal=to_pascal(view_plural_snake),
         has_one_to_many=has_one_to_many,
-        edge_apis="\n\n".join(edges_apis),
+        edge_apis="\n\n\n".join(edges_apis),
         edge_helpers="\n\n".join(edges_helpers),
         edge_retrieve=f"\n{' '*12}".join(snippet.retrieve for snippet in edge_snippets),
         edge_list=f"\n{' '*8}".join(snippet.list for snippet in edge_snippets),
@@ -174,7 +174,7 @@ def _to_python_type(type_: dm.DirectRelationReference | dm.PropertyType) -> str:
         out_type = "datetime"
     elif isinstance(type_, dm.Json):
         out_type = "dict"
-    elif isinstance(type_, (dm.Text, dm.DirectRelation)):
+    elif isinstance(type_, (dm.Text, dm.DirectRelation, dm.CDFExternalIdReference)):
         out_type = "str"
     else:
         raise ValueError(f"Unknown type {type_}")
