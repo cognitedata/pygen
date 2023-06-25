@@ -98,7 +98,7 @@ def test_property_to_edge_snippets(person_view: dm.View):
             [
                 "name: str",
                 "birth_year: Optional[int] = None",
-                "roles: list[str] = []",
+                'roles: list[Union[str, "RoleApply"]] = []',
             ],
         ),
     ],

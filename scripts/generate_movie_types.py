@@ -10,6 +10,7 @@ def main():
     client = MovieClient.from_toml("config.toml")
     c: CogniteClient = client.persons._client
 
+    generator = pygen.SDKGenerator("movie_domain")
     # view = c.data_modeling.views.retrieve(("IntegrationTestsImmutable", "Rating"))[0]
     views = c.data_modeling.views.list(limit=-1)
     for view in views:
@@ -17,10 +18,10 @@ def main():
             # The person classes are manually created and should not be overwritten
             continue
         file_name = f"{to_snake(view.name, pluralize=True)}.py"
-        data_class = pygen.view_to_data_classes(view)
+        data_class = generator.view_to_data_classes(view)
 
         (MovieSDKFiles.data_classes / f"_{file_name}").write_text(data_class)
-        type_api = pygen.view_to_api(view, sdk_name="movie_domain")
+        type_api = generator.view_to_api(view)
         (MovieSDKFiles.api / file_name).write_text(type_api)
 
 
