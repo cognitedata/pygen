@@ -14,8 +14,8 @@ def main():
     # view = c.data_modeling.views.retrieve(("IntegrationTestsImmutable", "Rating"))[0]
     views = c.data_modeling.views.list(limit=-1)
     for view in views:
-        if view.name == "Person":
-            # The person classes are manually created and should not be overwritten
+        if view.name in ["Person", "Actor"]:
+            # These classes are manually created and should not be overwritten
             continue
         file_name = f"{to_snake(view.name, pluralize=True)}.py"
         data_class = generator.view_to_data_classes(view)
@@ -23,6 +23,7 @@ def main():
         (MovieSDKFiles.data_classes / f"_{file_name}").write_text(data_class)
         type_api = generator.view_to_api(view)
         (MovieSDKFiles.api / file_name).write_text(type_api)
+    print(generator._dependencies_by_view_name)
 
 
 if __name__ == "__main__":

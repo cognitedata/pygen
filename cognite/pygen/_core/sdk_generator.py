@@ -20,11 +20,13 @@ class SDKGenerator:
             autoescape=select_autoescape(),
         )
         self._dependencies_by_view_name = defaultdict(set)
+        self._view_names = set()
 
     def view_to_data_classes(self, view: dm.View) -> str:
         type_data = self._env.get_template("type_data.py.jinja")
         fields = properties_to_fields(view.properties.values())
         self._update_dependencies(fields, view.name)
+        self._view_names.add(view.name)
         sources = properties_to_sources(view.properties.values())
 
         circular_imports = dependencies_to_imports(self._dependencies_by_view_name.get(view.name, set()))
@@ -103,6 +105,33 @@ class SDKGenerator:
                 edge_snake=to_snake(prop.name, singularize=True),
             )
         raise NotImplementedError(f"Edge API for type={type(prop)} is not implemented")
+
+    def create_data_classes_init(self) -> str:
+        import_lines = []
+        class_lines = []
+        for view_name in sorted(self._view_names):
+            classes = [view_name, f"{view_name}Apply", f"{view_name}List"]
+            import_lines.append(f"from ._{to_snake(view_name, pluralize=True)} import {', '.join(classes)}")
+            class_lines.extend(classes)
+
+        update_forward_refs_lines = []
+        for view_name, dependencies in sorted(self._dependencies_by_view_name.items()):
+            if not dependencies:
+                continue
+            dependencies = [f"{dependency}Apply={dependency}Apply" for dependency in sorted(dependencies)]
+            update_forward_refs_lines.append(f"{view_name}Apply.update_forward_refs({', '.join(dependencies)})")
+
+        imports = "\n".join(import_lines)
+        forward_refs = "\n".join(update_forward_refs_lines)
+        classes = '",\n    "'.join(class_lines)
+        return f"""{imports}
+
+{forward_refs}
+
+__all__ = [
+    "{classes}",
+]
+"""
 
 
 @dataclass

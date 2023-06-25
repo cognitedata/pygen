@@ -22,9 +22,8 @@ class BestLeadingActorsAPI(TypeAPI[BestLeadingActor, BestLeadingActorApply, Best
         )
 
     def apply(self, best_leading_actor: BestLeadingActorApply, replace: bool = False) -> dm.InstancesApplyResult:
-        return self._client.data_modeling.instances.apply(
-            nodes=best_leading_actor.to_instances_apply(), replace=replace
-        )
+        instances = best_leading_actor.to_instances_apply()
+        return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
     def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):

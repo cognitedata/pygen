@@ -22,7 +22,8 @@ class NominationsAPI(TypeAPI[Nomination, NominationApply, NominationList]):
         )
 
     def apply(self, nomination: NominationApply, replace: bool = False) -> dm.InstancesApplyResult:
-        return self._client.data_modeling.instances.apply(nodes=nomination.to_instances_apply(), replace=replace)
+        instances = nomination.to_instances_apply()
+        return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
     def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):

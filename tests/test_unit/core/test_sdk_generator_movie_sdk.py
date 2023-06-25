@@ -149,3 +149,41 @@ def test_dependencies_to_imports(dependencies: set[str], expected: str):
 
     # Assert
     assert actual == expected
+
+
+def test_create_api_classes(sdk_generator: SDKGenerator, monkeypatch):
+    # Arrange
+    expected = MovieSDKFiles.data_init.read_text()
+    monkeypatch.setattr(
+        sdk_generator,
+        "_dependencies_by_view_name",
+        {
+            "Person": {"Role"},
+            "Actor": {"Nomination", "Movie", "Person"},
+            "Director": {"Nomination", "Movie", "Person"},
+            "Movie": {"Actor", "Director"},
+            "Role": {"Nomination", "Movie", "Person"},
+        },
+    )
+    monkeypatch.setattr(
+        sdk_generator,
+        "_view_names",
+        {
+            "Actor",
+            "Person",
+            "BestDirector",
+            "BestLeadingActor",
+            "BestLeadingActress",
+            "Director",
+            "Movie",
+            "Nomination",
+            "Rating",
+            "Role",
+        },
+    )
+
+    # Act
+    actual = sdk_generator.create_data_classes_init()
+
+    # Assert
+    assert actual == expected
