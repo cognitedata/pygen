@@ -50,7 +50,7 @@ class PersonsAPI(TypeAPI[Person, PersonApply, PersonList]):
         self.roles = PersonRolesAPI(client)
 
     def apply(self, person: PersonApply, replace: bool = False) -> dm.InstancesApplyResult:
-        return self._client.data_modeling.instances.apply(nodes=person.to_node(), replace=replace)
+        return self._client.data_modeling.instances.apply(nodes=person.to_instances_apply(), replace=replace)
 
     def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):

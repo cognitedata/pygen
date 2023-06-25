@@ -29,7 +29,7 @@ class RoleApply(CircularModelApply):
     movies: list[Union[str, "MovieApply"]] = []
     nomination: list[Union[str, "NominationApply"]] = []
 
-    def to_node(self) -> dm.NodeApply:
+    def to_instances_apply(self) -> dm.NodeApply:
         return dm.NodeApply(
             space=self.space,
             external_id=self.external_id,

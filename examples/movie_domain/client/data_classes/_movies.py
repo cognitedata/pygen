@@ -35,7 +35,7 @@ class MovieApply(CircularModelApply):
     actors: list[Union[str, "ActorApply"]] = []
     directors: list[Union[str, "DirectorApply"]] = []
 
-    def to_node(self) -> dm.NodeApply:
+    def to_instances_apply(self) -> dm.NodeApply:
         return dm.NodeApply(
             space=self.space,
             external_id=self.external_id,

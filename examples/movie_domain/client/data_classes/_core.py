@@ -4,6 +4,7 @@ import inspect
 import types
 from abc import abstractmethod
 from collections import UserList
+from dataclasses import dataclass
 from datetime import datetime
 from typing import (
     Any,
@@ -25,6 +26,23 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Properties, PropertyValue
 from pydantic import BaseModel, Extra, constr
 from pydantic.utils import DUNDER_ATTRIBUTES
+
+# Todo - Move into SDK
+
+
+@dataclass
+class InstancesApply:
+    """This represents the read result of an instance query
+
+    Args:
+        nodes (dm.NodeApplyList): A list of nodes.
+        edges (dm.NodeApplyList): A list of edges.
+
+    """
+
+    nodes: list[dm.NodeApply]
+    edges: list[dm.NodeApply]
+
 
 ExternalId = constr(min_length=1, max_length=255)
 
@@ -65,7 +83,7 @@ class DomainModelApply(DomainModelCore):
     existing_version: Optional[int] = None
 
     @abstractmethod
-    def to_node(self) -> dm.NodeApply:
+    def to_instances_apply(self) -> dm.NodeApply:
         raise NotImplementedError()
 
     class Config:

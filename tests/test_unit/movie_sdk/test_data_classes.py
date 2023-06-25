@@ -3,7 +3,7 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Properties
 
 from movie_domain.client import data_classes as movie
-from movie_domain.client.data_classes._core import unpack_properties
+from movie_domain.client.data_classes._core import InstancesApply, unpack_properties
 
 
 def test_person_from_node():
@@ -41,22 +41,28 @@ def test_person_one_to_many_fields():
 def test_person_apply_to_node_apply():
     # Arrange
     person = movie.PersonApply(name="Christoph Waltz", birth_year=1956, external_id="person:christoph_waltz")
-    expected = dm.NodeApply(
-        "IntegrationTestsImmutable",
-        "person:christoph_waltz",
-        sources=[
-            dm.NodeOrEdgeData(
-                source=dm.ContainerId("IntegrationTestsImmutable", "Person"),
-                properties={"name": "Christoph Waltz", "birthYear": 1956},
+    expected = InstancesApply(
+        [
+            dm.NodeApply(
+                "IntegrationTestsImmutable",
+                "person:christoph_waltz",
+                sources=[
+                    dm.NodeOrEdgeData(
+                        source=dm.ContainerId("IntegrationTestsImmutable", "Person"),
+                        properties={"name": "Christoph Waltz", "birthYear": 1956},
+                    )
+                ],
             )
         ],
+        [],
     )
 
     # Act
-    actual = person.to_node()
+    actual = person.to_instances_apply()
 
     # Assert
-    assert actual == expected
+    assert actual.nodes == expected.nodes
+    assert actual.edges == expected.edges
 
 
 def unpack_properties_test_cases():

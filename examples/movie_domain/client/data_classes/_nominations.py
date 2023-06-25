@@ -20,7 +20,7 @@ class NominationApply(CircularModelApply):
     name: str
     year: int
 
-    def to_node(self) -> dm.NodeApply:
+    def to_instances_apply(self) -> dm.NodeApply:
         return dm.NodeApply(
             space=self.space,
             external_id=self.external_id,
