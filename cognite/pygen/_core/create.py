@@ -88,6 +88,7 @@ def property_to_edge_helper(prop: dm.ConnectionDefinition, view_name: str) -> st
             view_name=to_pascal(view_name),
             view_snake=to_snake(view_name),
             view_plural_snake=to_snake(view_name, pluralize=True),
+            edge_name=prop.name,
             edge_plural_snake=to_snake(prop.name, pluralize=True),
             edge_snake=to_snake(prop.name, singularize=True),
         )
@@ -112,7 +113,7 @@ def property_to_edge_snippets(prop: dm.ConnectionDefinition, view_name: str) -> 
         view_snake_plural = to_snake(view_name, pluralize=True)
         return EdgeSnippets(
             f"self.{prop_plural_snake} = {view_name}{prop_pascal}API(client)",
-            f"{view_snake}.{prop_plural_snake} = [edge.end_node.external_id for edge in {prop_snake}_edges]",
+            f"{view_snake}.{prop.name} = [edge.end_node.external_id for edge in {prop_snake}_edges]",
             f"self._set_{prop_plural_snake}({view_snake_plural}, {prop_snake}_edges)",
             f"{prop_snake}_edges = self.{prop_plural_snake}.retrieve(external_id)",
             f"{prop_snake}_edges = self.{prop_plural_snake}.list(limit=-1)",

@@ -1,6 +1,9 @@
+import pytest
 from cognite.client import data_modeling as dm
+from cognite.client.data_classes.data_modeling.instances import Properties
 
 from movie_domain.client import data_classes as movie
+from movie_domain.client.data_classes.serializations import unpack_properties
 
 
 def test_person_from_node():
@@ -51,6 +54,45 @@ def test_person_apply_to_node_apply():
 
     # Act
     actual = person.to_node()
+
+    # Assert
+    assert actual == expected
+
+
+def unpack_properties_test_cases():
+    properties = {
+        "IntegrationTestsImmutable": {
+            "Person/2": {
+                "name": "Christoph Waltz",
+                "birthYear": 1956,
+            }
+        }
+    }
+    expected = {
+        "name": "Christoph Waltz",
+        "birthYear": 1956,
+    }
+    yield pytest.param(properties, expected, id="Person")
+
+    properties = {
+        "IntegrationTestsImmutable": {
+            "Actor/2": {
+                "person": {"space": "IntegrationTestsImmutable", "externalId": "person:ethan_coen"},
+                "wonOscar": True,
+            }
+        }
+    }
+    expected = {"person": "person:ethan_coen", "wonOscar": True}
+    yield pytest.param(properties, expected, id="Actor")
+
+
+@pytest.mark.parametrize("raw_properties, expected", list(unpack_properties_test_cases()))
+def test_unpack_properties(raw_properties: dict, expected: dict):
+    # Arrange
+    properties = Properties.load(raw_properties)
+
+    # Act
+    actual = unpack_properties(properties)
 
     # Assert
     assert actual == expected

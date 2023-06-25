@@ -7,4 +7,4 @@
         for {{ view_snake }} in {{ view_plural_snake }}:
             node_id = {{ view_snake }}.id_tuple()
             if node_id in edges_by_start_node:
-                {{ view_snake }}.{{ edge_plural_snake }} = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
+                {{ view_snake }}.{{ edge_name }} = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]

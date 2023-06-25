@@ -1,4 +1,3 @@
-import movie_domain.client.data_classes.persons
 from movie_domain.client import MovieClient
 from movie_domain.client import data_classes as movie
 
@@ -6,8 +5,8 @@ from movie_domain.client import data_classes as movie
 def test_person_list(movie_client: MovieClient):
     people = movie_client.persons.list(limit=-1)
 
-    assert isinstance(people, movie_domain.client.data_classes.persons.PersonList)
-    assert all(isinstance(role, movie.RoleId) for person in people for role in person.roles)
+    assert isinstance(people, movie.PersonList)
+    assert all(isinstance(role, str) for person in people for role in person.roles)
 
 
 def test_person_retrieve(movie_client: MovieClient):
@@ -20,9 +19,9 @@ def test_person_retrieve(movie_client: MovieClient):
 def test_person_retrieve_multiple(movie_client: MovieClient):
     people = movie_client.persons.retrieve(["person:quentin_tarantino", "person:john_travolta"])
 
-    assert isinstance(people, movie_domain.client.data_classes.persons.PersonList)
+    assert isinstance(people, movie.PersonList)
     assert len(people) == 2
-    assert all(isinstance(role, movie.RoleId) for person in people for role in person.roles)
+    assert all(isinstance(role, str) for person in people for role in person.roles)
 
 
 def test_person_apply_and_delete(movie_client: MovieClient):

@@ -103,7 +103,7 @@ class ActorsAPI(TypeAPI[Actor, ActorApply, ActorList]):
             movie_edges = self.movies.retrieve(external_id)
             nomination_edges = self.nominations.retrieve(external_id)
             actor.movies = [edge.end_node.external_id for edge in movie_edges]
-            actor.nominations = [edge.end_node.external_id for edge in nomination_edges]
+            actor.nomination = [edge.end_node.external_id for edge in nomination_edges]
             return actor
         else:
             actors = self._retrieve([("IntegrationTestsImmutable", ext_id) for ext_id in external_id])
@@ -142,4 +142,4 @@ class ActorsAPI(TypeAPI[Actor, ActorApply, ActorList]):
         for actor in actors:
             node_id = actor.id_tuple()
             if node_id in edges_by_start_node:
-                actor.nominations = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
+                actor.nomination = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]

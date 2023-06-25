@@ -25,6 +25,8 @@ from cognite.client import data_modeling as dm
 from pydantic import BaseModel, Extra, constr
 from pydantic.utils import DUNDER_ATTRIBUTES
 
+from .serializations import unpack_properties
+
 ExternalId = constr(min_length=1, max_length=255)
 
 
@@ -45,7 +47,8 @@ class DomainModel(DomainModelCore):
     @classmethod
     def from_node(cls, node: dm.Node) -> T_TypeNode:
         data = node.dump(camel_case=False)
-        return cls(**data, **{k: v for prop in node.properties.values() for k, v in prop.items()})
+
+        return cls(**data, **unpack_properties(node.properties))
 
     @classmethod
     def one_to_many_fields(cls) -> list[str]:
