@@ -82,8 +82,11 @@ T_TypeNode = TypeVar("T_TypeNode", bound=DomainModel)
 class DomainModelApply(DomainModelCore):
     existing_version: Optional[int] = None
 
+    def to_instances_apply(self) -> InstancesApply:
+        return self._to_instances_apply(set())
+
     @abstractmethod
-    def to_instances_apply(self) -> dm.NodeApply:
+    def _to_instances_apply(self, cache: set[str]) -> InstancesApply:
         raise NotImplementedError()
 
     class Config:

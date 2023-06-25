@@ -30,7 +30,7 @@ def test_create_view_api_classes(sdk_generator: SDKGenerator, person_view: dm.Vi
     assert actual == expected
 
 
-def test_create_view_data_classes(sdk_generator: SDKGenerator, person_view: dm.View):
+def test_create_view_data_class_persons(sdk_generator: SDKGenerator, person_view: dm.View):
     # Arrange
     expected = MovieSDKFiles.persons_data.read_text()
 
