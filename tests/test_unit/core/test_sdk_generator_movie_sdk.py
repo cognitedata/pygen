@@ -135,6 +135,11 @@ def dependencies_to_imports_test_cases():
     from ._roles import RoleApply
 """
     yield pytest.param({"Role"}, expected, id="single dependency")
+    expected = """if TYPE_CHECKING:
+    from ._movies import MovieApply
+    from ._nominations import NominationApply
+"""
+    yield pytest.param({"Movie", "Nomination"}, expected, id="multiple dependencies")
 
 
 @pytest.mark.parametrize("dependencies, expected", list(dependencies_to_imports_test_cases()))

@@ -1,11 +1,15 @@
 from __future__ import annotations
 
-from typing import ClassVar, Optional
+from typing import TYPE_CHECKING, ClassVar, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from ._core import CircularModelApply, DomainModel, TypeList
+
+if TYPE_CHECKING:
+    from ._actors import ActorApply
+    from ._directors import DirectorApply
 
 __all__ = ["Movie", "MovieApply", "MovieList"]
 
@@ -28,8 +32,8 @@ class MovieApply(CircularModelApply):
     rating: Optional[str] = None
     run_time_minutes: Optional[float] = None
     meta: Optional[dict] = None
-    actors: list[str] = []
-    directors: list[str] = []
+    actors: list[Union[str, "ActorApply"]] = []
+    directors: list[Union[str, "DirectorApply"]] = []
 
     def to_node(self) -> dm.NodeApply:
         return dm.NodeApply(

@@ -1,11 +1,15 @@
 from __future__ import annotations
 
-from typing import ClassVar, Optional
+from typing import TYPE_CHECKING, ClassVar, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from ._core import CircularModelApply, DomainModel, TypeList
+
+if TYPE_CHECKING:
+    from ._movies import MovieApply
+    from ._nominations import NominationApply
 
 __all__ = ["Role", "RoleApply", "RoleList"]
 
@@ -22,8 +26,8 @@ class RoleApply(CircularModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
     won_oscar: Optional[bool] = None
     person: Optional[str] = None
-    movies: list[str] = []
-    nomination: list[str] = []
+    movies: list[Union[str, "MovieApply"]] = []
+    nomination: list[Union[str, "NominationApply"]] = []
 
     def to_node(self) -> dm.NodeApply:
         return dm.NodeApply(
