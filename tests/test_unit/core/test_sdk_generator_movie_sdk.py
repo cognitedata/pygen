@@ -41,6 +41,17 @@ def test_create_view_data_classes(sdk_generator: SDKGenerator, person_view: dm.V
     assert actual == expected
 
 
+def test_create_view_data_class_actors(sdk_generator: SDKGenerator, actor_view: dm.View):
+    # Arrange
+    expected = MovieSDKFiles.actors_data.read_text()
+
+    # Act
+    actual = sdk_generator.view_to_data_classes(actor_view)
+
+    # Assert
+    assert actual == expected
+
+
 def test_property_to_edge_api(sdk_generator: SDKGenerator, person_view: dm.View):
     # Arrange
     expected = "\n".join(MovieSDKFiles.persons_api.read_text().split("\n")[14:38])

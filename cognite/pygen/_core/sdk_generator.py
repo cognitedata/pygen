@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from typing import Literal
 
 from cognite.client import data_modeling as dm
+from cognite.client.data_classes.data_modeling.views import ViewDirectRelation
 from jinja2 import Environment, PackageLoader, select_autoescape
 
 from cognite.pygen._core import view_functions
@@ -167,6 +168,7 @@ class Field:
     type: str
     default: str
     is_nullable: bool
+    is_one_to_many: bool = False
     edge_end_node_external_id: str | None = None
 
     @property
@@ -179,13 +181,17 @@ class Field:
 
     @classmethod
     def from_property(cls, property_: dm.MappedPropertyDefinition | dm.ConnectionDefinition) -> Field:
-        if isinstance(property_, dm.MappedPropertyDefinition):
+        if isinstance(property_, dm.MappedPropertyDefinition) and not isinstance(property_.type, dm.DirectRelation):
             type_ = _to_python_type(property_.type)
             default = property_.default_value if isinstance(property_.type, dm.PropertyType) else "[]"
             is_nullable = isinstance(property_.type, dm.DirectRelationReference) or property_.nullable
             return cls(property_.name, type_, default, is_nullable)
         elif isinstance(property_, dm.SingleHopConnectionDefinition):
-            return cls(property_.name, "list[str]", "[]", True, property_.source.external_id)
+            # One to Many
+            return cls(property_.name, "list[str]", "[]", True, True, property_.source.external_id)
+        elif isinstance(property_, dm.MappedPropertyDefinition) and isinstance(property_.type, ViewDirectRelation):
+            # One to One
+            return cls(property_.name, "str", "None", True, False, property_.type.source.external_id)
         else:
             raise NotImplementedError(f"Property type={type(property_)} is not supported")
 
@@ -200,7 +206,10 @@ class Field:
 
         type_ = self.type
         if self.is_edge and field_type == "write":
-            type_ = f'list[Union[str, "{self.edge_end_node_external_id}Apply"]]'
+            type_ = f'Union[str, "{self.edge_end_node_external_id}Apply"]'
+            if self.is_one_to_many:
+                type_ = f"list[{type_}]"
+
         if is_nullable and not type_.startswith("list"):
             type_ = f"Optional[{type_}]"
 
