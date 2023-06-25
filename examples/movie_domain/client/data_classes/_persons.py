@@ -48,7 +48,9 @@ class PersonApply(CircularModelApply):
         edges = []
         for role in self.roles:
             edge = self._create_role_edge(role)
-            edges.append(edge)
+            if edge.external_id not in cache:
+                edges.append(edge)
+                cache.add(edge.external_id)
 
             if isinstance(role, CircularModelApply):
                 instances = role._to_instances_apply(cache)

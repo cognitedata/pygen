@@ -202,7 +202,7 @@ def test_create_api_classes(sdk_generator: SDKGenerator, monkeypatch):
 
 def test_properties_to_create_edge_methods_persons(sdk_generator: SDKGenerator, person_view: dm.View):
     # Arrange
-    expected = ["\n".join(MovieSDKFiles.persons_data.read_text().split("\n")[59:74])]
+    expected = ["\n".join(MovieSDKFiles.persons_data.read_text().split("\n")[61:76])]
 
     # Act
     actual = sdk_generator.properties_to_create_edge_methods(person_view.properties.values())
@@ -213,7 +213,7 @@ def test_properties_to_create_edge_methods_persons(sdk_generator: SDKGenerator, 
 
 def test_properties_to_add_edges_persons(sdk_generator: SDKGenerator, person_view: dm.View):
     # Arrange
-    expected = ["\n".join(MovieSDKFiles.persons_data.read_text().split("\n")[48:56])]
+    expected = ["\n".join(MovieSDKFiles.persons_data.read_text().split("\n")[48:58])]
 
     # Act
     actual = sdk_generator.properties_to_add_edges(person_view.properties.values())
