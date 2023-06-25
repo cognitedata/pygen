@@ -11,7 +11,7 @@ from ._roles import Role, RoleApply, RoleList
 
 ActorApply.update_forward_refs(MovieApply=MovieApply, NominationApply=NominationApply, PersonApply=PersonApply)
 DirectorApply.update_forward_refs(MovieApply=MovieApply, NominationApply=NominationApply, PersonApply=PersonApply)
-MovieApply.update_forward_refs(ActorApply=ActorApply, DirectorApply=DirectorApply)
+MovieApply.update_forward_refs(ActorApply=ActorApply, DirectorApply=DirectorApply, RatingApply=RatingApply)
 PersonApply.update_forward_refs(RoleApply=RoleApply)
 RoleApply.update_forward_refs(MovieApply=MovieApply, NominationApply=NominationApply, PersonApply=PersonApply)
 
