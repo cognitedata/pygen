@@ -19,11 +19,15 @@ class SDKGenerator:
             loader=PackageLoader("cognite.pygen._core", "templates"),
             autoescape=select_autoescape(),
         )
+        self._dependencies_by_view_name = defaultdict(set)
 
     def view_to_data_classes(self, view: dm.View) -> str:
         type_data = self._env.get_template("type_data.py.jinja")
         fields = properties_to_fields(view.properties.values())
+        self._update_dependencies(fields, view.name)
         sources = properties_to_sources(view.properties.values())
+
+        circular_imports = dependencies_to_imports(self._dependencies_by_view_name.get(view.name, set()))
 
         return (
             type_data.render(
@@ -32,9 +36,15 @@ class SDKGenerator:
                 read_fields="\n    ".join(f.as_type_hint("read") for f in fields),
                 write_fields="\n    ".join(f.as_type_hint("write") for f in fields),
                 sources=f',\n{" "*16}'.join(sources),
+                circular_imports=circular_imports,
             )
             + "\n"
         )
+
+    def _update_dependencies(self, fields: list[Field], view_name: str):
+        for field in fields:
+            if field.is_edge:
+                self._dependencies_by_view_name[view_name].add(field.edge_end_node_external_id)
 
     def view_to_api(self, view: dm.View) -> str:
         one_to_many_properties = list(view_functions.one_to_many_properties(view.properties.values()))
@@ -128,17 +138,27 @@ class Field:
     type: str
     default: str
     is_nullable: bool
+    edge_end_node_external_id: str | None = None
 
     @property
     def snake_name(self):
         return to_snake(self.source_name)
 
+    @property
+    def is_edge(self) -> bool:
+        return self.edge_end_node_external_id is not None
+
     @classmethod
     def from_property(cls, property_: dm.MappedPropertyDefinition | dm.ConnectionDefinition) -> Field:
-        type_ = _to_python_type(property_.type)
-        default = property_.default_value if isinstance(property_.type, dm.PropertyType) else "[]"
-        is_nullable = isinstance(property_.type, dm.DirectRelationReference) or property_.nullable
-        return cls(property_.name, type_, default, is_nullable)
+        if isinstance(property_, dm.MappedPropertyDefinition):
+            type_ = _to_python_type(property_.type)
+            default = property_.default_value if isinstance(property_.type, dm.PropertyType) else "[]"
+            is_nullable = isinstance(property_.type, dm.DirectRelationReference) or property_.nullable
+            return cls(property_.name, type_, default, is_nullable)
+        elif isinstance(property_, dm.SingleHopConnectionDefinition):
+            return cls(property_.name, "list[str]", "[]", True, property_.source.external_id)
+        else:
+            raise NotImplementedError(f"Property type={type(property_)} is not supported")
 
     def as_type_hint(self, field_type: Literal["read", "write"]) -> str:
         is_nullable = self.is_nullable or (field_type == "read")
@@ -146,10 +166,15 @@ class Field:
         snake_name = self.snake_name
         if snake_name != self.source_name and field_type == "read":
             default = f'Field({default}, alias="{self.source_name}")'
+
         rhs = f" = {default}" if is_nullable else ""
+
         type_ = self.type
+        if self.is_edge and field_type == "write":
+            type_ = f'list[Union[str, "{self.edge_end_node_external_id}Apply"]]'
         if is_nullable and not type_.startswith("list"):
             type_ = f"Optional[{type_}]"
+
         return f"{snake_name}: {type_}{rhs}"
 
 
@@ -207,3 +232,14 @@ def properties_to_sources(properties: Iterable[dm.MappedPropertyDefinition | dm.
             % (container_id.space, container_id.external_id, prop_str)
         )
     return output
+
+
+def dependencies_to_imports(dependencies: set[str]) -> str:
+    if not dependencies:
+        return ""
+    lines = ["if TYPE_CHECKING:"]
+    for dependency in sorted(dependencies):
+        snake_plural = to_snake(dependency, pluralize=True)
+        lines.append(f"    from ._{snake_plural} import {dependency}Apply")
+    lines.append("")
+    return "\n".join(lines)

@@ -6,6 +6,7 @@ from cognite.client import data_modeling as dm
 from cognite.pygen._core.sdk_generator import (
     EdgeSnippets,
     SDKGenerator,
+    dependencies_to_imports,
     properties_to_fields,
     properties_to_sources,
     property_to_edge_snippets,
@@ -124,6 +125,22 @@ def test_create_sources(person_view: dm.View):
 
     # Act
     actual = properties_to_sources(person_view.properties.values())
+
+    # Assert
+    assert actual == expected
+
+
+def dependencies_to_imports_test_cases():
+    expected = """if TYPE_CHECKING:
+    from ._roles import RoleApply
+"""
+    yield pytest.param({"Role"}, expected, id="single dependency")
+
+
+@pytest.mark.parametrize("dependencies, expected", list(dependencies_to_imports_test_cases()))
+def test_dependencies_to_imports(dependencies: set[str], expected: str):
+    # Act
+    actual = dependencies_to_imports(dependencies)
 
     # Assert
     assert actual == expected

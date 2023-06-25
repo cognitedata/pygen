@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-from typing import ClassVar, Optional
+from typing import TYPE_CHECKING, ClassVar, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from .core import CircularModelApply, DomainModel, TypeList
+from ._core import CircularModelApply, DomainModel, TypeList
 
+{% if circular_imports %}{{ circular_imports }}{% endif %}
 __all__ = ["{{ view_name }}", "{{ view_name }}Apply", "{{ view_name }}List"]
 
 
