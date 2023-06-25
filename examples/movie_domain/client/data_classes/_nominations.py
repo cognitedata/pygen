@@ -4,7 +4,7 @@ from typing import ClassVar, Optional
 
 from cognite.client import data_modeling as dm
 
-from ._core import CircularModelApply, DomainModel, TypeList
+from ._core import CircularModelApply, DomainModel, InstancesApply, TypeList
 
 __all__ = ["Nomination", "NominationApply", "NominationList"]
 
@@ -20,8 +20,8 @@ class NominationApply(CircularModelApply):
     name: str
     year: int
 
-    def to_node(self) -> dm.NodeApply:
-        return dm.NodeApply(
+    def to_instances_apply(self) -> InstancesApply:
+        this_node = dm.NodeApply(
             space=self.space,
             external_id=self.external_id,
             existing_version=self.existing_version,
@@ -35,6 +35,9 @@ class NominationApply(CircularModelApply):
                 ),
             ],
         )
+        nodes = [this_node]
+        edges = []
+        return InstancesApply(nodes, edges)
 
 
 class NominationList(TypeList[Nomination]):

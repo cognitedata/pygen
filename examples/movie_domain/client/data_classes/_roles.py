@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, ClassVar, Optional, Union
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import CircularModelApply, DomainModel, TypeList
+from ._core import CircularModelApply, DomainModel, InstancesApply, TypeList
 
 if TYPE_CHECKING:
     from ._movies import MovieApply
@@ -30,8 +30,8 @@ class RoleApply(CircularModelApply):
     movies: list[Union[str, "MovieApply"]] = []
     nomination: list[Union[str, "NominationApply"]] = []
 
-    def to_node(self) -> dm.NodeApply:
-        return dm.NodeApply(
+    def to_instances_apply(self) -> InstancesApply:
+        this_node = dm.NodeApply(
             space=self.space,
             external_id=self.external_id,
             existing_version=self.existing_version,
@@ -45,6 +45,9 @@ class RoleApply(CircularModelApply):
                 ),
             ],
         )
+        nodes = [this_node]
+        edges = []
+        return InstancesApply(nodes, edges)
 
 
 class RoleList(TypeList[Role]):
