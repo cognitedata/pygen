@@ -172,7 +172,7 @@ def test_create_api_classes(sdk_generator: SDKGenerator, monkeypatch):
             "Person": {"Role"},
             "Actor": {"Nomination", "Movie", "Person"},
             "Director": {"Nomination", "Movie", "Person"},
-            "Movie": {"Actor", "Director"},
+            "Movie": {"Actor", "Director", "Rating"},
             "Role": {"Nomination", "Movie", "Person"},
         },
     )

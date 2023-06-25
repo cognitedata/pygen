@@ -38,8 +38,7 @@ def test_person_one_to_many_fields():
     assert actual == expected
 
 
-def test_person_apply_to_node_apply():
-    # Arrange
+def person_apply_to_instances_test_cases():
     person = movie.PersonApply(name="Christoph Waltz", birth_year=1956, external_id="person:christoph_waltz")
     expected = InstancesApply(
         [
@@ -56,7 +55,52 @@ def test_person_apply_to_node_apply():
         ],
         [],
     )
+    yield pytest.param(person, expected, id="Person no extra dependencies")
 
+    person = movie.PersonApply(
+        name="Quentin Tarantino",
+        birth_year=1963,
+        external_id="person:quentin_tarantino",
+        roles=[
+            movie.RoleApply(
+                external_id="actor:quentin_tarantino",
+                won_oscar=False,
+                person="person:quentin_tarantino",
+                movies=[
+                    movie.MovieApply(
+                        external_id="movie:pulp_fiction",
+                        title="Pulp Fiction",
+                        release_year=1994,
+                        actors=["actor:quentin_tarantino"],
+                        directors=["director:quentin_tarantino"],
+                        run_time_minutes=154,
+                        meta={"imdb": {"rating": 8.9, "votes": 1780000}},
+                        rating=movie.RatingApply(
+                            external_id="rating:pulp_fiction",
+                            score="rating:pulp_fiction",
+                            votes="vote_count:pulp_fiction",
+                        ),
+                    )
+                ],
+            ),
+            movie.RoleApply(
+                external_id="director:quentin_tarantino",
+                won_oscar=True,
+                person="person:quentin_tarantino",
+                nomination=[
+                    movie.NominationApply(
+                        external_id="director:quentin_tarantino:pulp_fiction", name="Best Director", year=1995
+                    )
+                ],
+            ),
+        ],
+    )
+
+    yield pytest.param(person, expected, id="Person with extra dependencies")
+
+
+@pytest.mark.parametrize("person, expected", list(person_apply_to_instances_test_cases()))
+def test_person_to_apply_instances(person: movie.PersonApply, expected: InstancesApply):
     # Act
     actual = person.to_instances_apply()
 
