@@ -35,43 +35,36 @@ def view_to_data_classes(view: dm.View) -> str:
 
 
 def view_to_api(view: dm.View, sdk_name: str) -> str:
-    edges_apis = [
-        property_to_edge_api(prop, view.name, view.space)
-        for prop in view_functions.one_to_many_properties(view.properties.values())
-    ]
-    edges_helpers = [
-        property_to_edge_helper(prop, view.name)
-        for prop in view_functions.one_to_many_properties(view.properties.values())
-    ]
-    edge_snippets = [
-        property_to_edge_snippets(prop, view.name)
-        for prop in view_functions.one_to_many_properties(view.properties.values())
-    ]
+    one_to_many_properties = list(view_functions.one_to_many_properties(view.properties.values()))
+
+    edges_apis = [property_to_edge_api(prop, view.name, view.space) for prop in one_to_many_properties]
+    edges_helpers = [property_to_edge_helper(prop, view.name) for prop in one_to_many_properties]
+    edge_snippets = [property_to_edge_snippets(prop, view.name) for prop in one_to_many_properties]
+
+    has_one_to_many = len(one_to_many_properties) > 0
 
     type_api = _env.get_template("type_api.py.jinja")
 
     view_plural_snake = to_snake(view.name, pluralize=True)
-    return (
-        type_api.render(
-            sdk_name=sdk_name,
-            view_name=view.name,
-            view_snake=to_snake(view.name),
-            view_space=view.space,
-            view_ext_id=view.external_id,
-            view_version=view.version,
-            view_plural_snake=view_plural_snake,
-            view_plural_pascal=to_pascal(view_plural_snake),
-            edge_apis="\n\n".join(edges_apis),
-            edge_helpers="\n".join(edges_helpers),
-            edge_retrieve=(" " * 12).join(snippet.retrieve for snippet in edge_snippets),
-            edge_list=(" " * 8).join(snippet.list for snippet in edge_snippets),
-            init_edge_apis=(" " * 8).join(snippet.init for snippet in edge_snippets),
-            set_retrieve_singular=(" " * 12).join(snippet.set_singular for snippet in edge_snippets),
-            set_retrieve_plural=(" " * 12).join(snippet.set_plural for snippet in edge_snippets),
-            set_list_plural=(" " * 8).join(snippet.set_plural for snippet in edge_snippets),
-        )
-        + "\n"
-    )
+    return type_api.render(
+        sdk_name=sdk_name,
+        view_name=view.name,
+        view_snake=to_snake(view.name),
+        view_space=view.space,
+        view_ext_id=view.external_id,
+        view_version=view.version,
+        view_plural_snake=view_plural_snake,
+        view_plural_pascal=to_pascal(view_plural_snake),
+        has_one_to_many=has_one_to_many,
+        edge_apis="\n\n".join(edges_apis),
+        edge_helpers="\n".join(edges_helpers),
+        edge_retrieve=(" " * 12).join(snippet.retrieve for snippet in edge_snippets),
+        edge_list=(" " * 8).join(snippet.list for snippet in edge_snippets),
+        init_edge_apis=(" " * 8).join(snippet.init for snippet in edge_snippets),
+        set_retrieve_singular=(" " * 12).join(snippet.set_singular for snippet in edge_snippets),
+        set_retrieve_plural=(" " * 12).join(snippet.set_plural for snippet in edge_snippets),
+        set_list_plural=(" " * 8).join(snippet.set_plural for snippet in edge_snippets),
+    ) + ("\n" if has_one_to_many else "")
 
 
 def property_to_edge_api(prop: dm.ConnectionDefinition, view_name: str, view_space: str) -> str:

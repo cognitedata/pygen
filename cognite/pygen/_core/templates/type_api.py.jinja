@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from collections import defaultdict
-from typing import Dict, List, Sequence, Tuple, overload
+{% if has_one_to_many %}from collections import defaultdict
+from typing import Dict, List, Sequence, Tuple, overload{% else %}from typing import Sequence, overload{% endif %}
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -11,10 +11,10 @@ from {{ sdk_name }}.client.data_classes.{{ view_plural_snake }} import {{ view_n
 
 from ._core import TypeAPI
 
-
+{% if has_one_to_many %}
 {{ edge_apis }}
 
-
+{% endif %}
 class {{ view_plural_pascal }}API(TypeAPI[{{ view_name }}, {{ view_name }}Apply, {{ view_name }}List]):
     def __init__(self, client: CogniteClient):
         super().__init__(
@@ -23,8 +23,8 @@ class {{ view_plural_pascal }}API(TypeAPI[{{ view_name }}, {{ view_name }}Apply,
             class_type={{ view_name }},
             class_apply_type={{ view_name }}Apply,
             class_list={{ view_name }}List,
-        )
-        {{ init_edge_apis }}
+        ){% if has_one_to_many %}
+        {{ init_edge_apis }}{% endif %}
 
     def apply(self, {{ view_snake }}: {{ view_name }}Apply, replace: bool = False) -> dm.InstancesApplyResult:
         return self._client.data_modeling.instances.apply(nodes={{ view_snake }}.to_node(), replace=replace)
@@ -45,21 +45,21 @@ class {{ view_plural_pascal }}API(TypeAPI[{{ view_name }}, {{ view_name }}Apply,
 
     def retrieve(self, external_id: str | Sequence[str]) -> {{ view_name }} | {{ view_name }}List:
         if isinstance(external_id, str):
-            {% if edge_retrieve %}{{ view_snake }} = self._retrieve(("{{ view_space }}", external_id))
+            {% if has_one_to_many %}{{ view_snake }} = self._retrieve(("{{ view_space }}", external_id))
             {{ edge_retrieve }}
             {{ set_retrieve_singular }}
             return {{ view_snake }}{% else %}return self._retrieve(("{{ view_space }}", external_id)){% endif %}
         else:
-            {% if edge_retrieve %}{{ view_plural_snake }} = self._retrieve([("{{ view_space }}", ext_id) for ext_id in external_id])
+            {% if has_one_to_many %}{{ view_plural_snake }} = self._retrieve([("{{ view_space }}", ext_id) for ext_id in external_id])
             {{ edge_retrieve }}
             {{ set_retrieve_plural }}
             return {{ view_plural_snake }}{% else %}return self._retrieve([("{{ view_space }}", ext_id) for ext_id in external_id]){% endif %}
 
     def list(self, limit: int = INSTANCES_LIST_LIMIT_DEFAULT) -> {{ view_name }}List:
-        {% if edge_list %}{{ view_plural_snake }} = self._list(limit=limit)
+        {% if has_one_to_many %}{{ view_plural_snake }} = self._list(limit=limit)
 
         {{ edge_list }}
         {{ set_list_plural }}
         return {{ view_plural_snake }}{% else %}return self._list(limit=limit){% endif %}
-
-{{ edge_helpers }}
+{% if has_one_to_many %}
+{{ edge_helpers }}{% endif %}
