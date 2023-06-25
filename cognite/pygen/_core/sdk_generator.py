@@ -43,8 +43,8 @@ class SDKGenerator:
                 write_fields="\n    ".join(f.as_type_hint("write") for f in fields),
                 sources=f',\n{" "*16}'.join(sources),
                 circular_imports=circular_imports,
-                create_edges="\n    ".join(create_edges),
-                add_edges="\n   ".join(add_edges),
+                create_edges="\n\n".join(create_edges),
+                add_edges="\n\n".join(add_edges),
             )
             + "\n"
         )

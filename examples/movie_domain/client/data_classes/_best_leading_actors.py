@@ -20,7 +20,10 @@ class BestLeadingActorApply(CircularModelApply):
     name: str
     year: int
 
-    def to_instances_apply(self) -> InstancesApply:
+    def _to_instances_apply(self, cache: set[str]) -> InstancesApply:
+        if self.external_id in cache:
+            return InstancesApply([], [])
+
         this_node = dm.NodeApply(
             space=self.space,
             external_id=self.external_id,
@@ -37,6 +40,7 @@ class BestLeadingActorApply(CircularModelApply):
         )
         nodes = [this_node]
         edges = []
+
         return InstancesApply(nodes, edges)
 
 
