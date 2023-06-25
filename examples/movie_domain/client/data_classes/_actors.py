@@ -72,7 +72,7 @@ class ActorApply(CircularModelApply):
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
-        for nomination in self.nominations:
+        for nomination in self.nomination:
             edge = self._create_nomination_edge(nomination)
             if edge.external_id not in cache:
                 edges.append(edge)

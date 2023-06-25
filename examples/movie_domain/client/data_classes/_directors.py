@@ -43,7 +43,6 @@ class DirectorApply(CircularModelApply):
                     source=dm.ContainerId("IntegrationTestsImmutable", "Role"),
                     properties={
                         "wonOscar": self.won_oscar,
-                        "person": self.person,
                     },
                 ),
             ],

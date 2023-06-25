@@ -95,8 +95,14 @@ def person_apply_to_instances_test_cases():
             ),
         ],
     )
+    expected_edges = []
+    expected_nodes = []
 
-    yield pytest.param(person, expected, id="Person with extra dependencies")
+    yield pytest.param(
+        person,
+        InstancesApply([dm.NodeApply.load(n) for n in expected_nodes], [dm.EdgeApply.load(e) for e in expected_edges]),
+        id="Person with extra dependencies",
+    )
 
 
 @pytest.mark.parametrize("person, expected", list(person_apply_to_instances_test_cases()))

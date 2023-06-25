@@ -50,7 +50,6 @@ class MovieApply(CircularModelApply):
                     properties={
                         "title": self.title,
                         "releaseYear": self.release_year,
-                        "rating": self.rating,
                         "runTimeMinutes": self.run_time_minutes,
                         "meta": self.meta,
                     },

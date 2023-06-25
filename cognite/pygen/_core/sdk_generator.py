@@ -309,7 +309,7 @@ def _to_python_type(type_: dm.DirectRelationReference | dm.PropertyType) -> str:
 def properties_to_sources(properties: Iterable[dm.MappedPropertyDefinition | dm.ConnectionDefinition]) -> list[str]:
     properties_by_container_id: dict[dm.ContainerId, list[dm.MappedPropertyDefinition]] = defaultdict(list)
     for property_ in properties:
-        if isinstance(property_, dm.MappedPropertyDefinition):
+        if isinstance(property_, dm.MappedPropertyDefinition) and not isinstance(property_.type, ViewDirectRelation):
             properties_by_container_id[property_.container].append(property_)
 
     output = []
