@@ -27,7 +27,7 @@ def to_pascal(string: str, pluralize=False) -> str:
     return f"{camel[0].upper()}{camel[1:]}" if camel else ""
 
 
-def to_snake(string: str, pluralize: bool = False) -> str:
+def to_snake(string: str, pluralize: bool = False, singularize: bool = False) -> str:
     """
     Convert PascalCaseName to snake_case_name.
     >>> to_snake("aB")
@@ -60,10 +60,16 @@ def to_snake(string: str, pluralize: bool = False) -> str:
     '20_cool_dudes'
     >>> to_snake('BestDirector', pluralize=True)
     'best_directors'
+    >>> to_snake('BestDirectors', singularize=True)
+    'best_director'
     """
     words = re.findall(r"[A-Z]?[a-z]+|[A-Z]+(?=[A-Z][a-z]|\d|\W|$)|\d+", string)
-    if pluralize:
+    if pluralize and singularize:
+        raise ValueError("Cannot pluralize and singularize at the same time")
+    elif pluralize:
         words[-1] = as_plural(words[-1])
+    elif singularize:
+        words[-1] = as_singular(words[-1])
     return "_".join(map(str.lower, words))
 
 

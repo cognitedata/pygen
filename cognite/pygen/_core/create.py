@@ -57,13 +57,13 @@ def view_to_api(view: dm.View, sdk_name: str) -> str:
         view_plural_pascal=to_pascal(view_plural_snake),
         has_one_to_many=has_one_to_many,
         edge_apis="\n\n".join(edges_apis),
-        edge_helpers="\n".join(edges_helpers),
-        edge_retrieve=(" " * 12).join(snippet.retrieve for snippet in edge_snippets),
-        edge_list=(" " * 8).join(snippet.list for snippet in edge_snippets),
-        init_edge_apis=(" " * 8).join(snippet.init for snippet in edge_snippets),
-        set_retrieve_singular=(" " * 12).join(snippet.set_singular for snippet in edge_snippets),
-        set_retrieve_plural=(" " * 12).join(snippet.set_plural for snippet in edge_snippets),
-        set_list_plural=(" " * 8).join(snippet.set_plural for snippet in edge_snippets),
+        edge_helpers="\n\n".join(edges_helpers),
+        edge_retrieve=f"\n{' '*12}".join(snippet.retrieve for snippet in edge_snippets),
+        edge_list=f"\n{' '*8}".join(snippet.list for snippet in edge_snippets),
+        init_edge_apis=f"\n{' ' * 8}".join(snippet.init for snippet in edge_snippets),
+        set_retrieve_singular=f"\n{' '*12}".join(snippet.set_singular for snippet in edge_snippets),
+        set_retrieve_plural=f"\n{' '*12}".join(snippet.set_plural for snippet in edge_snippets),
+        set_list_plural=f"\n{' '*8}".join(snippet.set_plural for snippet in edge_snippets),
     ) + ("\n" if has_one_to_many else "")
 
 
@@ -85,8 +85,11 @@ def property_to_edge_helper(prop: dm.ConnectionDefinition, view_name: str) -> st
     helper = _env.get_template("type_api_set_edge_helper.py.jinja")
     if isinstance(prop, dm.SingleHopConnectionDefinition):
         return helper.render(
-            view_name=view_name,
-            view_plural=as_plural(view_name),
+            view_name=to_pascal(view_name),
+            view_snake=to_snake(view_name),
+            view_plural_snake=to_snake(view_name, pluralize=True),
+            edge_plural_snake=to_snake(prop.name, pluralize=True),
+            edge_snake=to_snake(prop.name, singularize=True),
         )
     raise NotImplementedError(f"Edge API for type={type(prop)} is not implemented")
 
@@ -102,12 +105,17 @@ class EdgeSnippets:
 
 def property_to_edge_snippets(prop: dm.ConnectionDefinition, view_name: str) -> EdgeSnippets:
     if isinstance(prop, dm.SingleHopConnectionDefinition):
+        prop_plural_snake = to_snake(prop.name, pluralize=True)
+        prop_snake = to_snake(prop.name, singularize=True)
+        prop_pascal = to_pascal(prop.name)
+        view_snake = to_snake(view_name)
+        view_snake_plural = to_snake(view_name, pluralize=True)
         return EdgeSnippets(
-            f"self.{prop.name} = {view_name}{prop.name.title()}API(client)",
-            f"{view_name.lower()}.{prop.name} = [edge.end_node.external_id for edge in edges]",
-            f"self._set_{prop.name}({as_plural(view_name.lower())}, edges)",
-            f"edges = self.{prop.name}.retrieve(external_id)",
-            f"edges = self.{prop.name}.list(limit=-1)",
+            f"self.{prop_plural_snake} = {view_name}{prop_pascal}API(client)",
+            f"{view_snake}.{prop_plural_snake} = [edge.end_node.external_id for edge in {prop_snake}_edges]",
+            f"self._set_{prop_plural_snake}({view_snake_plural}, {prop_snake}_edges)",
+            f"{prop_snake}_edges = self.{prop_plural_snake}.retrieve(external_id)",
+            f"{prop_snake}_edges = self.{prop_plural_snake}.list(limit=-1)",
         )
 
     raise NotImplementedError(f"Edge API for type={type(prop)} is not implemented")
@@ -165,7 +173,7 @@ def _to_python_type(type_: dm.DirectRelationReference | dm.PropertyType) -> str:
         out_type = "datetime"
     elif isinstance(type_, dm.Json):
         out_type = "dict"
-    elif isinstance(type_, dm.Text):
+    elif isinstance(type_, (dm.Text, dm.DirectRelation)):
         out_type = "str"
     else:
         raise ValueError(f"Unknown type {type_}")

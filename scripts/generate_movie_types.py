@@ -10,7 +10,7 @@ def main():
     client = MovieClient.from_toml("config.toml")
     c: CogniteClient = client.persons._client
 
-    view = c.data_modeling.views.retrieve(("IntegrationTestsImmutable", "BestDirector"))[0]
+    view = c.data_modeling.views.retrieve(("IntegrationTestsImmutable", "Actor"))[0]
     file_name = f"{to_snake(view.name, pluralize=True)}.py"
     data_class = pygen.view_to_data_classes(view)
 

@@ -65,10 +65,10 @@ def test_property_to_edge_snippets(person_view: dm.View):
     # Arrange
     expected = EdgeSnippets(
         "self.roles = PersonRolesAPI(client)",
-        "person.roles = [edge.end_node.external_id for edge in edges]",
-        "self._set_roles(persons, edges)",
-        "edges = self.roles.retrieve(external_id)",
-        "edges = self.roles.list(limit=-1)",
+        "person.roles = [edge.end_node.external_id for edge in role_edges]",
+        "self._set_roles(persons, role_edges)",
+        "role_edges = self.roles.retrieve(external_id)",
+        "role_edges = self.roles.list(limit=-1)",
     )
 
     # Act
