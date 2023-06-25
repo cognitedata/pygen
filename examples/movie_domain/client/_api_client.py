@@ -6,6 +6,8 @@ from pathlib import Path
 from cognite.client import ClientConfig, CogniteClient
 from cognite.client.credentials import OAuthClientCredentials
 
+from ._api.actors import ActorsAPI
+from ._api.best_directors import BestDirectorsAPI
 from ._api.persons import PersonsAPI
 
 
@@ -13,6 +15,8 @@ class MovieClient:
     def __init__(self, config: ClientConfig | None = None):
         client = CogniteClient(config)
         self.persons = PersonsAPI(client)
+        self.actors = ActorsAPI(client)
+        self.best_directors = BestDirectorsAPI(client)
 
     @classmethod
     def azure_project(
