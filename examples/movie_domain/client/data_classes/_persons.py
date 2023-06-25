@@ -46,6 +46,7 @@ class PersonApply(CircularModelApply):
         )
         nodes = [this_node]
         edges = []
+
         for role in self.roles:
             edge = self._create_role_edge(role)
             if edge.external_id not in cache:

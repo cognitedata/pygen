@@ -34,6 +34,7 @@ class {{ view_name }}Apply(CircularModelApply):
         )
         nodes = [this_node]
         edges = []
+
 {{ add_edges }}
 
         return InstancesApply(nodes, edges)

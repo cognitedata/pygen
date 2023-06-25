@@ -171,6 +171,8 @@ __all__ = [
         self, properties: Iterable[dm.MappedPropertyDefinition | dm.ConnectionDefinition]
     ) -> list[str]:
         add_edges = self._env.get_template("type_data_add_edges.py.jinja")
+        add_edge = self._env.get_template("type_data_add_edge.py.jinja")
+
         add_snippets = []
         for prop in properties:
             if isinstance(prop, dm.SingleHopConnectionDefinition):
@@ -182,9 +184,8 @@ __all__ = [
                 )
             elif isinstance(prop, dm.MappedPropertyDefinition) and isinstance(prop.type, ViewDirectRelation):
                 add_snippets.append(
-                    add_edges.render(
+                    add_edge.render(
                         edge_snake=to_snake(prop.name, singularize=True),
-                        edge_snake_plural=to_snake(prop.name, pluralize=True),
                     )
                 )
 
