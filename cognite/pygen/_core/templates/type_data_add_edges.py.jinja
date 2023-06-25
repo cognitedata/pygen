@@ -1,0 +1,8 @@
+        for role in self.roles:
+            edge = self._create_role_edge(role)
+            edges.append(edge)
+
+            if isinstance(role, CircularModelApply):
+                instances = role._to_instances_apply(cache)
+                nodes.extend(instances.nodes)
+                edges.extend(instances.edges)

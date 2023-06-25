@@ -28,7 +28,10 @@ class SDKGenerator:
         fields = properties_to_fields(view.properties.values())
         self._update_dependencies(fields, view.name)
         self._view_names.add(view.name)
+
         sources = properties_to_sources(view.properties.values())
+        create_edges = self.properties_to_create_edge_methods(view.properties.values())
+        add_edges = self.properties_to_add_edges(view.properties.values())
 
         circular_imports = dependencies_to_imports(self._dependencies_by_view_name.get(view.name, set()))
 
@@ -40,6 +43,8 @@ class SDKGenerator:
                 write_fields="\n    ".join(f.as_type_hint("write") for f in fields),
                 sources=f',\n{" "*16}'.join(sources),
                 circular_imports=circular_imports,
+                create_edges="\n    ".join(create_edges),
+                add_edges="\n   ".join(add_edges),
             )
             + "\n"
         )
@@ -133,6 +138,31 @@ __all__ = [
     "{classes}",
 ]
 """
+
+    def properties_to_create_edge_methods(
+        self, properties: Iterable[dm.MappedPropertyDefinition | dm.ConnectionDefinition]
+    ) -> list[str]:
+        create_edge = self._env.get_template("type_data_create_edge.py.jinja")
+        create_methods = []
+        for prop in properties:
+            if isinstance(prop, dm.SingleHopConnectionDefinition) or (
+                isinstance(prop, dm.MappedPropertyDefinition) and isinstance(prop.type, ViewDirectRelation)
+            ):
+                create_methods.append(create_edge.render())
+        return create_methods
+
+    def properties_to_add_edges(
+        self, properties: Iterable[dm.MappedPropertyDefinition | dm.ConnectionDefinition]
+    ) -> list[str]:
+        add_edges = self._env.get_template("type_data_add_edges.py.jinja")
+        add_snippets = []
+        for prop in properties:
+            if isinstance(prop, dm.SingleHopConnectionDefinition):
+                add_snippets.append(add_edges.render())
+            elif isinstance(prop, dm.MappedPropertyDefinition) and isinstance(prop.type, ViewDirectRelation):
+                raise NotImplementedError(f"Add edges for type={type(prop)} is not implemented")
+
+        return add_snippets
 
 
 @dataclass
