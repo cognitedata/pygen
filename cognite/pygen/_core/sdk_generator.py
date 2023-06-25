@@ -178,8 +178,8 @@ __all__ = [
             if isinstance(prop, dm.SingleHopConnectionDefinition):
                 add_snippets.append(
                     add_edges.render(
+                        edge_name=prop.name,
                         edge_snake=to_snake(prop.name, singularize=True),
-                        edge_snake_plural=to_snake(prop.name, pluralize=True),
                     )
                 )
             elif isinstance(prop, dm.MappedPropertyDefinition) and isinstance(prop.type, ViewDirectRelation):

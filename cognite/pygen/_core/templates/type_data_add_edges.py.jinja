@@ -1,4 +1,4 @@
-        for {{ edge_snake }} in self.{{ edge_snake_plural }}:
+        for {{ edge_snake }} in self.{{ edge_name }}:
             edge = self._create_{{edge_snake}}_edge({{ edge_snake }})
             if edge.external_id not in cache:
                 edges.append(edge)
