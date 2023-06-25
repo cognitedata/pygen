@@ -22,10 +22,9 @@ from typing import (
 
 import pandas as pd
 from cognite.client import data_modeling as dm
+from cognite.client.data_classes.data_modeling.instances import Properties, PropertyValue
 from pydantic import BaseModel, Extra, constr
 from pydantic.utils import DUNDER_ATTRIBUTES
-
-from .serializations import unpack_properties
 
 ExternalId = constr(min_length=1, max_length=255)
 
@@ -123,14 +122,14 @@ class CircularModelCore(DomainModelCore):
             exclude_none,
         )
         for field in domain_fields:
-            yield field, None
-            # if value := getattr(self, field):
-            #     if isinstance(value, list):
-            #         yield field, [v.external_id if hasattr(v, "external_id") else v for v in value]
-            #     else:
-            #         yield field, value.external_id if hasattr(value, "external_id") else value
-            # else:
-            #     yield field, None
+            # yield field, None
+            if value := getattr(self, field):
+                if isinstance(value, list):
+                    yield field, [v.external_id if hasattr(v, "external_id") else v for v in value]
+                else:
+                    yield field, value.external_id if hasattr(value, "external_id") else value
+            else:
+                yield field, None
 
     def __repr_args__(self) -> Sequence[tuple[str | None, Any]]:
         """
@@ -247,3 +246,20 @@ class Identifier(BaseModel):
 
 
 T_Identifier = TypeVar("T_Identifier", bound=Identifier)
+
+
+def unpack_properties(properties: Properties) -> dict[str, PropertyValue]:
+    unpacked = {}
+    for view_properties in properties.values():
+        for prop_name, prop_value in view_properties.items():
+            if isinstance(prop_value, (str, int, float, bool, list)):
+                unpacked[prop_name] = prop_value
+            elif isinstance(prop_value, dict):
+                # Dicts are assumed to be reference properties
+                if "space" in prop_value and "externalId" in prop_value:
+                    unpacked[prop_name] = prop_value["externalId"]
+                else:
+                    raise ValueError(f"Unexpected reference property {prop_value}")
+            else:
+                raise ValueError(f"Unexpected property value type {type(prop_value)}")
+    return unpacked

@@ -5,12 +5,12 @@ from typing import ClassVar, Optional
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from .core import CircularModelApply, DomainModel, TypeList
+from ._core import CircularModelApply, DomainModel, TypeList
 
-__all__ = ["Director", "DirectorApply", "DirectorList"]
+__all__ = ["Role", "RoleApply", "RoleList"]
 
 
-class Director(DomainModel):
+class Role(DomainModel):
     space: ClassVar[str] = "IntegrationTestsImmutable"
     won_oscar: Optional[bool] = Field(None, alias="wonOscar")
     person: Optional[str] = None
@@ -18,7 +18,7 @@ class Director(DomainModel):
     nomination: list[str] = []
 
 
-class DirectorApply(CircularModelApply):
+class RoleApply(CircularModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
     won_oscar: Optional[bool] = None
     person: Optional[str] = None
@@ -42,5 +42,5 @@ class DirectorApply(CircularModelApply):
         )
 
 
-class DirectorList(TypeList[Director]):
-    _NODE = Director
+class RoleList(TypeList[Role]):
+    _NODE = Role

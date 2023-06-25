@@ -19,7 +19,7 @@ def main():
         file_name = f"{to_snake(view.name, pluralize=True)}.py"
         data_class = pygen.view_to_data_classes(view)
 
-        (MovieSDKFiles.data_classes / file_name).write_text(data_class)
+        (MovieSDKFiles.data_classes / f"_{file_name}").write_text(data_class)
         type_api = pygen.view_to_api(view, sdk_name="movie_domain")
         (MovieSDKFiles.api / file_name).write_text(type_api)
 

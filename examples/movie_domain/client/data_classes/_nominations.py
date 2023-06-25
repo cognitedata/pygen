@@ -3,25 +3,22 @@ from __future__ import annotations
 from typing import ClassVar, Optional
 
 from cognite.client import data_modeling as dm
-from pydantic import Field
 
-from .core import CircularModelApply, DomainModel, TypeList
+from ._core import CircularModelApply, DomainModel, TypeList
 
-__all__ = ["Person", "PersonApply", "PersonList"]
+__all__ = ["Nomination", "NominationApply", "NominationList"]
 
 
-class Person(DomainModel):
+class Nomination(DomainModel):
     space: ClassVar[str] = "IntegrationTestsImmutable"
     name: Optional[str] = None
-    birth_year: Optional[int] = Field(None, alias="birthYear")
-    roles: list[str] = []
+    year: Optional[int] = None
 
 
-class PersonApply(CircularModelApply):
+class NominationApply(CircularModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
     name: str
-    birth_year: Optional[int] = None
-    roles: list[str] = []
+    year: int
 
     def to_node(self) -> dm.NodeApply:
         return dm.NodeApply(
@@ -30,15 +27,15 @@ class PersonApply(CircularModelApply):
             existing_version=self.existing_version,
             sources=[
                 dm.NodeOrEdgeData(
-                    source=dm.ContainerId("IntegrationTestsImmutable", "Person"),
+                    source=dm.ContainerId("IntegrationTestsImmutable", "Nomination"),
                     properties={
                         "name": self.name,
-                        "birthYear": self.birth_year,
+                        "year": self.year,
                     },
                 ),
             ],
         )
 
 
-class PersonList(TypeList[Person]):
-    _NODE = Person
+class NominationList(TypeList[Nomination]):
+    _NODE = Nomination

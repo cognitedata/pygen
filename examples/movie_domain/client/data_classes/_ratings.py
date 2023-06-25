@@ -4,21 +4,21 @@ from typing import ClassVar, Optional
 
 from cognite.client import data_modeling as dm
 
-from .core import CircularModelApply, DomainModel, TypeList
+from ._core import CircularModelApply, DomainModel, TypeList
 
-__all__ = ["BestLeadingActor", "BestLeadingActorApply", "BestLeadingActorList"]
+__all__ = ["Rating", "RatingApply", "RatingList"]
 
 
-class BestLeadingActor(DomainModel):
+class Rating(DomainModel):
     space: ClassVar[str] = "IntegrationTestsImmutable"
-    name: Optional[str] = None
-    year: Optional[int] = None
+    score: Optional[str] = None
+    votes: Optional[str] = None
 
 
-class BestLeadingActorApply(CircularModelApply):
+class RatingApply(CircularModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
-    name: str
-    year: int
+    score: Optional[str] = None
+    votes: Optional[str] = None
 
     def to_node(self) -> dm.NodeApply:
         return dm.NodeApply(
@@ -27,15 +27,15 @@ class BestLeadingActorApply(CircularModelApply):
             existing_version=self.existing_version,
             sources=[
                 dm.NodeOrEdgeData(
-                    source=dm.ContainerId("IntegrationTestsImmutable", "Nomination"),
+                    source=dm.ContainerId("IntegrationTestsImmutable", "Rating"),
                     properties={
-                        "name": self.name,
-                        "year": self.year,
+                        "score": self.score,
+                        "votes": self.votes,
                     },
                 ),
             ],
         )
 
 
-class BestLeadingActorList(TypeList[BestLeadingActor]):
-    _NODE = BestLeadingActor
+class RatingList(TypeList[Rating]):
+    _NODE = Rating

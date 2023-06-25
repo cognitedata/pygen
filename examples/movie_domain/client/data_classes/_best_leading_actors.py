@@ -4,18 +4,18 @@ from typing import ClassVar, Optional
 
 from cognite.client import data_modeling as dm
 
-from .core import CircularModelApply, DomainModel, TypeList
+from ._core import CircularModelApply, DomainModel, TypeList
 
-__all__ = ["BestLeadingActress", "BestLeadingActressApply", "BestLeadingActressList"]
+__all__ = ["BestLeadingActor", "BestLeadingActorApply", "BestLeadingActorList"]
 
 
-class BestLeadingActress(DomainModel):
+class BestLeadingActor(DomainModel):
     space: ClassVar[str] = "IntegrationTestsImmutable"
     name: Optional[str] = None
     year: Optional[int] = None
 
 
-class BestLeadingActressApply(CircularModelApply):
+class BestLeadingActorApply(CircularModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
     name: str
     year: int
@@ -37,5 +37,5 @@ class BestLeadingActressApply(CircularModelApply):
         )
 
 
-class BestLeadingActressList(TypeList[BestLeadingActress]):
-    _NODE = BestLeadingActress
+class BestLeadingActorList(TypeList[BestLeadingActor]):
+    _NODE = BestLeadingActor
