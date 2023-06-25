@@ -95,12 +95,159 @@ def person_apply_to_instances_test_cases():
             ),
         ],
     )
-    expected_edges = []
-    expected_nodes = []
+    expected_nodes = [
+        {
+            "instanceType": "node",
+            "space": "IntegrationTestsImmutable",
+            "externalId": "person:quentin_tarantino",
+            "sources": [
+                {
+                    "source": {"space": "IntegrationTestsImmutable", "externalId": "Person", "type": "container"},
+                    "properties": {"name": "Quentin Tarantino", "birthYear": 1963},
+                }
+            ],
+        },
+        {
+            "instanceType": "node",
+            "space": "IntegrationTestsImmutable",
+            "externalId": "actor:quentin_tarantino",
+            "sources": [
+                {
+                    "source": {"space": "IntegrationTestsImmutable", "externalId": "Role", "type": "container"},
+                    "properties": {"wonOscar": False},
+                }
+            ],
+        },
+        {
+            "instanceType": "node",
+            "space": "IntegrationTestsImmutable",
+            "externalId": "movie:pulp_fiction",
+            "sources": [
+                {
+                    "source": {"space": "IntegrationTestsImmutable", "externalId": "Movie", "type": "container"},
+                    "properties": {
+                        "title": "Pulp Fiction",
+                        "releaseYear": 1994,
+                        "runTimeMinutes": 154.0,
+                        "meta": {"imdb": {"rating": 8.9, "votes": 1780000}},
+                    },
+                }
+            ],
+        },
+        {
+            "instanceType": "node",
+            "space": "IntegrationTestsImmutable",
+            "externalId": "rating:pulp_fiction",
+            "sources": [
+                {
+                    "source": {"space": "IntegrationTestsImmutable", "externalId": "Rating", "type": "container"},
+                    "properties": {"score": "rating:pulp_fiction", "votes": "vote_count:pulp_fiction"},
+                }
+            ],
+        },
+        {
+            "instanceType": "node",
+            "space": "IntegrationTestsImmutable",
+            "externalId": "director:quentin_tarantino",
+            "sources": [
+                {
+                    "source": {"space": "IntegrationTestsImmutable", "externalId": "Role", "type": "container"},
+                    "properties": {"wonOscar": True},
+                }
+            ],
+        },
+        {
+            "instanceType": "node",
+            "space": "IntegrationTestsImmutable",
+            "externalId": "director:quentin_tarantino:pulp_fiction",
+            "sources": [
+                {
+                    "source": {"space": "IntegrationTestsImmutable", "externalId": "Nomination", "type": "container"},
+                    "properties": {"name": "Best Director", "year": 1995},
+                }
+            ],
+        },
+    ]
+    expected_edges = [
+        {
+            "instanceType": "edge",
+            "space": "IntegrationTestsImmutable",
+            "externalId": "person:quentin_tarantino:actor:quentin_tarantino",
+            "type": {"space": "IntegrationTestsImmutable", "externalId": "Person.roles"},
+            "startNode": {"space": "IntegrationTestsImmutable", "externalId": "person:quentin_tarantino"},
+            "endNode": {"space": "IntegrationTestsImmutable", "externalId": "actor:quentin_tarantino"},
+        },
+        {
+            "instanceType": "edge",
+            "space": "IntegrationTestsImmutable",
+            "externalId": "actor:quentin_tarantino:person:quentin_tarantino",
+            "type": {"space": "IntegrationTestsImmutable", "externalId": "Role.person"},
+            "startNode": {"space": "IntegrationTestsImmutable", "externalId": "actor:quentin_tarantino"},
+            "endNode": {"space": "IntegrationTestsImmutable", "externalId": "person:quentin_tarantino"},
+        },
+        {
+            "instanceType": "edge",
+            "space": "IntegrationTestsImmutable",
+            "externalId": "actor:quentin_tarantino:movie:pulp_fiction",
+            "type": {"space": "IntegrationTestsImmutable", "externalId": "Role.movies"},
+            "startNode": {"space": "IntegrationTestsImmutable", "externalId": "actor:quentin_tarantino"},
+            "endNode": {"space": "IntegrationTestsImmutable", "externalId": "movie:pulp_fiction"},
+        },
+        {
+            "instanceType": "edge",
+            "space": "IntegrationTestsImmutable",
+            "externalId": "movie:pulp_fiction:rating:pulp_fiction",
+            "type": {"space": "IntegrationTestsImmutable", "externalId": "Movie.rating"},
+            "startNode": {"space": "IntegrationTestsImmutable", "externalId": "movie:pulp_fiction"},
+            "endNode": {"space": "IntegrationTestsImmutable", "externalId": "rating:pulp_fiction"},
+        },
+        {
+            "instanceType": "edge",
+            "space": "IntegrationTestsImmutable",
+            "externalId": "movie:pulp_fiction:actor:quentin_tarantino",
+            "type": {"space": "IntegrationTestsImmutable", "externalId": "Movie.actors"},
+            "startNode": {"space": "IntegrationTestsImmutable", "externalId": "movie:pulp_fiction"},
+            "endNode": {"space": "IntegrationTestsImmutable", "externalId": "actor:quentin_tarantino"},
+        },
+        {
+            "instanceType": "edge",
+            "space": "IntegrationTestsImmutable",
+            "externalId": "movie:pulp_fiction:director:quentin_tarantino",
+            "type": {"space": "IntegrationTestsImmutable", "externalId": "Movie.directors"},
+            "startNode": {"space": "IntegrationTestsImmutable", "externalId": "movie:pulp_fiction"},
+            "endNode": {"space": "IntegrationTestsImmutable", "externalId": "director:quentin_tarantino"},
+        },
+        {
+            "instanceType": "edge",
+            "space": "IntegrationTestsImmutable",
+            "externalId": "person:quentin_tarantino:director:quentin_tarantino",
+            "type": {"space": "IntegrationTestsImmutable", "externalId": "Person.roles"},
+            "startNode": {"space": "IntegrationTestsImmutable", "externalId": "person:quentin_tarantino"},
+            "endNode": {"space": "IntegrationTestsImmutable", "externalId": "director:quentin_tarantino"},
+        },
+        {
+            "instanceType": "edge",
+            "space": "IntegrationTestsImmutable",
+            "externalId": "director:quentin_tarantino:person:quentin_tarantino",
+            "type": {"space": "IntegrationTestsImmutable", "externalId": "Role.person"},
+            "startNode": {"space": "IntegrationTestsImmutable", "externalId": "director:quentin_tarantino"},
+            "endNode": {"space": "IntegrationTestsImmutable", "externalId": "person:quentin_tarantino"},
+        },
+        {
+            "instanceType": "edge",
+            "space": "IntegrationTestsImmutable",
+            "externalId": "director:quentin_tarantino:director:quentin_tarantino:pulp_fiction",
+            "type": {"space": "IntegrationTestsImmutable", "externalId": "Role.nomination"},
+            "startNode": {"space": "IntegrationTestsImmutable", "externalId": "director:quentin_tarantino"},
+            "endNode": {"space": "IntegrationTestsImmutable", "externalId": "director:quentin_tarantino:pulp_fiction"},
+        },
+    ]
 
     yield pytest.param(
         person,
-        InstancesApply([dm.NodeApply.load(n) for n in expected_nodes], [dm.EdgeApply.load(e) for e in expected_edges]),
+        InstancesApply(
+            nodes=[dm.NodeApply.load(e) for e in expected_nodes], edges=[dm.EdgeApply.load(e) for e in expected_edges]
+        ),
         id="Person with extra dependencies",
     )
 
@@ -111,8 +258,8 @@ def test_person_to_apply_instances(person: movie.PersonApply, expected: Instance
     actual = person.to_instances_apply()
 
     # Assert
-    assert actual.nodes == expected.nodes
-    assert actual.edges == expected.edges
+    assert [n.dump(camel_case=True) for n in actual.nodes] == [n.dump(camel_case=True) for n in expected.nodes]
+    assert [e.dump(camel_case=True) for e in actual.edges] == [e.dump(camel_case=True) for e in expected.edges]
 
 
 def unpack_properties_test_cases():

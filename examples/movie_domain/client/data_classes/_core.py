@@ -36,12 +36,12 @@ class InstancesApply:
 
     Args:
         nodes (dm.NodeApplyList): A list of nodes.
-        edges (dm.NodeApplyList): A list of edges.
+        edges (dm.EdgeApply): A list of edges.
 
     """
 
     nodes: list[dm.NodeApply]
-    edges: list[dm.NodeApply]
+    edges: list[dm.EdgeApply]
 
 
 ExternalId = constr(min_length=1, max_length=255)
