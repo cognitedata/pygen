@@ -9,10 +9,12 @@ from cognite.client import data_modeling as dm
 from cognite.pygen._core.sdk_generator import (
     EdgeSnippets,
     SDKGenerator,
+    client_subapi_import,
     dependencies_to_imports,
     properties_to_fields,
     properties_to_sources,
     property_to_edge_snippets,
+    subapi_instantiation,
 )
 from tests.constants import MovieSDKFiles
 
@@ -312,9 +314,42 @@ def test_create_api_client(sdk_generator: SDKGenerator, monkeypatch):
             "Role",
         },
     )
+    monkeypatch.setattr(sdk_generator, "_data_model_space", "IntegrationTestsImmutable")
+    monkeypatch.setattr(sdk_generator, "_data_model_external_id", "Movie")
+    monkeypatch.setattr(sdk_generator, "_data_model_version", "2")
 
     # Act
     actual = sdk_generator.create_api_client()
+
+    # Assert
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "view_name, expected",
+    [
+        ("Actor", "from ._api.actors import ActorsAPI"),
+        ("BestDirector", "from ._api.best_directors import BestDirectorsAPI"),
+    ],
+)
+def test_client_subapi_import(view_name: str, expected: str):
+    # Act
+    actual = client_subapi_import(view_name)
+
+    # Assert
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "view_name, expected",
+    [
+        ("Actor", "self.actors = ActorsAPI(client)"),
+        ("BestDirector", "self.best_directors = BestDirectorsAPI(client)"),
+    ],
+)
+def test_subapi_instantiation(view_name: str, expected: str):
+    # Act
+    actual = subapi_instantiation(view_name)
 
     # Assert
     assert actual == expected

@@ -6,10 +6,13 @@ from dataclasses import dataclass
 from typing import Literal
 
 from cognite.client import data_modeling as dm
+from cognite.client._version import __version__ as cognite_sdk_version
 from cognite.client.data_classes.data_modeling.views import ViewDirectRelation
 from jinja2 import Environment, PackageLoader, select_autoescape
+from pydantic.version import VERSION as PYDANTIC_VERSION
 
 from cognite.pygen._core import view_functions
+from cognite.pygen._version import __version__
 from cognite.pygen.utils.text import to_pascal, to_snake
 
 
@@ -23,10 +26,30 @@ class SDKGenerator:
         )
         self._dependencies_by_view_name = defaultdict(set)
         self._view_names = set()
+        self._data_model_space = None
+        self._data_model_external_id = None
+        self._data_model_version = None
 
     def create_api_client(self) -> str:
         api_client = self._env.get_template("_api_client.py.jinja")
-        return api_client.render(client_name_pascal=self.client_name_pascal) + "\n"
+
+        api_imports = [client_subapi_import(view_name) for view_name in sorted(self._view_names)]
+        api_instantiations = [subapi_instantiation(view_name) for view_name in sorted(self._view_names)]
+
+        return (
+            api_client.render(
+                client_name_pascal=self.client_name_pascal,
+                pygen_version=__version__,
+                cognite_sdk_version=cognite_sdk_version,
+                pydantic_version=PYDANTIC_VERSION,
+                data_model_space=self._data_model_space,
+                data_model_external_id=self._data_model_external_id,
+                data_model_version=self._data_model_version,
+                api_imports="\n".join(api_imports),
+                api_instantiations="\n        ".join(api_instantiations),
+            )
+            + "\n"
+        )
 
     def view_to_data_classes(self, view: dm.View) -> str:
         type_data = self._env.get_template("type_data.py.jinja")
@@ -376,3 +399,11 @@ def dependencies_to_imports(dependencies: set[str]) -> str:
         lines.append(f"    from ._{snake_plural} import {dependency}Apply")
     lines.append("")
     return "\n".join(lines)
+
+
+def client_subapi_import(view_name: str) -> str:
+    return f"from ._api.{to_snake(view_name, pluralize=True)} import {to_pascal(view_name, pluralize=True)}API"
+
+
+def subapi_instantiation(view_name: str) -> str:
+    return f"self.{to_snake(view_name, pluralize=True)} = {to_pascal(view_name, pluralize=True)}API(client)"

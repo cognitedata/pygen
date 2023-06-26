@@ -35,16 +35,16 @@ class MovieClient:
 
     def __init__(self, config: ClientConfig | None = None):
         client = CogniteClient(config)
-        self.persons = PersonsAPI(client)
         self.actors = ActorsAPI(client)
         self.best_directors = BestDirectorsAPI(client)
-        self.best_leading_actress = BestLeadingActressAPI(client)
         self.best_leading_actors = BestLeadingActorsAPI(client)
+        self.best_leading_actress = BestLeadingActressAPI(client)
         self.directors = DirectorsAPI(client)
         self.movies = MoviesAPI(client)
+        self.nominations = NominationsAPI(client)
+        self.persons = PersonsAPI(client)
         self.ratings = RatingsAPI(client)
         self.roles = RolesAPI(client)
-        self.nominations = NominationsAPI(client)
 
     @classmethod
     def azure_project(
