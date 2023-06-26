@@ -59,15 +59,16 @@ class MovieApply(CircularModelApply):
         nodes = [this_node]
         edges = []
 
-        edge = self._create_rating_edge(self.rating)
-        if edge.external_id not in cache:
-            edges.append(edge)
-            cache.add(edge.external_id)
+        if self.rating is not None:
+            edge = self._create_rating_edge(self.rating)
+            if edge.external_id not in cache:
+                edges.append(edge)
+                cache.add(edge.external_id)
 
-        if isinstance(self.rating, CircularModelApply):
-            instances = self.rating._to_instances_apply(cache)
-            nodes.extend(instances.nodes)
-            edges.extend(instances.edges)
+            if isinstance(self.rating, CircularModelApply):
+                instances = self.rating._to_instances_apply(cache)
+                nodes.extend(instances.nodes)
+                edges.extend(instances.edges)
 
         for actor in self.actors:
             edge = self._create_actor_edge(actor)
