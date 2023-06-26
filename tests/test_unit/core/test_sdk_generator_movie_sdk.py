@@ -24,6 +24,16 @@ def sdk_generator():
     return SDKGenerator("movie_domain", "Movie")
 
 
+def test_movie_model_to_sdk(sdk_generator: SDKGenerator, movie_model: dm.DataModel, tmp_path: Path):
+    # Act
+    files_by_path = sdk_generator.data_model_to_sdk(movie_model)
+
+    # Assert
+    for file_path, file_content in files_by_path.items():
+        expected = (MovieSDKFiles.client_dir / file_path).read_text()
+        assert file_content == expected
+
+
 def test_create_view_api_classes_persons(sdk_generator: SDKGenerator, person_view: dm.View):
     # Arrange
     expected = MovieSDKFiles.persons_api.read_text()
@@ -172,16 +182,16 @@ def test_property_to_single_edge_snippets(actor_view: dm.View):
         (
             "read",
             [
-                "name: Optional[str] = None",
                 'birth_year: Optional[int] = Field(None, alias="birthYear")',
+                "name: Optional[str] = None",
                 "roles: list[str] = []",
             ],
         ),
         (
             "write",
             [
-                "name: str",
                 "birth_year: Optional[int] = None",
+                "name: str",
                 'roles: list[Union[str, "RoleApply"]] = []',
             ],
         ),
@@ -201,8 +211,8 @@ def test_create_sources(person_view: dm.View):
         """dm.NodeOrEdgeData(
                     source=dm.ContainerId("IntegrationTestsImmutable", "Person"),
                     properties={
-                        "name": self.name,
                         "birthYear": self.birth_year,
+                        "name": self.name,
                     },
                 ),"""
     ]

@@ -13,6 +13,10 @@ class TestSchemas:
     case_scenario = schemas_dir / "case_scenario.graphql"
 
 
+class DataModels:
+    movie_model = schemas_dir / "movie_data_model.yaml"
+
+
 class MovieSDKFiles:
     client_dir = movie_sdk / "client"
 

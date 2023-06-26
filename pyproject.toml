@@ -59,7 +59,7 @@ faker = "*"
 toml = "*"
 pandas = "*"
 black = "23.3.0"
-
+pyyaml = "*"
 
 [tool.pytest.ini_options]
 filterwarnings = [

@@ -15,15 +15,15 @@ __all__ = ["Person", "PersonApply", "PersonList"]
 
 class Person(DomainModel):
     space: ClassVar[str] = "IntegrationTestsImmutable"
-    name: Optional[str] = None
     birth_year: Optional[int] = Field(None, alias="birthYear")
+    name: Optional[str] = None
     roles: list[str] = []
 
 
 class PersonApply(CircularModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
-    name: str
     birth_year: Optional[int] = None
+    name: str
     roles: list[Union[str, "RoleApply"]] = []
 
     def _to_instances_apply(self, cache: set[str]) -> InstancesApply:
@@ -38,8 +38,8 @@ class PersonApply(CircularModelApply):
                 dm.NodeOrEdgeData(
                     source=dm.ContainerId("IntegrationTestsImmutable", "Person"),
                     properties={
-                        "name": self.name,
                         "birthYear": self.birth_year,
+                        "name": self.name,
                     },
                 ),
             ],

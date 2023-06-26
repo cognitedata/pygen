@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections import defaultdict
 from collections.abc import Iterable
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Literal
 
 from cognite.client import data_modeling as dm
@@ -29,6 +30,16 @@ class SDKGenerator:
         self._data_model_space = None
         self._data_model_external_id = None
         self._data_model_version = None
+
+    def data_model_to_sdk(self, data_model: dm.DataModel) -> dict[Path, str]:
+        self._data_model_space = data_model.space
+        self._data_model_external_id = data_model.external_id
+        self._data_model_version = data_model.version
+
+        client_dir = Path(self.sdk_name) / "client"
+        client_dir / "data_classes"
+        client_dir / "_api"
+        raise NotImplementedError()
 
     def create_api_client(self) -> str:
         api_client = self._env.get_template("_api_client.py.jinja")
