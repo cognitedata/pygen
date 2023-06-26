@@ -4,26 +4,33 @@ import inspect
 import types
 from abc import abstractmethod
 from collections import UserList
+from collections.abc import Collection, Iterable, Mapping, Sequence
+from dataclasses import dataclass
 from datetime import datetime
-from typing import (
-    Any,
-    ClassVar,
-    Collection,
-    ForwardRef,
-    Generic,
-    Iterable,
-    Mapping,
-    Optional,
-    Sequence,
-    Type,
-    TypeVar,
-    Union,
-)
+from typing import Any, ClassVar, ForwardRef, Generic, TypeVar
 
 import pandas as pd
 from cognite.client import data_modeling as dm
+from cognite.client.data_classes.data_modeling.instances import Properties, PropertyValue
 from pydantic import BaseModel, Extra, constr
 from pydantic.utils import DUNDER_ATTRIBUTES
+
+# Todo - Move into SDK
+
+
+@dataclass
+class InstancesApply:
+    """This represents the read result of an instance query
+
+    Args:
+        nodes (dm.NodeApplyList): A list of nodes.
+        edges (dm.EdgeApply): A list of edges.
+
+    """
+
+    nodes: list[dm.NodeApply]
+    edges: list[dm.EdgeApply]
+
 
 ExternalId = constr(min_length=1, max_length=255)
 
@@ -40,12 +47,13 @@ class DomainModel(DomainModelCore):
     version: str
     last_updated_time: datetime
     created_time: datetime
-    deleted_time: Optional[datetime]
+    deleted_time: datetime | None
 
     @classmethod
     def from_node(cls, node: dm.Node) -> T_TypeNode:
         data = node.dump(camel_case=False)
-        return cls(**data, **{k: v for prop in node.properties.values() for k, v in prop.items()})
+
+        return cls(**data, **unpack_properties(node.properties))
 
     @classmethod
     def one_to_many_fields(cls) -> list[str]:
@@ -60,10 +68,13 @@ T_TypeNode = TypeVar("T_TypeNode", bound=DomainModel)
 
 
 class DomainModelApply(DomainModelCore):
-    existing_version: Optional[int] = None
+    existing_version: int | None = None
+
+    def to_instances_apply(self) -> InstancesApply:
+        return self._to_instances_apply(set())
 
     @abstractmethod
-    def to_node(self) -> dm.NodeApply:
+    def _to_instances_apply(self, cache: set[str]) -> InstancesApply:
         raise NotImplementedError()
 
     class Config:
@@ -103,8 +114,8 @@ class CircularModelCore(DomainModelCore):
         self,
         to_dict: bool = False,
         by_alias: bool = False,
-        include: Optional[set[int | str] | Mapping[int | str, Any]] = None,
-        exclude: Optional[set[int | str] | Mapping[int | str, Any]] = None,
+        include: set[int | str] | Mapping[int | str, Any] | None = None,
+        exclude: set[int | str] | Mapping[int | str, Any] | None = None,
         exclude_unset: bool = False,
         exclude_defaults: bool = False,
         exclude_none: bool = False,
@@ -120,14 +131,14 @@ class CircularModelCore(DomainModelCore):
             exclude_none,
         )
         for field in domain_fields:
-            yield field, None
-            # if value := getattr(self, field):
-            #     if isinstance(value, list):
-            #         yield field, [v.external_id if hasattr(v, "external_id") else v for v in value]
-            #     else:
-            #         yield field, value.external_id if hasattr(value, "external_id") else value
-            # else:
-            #     yield field, None
+            # yield field, None
+            if value := getattr(self, field):
+                if isinstance(value, list):
+                    yield field, [v.external_id if hasattr(v, "external_id") else v for v in value]
+                else:
+                    yield field, value.external_id if hasattr(value, "external_id") else value
+            else:
+                yield field, None
 
     def __repr_args__(self) -> Sequence[tuple[str | None, Any]]:
         """
@@ -193,23 +204,23 @@ class StringDataPoint(DataPoint):
 
 
 class TimeSeries(DomainModelCore):
-    id: Optional[int]
-    name: Optional[str]
+    id: int | None
+    name: str | None
     is_string: bool = False
     metadata: dict = {}
-    unit: Optional[str]
-    asset_id: Optional[int]
+    unit: str | None
+    asset_id: int | None
     is_step: bool = False
-    description: Optional[str]
-    security_categories: Optional[str]
-    dataset_id: Optional[int]
-    data_points: Union[list[NumericDataPoint], list[StringDataPoint]]
+    description: str | None
+    security_categories: str | None
+    dataset_id: int | None
+    data_points: list[NumericDataPoint] | list[StringDataPoint]
 
 
 class TypeList(UserList, Generic[T_TypeNode]):
-    _NODE: Type[T_TypeNode]
+    _NODE: type[T_TypeNode]
 
-    def __init__(self, nodes: Collection[Type[DomainModelCore]]):
+    def __init__(self, nodes: Collection[type[DomainModelCore]]):
         # if any(not isinstance(node, self._NODE) for node in nodes):
         # raise TypeError(
         #     f"All nodes for class {type(self).__name__} must be of type " f"{type(self._NODE).__name__}."
@@ -233,7 +244,7 @@ T_TypeNodeList = TypeVar("T_TypeNodeList", bound=TypeList)
 class Identifier(BaseModel):
     _instance_type: ClassVar[str] = "node"
     space: constr(min_length=1, max_length=255)
-    external_id: ExternalId
+    external_id: constr(min_length=1, max_length=255)
 
     @classmethod
     def from_direct_relation(cls, relation: dm.DirectRelationReference) -> T_Identifier:
@@ -244,3 +255,20 @@ class Identifier(BaseModel):
 
 
 T_Identifier = TypeVar("T_Identifier", bound=Identifier)
+
+
+def unpack_properties(properties: Properties) -> dict[str, PropertyValue]:
+    unpacked = {}
+    for view_properties in properties.values():
+        for prop_name, prop_value in view_properties.items():
+            if isinstance(prop_value, (str, int, float, bool, list)):
+                unpacked[prop_name] = prop_value
+            elif isinstance(prop_value, dict):
+                # Dicts are assumed to be reference properties
+                if "space" in prop_value and "externalId" in prop_value:
+                    unpacked[prop_name] = prop_value["externalId"]
+                else:
+                    raise ValueError(f"Unexpected reference property {prop_value}")
+            else:
+                raise ValueError(f"Unexpected property value type {type(prop_value)}")
+    return unpacked

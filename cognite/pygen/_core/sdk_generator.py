@@ -30,6 +30,7 @@ class SDKGenerator:
         self._data_model_space = None
         self._data_model_external_id = None
         self._data_model_version = None
+        self._static_dir = Path(__file__).parent / "static"
 
     def data_model_to_sdk(self, data_model: dm.DataModel) -> dict[Path, str]:
         self._data_model_space = data_model.space
@@ -37,9 +38,31 @@ class SDKGenerator:
         self._data_model_version = data_model.version
 
         client_dir = Path(self.sdk_name) / "client"
-        client_dir / "data_classes"
-        client_dir / "_api"
-        raise NotImplementedError()
+        data_classes_dir = client_dir / "data_classes"
+        api_dir = client_dir / "_api"
+        sdk = {(api_dir / "__init__.py"): ""}
+        for view in data_model.views:
+            view_snake_plural = to_snake(view.name, pluralize=True)
+            try:
+                sdk[data_classes_dir / f"_{view_snake_plural}.py"] = self.view_to_data_classes(view)
+                sdk[api_dir / f"{view_snake_plural}.py"] = self.view_to_api(view)
+            except Exception as e:
+                print(f"Failed to generate SDK for view {view.name}: {e}")  # noqa
+                print(f"Skipping view {view.name}")  # noqa
+                if view.name in self._view_names:
+                    self._view_names.remove(view.name)
+                if view.name in self._dependencies_by_view_name:
+                    del self._dependencies_by_view_name[view.name]
+        sdk[client_dir / "_api_client.py"] = self.create_api_client()
+        sdk[client_dir / "__init__.py"] = self.create_client_init()
+        sdk[data_classes_dir / "__init__.py"] = self.create_data_classes_init()
+        sdk[api_dir / "_core.py"] = (self._static_dir / "_core_api.py").read_text()
+        sdk[data_classes_dir / "_core.py"] = (self._static_dir / "_core_data_classes.py").read_text()
+        return sdk
+
+    def create_client_init(self) -> str:
+        client_init = self._env.get_template("_client_init.py.jinja")
+        return client_init.render(client_name_pascal=self.client_name_pascal)
 
     def create_api_client(self) -> str:
         api_client = self._env.get_template("_api_client.py.jinja")

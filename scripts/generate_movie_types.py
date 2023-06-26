@@ -10,7 +10,7 @@ def main():
     client = MovieClient.from_toml("config.toml")
     c: CogniteClient = client.persons._client
 
-    generator = pygen.SDKGenerator("movie_domain")
+    generator = pygen.SDKGenerator("movie_domain", "Movie")
     # view = c.data_modeling.views.retrieve(("IntegrationTestsImmutable", "Rating"))[0]
     views = c.data_modeling.views.list(limit=-1)
     for view in views:

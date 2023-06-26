@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-from typing import Generic, Sequence, Type, overload
+from collections.abc import Sequence
+from typing import Generic, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client._constants import INSTANCES_LIST_LIMIT_DEFAULT
 
-from {{ sdk_name }}.client.data_classes.core import T_TypeApplyNode, T_TypeNode, T_TypeNodeList
+from movie_domain.client.data_classes._core import T_TypeApplyNode, T_TypeNode, T_TypeNodeList
 
 
 class TypeAPI(Generic[T_TypeNode, T_TypeApplyNode, T_TypeNodeList]):
@@ -14,9 +15,9 @@ class TypeAPI(Generic[T_TypeNode, T_TypeApplyNode, T_TypeNodeList]):
         self,
         client: CogniteClient,
         sources: dm.ViewIdentifier | Sequence[dm.ViewIdentifier] | dm.View | Sequence[dm.View],
-        class_type: Type[T_TypeNode],
-        class_apply_type: Type[T_TypeApplyNode],
-        class_list: Type[T_TypeNodeList],
+        class_type: type[T_TypeNode],
+        class_apply_type: type[T_TypeApplyNode],
+        class_list: type[T_TypeNodeList],
     ):
         self._client = client
         self.sources = sources
