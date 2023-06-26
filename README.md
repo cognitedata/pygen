@@ -21,6 +21,9 @@ benefits
 * Keeping the language domain specific for the developer. Instead of working with generic concepts such as instances,
   nodes, edges, the developer can work with the concepts in the data model.
 
+## Documentation
+
+See the [documentation](https://cognite-pygen.readthedocs-hosted.com/en/latest/) for more information.
 
 ## Installation
 

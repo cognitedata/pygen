@@ -13,6 +13,13 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.10.2] - 26-06-23
+
+### Fixed
+
+* Bug when trying to write an edge set to `None` in an Apply class. It caused a `TypeError` to be raised. Now, an edge
+  set to `None` is ignored.
+
 ## [0.10.1] - 26-06-23
 
 ### Fixed
