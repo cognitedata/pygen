@@ -58,7 +58,7 @@ pytest-mock = "*"
 faker = "*"
 toml = "*"
 pandas = "*"
-black = "*"
+black = "23.3.0"
 
 
 [tool.pytest.ini_options]

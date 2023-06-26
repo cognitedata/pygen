@@ -2557,4 +2557,4 @@ docs = ["mkdocs", "mkdocs-jupyter", "mkdocs-material-extensions", "mkdocs-git-re
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "cfba8c4d7e09f4c9c4550804ed677fea3cb63782ef099ad56a61e554621b16f8"
+content-hash = "1d636d6c49cfed8a09835e2b79b0886273053044198259f075cf0ac883a65cc6"
