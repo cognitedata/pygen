@@ -1,13 +1,14 @@
 [tool.poetry]
 name = "cognite-pygen"
 version = "0.10.0"
-description = "Cognite GraphQL Python Generation SDK"
+description = "Cognite Python SDK Generator"
 readme = "README.md"
 authors = ["Cognite <support@cognite.com>"]
 license = "Apache-2.0"
-
+documentation = "https://cognite-pygen.readthedocs-hosted.com/en/latest/"
+homepage = "https://cognite-pygen.readthedocs-hosted.com/en/latest/"
+repository = "https://github.com/cognitedata/pygen"
 packages = [{ include="cognite", from="." }]
-exclude = ["cognite/dm_clients/*.toml"]
 
 [tool.black]
 line-length = 120
