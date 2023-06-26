@@ -52,18 +52,18 @@ if _has_typer:
             # The Python-SDK retrieve does not support inline views which we need.
             # data_models = client.data_modeling.data_models.retrieve((space, external_id, version), inline_views=True)
             # Todo Temporary workaround until the above is fixed
-            data_models = client.data_modeling.data_models.list(inline_views=True, limit=-1)
-            data_models = [
-                dm
-                for dm in data_models
-                if dm.space == space and dm.external_id == external_id and dm.version == version
-            ]
+            data_models = client.data_modeling.data_models.retrieve((space, external_id, version))
+            views = client.data_modeling.views.retrieve(list(data_models[0].views))
         except CogniteAPIError as e:
             typer.echo(f"Error retrieving data model: {e}")
             raise typer.Exit(code=1) from e
+        data_model = data_models[0]
+        view_by_id = {view.as_id(): view for view in views}
+        data_model.views = [view_by_id[view] for view in data_model.views]
         typer.echo("Successfully retrieved data model {space}/{external_id}/{version}")
+
         sdk_generator = SDKGenerator(sdk_name_snake, client_name_pascal)
-        sdk = sdk_generator.data_model_to_sdk(data_models[0])
+        sdk = sdk_generator.data_model_to_sdk(data_model)
         typer.echo(f"Writing SDK to {output_dir}")
         for file_path, file_content in sdk.items():
             path = output_dir / file_path
