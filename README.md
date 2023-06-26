@@ -56,6 +56,20 @@ Given a Data Model with external id `Movie` in the space `movies` in CDF, the fo
 pygen --space movies --external-id Movie --tenant-id <tenant-id> --client-id <client-id> --client-secret <client-secret> --cdf-cluster <cdf-cluster> --cdf-procect <cdf-project>
 ```
 
+## Dependencies
+
+### Dependencies for the generated SDK
+
+* [cognite-sdk](https://cognite-sdk-python.readthedocs-hosted.com/en/latest/) This is the basis for all requests to the Cognite Data Fusion API. This is a dependency for the generated SDK.
+* [pytandic](https://docs.pydantic.dev/latest/) This is used for all data classes in the generated SDK. This is a dependency for the generated SDK.
+
+### Dependencies for the `pygen`
+
+* [jinja2](https://jinja.palletsprojects.com/en/3.1.x/) This is used for the templating of the generated SDK.
+* [inflect](https://pypi.org/project/inflect/) This is used for the singularization/pluralization of words in the generated SDK.
+* [typer](https://typer.tiangolo.com/) This is used for the CLI of the `pygen` package.
+
+
 ## Changelog
 Wondering about previous changes to the SDK? Take a look at the [CHANGELOG](https://github.com/cognitedata/pygen/blob/master/docs/CHANGELOG.md).
 
