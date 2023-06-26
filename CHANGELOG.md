@@ -13,6 +13,12 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.10.1] - 26-06-23
+
+### Fixed
+
+* Workaround for missing `inline_views` in `data_modeling.data_models.retrieve` in `cognite-sdk`.
+
 ## [0.10.0] - 26-06-23
 
 A complete rewrite of the package. It is now DMS based instead of graphql schema.
