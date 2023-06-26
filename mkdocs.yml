@@ -9,6 +9,7 @@ theme:
 
 nav:
     - Home: index.md
+    - Examples: examples/movie_domain.ipynb
     - Changelog: CHANGELOG.md
 
 plugins:
