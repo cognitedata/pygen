@@ -18,10 +18,14 @@ class PersonRolesAPI:
 
     def retrieve(self, external_id: str | Sequence[str]) -> dm.EdgeList:
         f = dm.filters
-        is_edge_type = f.Equals(["edge", "type"], {"space": "IntegrationTestsImmutable", "externalId": "Person.roles"})
+        is_edge_type = f.Equals(
+            ["edge", "type"],
+            {"space": "IntegrationTestsImmutable", "externalId": "Person.roles"},
+        )
         if isinstance(external_id, str):
             is_person = f.Equals(
-                ["edge", "startNode"], {"space": "IntegrationTestsImmutable", "externalId": external_id}
+                ["edge", "startNode"],
+                {"space": "IntegrationTestsImmutable", "externalId": external_id},
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_person))
 
@@ -34,7 +38,10 @@ class PersonRolesAPI:
 
     def list(self, limit=INSTANCES_LIST_LIMIT_DEFAULT) -> dm.EdgeList:
         f = dm.filters
-        is_edge_type = f.Equals(["edge", "type"], {"space": "IntegrationTestsImmutable", "externalId": "Person.roles"})
+        is_edge_type = f.Equals(
+            ["edge", "type"],
+            {"space": "IntegrationTestsImmutable", "externalId": "Person.roles"},
+        )
         return self._client.data_modeling.instances.list("edge", limit=limit, filter=is_edge_type)
 
 
@@ -72,11 +79,13 @@ class PersonsAPI(TypeAPI[Person, PersonApply, PersonList]):
             person = self._retrieve(("IntegrationTestsImmutable", external_id))
             role_edges = self.roles.retrieve(external_id)
             person.roles = [edge.end_node.external_id for edge in role_edges]
+
             return person
         else:
             persons = self._retrieve([("IntegrationTestsImmutable", ext_id) for ext_id in external_id])
             role_edges = self.roles.retrieve(external_id)
             self._set_roles(persons, role_edges)
+
             return persons
 
     def list(self, limit: int = INSTANCES_LIST_LIMIT_DEFAULT) -> PersonList:
@@ -84,6 +93,7 @@ class PersonsAPI(TypeAPI[Person, PersonApply, PersonList]):
 
         role_edges = self.roles.list(limit=-1)
         self._set_roles(persons, role_edges)
+
         return persons
 
     @staticmethod

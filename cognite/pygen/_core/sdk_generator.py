@@ -90,21 +90,22 @@ class SDKGenerator:
         self, prop: dm.ConnectionDefinition | dm.MappedPropertyDefinition, view_name: str, view_space: str
     ) -> str:
         edge_api = self._env.get_template("edge_api.py.jinja")
+        shared_args = dict(
+            view_name=view_name,
+            view_space=view_space,
+            view_snake=to_snake(view_name, singularize=True),
+            view_snake_plural=to_snake(view_name, pluralize=True),
+        )
         if isinstance(prop, dm.SingleHopConnectionDefinition):
             return edge_api.render(
-                view_name=view_name,
-                view_space=view_space,
-                view_snake_plural=to_snake(view_name, pluralize=True),
-                edge_name_pascal=prop.name,
+                **shared_args,
+                edge_api_name=to_pascal(prop.name, pluralize=True),
                 type_ext_id=prop.type.external_id,
             )
         elif isinstance(prop, dm.MappedPropertyDefinition):
             return edge_api.render(
-                view_name=view_name,
-                view_space=view_space,
-                view_snake=to_snake(view_name, singularize=True),
-                view_snake_plural=to_snake(view_name, pluralize=True),
-                edge_name_pascal=to_pascal(prop.name),
+                **shared_args,
+                edge_api_name=to_pascal(prop.name, singularize=True),
                 type_ext_id=f"{prop.container.external_id}.{prop.name}",
             )
         raise NotImplementedError(f"Edge API for type={type(prop)} is not implemented")
@@ -222,19 +223,30 @@ class EdgeSnippets:
     list: str
 
 
-def property_to_edge_snippets(prop: dm.ConnectionDefinition, view_name: str) -> EdgeSnippets:
+def property_to_edge_snippets(
+    prop: dm.ConnectionDefinition | dm.MappedPropertyDefinition, view_name: str
+) -> EdgeSnippets:
+    view_snake = to_snake(view_name)
+    view_snake_plural = to_snake(view_name, pluralize=True)
+    prop_snake = to_snake(prop.name, singularize=True)
+    prop_pascal = to_pascal(prop.name, singularize=True)
     if isinstance(prop, dm.SingleHopConnectionDefinition):
+        prop_pascal_plural = to_pascal(prop.name, pluralize=True)
         prop_plural_snake = to_snake(prop.name, pluralize=True)
-        prop_snake = to_snake(prop.name, singularize=True)
-        prop_pascal = to_pascal(prop.name)
-        view_snake = to_snake(view_name)
-        view_snake_plural = to_snake(view_name, pluralize=True)
         return EdgeSnippets(
-            f"self.{prop_plural_snake} = {view_name}{prop_pascal}API(client)",
+            f"self.{prop_plural_snake} = {view_name}{prop_pascal_plural}API(client)",
             f"{view_snake}.{prop.name} = [edge.end_node.external_id for edge in {prop_snake}_edges]",
             f"self._set_{prop_plural_snake}({view_snake_plural}, {prop_snake}_edges)",
             f"{prop_snake}_edges = self.{prop_plural_snake}.retrieve(external_id)",
             f"{prop_snake}_edges = self.{prop_plural_snake}.list(limit=-1)",
+        )
+    elif isinstance(prop, dm.MappedPropertyDefinition):
+        return EdgeSnippets(
+            f"self.{prop_snake} = {view_name}{prop_pascal}API(client)",
+            f"{view_snake}.{prop.name} = {prop_snake}_edges[0].end_node.external_id if {prop_snake}_edges else None",
+            f"self._set_{prop_snake}({view_snake_plural}, {prop_snake}_edges)",
+            f"{prop_snake}_edges = self.{prop_snake}.retrieve(external_id)",
+            f"{prop_snake}_edges = self.{prop_snake}.list(limit=-1)",
         )
 
     raise NotImplementedError(f"Edge API for type={type(prop)} is not implemented")

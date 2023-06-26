@@ -12,72 +12,6 @@ from movie_domain.client.data_classes import Actor, ActorApply, ActorList
 from ._core import TypeAPI
 
 
-class ActorMoviesAPI:
-    def __init__(self, client: CogniteClient):
-        self._client = client
-
-    def retrieve(self, external_id: str | Sequence[str]) -> dm.EdgeList:
-        f = dm.filters
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": "IntegrationTestsImmutable", "externalId": "Role.movies"},
-        )
-        if isinstance(external_id, str):
-            is_actor = f.Equals(
-                ["edge", "startNode"],
-                {"space": "IntegrationTestsImmutable", "externalId": external_id},
-            )
-            return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_actor))
-
-        else:
-            is_actors = f.In(
-                ["edge", "startNode"],
-                [{"space": "IntegrationTestsImmutable", "externalId": ext_id} for ext_id in external_id],
-            )
-            return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_actors))
-
-    def list(self, limit=INSTANCES_LIST_LIMIT_DEFAULT) -> dm.EdgeList:
-        f = dm.filters
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": "IntegrationTestsImmutable", "externalId": "Role.movies"},
-        )
-        return self._client.data_modeling.instances.list("edge", limit=limit, filter=is_edge_type)
-
-
-class ActorNominationAPI:
-    def __init__(self, client: CogniteClient):
-        self._client = client
-
-    def retrieve(self, external_id: str | Sequence[str]) -> dm.EdgeList:
-        f = dm.filters
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": "IntegrationTestsImmutable", "externalId": "Role.nomination"},
-        )
-        if isinstance(external_id, str):
-            is_actor = f.Equals(
-                ["edge", "startNode"],
-                {"space": "IntegrationTestsImmutable", "externalId": external_id},
-            )
-            return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_actor))
-
-        else:
-            is_actors = f.In(
-                ["edge", "startNode"],
-                [{"space": "IntegrationTestsImmutable", "externalId": ext_id} for ext_id in external_id],
-            )
-            return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_actors))
-
-    def list(self, limit=INSTANCES_LIST_LIMIT_DEFAULT) -> dm.EdgeList:
-        f = dm.filters
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": "IntegrationTestsImmutable", "externalId": "Role.nomination"},
-        )
-        return self._client.data_modeling.instances.list("edge", limit=limit, filter=is_edge_type)
-
-
 class ActorPersonAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
@@ -111,6 +45,72 @@ class ActorPersonAPI:
         return self._client.data_modeling.instances.list("edge", limit=limit, filter=is_edge_type)
 
 
+class ActorMoviesAPI:
+    def __init__(self, client: CogniteClient):
+        self._client = client
+
+    def retrieve(self, external_id: str | Sequence[str]) -> dm.EdgeList:
+        f = dm.filters
+        is_edge_type = f.Equals(
+            ["edge", "type"],
+            {"space": "IntegrationTestsImmutable", "externalId": "Role.movies"},
+        )
+        if isinstance(external_id, str):
+            is_actor = f.Equals(
+                ["edge", "startNode"],
+                {"space": "IntegrationTestsImmutable", "externalId": external_id},
+            )
+            return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_actor))
+
+        else:
+            is_actors = f.In(
+                ["edge", "startNode"],
+                [{"space": "IntegrationTestsImmutable", "externalId": ext_id} for ext_id in external_id],
+            )
+            return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_actors))
+
+    def list(self, limit=INSTANCES_LIST_LIMIT_DEFAULT) -> dm.EdgeList:
+        f = dm.filters
+        is_edge_type = f.Equals(
+            ["edge", "type"],
+            {"space": "IntegrationTestsImmutable", "externalId": "Role.movies"},
+        )
+        return self._client.data_modeling.instances.list("edge", limit=limit, filter=is_edge_type)
+
+
+class ActorNominationsAPI:
+    def __init__(self, client: CogniteClient):
+        self._client = client
+
+    def retrieve(self, external_id: str | Sequence[str]) -> dm.EdgeList:
+        f = dm.filters
+        is_edge_type = f.Equals(
+            ["edge", "type"],
+            {"space": "IntegrationTestsImmutable", "externalId": "Role.nomination"},
+        )
+        if isinstance(external_id, str):
+            is_actor = f.Equals(
+                ["edge", "startNode"],
+                {"space": "IntegrationTestsImmutable", "externalId": external_id},
+            )
+            return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_actor))
+
+        else:
+            is_actors = f.In(
+                ["edge", "startNode"],
+                [{"space": "IntegrationTestsImmutable", "externalId": ext_id} for ext_id in external_id],
+            )
+            return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_actors))
+
+    def list(self, limit=INSTANCES_LIST_LIMIT_DEFAULT) -> dm.EdgeList:
+        f = dm.filters
+        is_edge_type = f.Equals(
+            ["edge", "type"],
+            {"space": "IntegrationTestsImmutable", "externalId": "Role.nomination"},
+        )
+        return self._client.data_modeling.instances.list("edge", limit=limit, filter=is_edge_type)
+
+
 class ActorsAPI(TypeAPI[Actor, ActorApply, ActorList]):
     def __init__(self, client: CogniteClient):
         super().__init__(
@@ -120,9 +120,9 @@ class ActorsAPI(TypeAPI[Actor, ActorApply, ActorList]):
             class_apply_type=ActorApply,
             class_list=ActorList,
         )
-        self.movies = ActorMoviesAPI(client)
-        self.nominations = ActorNominationAPI(client)
         self.person = ActorPersonAPI(client)
+        self.movies = ActorMoviesAPI(client)
+        self.nominations = ActorNominationsAPI(client)
 
     def apply(self, actor: ActorApply, replace: bool = False) -> dm.InstancesApplyResult:
         instances = actor.to_instances_apply()
@@ -145,33 +145,45 @@ class ActorsAPI(TypeAPI[Actor, ActorApply, ActorList]):
     def retrieve(self, external_id: str | Sequence[str]) -> Actor | ActorList:
         if isinstance(external_id, str):
             actor = self._retrieve(("IntegrationTestsImmutable", external_id))
+            person_edges = self.person.retrieve(external_id)
             movie_edges = self.movies.retrieve(external_id)
             nomination_edges = self.nominations.retrieve(external_id)
-            actor_edge = self.person.retrieve(external_id)
+            actor.person = person_edges[0].end_node.external_id if person_edges else None
             actor.movies = [edge.end_node.external_id for edge in movie_edges]
             actor.nomination = [edge.end_node.external_id for edge in nomination_edges]
-            actor.person = actor_edge[0].end_node.external_id if actor_edge else None
+
             return actor
         else:
             actors = self._retrieve([("IntegrationTestsImmutable", ext_id) for ext_id in external_id])
+            person_edges = self.person.retrieve(external_id)
             movie_edges = self.movies.retrieve(external_id)
             nomination_edges = self.nominations.retrieve(external_id)
-            actor_edges = self.person.retrieve(external_id)
+            self._set_person(actors, person_edges)
             self._set_movies(actors, movie_edges)
             self._set_nominations(actors, nomination_edges)
-            self._set_person(actors, actor_edges)
+
             return actors
 
     def list(self, limit: int = INSTANCES_LIST_LIMIT_DEFAULT) -> ActorList:
         actors = self._list(limit=limit)
 
+        person_edges = self.person.list(limit=-1)
         movie_edges = self.movies.list(limit=-1)
         nomination_edges = self.nominations.list(limit=-1)
-        actor_edges = self.person.list(limit=-1)
+        self._set_person(actors, person_edges)
         self._set_movies(actors, movie_edges)
         self._set_nominations(actors, nomination_edges)
-        self._set_person(actors, actor_edges)
+
         return actors
+
+    @staticmethod
+    def _set_person(actors: Sequence[Actor], person_edges: Sequence[dm.Edge]):
+        edges_by_start_node: Dict[Tuple, dm.Edge] = {edge.start_node.as_tuple(): edge for edge in person_edges}
+
+        for actor in actors:
+            node_id = actor.id_tuple()
+            if node_id in edges_by_start_node:
+                actor.person = edges_by_start_node[node_id].end_node.external_id
 
     @staticmethod
     def _set_movies(actors: Sequence[Actor], movie_edges: Sequence[dm.Edge]):
@@ -194,12 +206,3 @@ class ActorsAPI(TypeAPI[Actor, ActorApply, ActorList]):
             node_id = actor.id_tuple()
             if node_id in edges_by_start_node:
                 actor.nomination = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
-
-    @staticmethod
-    def _set_person(actors: Sequence[Actor], person_edges: Sequence[dm.Edge]):
-        edges_by_start_node: Dict[Tuple, dm.Edge] = {edge.start_node.as_tuple(): edge for edge in person_edges}
-
-        for actor in actors:
-            node_id = actor.id_tuple()
-            if node_id in edges_by_start_node:
-                actor.person = edges_by_start_node[node_id].end_node.external_id
