@@ -82,13 +82,26 @@ def test_create_view_api_classes_actors(sdk_generator: SDKGenerator, actor_view:
     assert actual == expected
 
 
-def test_property_to_edge_api(sdk_generator: SDKGenerator, person_view: dm.View):
+def test_property_to_edge_api_person_roles(sdk_generator: SDKGenerator, person_view: dm.View):
     # Arrange
     expected = "\n".join(MovieSDKFiles.persons_api.read_text().split("\n")[14:38])
 
     # Act
     actual = sdk_generator.property_to_edge_api(
         person_view.properties["roles"], view_name="Person", view_space="IntegrationTestsImmutable"
+    )
+
+    # Assert
+    assert actual == expected
+
+
+def test_property_to_edge_api_actor_person(sdk_generator: SDKGenerator, actor_view: dm.View):
+    # Arrange
+    expected = "\n".join(MovieSDKFiles.actors_api.read_text().split("\n")[80:111])
+
+    # Act
+    actual = sdk_generator.property_to_edge_api(
+        actor_view.properties["person"], view_name="Actor", view_space="IntegrationTestsImmutable"
     )
 
     # Assert

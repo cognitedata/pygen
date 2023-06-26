@@ -89,18 +89,18 @@ class ActorPersonAPI:
             {"space": "IntegrationTestsImmutable", "externalId": "Role.person"},
         )
         if isinstance(external_id, str):
-            is_person = f.Equals(
+            is_actor = f.Equals(
                 ["edge", "startNode"],
                 {"space": "IntegrationTestsImmutable", "externalId": external_id},
             )
-            return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_person))
+            return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_actor))
 
         else:
-            is_persons = f.In(
+            is_actors = f.In(
                 ["edge", "startNode"],
                 [{"space": "IntegrationTestsImmutable", "externalId": ext_id} for ext_id in external_id],
             )
-            return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_persons))
+            return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_actors))
 
     def list(self, limit=INSTANCES_LIST_LIMIT_DEFAULT) -> dm.EdgeList:
         f = dm.filters

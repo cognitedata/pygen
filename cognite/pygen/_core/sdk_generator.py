@@ -10,7 +10,7 @@ from cognite.client.data_classes.data_modeling.views import ViewDirectRelation
 from jinja2 import Environment, PackageLoader, select_autoescape
 
 from cognite.pygen._core import view_functions
-from cognite.pygen.utils.text import as_plural, as_singular, to_pascal, to_snake
+from cognite.pygen.utils.text import to_pascal, to_snake
 
 
 class SDKGenerator:
@@ -55,13 +55,13 @@ class SDKGenerator:
                 self._dependencies_by_view_name[view_name].add(field.edge_end_node_external_id)
 
     def view_to_api(self, view: dm.View) -> str:
-        one_to_many_properties = list(view_functions.one_to_many_properties(view.properties.values()))
+        edge_properties = list(view_functions.edge_properties(view.properties.values()))
 
-        edges_apis = [self.property_to_edge_api(prop, view.name, view.space) for prop in one_to_many_properties]
-        edges_helpers = [self.property_to_edge_helper(prop, view.name) for prop in one_to_many_properties]
-        edge_snippets = [property_to_edge_snippets(prop, view.name) for prop in one_to_many_properties]
+        edges_apis = [self.property_to_edge_api(prop, view.name, view.space) for prop in edge_properties]
+        edges_helpers = [self.property_to_edge_helper(prop, view.name) for prop in edge_properties]
+        edge_snippets = [property_to_edge_snippets(prop, view.name) for prop in edge_properties]
 
-        has_one_to_many = len(one_to_many_properties) > 0
+        has_one_to_many = len(edge_properties) > 0
 
         type_api = self._env.get_template("type_api.py.jinja")
 
@@ -92,10 +92,18 @@ class SDKGenerator:
             return edge_api.render(
                 view_name=view_name,
                 view_space=view_space,
-                view_plural=as_plural(view_name),
-                edge_name=as_singular(prop.name),
-                edge_plural=prop.name,
+                view_snake_plural=to_snake(view_name, pluralize=True),
+                edge_name_pascal=prop.name,
                 type_ext_id=prop.type.external_id,
+            )
+        elif isinstance(prop, dm.MappedPropertyDefinition):
+            return edge_api.render(
+                view_name=view_name,
+                view_space=view_space,
+                view_snake=to_snake(view_name, singularize=True),
+                view_snake_plural=to_snake(view_name, pluralize=True),
+                edge_name_pascal=to_pascal(prop.name),
+                type_ext_id=f"{prop.container.external_id}.{prop.name}",
             )
         raise NotImplementedError(f"Edge API for type={type(prop)} is not implemented")
 
