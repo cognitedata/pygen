@@ -60,7 +60,7 @@ if _has_typer:
         data_model = data_models[0]
         view_by_id = {view.as_id(): view for view in views}
         data_model.views = [view_by_id[view] for view in data_model.views]
-        typer.echo("Successfully retrieved data model {space}/{external_id}/{version}")
+        typer.echo(f"Successfully retrieved data model {space}/{external_id}/{version}")
 
         sdk_generator = SDKGenerator(sdk_name_snake, client_name_pascal)
         sdk = sdk_generator.data_model_to_sdk(data_model)
