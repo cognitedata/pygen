@@ -7,7 +7,7 @@ from collections import UserList
 from collections.abc import Collection, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, ClassVar, ForwardRef, Generic, TypeVar
+from typing import Any, ClassVar, ForwardRef, Generic, List, Optional, TypeVar, Union
 
 import pandas as pd
 from cognite.client import data_modeling as dm
@@ -47,7 +47,7 @@ class DomainModel(DomainModelCore):
     version: str
     last_updated_time: datetime
     created_time: datetime
-    deleted_time: datetime | None
+    deleted_time: Optional[datetime]
 
     @classmethod
     def from_node(cls, node: dm.Node) -> T_TypeNode:
@@ -68,7 +68,7 @@ T_TypeNode = TypeVar("T_TypeNode", bound=DomainModel)
 
 
 class DomainModelApply(DomainModelCore):
-    existing_version: int | None = None
+    existing_version: Optional[int] = None
 
     def to_instances_apply(self) -> InstancesApply:
         return self._to_instances_apply(set())
@@ -204,17 +204,17 @@ class StringDataPoint(DataPoint):
 
 
 class TimeSeries(DomainModelCore):
-    id: int | None
-    name: str | None
+    id: Optional[int]
+    name: Optional[str]
     is_string: bool = False
     metadata: dict = {}
-    unit: str | None
-    asset_id: int | None
+    unit: Optional[str]
+    asset_id: Optional[int]
     is_step: bool = False
-    description: str | None
-    security_categories: str | None
-    dataset_id: int | None
-    data_points: list[NumericDataPoint] | list[StringDataPoint]
+    description: Optional[str]
+    security_categories: Optional[str]
+    dataset_id: Optional[int]
+    data_points: Union[List[NumericDataPoint], List[StringDataPoint]]
 
 
 class TypeList(UserList, Generic[T_TypeNode]):
