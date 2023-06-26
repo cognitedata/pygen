@@ -21,7 +21,8 @@ class ActorMoviesAPI:
         is_edge_type = f.Equals(["edge", "type"], {"space": "IntegrationTestsImmutable", "externalId": "Role.movies"})
         if isinstance(external_id, str):
             is_actor = f.Equals(
-                ["edge", "startNode"], {"space": "IntegrationTestsImmutable", "externalId": external_id}
+                ["edge", "startNode"],
+                {"space": "IntegrationTestsImmutable", "externalId": external_id},
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_actor))
 

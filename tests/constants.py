@@ -21,6 +21,7 @@ class MovieSDKFiles:
 
     api = client_dir / "_api"
     persons_api = api / "persons.py"
+    actors_api = api / "actors.py"
     client = client_dir / "_api_client.py"
     client_init = client_dir / "__init__.py"
     data_init = data_classes / "__init__.py"
