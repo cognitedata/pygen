@@ -14,7 +14,7 @@ def main():
     # view = c.data_modeling.views.retrieve(("IntegrationTestsImmutable", "Rating"))[0]
     views = c.data_modeling.views.list(limit=-1)
     for view in views:
-        if view.name not in ["Actor"]:
+        if view.name in ["Person", "Actor"]:
             # These classes are manually created and should not be overwritten
             continue
         file_name = f"{to_snake(view.name, pluralize=True)}.py"
