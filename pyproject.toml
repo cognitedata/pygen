@@ -37,16 +37,22 @@ inflect = ">=6.0"
 toml = {version=">=0.10", optional=true}
 packaging = {version=">=21.3", optional=true}
 typer = {version = ">=0.9", extras = ["rich"], optional=true }
+
 mkdocs =  {version="*", optional=true}
 mkdocs-jupyter = {version="*", optional=true}
+mkdocs-material = {version="*", optional=true}
 mkdocs-material-extensions = {version="*", optional=true}
 mkdocs-git-revision-date-localized-plugin = {version="*", optional=true}
 mkdocs-git-authors-plugin = {version="*", optional=true}
 mkdocs-gitbook = {version="*", optional=true}
+mkdocs-glightbox = {version="*", optional=true}
+pymdown-extensions = {version="*", optional=true}
+mkdocstrings = {version="*", optional=true, extras=["python"]}
 
 [tool.poetry.extras]
 cli = ["packaging", "typer", "toml"]
-docs = ["mkdocs", "mkdocs-jupyter", "mkdocs-material-extensions", "mkdocs-git-revision-date-localized-plugin", "mkdocs-git-authors-plugin", "mkdocs-gitbook"]
+docs = ["mkdocs", "mkdocs-jupyter", "mkdocs-material", "mkdocs-material-extensions", "mkdocs-git-revision-date-localized-plugin",
+    "mkdocs-git-authors-plugin", "mkdocs-gitbook", "mkdocs-glightbox", "pymdown-extensions", "mkdocstrings"]
 all = ["packaging", "typer", "toml"]
 
 [tool.poetry.dev-dependencies]

@@ -53,7 +53,7 @@ pygen --space movies --external-id Movie --tenant-id <tenant-id> --client-id <cl
 ```
 
 ## Changelog
-Wondering about previous changes to the SDK? Take a look at the [CHANGELOG](https://github.com/cognitedata/pygen/blob/master/CHANGELOG.md).
+Wondering about previous changes to the SDK? Take a look at the [CHANGELOG](https://github.com/cognitedata/pygen/blob/master/docs/CHANGELOG.md).
 
 ## Contributing
 Want to contribute? Check out [CONTRIBUTING](https://github.com/cognitedata/pygen/blob/master/CONTRIBUTING.md).
