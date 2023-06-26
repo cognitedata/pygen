@@ -56,9 +56,13 @@ class SDKGenerator:
         sdk[client_dir / "_api_client.py"] = self.create_api_client()
         sdk[client_dir / "__init__.py"] = self.create_client_init()
         sdk[data_classes_dir / "__init__.py"] = self.create_data_classes_init()
-        sdk[api_dir / "_core.py"] = (self._static_dir / "_core_api.py").read_text()
+        sdk[api_dir / "_core.py"] = self.create_api_core()
         sdk[data_classes_dir / "_core.py"] = (self._static_dir / "_core_data_classes.py").read_text()
         return sdk
+
+    def create_api_core(self) -> str:
+        api_core = self._env.get_template("_core_api.py.jinja")
+        return api_core.render(sdk_name=self.sdk_name)
 
     def create_client_init(self) -> str:
         client_init = self._env.get_template("_client_init.py.jinja")
