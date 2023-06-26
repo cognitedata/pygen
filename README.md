@@ -44,6 +44,11 @@ pip install cognite-pygen[cli]
 The goal of the package is to have representations of all the types in a given data model with API calls to *.list()*,
 *.apply()*, *.delete()*, and *.retrieve()* individuals for each type.
 
+![image](https://github.com/cognitedata/pygen/assets/60234212/b9942595-424c-4c5e-8a9c-37a43e0a5a7c)
+
+![image](https://github.com/cognitedata/pygen/assets/60234212/70a5f6b0-cec0-4178-93e1-4f9902658638)
+
+
 ## Creating a Python SDK from a Data Model
 
 Given a Data Model with external id `Movie` in the space `movies` in CDF, the following command will generate a Python SDK
