@@ -50,15 +50,16 @@ class RoleApply(CircularModelApply):
         nodes = [this_node]
         edges = []
 
-        edge = self._create_person_edge(self.person)
-        if edge.external_id not in cache:
-            edges.append(edge)
-            cache.add(edge.external_id)
+        if self.person is not None:
+            edge = self._create_person_edge(self.person)
+            if edge.external_id not in cache:
+                edges.append(edge)
+                cache.add(edge.external_id)
 
-        if isinstance(self.person, CircularModelApply):
-            instances = self.person._to_instances_apply(cache)
-            nodes.extend(instances.nodes)
-            edges.extend(instances.edges)
+            if isinstance(self.person, CircularModelApply):
+                instances = self.person._to_instances_apply(cache)
+                nodes.extend(instances.nodes)
+                edges.extend(instances.edges)
 
         for movie in self.movies:
             edge = self._create_movie_edge(movie)
