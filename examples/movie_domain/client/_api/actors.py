@@ -78,6 +78,39 @@ class ActorNominationAPI:
         return self._client.data_modeling.instances.list("edge", limit=limit, filter=is_edge_type)
 
 
+class ActorPersonAPI:
+    def __init__(self, client: CogniteClient):
+        self._client = client
+
+    def retrieve(self, external_id: str | Sequence[str]) -> dm.EdgeList:
+        f = dm.filters
+        is_edge_type = f.Equals(
+            ["edge", "type"],
+            {"space": "IntegrationTestsImmutable", "externalId": "Role.person"},
+        )
+        if isinstance(external_id, str):
+            is_person = f.Equals(
+                ["edge", "startNode"],
+                {"space": "IntegrationTestsImmutable", "externalId": external_id},
+            )
+            return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_person))
+
+        else:
+            is_persons = f.In(
+                ["edge", "startNode"],
+                [{"space": "IntegrationTestsImmutable", "externalId": ext_id} for ext_id in external_id],
+            )
+            return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_persons))
+
+    def list(self, limit=INSTANCES_LIST_LIMIT_DEFAULT) -> dm.EdgeList:
+        f = dm.filters
+        is_edge_type = f.Equals(
+            ["edge", "type"],
+            {"space": "IntegrationTestsImmutable", "externalId": "Role.person"},
+        )
+        return self._client.data_modeling.instances.list("edge", limit=limit, filter=is_edge_type)
+
+
 class ActorsAPI(TypeAPI[Actor, ActorApply, ActorList]):
     def __init__(self, client: CogniteClient):
         super().__init__(
@@ -89,6 +122,7 @@ class ActorsAPI(TypeAPI[Actor, ActorApply, ActorList]):
         )
         self.movies = ActorMoviesAPI(client)
         self.nominations = ActorNominationAPI(client)
+        self.person = ActorPersonAPI(client)
 
     def apply(self, actor: ActorApply, replace: bool = False) -> dm.InstancesApplyResult:
         instances = actor.to_instances_apply()
@@ -113,15 +147,19 @@ class ActorsAPI(TypeAPI[Actor, ActorApply, ActorList]):
             actor = self._retrieve(("IntegrationTestsImmutable", external_id))
             movie_edges = self.movies.retrieve(external_id)
             nomination_edges = self.nominations.retrieve(external_id)
+            actor_edge = self.person.retrieve(external_id)
             actor.movies = [edge.end_node.external_id for edge in movie_edges]
             actor.nomination = [edge.end_node.external_id for edge in nomination_edges]
+            actor.person = actor_edge[0].end_node.external_id if actor_edge else None
             return actor
         else:
             actors = self._retrieve([("IntegrationTestsImmutable", ext_id) for ext_id in external_id])
             movie_edges = self.movies.retrieve(external_id)
             nomination_edges = self.nominations.retrieve(external_id)
+            actor_edges = self.person.retrieve(external_id)
             self._set_movies(actors, movie_edges)
             self._set_nominations(actors, nomination_edges)
+            self._set_person(actors, actor_edges)
             return actors
 
     def list(self, limit: int = INSTANCES_LIST_LIMIT_DEFAULT) -> ActorList:
@@ -129,8 +167,10 @@ class ActorsAPI(TypeAPI[Actor, ActorApply, ActorList]):
 
         movie_edges = self.movies.list(limit=-1)
         nomination_edges = self.nominations.list(limit=-1)
+        actor_edges = self.person.list(limit=-1)
         self._set_movies(actors, movie_edges)
         self._set_nominations(actors, nomination_edges)
+        self._set_person(actors, actor_edges)
         return actors
 
     @staticmethod
@@ -154,3 +194,12 @@ class ActorsAPI(TypeAPI[Actor, ActorApply, ActorList]):
             node_id = actor.id_tuple()
             if node_id in edges_by_start_node:
                 actor.nomination = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
+
+    @staticmethod
+    def _set_person(actors: Sequence[Actor], person_edges: Sequence[dm.Edge]):
+        edges_by_start_node: Dict[Tuple, dm.Edge] = {edge.start_node.as_tuple(): edge for edge in person_edges}
+
+        for actor in actors:
+            node_id = actor.id_tuple()
+            if node_id in edges_by_start_node:
+                actor.person = edges_by_start_node[node_id].end_node.external_id
