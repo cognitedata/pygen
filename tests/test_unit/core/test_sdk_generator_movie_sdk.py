@@ -108,12 +108,23 @@ def test_property_to_edge_api_actor_person(sdk_generator: SDKGenerator, actor_vi
     assert actual == expected
 
 
-def test_property_to_edge_helper(sdk_generator: SDKGenerator, person_view: dm.View):
+def test_property_to_edges_helper(sdk_generator: SDKGenerator, person_view: dm.View):
     # Arrange
     expected = "\n".join(MovieSDKFiles.persons_api.read_text().split("\n")[88:98])
 
     # Act
     actual = sdk_generator.property_to_edge_helper(person_view.properties["roles"], view_name="Person")
+
+    # Assert
+    assert actual == expected
+
+
+def test_property_to_edge_helper(sdk_generator: SDKGenerator, actor_view: dm.View):
+    # Arrange
+    expected = "\n".join(MovieSDKFiles.actors_api.read_text().split("\n")[197:205])
+
+    # Act
+    actual = sdk_generator.property_to_edge_helper(actor_view.properties["person"], view_name="Actor")
 
     # Assert
     assert actual == expected

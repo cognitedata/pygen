@@ -86,7 +86,9 @@ class SDKGenerator:
             set_list_plural=f"\n{' '*8}".join(snippet.set_plural for snippet in edge_snippets),
         ) + ("\n" if has_one_to_many else "")
 
-    def property_to_edge_api(self, prop: dm.ConnectionDefinition, view_name: str, view_space: str) -> str:
+    def property_to_edge_api(
+        self, prop: dm.ConnectionDefinition | dm.MappedPropertyDefinition, view_name: str, view_space: str
+    ) -> str:
         edge_api = self._env.get_template("edge_api.py.jinja")
         if isinstance(prop, dm.SingleHopConnectionDefinition):
             return edge_api.render(
@@ -107,9 +109,11 @@ class SDKGenerator:
             )
         raise NotImplementedError(f"Edge API for type={type(prop)} is not implemented")
 
-    def property_to_edge_helper(self, prop: dm.ConnectionDefinition, view_name: str) -> str:
-        helper = self._env.get_template("type_api_set_edge_helper.py.jinja")
+    def property_to_edge_helper(
+        self, prop: dm.ConnectionDefinition | dm.MappedPropertyDefinition, view_name: str
+    ) -> str:
         if isinstance(prop, dm.SingleHopConnectionDefinition):
+            helper = self._env.get_template("type_api_set_edges_helper.py.jinja")
             return helper.render(
                 view_name=to_pascal(view_name),
                 view_snake=to_snake(view_name),
@@ -117,6 +121,15 @@ class SDKGenerator:
                 edge_name=prop.name,
                 edge_plural_snake=to_snake(prop.name, pluralize=True),
                 edge_snake=to_snake(prop.name, singularize=True),
+            )
+        elif isinstance(prop, dm.MappedPropertyDefinition):
+            helper = self._env.get_template("type_api_set_edge_helper.py.jinja")
+            return helper.render(
+                edge_name=prop.name,
+                edge_snake=to_snake(prop.name, singularize=True),
+                view_name=view_name,
+                view_snake=to_snake(view_name),
+                view_snake_plural=to_snake(view_name, pluralize=True),
             )
         raise NotImplementedError(f"Edge API for type={type(prop)} is not implemented")
 
