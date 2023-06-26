@@ -1,0 +1,8 @@
+    @staticmethod
+    def _set_{{ edge_name }}({{ view_snake_plural }}: Sequence[{{ view_name }}], {{ edge_snake }}_edges: Sequence[dm.Edge]):
+        edges_by_start_node: Dict[Tuple, dm.Edge] = {edge.start_node.as_tuple(): edge for edge in {{ edge_snake }}_edges}
+
+        for {{ view_snake }} in {{ view_snake_plural }}:
+            node_id = {{ view_snake }}.id_tuple()
+            if node_id in edges_by_start_node:
+                {{ view_snake }}.{{ edge_name }} = edges_by_start_node[node_id].end_node.external_id

@@ -54,3 +54,7 @@ test-report.xml
 .secrets.*
 tests/test_gqlpygen/tmp
 playground/
+data_models/
+examples/movie_domain/data/settings.toml
+config.toml
+playground

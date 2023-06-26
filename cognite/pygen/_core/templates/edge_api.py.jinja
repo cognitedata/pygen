@@ -1,0 +1,31 @@
+class {{ view_name }}{{ edge_api_name }}API:
+    def __init__(self, client: CogniteClient):
+        self._client = client
+
+    def retrieve(self, external_id: str | Sequence[str]) -> dm.EdgeList:
+        f = dm.filters
+        is_edge_type = f.Equals(
+            ["edge", "type"],
+            {"space": "{{ view_space }}", "externalId": "{{ type_ext_id }}"},
+        )
+        if isinstance(external_id, str):
+            is_{{ view_snake }} = f.Equals(
+                ["edge", "startNode"],
+                {"space": "{{ view_space }}", "externalId": external_id},
+            )
+            return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_{{ view_snake }}))
+
+        else:
+            is_{{ view_snake_plural }} = f.In(
+                ["edge", "startNode"],
+                [{"space": "{{ view_space }}", "externalId": ext_id} for ext_id in external_id],
+            )
+            return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_{{ view_snake_plural }}))
+
+    def list(self, limit=INSTANCES_LIST_LIMIT_DEFAULT) -> dm.EdgeList:
+        f = dm.filters
+        is_edge_type = f.Equals(
+            ["edge", "type"],
+            {"space": "{{ view_space }}", "externalId": "{{ type_ext_id }}"},
+        )
+        return self._client.data_modeling.instances.list("edge", limit=limit, filter=is_edge_type)

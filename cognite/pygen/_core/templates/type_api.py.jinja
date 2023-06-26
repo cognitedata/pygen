@@ -1,0 +1,69 @@
+from __future__ import annotations
+
+{% if has_one_to_many %}from collections import defaultdict
+from typing import Dict, List, Sequence, Tuple, overload{% else %}from typing import Sequence, overload{% endif %}
+
+from cognite.client import CogniteClient
+from cognite.client import data_modeling as dm
+from cognite.client._constants import INSTANCES_LIST_LIMIT_DEFAULT
+
+from {{ sdk_name }}.client.data_classes import {{ view_name }}, {{ view_name }}Apply, {{ view_name }}List
+
+from ._core import TypeAPI
+
+{% if has_one_to_many %}
+{{ edge_apis }}
+
+{% endif %}
+class {{ view_plural_pascal }}API(TypeAPI[{{ view_name }}, {{ view_name }}Apply, {{ view_name }}List]):
+    def __init__(self, client: CogniteClient):
+        super().__init__(
+            client=client,
+            sources=dm.ViewId("{{ view_space }}", "{{ view_ext_id }}", "{{ view_version }}"),
+            class_type={{ view_name }},
+            class_apply_type={{ view_name }}Apply,
+            class_list={{ view_name }}List,
+        ){% if has_one_to_many %}
+        {{ init_edge_apis }}{% endif %}
+
+    def apply(self, {{ view_snake }}: {{ view_name }}Apply, replace: bool = False) -> dm.InstancesApplyResult:
+        instances = {{ view_snake }}.to_instances_apply()
+        return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
+
+    def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
+        if isinstance(external_id, str):
+            return self._client.data_modeling.instances.delete(nodes=({{ view_name }}Apply.space, external_id))
+        else:
+            return self._client.data_modeling.instances.delete(nodes=[({{ view_name }}Apply.space, id) for id in external_id])
+
+    @overload
+    def retrieve(self, external_id: str) -> {{ view_name }}:
+        ...
+
+    @overload
+    def retrieve(self, external_id: Sequence[str]) -> {{ view_name }}List:
+        ...
+
+    def retrieve(self, external_id: str | Sequence[str]) -> {{ view_name }} | {{ view_name }}List:
+        if isinstance(external_id, str):
+            {% if has_one_to_many %}{{ view_snake }} = self._retrieve(("{{ view_space }}", external_id))
+            {{ edge_retrieve }}
+            {{ set_retrieve_singular }}
+
+            return {{ view_snake }}{% else %}return self._retrieve(("{{ view_space }}", external_id)){% endif %}
+        else:
+            {% if has_one_to_many %}{{ view_plural_snake }} = self._retrieve([("{{ view_space }}", ext_id) for ext_id in external_id])
+            {{ edge_retrieve }}
+            {{ set_retrieve_plural }}
+
+            return {{ view_plural_snake }}{% else %}return self._retrieve([("{{ view_space }}", ext_id) for ext_id in external_id]){% endif %}
+
+    def list(self, limit: int = INSTANCES_LIST_LIMIT_DEFAULT) -> {{ view_name }}List:
+        {% if has_one_to_many %}{{ view_plural_snake }} = self._list(limit=limit)
+
+        {{ edge_list }}
+        {{ set_list_plural }}
+
+        return {{ view_plural_snake }}{% else %}return self._list(limit=limit){% endif %}
+{% if has_one_to_many %}
+{{ edge_helpers }}{% endif %}

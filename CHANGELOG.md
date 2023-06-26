@@ -13,6 +13,20 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.10.0] - 26-06-23
+
+A complete rewrite of the package. It is now DMS based instead of graphql schema.
+
+### Improved
+* `pygen` is now a generator package, meaning you generate code with it, but do not neet to have `pygen`
+  as a dependency in your project.
+* The CLI now depends on connection to CDF to download data models.
+* `pygen` is now built on top of `cognit-sdk` and thus do not have its own custom implementation of `data modeling`
+  client.
+
+**Caveat** Not a single line of code from the previous version is used in this version. Thus, no of the own functionality is
+  available in this version. This is a complete rewrite.
+
 ## [0.9.1] - 09-06-23
 
 ### Fixed

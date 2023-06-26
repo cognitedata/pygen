@@ -1,0 +1,46 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, ClassVar, Optional, Union
+
+from cognite.client import data_modeling as dm
+from pydantic import Field
+
+from ._core import CircularModelApply, DomainModel, InstancesApply, TypeList
+
+{% if circular_imports %}{{ circular_imports }}{% endif %}
+__all__ = ["{{ view_name }}", "{{ view_name }}Apply", "{{ view_name }}List"]
+
+
+class {{ view_name }}(DomainModel):
+    space: ClassVar[str] = "{{ view_space }}"
+    {{ read_fields }}
+
+
+class {{ view_name }}Apply(CircularModelApply):
+    space: ClassVar[str] = "{{ view_space }}"
+    {{ write_fields }}
+
+    def _to_instances_apply(self, cache: set[str]) -> InstancesApply:
+        if self.external_id in cache:
+            return InstancesApply([], [])
+
+        this_node = dm.NodeApply(
+            space=self.space,
+            external_id=self.external_id,
+            existing_version=self.existing_version,
+            sources=[
+                {{ sources }}
+            ],
+        )
+        nodes = [this_node]
+        edges = []
+
+{{ add_edges }}
+
+        return InstancesApply(nodes, edges)
+
+{{ create_edges }}
+
+
+class {{ view_name }}List(TypeList[{{ view_name }}]):
+    _NODE = {{ view_name }}

@@ -1,4 +1,4 @@
-from cognite.pygen.generator import to_client_sdk
-from cognite.pygen.version import __version__
+from ._core.sdk_generator import SDKGenerator
+from ._version import __version__
 
-__all__ = ["__version__", "to_client_sdk"]
+__all__ = ["__version__", "SDKGenerator"]

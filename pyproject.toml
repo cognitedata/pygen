@@ -1,13 +1,14 @@
 [tool.poetry]
 name = "cognite-pygen"
-version = "0.9.1"
-description = "Cognite GraphQL Python Generation SDK"
+version = "0.10.0"
+description = "Cognite Python SDK Generator"
 readme = "README.md"
 authors = ["Cognite <support@cognite.com>"]
 license = "Apache-2.0"
-
+documentation = "https://cognite-pygen.readthedocs-hosted.com/en/latest/"
+homepage = "https://cognite-pygen.readthedocs-hosted.com/en/latest/"
+repository = "https://github.com/cognitedata/pygen"
 packages = [{ include="cognite", from="." }]
-exclude = ["cognite/dm_clients/*.toml"]
 
 [tool.black]
 line-length = 120
@@ -23,23 +24,17 @@ known_third_party = []
 src_paths = [".", "examples"]
 
 [tool.poetry.scripts]
-pygen = "cognite.pygen.main:main"
+pygen = "cognite.pygen.cli:main"
 
 
 [tool.poetry.dependencies]
 python = "^3.9"
+cognite-sdk = {version = ">=6.4.8"}
 pydantic = ">=1.10"
-graphql-core = ">=3.2"
 Jinja2 = ">=3.1"
-cognite-sdk = {version = ">5.9.0"}
-msal = ">=1.16.0"
-retry = ">=0.9.2"
-strawberry-graphql = "^0.156.4"
-cachelib = ">=0.10.2"
-typing-extensions = ">=4.4.0"
-dynaconf = {version=">=3.1.12"}
-toml = {version=">=0.10"}
+inflect = ">=6.0"
 
+toml = {version=">=0.10", optional=true}
 packaging = {version=">=21.3", optional=true}
 typer = {version = ">=0.9", extras = ["rich"], optional=true }
 mkdocs =  {version="*", optional=true}
@@ -50,9 +45,9 @@ mkdocs-git-authors-plugin = {version="*", optional=true}
 mkdocs-gitbook = {version="*", optional=true}
 
 [tool.poetry.extras]
-cli = ["packaging", "typer"]
+cli = ["packaging", "typer", "toml"]
 docs = ["mkdocs", "mkdocs-jupyter", "mkdocs-material-extensions", "mkdocs-git-revision-date-localized-plugin", "mkdocs-git-authors-plugin", "mkdocs-gitbook"]
-all = ["packaging", "typer"]
+all = ["packaging", "typer", "toml"]
 
 [tool.poetry.dev-dependencies]
 twine = "*"
@@ -62,6 +57,10 @@ pytest = "*"
 pytest-cov = "*"
 pytest-mock = "*"
 faker = "*"
+toml = "*"
+pandas = "*"
+black = "23.3.0"
+pyyaml = "*"
 
 [tool.pytest.ini_options]
 filterwarnings = [
@@ -71,7 +70,8 @@ addopts = "--doctest-modules"
 markers = [
     "full: Requiers all optional dependencies to run.",
 ]
-
+pythonpath = [".", "examples"]
+testpaths = ["tests", "cognite/pygen"]
 
 [build-system]
 requires = ["poetry-core>=1.3"]

@@ -18,7 +18,7 @@ repos:
         args: ["--profile", "black"]
 
   - repo: https://github.com/psf/black
-    rev: 23.1.0
+    rev: 23.3.0
     hooks:
       - id: black
 
@@ -53,14 +53,14 @@ repos:
       - id: yamllint
         args: [-d, "{extends: relaxed, rules: {line-length: {max: 120}, new-lines: disable}}"]
 
-  - repo: https://github.com/asottile/pyupgrade
-    rev: v3.3.1
-    hooks:
-    - id: pyupgrade
-      exclude: ^(cognite/pygen/dm_clients/.*)|(examples/.*)|(tests/test_dm_clients/.*)$
-      # ^^ Correctly updates thing like `Optional[]` with `| None` but Pydantic chokes on this on Python<3.10 :(
-      args:
-          - --py39-plus
+#  - repo: https://github.com/asottile/pyupgrade
+#    rev: v3.3.1
+#    hooks:
+#    - id: pyupgrade
+#      exclude: ^(cognite/pygen/dm_clients/.*)|(examples/.*)|(tests/test_dm_clients/.*)$
+#      # ^^ Correctly updates thing like `Optional[]` with `| None` but Pydantic chokes on this on Python<3.10 :(
+#      args:
+#          - --py39-plus
 
   - repo: https://github.com/ikamensh/flynt/
     rev: '0.77'

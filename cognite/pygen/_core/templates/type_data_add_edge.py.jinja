@@ -1,0 +1,9 @@
+        edge = self._create_{{ edge_snake }}_edge(self.{{ edge_snake }})
+        if edge.external_id not in cache:
+            edges.append(edge)
+            cache.add(edge.external_id)
+
+        if isinstance(self.{{ edge_snake }}, CircularModelApply):
+            instances = self.{{ edge_snake }}._to_instances_apply(cache)
+            nodes.extend(instances.nodes)
+            edges.extend(instances.edges)
