@@ -18,7 +18,10 @@ class ActorMoviesAPI:
 
     def retrieve(self, external_id: str | Sequence[str]) -> dm.EdgeList:
         f = dm.filters
-        is_edge_type = f.Equals(["edge", "type"], {"space": "IntegrationTestsImmutable", "externalId": "Role.movies"})
+        is_edge_type = f.Equals(
+            ["edge", "type"],
+            {"space": "IntegrationTestsImmutable", "externalId": "Role.movies"},
+        )
         if isinstance(external_id, str):
             is_actor = f.Equals(
                 ["edge", "startNode"],
@@ -35,7 +38,10 @@ class ActorMoviesAPI:
 
     def list(self, limit=INSTANCES_LIST_LIMIT_DEFAULT) -> dm.EdgeList:
         f = dm.filters
-        is_edge_type = f.Equals(["edge", "type"], {"space": "IntegrationTestsImmutable", "externalId": "Role.movies"})
+        is_edge_type = f.Equals(
+            ["edge", "type"],
+            {"space": "IntegrationTestsImmutable", "externalId": "Role.movies"},
+        )
         return self._client.data_modeling.instances.list("edge", limit=limit, filter=is_edge_type)
 
 
@@ -46,11 +52,13 @@ class ActorNominationAPI:
     def retrieve(self, external_id: str | Sequence[str]) -> dm.EdgeList:
         f = dm.filters
         is_edge_type = f.Equals(
-            ["edge", "type"], {"space": "IntegrationTestsImmutable", "externalId": "Role.nomination"}
+            ["edge", "type"],
+            {"space": "IntegrationTestsImmutable", "externalId": "Role.nomination"},
         )
         if isinstance(external_id, str):
             is_actor = f.Equals(
-                ["edge", "startNode"], {"space": "IntegrationTestsImmutable", "externalId": external_id}
+                ["edge", "startNode"],
+                {"space": "IntegrationTestsImmutable", "externalId": external_id},
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_actor))
 
@@ -64,7 +72,8 @@ class ActorNominationAPI:
     def list(self, limit=INSTANCES_LIST_LIMIT_DEFAULT) -> dm.EdgeList:
         f = dm.filters
         is_edge_type = f.Equals(
-            ["edge", "type"], {"space": "IntegrationTestsImmutable", "externalId": "Role.nomination"}
+            ["edge", "type"],
+            {"space": "IntegrationTestsImmutable", "externalId": "Role.nomination"},
         )
         return self._client.data_modeling.instances.list("edge", limit=limit, filter=is_edge_type)
 
