@@ -32,7 +32,6 @@ class MovieClient:
         externalId: Movie
         version: 2
     """
-
     def __init__(self, config: ClientConfig | None = None):
         client = CogniteClient(config)
         self.persons = PersonsAPI(client)

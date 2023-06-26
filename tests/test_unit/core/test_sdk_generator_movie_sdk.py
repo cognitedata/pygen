@@ -19,7 +19,7 @@ from tests.constants import MovieSDKFiles
 
 @pytest.fixture
 def sdk_generator():
-    return SDKGenerator("movie_domain")
+    return SDKGenerator("movie_domain", "Movie")
 
 
 def test_create_view_api_classes_persons(sdk_generator: SDKGenerator, person_view: dm.View):
@@ -288,6 +288,33 @@ def test_properties_to_add_edges_persons(sdk_generator: SDKGenerator, person_vie
 
     # Act
     actual = sdk_generator.properties_to_add_edges(person_view.properties.values())
+
+    # Assert
+    assert actual == expected
+
+
+def test_create_api_client(sdk_generator: SDKGenerator, monkeypatch):
+    # Arrange
+    expected = MovieSDKFiles.client.read_text()
+    monkeypatch.setattr(
+        sdk_generator,
+        "_view_names",
+        {
+            "Actor",
+            "Person",
+            "BestDirector",
+            "BestLeadingActor",
+            "BestLeadingActress",
+            "Director",
+            "Movie",
+            "Nomination",
+            "Rating",
+            "Role",
+        },
+    )
+
+    # Act
+    actual = sdk_generator.create_api_client()
 
     # Assert
     assert actual == expected

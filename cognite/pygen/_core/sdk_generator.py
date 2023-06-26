@@ -14,14 +14,19 @@ from cognite.pygen.utils.text import to_pascal, to_snake
 
 
 class SDKGenerator:
-    def __init__(self, sdk_name: str):
+    def __init__(self, sdk_name: str, client_name_pascal: str):
         self.sdk_name = sdk_name
+        self.client_name_pascal = client_name_pascal
         self._env = Environment(
             loader=PackageLoader("cognite.pygen._core", "templates"),
             autoescape=select_autoescape(),
         )
         self._dependencies_by_view_name = defaultdict(set)
         self._view_names = set()
+
+    def create_api_client(self) -> str:
+        api_client = self._env.get_template("_api_client.py.jinja")
+        return api_client.render(client_name_pascal=self.client_name_pascal) + "\n"
 
     def view_to_data_classes(self, view: dm.View) -> str:
         type_data = self._env.get_template("type_data.py.jinja")
