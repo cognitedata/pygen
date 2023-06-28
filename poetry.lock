@@ -322,14 +322,14 @@ colorama = {version = "*", markers = "platform_system == \"Windows\""}
 
 [[package]]
 name = "cognite-sdk"
-version = "6.4.8"
+version = "6.5.3"
 description = "Cognite Python SDK"
 category = "main"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "cognite_sdk-6.4.8-py3-none-any.whl", hash = "sha256:71911dc6616a5f68f786239813333e288cfa6c8be97c5191fbc019b56e9cab6d"},
-    {file = "cognite_sdk-6.4.8.tar.gz", hash = "sha256:e9915af61ce75333c611896e06cf88bcd9dd074c5e4ae898a546797818b12c85"},
+    {file = "cognite_sdk-6.5.3-py3-none-any.whl", hash = "sha256:c625ced5af4487184900328ee35c5def0734b4bd92aa07db7be1bebbe7a818b3"},
+    {file = "cognite_sdk-6.5.3.tar.gz", hash = "sha256:11def52c9c7223bea307fdeb242e3110c62a285dd2eb6445aa0ef1e0d146e2b1"},
 ]
 
 [package.dependencies]
@@ -532,14 +532,14 @@ test = ["pytest (>=6)"]
 
 [[package]]
 name = "faker"
-version = "18.11.1"
+version = "18.11.2"
 description = "Faker is a Python package that generates fake data for you."
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "Faker-18.11.1-py3-none-any.whl", hash = "sha256:02980fe15acd58861305568bae0a277680792a505a5a45a309d352f79c452dd1"},
-    {file = "Faker-18.11.1.tar.gz", hash = "sha256:df4ee36d058a6a96de9d5e645571ef8536946a0b62db841494f8a3bc3bcdc5af"},
+    {file = "Faker-18.11.2-py3-none-any.whl", hash = "sha256:21c2c29638e98502f3bba9ad6a4f07a4b09c5e2150bb491ff02411a5888f6955"},
+    {file = "Faker-18.11.2.tar.gz", hash = "sha256:ec6e2824bb1d3546b36c156324b9df6bca5a3d6d03adf991e6a5586756dcab9d"},
 ]
 
 [package.dependencies]
@@ -1926,14 +1926,14 @@ files = [
 
 [[package]]
 name = "pywin32-ctypes"
-version = "0.2.1"
+version = "0.2.2"
 description = "A (partial) reimplementation of pywin32 using ctypes/cffi"
 category = "dev"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "pywin32-ctypes-0.2.1.tar.gz", hash = "sha256:934a2def1e5cbc472b2b6bf80680c0f03cd87df65dfd58bfd1846969de095b03"},
-    {file = "pywin32_ctypes-0.2.1-py3-none-any.whl", hash = "sha256:b9a53ef754c894a525469933ab2a447c74ec1ea6b9d2ef446f40ec50d3dcec9f"},
+    {file = "pywin32-ctypes-0.2.2.tar.gz", hash = "sha256:3426e063bdd5fd4df74a14fa3cf80a0b42845a87e1d1e81f6549f9daec593a60"},
+    {file = "pywin32_ctypes-0.2.2-py3-none-any.whl", hash = "sha256:bf490a1a709baf35d688fe0ecf980ed4de11d2b3e37b51e5442587a75d9957e7"},
 ]
 
 [[package]]
@@ -2644,4 +2644,4 @@ docs = ["mkdocs", "mkdocs-jupyter", "mkdocs-material", "mkdocs-material-extensio
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "4c638b9e89b05e74f236100049c515854ce594e7d712b70b2fc024aee9f2cc0f"
+content-hash = "d5616f4394badcdaa0bb9e7c304237649d5addf71051d371e409e4ecbafd5c0e"

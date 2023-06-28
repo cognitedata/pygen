@@ -8,7 +8,6 @@ from typing import Literal
 
 from cognite.client import data_modeling as dm
 from cognite.client._version import __version__ as cognite_sdk_version
-from cognite.client.data_classes.data_modeling.views import ViewDirectRelation
 from jinja2 import Environment, PackageLoader, select_autoescape
 from pydantic.version import VERSION as PYDANTIC_VERSION
 
@@ -153,7 +152,7 @@ class SDKGenerator:
         ) + ("\n" if has_one_to_many else "")
 
     def property_to_edge_api(
-        self, prop: dm.ConnectionDefinition | dm.MappedPropertyDefinition, view_name: str, view_space: str
+        self, prop: dm.ConnectionDefinition | dm.MappedProperty, view_name: str, view_space: str
     ) -> str:
         edge_api = self._env.get_template("edge_api.py.jinja")
         shared_args = dict(
@@ -168,7 +167,7 @@ class SDKGenerator:
                 edge_api_name=to_pascal(prop.name, pluralize=True),
                 type_ext_id=prop.type.external_id,
             )
-        elif isinstance(prop, dm.MappedPropertyDefinition):
+        elif isinstance(prop, dm.MappedProperty):
             return edge_api.render(
                 **shared_args,
                 edge_api_name=to_pascal(prop.name, singularize=True),
@@ -176,9 +175,7 @@ class SDKGenerator:
             )
         raise NotImplementedError(f"Edge API for type={type(prop)} is not implemented")
 
-    def property_to_edge_helper(
-        self, prop: dm.ConnectionDefinition | dm.MappedPropertyDefinition, view_name: str
-    ) -> str:
+    def property_to_edge_helper(self, prop: dm.ConnectionDefinition | dm.MappedProperty, view_name: str) -> str:
         if isinstance(prop, dm.SingleHopConnectionDefinition):
             helper = self._env.get_template("type_api_set_edges_helper.py.jinja")
             return helper.render(
@@ -189,7 +186,7 @@ class SDKGenerator:
                 edge_plural_snake=to_snake(prop.name, pluralize=True),
                 edge_snake=to_snake(prop.name, singularize=True),
             )
-        elif isinstance(prop, dm.MappedPropertyDefinition):
+        elif isinstance(prop, dm.MappedProperty):
             helper = self._env.get_template("type_api_set_edge_helper.py.jinja")
             return helper.render(
                 edge_name=prop.name,
@@ -228,7 +225,7 @@ __all__ = [
 """
 
     def properties_to_create_edge_methods(
-        self, properties: Iterable[dm.MappedPropertyDefinition | dm.ConnectionDefinition]
+        self, properties: Iterable[dm.MappedProperty | dm.ConnectionDefinition]
     ) -> list[str]:
         create_edge = self._env.get_template("type_data_create_edge.py.jinja")
         create_methods = []
@@ -243,21 +240,19 @@ __all__ = [
                         type_ext_id=prop.type.external_id,
                     )
                 )
-            elif isinstance(prop, dm.MappedPropertyDefinition) and isinstance(prop.type, ViewDirectRelation):
+            elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation):
                 create_methods.append(
                     create_edge.render(
                         edge_snake=to_snake(prop.name, singularize=True),
                         # Todo Avoid assuming that nodes and edges are in the same space.
-                        space=prop.type.source.space,
+                        space=prop.source.space,
                         edge_pascal=to_pascal(prop.name, singularize=True),
                         type_ext_id=f"{prop.container.external_id}.{prop.name}",
                     )
                 )
         return create_methods
 
-    def properties_to_add_edges(
-        self, properties: Iterable[dm.MappedPropertyDefinition | dm.ConnectionDefinition]
-    ) -> list[str]:
+    def properties_to_add_edges(self, properties: Iterable[dm.MappedProperty | dm.ConnectionDefinition]) -> list[str]:
         add_edges = self._env.get_template("type_data_add_edges.py.jinja")
         add_edge = self._env.get_template("type_data_add_edge.py.jinja")
 
@@ -270,7 +265,7 @@ __all__ = [
                         edge_snake=to_snake(prop.name, singularize=True),
                     )
                 )
-            elif isinstance(prop, dm.MappedPropertyDefinition) and isinstance(prop.type, ViewDirectRelation):
+            elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation):
                 add_snippets.append(
                     add_edge.render(
                         edge_snake=to_snake(prop.name, singularize=True),
@@ -289,9 +284,7 @@ class EdgeSnippets:
     list: str
 
 
-def property_to_edge_snippets(
-    prop: dm.ConnectionDefinition | dm.MappedPropertyDefinition, view_name: str
-) -> EdgeSnippets:
+def property_to_edge_snippets(prop: dm.ConnectionDefinition | dm.MappedProperty, view_name: str) -> EdgeSnippets:
     view_snake = to_snake(view_name)
     view_snake_plural = to_snake(view_name, pluralize=True)
     prop_snake = to_snake(prop.name, singularize=True)
@@ -306,7 +299,7 @@ def property_to_edge_snippets(
             f"{prop_snake}_edges = self.{prop_plural_snake}.retrieve(external_id)",
             f"{prop_snake}_edges = self.{prop_plural_snake}.list(limit=-1)",
         )
-    elif isinstance(prop, dm.MappedPropertyDefinition):
+    elif isinstance(prop, dm.MappedProperty):
         return EdgeSnippets(
             f"self.{prop_snake} = {view_name}{prop_pascal}API(client)",
             f"{view_snake}.{prop.name} = {prop_snake}_edges[0].end_node.external_id if {prop_snake}_edges else None",
@@ -336,8 +329,8 @@ class Field:
         return self.edge_end_node_external_id is not None
 
     @classmethod
-    def from_property(cls, property_: dm.MappedPropertyDefinition | dm.ConnectionDefinition) -> Field:
-        if isinstance(property_, dm.MappedPropertyDefinition) and not isinstance(property_.type, dm.DirectRelation):
+    def from_property(cls, property_: dm.MappedProperty | dm.ConnectionDefinition) -> Field:
+        if isinstance(property_, dm.MappedProperty) and not isinstance(property_.type, dm.DirectRelation):
             type_ = _to_python_type(property_.type)
             default = property_.default_value if isinstance(property_.type, dm.PropertyType) else "[]"
             is_nullable = isinstance(property_.type, dm.DirectRelationReference) or property_.nullable
@@ -345,9 +338,9 @@ class Field:
         elif isinstance(property_, dm.SingleHopConnectionDefinition):
             # One to Many
             return cls(property_.name, "list[str]", "[]", True, True, property_.source.external_id)
-        elif isinstance(property_, dm.MappedPropertyDefinition) and isinstance(property_.type, ViewDirectRelation):
+        elif isinstance(property_, dm.MappedProperty) and isinstance(property_.type, dm.DirectRelation):
             # One to One
-            return cls(property_.name, "str", "None", True, False, property_.type.source.external_id)
+            return cls(property_.name, "str", "None", True, False, property_.source.external_id)
         else:
             raise NotImplementedError(f"Property type={type(property_)} is not supported")
 
@@ -373,7 +366,7 @@ class Field:
 
 
 def properties_to_fields(
-    properties: Iterable[dm.MappedPropertyDefinition | dm.ConnectionDefinition],
+    properties: Iterable[dm.MappedProperty | dm.ConnectionDefinition],
 ) -> list[Field]:
     return [Field.from_property(p) for p in properties]
 
@@ -405,10 +398,10 @@ def _to_python_type(type_: dm.DirectRelationReference | dm.PropertyType) -> str:
     return out_type
 
 
-def properties_to_sources(properties: Iterable[dm.MappedPropertyDefinition | dm.ConnectionDefinition]) -> list[str]:
-    properties_by_container_id: dict[dm.ContainerId, list[dm.MappedPropertyDefinition]] = defaultdict(list)
+def properties_to_sources(properties: Iterable[dm.MappedProperty | dm.ConnectionDefinition]) -> list[str]:
+    properties_by_container_id: dict[dm.ContainerId, list[dm.MappedProperty]] = defaultdict(list)
     for property_ in properties:
-        if isinstance(property_, dm.MappedPropertyDefinition) and not isinstance(property_.type, ViewDirectRelation):
+        if isinstance(property_, dm.MappedProperty) and not isinstance(property_.type, dm.DirectRelation):
             properties_by_container_id[property_.container].append(property_)
 
     output = []
