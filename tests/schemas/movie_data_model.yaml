@@ -19,7 +19,6 @@ views:
       container:
         externalId: Person
         space: IntegrationTestsImmutable
-        type: container
       containerPropertyIdentifier: birthYear
       defaultValue: null
       description: null
@@ -27,13 +26,13 @@ views:
       nullable: true
       type:
         list: false
+        source: null
         type: int32
     name:
       autoIncrement: false
       container:
         externalId: Person
         space: IntegrationTestsImmutable
-        type: container
       containerPropertyIdentifier: name
       defaultValue: null
       description: null
@@ -42,6 +41,7 @@ views:
       type:
         collation: ucs_basic
         list: false
+        source: null
         type: text
     roles:
       description: null
@@ -71,7 +71,6 @@ views:
       container:
         externalId: Nomination
         space: IntegrationTestsImmutable
-        type: container
       containerPropertyIdentifier: name
       defaultValue: null
       description: null
@@ -80,13 +79,13 @@ views:
       type:
         collation: ucs_basic
         list: false
+        source: null
         type: text
     year:
       autoIncrement: false
       container:
         externalId: Nomination
         space: IntegrationTestsImmutable
-        type: container
       containerPropertyIdentifier: year
       defaultValue: null
       description: null
@@ -94,6 +93,7 @@ views:
       nullable: false
       type:
         list: false
+        source: null
         type: int32
   space: IntegrationTestsImmutable
   usedFor: node
@@ -115,7 +115,6 @@ views:
       container:
         externalId: Nomination
         space: IntegrationTestsImmutable
-        type: container
       containerPropertyIdentifier: name
       defaultValue: null
       description: null
@@ -124,13 +123,13 @@ views:
       type:
         collation: ucs_basic
         list: false
+        source: null
         type: text
     year:
       autoIncrement: false
       container:
         externalId: Nomination
         space: IntegrationTestsImmutable
-        type: container
       containerPropertyIdentifier: year
       defaultValue: null
       description: null
@@ -138,6 +137,7 @@ views:
       nullable: false
       type:
         list: false
+        source: null
         type: int32
   space: IntegrationTestsImmutable
   usedFor: node
@@ -159,7 +159,6 @@ views:
       container:
         externalId: Nomination
         space: IntegrationTestsImmutable
-        type: container
       containerPropertyIdentifier: name
       defaultValue: null
       description: null
@@ -168,13 +167,13 @@ views:
       type:
         collation: ucs_basic
         list: false
+        source: null
         type: text
     year:
       autoIncrement: false
       container:
         externalId: Nomination
         space: IntegrationTestsImmutable
-        type: container
       containerPropertyIdentifier: year
       defaultValue: null
       description: null
@@ -182,6 +181,7 @@ views:
       nullable: false
       type:
         list: false
+        source: null
         type: int32
   space: IntegrationTestsImmutable
   usedFor: node
@@ -203,7 +203,6 @@ views:
       container:
         externalId: Nomination
         space: IntegrationTestsImmutable
-        type: container
       containerPropertyIdentifier: name
       defaultValue: null
       description: null
@@ -212,13 +211,13 @@ views:
       type:
         collation: ucs_basic
         list: false
+        source: null
         type: text
     year:
       autoIncrement: false
       container:
         externalId: Nomination
         space: IntegrationTestsImmutable
-        type: container
       containerPropertyIdentifier: year
       defaultValue: null
       description: null
@@ -226,6 +225,7 @@ views:
       nullable: false
       type:
         list: false
+        source: null
         type: int32
   space: IntegrationTestsImmutable
   usedFor: node
@@ -268,17 +268,16 @@ views:
       container:
         externalId: Role
         space: IntegrationTestsImmutable
-        type: container
       containerPropertyIdentifier: person
       defaultValue: null
       description: null
       name: person
       nullable: true
       type:
+        container: null
         source:
           externalId: Person
           space: IntegrationTestsImmutable
-          type: view
           version: '2'
         type: direct
     wonOscar:
@@ -286,7 +285,6 @@ views:
       container:
         externalId: Role
         space: IntegrationTestsImmutable
-        type: container
       containerPropertyIdentifier: wonOscar
       defaultValue: null
       description: null
@@ -294,6 +292,7 @@ views:
       nullable: true
       type:
         list: false
+        source: null
         type: boolean
   space: IntegrationTestsImmutable
   usedFor: node
@@ -341,17 +340,16 @@ views:
       container:
         externalId: Role
         space: IntegrationTestsImmutable
-        type: container
       containerPropertyIdentifier: person
       defaultValue: null
       description: null
       name: person
       nullable: true
       type:
+        container: null
         source:
           externalId: Person
           space: IntegrationTestsImmutable
-          type: view
           version: '2'
         type: direct
     wonOscar:
@@ -359,7 +357,6 @@ views:
       container:
         externalId: Role
         space: IntegrationTestsImmutable
-        type: container
       containerPropertyIdentifier: wonOscar
       defaultValue: null
       description: null
@@ -367,6 +364,7 @@ views:
       nullable: true
       type:
         list: false
+        source: null
         type: boolean
   space: IntegrationTestsImmutable
   usedFor: node
@@ -414,17 +412,16 @@ views:
       container:
         externalId: Role
         space: IntegrationTestsImmutable
-        type: container
       containerPropertyIdentifier: person
       defaultValue: null
       description: null
       name: person
       nullable: true
       type:
+        container: null
         source:
           externalId: Person
           space: IntegrationTestsImmutable
-          type: view
           version: '2'
         type: direct
     wonOscar:
@@ -432,7 +429,6 @@ views:
       container:
         externalId: Role
         space: IntegrationTestsImmutable
-        type: container
       containerPropertyIdentifier: wonOscar
       defaultValue: null
       description: null
@@ -440,6 +436,7 @@ views:
       nullable: true
       type:
         list: false
+        source: null
         type: boolean
   space: IntegrationTestsImmutable
   usedFor: node
@@ -456,7 +453,6 @@ views:
       container:
         externalId: Rating
         space: IntegrationTestsImmutable
-        type: container
       containerPropertyIdentifier: score
       defaultValue: null
       description: null
@@ -464,13 +460,13 @@ views:
       nullable: true
       type:
         list: false
+        source: null
         type: timeseries
     votes:
       autoIncrement: false
       container:
         externalId: Rating
         space: IntegrationTestsImmutable
-        type: container
       containerPropertyIdentifier: votes
       defaultValue: null
       description: null
@@ -478,6 +474,7 @@ views:
       nullable: true
       type:
         list: false
+        source: null
         type: timeseries
   space: IntegrationTestsImmutable
   usedFor: node
@@ -520,7 +517,6 @@ views:
       container:
         externalId: Movie
         space: IntegrationTestsImmutable
-        type: container
       containerPropertyIdentifier: meta
       defaultValue: null
       description: null
@@ -528,23 +524,23 @@ views:
       nullable: true
       type:
         list: false
+        source: null
         type: json
     rating:
       autoIncrement: false
       container:
         externalId: Movie
         space: IntegrationTestsImmutable
-        type: container
       containerPropertyIdentifier: rating
       defaultValue: null
       description: null
       name: rating
       nullable: true
       type:
+        container: null
         source:
           externalId: Rating
           space: IntegrationTestsImmutable
-          type: view
           version: '2'
         type: direct
     releaseYear:
@@ -552,7 +548,6 @@ views:
       container:
         externalId: Movie
         space: IntegrationTestsImmutable
-        type: container
       containerPropertyIdentifier: releaseYear
       defaultValue: null
       description: null
@@ -560,13 +555,13 @@ views:
       nullable: true
       type:
         list: false
+        source: null
         type: int32
     runTimeMinutes:
       autoIncrement: false
       container:
         externalId: Movie
         space: IntegrationTestsImmutable
-        type: container
       containerPropertyIdentifier: runTimeMinutes
       defaultValue: null
       description: null
@@ -574,13 +569,13 @@ views:
       nullable: true
       type:
         list: false
+        source: null
         type: float64
     title:
       autoIncrement: false
       container:
         externalId: Movie
         space: IntegrationTestsImmutable
-        type: container
       containerPropertyIdentifier: title
       defaultValue: null
       description: null
@@ -589,6 +584,7 @@ views:
       type:
         collation: ucs_basic
         list: false
+        source: null
         type: text
   space: IntegrationTestsImmutable
   usedFor: node
