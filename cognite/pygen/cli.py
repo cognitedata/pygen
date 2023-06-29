@@ -6,7 +6,7 @@ from cognite.client.credentials import OAuthClientCredentials
 from cognite.client.exceptions import CogniteAPIError
 from typing_extensions import Annotated
 
-from cognite.pygen import SDKGenerator
+from cognite.pygen import SDKGenerator, write_sdk_to_disk
 
 try:
     import typer
@@ -48,27 +48,22 @@ if _has_typer:
             base_url=base_url,
         )
         client = CogniteClient(config)
+
+        model_id = (space, external_id, version)
         try:
-            # The Python-SDK retrieve does not support inline views which we need.
-            # data_models = client.data_modeling.data_models.retrieve((space, external_id, version), inline_views=True)
-            # Todo Temporary workaround until the above is fixed
-            data_models = client.data_modeling.data_models.retrieve((space, external_id, version))
-            views = client.data_modeling.views.retrieve(list(data_models[0].views))
+            data_models = client.data_modeling.data_models.retrieve(model_id, inline_views=True)
+            data_model = data_models[0]
         except CogniteAPIError as e:
             typer.echo(f"Error retrieving data model: {e}")
             raise typer.Exit(code=1) from e
-        data_model = data_models[0]
-        view_by_id = {view.as_id(): view for view in views}
-        data_model.views = [view_by_id[view] for view in data_model.views]
+        except IndexError as e:
+            typer.echo(f"Cannot find {model_id}")
+            raise typer.Exit(code=1) from e
         typer.echo(f"Successfully retrieved data model {space}/{external_id}/{version}")
-
         sdk_generator = SDKGenerator(sdk_name_snake, client_name_pascal)
         sdk = sdk_generator.data_model_to_sdk(data_model)
         typer.echo(f"Writing SDK to {output_dir}")
-        for file_path, file_content in sdk.items():
-            path = output_dir / file_path
-            path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(file_content)
+        write_sdk_to_disk(sdk, output_dir)
         typer.echo("Done!")
 
     def main():
