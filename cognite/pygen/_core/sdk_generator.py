@@ -211,7 +211,8 @@ class SDKGenerator:
         import_lines = []
         class_lines = []
         for view_name in sorted(self._view_names):
-            classes = [view_name, f"{view_name}Apply", f"{view_name}List"]
+            pascal_name = to_pascal(view_name, singularize=True)
+            classes = [pascal_name, f"{pascal_name}Apply", f"{pascal_name}List"]
             import_lines.append(f"from ._{to_snake(view_name, pluralize=True)} import {', '.join(classes)}")
             class_lines.extend(classes)
 
@@ -219,8 +220,12 @@ class SDKGenerator:
         for view_name, dependencies in sorted(self._dependencies_by_view_name.items()):
             if not dependencies:
                 continue
-            dependencies = [f"{dependency}Apply={dependency}Apply" for dependency in sorted(dependencies)]
-            update_forward_refs_lines.append(f"{view_name}Apply.update_forward_refs({', '.join(dependencies)})")
+            pascal_name = to_pascal(view_name, singularize=True)
+            dependencies = [
+                f"{to_pascal(dependency, singularize=True)}Apply={to_pascal(dependency, singularize=True)}Apply"
+                for dependency in sorted(dependencies)
+            ]
+            update_forward_refs_lines.append(f"{pascal_name}Apply.update_forward_refs({', '.join(dependencies)})")
 
         imports = "\n".join(import_lines)
         forward_refs = "\n".join(update_forward_refs_lines)

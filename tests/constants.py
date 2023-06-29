@@ -26,7 +26,7 @@ class ShopSDKFiles:
     api = client_dir / "_api"
     cases_data = data_classes / "_cases.py"
     command_configs_data = data_classes / "_command_configs.py"
-
+    data_init = data_classes / "__init__.py"
     command_configs_api = api / "command_configs.py"
 
 
