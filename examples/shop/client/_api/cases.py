@@ -28,7 +28,9 @@ class CasesAPI(TypeAPI[Case, CaseApply, CaseList]):
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(CaseApply.space, external_id))
         else:
-            return self._client.data_modeling.instances.delete(nodes=[(CaseApply.space, id) for id in external_id])
+            return self._client.data_modeling.instances.delete(
+                nodes=[(CaseApply.space, id) for id in external_id],
+            )
 
     @overload
     def retrieve(self, external_id: str) -> Case:

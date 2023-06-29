@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from shop.client import ShopClient
-from shop.client.data_classes import Case, CaseApply, CaseList, CommandConfigApply
+from shop.client.data_classes import CaseApply, CommandConfigApply
 
 
 def test_case_list(shop_client: ShopClient):
@@ -13,8 +13,7 @@ def test_case_list(shop_client: ShopClient):
 def test_case_retrieve(shop_client: ShopClient):
     kelly = shop_client.cases.retrieve("shop:case:4:Kelly")
 
-    assert type(kelly).__name__ == Case.__name__
-    # assert isinstance(kelly, Case)
+    assert kelly.external_id == "shop:case:4:Kelly"
     assert len(kelly.cut_files) == 8
     assert kelly.arguments == "Hunter LLC"
 
@@ -22,7 +21,7 @@ def test_case_retrieve(shop_client: ShopClient):
 def test_case_retrieve_multiple(shop_client: ShopClient):
     cases = shop_client.cases.retrieve(["shop:case:4:Kelly", "shop:case:3:Frederick"])
 
-    assert isinstance(cases, CaseList)
+    assert sorted([c.external_id for c in cases]) == sorted(["shop:case:4:Kelly", "shop:case:3:Frederick"])
     assert len(cases) == 2
 
 
