@@ -120,7 +120,7 @@ class SDKGenerator:
                 self._dependencies_by_view_name[view_name].add(field.edge_end_node_external_id)
 
     def view_to_api(self, view: dm.View) -> str:
-        edge_properties = list(view_functions.edge_properties(view.properties.values()))
+        edge_properties = list(view_functions.edge_one_to_many_properties(view.properties.values()))
 
         edges_apis = [self.property_to_edge_api(prop, view.name, view.space) for prop in edge_properties]
         edges_helpers = [self.property_to_edge_helper(prop, view.name) for prop in edge_properties]
@@ -224,9 +224,7 @@ __all__ = [
 ]
 """
 
-    def properties_to_create_edge_methods(
-        self, properties: Iterable[dm.MappedProperty | dm.ConnectionDefinition]
-    ) -> list[str]:
+    def properties_to_create_edge_methods(self, properties: Iterable[dm.ConnectionDefinition]) -> list[str]:
         create_edge = self._env.get_template("type_data_create_edge.py.jinja")
         create_methods = []
         for prop in properties:
@@ -238,16 +236,6 @@ __all__ = [
                         space=prop.source.space,
                         edge_pascal=to_pascal(prop.name, singularize=True),
                         type_ext_id=prop.type.external_id,
-                    )
-                )
-            elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation):
-                create_methods.append(
-                    create_edge.render(
-                        edge_snake=to_snake(prop.name, singularize=True),
-                        # Todo Avoid assuming that nodes and edges are in the same space.
-                        space=prop.source.space,
-                        edge_pascal=to_pascal(prop.name, singularize=True),
-                        type_ext_id=f"{prop.container.external_id}.{prop.name}",
                     )
                 )
         return create_methods
@@ -288,7 +276,6 @@ def property_to_edge_snippets(prop: dm.ConnectionDefinition | dm.MappedProperty,
     view_snake = to_snake(view_name)
     view_snake_plural = to_snake(view_name, pluralize=True)
     prop_snake = to_snake(prop.name, singularize=True)
-    prop_pascal = to_pascal(prop.name, singularize=True)
     if isinstance(prop, dm.SingleHopConnectionDefinition):
         prop_pascal_plural = to_pascal(prop.name, pluralize=True)
         prop_plural_snake = to_snake(prop.name, pluralize=True)
@@ -298,14 +285,6 @@ def property_to_edge_snippets(prop: dm.ConnectionDefinition | dm.MappedProperty,
             f"self._set_{prop_plural_snake}({view_snake_plural}, {prop_snake}_edges)",
             f"{prop_snake}_edges = self.{prop_plural_snake}.retrieve(external_id)",
             f"{prop_snake}_edges = self.{prop_plural_snake}.list(limit=-1)",
-        )
-    elif isinstance(prop, dm.MappedProperty):
-        return EdgeSnippets(
-            f"self.{prop_snake} = {view_name}{prop_pascal}API(client)",
-            f"{view_snake}.{prop.name} = {prop_snake}_edges[0].end_node.external_id if {prop_snake}_edges else None",
-            f"self._set_{prop_snake}({view_snake_plural}, {prop_snake}_edges)",
-            f"{prop_snake}_edges = self.{prop_snake}.retrieve(external_id)",
-            f"{prop_snake}_edges = self.{prop_snake}.list(limit=-1)",
         )
 
     raise NotImplementedError(f"Edge API for type={type(prop)} is not implemented")

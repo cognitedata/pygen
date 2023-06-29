@@ -24,7 +24,7 @@ class MovieClient:
 
     Generated with:
         pygen = 0.10.3
-        cognite-sdk = 6.5.3
+        cognite-sdk = 6.5.5
         pydantic = 1.10.9
 
     Data Model:

@@ -108,36 +108,12 @@ def test_property_to_edge_api_person_roles(sdk_generator: SDKGenerator, person_v
     assert actual == expected
 
 
-def test_property_to_edge_api_actor_person(sdk_generator: SDKGenerator, actor_view: dm.View):
-    # Arrange
-    expected = "\n".join(MovieSDKFiles.actors_api.read_text().split("\n")[14:45])
-
-    # Act
-    actual = sdk_generator.property_to_edge_api(
-        actor_view.properties["person"], view_name="Actor", view_space="IntegrationTestsImmutable"
-    )
-
-    # Assert
-    assert actual == expected
-
-
 def test_property_to_edges_helper(sdk_generator: SDKGenerator, person_view: dm.View):
     # Arrange
     expected = "\n".join(MovieSDKFiles.persons_api.read_text().split("\n")[98:108])
 
     # Act
     actual = sdk_generator.property_to_edge_helper(person_view.properties["roles"], view_name="Person")
-
-    # Assert
-    assert actual == expected
-
-
-def test_property_to_edge_helper(sdk_generator: SDKGenerator, actor_view: dm.View):
-    # Arrange
-    expected = "\n".join(MovieSDKFiles.actors_api.read_text().split("\n")[178:186])
-
-    # Act
-    actual = sdk_generator.property_to_edge_helper(actor_view.properties["person"], view_name="Actor")
 
     # Assert
     assert actual == expected
@@ -155,23 +131,6 @@ def test_property_to_edge_snippets(person_view: dm.View):
 
     # Act
     actual = property_to_edge_snippets(person_view.properties["roles"], view_name="Person")
-
-    # Assert
-    assert actual == expected
-
-
-def test_property_to_single_edge_snippets(actor_view: dm.View):
-    # Arrange
-    expected = EdgeSnippets(
-        "self.person = ActorPersonAPI(client)",
-        "actor.person = person_edges[0].end_node.external_id if person_edges else None",
-        "self._set_person(actors, person_edges)",
-        "person_edges = self.person.retrieve(external_id)",
-        "person_edges = self.person.list(limit=-1)",
-    )
-
-    # Act
-    actual = property_to_edge_snippets(actor_view.properties["person"], view_name="Actor")
 
     # Assert
     assert actual == expected
