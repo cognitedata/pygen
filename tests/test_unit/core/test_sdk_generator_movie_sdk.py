@@ -169,12 +169,13 @@ def test_create_sources(person_view: dm.View):
     # Arrange
     expected = [
         """dm.NodeOrEdgeData(
-                    source=dm.ContainerId("IntegrationTestsImmutable", "Person"),
-                    properties={
-                        "name": self.name,
-                        "birthYear": self.birth_year,
-                    },
-                ),"""
+            source=dm.ContainerId("IntegrationTestsImmutable", "Person"),
+            properties={
+                "name": self.name,
+                "birthYear": self.birth_year,
+            },
+        )
+"""
     ]
 
     # Act
@@ -245,7 +246,7 @@ def test_create_api_classes(sdk_generator: SDKGenerator, monkeypatch):
 
 def test_properties_to_create_edge_methods_persons(sdk_generator: SDKGenerator, person_view: dm.View):
     # Arrange
-    expected = ["\n".join(MovieSDKFiles.persons_data.read_text().split("\n")[62:77])]
+    expected = ["\n".join(MovieSDKFiles.persons_data.read_text().split("\n")[61:76])]
 
     # Act
     actual = sdk_generator.properties_to_create_edge_methods(person_view.properties.values())
@@ -256,7 +257,7 @@ def test_properties_to_create_edge_methods_persons(sdk_generator: SDKGenerator, 
 
 def test_properties_to_add_edges_persons(sdk_generator: SDKGenerator, person_view: dm.View):
     # Arrange
-    expected = ["\n".join(MovieSDKFiles.persons_data.read_text().split("\n")[49:59])]
+    expected = ["\n".join(MovieSDKFiles.persons_data.read_text().split("\n")[48:58])]
 
     # Act
     actual = sdk_generator.properties_to_add_edges(person_view.properties.values())
@@ -320,6 +321,22 @@ def test_client_subapi_import(view_name: str, expected: str):
 def test_subapi_instantiation(view_name: str, expected: str):
     # Act
     actual = subapi_instantiation(view_name)
+
+    # Assert
+    assert actual == expected
+
+
+def test_properties_to_direct_relations_in_node_data_actors(sdk_generator: SDKGenerator, actor_view: dm.View):
+    expected = [
+        """        if self.person:
+            node_data.properties["person"] = {
+                "space": "IntegrationTestsImmutable",
+                "externalId": self.person if isinstance(self.person, str) else self.person.external_id,
+            }"""
+    ]
+
+    # Act
+    actual = sdk_generator.properties_to_direct_relations_in_node_data(actor_view.properties.values())
 
     # Assert
     assert actual == expected

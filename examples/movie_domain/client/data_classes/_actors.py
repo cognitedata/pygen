@@ -44,7 +44,6 @@ class ActorApply(CircularModelApply):
                 "space": "IntegrationTestsImmutable",
                 "externalId": self.person if isinstance(self.person, str) else self.person.external_id,
             }
-
         this_node = dm.NodeApply(
             space=self.space,
             external_id=self.external_id,
@@ -83,22 +82,6 @@ class ActorApply(CircularModelApply):
                 edges.extend(instances.edges)
 
         return InstancesApply(nodes, edges)
-
-    def _create_person_edge(self, person: Union[str, "PersonApply"]) -> dm.EdgeApply:
-        if isinstance(person, str):
-            end_node_ext_id = person
-        elif isinstance(person, CircularModelApply):
-            end_node_ext_id = person.external_id
-        else:
-            raise TypeError(f"Expected str or PersonApply, got {type(person)}")
-
-        return dm.EdgeApply(
-            space="IntegrationTestsImmutable",
-            external_id=f"{self.external_id}:{end_node_ext_id}",
-            type=dm.DirectRelationReference("IntegrationTestsImmutable", "Role.person"),
-            start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference("IntegrationTestsImmutable", end_node_ext_id),
-        )
 
     def _create_movie_edge(self, movie: Union[str, "MovieApply"]) -> dm.EdgeApply:
         if isinstance(movie, str):

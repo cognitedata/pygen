@@ -97,7 +97,7 @@ class SDKGenerator:
         sources = properties_to_sources(view.properties.values())
         create_edges = self.properties_to_create_edge_methods(view.properties.values())
         add_edges = self.properties_to_add_edges(view.properties.values())
-
+        direct_relations = self.properties_to_direct_relations_in_node_data(view.properties.values())
         circular_imports = dependencies_to_imports(self._dependencies_by_view_name.get(view.name, set()))
 
         return (
@@ -110,6 +110,7 @@ class SDKGenerator:
                 circular_imports=circular_imports,
                 create_edges="\n\n".join(create_edges),
                 add_edges="\n\n".join(add_edges),
+                add_direct_relations="\n\n".join(direct_relations),
             )
             + "\n"
         )
@@ -262,6 +263,20 @@ __all__ = [
 
         return add_snippets
 
+    def properties_to_direct_relations_in_node_data(
+        self, properties: Iterable[dm.MappedProperty | dm.ConnectionDefinition]
+    ) -> list[str]:
+        direct_relation = []
+        for prop in properties:
+            if isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation):
+                set_direct_relation = f"""        if self.{prop.name}:
+            node_data.properties["{prop.name}"] = {{
+                "space": "{prop.source.space}",
+                "externalId": self.{prop.name} if isinstance(self.{prop.name}, str) else self.{prop.name}.external_id,
+            }}"""
+                direct_relation.append(set_direct_relation)
+        return direct_relation
+
 
 @dataclass
 class EdgeSnippets:
@@ -385,16 +400,15 @@ def properties_to_sources(properties: Iterable[dm.MappedProperty | dm.Connection
 
     output = []
     for container_id, container_props in properties_by_container_id.items():
-        prop_str = (
-            ",\n                        ".join(f'"{p.name}": self.{to_snake(p.name)}' for p in container_props) + ","
-        )
+        prop_str = ",\n                ".join(f'"{p.name}": self.{to_snake(p.name)}' for p in container_props) + ","
         output.append(
             """dm.NodeOrEdgeData(
-                    source=dm.ContainerId("%s", "%s"),
-                    properties={
-                        %s
-                    },
-                ),"""
+            source=dm.ContainerId("%s", "%s"),
+            properties={
+                %s
+            },
+        )
+"""
             % (container_id.space, container_id.external_id, prop_str)
         )
     return output
