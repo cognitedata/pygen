@@ -6,16 +6,16 @@ from cognite.client import data_modeling as dm
 
 from ._core import CircularModelApply, DomainModel, InstancesApply, TypeList
 
-__all__ = ["BestLeadingActress", "BestLeadingActressApply", "BestLeadingActressList"]
+__all__ = ["BestLeadingActres", "BestLeadingActresApply", "BestLeadingActresList"]
 
 
-class BestLeadingActress(DomainModel):
+class BestLeadingActres(DomainModel):
     space: ClassVar[str] = "IntegrationTestsImmutable"
     name: Optional[str] = None
     year: Optional[int] = None
 
 
-class BestLeadingActressApply(CircularModelApply):
+class BestLeadingActresApply(CircularModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
     name: str
     year: int
@@ -43,5 +43,5 @@ class BestLeadingActressApply(CircularModelApply):
         return InstancesApply(nodes, edges)
 
 
-class BestLeadingActressList(TypeList[BestLeadingActress]):
-    _NODE = BestLeadingActress
+class BestLeadingActresList(TypeList[BestLeadingActres]):
+    _NODE = BestLeadingActres

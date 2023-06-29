@@ -6,8 +6,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client._constants import INSTANCES_LIST_LIMIT_DEFAULT
 
-from movie_domain.client.data_classes import Rating, RatingApply, RatingList
-
+from ..data_classes import Rating, RatingApply, RatingList
 from ._core import TypeAPI
 
 
@@ -29,7 +28,9 @@ class RatingsAPI(TypeAPI[Rating, RatingApply, RatingList]):
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(RatingApply.space, external_id))
         else:
-            return self._client.data_modeling.instances.delete(nodes=[(RatingApply.space, id) for id in external_id])
+            return self._client.data_modeling.instances.delete(
+                nodes=[(RatingApply.space, id) for id in external_id],
+            )
 
     @overload
     def retrieve(self, external_id: str) -> Rating:

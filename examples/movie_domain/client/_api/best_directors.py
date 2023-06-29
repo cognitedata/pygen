@@ -6,8 +6,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client._constants import INSTANCES_LIST_LIMIT_DEFAULT
 
-from movie_domain.client.data_classes import BestDirector, BestDirectorApply, BestDirectorList
-
+from ..data_classes import BestDirector, BestDirectorApply, BestDirectorList
 from ._core import TypeAPI
 
 
@@ -30,7 +29,7 @@ class BestDirectorsAPI(TypeAPI[BestDirector, BestDirectorApply, BestDirectorList
             return self._client.data_modeling.instances.delete(nodes=(BestDirectorApply.space, external_id))
         else:
             return self._client.data_modeling.instances.delete(
-                nodes=[(BestDirectorApply.space, id) for id in external_id]
+                nodes=[(BestDirectorApply.space, id) for id in external_id],
             )
 
     @overload

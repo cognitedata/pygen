@@ -7,8 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client._constants import INSTANCES_LIST_LIMIT_DEFAULT
 
-from movie_domain.client.data_classes import Movie, MovieApply, MovieList
-
+from ..data_classes import Movie, MovieApply, MovieList
 from ._core import TypeAPI
 
 
@@ -98,7 +97,9 @@ class MoviesAPI(TypeAPI[Movie, MovieApply, MovieList]):
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(MovieApply.space, external_id))
         else:
-            return self._client.data_modeling.instances.delete(nodes=[(MovieApply.space, id) for id in external_id])
+            return self._client.data_modeling.instances.delete(
+                nodes=[(MovieApply.space, id) for id in external_id],
+            )
 
     @overload
     def retrieve(self, external_id: str) -> Movie:
