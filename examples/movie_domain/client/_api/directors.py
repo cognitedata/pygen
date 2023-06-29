@@ -12,39 +12,6 @@ from movie_domain.client.data_classes import Director, DirectorApply, DirectorLi
 from ._core import TypeAPI
 
 
-class DirectorPersonAPI:
-    def __init__(self, client: CogniteClient):
-        self._client = client
-
-    def retrieve(self, external_id: str | Sequence[str]) -> dm.EdgeList:
-        f = dm.filters
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": "IntegrationTestsImmutable", "externalId": "Role.person"},
-        )
-        if isinstance(external_id, str):
-            is_director = f.Equals(
-                ["edge", "startNode"],
-                {"space": "IntegrationTestsImmutable", "externalId": external_id},
-            )
-            return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_director))
-
-        else:
-            is_directors = f.In(
-                ["edge", "startNode"],
-                [{"space": "IntegrationTestsImmutable", "externalId": ext_id} for ext_id in external_id],
-            )
-            return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_directors))
-
-    def list(self, limit=INSTANCES_LIST_LIMIT_DEFAULT) -> dm.EdgeList:
-        f = dm.filters
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": "IntegrationTestsImmutable", "externalId": "Role.person"},
-        )
-        return self._client.data_modeling.instances.list("edge", limit=limit, filter=is_edge_type)
-
-
 class DirectorMoviesAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
@@ -120,7 +87,6 @@ class DirectorsAPI(TypeAPI[Director, DirectorApply, DirectorList]):
             class_apply_type=DirectorApply,
             class_list=DirectorList,
         )
-        self.person = DirectorPersonAPI(client)
         self.movies = DirectorMoviesAPI(client)
         self.nominations = DirectorNominationsAPI(client)
 
@@ -145,20 +111,16 @@ class DirectorsAPI(TypeAPI[Director, DirectorApply, DirectorList]):
     def retrieve(self, external_id: str | Sequence[str]) -> Director | DirectorList:
         if isinstance(external_id, str):
             director = self._retrieve(("IntegrationTestsImmutable", external_id))
-            person_edges = self.person.retrieve(external_id)
             movie_edges = self.movies.retrieve(external_id)
             nomination_edges = self.nominations.retrieve(external_id)
-            director.person = person_edges[0].end_node.external_id if person_edges else None
             director.movies = [edge.end_node.external_id for edge in movie_edges]
             director.nomination = [edge.end_node.external_id for edge in nomination_edges]
 
             return director
         else:
             directors = self._retrieve([("IntegrationTestsImmutable", ext_id) for ext_id in external_id])
-            person_edges = self.person.retrieve(external_id)
             movie_edges = self.movies.retrieve(external_id)
             nomination_edges = self.nominations.retrieve(external_id)
-            self._set_person(directors, person_edges)
             self._set_movies(directors, movie_edges)
             self._set_nominations(directors, nomination_edges)
 
@@ -167,23 +129,12 @@ class DirectorsAPI(TypeAPI[Director, DirectorApply, DirectorList]):
     def list(self, limit: int = INSTANCES_LIST_LIMIT_DEFAULT) -> DirectorList:
         directors = self._list(limit=limit)
 
-        person_edges = self.person.list(limit=-1)
         movie_edges = self.movies.list(limit=-1)
         nomination_edges = self.nominations.list(limit=-1)
-        self._set_person(directors, person_edges)
         self._set_movies(directors, movie_edges)
         self._set_nominations(directors, nomination_edges)
 
         return directors
-
-    @staticmethod
-    def _set_person(directors: Sequence[Director], person_edges: Sequence[dm.Edge]):
-        edges_by_start_node: Dict[Tuple, dm.Edge] = {edge.start_node.as_tuple(): edge for edge in person_edges}
-
-        for director in directors:
-            node_id = director.id_tuple()
-            if node_id in edges_by_start_node:
-                director.person = edges_by_start_node[node_id].end_node.external_id
 
     @staticmethod
     def _set_movies(directors: Sequence[Director], movie_edges: Sequence[dm.Edge]):
