@@ -143,7 +143,7 @@ class SDKGenerator:
         view_plural_snake = to_snake(view.name, pluralize=True)
         return type_api.render(
             sdk_name=self.sdk_name,
-            view_name=view.name,
+            view_name=to_pascal(view.name, singularize=True),
             view_snake=to_snake(view.name),
             view_space=view.space,
             view_ext_id=view.external_id,
@@ -358,7 +358,7 @@ class Field:
 
         type_ = self.type
         if self.is_edge and field_type == "write":
-            type_ = f'Union[str, "{self.edge_end_node_external_id}Apply"]'
+            type_ = f'Union[str, "{to_pascal(self.edge_end_node_external_id, singularize=True)}Apply"]'
             if self.is_one_to_many:
                 type_ = f"list[{type_}]"
 
@@ -429,7 +429,8 @@ def dependencies_to_imports(dependencies: set[str]) -> str:
     lines = ["if TYPE_CHECKING:"]
     for dependency in sorted(dependencies):
         snake_plural = to_snake(dependency, pluralize=True)
-        lines.append(f"    from ._{snake_plural} import {dependency}Apply")
+        pascal_singular = to_pascal(dependency, singularize=True)
+        lines.append(f"    from ._{snake_plural} import {pascal_singular}Apply")
     lines.append("")
     return "\n".join(lines)
 

@@ -6,8 +6,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client._constants import INSTANCES_LIST_LIMIT_DEFAULT
 
-from shop.client.data_classes import CommandConfig, CommandConfigApply, CommandConfigList
-
+from ..data_classes import CommandConfig, CommandConfigApply, CommandConfigList
 from ._core import TypeAPI
 
 
@@ -30,7 +29,7 @@ class CommandConfigsAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfig
             return self._client.data_modeling.instances.delete(nodes=(CommandConfigApply.space, external_id))
         else:
             return self._client.data_modeling.instances.delete(
-                nodes=[(CommandConfigApply.space, id) for id in external_id]
+                nodes=[(CommandConfigApply.space, id) for id in external_id],
             )
 
     @overload
