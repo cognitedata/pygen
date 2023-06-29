@@ -1,0 +1,17 @@
+commands:
+  - set time_delay_unit MINUTE
+  - set ramping /on
+  - set stop_cost_from_start_cost /on
+  - set bypass_loss /on
+  - set mipgap 0.001000
+  - set timelimit 600.000
+  - set reserve_ramping_cost 1
+  - set fcr_n_equality /on
+  - set reserve_slack_cost 1 #uncertain
+  - set reserve_min_capacity 0.02
+  - set dyn_seg /on
+  - set dyn_juncloss /on
+  - penalty flag /on /plant /schedule
+  - start sim 3
+  - set code /inc
+  - start sim 4

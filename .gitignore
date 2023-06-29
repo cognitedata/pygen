@@ -58,3 +58,4 @@ data_models/
 examples/movie_domain/data/settings.toml
 config.toml
 playground
+examples/playground.ipynb
