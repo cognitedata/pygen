@@ -6,6 +6,7 @@ examples_dir = repo_root / "examples"
 
 movie_sdk = examples_dir / "movie_domain"
 schemas_dir = repo_root / "tests" / "schemas"
+shop_sdk = examples_dir / "shop"
 
 
 class TestSchemas:
@@ -16,6 +17,13 @@ class TestSchemas:
 class DataModels:
     movie_model = schemas_dir / "movie_data_model.yaml"
     movie_model_pickle = schemas_dir / "movie_data_model_6.5.3.pickle"
+    shop_model_pickle = schemas_dir / "shop_data_model_6.5.5.pickle"
+
+
+class ShopSDKFiles:
+    client_dir = shop_sdk / "client"
+    data_classes = client_dir / "data_classes"
+    cases_data = data_classes / "_cases.py"
 
 
 class MovieSDKFiles:

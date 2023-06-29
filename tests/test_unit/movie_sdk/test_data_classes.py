@@ -114,7 +114,10 @@ def person_apply_to_instances_test_cases():
             "sources": [
                 {
                     "source": {"space": "IntegrationTestsImmutable", "externalId": "Role", "type": "container"},
-                    "properties": {"wonOscar": False},
+                    "properties": {
+                        "person": {"externalId": "person:quentin_tarantino", "space": "IntegrationTestsImmutable"},
+                        "wonOscar": False,
+                    },
                 }
             ],
         },
@@ -126,10 +129,11 @@ def person_apply_to_instances_test_cases():
                 {
                     "source": {"space": "IntegrationTestsImmutable", "externalId": "Movie", "type": "container"},
                     "properties": {
-                        "title": "Pulp Fiction",
+                        "meta": {"imdb": {"rating": 8.9, "votes": 1780000}},
+                        "rating": {"externalId": "rating:pulp_fiction", "space": "IntegrationTestsImmutable"},
                         "releaseYear": 1994,
                         "runTimeMinutes": 154.0,
-                        "meta": {"imdb": {"rating": 8.9, "votes": 1780000}},
+                        "title": "Pulp Fiction",
                     },
                 }
             ],
@@ -152,7 +156,10 @@ def person_apply_to_instances_test_cases():
             "sources": [
                 {
                     "source": {"space": "IntegrationTestsImmutable", "externalId": "Role", "type": "container"},
-                    "properties": {"wonOscar": True},
+                    "properties": {
+                        "person": {"externalId": "person:quentin_tarantino", "space": "IntegrationTestsImmutable"},
+                        "wonOscar": True,
+                    },
                 }
             ],
         },
@@ -170,20 +177,12 @@ def person_apply_to_instances_test_cases():
     ]
     expected_edges = [
         {
-            "instanceType": "edge",
-            "space": "IntegrationTestsImmutable",
+            "endNode": {"externalId": "actor:quentin_tarantino", "space": "IntegrationTestsImmutable"},
             "externalId": "person:quentin_tarantino:actor:quentin_tarantino",
-            "type": {"space": "IntegrationTestsImmutable", "externalId": "Person.roles"},
-            "startNode": {"space": "IntegrationTestsImmutable", "externalId": "person:quentin_tarantino"},
-            "endNode": {"space": "IntegrationTestsImmutable", "externalId": "actor:quentin_tarantino"},
-        },
-        {
             "instanceType": "edge",
             "space": "IntegrationTestsImmutable",
-            "externalId": "actor:quentin_tarantino:person:quentin_tarantino",
-            "type": {"space": "IntegrationTestsImmutable", "externalId": "Role.person"},
-            "startNode": {"space": "IntegrationTestsImmutable", "externalId": "actor:quentin_tarantino"},
-            "endNode": {"space": "IntegrationTestsImmutable", "externalId": "person:quentin_tarantino"},
+            "startNode": {"externalId": "person:quentin_tarantino", "space": "IntegrationTestsImmutable"},
+            "type": {"externalId": "Person.roles", "space": "IntegrationTestsImmutable"},
         },
         {
             "instanceType": "edge",
@@ -192,14 +191,6 @@ def person_apply_to_instances_test_cases():
             "type": {"space": "IntegrationTestsImmutable", "externalId": "Role.movies"},
             "startNode": {"space": "IntegrationTestsImmutable", "externalId": "actor:quentin_tarantino"},
             "endNode": {"space": "IntegrationTestsImmutable", "externalId": "movie:pulp_fiction"},
-        },
-        {
-            "instanceType": "edge",
-            "space": "IntegrationTestsImmutable",
-            "externalId": "movie:pulp_fiction:rating:pulp_fiction",
-            "type": {"space": "IntegrationTestsImmutable", "externalId": "Movie.rating"},
-            "startNode": {"space": "IntegrationTestsImmutable", "externalId": "movie:pulp_fiction"},
-            "endNode": {"space": "IntegrationTestsImmutable", "externalId": "rating:pulp_fiction"},
         },
         {
             "instanceType": "edge",
@@ -218,20 +209,12 @@ def person_apply_to_instances_test_cases():
             "endNode": {"space": "IntegrationTestsImmutable", "externalId": "director:quentin_tarantino"},
         },
         {
-            "instanceType": "edge",
-            "space": "IntegrationTestsImmutable",
+            "endNode": {"externalId": "director:quentin_tarantino", "space": "IntegrationTestsImmutable"},
             "externalId": "person:quentin_tarantino:director:quentin_tarantino",
-            "type": {"space": "IntegrationTestsImmutable", "externalId": "Person.roles"},
-            "startNode": {"space": "IntegrationTestsImmutable", "externalId": "person:quentin_tarantino"},
-            "endNode": {"space": "IntegrationTestsImmutable", "externalId": "director:quentin_tarantino"},
-        },
-        {
             "instanceType": "edge",
             "space": "IntegrationTestsImmutable",
-            "externalId": "director:quentin_tarantino:person:quentin_tarantino",
-            "type": {"space": "IntegrationTestsImmutable", "externalId": "Role.person"},
-            "startNode": {"space": "IntegrationTestsImmutable", "externalId": "director:quentin_tarantino"},
-            "endNode": {"space": "IntegrationTestsImmutable", "externalId": "person:quentin_tarantino"},
+            "startNode": {"externalId": "person:quentin_tarantino", "space": "IntegrationTestsImmutable"},
+            "type": {"externalId": "Person.roles", "space": "IntegrationTestsImmutable"},
         },
         {
             "instanceType": "edge",

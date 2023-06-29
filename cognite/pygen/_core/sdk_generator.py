@@ -99,7 +99,7 @@ class SDKGenerator:
         add_edges = self.properties_to_add_edges(view.properties.values())
         direct_relations = self.properties_to_direct_relations_in_node_data(view.properties.values())
         circular_imports = dependencies_to_imports(self._dependencies_by_view_name.get(view.name, set()))
-
+        has_datetime = any(f.type == "datetime" for f in fields)
         return (
             type_data.render(
                 view_name=view.name,
@@ -111,6 +111,7 @@ class SDKGenerator:
                 create_edges="\n\n".join(create_edges),
                 add_edges="\n\n".join(add_edges),
                 add_direct_relations="\n\n".join(direct_relations),
+                has_datetime=has_datetime,
             )
             + "\n"
         )
@@ -257,7 +258,7 @@ __all__ = [
             elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation):
                 add_snippets.append(
                     add_edge.render(
-                        edge_snake=to_snake(prop.name, singularize=True),
+                        edge_name=prop.name,
                     )
                 )
 

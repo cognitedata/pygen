@@ -1,5 +1,6 @@
 from __future__ import annotations
-
+{%  if has_datetime %}
+from datetime import datetime{% endif %}
 from typing import TYPE_CHECKING, ClassVar, Optional, Union
 
 from cognite.client import data_modeling as dm
@@ -36,9 +37,9 @@ class {{ view_name }}Apply(CircularModelApply):
 {{ add_edges }}
 
         return InstancesApply(nodes, edges)
-
+{% if create_edges %}
 {{ create_edges }}
-
+{% endif %}
 
 class {{ view_name }}List(TypeList[{{ view_name }}]):
     _NODE = {{ view_name }}
