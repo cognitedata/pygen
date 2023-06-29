@@ -100,18 +100,26 @@ class SDKGenerator:
         direct_relations = self.properties_to_direct_relations_in_node_data(view.properties.values())
         circular_imports = dependencies_to_imports(self._dependencies_by_view_name.get(view.name, set()))
         has_datetime = any(f.type == "datetime" for f in fields)
+        has_circular_imports = len(circular_imports) > 0
+
+        read_type_hints = [f.as_type_hint("read") for f in fields]
+        write_type_hints = [f.as_type_hint("write") for f in fields]
+        has_alias = any("Field" in hint for hint in read_type_hints)
+
         return (
             type_data.render(
-                view_name=view.name,
+                view_name=to_pascal(view.name, singularize=True),
                 view_space=view.space,
-                read_fields="\n    ".join(f.as_type_hint("read") for f in fields),
-                write_fields="\n    ".join(f.as_type_hint("write") for f in fields),
+                read_fields="\n    ".join(read_type_hints),
+                write_fields="\n    ".join(write_type_hints),
                 sources=f',\n{" "*16}'.join(sources),
                 circular_imports=circular_imports,
                 create_edges="\n\n".join(create_edges),
                 add_edges="\n\n".join(add_edges),
                 add_direct_relations="\n\n".join(direct_relations),
                 has_datetime=has_datetime,
+                has_circular_imports=has_circular_imports,
+                has_alias=has_alias,
             )
             + "\n"
         )

@@ -24,6 +24,7 @@ class ShopSDKFiles:
     client_dir = shop_sdk / "client"
     data_classes = client_dir / "data_classes"
     cases_data = data_classes / "_cases.py"
+    command_configs_data = data_classes / "_command_configs.py"
 
 
 class MovieSDKFiles:

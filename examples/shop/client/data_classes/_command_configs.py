@@ -6,16 +6,16 @@ from cognite.client import data_modeling as dm
 
 from ._core import CircularModelApply, DomainModel, InstancesApply, TypeList
 
-__all__ = ["Command_Config", "Command_ConfigApply", "Command_ConfigList"]
+__all__ = ["CommandConfig", "CommandConfigApply", "CommandConfigList"]
 
 
-class Command_Config(DomainModel):
+class CommandConfig(DomainModel):
     space: ClassVar[str] = "IntegrationTestsImmutable"
     configs: list[str] = None
     source: Optional[str] = None
 
 
-class Command_ConfigApply(CircularModelApply):
+class CommandConfigApply(CircularModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
     configs: list[str]
     source: Optional[str] = None
@@ -43,5 +43,5 @@ class Command_ConfigApply(CircularModelApply):
         return InstancesApply(nodes, edges)
 
 
-class Command_ConfigList(TypeList[Command_Config]):
-    _NODE = Command_Config
+class CommandConfigList(TypeList[CommandConfig]):
+    _NODE = CommandConfig

@@ -9,7 +9,7 @@ from pydantic import Field
 from ._core import CircularModelApply, DomainModel, InstancesApply, TypeList
 
 if TYPE_CHECKING:
-    from ._command_configs import Command_ConfigApply
+    from ._command_configs import CommandConfigApply
 
 __all__ = ["Case", "CaseApply", "CaseList"]
 
@@ -34,7 +34,7 @@ class CaseApply(CircularModelApply):
     scenario: Optional[str] = None
     start_time: datetime
     end_time: Optional[datetime] = None
-    commands: Optional[Union[str, "Command_ConfigApply"]] = None
+    commands: Optional[Union[str, "CommandConfigApply"]] = None
     cut_files: list[str] = None
     bid: Optional[str] = None
     bid_history: list[str] = None
