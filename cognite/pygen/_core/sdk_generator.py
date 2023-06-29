@@ -97,19 +97,29 @@ class SDKGenerator:
         sources = properties_to_sources(view.properties.values())
         create_edges = self.properties_to_create_edge_methods(view.properties.values())
         add_edges = self.properties_to_add_edges(view.properties.values())
-
+        direct_relations = self.properties_to_direct_relations_in_node_data(view.properties.values())
         circular_imports = dependencies_to_imports(self._dependencies_by_view_name.get(view.name, set()))
+        has_datetime = any(f.type == "datetime" for f in fields)
+        has_circular_imports = len(circular_imports) > 0
+
+        read_type_hints = [f.as_type_hint("read") for f in fields]
+        write_type_hints = [f.as_type_hint("write") for f in fields]
+        has_alias = any("Field" in hint for hint in read_type_hints)
 
         return (
             type_data.render(
-                view_name=view.name,
+                view_name=to_pascal(view.name, singularize=True),
                 view_space=view.space,
-                read_fields="\n    ".join(f.as_type_hint("read") for f in fields),
-                write_fields="\n    ".join(f.as_type_hint("write") for f in fields),
+                read_fields="\n    ".join(read_type_hints),
+                write_fields="\n    ".join(write_type_hints),
                 sources=f',\n{" "*16}'.join(sources),
                 circular_imports=circular_imports,
                 create_edges="\n\n".join(create_edges),
                 add_edges="\n\n".join(add_edges),
+                add_direct_relations="\n\n".join(direct_relations),
+                has_datetime=has_datetime,
+                has_circular_imports=has_circular_imports,
+                has_alias=has_alias,
             )
             + "\n"
         )
@@ -120,7 +130,7 @@ class SDKGenerator:
                 self._dependencies_by_view_name[view_name].add(field.edge_end_node_external_id)
 
     def view_to_api(self, view: dm.View) -> str:
-        edge_properties = list(view_functions.edge_properties(view.properties.values()))
+        edge_properties = list(view_functions.edge_one_to_many_properties(view.properties.values()))
 
         edges_apis = [self.property_to_edge_api(prop, view.name, view.space) for prop in edge_properties]
         edges_helpers = [self.property_to_edge_helper(prop, view.name) for prop in edge_properties]
@@ -133,7 +143,7 @@ class SDKGenerator:
         view_plural_snake = to_snake(view.name, pluralize=True)
         return type_api.render(
             sdk_name=self.sdk_name,
-            view_name=view.name,
+            view_name=to_pascal(view.name, singularize=True),
             view_snake=to_snake(view.name),
             view_space=view.space,
             view_ext_id=view.external_id,
@@ -201,7 +211,8 @@ class SDKGenerator:
         import_lines = []
         class_lines = []
         for view_name in sorted(self._view_names):
-            classes = [view_name, f"{view_name}Apply", f"{view_name}List"]
+            pascal_name = to_pascal(view_name, singularize=True)
+            classes = [pascal_name, f"{pascal_name}Apply", f"{pascal_name}List"]
             import_lines.append(f"from ._{to_snake(view_name, pluralize=True)} import {', '.join(classes)}")
             class_lines.extend(classes)
 
@@ -209,8 +220,12 @@ class SDKGenerator:
         for view_name, dependencies in sorted(self._dependencies_by_view_name.items()):
             if not dependencies:
                 continue
-            dependencies = [f"{dependency}Apply={dependency}Apply" for dependency in sorted(dependencies)]
-            update_forward_refs_lines.append(f"{view_name}Apply.update_forward_refs({', '.join(dependencies)})")
+            pascal_name = to_pascal(view_name, singularize=True)
+            dependencies = [
+                f"{to_pascal(dependency, singularize=True)}Apply={to_pascal(dependency, singularize=True)}Apply"
+                for dependency in sorted(dependencies)
+            ]
+            update_forward_refs_lines.append(f"{pascal_name}Apply.update_forward_refs({', '.join(dependencies)})")
 
         imports = "\n".join(import_lines)
         forward_refs = "\n".join(update_forward_refs_lines)
@@ -224,9 +239,7 @@ __all__ = [
 ]
 """
 
-    def properties_to_create_edge_methods(
-        self, properties: Iterable[dm.MappedProperty | dm.ConnectionDefinition]
-    ) -> list[str]:
+    def properties_to_create_edge_methods(self, properties: Iterable[dm.ConnectionDefinition]) -> list[str]:
         create_edge = self._env.get_template("type_data_create_edge.py.jinja")
         create_methods = []
         for prop in properties:
@@ -238,16 +251,6 @@ __all__ = [
                         space=prop.source.space,
                         edge_pascal=to_pascal(prop.name, singularize=True),
                         type_ext_id=prop.type.external_id,
-                    )
-                )
-            elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation):
-                create_methods.append(
-                    create_edge.render(
-                        edge_snake=to_snake(prop.name, singularize=True),
-                        # Todo Avoid assuming that nodes and edges are in the same space.
-                        space=prop.source.space,
-                        edge_pascal=to_pascal(prop.name, singularize=True),
-                        type_ext_id=f"{prop.container.external_id}.{prop.name}",
                     )
                 )
         return create_methods
@@ -268,11 +271,25 @@ __all__ = [
             elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation):
                 add_snippets.append(
                     add_edge.render(
-                        edge_snake=to_snake(prop.name, singularize=True),
+                        edge_name=prop.name,
                     )
                 )
 
         return add_snippets
+
+    def properties_to_direct_relations_in_node_data(
+        self, properties: Iterable[dm.MappedProperty | dm.ConnectionDefinition]
+    ) -> list[str]:
+        direct_relation = []
+        for prop in properties:
+            if isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation):
+                set_direct_relation = f"""        if self.{prop.name}:
+            node_data.properties["{prop.name}"] = {{
+                "space": "{prop.source.space}",
+                "externalId": self.{prop.name} if isinstance(self.{prop.name}, str) else self.{prop.name}.external_id,
+            }}"""
+                direct_relation.append(set_direct_relation)
+        return direct_relation
 
 
 @dataclass
@@ -288,7 +305,6 @@ def property_to_edge_snippets(prop: dm.ConnectionDefinition | dm.MappedProperty,
     view_snake = to_snake(view_name)
     view_snake_plural = to_snake(view_name, pluralize=True)
     prop_snake = to_snake(prop.name, singularize=True)
-    prop_pascal = to_pascal(prop.name, singularize=True)
     if isinstance(prop, dm.SingleHopConnectionDefinition):
         prop_pascal_plural = to_pascal(prop.name, pluralize=True)
         prop_plural_snake = to_snake(prop.name, pluralize=True)
@@ -298,14 +314,6 @@ def property_to_edge_snippets(prop: dm.ConnectionDefinition | dm.MappedProperty,
             f"self._set_{prop_plural_snake}({view_snake_plural}, {prop_snake}_edges)",
             f"{prop_snake}_edges = self.{prop_plural_snake}.retrieve(external_id)",
             f"{prop_snake}_edges = self.{prop_plural_snake}.list(limit=-1)",
-        )
-    elif isinstance(prop, dm.MappedProperty):
-        return EdgeSnippets(
-            f"self.{prop_snake} = {view_name}{prop_pascal}API(client)",
-            f"{view_snake}.{prop.name} = {prop_snake}_edges[0].end_node.external_id if {prop_snake}_edges else None",
-            f"self._set_{prop_snake}({view_snake_plural}, {prop_snake}_edges)",
-            f"{prop_snake}_edges = self.{prop_snake}.retrieve(external_id)",
-            f"{prop_snake}_edges = self.{prop_snake}.list(limit=-1)",
         )
 
     raise NotImplementedError(f"Edge API for type={type(prop)} is not implemented")
@@ -355,7 +363,7 @@ class Field:
 
         type_ = self.type
         if self.is_edge and field_type == "write":
-            type_ = f'Union[str, "{self.edge_end_node_external_id}Apply"]'
+            type_ = f'Union[str, "{to_pascal(self.edge_end_node_external_id, singularize=True)}Apply"]'
             if self.is_one_to_many:
                 type_ = f"list[{type_}]"
 
@@ -407,15 +415,20 @@ def properties_to_sources(properties: Iterable[dm.MappedProperty | dm.Connection
     output = []
     for container_id, container_props in properties_by_container_id.items():
         prop_str = (
-            ",\n                        ".join(f'"{p.name}": self.{to_snake(p.name)}' for p in container_props) + ","
+            ",\n                ".join(
+                f'"{p.name}": self.{to_snake(p.name)}{".isoformat()" if isinstance(p.type, dm.Timestamp) else ""}'
+                for p in container_props
+            )
+            + ","
         )
         output.append(
             """dm.NodeOrEdgeData(
-                    source=dm.ContainerId("%s", "%s"),
-                    properties={
-                        %s
-                    },
-                ),"""
+            source=dm.ContainerId("%s", "%s"),
+            properties={
+                %s
+            },
+        )
+"""
             % (container_id.space, container_id.external_id, prop_str)
         )
     return output
@@ -427,7 +440,8 @@ def dependencies_to_imports(dependencies: set[str]) -> str:
     lines = ["if TYPE_CHECKING:"]
     for dependency in sorted(dependencies):
         snake_plural = to_snake(dependency, pluralize=True)
-        lines.append(f"    from ._{snake_plural} import {dependency}Apply")
+        pascal_singular = to_pascal(dependency, singularize=True)
+        lines.append(f"    from ._{snake_plural} import {pascal_singular}Apply")
     lines.append("")
     return "\n".join(lines)
 

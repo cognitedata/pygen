@@ -1,7 +1,7 @@
 from ._actors import Actor, ActorApply, ActorList
 from ._best_directors import BestDirector, BestDirectorApply, BestDirectorList
 from ._best_leading_actors import BestLeadingActor, BestLeadingActorApply, BestLeadingActorList
-from ._best_leading_actress import BestLeadingActress, BestLeadingActressApply, BestLeadingActressList
+from ._best_leading_actresses import BestLeadingActress, BestLeadingActressApply, BestLeadingActressList
 from ._directors import Director, DirectorApply, DirectorList
 from ._movies import Movie, MovieApply, MovieList
 from ._nominations import Nomination, NominationApply, NominationList

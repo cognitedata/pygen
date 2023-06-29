@@ -6,12 +6,11 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client._constants import INSTANCES_LIST_LIMIT_DEFAULT
 
-from movie_domain.client.data_classes import BestLeadingActress, BestLeadingActressApply, BestLeadingActressList
-
+from ..data_classes import BestLeadingActress, BestLeadingActressApply, BestLeadingActressList
 from ._core import TypeAPI
 
 
-class BestLeadingActressAPI(TypeAPI[BestLeadingActress, BestLeadingActressApply, BestLeadingActressList]):
+class BestLeadingActressesAPI(TypeAPI[BestLeadingActress, BestLeadingActressApply, BestLeadingActressList]):
     def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,
@@ -30,7 +29,7 @@ class BestLeadingActressAPI(TypeAPI[BestLeadingActress, BestLeadingActressApply,
             return self._client.data_modeling.instances.delete(nodes=(BestLeadingActressApply.space, external_id))
         else:
             return self._client.data_modeling.instances.delete(
-                nodes=[(BestLeadingActressApply.space, id) for id in external_id]
+                nodes=[(BestLeadingActressApply.space, id) for id in external_id],
             )
 
     @overload

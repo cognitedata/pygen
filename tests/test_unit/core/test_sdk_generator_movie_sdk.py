@@ -97,7 +97,7 @@ def test_create_view_api_classes_actors(sdk_generator: SDKGenerator, actor_view:
 
 def test_property_to_edge_api_person_roles(sdk_generator: SDKGenerator, person_view: dm.View):
     # Arrange
-    expected = "\n".join(MovieSDKFiles.persons_api.read_text().split("\n")[14:45])
+    expected = "\n".join(MovieSDKFiles.persons_api.read_text().split("\n")[13:44])
 
     # Act
     actual = sdk_generator.property_to_edge_api(
@@ -108,36 +108,12 @@ def test_property_to_edge_api_person_roles(sdk_generator: SDKGenerator, person_v
     assert actual == expected
 
 
-def test_property_to_edge_api_actor_person(sdk_generator: SDKGenerator, actor_view: dm.View):
-    # Arrange
-    expected = "\n".join(MovieSDKFiles.actors_api.read_text().split("\n")[14:45])
-
-    # Act
-    actual = sdk_generator.property_to_edge_api(
-        actor_view.properties["person"], view_name="Actor", view_space="IntegrationTestsImmutable"
-    )
-
-    # Assert
-    assert actual == expected
-
-
 def test_property_to_edges_helper(sdk_generator: SDKGenerator, person_view: dm.View):
     # Arrange
-    expected = "\n".join(MovieSDKFiles.persons_api.read_text().split("\n")[98:108])
+    expected = "\n".join(MovieSDKFiles.persons_api.read_text().split("\n")[99:109])
 
     # Act
     actual = sdk_generator.property_to_edge_helper(person_view.properties["roles"], view_name="Person")
-
-    # Assert
-    assert actual == expected
-
-
-def test_property_to_edge_helper(sdk_generator: SDKGenerator, actor_view: dm.View):
-    # Arrange
-    expected = "\n".join(MovieSDKFiles.actors_api.read_text().split("\n")[178:186])
-
-    # Act
-    actual = sdk_generator.property_to_edge_helper(actor_view.properties["person"], view_name="Actor")
 
     # Assert
     assert actual == expected
@@ -155,23 +131,6 @@ def test_property_to_edge_snippets(person_view: dm.View):
 
     # Act
     actual = property_to_edge_snippets(person_view.properties["roles"], view_name="Person")
-
-    # Assert
-    assert actual == expected
-
-
-def test_property_to_single_edge_snippets(actor_view: dm.View):
-    # Arrange
-    expected = EdgeSnippets(
-        "self.person = ActorPersonAPI(client)",
-        "actor.person = person_edges[0].end_node.external_id if person_edges else None",
-        "self._set_person(actors, person_edges)",
-        "person_edges = self.person.retrieve(external_id)",
-        "person_edges = self.person.list(limit=-1)",
-    )
-
-    # Act
-    actual = property_to_edge_snippets(actor_view.properties["person"], view_name="Actor")
 
     # Assert
     assert actual == expected
@@ -210,12 +169,13 @@ def test_create_sources(person_view: dm.View):
     # Arrange
     expected = [
         """dm.NodeOrEdgeData(
-                    source=dm.ContainerId("IntegrationTestsImmutable", "Person"),
-                    properties={
-                        "name": self.name,
-                        "birthYear": self.birth_year,
-                    },
-                ),"""
+            source=dm.ContainerId("IntegrationTestsImmutable", "Person"),
+            properties={
+                "name": self.name,
+                "birthYear": self.birth_year,
+            },
+        )
+"""
     ]
 
     # Act
@@ -286,7 +246,7 @@ def test_create_api_classes(sdk_generator: SDKGenerator, monkeypatch):
 
 def test_properties_to_create_edge_methods_persons(sdk_generator: SDKGenerator, person_view: dm.View):
     # Arrange
-    expected = ["\n".join(MovieSDKFiles.persons_data.read_text().split("\n")[62:77])]
+    expected = ["\n".join(MovieSDKFiles.persons_data.read_text().split("\n")[61:76])]
 
     # Act
     actual = sdk_generator.properties_to_create_edge_methods(person_view.properties.values())
@@ -297,7 +257,7 @@ def test_properties_to_create_edge_methods_persons(sdk_generator: SDKGenerator, 
 
 def test_properties_to_add_edges_persons(sdk_generator: SDKGenerator, person_view: dm.View):
     # Arrange
-    expected = ["\n".join(MovieSDKFiles.persons_data.read_text().split("\n")[49:59])]
+    expected = ["\n".join(MovieSDKFiles.persons_data.read_text().split("\n")[48:58])]
 
     # Act
     actual = sdk_generator.properties_to_add_edges(person_view.properties.values())
@@ -361,6 +321,22 @@ def test_client_subapi_import(view_name: str, expected: str):
 def test_subapi_instantiation(view_name: str, expected: str):
     # Act
     actual = subapi_instantiation(view_name)
+
+    # Assert
+    assert actual == expected
+
+
+def test_properties_to_direct_relations_in_node_data_actors(sdk_generator: SDKGenerator, actor_view: dm.View):
+    expected = [
+        """        if self.person:
+            node_data.properties["person"] = {
+                "space": "IntegrationTestsImmutable",
+                "externalId": self.person if isinstance(self.person, str) else self.person.external_id,
+            }"""
+    ]
+
+    # Act
+    actual = sdk_generator.properties_to_direct_relations_in_node_data(actor_view.properties.values())
 
     # Assert
     assert actual == expected

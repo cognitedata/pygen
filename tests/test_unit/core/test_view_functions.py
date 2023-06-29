@@ -7,7 +7,7 @@ def test_edge_properties_person(person_view: dm.View):
     # Arrange
     expected = [person_view.properties["roles"]]
     # Act
-    actual = view_functions.edge_properties(person_view.properties.values())
+    actual = view_functions.edge_one_to_many_properties(person_view.properties.values())
 
     # Assert
     assert list(actual) == expected
@@ -15,10 +15,10 @@ def test_edge_properties_person(person_view: dm.View):
 
 def test_edge_properties_actor(actor_view: dm.View):
     # Arrange
-    expected = [actor_view.properties["person"], actor_view.properties["movies"], actor_view.properties["nomination"]]
+    expected = [actor_view.properties["movies"], actor_view.properties["nomination"]]
 
     # Act
-    actual = view_functions.edge_properties(actor_view.properties.values())
+    actual = view_functions.edge_one_to_many_properties(actor_view.properties.values())
 
     # Assert
     assert list(actual) == expected

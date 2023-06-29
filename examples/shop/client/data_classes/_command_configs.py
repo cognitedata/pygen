@@ -6,37 +6,36 @@ from cognite.client import data_modeling as dm
 
 from ._core import CircularModelApply, DomainModel, InstancesApply, TypeList
 
-__all__ = ["BestLeadingActress", "BestLeadingActressApply", "BestLeadingActressList"]
+__all__ = ["CommandConfig", "CommandConfigApply", "CommandConfigList"]
 
 
-class BestLeadingActress(DomainModel):
+class CommandConfig(DomainModel):
     space: ClassVar[str] = "IntegrationTestsImmutable"
-    name: Optional[str] = None
-    year: Optional[int] = None
+    configs: list[str] = None
+    source: Optional[str] = None
 
 
-class BestLeadingActressApply(CircularModelApply):
+class CommandConfigApply(CircularModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
-    name: str
-    year: int
+    configs: list[str]
+    source: Optional[str] = None
 
     def _to_instances_apply(self, cache: set[str]) -> InstancesApply:
         if self.external_id in cache:
             return InstancesApply([], [])
+        node_data = dm.NodeOrEdgeData(
+            source=dm.ContainerId("IntegrationTestsImmutable", "Command_Config"),
+            properties={
+                "configs": self.configs,
+                "source": self.source,
+            },
+        )
 
         this_node = dm.NodeApply(
             space=self.space,
             external_id=self.external_id,
             existing_version=self.existing_version,
-            sources=[
-                dm.NodeOrEdgeData(
-                    source=dm.ContainerId("IntegrationTestsImmutable", "Nomination"),
-                    properties={
-                        "name": self.name,
-                        "year": self.year,
-                    },
-                ),
-            ],
+            sources=[node_data],
         )
         nodes = [this_node]
         edges = []
@@ -44,5 +43,5 @@ class BestLeadingActressApply(CircularModelApply):
         return InstancesApply(nodes, edges)
 
 
-class BestLeadingActressList(TypeList[BestLeadingActress]):
-    _NODE = BestLeadingActress
+class CommandConfigList(TypeList[CommandConfig]):
+    _NODE = CommandConfig

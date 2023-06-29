@@ -29,20 +29,19 @@ class PersonApply(CircularModelApply):
     def _to_instances_apply(self, cache: set[str]) -> InstancesApply:
         if self.external_id in cache:
             return InstancesApply([], [])
+        node_data = dm.NodeOrEdgeData(
+            source=dm.ContainerId("IntegrationTestsImmutable", "Person"),
+            properties={
+                "name": self.name,
+                "birthYear": self.birth_year,
+            },
+        )
 
         this_node = dm.NodeApply(
             space=self.space,
             external_id=self.external_id,
             existing_version=self.existing_version,
-            sources=[
-                dm.NodeOrEdgeData(
-                    source=dm.ContainerId("IntegrationTestsImmutable", "Person"),
-                    properties={
-                        "name": self.name,
-                        "birthYear": self.birth_year,
-                    },
-                ),
-            ],
+            sources=[node_data],
         )
         nodes = [this_node]
         edges = []

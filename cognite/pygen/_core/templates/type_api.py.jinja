@@ -7,8 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client._constants import INSTANCES_LIST_LIMIT_DEFAULT
 
-from {{ sdk_name }}.client.data_classes import {{ view_name }}, {{ view_name }}Apply, {{ view_name }}List
-
+from ..data_classes import {{ view_name }}, {{ view_name }}Apply, {{ view_name }}List
 from ._core import TypeAPI
 
 {% if has_one_to_many %}
@@ -34,7 +33,9 @@ class {{ view_plural_pascal }}API(TypeAPI[{{ view_name }}, {{ view_name }}Apply,
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=({{ view_name }}Apply.space, external_id))
         else:
-            return self._client.data_modeling.instances.delete(nodes=[({{ view_name }}Apply.space, id) for id in external_id])
+            return self._client.data_modeling.instances.delete(
+                nodes=[({{ view_name }}Apply.space, id) for id in external_id],
+            )
 
     @overload
     def retrieve(self, external_id: str) -> {{ view_name }}:

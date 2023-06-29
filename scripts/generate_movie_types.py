@@ -12,7 +12,9 @@ def main():
 
     generator = pygen.SDKGenerator("movie_domain", "Movie")
     # view = c.data_modeling.views.retrieve(("IntegrationTestsImmutable", "Rating"))[0]
-    views = c.data_modeling.views.list(limit=-1)
+    views = c.data_modeling.data_models.retrieve(("IntegrationTestsImmutable", "Movie", "2"), inline_views=True)[
+        0
+    ].views
     for view in views:
         if view.name in ["Person", "Actor"]:
             # These classes are manually created and should not be overwritten

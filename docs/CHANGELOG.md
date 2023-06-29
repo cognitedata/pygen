@@ -13,6 +13,15 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.10.4] - 26-06-29
+
+### Fixed
+
+* Only use relative imports to avoid requiring to be top level package.
+* Writing a direct relation. (Earlier direct relation was treated as an edge, which is a bug).
+* Types with snake case names caused `flake8` errors are now fixed.
+* import `datetime` when one or more fields are of type `timestamp`.
+
 ## [0.10.3] - 26-06-28
 
 ### Fixed

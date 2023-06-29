@@ -23,3 +23,19 @@ def person_view(movie_model: dm.DataModel) -> dm.View:
 @pytest.fixture
 def actor_view(movie_model: dm.DataModel) -> dm.View:
     return next(v for v in movie_model.views if v.name == "Actor")
+
+
+@pytest.fixture
+def shop_model() -> dm.DataModel:
+    with DataModels.shop_model_pickle.open("rb") as f:
+        return pickle.load(f)[0]
+
+
+@pytest.fixture
+def case_view(shop_model) -> dm.View:
+    return next(v for v in shop_model.views if v.name == "Case")
+
+
+@pytest.fixture
+def command_config_view(shop_model) -> dm.View:
+    return next(v for v in shop_model.views if v.name == "Command_Config")
