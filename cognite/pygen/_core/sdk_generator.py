@@ -414,7 +414,13 @@ def properties_to_sources(properties: Iterable[dm.MappedProperty | dm.Connection
 
     output = []
     for container_id, container_props in properties_by_container_id.items():
-        prop_str = ",\n                ".join(f'"{p.name}": self.{to_snake(p.name)}' for p in container_props) + ","
+        prop_str = (
+            ",\n                ".join(
+                f'"{p.name}": self.{to_snake(p.name)}{".isoformat()" if isinstance(p.type, dm.Timestamp) else ""}'
+                for p in container_props
+            )
+            + ","
+        )
         output.append(
             """dm.NodeOrEdgeData(
             source=dm.ContainerId("%s", "%s"),

@@ -49,8 +49,8 @@ class CaseApply(CircularModelApply):
             properties={
                 "name": self.name,
                 "scenario": self.scenario,
-                "start_time": self.start_time,
-                "end_time": self.end_time,
+                "start_time": self.start_time.isoformat(),
+                "end_time": self.end_time.isoformat(),
                 "cut_files": self.cut_files,
                 "bid": self.bid,
                 "bid_history": self.bid_history,
