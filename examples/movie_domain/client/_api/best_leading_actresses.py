@@ -10,11 +10,11 @@ from ..data_classes import BestLeadingActress, BestLeadingActressApply, BestLead
 from ._core import TypeAPI
 
 
-class BestLeadingActressAPI(TypeAPI[BestLeadingActress, BestLeadingActressApply, BestLeadingActressList]):
+class BestLeadingActressesAPI(TypeAPI[BestLeadingActress, BestLeadingActressApply, BestLeadingActressList]):
     def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,
-            sources=dm.ViewId("IntegrationTestsImmutable", "BestLeadingActresss", "2"),
+            sources=dm.ViewId("IntegrationTestsImmutable", "BestLeadingActress", "2"),
             class_type=BestLeadingActress,
             class_apply_type=BestLeadingActressApply,
             class_list=BestLeadingActressList,
