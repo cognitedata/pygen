@@ -9,7 +9,7 @@ from cognite.client.credentials import OAuthClientCredentials
 from ._api.actors import ActorsAPI
 from ._api.best_directors import BestDirectorsAPI
 from ._api.best_leading_actors import BestLeadingActorsAPI
-from ._api.best_leading_actress import BestLeadingActressAPI
+from ._api.best_leading_actresses import BestLeadingActressesAPI
 from ._api.directors import DirectorsAPI
 from ._api.movies import MoviesAPI
 from ._api.nominations import NominationsAPI
@@ -38,7 +38,7 @@ class MovieClient:
         self.actors = ActorsAPI(client)
         self.best_directors = BestDirectorsAPI(client)
         self.best_leading_actors = BestLeadingActorsAPI(client)
-        self.best_leading_actress = BestLeadingActressAPI(client)
+        self.best_leading_actresses = BestLeadingActressesAPI(client)
         self.directors = DirectorsAPI(client)
         self.movies = MoviesAPI(client)
         self.nominations = NominationsAPI(client)

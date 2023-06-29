@@ -82,6 +82,8 @@ def to_snake(string: str, pluralize: bool = False, singularize: bool = False) ->
     'best_directors'
     >>> to_snake('BestDirectors', singularize=True)
     'best_director'
+    >>> to_snake('BestLeadingActress', pluralize=True)
+    'best_leading_actresses'
     """
     words = re.findall(r"[A-Z]?[a-z]+|[A-Z]+(?=[A-Z][a-z]|\d|\W|$)|\d+", string)
     if pluralize and singularize:
