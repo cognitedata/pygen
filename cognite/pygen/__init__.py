@@ -13,7 +13,7 @@ def write_sdk_to_disk(sdk: dict[Path, str], output_dir: Path):
         sdk: The generated SDK.
         output_dir: The output directory to write to.
     """
-    for path, content in sdk.items():
+    for file_path, file_content in sdk.items():
+        path = output_dir / file_path
         path.parent.mkdir(parents=True, exist_ok=True)
-        with path.open("w") as fh:
-            fh.write(content)
+        path.write_text(file_content)
