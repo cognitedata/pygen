@@ -36,7 +36,7 @@ class SDKGenerator:
         self._data_model_external_id = data_model.external_id
         self._data_model_version = data_model.version
 
-        client_dir = Path(self.top_level_package.replace(".", "/")) / "client"
+        client_dir = Path(self.top_level_package.replace(".", "/"))
         data_classes_dir = client_dir / "data_classes"
         api_dir = client_dir / "_api"
         sdk = {(api_dir / "__init__.py"): ""}
