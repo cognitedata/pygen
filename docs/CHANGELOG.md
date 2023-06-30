@@ -17,7 +17,18 @@ Changes are grouped as follows
 
 ### Fixed
 
-* The `.apply()` method failed to update nested nodes. This is now fixed.
+* The `.apply()` method failed to update nested nodes. This is now fixed. This was caused by the last fix in 0.10.4,
+  where there was an issue with relative vs absolute imports. As a result `--top-level-package` has been introduced
+  See below.
+
+### Changed
+
+* The argument `---sdk-name-snake` is renamed to `--top-level-package` and now is expected to contain the path to
+  the top level package. For example, `--top-level-package movie_sdk.client` will place the generated SDK in the
+  `movie_sdk` package and the client in the `movie_sdk.client` package. Earlier the `.client` was automatically
+  appended to the `---sdk-name-snake` argument.
+* The argument `--client-name-pascal` is renamed to `--client-name` and the word `Client` is no longer appended to it.
+
 
 ## [0.10.4] - 29-06-23
 
