@@ -51,4 +51,4 @@ def test_case_apply_and_delete(shop_client: ShopClient):
         assert len(result.edges) == 0
     finally:
         if result is not None:
-            shop_client.cases.delete([n.as_id() for n in result.nodes])
+            shop_client.cases.delete([n.external_id for n in result.nodes])
