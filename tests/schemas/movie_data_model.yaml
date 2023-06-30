@@ -24,9 +24,9 @@ views:
       description: null
       name: birthYear
       nullable: true
+      source: null
       type:
         list: false
-        source: null
         type: int32
     name:
       autoIncrement: false
@@ -38,10 +38,10 @@ views:
       description: null
       name: name
       nullable: false
+      source: null
       type:
         collation: ucs_basic
         list: false
-        source: null
         type: text
     roles:
       description: null
@@ -76,10 +76,10 @@ views:
       description: null
       name: name
       nullable: false
+      source: null
       type:
         collation: ucs_basic
         list: false
-        source: null
         type: text
     year:
       autoIncrement: false
@@ -91,9 +91,9 @@ views:
       description: null
       name: year
       nullable: false
+      source: null
       type:
         list: false
-        source: null
         type: int32
   space: IntegrationTestsImmutable
   usedFor: node
@@ -120,10 +120,10 @@ views:
       description: null
       name: name
       nullable: false
+      source: null
       type:
         collation: ucs_basic
         list: false
-        source: null
         type: text
     year:
       autoIncrement: false
@@ -135,9 +135,9 @@ views:
       description: null
       name: year
       nullable: false
+      source: null
       type:
         list: false
-        source: null
         type: int32
   space: IntegrationTestsImmutable
   usedFor: node
@@ -164,10 +164,10 @@ views:
       description: null
       name: name
       nullable: false
+      source: null
       type:
         collation: ucs_basic
         list: false
-        source: null
         type: text
     year:
       autoIncrement: false
@@ -179,9 +179,9 @@ views:
       description: null
       name: year
       nullable: false
+      source: null
       type:
         list: false
-        source: null
         type: int32
   space: IntegrationTestsImmutable
   usedFor: node
@@ -208,10 +208,10 @@ views:
       description: null
       name: name
       nullable: false
+      source: null
       type:
         collation: ucs_basic
         list: false
-        source: null
         type: text
     year:
       autoIncrement: false
@@ -223,9 +223,9 @@ views:
       description: null
       name: year
       nullable: false
+      source: null
       type:
         list: false
-        source: null
         type: int32
   space: IntegrationTestsImmutable
   usedFor: node
@@ -290,9 +290,9 @@ views:
       description: null
       name: wonOscar
       nullable: true
+      source: null
       type:
         list: false
-        source: null
         type: boolean
   space: IntegrationTestsImmutable
   usedFor: node
@@ -362,9 +362,9 @@ views:
       description: null
       name: wonOscar
       nullable: true
+      source: null
       type:
         list: false
-        source: null
         type: boolean
   space: IntegrationTestsImmutable
   usedFor: node
@@ -434,9 +434,9 @@ views:
       description: null
       name: wonOscar
       nullable: true
+      source: null
       type:
         list: false
-        source: null
         type: boolean
   space: IntegrationTestsImmutable
   usedFor: node
@@ -458,9 +458,9 @@ views:
       description: null
       name: score
       nullable: true
+      source: null
       type:
         list: false
-        source: null
         type: timeseries
     votes:
       autoIncrement: false
@@ -472,9 +472,9 @@ views:
       description: null
       name: votes
       nullable: true
+      source: null
       type:
         list: false
-        source: null
         type: timeseries
   space: IntegrationTestsImmutable
   usedFor: node
@@ -522,9 +522,9 @@ views:
       description: null
       name: meta
       nullable: true
+      source: null
       type:
         list: false
-        source: null
         type: json
     rating:
       autoIncrement: false
@@ -553,9 +553,9 @@ views:
       description: null
       name: releaseYear
       nullable: true
+      source: null
       type:
         list: false
-        source: null
         type: int32
     runTimeMinutes:
       autoIncrement: false
@@ -567,9 +567,9 @@ views:
       description: null
       name: runTimeMinutes
       nullable: true
+      source: null
       type:
         list: false
-        source: null
         type: float64
     title:
       autoIncrement: false
@@ -581,10 +581,10 @@ views:
       description: null
       name: title
       nullable: false
+      source: null
       type:
         collation: ucs_basic
         list: false
-        source: null
         type: text
   space: IntegrationTestsImmutable
   usedFor: node

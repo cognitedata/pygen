@@ -142,16 +142,16 @@ def test_property_to_edge_snippets(person_view: dm.View):
         (
             "read",
             [
-                "name: Optional[str] = None",
                 'birth_year: Optional[int] = Field(None, alias="birthYear")',
+                "name: Optional[str] = None",
                 "roles: list[str] = []",
             ],
         ),
         (
             "write",
             [
-                "name: str",
                 "birth_year: Optional[int] = None",
+                "name: str",
                 'roles: list[Union[str, "RoleApply"]] = []',
             ],
         ),
@@ -171,8 +171,8 @@ def test_create_sources(person_view: dm.View):
         """dm.NodeOrEdgeData(
             source=dm.ContainerId("IntegrationTestsImmutable", "Person"),
             properties={
-                "name": self.name,
                 "birthYear": self.birth_year,
+                "name": self.name,
             },
         )
 """

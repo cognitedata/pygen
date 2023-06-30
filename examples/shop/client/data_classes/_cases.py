@@ -16,30 +16,30 @@ __all__ = ["Case", "CaseApply", "CaseList"]
 
 class Case(DomainModel):
     space: ClassVar[str] = "IntegrationTestsImmutable"
-    name: Optional[str] = None
-    scenario: Optional[str] = None
-    start_time: Optional[datetime] = None
-    end_time: Optional[datetime] = None
-    commands: Optional[str] = None
-    cut_files: list[str] = None
+    arguments: Optional[str] = None
     bid: Optional[str] = None
     bid_history: list[str] = None
+    commands: Optional[str] = None
+    cut_files: list[str] = None
+    end_time: Optional[datetime] = None
+    name: Optional[str] = None
     run_status: Optional[str] = Field(None, alias="runStatus")
-    arguments: Optional[str] = None
+    scenario: Optional[str] = None
+    start_time: Optional[datetime] = None
 
 
 class CaseApply(CircularModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
-    name: str
-    scenario: Optional[str] = None
-    start_time: datetime
-    end_time: Optional[datetime] = None
-    commands: Optional[Union[str, "CommandConfigApply"]] = None
-    cut_files: list[str] = None
+    arguments: Optional[str] = None
     bid: Optional[str] = None
     bid_history: list[str] = None
+    commands: Optional[Union[str, "CommandConfigApply"]] = None
+    cut_files: list[str] = None
+    end_time: Optional[datetime] = None
+    name: str
     run_status: str
-    arguments: Optional[str] = None
+    scenario: Optional[str] = None
+    start_time: datetime
 
     def _to_instances_apply(self, cache: set[str]) -> InstancesApply:
         if self.external_id in cache:
@@ -47,15 +47,15 @@ class CaseApply(CircularModelApply):
         node_data = dm.NodeOrEdgeData(
             source=dm.ContainerId("IntegrationTestsImmutable", "Case"),
             properties={
-                "name": self.name,
-                "scenario": self.scenario,
-                "start_time": self.start_time.isoformat(),
-                "end_time": self.end_time.isoformat(),
-                "cut_files": self.cut_files,
+                "arguments": self.arguments,
                 "bid": self.bid,
                 "bid_history": self.bid_history,
+                "cut_files": self.cut_files,
+                "end_time": self.end_time.isoformat(),
+                "name": self.name,
                 "runStatus": self.run_status,
-                "arguments": self.arguments,
+                "scenario": self.scenario,
+                "start_time": self.start_time.isoformat(),
             },
         )
         if self.commands:
