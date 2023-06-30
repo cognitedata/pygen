@@ -1,0 +1,80 @@
+from __future__ import annotations
+{%  if fields.has_datetime %}
+from datetime import datetime{% endif %}
+{% if fields.import_dependencies %}from typing import TYPE_CHECKING, ClassVar, Optional, Union{% else %}from typing import ClassVar, Optional{% endif %}
+
+from cognite.client import data_modeling as dm{% if fields.import_pydantic_field %}
+from pydantic import Field{% endif %}
+
+from ._core import CircularModelApply, DomainModel, {% if fields.import_dependencies %}DomainModelApply, {% endif %}InstancesApply, TypeList
+
+{% if fields.import_dependencies %}if TYPE_CHECKING:{% for field in fields %}{% if field.is_edge %}
+    from ._{{ field.dependency_file }} import {{ field.dependency_class }}Apply{% endif %}{% endfor %}{% endif %}
+
+__all__ = ["{{ class_name }}", "{{ class_name }}Apply", "{{ class_name }}List"]
+
+
+class {{ class_name }}(DomainModel):
+    space: ClassVar[str] = "{{ space }}"{% for field in fields %}
+    {{ field.name }}: {{ field.as_type_hint('read') }}{% endfor %}
+
+
+class {{ class_name }}Apply(CircularModelApply):
+    space: ClassVar[str] = "{{ space }}"{% for field in fields %}
+    {{ field.name }}: {{ field.as_type_hint('write') }}{% endfor %}
+
+    def _to_instances_apply(self, cache: set[str]) -> InstancesApply:
+        if self.external_id in cache:
+            return InstancesApply([], [])
+        node_data = dm.NodeOrEdgeData(
+            source=dm.ContainerId("{{ space }}", "{{ view_name }}"),
+            properties={% raw %}{{% endraw %}{% for field in fields %}{% if not field.is_edges %}
+                "{{ field.prop.name }}": self.{{ field.name }},{% endif %}{% endfor %}
+            },
+        ){% for field in fields %}{% if field.is_edge and not field.is_list %}
+        if isinstance(self.{{ field.name }}, DomainModelApply):
+            instances = self.{{ field.name }}._to_instances_apply(cache)
+            nodes.extend(instances.nodes)
+            edges.extend(instances.edges){% endif %}{% endfor %}
+
+        this_node = dm.NodeApply(
+            space=self.space,
+            external_id=self.external_id,
+            existing_version=self.existing_version,
+            sources=[node_data],
+        )
+        nodes = [this_node]
+        edges = []
+{%  for field in fields %}{% if field.is_edges %}
+        for {{ field.variable }} in self.{{ field.name }}:
+            edge = self._create_{{field.variable}}_edge({{ field.variable }})
+            if edge.external_id not in cache:
+                edges.append(edge)
+                cache.add(edge.external_id)
+
+            if isinstance({{ field.variable }}, DomainModelApply):
+                instances = {{ field.variable }}._to_instances_apply(cache)
+                nodes.extend(instances.nodes)
+                edges.extend(instances.edges)
+{% endif %}{% endfor %}
+        return InstancesApply(nodes, edges)
+{%  for field in fields %}{% if field.is_edges %}
+    def _create_{{ field.variable }}_edge(self, {{ field.variable }}: Union[str, "{{ field.prop.source.external_id }}Apply"]) -> dm.EdgeApply:
+        if isinstance({{ field.variable }}, str):
+            end_node_ext_id = {{ field.variable }}
+        elif isinstance({{ field.variable }}, DomainModelApply):
+            end_node_ext_id = {{ field.variable }}.external_id
+        else:
+            raise TypeError(f"Expected str or {{ field.prop.source.external_id }}Apply, got {type({{ field.variable }})}")
+
+        return dm.EdgeApply(
+            space="{{ space }}",
+            external_id=f"{self.external_id}:{end_node_ext_id}",
+            type=dm.DirectRelationReference("{{ field.prop.type.space }}", "{{ field.prop.type.external_id }}"),
+            start_node=dm.DirectRelationReference(self.space, self.external_id),
+            end_node=dm.DirectRelationReference("{{ field.prop.source.space }}", end_node_ext_id),
+        )
+{% endif %}{% endfor %}
+
+class {{ class_name }}List(TypeList[{{ class_name }}]):
+    _NODE = {{ class_name }}

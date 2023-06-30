@@ -11,7 +11,7 @@ __all__ = ["CommandConfig", "CommandConfigApply", "CommandConfigList"]
 
 class CommandConfig(DomainModel):
     space: ClassVar[str] = "IntegrationTestsImmutable"
-    configs: list[str] = None
+    configs: list[str] = []
     source: Optional[str] = None
 
 

@@ -8,6 +8,7 @@ from typing import Literal
 
 from cognite.client import data_modeling as dm
 from cognite.client._version import __version__ as cognite_sdk_version
+from cognite.client.data_classes.data_modeling.data_types import ListablePropertyType
 from jinja2 import Environment, PackageLoader, select_autoescape
 from pydantic.version import VERSION as PYDANTIC_VERSION
 
@@ -39,12 +40,14 @@ class SDKGenerator:
         client_dir = Path(self.top_level_package.replace(".", "/"))
         data_classes_dir = client_dir / "data_classes"
         api_dir = client_dir / "_api"
+
         sdk = {(api_dir / "__init__.py"): ""}
         for view in data_model.views:
-            view_snake_plural = to_snake(view.name, pluralize=True)
+            file_name = to_snake(view.name, pluralize=True)
             try:
-                sdk[data_classes_dir / f"_{view_snake_plural}.py"] = self.view_to_data_classes(view)
-                sdk[api_dir / f"{view_snake_plural}.py"] = self.view_to_api(view)
+                data_class = DataClassGenerator(view)
+                sdk[data_classes_dir / f"_{file_name}.py"] = data_class.generate()
+                sdk[api_dir / f"{file_name}.py"] = self.view_to_api(view)
             except Exception as e:
                 print(f"Failed to generate SDK for view {view.name}: {e}")  # noqa
                 print(f"Skipping view {view.name}")  # noqa
@@ -52,6 +55,10 @@ class SDKGenerator:
                     self._view_names.remove(view.name)
                 if view.name in self._dependencies_by_view_name:
                     del self._dependencies_by_view_name[view.name]
+            else:
+                self._update_dependencies(data_class.fields, view.name)
+                self._view_names.add(view.name)
+
         sdk[client_dir / "_api_client.py"] = self.create_api_client()
         sdk[client_dir / "__init__.py"] = self.create_client_init()
         sdk[data_classes_dir / "__init__.py"] = self.create_data_classes_init()
@@ -84,42 +91,6 @@ class SDKGenerator:
                 data_model_version=self._data_model_version,
                 api_imports="\n".join(api_imports),
                 api_instantiations="\n        ".join(api_instantiations),
-            )
-            + "\n"
-        )
-
-    def view_to_data_classes(self, view: dm.View) -> str:
-        type_data = self._env.get_template("type_data.py.jinja")
-        fields = properties_to_fields(view.properties.values())
-        self._update_dependencies(fields, view.name)
-        self._view_names.add(view.name)
-
-        sources = properties_to_sources(view.properties.values())
-        create_edges = self.properties_to_create_edge_methods(view.properties.values())
-        add_edges = self.properties_to_add_edges(view.properties.values())
-        direct_relations = self.properties_to_direct_relations_in_node_data(view.properties.values())
-        circular_imports = dependencies_to_imports(self._dependencies_by_view_name.get(view.name, set()))
-        has_datetime = any(f.type == "datetime" for f in fields)
-        has_circular_imports = len(circular_imports) > 0
-
-        read_type_hints = [f.as_type_hint("read") for f in fields]
-        write_type_hints = [f.as_type_hint("write") for f in fields]
-        has_alias = any("Field" in hint for hint in read_type_hints)
-
-        return (
-            type_data.render(
-                view_name=to_pascal(view.name, singularize=True),
-                view_space=view.space,
-                read_fields="\n    ".join(read_type_hints),
-                write_fields="\n    ".join(write_type_hints),
-                sources=f',\n{" "*16}'.join(sources),
-                circular_imports=circular_imports,
-                create_edges="\n\n".join(create_edges),
-                add_edges="\n\n".join(add_edges),
-                add_direct_relations="\n\n".join(direct_relations),
-                has_datetime=has_datetime,
-                has_circular_imports=has_circular_imports,
-                has_alias=has_alias,
             )
             + "\n"
         )
@@ -239,57 +210,137 @@ __all__ = [
 ]
 """
 
-    def properties_to_create_edge_methods(self, properties: Iterable[dm.ConnectionDefinition]) -> list[str]:
-        create_edge = self._env.get_template("type_data_create_edge.py.jinja")
-        create_methods = []
-        for prop in properties:
-            if isinstance(prop, dm.SingleHopConnectionDefinition):
-                create_methods.append(
-                    create_edge.render(
-                        edge_snake=to_snake(prop.name, singularize=True),
-                        # Todo Avoid assuming that nodes and edges are in the same space.
-                        space=prop.source.space,
-                        edge_pascal=to_pascal(prop.name, singularize=True),
-                        type_ext_id=prop.type.external_id,
-                    )
-                )
-        return create_methods
 
-    def properties_to_add_edges(self, properties: Iterable[dm.MappedProperty | dm.ConnectionDefinition]) -> list[str]:
-        add_edges = self._env.get_template("type_data_add_edges.py.jinja")
-        add_edge = self._env.get_template("type_data_add_edge.py.jinja")
+@dataclass
+class Field:
+    name: str
+    read_type: str
+    is_list: bool
+    is_nullable: bool
+    default: str | None
+    prop: dm.MappedProperty | dm.ConnectionDefinition
+    write_type: str | None = None
+    is_edge: bool = False
+    variable: str | None = None
+    dependency_class: str | None = None
+    dependency_file: str | None = None
 
-        add_snippets = []
-        for prop in properties:
-            if isinstance(prop, dm.SingleHopConnectionDefinition):
-                add_snippets.append(
-                    add_edges.render(
-                        edge_name=prop.name,
-                        edge_snake=to_snake(prop.name, singularize=True),
-                    )
-                )
-            elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation):
-                add_snippets.append(
-                    add_edge.render(
-                        edge_name=prop.name,
-                    )
-                )
+    @property
+    def is_edges(self) -> bool:
+        return self.is_edge and self.is_list
 
-        return add_snippets
+    @classmethod
+    def from_property(cls, property_: dm.MappedProperty | dm.ConnectionDefinition) -> Field:
+        if isinstance(property_, dm.MappedProperty) and not isinstance(property_.type, dm.DirectRelation):
+            # Is primary field
+            is_list = isinstance(property_.type, ListablePropertyType) and property_.type.is_list
+            name = to_snake(property_.name, singularize=not is_list, pluralize=is_list)
+            type_ = _to_python_type(property_.type)
+            is_nullable = property_.nullable
+            default = property_.default_value or ("[]" if is_list else ("None" if is_nullable else None))
+            variable = to_snake(property_.name, singularize=True) if is_list else None
+            return cls(name, type_, is_list, is_nullable, default, property_, write_type=type_, variable=variable)
+        elif isinstance(property_, dm.MappedProperty):
+            # Edge One to One
+            name = to_snake(property_.name, singularize=True)
+            dependency_class = to_pascal(property_.source.external_id, singularize=True)
+            dependency_file = to_snake(property_.source.external_id, pluralize=True)
+            write_type = f'Union[str, "{dependency_class}Apply"]'
+            return cls(
+                name,
+                "str",
+                is_list=False,
+                is_nullable=property_.nullable,
+                write_type=write_type,
+                default="None",
+                is_edge=True,
+                prop=property_,
+                dependency_class=dependency_class,
+                dependency_file=dependency_file,
+            )
+        elif isinstance(property_, dm.SingleHopConnectionDefinition):
+            # One to Many
+            name = to_snake(property_.name, pluralize=True)
+            dependency_class = to_pascal(property_.source.external_id, singularize=True)
+            dependency_file = to_snake(property_.source.external_id, pluralize=True)
+            write_type = f'Union[str, "{dependency_class}Apply"]'
+            return cls(
+                name,
+                "str",
+                is_list=True,
+                is_nullable=True,
+                write_type=write_type,
+                default="[]",
+                is_edge=True,
+                variable=to_snake(property_.name, singularize=True),
+                prop=property_,
+                dependency_class=dependency_class,
+                dependency_file=dependency_file,
+            )
+        else:
+            raise NotImplementedError(f"Property type={type(property_)} is not supported")
 
-    def properties_to_direct_relations_in_node_data(
-        self, properties: Iterable[dm.MappedProperty | dm.ConnectionDefinition]
-    ) -> list[str]:
-        direct_relation = []
-        for prop in properties:
-            if isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation):
-                set_direct_relation = f"""        if self.{prop.name}:
-            node_data.properties["{prop.name}"] = {{
-                "space": "{prop.source.space}",
-                "externalId": self.{prop.name} if isinstance(self.{prop.name}, str) else self.{prop.name}.external_id,
-            }}"""
-                direct_relation.append(set_direct_relation)
-        return direct_relation
+    def as_type_hint(self, field_type: Literal["read", "write"]) -> str:
+        is_nullable = self.is_nullable or (field_type == "read")
+        default = self.default
+        if self.name != self.prop.name and field_type == "read":
+            default = f'Field({default}, alias="{self.prop.name}")'
+
+        rhs = f" = {default}" if is_nullable else ""
+
+        type_ = self.read_type if field_type == "read" else self.write_type
+        if self.is_list:
+            type_ = f"list[{type_}]"
+
+        if is_nullable and not type_.startswith("list"):
+            type_ = f"Optional[{type_}]"
+
+        return f"{type_}{rhs}"
+
+
+@dataclass
+class Fields:
+    data: list[Field]
+
+    def __iter__(self):
+        return iter(self.data)
+
+    @property
+    def import_pydantic_field(self) -> bool:
+        return any("Field" in field.as_type_hint("read") for field in self.data)
+
+    @property
+    def import_dependencies(self) -> bool:
+        return any(field.is_edge for field in self.data)
+
+    @property
+    def has_datetime(self) -> bool:
+        return any("datetime" in field.read_type for field in self.data)
+
+
+class DataClassGenerator:
+    def __init__(self, view: dm.View):
+        self._view = view
+        self._env = Environment(
+            loader=PackageLoader("cognite.pygen._core", "data_class_templates"),
+            autoescape=select_autoescape(),
+        )
+        self.fields = Fields([Field.from_property(prop) for prop in view.properties.values()])
+        self.view_name = view.name
+        self.class_name = to_pascal(view.name, singularize=True)
+        self.space = view.space
+
+    def generate(self) -> str:
+        type_data = self._env.get_template("type_data.py.jinja")
+
+        return (
+            type_data.render(class_name=self.class_name, fields=self.fields, space=self.space, view_name=self.view_name)
+            + "\n"
+        )
+
+
+class APIGenerator:
+    ...
 
 
 @dataclass
@@ -319,60 +370,6 @@ def property_to_edge_snippets(prop: dm.ConnectionDefinition | dm.MappedProperty,
     raise NotImplementedError(f"Edge API for type={type(prop)} is not implemented")
 
 
-@dataclass
-class Field:
-    source_name: str
-    type: str
-    default: str
-    is_nullable: bool
-    is_one_to_many: bool = False
-    edge_end_node_external_id: str | None = None
-
-    @property
-    def snake_name(self):
-        return to_snake(self.source_name)
-
-    @property
-    def is_edge(self) -> bool:
-        return self.edge_end_node_external_id is not None
-
-    @classmethod
-    def from_property(cls, property_: dm.MappedProperty | dm.ConnectionDefinition) -> Field:
-        if isinstance(property_, dm.MappedProperty) and not isinstance(property_.type, dm.DirectRelation):
-            type_ = _to_python_type(property_.type)
-            default = property_.default_value if isinstance(property_.type, dm.PropertyType) else "[]"
-            is_nullable = isinstance(property_.type, dm.DirectRelationReference) or property_.nullable
-            return cls(property_.name, type_, default, is_nullable)
-        elif isinstance(property_, dm.SingleHopConnectionDefinition):
-            # One to Many
-            return cls(property_.name, "list[str]", "[]", True, True, property_.source.external_id)
-        elif isinstance(property_, dm.MappedProperty) and isinstance(property_.type, dm.DirectRelation):
-            # One to One
-            return cls(property_.name, "str", "None", True, False, property_.source.external_id)
-        else:
-            raise NotImplementedError(f"Property type={type(property_)} is not supported")
-
-    def as_type_hint(self, field_type: Literal["read", "write"]) -> str:
-        is_nullable = self.is_nullable or (field_type == "read")
-        default = self.default
-        snake_name = self.snake_name
-        if snake_name != self.source_name and field_type == "read":
-            default = f'Field({default}, alias="{self.source_name}")'
-
-        rhs = f" = {default}" if is_nullable else ""
-
-        type_ = self.type
-        if self.is_edge and field_type == "write":
-            type_ = f'Union[str, "{to_pascal(self.edge_end_node_external_id, singularize=True)}Apply"]'
-            if self.is_one_to_many:
-                type_ = f"list[{type_}]"
-
-        if is_nullable and not type_.startswith("list"):
-            type_ = f"Optional[{type_}]"
-
-        return f"{snake_name}: {type_}{rhs}"
-
-
 def properties_to_fields(
     properties: Iterable[dm.MappedProperty | dm.ConnectionDefinition],
 ) -> list[Field]:
@@ -380,8 +377,6 @@ def properties_to_fields(
 
 
 def _to_python_type(type_: dm.DirectRelationReference | dm.PropertyType) -> str:
-    if isinstance(type_, dm.DirectRelationReference):
-        return "list[str]"
     if isinstance(type_, (dm.Int32, dm.Int64)):
         out_type = "int"
     elif isinstance(type_, dm.Boolean):
@@ -394,44 +389,12 @@ def _to_python_type(type_: dm.DirectRelationReference | dm.PropertyType) -> str:
         out_type = "datetime"
     elif isinstance(type_, dm.Json):
         out_type = "dict"
-    elif isinstance(type_, (dm.Text, dm.DirectRelation, dm.CDFExternalIdReference)):
+    elif isinstance(type_, (dm.Text, dm.DirectRelation, dm.CDFExternalIdReference, dm.DirectRelationReference)):
         out_type = "str"
     else:
         raise ValueError(f"Unknown type {type_}")
 
-    # Todo use this when SDK has exposed the type
-    # if isinstance(type_, dm.ListablePropertyType) and type_.is_list:
-    if hasattr(type_, "is_list") and type_.is_list:
-        out_type = "list[str]"
     return out_type
-
-
-def properties_to_sources(properties: Iterable[dm.MappedProperty | dm.ConnectionDefinition]) -> list[str]:
-    properties_by_container_id: dict[dm.ContainerId, list[dm.MappedProperty]] = defaultdict(list)
-    for property_ in properties:
-        if isinstance(property_, dm.MappedProperty) and not isinstance(property_.type, dm.DirectRelation):
-            properties_by_container_id[property_.container].append(property_)
-
-    output = []
-    for container_id, container_props in properties_by_container_id.items():
-        prop_str = (
-            ",\n                ".join(
-                f'"{p.name}": self.{to_snake(p.name)}{".isoformat()" if isinstance(p.type, dm.Timestamp) else ""}'
-                for p in container_props
-            )
-            + ","
-        )
-        output.append(
-            """dm.NodeOrEdgeData(
-            source=dm.ContainerId("%s", "%s"),
-            properties={
-                %s
-            },
-        )
-"""
-            % (container_id.space, container_id.external_id, prop_str)
-        )
-    return output
 
 
 def dependencies_to_imports(dependencies: set[str]) -> str:
