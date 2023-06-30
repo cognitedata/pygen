@@ -16,8 +16,7 @@ class TestSchemas:
 
 class DataModels:
     movie_model = schemas_dir / "movie_data_model.yaml"
-    movie_model_pickle = schemas_dir / "movie_data_model_6.5.3.pickle"
-    shop_model_pickle = schemas_dir / "shop_data_model_6.5.5.pickle"
+    shop_model = schemas_dir / "shop_data_model.yaml"
 
 
 class ShopSDKFiles:

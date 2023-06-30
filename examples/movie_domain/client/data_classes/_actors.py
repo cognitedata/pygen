@@ -17,18 +17,18 @@ __all__ = ["Actor", "ActorApply", "ActorList"]
 
 class Actor(DomainModel):
     space: ClassVar[str] = "IntegrationTestsImmutable"
-    won_oscar: Optional[bool] = Field(None, alias="wonOscar")
-    person: Optional[str] = None
     movies: list[str] = []
     nomination: list[str] = []
+    person: Optional[str] = None
+    won_oscar: Optional[bool] = Field(None, alias="wonOscar")
 
 
 class ActorApply(CircularModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
-    won_oscar: Optional[bool] = None
-    person: Optional[Union[str, "PersonApply"]] = None
     movies: list[Union[str, "MovieApply"]] = []
     nomination: list[Union[str, "NominationApply"]] = []
+    person: Optional[Union[str, "PersonApply"]] = None
+    won_oscar: Optional[bool] = None
 
     def _to_instances_apply(self, cache: set[str]) -> InstancesApply:
         if self.external_id in cache:
@@ -53,11 +53,6 @@ class ActorApply(CircularModelApply):
         nodes = [this_node]
         edges = []
 
-        if isinstance(self.person, DomainModelApply):
-            instances = self.person._to_instances_apply(cache)
-            nodes.extend(instances.nodes)
-            edges.extend(instances.edges)
-
         for movie in self.movies:
             edge = self._create_movie_edge(movie)
             if edge.external_id not in cache:
@@ -79,6 +74,11 @@ class ActorApply(CircularModelApply):
                 instances = nomination._to_instances_apply(cache)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
+
+        if isinstance(self.person, DomainModelApply):
+            instances = self.person._to_instances_apply(cache)
+            nodes.extend(instances.nodes)
+            edges.extend(instances.edges)
 
         return InstancesApply(nodes, edges)
 

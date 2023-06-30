@@ -1,9 +1,0 @@
-type Case {
-  scenario: Scenario
-  start_time: String!
-  end_time: String!
-}
-
-type Scenario {
-  name: String!
-}

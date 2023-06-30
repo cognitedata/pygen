@@ -1,18 +1,15 @@
-import pickle
-
 import pytest
 from cognite.client import data_modeling as dm
+from yaml import safe_load
 
 from tests.constants import DataModels
 
 
 @pytest.fixture(scope="session")
 def movie_model() -> dm.DataModel:
-    # with DataModels.movie_model.open("r") as f:
-    #     raw = safe_load(f)
-    # return dm.DataModel.load(raw)
-    with DataModels.movie_model_pickle.open("rb") as f:
-        return pickle.load(f)[0]
+    with DataModels.movie_model.open("r") as f:
+        raw = safe_load(f)
+    return dm.DataModel.load(raw)
 
 
 @pytest.fixture(scope="session")
@@ -27,8 +24,9 @@ def actor_view(movie_model: dm.DataModel) -> dm.View:
 
 @pytest.fixture
 def shop_model() -> dm.DataModel:
-    with DataModels.shop_model_pickle.open("rb") as f:
-        return pickle.load(f)[0]
+    with DataModels.shop_model.open("r") as f:
+        raw = safe_load(f)
+    return dm.DataModel.load(raw)
 
 
 @pytest.fixture

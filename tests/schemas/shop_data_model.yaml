@@ -1,0 +1,205 @@
+createdTime: 1687962394007
+description: 'A test model with snake_case and CDF specific fields. '
+externalId: SHOP_Model
+isGlobal: false
+lastUpdatedTime: 1687962394007
+name: SHOP_Model
+space: IntegrationTestsImmutable
+version: '2'
+views:
+- createdTime: 1687962393258
+  externalId: Case
+  isGlobal: false
+  lastUpdatedTime: 1687962393258
+  name: Case
+  properties:
+    arguments:
+      autoIncrement: false
+      container:
+        externalId: Case
+        space: IntegrationTestsImmutable
+      containerPropertyIdentifier: arguments
+      defaultValue: null
+      description: null
+      name: arguments
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    bid:
+      autoIncrement: false
+      container:
+        externalId: Case
+        space: IntegrationTestsImmutable
+      containerPropertyIdentifier: bid
+      defaultValue: null
+      description: null
+      name: bid
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: sequence
+    bid_history:
+      autoIncrement: false
+      container:
+        externalId: Case
+        space: IntegrationTestsImmutable
+      containerPropertyIdentifier: bid_history
+      defaultValue: null
+      description: null
+      name: bid_history
+      nullable: true
+      source: null
+      type:
+        list: true
+        type: sequence
+    commands:
+      autoIncrement: false
+      container:
+        externalId: Case
+        space: IntegrationTestsImmutable
+      containerPropertyIdentifier: commands
+      defaultValue: null
+      description: null
+      name: commands
+      nullable: true
+      type:
+        container: null
+        source:
+          externalId: Command_Config
+          space: IntegrationTestsImmutable
+          version: 4727b5ad34b608
+        type: direct
+    cut_files:
+      autoIncrement: false
+      container:
+        externalId: Case
+        space: IntegrationTestsImmutable
+      containerPropertyIdentifier: cut_files
+      defaultValue: null
+      description: null
+      name: cut_files
+      nullable: true
+      source: null
+      type:
+        list: true
+        type: file
+    end_time:
+      autoIncrement: false
+      container:
+        externalId: Case
+        space: IntegrationTestsImmutable
+      containerPropertyIdentifier: end_time
+      defaultValue: null
+      description: null
+      name: end_time
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: timestamp
+    name:
+      autoIncrement: false
+      container:
+        externalId: Case
+        space: IntegrationTestsImmutable
+      containerPropertyIdentifier: name
+      defaultValue: null
+      description: null
+      name: name
+      nullable: false
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    runStatus:
+      autoIncrement: false
+      container:
+        externalId: Case
+        space: IntegrationTestsImmutable
+      containerPropertyIdentifier: runStatus
+      defaultValue: null
+      description: null
+      name: runStatus
+      nullable: false
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    scenario:
+      autoIncrement: false
+      container:
+        externalId: Case
+        space: IntegrationTestsImmutable
+      containerPropertyIdentifier: scenario
+      defaultValue: null
+      description: null
+      name: scenario
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    start_time:
+      autoIncrement: false
+      container:
+        externalId: Case
+        space: IntegrationTestsImmutable
+      containerPropertyIdentifier: start_time
+      defaultValue: null
+      description: null
+      name: start_time
+      nullable: false
+      source: null
+      type:
+        list: false
+        type: timestamp
+  space: IntegrationTestsImmutable
+  usedFor: node
+  version: 366b75cc4e699f
+  writable: true
+- createdTime: 1687962231207
+  externalId: Command_Config
+  isGlobal: false
+  lastUpdatedTime: 1687962231207
+  name: Command_Config
+  properties:
+    configs:
+      autoIncrement: false
+      container:
+        externalId: Command_Config
+        space: IntegrationTestsImmutable
+      containerPropertyIdentifier: configs
+      defaultValue: null
+      description: null
+      name: configs
+      nullable: false
+      source: null
+      type:
+        collation: ucs_basic
+        list: true
+        type: text
+    source:
+      autoIncrement: false
+      container:
+        externalId: Command_Config
+        space: IntegrationTestsImmutable
+      containerPropertyIdentifier: source
+      defaultValue: null
+      description: null
+      name: source
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: file
+  space: IntegrationTestsImmutable
+  usedFor: node
+  version: 4727b5ad34b608
+  writable: true
