@@ -13,6 +13,13 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.10.6] - 30-06-23
+
+### Fixed
+
+* The paths for the generated SDK and client were not correctly set. This is now fixed. This caused a `ModuleNotFoundError`
+  when trying to import from the generated SDK.
+
 ## [0.10.5] - 30-06-23
 
 ### Fixed
