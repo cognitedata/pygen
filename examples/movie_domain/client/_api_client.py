@@ -20,7 +20,7 @@ from ._api.roles import RolesAPI
 
 class MovieClient:
     """
-    Movie Client
+    MovieClient
 
     Generated with:
         pygen = 0.10.5

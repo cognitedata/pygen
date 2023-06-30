@@ -9,9 +9,9 @@ from cognite.client.credentials import OAuthClientCredentials
 {{ api_imports }}
 
 
-class {{ client_name_pascal }}Client:
+class {{ client_name_pascal }}:
     """
-    {{ client_name_pascal }} Client
+    {{ client_name_pascal }}
 
     Generated with:
         pygen = {{ pygen_version }}
@@ -31,7 +31,7 @@ class {{ client_name_pascal }}Client:
     @classmethod
     def azure_project(
         cls, tenant_id: str, client_id: str, client_secret: str, cdf_cluster: str, project: str
-    ) -> {{ client_name_pascal }}Client:
+    ) -> {{ client_name_pascal }}:
         base_url = f"https://{cdf_cluster}.cognitedata.com/"
         credentials = OAuthClientCredentials(
             token_url=f"https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/token",
@@ -49,7 +49,7 @@ class {{ client_name_pascal }}Client:
         return cls(config)
 
     @classmethod
-    def from_toml(cls, file_path: Path | str) -> {{ client_name_pascal }}Client:
+    def from_toml(cls, file_path: Path | str) -> {{ client_name_pascal }}:
         import toml
 
         return cls.azure_project(**toml.load(file_path)["cognite"])

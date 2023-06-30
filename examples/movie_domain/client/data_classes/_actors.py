@@ -53,7 +53,7 @@ class ActorApply(CircularModelApply):
         nodes = [this_node]
         edges = []
 
-        if self.person is not None and isinstance(self.person, DomainModelApply):
+        if isinstance(self.person, DomainModelApply):
             instances = self.person._to_instances_apply(cache)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)

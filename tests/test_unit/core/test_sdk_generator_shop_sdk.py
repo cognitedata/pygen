@@ -9,7 +9,7 @@ from tests.constants import ShopSDKFiles
 
 @pytest.fixture
 def sdk_generator():
-    return SDKGenerator("movie_domain", "Movie")
+    return SDKGenerator("shop.client", "ShopClient")
 
 
 def test_create_view_data_classes_case(sdk_generator: SDKGenerator, case_view: dm.View):

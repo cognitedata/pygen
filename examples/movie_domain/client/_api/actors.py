@@ -7,7 +7,8 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client._constants import INSTANCES_LIST_LIMIT_DEFAULT
 
-from ..data_classes import Actor, ActorApply, ActorList
+from movie_domain.client.data_classes import Actor, ActorApply, ActorList
+
 from ._core import TypeAPI
 
 

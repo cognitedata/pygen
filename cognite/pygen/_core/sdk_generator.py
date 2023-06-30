@@ -17,9 +17,9 @@ from cognite.pygen.utils.text import to_pascal, to_snake
 
 
 class SDKGenerator:
-    def __init__(self, sdk_name: str, client_name_pascal: str):
-        self.sdk_name = sdk_name
-        self.client_name_pascal = client_name_pascal
+    def __init__(self, top_level_package: str, client_name: str):
+        self.top_level_package = top_level_package
+        self.client_name = client_name
         self._env = Environment(
             loader=PackageLoader("cognite.pygen._core", "templates"),
             autoescape=select_autoescape(),
@@ -36,7 +36,7 @@ class SDKGenerator:
         self._data_model_external_id = data_model.external_id
         self._data_model_version = data_model.version
 
-        client_dir = Path(self.sdk_name) / "client"
+        client_dir = Path(self.top_level_package) / "client"
         data_classes_dir = client_dir / "data_classes"
         api_dir = client_dir / "_api"
         sdk = {(api_dir / "__init__.py"): ""}
@@ -61,11 +61,11 @@ class SDKGenerator:
 
     def create_api_core(self) -> str:
         api_core = self._env.get_template("_core_api.py.jinja")
-        return api_core.render(sdk_name=self.sdk_name)
+        return api_core.render(top_level_package=self.top_level_package)
 
     def create_client_init(self) -> str:
         client_init = self._env.get_template("_client_init.py.jinja")
-        return client_init.render(client_name_pascal=self.client_name_pascal)
+        return client_init.render(client_name_pascal=self.client_name)
 
     def create_api_client(self) -> str:
         api_client = self._env.get_template("_api_client.py.jinja")
@@ -75,7 +75,7 @@ class SDKGenerator:
 
         return (
             api_client.render(
-                client_name_pascal=self.client_name_pascal,
+                client_name_pascal=self.client_name,
                 pygen_version=__version__,
                 cognite_sdk_version=cognite_sdk_version,
                 pydantic_version=PYDANTIC_VERSION,
@@ -142,7 +142,7 @@ class SDKGenerator:
 
         view_plural_snake = to_snake(view.name, pluralize=True)
         return type_api.render(
-            sdk_name=self.sdk_name,
+            top_level_package=self.top_level_package,
             view_name=to_pascal(view.name, singularize=True),
             view_snake=to_snake(view.name),
             view_space=view.space,

@@ -72,7 +72,7 @@ class CaseApply(CircularModelApply):
         nodes = [this_node]
         edges = []
 
-        if self.commands is not None and isinstance(self.commands, DomainModelApply):
+        if isinstance(self.commands, DomainModelApply):
             instances = self.commands._to_instances_apply(cache)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
