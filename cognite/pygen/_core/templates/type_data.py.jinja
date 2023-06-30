@@ -6,7 +6,7 @@ from datetime import datetime{% endif %}
 from cognite.client import data_modeling as dm{% if  has_alias %}
 from pydantic import Field{% endif %}
 
-from ._core import CircularModelApply, DomainModel, InstancesApply, TypeList
+from ._core import CircularModelApply, DomainModel, {% if has_circular_imports %}DomainModelApply, {% endif %}InstancesApply, TypeList
 {% if has_circular_imports %}
 {{ circular_imports }}{% endif %}
 __all__ = ["{{ view_name }}", "{{ view_name }}Apply", "{{ view_name }}List"]

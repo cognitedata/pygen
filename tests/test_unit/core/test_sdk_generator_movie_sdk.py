@@ -21,7 +21,7 @@ from tests.constants import MovieSDKFiles, examples_dir
 
 @pytest.fixture
 def sdk_generator():
-    return SDKGenerator("movie_domain", "Movie")
+    return SDKGenerator("movie_domain.client", "MovieClient")
 
 
 @pytest.mark.skip("Need to implement a AST comparison function as order of fields/methods/functions are not important")
@@ -97,7 +97,7 @@ def test_create_view_api_classes_actors(sdk_generator: SDKGenerator, actor_view:
 
 def test_property_to_edge_api_person_roles(sdk_generator: SDKGenerator, person_view: dm.View):
     # Arrange
-    expected = "\n".join(MovieSDKFiles.persons_api.read_text().split("\n")[13:44])
+    expected = "\n".join(MovieSDKFiles.persons_api.read_text().split("\n")[14:45])
 
     # Act
     actual = sdk_generator.property_to_edge_api(
@@ -110,7 +110,7 @@ def test_property_to_edge_api_person_roles(sdk_generator: SDKGenerator, person_v
 
 def test_property_to_edges_helper(sdk_generator: SDKGenerator, person_view: dm.View):
     # Arrange
-    expected = "\n".join(MovieSDKFiles.persons_api.read_text().split("\n")[99:109])
+    expected = "\n".join(MovieSDKFiles.persons_api.read_text().split("\n")[100:110])
 
     # Act
     actual = sdk_generator.property_to_edge_helper(person_view.properties["roles"], view_name="Person")

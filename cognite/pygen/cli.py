@@ -30,9 +30,9 @@ if _has_typer:
         client_secret: Annotated[str, typer.Option(..., help="Azure Client Secret for connecting to CDF")],
         cdf_cluster: Annotated[str, typer.Option(..., help="CDF Cluster to connect to")],
         cdf_project: Annotated[str, typer.Option(..., help="CDF Project to connect to")],
-        output_dir: str = typer.Option(Path.cwd(), help="Output directory for generated SDK"),
-        sdk_name_snake: str = typer.Option("my_domain", help="Package name for the generated client."),
-        client_name_pascal: str = typer.Option("MyClient", help="Client name for the generated client."),
+        output_dir: Path = typer.Option(Path.cwd(), help="Output directory for generated SDK"),
+        top_level_package: str = typer.Option("my_domain.client", help="Package name for the generated client."),
+        client_name: str = typer.Option("MyClient", help="Client name for the generated client."),
     ):
         base_url = f"https://{cdf_cluster}.cognitedata.com/"
         credentials = OAuthClientCredentials(
@@ -60,7 +60,7 @@ if _has_typer:
             typer.echo(f"Cannot find {model_id}")
             raise typer.Exit(code=1) from e
         typer.echo(f"Successfully retrieved data model {space}/{external_id}/{version}")
-        sdk_generator = SDKGenerator(sdk_name_snake, client_name_pascal)
+        sdk_generator = SDKGenerator(top_level_package, client_name)
         sdk = sdk_generator.data_model_to_sdk(data_model)
         typer.echo(f"Writing SDK to {output_dir}")
         write_sdk_to_disk(sdk, output_dir)

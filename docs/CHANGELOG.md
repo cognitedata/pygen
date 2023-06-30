@@ -13,7 +13,24 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## [0.10.4] - 26-06-29
+## [0.10.5] - 30-06-23
+
+### Fixed
+
+* The `.apply()` method failed to update nested nodes. This is now fixed. This was caused by the last fix in 0.10.4,
+  where there was an issue with relative vs absolute imports. As a result `--top-level-package` has been introduced
+  See below.
+
+### Changed
+
+* The argument `---sdk-name-snake` is renamed to `--top-level-package` and now is expected to contain the path to
+  the top level package. For example, `--top-level-package movie_sdk.client` will place the generated SDK in the
+  `movie_sdk` package and the client in the `movie_sdk.client` package. Earlier the `.client` was automatically
+  appended to the `---sdk-name-snake` argument.
+* The argument `--client-name-pascal` is renamed to `--client-name` and the word `Client` is no longer appended to it.
+
+
+## [0.10.4] - 29-06-23
 
 ### Fixed
 
@@ -22,26 +39,26 @@ Changes are grouped as follows
 * Types with snake case names caused `flake8` errors are now fixed.
 * import `datetime` when one or more fields are of type `timestamp`.
 
-## [0.10.3] - 26-06-28
+## [0.10.3] - 28-06-23
 
 ### Fixed
 
 * Compatible with `cognite-sdk>=6.5`
 
-## [0.10.2] - 26-06-26
+## [0.10.2] - 26-06-23
 
 ### Fixed
 
 * Bug when trying to write an edge set to `None` in an Apply class. It caused a `TypeError` to be raised. Now, an edge
   set to `None` is ignored.
 
-## [0.10.1] - 26-06-26
+## [0.10.1] - 26-06-23
 
 ### Fixed
 
 * Workaround for missing `inline_views` in `data_modeling.data_models.retrieve` in `cognite-sdk`.
 
-## [0.10.0] - 26-06-26
+## [0.10.0] - 26-06-23
 
 A complete rewrite of the package. It is now DMS based instead of graphql schema.
 

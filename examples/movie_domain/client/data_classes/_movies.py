@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, ClassVar, Optional, Union
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import CircularModelApply, DomainModel, InstancesApply, TypeList
+from ._core import CircularModelApply, DomainModel, DomainModelApply, InstancesApply, TypeList
 
 if TYPE_CHECKING:
     from ._actors import ActorApply
@@ -62,11 +62,10 @@ class MovieApply(CircularModelApply):
         nodes = [this_node]
         edges = []
 
-        if self.rating is not None:
-            if isinstance(self.rating, CircularModelApply):
-                instances = self.rating._to_instances_apply(cache)
-                nodes.extend(instances.nodes)
-                edges.extend(instances.edges)
+        if self.rating is not None and isinstance(self.rating, DomainModelApply):
+            instances = self.rating._to_instances_apply(cache)
+            nodes.extend(instances.nodes)
+            edges.extend(instances.edges)
 
         for actor in self.actors:
             edge = self._create_actor_edge(actor)
@@ -74,7 +73,7 @@ class MovieApply(CircularModelApply):
                 edges.append(edge)
                 cache.add(edge.external_id)
 
-            if isinstance(actor, CircularModelApply):
+            if isinstance(actor, DomainModelApply):
                 instances = actor._to_instances_apply(cache)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
@@ -85,7 +84,7 @@ class MovieApply(CircularModelApply):
                 edges.append(edge)
                 cache.add(edge.external_id)
 
-            if isinstance(director, CircularModelApply):
+            if isinstance(director, DomainModelApply):
                 instances = director._to_instances_apply(cache)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
@@ -95,7 +94,7 @@ class MovieApply(CircularModelApply):
     def _create_actor_edge(self, actor: Union[str, "ActorApply"]) -> dm.EdgeApply:
         if isinstance(actor, str):
             end_node_ext_id = actor
-        elif isinstance(actor, CircularModelApply):
+        elif isinstance(actor, DomainModelApply):
             end_node_ext_id = actor.external_id
         else:
             raise TypeError(f"Expected str or ActorApply, got {type(actor)}")
@@ -111,7 +110,7 @@ class MovieApply(CircularModelApply):
     def _create_director_edge(self, director: Union[str, "DirectorApply"]) -> dm.EdgeApply:
         if isinstance(director, str):
             end_node_ext_id = director
-        elif isinstance(director, CircularModelApply):
+        elif isinstance(director, DomainModelApply):
             end_node_ext_id = director.external_id
         else:
             raise TypeError(f"Expected str or DirectorApply, got {type(director)}")

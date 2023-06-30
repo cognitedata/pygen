@@ -1,7 +1,7 @@
     def _create_{{ edge_snake }}_edge(self, {{ edge_snake }}: Union[str, "{{ edge_pascal }}Apply"]) -> dm.EdgeApply:
         if isinstance({{ edge_snake }}, str):
             end_node_ext_id = {{ edge_snake }}
-        elif isinstance({{ edge_snake }}, CircularModelApply):
+        elif isinstance({{ edge_snake }}, DomainModelApply):
             end_node_ext_id = {{ edge_snake }}.external_id
         else:
             raise TypeError(f"Expected str or {{ edge_pascal }}Apply, got {type({{ edge_snake }})}")

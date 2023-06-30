@@ -1,5 +1,4 @@
-        if self.{{ edge_name }} is not None:
-            if isinstance(self.{{ edge_name }}, CircularModelApply):
-                instances = self.{{ edge_name }}._to_instances_apply(cache)
-                nodes.extend(instances.nodes)
-                edges.extend(instances.edges)
+        if isinstance(self.{{ edge_name }}, DomainModelApply):
+            instances = self.{{ edge_name }}._to_instances_apply(cache)
+            nodes.extend(instances.nodes)
+            edges.extend(instances.edges)

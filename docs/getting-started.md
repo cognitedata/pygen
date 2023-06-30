@@ -27,7 +27,7 @@
     source venv/bin/activate
     ```
     ``` bash
-    pip install cognite-pygen[cli]
+    pip install "cognite-pygen[cli]"
     ```
 
 
@@ -42,7 +42,7 @@ pygen --space movies --external-id Movie --tenant-id <tenant-id> --client-id <cl
 In addition, the following options are available and recommended to be used:
 
 * `--output-dir` This is the directory where the generated SDK will be placed.
-* `--sdk-name-snake` Package name for the generated client given in `snake_case`.
-* `--client-name-pascal` Client name for the generated client given in `PascalCase`.
+* `--top-level-package` The top level package for where to place the SDK, for example `movie_sdk.client`.
+* `--client-name` Client name for the generated client expected to be given in `PascalCase`, for example `MovieClient`.
 
 For more information about the available options, see `pygen --help`.

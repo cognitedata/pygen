@@ -4,7 +4,7 @@
                 edges.append(edge)
                 cache.add(edge.external_id)
 
-            if isinstance({{ edge_snake }}, CircularModelApply):
+            if isinstance({{ edge_snake }}, DomainModelApply):
                 instances = {{ edge_snake }}._to_instances_apply(cache)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)

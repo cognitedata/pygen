@@ -7,7 +7,8 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client._constants import INSTANCES_LIST_LIMIT_DEFAULT
 
-from ..data_classes import {{ view_name }}, {{ view_name }}Apply, {{ view_name }}List
+from {{ top_level_package }}.data_classes import {{ view_name }}, {{ view_name }}Apply, {{ view_name }}List
+
 from ._core import TypeAPI
 
 {% if has_one_to_many %}
