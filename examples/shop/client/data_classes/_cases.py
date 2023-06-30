@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, ClassVar, Optional, Union
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import CircularModelApply, DomainModel, InstancesApply, TypeList
+from ._core import CircularModelApply, DomainModel, DomainModelApply, InstancesApply, TypeList
 
 if TYPE_CHECKING:
     from ._command_configs import CommandConfigApply
@@ -72,11 +72,10 @@ class CaseApply(CircularModelApply):
         nodes = [this_node]
         edges = []
 
-        if self.commands is not None:
-            if isinstance(self.commands, CircularModelApply):
-                instances = self.commands._to_instances_apply(cache)
-                nodes.extend(instances.nodes)
-                edges.extend(instances.edges)
+        if self.commands is not None and isinstance(self.commands, DomainModelApply):
+            instances = self.commands._to_instances_apply(cache)
+            nodes.extend(instances.nodes)
+            edges.extend(instances.edges)
 
         return InstancesApply(nodes, edges)
 

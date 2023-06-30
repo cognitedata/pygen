@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, ClassVar, Optional, Union
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import CircularModelApply, DomainModel, InstancesApply, TypeList
+from ._core import CircularModelApply, DomainModel, DomainModelApply, InstancesApply, TypeList
 
 if TYPE_CHECKING:
     from ._roles import RoleApply
@@ -52,7 +52,7 @@ class PersonApply(CircularModelApply):
                 edges.append(edge)
                 cache.add(edge.external_id)
 
-            if isinstance(role, CircularModelApply):
+            if isinstance(role, DomainModelApply):
                 instances = role._to_instances_apply(cache)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
@@ -62,7 +62,7 @@ class PersonApply(CircularModelApply):
     def _create_role_edge(self, role: Union[str, "RoleApply"]) -> dm.EdgeApply:
         if isinstance(role, str):
             end_node_ext_id = role
-        elif isinstance(role, CircularModelApply):
+        elif isinstance(role, DomainModelApply):
             end_node_ext_id = role.external_id
         else:
             raise TypeError(f"Expected str or RoleApply, got {type(role)}")

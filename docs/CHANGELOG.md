@@ -13,7 +13,13 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## [0.10.4] - 26-06-29
+## [0.10.5] - 30-06-23
+
+### Fixed
+
+* The `.apply()` method failed to update nested nodes. This is now fixed.
+
+## [0.10.4] - 29-06-23
 
 ### Fixed
 
@@ -22,26 +28,26 @@ Changes are grouped as follows
 * Types with snake case names caused `flake8` errors are now fixed.
 * import `datetime` when one or more fields are of type `timestamp`.
 
-## [0.10.3] - 26-06-28
+## [0.10.3] - 28-06-23
 
 ### Fixed
 
 * Compatible with `cognite-sdk>=6.5`
 
-## [0.10.2] - 26-06-26
+## [0.10.2] - 26-06-23
 
 ### Fixed
 
 * Bug when trying to write an edge set to `None` in an Apply class. It caused a `TypeError` to be raised. Now, an edge
   set to `None` is ignored.
 
-## [0.10.1] - 26-06-26
+## [0.10.1] - 26-06-23
 
 ### Fixed
 
 * Workaround for missing `inline_views` in `data_modeling.data_models.retrieve` in `cognite-sdk`.
 
-## [0.10.0] - 26-06-26
+## [0.10.0] - 26-06-23
 
 A complete rewrite of the package. It is now DMS based instead of graphql schema.
 
