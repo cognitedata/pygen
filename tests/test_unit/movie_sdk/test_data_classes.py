@@ -73,12 +73,12 @@ def person_apply_to_instances_test_cases():
                         release_year=1994,
                         actors=["actor:quentin_tarantino"],
                         directors=["director:quentin_tarantino"],
-                        run_time_minutes=154,
+                        run_time_minute=154,
                         meta={"imdb": {"rating": 8.9, "votes": 1780000}},
                         rating=movie.RatingApply(
                             external_id="rating:pulp_fiction",
                             score="rating:pulp_fiction",
-                            votes="vote_count:pulp_fiction",
+                            vote="vote_count:pulp_fiction",
                         ),
                     )
                 ],
