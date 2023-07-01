@@ -10,8 +10,8 @@ from cognite.client._constants import INSTANCES_LIST_LIMIT_DEFAULT
 from {{ top_level_package }}.data_classes import {{ class_.data_class }}, {{ class_.data_class }}Apply, {{ class_.data_class }}List
 
 from ._core import TypeAPI
-{% for field in fields.edges_one_to_many %}
 
+{% for field in fields.edges_one_to_many %}
 class {{ class_.data_class }}{{ field.edge_api_class_suffix }}API:
     def __init__(self, client: CogniteClient):
         self._client = client
@@ -81,15 +81,15 @@ class {{ class_.api_class }}API(TypeAPI[{{ class_.data_class }}, {{ class_.data_
             {% if fields.has_one_to_many_edges %}{{ class_.variable }} = self._retrieve((self.sources.space, external_id))
 {% for field in fields.edges_one_to_many %}
             {{ field.variable }}_edges = self.{{ field.name }}.retrieve(external_id)
-            {{ class_.variable }}.{{ field.name }} = [edge.end_node.external_id for edge in {{ field.variable }}_edges]
-{% endfor %}
+            {{ class_.variable }}.{{ field.name }} = [edge.end_node.external_id for edge in {{ field.variable }}_edges]{% endfor %}
+
             return {{ class_.variable }}{% else %}return self._retrieve((self.sources.space, external_id)){% endif %}
         else:
             {% if fields.has_one_to_many_edges %}{{ class_.variable_list }} = self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
 {% for field in fields.edges_one_to_many %}
             {{ field.variable }}_edges = self.{{ field.name }}.retrieve(external_id)
-            self._set_{{ field.name }}({{ class_.variable_list }}, {{ field.variable }}_edges)
-{% endfor %}
+            self._set_{{ field.name }}({{ class_.variable_list }}, {{ field.variable }}_edges){% endfor %}
+
             return {{ class_.variable_list }}{% else %}return self._retrieve([(self.sources.space, ext_id) for ext_id in external_id]){% endif %}
 
     def list(self, limit: int = INSTANCES_LIST_LIMIT_DEFAULT) -> {{ class_.data_class }}List:
@@ -99,8 +99,8 @@ class {{ class_.api_class }}API(TypeAPI[{{ class_.data_class }}, {{ class_.data_
         self._set_{{ field.name }}({{ class_.variable_list }}, {{ field.variable }}_edges){% endfor %}
 
         return {{ class_.variable_list }}{% else %}return self._list(limit=limit){% endif %}
-
-{% for field in fields.edges %}{% if field.is_list %}    @staticmethod
+{% for field in fields.edges_one_to_many %}
+    @staticmethod
     def _set_{{ field.name }}({{ class_.variable_list }}: Sequence[{{ class_.data_class }}], {{ field.variable }}_edges: Sequence[dm.Edge]):
         edges_by_start_node: Dict[Tuple, List] = defaultdict(list)
         for edge in {{ field.variable }}_edges:
@@ -110,11 +110,4 @@ class {{ class_.api_class }}API(TypeAPI[{{ class_.data_class }}, {{ class_.data_
             node_id = {{ class_.variable }}.id_tuple()
             if node_id in edges_by_start_node:
                 {{ class_.variable }}.{{ field.name }} = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
-{% else %}    @staticmethod
-    def _set_{{ field.name }}({{ class_.variable_list }}: Sequence[{{ class_.data_class }}], {{ field.variable }}_edges: Sequence[dm.Edge]):
-        edges_by_start_node: Dict[Tuple, dm.Edge] = {edge.start_node.as_tuple(): edge for edge in {{ field.variable }}_edges}
-
-        for {{ class_.variable }} in {{ class_.variable_list }}:
-            node_id = {{ class_.variable }}.id_tuple()
-            if node_id in edges_by_start_node:
-                {{ class_.variable }}.{{ field.name }} = edges_by_start_node[node_id].end_node.external_id{% endif %}{% endfor %}
+{% endfor %}

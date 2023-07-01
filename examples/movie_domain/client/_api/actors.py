@@ -115,17 +115,17 @@ class ActorsAPI(TypeAPI[Actor, ActorApply, ActorList]):
             actor = self._retrieve((self.sources.space, external_id))
 
             movie_edges = self.movies.retrieve(external_id)
-            nomination_edges = self.nominations.retrieve(external_id)
             actor.movies = [edge.end_node.external_id for edge in movie_edges]
-            actor.nomination = [edge.end_node.external_id for edge in nomination_edges]
+            nomination_edges = self.nominations.retrieve(external_id)
+            actor.nominations = [edge.end_node.external_id for edge in nomination_edges]
 
             return actor
         else:
             actors = self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
 
             movie_edges = self.movies.retrieve(external_id)
-            nomination_edges = self.nominations.retrieve(external_id)
             self._set_movies(actors, movie_edges)
+            nomination_edges = self.nominations.retrieve(external_id)
             self._set_nominations(actors, nomination_edges)
 
             return actors

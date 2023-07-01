@@ -34,12 +34,12 @@ def test_create_view_data_classes_command_configs(sdk_generator: SDKGenerator, c
     assert actual == expected
 
 
-def test_create_view_api_classes_command_configs(sdk_generator: SDKGenerator, command_config_view: dm.View):
+def test_create_view_api_classes_command_configs(command_config_view: dm.View):
     # Arrange
     expected = ShopSDKFiles.command_configs_api.read_text()
 
     # Act
-    actual = sdk_generator.view_to_api(command_config_view)
+    actual = APIGenerator(command_config_view).generate_api_file("shop.client")
 
     assert actual == expected
 

@@ -224,12 +224,12 @@ def test_create_view_data_class_actors(actor_view: dm.View):
     assert actual == expected
 
 
-def test_create_view_api_classes_actors(sdk_generator: SDKGenerator, actor_view: dm.View, tmp_path: Path):
+def test_create_view_api_classes_actors(actor_view: dm.View, tmp_path: Path):
     # Arrange
     expected = MovieSDKFiles.actors_api.read_text()
 
     # Act
-    actual = sdk_generator.view_to_api(actor_view)
+    actual = APIGenerator(actor_view).generate_api_file("movie_domain.client")
 
     # Assert
     # Reformat with black to make sure the formatting is correct
