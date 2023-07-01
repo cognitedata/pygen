@@ -260,6 +260,7 @@ class APIClass:
     data_class: str
     variable: str
     variable_list: str
+    client_attribute: str
     api_class: str
     file_name: str
 
@@ -269,6 +270,7 @@ class APIClass:
             data_class=to_pascal(view_name, singularize=True),
             variable=to_snake(view_name, singularize=True),
             variable_list=to_snake(view_name, pluralize=True),
+            client_attribute=to_snake(view_name, pluralize=True),
             api_class=to_pascal(view_name, pluralize=True),
             file_name=to_snake(view_name, pluralize=True),
         )

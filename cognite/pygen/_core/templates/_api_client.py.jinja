@@ -5,6 +5,8 @@ from pathlib import Path
 
 from cognite.client import ClientConfig, CogniteClient
 from cognite.client.credentials import OAuthClientCredentials
+{% for class_ in classes %}
+from ._api.{{ class_.file_name }} import {{ class_.api_class }}API{% endfor %}
 
 
 class {{ client_name }}:
@@ -23,7 +25,8 @@ class {{ client_name }}:
     """
 
     def __init__(self, config: ClientConfig | None = None):
-        client = CogniteClient(config)
+        client = CogniteClient(config){% for class_ in classes %}
+        self.{{ class_.client_attribute }} = {{ class_.api_class }}API(client){% endfor %}
 
     @classmethod
     def azure_project(
