@@ -1,9 +1,9 @@
 from pathlib import Path
 
-from ._core.sdk_generator import SDKGenerator
+from ._core.sdk_generator import APIGenerator, SDKGenerator
 from ._version import __version__
 
-__all__ = ["__version__", "SDKGenerator", "write_sdk_to_disk"]
+__all__ = ["__version__", "SDKGenerator", "APIGenerator", "write_sdk_to_disk"]
 
 
 def write_sdk_to_disk(sdk: dict[Path, str], output_dir: Path):
