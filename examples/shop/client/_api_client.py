@@ -12,7 +12,7 @@ from ._api.command_configs import CommandConfigsAPI
 
 class ShopClient:
     """
-    Shop Client
+    ShopClient
 
     Generated with:
         pygen = 0.10.6

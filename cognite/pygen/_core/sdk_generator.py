@@ -290,7 +290,9 @@ class APIGenerator:
             loader=PackageLoader("cognite.pygen._core", "templates"),
             autoescape=select_autoescape(),
         )
-        self.fields = Fields([Field.from_property(prop) for prop in view.properties.values()])
+        self.fields = Fields(
+            sorted((Field.from_property(prop) for prop in view.properties.values()), key=lambda f: f.name)
+        )
         self.class_ = APIClass.from_view(view.name)
 
     def generate_data_class_file(self) -> str:

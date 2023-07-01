@@ -43,9 +43,9 @@ class CasesAPI(TypeAPI[Case, CaseApply, CaseList]):
 
     def retrieve(self, external_id: str | Sequence[str]) -> Case | CaseList:
         if isinstance(external_id, str):
-            return self._retrieve(("IntegrationTestsImmutable", external_id))
+            return self._retrieve((self.sources.space, external_id))
         else:
-            return self._retrieve([("IntegrationTestsImmutable", ext_id) for ext_id in external_id])
+            return self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
 
     def list(self, limit: int = INSTANCES_LIST_LIMIT_DEFAULT) -> CaseList:
         return self._list(limit=limit)
