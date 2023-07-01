@@ -17,7 +17,7 @@ def test_create_view_data_classes_case(sdk_generator: SDKGenerator, case_view: d
     expected = ShopSDKFiles.cases_data.read_text()
 
     # Act
-    actual = APIGenerator(case_view).generate_data_class()
+    actual = APIGenerator(case_view).generate_data_class_file()
 
     # Assert
     assert actual == expected
@@ -28,7 +28,7 @@ def test_create_view_data_classes_command_configs(sdk_generator: SDKGenerator, c
     expected = ShopSDKFiles.command_configs_data.read_text()
 
     # Act
-    actual = APIGenerator(command_config_view).generate_data_class()
+    actual = APIGenerator(command_config_view).generate_data_class_file()
 
     # Assert
     assert actual == expected

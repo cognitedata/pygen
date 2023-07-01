@@ -46,7 +46,7 @@ class SDKGenerator:
             file_name = to_snake(view.name, pluralize=True)
             try:
                 data_class = APIGenerator(view)
-                sdk[data_classes_dir / f"_{file_name}.py"] = data_class.generate_data_class()
+                sdk[data_classes_dir / f"_{file_name}.py"] = data_class.generate_data_class_file()
                 sdk[api_dir / f"{file_name}.py"] = self.view_to_api(view)
             except Exception as e:
                 print(f"Failed to generate SDK for view {view.name}: {e}")  # noqa
@@ -224,6 +224,7 @@ class Field:
     variable: str | None = None
     dependency_class: str | None = None
     dependency_file: str | None = None
+    edge_api_class_suffix: str | None = None
 
     @property
     def is_edges(self) -> bool:
@@ -280,6 +281,7 @@ class Field:
                 prop=property_,
                 dependency_class=dependency_class,
                 dependency_file=dependency_file,
+                edge_api_class_suffix=to_pascal(property_.name, pluralize=True),
             )
         else:
             raise NotImplementedError(f"Property type={type(property_)} is not supported")
@@ -334,6 +336,14 @@ class Fields:
         return [field for field in self.data if field.is_edge and field.is_list]
 
     @property
+    def has_one_to_many_edges(self) -> bool:
+        return any(field.is_edge and field.is_list for field in self.data)
+
+    @property
+    def has_one_to_one_edges(self) -> bool:
+        return any(field.is_edge and not field.is_list for field in self.data)
+
+    @property
     def import_pydantic_field(self) -> bool:
         return any("Field" in field.as_type_hint("read") for field in self.data)
 
@@ -346,27 +356,56 @@ class Fields:
         return any(field.is_datetime for field in self.data)
 
 
+@dataclass
+class APIClass:
+    data_class: str
+    variable: str
+    variable_list: str
+    api_class: str
+
+    @classmethod
+    def from_view(cls, view: dm.View) -> APIClass:
+        return cls(
+            to_pascal(view.name, singularize=True),
+            to_snake(view.name, singularize=True),
+            to_snake(view.name, pluralize=True),
+            to_pascal(view.name, pluralize=True),
+        )
+
+
 class APIGenerator:
     def __init__(self, view: dm.View):
         self._view = view
         self._env = Environment(
-            loader=PackageLoader("cognite.pygen._core", "data_class_templates"),
+            loader=PackageLoader("cognite.pygen._core", "templates"),
             autoescape=select_autoescape(),
         )
         self.fields = Fields([Field.from_property(prop) for prop in view.properties.values()])
-        self.class_name = to_pascal(view.name, singularize=True)
+        self.class_ = APIClass.from_view(view)
 
-    def generate_data_class(self) -> str:
+    def generate_data_class_file(self) -> str:
         type_data = self._env.get_template("type_data.py.jinja")
 
         return (
             type_data.render(
-                class_name=self.class_name,
+                class_name=self.class_.data_class,
                 fields=self.fields,
                 space=self._view.space,
                 view_name=self._view.name,
             )
             + "\n"
+        )
+
+    def generate_api_file(self, top_level_package: str) -> str:
+        type_api = self._env.get_template("type_api.py.jinja")
+
+        return type_api.render(
+            top_level_package=top_level_package,
+            class_=self.class_,
+            fields=self.fields,
+            view_space=self._view.space,
+            view_external_id=self._view.external_id,
+            view_version=self._view.version,
         )
 
 

@@ -78,13 +78,15 @@ class PersonsAPI(TypeAPI[Person, PersonApply, PersonList]):
 
     def retrieve(self, external_id: str | Sequence[str]) -> Person | PersonList:
         if isinstance(external_id, str):
-            person = self._retrieve(("IntegrationTestsImmutable", external_id))
+            person = self._retrieve((self.sources.space, external_id))
+
             role_edges = self.roles.retrieve(external_id)
             person.roles = [edge.end_node.external_id for edge in role_edges]
 
             return person
         else:
-            persons = self._retrieve([("IntegrationTestsImmutable", ext_id) for ext_id in external_id])
+            persons = self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
+
             role_edges = self.roles.retrieve(external_id)
             self._set_roles(persons, role_edges)
 

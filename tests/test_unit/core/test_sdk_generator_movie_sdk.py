@@ -10,11 +10,9 @@ from cognite.client.data_classes.data_modeling.views import ViewProperty
 
 from cognite.pygen._core.sdk_generator import (
     APIGenerator,
-    EdgeSnippets,
     Field,
     SDKGenerator,
     client_subapi_import,
-    property_to_edge_snippets,
     subapi_instantiation,
 )
 from tests.constants import MovieSDKFiles, examples_dir
@@ -77,6 +75,7 @@ def create_fields_test_cases():
             variable="role",
             dependency_class="Role",
             dependency_file="roles",
+            edge_api_class_suffix="Roles",
         ),
         "list[str] = []",
         'list[Union[str, "RoleApply"]] = []',
@@ -203,34 +202,23 @@ def test_movie_model_to_sdk(sdk_generator: SDKGenerator, movie_model: dm.DataMod
         assert file_content == expected
 
 
-def test_create_view_api_classes_persons(sdk_generator: SDKGenerator, person_view: dm.View):
-    # Arrange
-    expected = MovieSDKFiles.persons_api.read_text()
-
-    # Act
-    actual = sdk_generator.view_to_api(person_view)
-
-    # Assert
-    assert actual == expected
-
-
-def test_create_view_data_class_persons(sdk_generator: SDKGenerator, person_view: dm.View):
+def test_create_view_data_class_persons(person_view: dm.View):
     # Arrange
     expected = MovieSDKFiles.persons_data.read_text()
 
     # Act
-    actual = APIGenerator(person_view).generate_data_class()
+    actual = APIGenerator(person_view).generate_data_class_file()
 
     # Assert
     assert actual == expected
 
 
-def test_create_view_data_class_actors(sdk_generator: SDKGenerator, actor_view: dm.View):
+def test_create_view_data_class_actors(actor_view: dm.View):
     # Arrange
     expected = MovieSDKFiles.actors_data.read_text()
 
     # Act
-    actual = APIGenerator(actor_view).generate_data_class()
+    actual = APIGenerator(actor_view).generate_data_class_file()
 
     # Assert
     assert actual == expected
@@ -263,42 +251,12 @@ def test_create_view_api_classes_actors(sdk_generator: SDKGenerator, actor_view:
     assert actual == expected
 
 
-def test_property_to_edge_api_person_roles(sdk_generator: SDKGenerator, person_view: dm.View):
+def test_create_view_api_classes_persons(sdk_generator: SDKGenerator, person_view: dm.View):
     # Arrange
-    expected = "\n".join(MovieSDKFiles.persons_api.read_text().split("\n")[14:45])
+    expected = MovieSDKFiles.persons_api.read_text()
 
     # Act
-    actual = sdk_generator.property_to_edge_api(
-        person_view.properties["roles"], view_name="Person", view_space="IntegrationTestsImmutable"
-    )
-
-    # Assert
-    assert actual == expected
-
-
-def test_property_to_edges_helper(sdk_generator: SDKGenerator, person_view: dm.View):
-    # Arrange
-    expected = "\n".join(MovieSDKFiles.persons_api.read_text().split("\n")[100:110])
-
-    # Act
-    actual = sdk_generator.property_to_edge_helper(person_view.properties["roles"], view_name="Person")
-
-    # Assert
-    assert actual == expected
-
-
-def test_property_to_edge_snippets(person_view: dm.View):
-    # Arrange
-    expected = EdgeSnippets(
-        "self.roles = PersonRolesAPI(client)",
-        "person.roles = [edge.end_node.external_id for edge in role_edges]",
-        "self._set_roles(persons, role_edges)",
-        "role_edges = self.roles.retrieve(external_id)",
-        "role_edges = self.roles.list(limit=-1)",
-    )
-
-    # Act
-    actual = property_to_edge_snippets(person_view.properties["roles"], view_name="Person")
+    actual = APIGenerator(person_view).generate_api_file("movie_domain.client")
 
     # Assert
     assert actual == expected
