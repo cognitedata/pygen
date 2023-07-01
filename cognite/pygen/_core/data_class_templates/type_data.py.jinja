@@ -7,10 +7,10 @@ from cognite.client import data_modeling as dm{% if fields.import_pydantic_field
 from pydantic import Field{% endif %}
 
 from ._core import CircularModelApply, DomainModel, {% if fields.import_dependencies %}DomainModelApply, {% endif %}InstancesApply, TypeList
-
-{% if fields.import_dependencies %}if TYPE_CHECKING:{% for field in fields.edges %}
-    from ._{{ field.dependency_file }} import {{ field.dependency_class }}Apply{% endfor %}{% endif %}
-
+{% if fields.import_dependencies %}
+if TYPE_CHECKING:{% for field in fields.edges %}
+    from ._{{ field.dependency_file }} import {{ field.dependency_class }}Apply{% endfor %}
+{% endif %}
 __all__ = ["{{ class_name }}", "{{ class_name }}Apply", "{{ class_name }}List"]
 
 
@@ -34,7 +34,7 @@ class {{ class_name }}Apply(CircularModelApply):
                 "{{ field.prop.name }}": {% if field.is_edge %}{
                     "space": "{{ field.prop.source.space }}",
                     "externalId": self.{{ field.name }} if isinstance(self.{{ field.name }}, str) else self.{{ field.name }}.external_id,
-                }{% else %}self.{{ field.name }}{% endif %},{% endfor %}
+                }{% else %}self.{{ field.name }}{% if field.is_datetime %}.isoformat(){% endif %}{% endif %},{% endfor %}
             },
         )
         sources.append(source)

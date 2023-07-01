@@ -229,6 +229,10 @@ class Field:
     def is_edges(self) -> bool:
         return self.is_edge and self.is_list
 
+    @property
+    def is_datetime(self) -> bool:
+        return self.read_type == "datetime"
+
     @classmethod
     def from_property(cls, property_: dm.MappedProperty | dm.ConnectionDefinition) -> Field:
         if isinstance(property_, dm.MappedProperty) and not isinstance(property_.type, dm.DirectRelation):
@@ -339,7 +343,7 @@ class Fields:
 
     @property
     def has_datetime(self) -> bool:
-        return any("datetime" in field.read_type for field in self.data)
+        return any(field.is_datetime for field in self.data)
 
 
 class APIGenerator:
