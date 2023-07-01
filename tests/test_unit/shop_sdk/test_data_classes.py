@@ -12,12 +12,12 @@ def test_to_instances_apply_case():
         scenario="Integration test",
         start_time=datetime.strptime("2021-01-01T00:00:00Z", date_format),
         end_time=datetime.strptime("2021-01-01T00:00:00Z", date_format),
-        command=CommandConfigApply(external_id="shop:command_config:integration_test", configs=["BlueViolet", "Red"]),
+        commands=CommandConfigApply(external_id="shop:command_config:integration_test", configs=["BlueViolet", "Red"]),
         cut_files=["shop:cut_file:1"],
         bid="shop:bid_matrix:8",
-        bid_histories=["shop:bid_matrix:9"],
+        bid_history=["shop:bid_matrix:9"],
         run_status="Running",
-        argument="Integration test",
+        arguments="Integration test",
     )
 
     # Act

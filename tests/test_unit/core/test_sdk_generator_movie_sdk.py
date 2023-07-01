@@ -70,6 +70,7 @@ def create_fields_test_cases():
             dependency_class="Role",
             dependency_file="roles",
             edge_api_class_suffix="Roles",
+            edge_api_attribute="roles",
         ),
         "list[str] = []",
         'list[Union[str, "RoleApply"]] = []',

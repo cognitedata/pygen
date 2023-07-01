@@ -16,10 +16,10 @@ __all__ = ["Case", "CaseApply", "CaseList"]
 
 class Case(DomainModel):
     space: ClassVar[str] = "IntegrationTestsImmutable"
-    argument: Optional[str] = Field(None, alias="arguments")
+    arguments: Optional[str] = None
     bid: Optional[str] = None
-    bid_histories: list[str] = Field([], alias="bid_history")
-    command: Optional[str] = Field(None, alias="commands")
+    bid_history: list[str] = []
+    commands: Optional[str] = None
     cut_files: list[str] = []
     end_time: Optional[datetime] = None
     name: Optional[str] = None
@@ -30,10 +30,10 @@ class Case(DomainModel):
 
 class CaseApply(CircularModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
-    argument: Optional[str] = None
+    arguments: Optional[str] = None
     bid: Optional[str] = None
-    bid_histories: list[str] = []
-    command: Optional[Union[str, "CommandConfigApply"]] = None
+    bid_history: list[str] = []
+    commands: Optional[Union[str, "CommandConfigApply"]] = None
     cut_files: list[str] = []
     end_time: Optional[datetime] = None
     name: str
@@ -49,12 +49,12 @@ class CaseApply(CircularModelApply):
         source = dm.NodeOrEdgeData(
             source=dm.ContainerId("IntegrationTestsImmutable", "Case"),
             properties={
-                "arguments": self.argument,
+                "arguments": self.arguments,
                 "bid": self.bid,
-                "bid_history": self.bid_histories,
+                "bid_history": self.bid_history,
                 "commands": {
                     "space": "IntegrationTestsImmutable",
-                    "externalId": self.command if isinstance(self.command, str) else self.command.external_id,
+                    "externalId": self.commands if isinstance(self.commands, str) else self.commands.external_id,
                 },
                 "cut_files": self.cut_files,
                 "end_time": self.end_time.isoformat(),
@@ -75,8 +75,8 @@ class CaseApply(CircularModelApply):
         nodes = [this_node]
         edges = []
 
-        if isinstance(self.command, DomainModelApply):
-            instances = self.command._to_instances_apply(cache)
+        if isinstance(self.commands, DomainModelApply):
+            instances = self.commands._to_instances_apply(cache)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 

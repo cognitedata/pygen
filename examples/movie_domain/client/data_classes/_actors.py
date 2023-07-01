@@ -18,7 +18,7 @@ __all__ = ["Actor", "ActorApply", "ActorList"]
 class Actor(DomainModel):
     space: ClassVar[str] = "IntegrationTestsImmutable"
     movies: list[str] = []
-    nominations: list[str] = Field([], alias="nomination")
+    nomination: list[str] = []
     person: Optional[str] = None
     won_oscar: Optional[bool] = Field(None, alias="wonOscar")
 
@@ -26,7 +26,7 @@ class Actor(DomainModel):
 class ActorApply(CircularModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
     movies: list[Union[str, "MovieApply"]] = []
-    nominations: list[Union[str, "NominationApply"]] = []
+    nomination: list[Union[str, "NominationApply"]] = []
     person: Optional[Union[str, "PersonApply"]] = None
     won_oscar: Optional[bool] = None
 
@@ -67,7 +67,7 @@ class ActorApply(CircularModelApply):
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
-        for nomination in self.nominations:
+        for nomination in self.nomination:
             edge = self._create_nomination_edge(nomination)
             if edge.external_id not in cache:
                 edges.append(edge)

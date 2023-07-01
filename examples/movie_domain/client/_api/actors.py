@@ -117,7 +117,7 @@ class ActorsAPI(TypeAPI[Actor, ActorApply, ActorList]):
             movie_edges = self.movies.retrieve(external_id)
             actor.movies = [edge.end_node.external_id for edge in movie_edges]
             nomination_edges = self.nominations.retrieve(external_id)
-            actor.nominations = [edge.end_node.external_id for edge in nomination_edges]
+            actor.nomination = [edge.end_node.external_id for edge in nomination_edges]
 
             return actor
         else:
@@ -126,7 +126,7 @@ class ActorsAPI(TypeAPI[Actor, ActorApply, ActorList]):
             movie_edges = self.movies.retrieve(external_id)
             self._set_movies(actors, movie_edges)
             nomination_edges = self.nominations.retrieve(external_id)
-            self._set_nominations(actors, nomination_edges)
+            self._set_nomination(actors, nomination_edges)
 
             return actors
 
@@ -136,7 +136,7 @@ class ActorsAPI(TypeAPI[Actor, ActorApply, ActorList]):
         movie_edges = self.movies.list(limit=-1)
         self._set_movies(actors, movie_edges)
         nomination_edges = self.nominations.list(limit=-1)
-        self._set_nominations(actors, nomination_edges)
+        self._set_nomination(actors, nomination_edges)
 
         return actors
 
@@ -152,7 +152,7 @@ class ActorsAPI(TypeAPI[Actor, ActorApply, ActorList]):
                 actor.movies = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
 
     @staticmethod
-    def _set_nominations(actors: Sequence[Actor], nomination_edges: Sequence[dm.Edge]):
+    def _set_nomination(actors: Sequence[Actor], nomination_edges: Sequence[dm.Edge]):
         edges_by_start_node: Dict[Tuple, List] = defaultdict(list)
         for edge in nomination_edges:
             edges_by_start_node[edge.start_node.as_tuple()].append(edge)
@@ -160,4 +160,4 @@ class ActorsAPI(TypeAPI[Actor, ActorApply, ActorList]):
         for actor in actors:
             node_id = actor.id_tuple()
             if node_id in edges_by_start_node:
-                actor.nominations = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
+                actor.nomination = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]

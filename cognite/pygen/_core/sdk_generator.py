@@ -119,6 +119,7 @@ class Field:
     dependency_class: str | None = None
     dependency_file: str | None = None
     edge_api_class_suffix: str | None = None
+    edge_api_attribute: str | None = None
 
     @property
     def is_edges(self) -> bool:
@@ -137,7 +138,7 @@ class Field:
         if isinstance(property_, dm.MappedProperty) and not isinstance(property_.type, dm.DirectRelation):
             # Is primary field
             is_list = isinstance(property_.type, ListablePropertyType) and property_.type.is_list
-            name = to_snake(property_.name, singularize=not is_list, pluralize=is_list)
+            name = to_snake(property_.name)
             type_ = _to_python_type(property_.type)
             is_nullable = property_.nullable
             default = property_.default_value or ("[]" if is_list else ("None" if is_nullable else None))
@@ -145,7 +146,7 @@ class Field:
             return cls(name, type_, is_list, is_nullable, default, property_, write_type=type_, variable=variable)
         elif isinstance(property_, dm.MappedProperty):
             # Edge One to One
-            name = to_snake(property_.name, singularize=True)
+            name = to_snake(property_.name)
             dependency_class = to_pascal(property_.source.external_id, singularize=True)
             dependency_file = to_snake(property_.source.external_id, pluralize=True)
             write_type = f'Union[str, "{dependency_class}Apply"]'
@@ -163,7 +164,7 @@ class Field:
             )
         elif isinstance(property_, dm.SingleHopConnectionDefinition):
             # One to Many
-            name = to_snake(property_.name, pluralize=True)
+            name = to_snake(property_.name)
             dependency_class = to_pascal(property_.source.external_id, singularize=True)
             dependency_file = to_snake(property_.source.external_id, pluralize=True)
             write_type = f'Union[str, "{dependency_class}Apply"]'
@@ -180,6 +181,7 @@ class Field:
                 dependency_class=dependency_class,
                 dependency_file=dependency_file,
                 edge_api_class_suffix=to_pascal(property_.name, pluralize=True),
+                edge_api_attribute=to_snake(property_.name, pluralize=True),
             )
         else:
             raise NotImplementedError(f"Property type={type(property_)} is not supported")

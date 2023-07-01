@@ -54,7 +54,7 @@ class {{ class_.api_class }}API(TypeAPI[{{ class_.data_class }}, {{ class_.data_
             class_apply_type={{ class_.data_class }}Apply,
             class_list={{ class_.data_class }}List,
         ){% for field in fields.edges_one_to_many %}
-        self.{{ field.name }} = {{ class_.data_class }}{{ field.edge_api_class_suffix }}API(client){% endfor %}
+        self.{{ field.edge_api_attribute }} = {{ class_.data_class }}{{ field.edge_api_class_suffix }}API(client){% endfor %}
 
     def apply(self, {{ class_.variable }}: {{ class_.data_class }}Apply, replace: bool = False) -> dm.InstancesApplyResult:
         instances = {{ class_.variable }}.to_instances_apply()
@@ -80,14 +80,14 @@ class {{ class_.api_class }}API(TypeAPI[{{ class_.data_class }}, {{ class_.data_
         if isinstance(external_id, str):
             {% if fields.has_one_to_many_edges %}{{ class_.variable }} = self._retrieve((self.sources.space, external_id))
 {% for field in fields.edges_one_to_many %}
-            {{ field.variable }}_edges = self.{{ field.name }}.retrieve(external_id)
+            {{ field.variable }}_edges = self.{{ field.edge_api_attribute }}.retrieve(external_id)
             {{ class_.variable }}.{{ field.name }} = [edge.end_node.external_id for edge in {{ field.variable }}_edges]{% endfor %}
 
             return {{ class_.variable }}{% else %}return self._retrieve((self.sources.space, external_id)){% endif %}
         else:
             {% if fields.has_one_to_many_edges %}{{ class_.variable_list }} = self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
 {% for field in fields.edges_one_to_many %}
-            {{ field.variable }}_edges = self.{{ field.name }}.retrieve(external_id)
+            {{ field.variable }}_edges = self.{{ field.edge_api_attribute }}.retrieve(external_id)
             self._set_{{ field.name }}({{ class_.variable_list }}, {{ field.variable }}_edges){% endfor %}
 
             return {{ class_.variable_list }}{% else %}return self._retrieve([(self.sources.space, ext_id) for ext_id in external_id]){% endif %}
@@ -95,7 +95,7 @@ class {{ class_.api_class }}API(TypeAPI[{{ class_.data_class }}, {{ class_.data_
     def list(self, limit: int = INSTANCES_LIST_LIMIT_DEFAULT) -> {{ class_.data_class }}List:
         {% if fields.has_one_to_many_edges %}{{ class_.variable_list }} = self._list(limit=limit)
 {% for field in fields.edges_one_to_many %}
-        {{ field.variable }}_edges = self.{{ field.name }}.list(limit=-1)
+        {{ field.variable }}_edges = self.{{ field.edge_api_attribute }}.list(limit=-1)
         self._set_{{ field.name }}({{ class_.variable_list }}, {{ field.variable }}_edges){% endfor %}
 
         return {{ class_.variable_list }}{% else %}return self._list(limit=limit){% endif %}
