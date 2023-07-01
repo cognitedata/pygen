@@ -61,7 +61,7 @@ if _has_typer:
             raise typer.Exit(code=1) from e
         typer.echo(f"Successfully retrieved data model {space}/{external_id}/{version}")
         sdk_generator = SDKGenerator(top_level_package, client_name)
-        sdk = sdk_generator.data_model_to_sdk(data_model)
+        sdk = sdk_generator.generate_sdk(data_model)
         typer.echo(f"Writing SDK to {output_dir}")
         write_sdk_to_disk(sdk, output_dir)
         typer.echo("Done!")

@@ -1,0 +1,11 @@
+{% for class_ in classes %}from ._{{ class_.file_name }} import {{ class_.data_class }}, {{ class_.data_class }}Apply, {{ class_.data_class }}List
+{% endfor %}
+{% for class_, dependencies in dependencies_by_class.items() %}{{ class_.data_class }}Apply.update_forward_refs({% for dependency in dependencies %}
+    {{ dependency.data_class }}Apply={{ dependency.data_class }}Apply,{%  endfor %}
+)
+{% endfor %}
+__all__ = [{% for class_ in classes %}
+    "{{ class_.data_class }}",
+    "{{ class_.data_class }}Apply",
+    "{{ class_.data_class }}List",{% endfor %}
+]

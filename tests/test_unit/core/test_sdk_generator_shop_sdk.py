@@ -8,8 +8,8 @@ from tests.constants import ShopSDKFiles
 
 
 @pytest.fixture
-def sdk_generator():
-    return SDKGenerator("shop.client", "ShopClient")
+def sdk_generator(shop_model: dm.DataModel):
+    return SDKGenerator("shop.client", "ShopClient", shop_model)
 
 
 def test_create_view_data_classes_case(sdk_generator: SDKGenerator, case_view: dm.View):
@@ -23,7 +23,7 @@ def test_create_view_data_classes_case(sdk_generator: SDKGenerator, case_view: d
     assert actual == expected
 
 
-def test_create_view_data_classes_command_configs(sdk_generator: SDKGenerator, command_config_view: dm.View):
+def test_generate_data_class_file_command_configs(command_config_view: dm.View):
     # Arrange
     expected = ShopSDKFiles.command_configs_data.read_text()
 
@@ -44,27 +44,14 @@ def test_create_view_api_classes_command_configs(command_config_view: dm.View):
     assert actual == expected
 
 
-def test_create_api_classes(sdk_generator: SDKGenerator, monkeypatch):
+def test_create_api_classes(
+    sdk_generator: SDKGenerator,
+):
     # Arrange
     expected = ShopSDKFiles.data_init.read_text()
-    monkeypatch.setattr(
-        sdk_generator,
-        "_dependencies_by_view_name",
-        {
-            "Case": {"Command_Config"},
-        },
-    )
-    monkeypatch.setattr(
-        sdk_generator,
-        "_view_names",
-        {
-            "Case",
-            "Command_Config",
-        },
-    )
 
     # Act
-    actual = sdk_generator.create_data_classes_init()
+    actual = sdk_generator.generate_data_classes_init_file()
 
     # Assert
     assert actual == expected

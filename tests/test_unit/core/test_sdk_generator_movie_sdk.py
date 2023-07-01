@@ -8,19 +8,13 @@ import pytest
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.views import ViewProperty
 
-from cognite.pygen._core.sdk_generator import (
-    APIGenerator,
-    Field,
-    SDKGenerator,
-    client_subapi_import,
-    subapi_instantiation,
-)
+from cognite.pygen._core.sdk_generator import APIClass, APIGenerator, Field, SDKGenerator, find_dependencies
 from tests.constants import MovieSDKFiles, examples_dir
 
 
 @pytest.fixture
-def sdk_generator():
-    return SDKGenerator("movie_domain.client", "MovieClient")
+def sdk_generator(movie_model):
+    return SDKGenerator("movie_domain.client", "MovieClient", movie_model)
 
 
 def create_fields_test_cases():
@@ -192,9 +186,9 @@ def test_fields_from_property(
 
 
 @pytest.mark.skip("Need to implement a AST comparison function as order of fields/methods/functions are not important")
-def test_movie_model_to_sdk(sdk_generator: SDKGenerator, movie_model: dm.DataModel, tmp_path: Path):
+def test_generate_sdk(sdk_generator: SDKGenerator, movie_model: dm.DataModel, tmp_path: Path):
     # Act
-    files_by_path = sdk_generator.data_model_to_sdk(movie_model)
+    files_by_path = sdk_generator.generate_sdk()
 
     # Assert
     for file_path, file_content in files_by_path.items():
@@ -202,7 +196,7 @@ def test_movie_model_to_sdk(sdk_generator: SDKGenerator, movie_model: dm.DataMod
         assert file_content == expected
 
 
-def test_create_view_data_class_persons(person_view: dm.View):
+def test_generate_data_class_file_persons(person_view: dm.View):
     # Arrange
     expected = MovieSDKFiles.persons_data.read_text()
 
@@ -262,99 +256,45 @@ def test_create_view_api_classes_persons(sdk_generator: SDKGenerator, person_vie
     assert actual == expected
 
 
-def test_create_api_classes(sdk_generator: SDKGenerator, monkeypatch):
+def test_create_api_classes(sdk_generator: SDKGenerator):
     # Arrange
     expected = MovieSDKFiles.data_init.read_text()
-    monkeypatch.setattr(
-        sdk_generator,
-        "_dependencies_by_view_name",
-        {
+
+    # Act
+    actual = sdk_generator.generate_data_classes_init_file()
+
+    # Assert
+    assert actual == expected
+
+
+def test_create_api_client(sdk_generator: SDKGenerator):
+    # Arrange
+    expected = MovieSDKFiles.client.read_text()
+
+    # Act
+    actual = sdk_generator.generate_api_client_file()
+
+    # Assert
+    assert actual == expected
+
+
+def test_find_dependencies(movie_model: dm.DataModel):
+    # Arrange
+    views = dm.ViewList(movie_model.views)
+    apis = [APIGenerator(view) for view in views]
+    expected = {
+        APIClass.from_view(k): {APIClass.from_view(v) for v in values}
+        for k, values in {
             "Person": {"Role"},
             "Actor": {"Nomination", "Movie", "Person"},
             "Director": {"Nomination", "Movie", "Person"},
             "Movie": {"Actor", "Director", "Rating"},
             "Role": {"Nomination", "Movie", "Person"},
-        },
-    )
-    monkeypatch.setattr(
-        sdk_generator,
-        "_view_names",
-        {
-            "Actor",
-            "Person",
-            "BestDirector",
-            "BestLeadingActor",
-            "BestLeadingActress",
-            "Director",
-            "Movie",
-            "Nomination",
-            "Rating",
-            "Role",
-        },
-    )
+        }.items()
+    }
 
     # Act
-    actual = sdk_generator.create_data_classes_init()
-
-    # Assert
-    assert actual == expected
-
-
-def test_create_api_client(sdk_generator: SDKGenerator, monkeypatch):
-    # Arrange
-    expected = MovieSDKFiles.client.read_text()
-    monkeypatch.setattr(
-        sdk_generator,
-        "_view_names",
-        {
-            "Actor",
-            "Person",
-            "BestDirector",
-            "BestLeadingActor",
-            "BestLeadingActress",
-            "Director",
-            "Movie",
-            "Nomination",
-            "Rating",
-            "Role",
-        },
-    )
-    monkeypatch.setattr(sdk_generator, "_data_model_space", "IntegrationTestsImmutable")
-    monkeypatch.setattr(sdk_generator, "_data_model_external_id", "Movie")
-    monkeypatch.setattr(sdk_generator, "_data_model_version", "2")
-
-    # Act
-    actual = sdk_generator.create_api_client()
-
-    # Assert
-    assert actual == expected
-
-
-@pytest.mark.parametrize(
-    "view_name, expected",
-    [
-        ("Actor", "from ._api.actors import ActorsAPI"),
-        ("BestDirector", "from ._api.best_directors import BestDirectorsAPI"),
-    ],
-)
-def test_client_subapi_import(view_name: str, expected: str):
-    # Act
-    actual = client_subapi_import(view_name)
-
-    # Assert
-    assert actual == expected
-
-
-@pytest.mark.parametrize(
-    "view_name, expected",
-    [
-        ("Actor", "self.actors = ActorsAPI(client)"),
-        ("BestDirector", "self.best_directors = BestDirectorsAPI(client)"),
-    ],
-)
-def test_subapi_instantiation(view_name: str, expected: str):
-    # Act
-    actual = subapi_instantiation(view_name)
+    actual = find_dependencies(apis)
 
     # Assert
     assert actual == expected

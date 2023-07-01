@@ -13,7 +13,7 @@ def test_generate_movie_sdk(cognite_client: CogniteClient) -> None:
     generator = SDKGenerator("movie_domain", "Movie")
 
     # Act
-    sdk = generator.data_model_to_sdk(data_model)
+    sdk = generator.generate_sdk(data_model)
 
     # Assert
     assert sdk
@@ -31,7 +31,7 @@ def test_generate_shop_sdk(cognite_client: CogniteClient) -> None:
     generator = SDKGenerator("shop_domain", "Shop")
 
     # Act
-    sdk = generator.data_model_to_sdk(data_model)
+    sdk = generator.generate_sdk(data_model)
 
     # Assert
     assert sdk

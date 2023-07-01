@@ -16,67 +16,59 @@ from cognite.pygen.utils.text import to_pascal, to_snake
 
 
 class SDKGenerator:
-    def __init__(self, top_level_package: str, client_name: str):
-        self.top_level_package = top_level_package
-        self.client_name = client_name
+    def __init__(self, top_level_package: str, client_name: str, data_model: dm.DataModel):
+        self._data_model = data_model
         self._env = Environment(
             loader=PackageLoader("cognite.pygen._core", "templates"),
             autoescape=select_autoescape(),
         )
-        self._dependencies_by_view_name = defaultdict(set)
-        self._view_names = set()
-        self._data_model_space = None
-        self._data_model_external_id = None
-        self._data_model_version = None
+        self.top_level_package = top_level_package
+        self.client_name = client_name
+
+        self.apis = []
+        for view in data_model.views:
+            try:
+                api_generator = APIGenerator(view)
+            except Exception as e:
+                print(f"Failed to generate SDK for view {view.name}: {e}")  # noqa
+            else:
+                self.apis.append(api_generator)
+        self._dependencies_by_class = find_dependencies(self.apis)
         self._static_dir = Path(__file__).parent / "static"
 
-    def data_model_to_sdk(self, data_model: dm.DataModel) -> dict[Path, str]:
-        self._data_model_space = data_model.space
-        self._data_model_external_id = data_model.external_id
-        self._data_model_version = data_model.version
-
+    def generate_sdk(self) -> dict[Path, str]:
         client_dir = Path(self.top_level_package.replace(".", "/"))
         data_classes_dir = client_dir / "data_classes"
         api_dir = client_dir / "_api"
 
         sdk = {(api_dir / "__init__.py"): ""}
-        for view in data_model.views:
-            file_name = to_snake(view.name, pluralize=True)
+        for api in self.apis:
+            file_name = api.class_.file_name
             try:
-                data_class = APIGenerator(view)
-                sdk[data_classes_dir / f"_{file_name}.py"] = data_class.generate_data_class_file()
-                sdk[api_dir / f"{file_name}.py"] = self.view_to_api(view)
+                sdk[data_classes_dir / f"_{file_name}.py"] = api.generate_data_class_file()
+                sdk[api_dir / f"{file_name}.py"] = api.generate_api_file(self.top_level_package)
             except Exception as e:
                 print(f"Failed to generate SDK for view {view.name}: {e}")  # noqa
                 print(f"Skipping view {view.name}")  # noqa
-                if view.name in self._view_names:
-                    self._view_names.remove(view.name)
-                if view.name in self._dependencies_by_view_name:
-                    del self._dependencies_by_view_name[view.name]
-            else:
-                self._update_dependencies(data_class.fields, view.name)
-                self._view_names.add(view.name)
+                self._dependencies_by_class.pop(api.class_, None)
 
-        sdk[client_dir / "_api_client.py"] = self.create_api_client()
-        sdk[client_dir / "__init__.py"] = self.create_client_init()
-        sdk[data_classes_dir / "__init__.py"] = self.create_data_classes_init()
-        sdk[api_dir / "_core.py"] = self.create_api_core()
+        sdk[client_dir / "_api_client.py"] = self.generate_api_client_file()
+        sdk[client_dir / "__init__.py"] = self.generate_client_init_file()
+        sdk[data_classes_dir / "__init__.py"] = self.generate_data_classes_init_file()
+        sdk[api_dir / "_core.py"] = self.generate_api_core_file()
         sdk[data_classes_dir / "_core.py"] = (self._static_dir / "_core_data_classes.py").read_text()
         return sdk
 
-    def create_api_core(self) -> str:
+    def generate_api_core_file(self) -> str:
         api_core = self._env.get_template("_core_api.py.jinja")
         return api_core.render(top_level_package=self.top_level_package)
 
-    def create_client_init(self) -> str:
+    def generate_client_init_file(self) -> str:
         client_init = self._env.get_template("_client_init.py.jinja")
         return client_init.render(client_name=self.client_name)
 
-    def create_api_client(self) -> str:
+    def generate_api_client_file(self) -> str:
         api_client = self._env.get_template("_api_client.py.jinja")
-
-        api_imports = [client_subapi_import(view_name) for view_name in sorted(self._view_names)]
-        api_instantiations = [subapi_instantiation(view_name) for view_name in sorted(self._view_names)]
 
         return (
             api_client.render(
@@ -84,51 +76,26 @@ class SDKGenerator:
                 pygen_version=__version__,
                 cognite_sdk_version=cognite_sdk_version,
                 pydantic_version=PYDANTIC_VERSION,
-                data_model_space=self._data_model_space,
-                data_model_external_id=self._data_model_external_id,
-                data_model_version=self._data_model_version,
-                api_imports="\n".join(api_imports),
-                api_instantiations="\n        ".join(api_instantiations),
+                data_model=self._data_model,
+                classes=sorted((api.class_ for api in self.apis), key=lambda c: c.data_class),
             )
             + "\n"
         )
 
-    def _update_dependencies(self, fields: list[Field], view_name: str):
-        for field in fields:
-            if field.is_edge:
-                self._dependencies_by_view_name[view_name].add(field.edge_end_node_external_id)
-
-    def create_data_classes_init(self) -> str:
-        import_lines = []
-        class_lines = []
-        for view_name in sorted(self._view_names):
-            pascal_name = to_pascal(view_name, singularize=True)
-            classes = [pascal_name, f"{pascal_name}Apply", f"{pascal_name}List"]
-            import_lines.append(f"from ._{to_snake(view_name, pluralize=True)} import {', '.join(classes)}")
-            class_lines.extend(classes)
-
-        update_forward_refs_lines = []
-        for view_name, dependencies in sorted(self._dependencies_by_view_name.items()):
-            if not dependencies:
-                continue
-            pascal_name = to_pascal(view_name, singularize=True)
-            dependencies = [
-                f"{to_pascal(dependency, singularize=True)}Apply={to_pascal(dependency, singularize=True)}Apply"
-                for dependency in sorted(dependencies)
-            ]
-            update_forward_refs_lines.append(f"{pascal_name}Apply.update_forward_refs({', '.join(dependencies)})")
-
-        imports = "\n".join(import_lines)
-        forward_refs = "\n".join(update_forward_refs_lines)
-        classes = '",\n    "'.join(class_lines)
-        return f"""{imports}
-
-{forward_refs}
-
-__all__ = [
-    "{classes}",
-]
-"""
+    def generate_data_classes_init_file(self) -> str:
+        data_class_init = self._env.get_template("data_classes_init.py.jinja")
+        return (
+            data_class_init.render(
+                classes=sorted((api.class_ for api in self.apis), key=lambda c: c.data_class),
+                dependencies_by_class={
+                    class_: sorted(dependencies, key=lambda c: c.data_class)
+                    for class_, dependencies in sorted(
+                        self._dependencies_by_class.items(), key=lambda x: x[0].data_class
+                    )
+                },
+            )
+            + "\n"
+        )
 
 
 @dataclass
@@ -153,6 +120,10 @@ class Field:
     @property
     def is_datetime(self) -> bool:
         return self.read_type == "datetime"
+
+    @property
+    def is_date(self) -> bool:
+        return self.read_type == "date"
 
     @classmethod
     def from_property(cls, property_: dm.MappedProperty | dm.ConnectionDefinition) -> Field:
@@ -275,33 +246,43 @@ class Fields:
     def has_datetime(self) -> bool:
         return any(field.is_datetime for field in self.data)
 
+    @property
+    def has_date(self) -> bool:
+        return any(field.is_date for field in self.data)
 
-@dataclass
+    @property
+    def dependencies(self) -> set[str]:
+        return {field.dependency_class for field in self.data if field.is_edge}
+
+
+@dataclass(frozen=True)
 class APIClass:
     data_class: str
     variable: str
     variable_list: str
     api_class: str
+    file_name: str
 
     @classmethod
-    def from_view(cls, view: dm.View) -> APIClass:
+    def from_view(cls, view_name: str) -> APIClass:
         return cls(
-            to_pascal(view.name, singularize=True),
-            to_snake(view.name, singularize=True),
-            to_snake(view.name, pluralize=True),
-            to_pascal(view.name, pluralize=True),
+            data_class=to_pascal(view_name, singularize=True),
+            variable=to_snake(view_name, singularize=True),
+            variable_list=to_snake(view_name, pluralize=True),
+            api_class=to_pascal(view_name, pluralize=True),
+            file_name=to_snake(view_name, pluralize=True),
         )
 
 
 class APIGenerator:
     def __init__(self, view: dm.View):
-        self._view = view
+        self.view = view
         self._env = Environment(
             loader=PackageLoader("cognite.pygen._core", "templates"),
             autoescape=select_autoescape(),
         )
         self.fields = Fields([Field.from_property(prop) for prop in view.properties.values()])
-        self.class_ = APIClass.from_view(view)
+        self.class_ = APIClass.from_view(view.name)
 
     def generate_data_class_file(self) -> str:
         type_data = self._env.get_template("type_data.py.jinja")
@@ -310,8 +291,7 @@ class APIGenerator:
             type_data.render(
                 class_name=self.class_.data_class,
                 fields=self.fields,
-                space=self._view.space,
-                view_name=self._view.name,
+                view=self.view,
             )
             + "\n"
         )
@@ -323,9 +303,7 @@ class APIGenerator:
             top_level_package=top_level_package,
             class_=self.class_,
             fields=self.fields,
-            view_space=self._view.space,
-            view_external_id=self._view.external_id,
-            view_version=self._view.version,
+            view=self.view,
         )
 
 
@@ -350,9 +328,10 @@ def _to_python_type(type_: dm.DirectRelationReference | dm.PropertyType) -> str:
     return out_type
 
 
-def client_subapi_import(view_name: str) -> str:
-    return f"from ._api.{to_snake(view_name, pluralize=True)} import {to_pascal(view_name, pluralize=True)}API"
-
-
-def subapi_instantiation(view_name: str) -> str:
-    return f"self.{to_snake(view_name, pluralize=True)} = {to_pascal(view_name, pluralize=True)}API(client)"
+def find_dependencies(apis: List[APIGenerator]) -> dict[APIClass, set[APIClass]]:
+    class_by_data_class_name = {api.class_.data_class: api.class_ for api in apis}
+    return {
+        api.class_: {class_by_data_class_name[d] for d in dependencies}
+        for api in apis
+        if (dependencies := api.fields.dependencies)
+    }

@@ -6,8 +6,6 @@ from pathlib import Path
 from cognite.client import ClientConfig, CogniteClient
 from cognite.client.credentials import OAuthClientCredentials
 
-{{ api_imports }}
-
 
 class {{ client_name }}:
     """
@@ -19,19 +17,18 @@ class {{ client_name }}:
         pydantic = {{ pydantic_version }}
 
     Data Model:
-        space: {{ data_model_space }}
-        externalId: {{ data_model_external_id }}
-        version: {{ data_model_version }}
+        space: {{ data_model.space }}
+        externalId: {{ data_model.external_id }}
+        version: {{ data_model.version }}
     """
 
     def __init__(self, config: ClientConfig | None = None):
         client = CogniteClient(config)
-        {{ api_instantiations }}
 
     @classmethod
     def azure_project(
         cls, tenant_id: str, client_id: str, client_secret: str, cdf_cluster: str, project: str
-    ) -> {{ client_name_pascal }}:
+    ) -> {{ client_name }}:
         base_url = f"https://{cdf_cluster}.cognitedata.com/"
         credentials = OAuthClientCredentials(
             token_url=f"https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/token",
@@ -49,7 +46,7 @@ class {{ client_name }}:
         return cls(config)
 
     @classmethod
-    def from_toml(cls, file_path: Path | str) -> {{ client_name_pascal }}:
+    def from_toml(cls, file_path: Path | str) -> {{ client_name }}:
         import toml
 
         return cls.azure_project(**toml.load(file_path)["cognite"])

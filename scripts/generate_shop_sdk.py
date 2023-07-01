@@ -14,7 +14,7 @@ def main():
     data_model = c.data_modeling.data_models.retrieve(
         ("IntegrationTestsImmutable", "SHOP_Model", "2"), inline_views=True
     )[0]
-    sdk = generator.data_model_to_sdk(data_model)
+    sdk = generator.generate_sdk(data_model)
 
     pygen.write_sdk_to_disk(sdk, examples_dir)
 

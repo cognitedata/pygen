@@ -49,7 +49,7 @@ class {{ class_.api_class }}API(TypeAPI[{{ class_.data_class }}, {{ class_.data_
     def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,
-            sources=dm.ViewId("{{ view_space }}", "{{ view_external_id }}", "{{ view_version }}"),
+            sources=dm.ViewId("{{ view.space }}", "{{ view.external_id }}", "{{ view.version }}"),
             class_type={{ class_.data_class }},
             class_apply_type={{ class_.data_class }}Apply,
             class_list={{ class_.data_class }}List,
