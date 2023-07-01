@@ -157,4 +157,4 @@ class DirectorsAPI(TypeAPI[Director, DirectorApply, DirectorList]):
         for director in directors:
             node_id = director.id_tuple()
             if node_id in edges_by_start_node:
-                director.nomination = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
+                director.nominations = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]

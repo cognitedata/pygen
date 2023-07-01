@@ -87,7 +87,7 @@ def person_apply_to_instances_test_cases():
                 external_id="director:quentin_tarantino",
                 won_oscar=True,
                 person="person:quentin_tarantino",
-                nomination=[
+                nominations=[
                     movie.NominationApply(
                         external_id="director:quentin_tarantino:pulp_fiction", name="Best Director", year=1995
                     )

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Literal
 
 import pytest
 
@@ -10,13 +9,11 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.views import ViewProperty
 
 from cognite.pygen._core.sdk_generator import (
-    DataClassGenerator,
+    APIGenerator,
     EdgeSnippets,
     Field,
     SDKGenerator,
     client_subapi_import,
-    dependencies_to_imports,
-    properties_to_fields,
     property_to_edge_snippets,
     subapi_instantiation,
 )
@@ -222,7 +219,7 @@ def test_create_view_data_class_persons(sdk_generator: SDKGenerator, person_view
     expected = MovieSDKFiles.persons_data.read_text()
 
     # Act
-    actual = DataClassGenerator(person_view).generate()
+    actual = APIGenerator(person_view).generate_data_class()
 
     # Assert
     assert actual == expected
@@ -233,7 +230,7 @@ def test_create_view_data_class_actors(sdk_generator: SDKGenerator, actor_view: 
     expected = MovieSDKFiles.actors_data.read_text()
 
     # Act
-    actual = sdk_generator.view_to_data_classes(actor_view)
+    actual = APIGenerator(actor_view).generate_data_class()
 
     # Assert
     assert actual == expected
@@ -307,76 +304,6 @@ def test_property_to_edge_snippets(person_view: dm.View):
     assert actual == expected
 
 
-@pytest.mark.parametrize(
-    "field_type, expected",
-    [
-        (
-            "read",
-            [
-                'birth_year: Optional[int] = Field(None, alias="birthYear")',
-                "name: Optional[str] = None",
-                "roles: list[str] = []",
-            ],
-        ),
-        (
-            "write",
-            [
-                "birth_year: Optional[int] = None",
-                "name: str",
-                'roles: list[Union[str, "RoleApply"]] = []',
-            ],
-        ),
-    ],
-)
-def test_create_fields(field_type: Literal["read", "write"], expected: list[str], person_view):
-    # Act
-    actual = properties_to_fields(person_view.properties.values())
-
-    # Assert
-    assert [f.as_type_hint(field_type) for f in actual] == expected
-
-
-# def test_create_sources(person_view: dm.View):
-#     # Arrange
-#     expected = [
-#         """dm.NodeOrEdgeData(
-#             source=dm.ContainerId("IntegrationTestsImmutable", "Person"),
-#             properties={
-#                 "birthYear": self.birth_year,
-#                 "name": self.name,
-#             },
-#         )
-# """
-#     ]
-#
-#     # Act
-#     actual = properties_to_sources(person_view.properties.values())
-#
-#     # Assert
-#     assert actual == expected
-
-
-def dependencies_to_imports_test_cases():
-    expected = """if TYPE_CHECKING:
-    from ._roles import RoleApply
-"""
-    yield pytest.param({"Role"}, expected, id="single dependency")
-    expected = """if TYPE_CHECKING:
-    from ._movies import MovieApply
-    from ._nominations import NominationApply
-"""
-    yield pytest.param({"Movie", "Nomination"}, expected, id="multiple dependencies")
-
-
-@pytest.mark.parametrize("dependencies, expected", list(dependencies_to_imports_test_cases()))
-def test_dependencies_to_imports(dependencies: set[str], expected: str):
-    # Act
-    actual = dependencies_to_imports(dependencies)
-
-    # Assert
-    assert actual == expected
-
-
 def test_create_api_classes(sdk_generator: SDKGenerator, monkeypatch):
     # Arrange
     expected = MovieSDKFiles.data_init.read_text()
@@ -410,28 +337,6 @@ def test_create_api_classes(sdk_generator: SDKGenerator, monkeypatch):
 
     # Act
     actual = sdk_generator.create_data_classes_init()
-
-    # Assert
-    assert actual == expected
-
-
-def test_properties_to_create_edge_methods_persons(sdk_generator: SDKGenerator, person_view: dm.View):
-    # Arrange
-    expected = ["\n".join(MovieSDKFiles.persons_data.read_text().split("\n")[61:76])]
-
-    # Act
-    actual = sdk_generator.properties_to_create_edge_methods(person_view.properties.values())
-
-    # Assert
-    assert actual == expected
-
-
-def test_properties_to_add_edges_persons(sdk_generator: SDKGenerator, person_view: dm.View):
-    # Arrange
-    expected = ["\n".join(MovieSDKFiles.persons_data.read_text().split("\n")[48:58])]
-
-    # Act
-    actual = sdk_generator.properties_to_add_edges(person_view.properties.values())
 
     # Assert
     assert actual == expected
@@ -492,22 +397,6 @@ def test_client_subapi_import(view_name: str, expected: str):
 def test_subapi_instantiation(view_name: str, expected: str):
     # Act
     actual = subapi_instantiation(view_name)
-
-    # Assert
-    assert actual == expected
-
-
-def test_properties_to_direct_relations_in_node_data_actors(sdk_generator: SDKGenerator, actor_view: dm.View):
-    expected = [
-        """        if self.person:
-            node_data.properties["person"] = {
-                "space": "IntegrationTestsImmutable",
-                "externalId": self.person if isinstance(self.person, str) else self.person.external_id,
-            }"""
-    ]
-
-    # Act
-    actual = sdk_generator.properties_to_direct_relations_in_node_data(actor_view.properties.values())
 
     # Assert
     assert actual == expected

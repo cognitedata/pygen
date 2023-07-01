@@ -157,4 +157,4 @@ class RolesAPI(TypeAPI[Role, RoleApply, RoleList]):
         for role in roles:
             node_id = role.id_tuple()
             if node_id in edges_by_start_node:
-                role.nomination = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
+                role.nominations = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]

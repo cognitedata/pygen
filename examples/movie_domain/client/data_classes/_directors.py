@@ -20,7 +20,7 @@ class Director(DomainModel):
     won_oscar: Optional[bool] = Field(None, alias="wonOscar")
     person: Optional[str] = None
     movies: list[str] = []
-    nomination: list[str] = []
+    nominations: list[str] = []
 
 
 class DirectorApply(CircularModelApply):
@@ -28,7 +28,7 @@ class DirectorApply(CircularModelApply):
     won_oscar: Optional[bool] = None
     person: Optional[Union[str, "PersonApply"]] = None
     movies: list[Union[str, "MovieApply"]] = []
-    nomination: list[Union[str, "NominationApply"]] = []
+    nominations: list[Union[str, "NominationApply"]] = []
 
     def _to_instances_apply(self, cache: set[str]) -> InstancesApply:
         if self.external_id in cache:
@@ -69,7 +69,7 @@ class DirectorApply(CircularModelApply):
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
-        for nomination in self.nomination:
+        for nomination in self.nominations:
             edge = self._create_nomination_edge(nomination)
             if edge.external_id not in cache:
                 edges.append(edge)

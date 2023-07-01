@@ -158,4 +158,4 @@ class ActorsAPI(TypeAPI[Actor, ActorApply, ActorList]):
         for actor in actors:
             node_id = actor.id_tuple()
             if node_id in edges_by_start_node:
-                actor.nomination = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
+                actor.nominations = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]

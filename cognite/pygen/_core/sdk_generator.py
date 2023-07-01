@@ -4,7 +4,7 @@ from collections import defaultdict
 from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Literal
+from typing import Dict, List, Literal
 
 from cognite.client import data_modeling as dm
 from cognite.client._version import __version__ as cognite_sdk_version
@@ -45,8 +45,8 @@ class SDKGenerator:
         for view in data_model.views:
             file_name = to_snake(view.name, pluralize=True)
             try:
-                data_class = DataClassGenerator(view)
-                sdk[data_classes_dir / f"_{file_name}.py"] = data_class.generate()
+                data_class = APIGenerator(view)
+                sdk[data_classes_dir / f"_{file_name}.py"] = data_class.generate_data_class()
                 sdk[api_dir / f"{file_name}.py"] = self.view_to_api(view)
             except Exception as e:
                 print(f"Failed to generate SDK for view {view.name}: {e}")  # noqa
@@ -306,6 +306,30 @@ class Fields:
         return iter(self.data)
 
     @property
+    def primary(self) -> list[Field]:
+        return [field for field in self.data if not field.is_edge]
+
+    @property
+    def fields_by_container(self) -> dict[dm.ContainerId, list[Field]]:
+        result: Dict[dm.ContainerId, List[Field]] = defaultdict(list)
+        for field in self:
+            if isinstance(field.prop, dm.MappedProperty):
+                result[field.prop.container].append(field)
+        return result
+
+    @property
+    def edges(self) -> list[Field]:
+        return [field for field in self.data if field.is_edge]
+
+    @property
+    def edges_one_to_one(self) -> list[Field]:
+        return [field for field in self.data if field.is_edge and not field.is_list]
+
+    @property
+    def edges_one_to_many(self) -> list[Field]:
+        return [field for field in self.data if field.is_edge and field.is_list]
+
+    @property
     def import_pydantic_field(self) -> bool:
         return any("Field" in field.as_type_hint("read") for field in self.data)
 
@@ -318,7 +342,7 @@ class Fields:
         return any("datetime" in field.read_type for field in self.data)
 
 
-class DataClassGenerator:
+class APIGenerator:
     def __init__(self, view: dm.View):
         self._view = view
         self._env = Environment(
@@ -326,21 +350,20 @@ class DataClassGenerator:
             autoescape=select_autoescape(),
         )
         self.fields = Fields([Field.from_property(prop) for prop in view.properties.values()])
-        self.view_name = view.name
         self.class_name = to_pascal(view.name, singularize=True)
-        self.space = view.space
 
-    def generate(self) -> str:
+    def generate_data_class(self) -> str:
         type_data = self._env.get_template("type_data.py.jinja")
 
         return (
-            type_data.render(class_name=self.class_name, fields=self.fields, space=self.space, view_name=self.view_name)
+            type_data.render(
+                class_name=self.class_name,
+                fields=self.fields,
+                space=self._view.space,
+                view_name=self._view.name,
+            )
             + "\n"
         )
-
-
-class APIGenerator:
-    ...
 
 
 @dataclass
@@ -395,18 +418,6 @@ def _to_python_type(type_: dm.DirectRelationReference | dm.PropertyType) -> str:
         raise ValueError(f"Unknown type {type_}")
 
     return out_type
-
-
-def dependencies_to_imports(dependencies: set[str]) -> str:
-    if not dependencies:
-        return ""
-    lines = ["if TYPE_CHECKING:"]
-    for dependency in sorted(dependencies):
-        snake_plural = to_snake(dependency, pluralize=True)
-        pascal_singular = to_pascal(dependency, singularize=True)
-        lines.append(f"    from ._{snake_plural} import {pascal_singular}Apply")
-    lines.append("")
-    return "\n".join(lines)
 
 
 def client_subapi_import(view_name: str) -> str:
