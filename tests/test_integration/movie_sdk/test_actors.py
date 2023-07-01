@@ -7,7 +7,7 @@ def test_actor_list(movie_client: MovieClient):
 
     assert len(actors) > 0
     assert all(isinstance(movie, str) for actor in actors for movie in actor.movies)
-    assert all(isinstance(nomination, str) for actor in actors for nomination in actor.nominations)
+    assert all(isinstance(nomination, str) for actor in actors for nomination in actor.nomination)
 
 
 def test_actor_apply_with_person(movie_client: MovieClient):
@@ -15,7 +15,7 @@ def test_actor_apply_with_person(movie_client: MovieClient):
     actor = m.ActorApply(
         external_id="actor:anders",
         movies=[],
-        nominations=[],
+        nomination=[],
         person=m.PersonApply(external_id="person:anders", name="Anders", birth_year=0),
     )
 
