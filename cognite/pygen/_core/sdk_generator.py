@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Literal
@@ -12,7 +11,6 @@ from cognite.client.data_classes.data_modeling.data_types import ListablePropert
 from jinja2 import Environment, PackageLoader, select_autoescape
 from pydantic.version import VERSION as PYDANTIC_VERSION
 
-from cognite.pygen._core import view_functions
 from cognite.pygen._version import __version__
 from cognite.pygen.utils.text import to_pascal, to_snake
 
@@ -72,7 +70,7 @@ class SDKGenerator:
 
     def create_client_init(self) -> str:
         client_init = self._env.get_template("_client_init.py.jinja")
-        return client_init.render(client_name_pascal=self.client_name)
+        return client_init.render(client_name=self.client_name)
 
     def create_api_client(self) -> str:
         api_client = self._env.get_template("_api_client.py.jinja")
@@ -82,7 +80,7 @@ class SDKGenerator:
 
         return (
             api_client.render(
-                client_name_pascal=self.client_name,
+                client_name=self.client_name,
                 pygen_version=__version__,
                 cognite_sdk_version=cognite_sdk_version,
                 pydantic_version=PYDANTIC_VERSION,
@@ -99,84 +97,6 @@ class SDKGenerator:
         for field in fields:
             if field.is_edge:
                 self._dependencies_by_view_name[view_name].add(field.edge_end_node_external_id)
-
-    def view_to_api(self, view: dm.View) -> str:
-        edge_properties = list(view_functions.edge_one_to_many_properties(view.properties.values()))
-
-        edges_apis = [self.property_to_edge_api(prop, view.name, view.space) for prop in edge_properties]
-        edges_helpers = [self.property_to_edge_helper(prop, view.name) for prop in edge_properties]
-        edge_snippets = [property_to_edge_snippets(prop, view.name) for prop in edge_properties]
-
-        has_one_to_many = len(edge_properties) > 0
-
-        type_api = self._env.get_template("type_api.py.jinja")
-
-        view_plural_snake = to_snake(view.name, pluralize=True)
-        return type_api.render(
-            top_level_package=self.top_level_package,
-            view_name=to_pascal(view.name, singularize=True),
-            view_snake=to_snake(view.name),
-            view_space=view.space,
-            view_ext_id=view.external_id,
-            view_version=view.version,
-            view_plural_snake=view_plural_snake,
-            view_plural_pascal=to_pascal(view_plural_snake),
-            has_one_to_many=has_one_to_many,
-            edge_apis="\n\n\n".join(edges_apis),
-            edge_helpers="\n\n".join(edges_helpers),
-            edge_retrieve=f"\n{' '*12}".join(snippet.retrieve for snippet in edge_snippets),
-            edge_list=f"\n{' '*8}".join(snippet.list for snippet in edge_snippets),
-            init_edge_apis=f"\n{' ' * 8}".join(snippet.init for snippet in edge_snippets),
-            set_retrieve_singular=f"\n{' '*12}".join(snippet.set_singular for snippet in edge_snippets),
-            set_retrieve_plural=f"\n{' '*12}".join(snippet.set_plural for snippet in edge_snippets),
-            set_list_plural=f"\n{' '*8}".join(snippet.set_plural for snippet in edge_snippets),
-        ) + ("\n" if has_one_to_many else "")
-
-    def property_to_edge_api(
-        self, prop: dm.ConnectionDefinition | dm.MappedProperty, view_name: str, view_space: str
-    ) -> str:
-        edge_api = self._env.get_template("edge_api.py.jinja")
-        shared_args = dict(
-            view_name=view_name,
-            view_space=view_space,
-            view_snake=to_snake(view_name, singularize=True),
-            view_snake_plural=to_snake(view_name, pluralize=True),
-        )
-        if isinstance(prop, dm.SingleHopConnectionDefinition):
-            return edge_api.render(
-                **shared_args,
-                edge_api_name=to_pascal(prop.name, pluralize=True),
-                type_ext_id=prop.type.external_id,
-            )
-        elif isinstance(prop, dm.MappedProperty):
-            return edge_api.render(
-                **shared_args,
-                edge_api_name=to_pascal(prop.name, singularize=True),
-                type_ext_id=f"{prop.container.external_id}.{prop.name}",
-            )
-        raise NotImplementedError(f"Edge API for type={type(prop)} is not implemented")
-
-    def property_to_edge_helper(self, prop: dm.ConnectionDefinition | dm.MappedProperty, view_name: str) -> str:
-        if isinstance(prop, dm.SingleHopConnectionDefinition):
-            helper = self._env.get_template("type_api_set_edges_helper.py.jinja")
-            return helper.render(
-                view_name=to_pascal(view_name),
-                view_snake=to_snake(view_name),
-                view_plural_snake=to_snake(view_name, pluralize=True),
-                edge_name=prop.name,
-                edge_plural_snake=to_snake(prop.name, pluralize=True),
-                edge_snake=to_snake(prop.name, singularize=True),
-            )
-        elif isinstance(prop, dm.MappedProperty):
-            helper = self._env.get_template("type_api_set_edge_helper.py.jinja")
-            return helper.render(
-                edge_name=prop.name,
-                edge_snake=to_snake(prop.name, singularize=True),
-                view_name=view_name,
-                view_snake=to_snake(view_name),
-                view_snake_plural=to_snake(view_name, pluralize=True),
-            )
-        raise NotImplementedError(f"Edge API for type={type(prop)} is not implemented")
 
     def create_data_classes_init(self) -> str:
         import_lines = []
@@ -407,39 +327,6 @@ class APIGenerator:
             view_external_id=self._view.external_id,
             view_version=self._view.version,
         )
-
-
-@dataclass
-class EdgeSnippets:
-    init: str
-    set_singular: str
-    set_plural: str
-    retrieve: str
-    list: str
-
-
-def property_to_edge_snippets(prop: dm.ConnectionDefinition | dm.MappedProperty, view_name: str) -> EdgeSnippets:
-    view_snake = to_snake(view_name)
-    view_snake_plural = to_snake(view_name, pluralize=True)
-    prop_snake = to_snake(prop.name, singularize=True)
-    if isinstance(prop, dm.SingleHopConnectionDefinition):
-        prop_pascal_plural = to_pascal(prop.name, pluralize=True)
-        prop_plural_snake = to_snake(prop.name, pluralize=True)
-        return EdgeSnippets(
-            f"self.{prop_plural_snake} = {view_name}{prop_pascal_plural}API(client)",
-            f"{view_snake}.{prop.name} = [edge.end_node.external_id for edge in {prop_snake}_edges]",
-            f"self._set_{prop_plural_snake}({view_snake_plural}, {prop_snake}_edges)",
-            f"{prop_snake}_edges = self.{prop_plural_snake}.retrieve(external_id)",
-            f"{prop_snake}_edges = self.{prop_plural_snake}.list(limit=-1)",
-        )
-
-    raise NotImplementedError(f"Edge API for type={type(prop)} is not implemented")
-
-
-def properties_to_fields(
-    properties: Iterable[dm.MappedProperty | dm.ConnectionDefinition],
-) -> list[Field]:
-    return [Field.from_property(p) for p in properties]
 
 
 def _to_python_type(type_: dm.DirectRelationReference | dm.PropertyType) -> str:
