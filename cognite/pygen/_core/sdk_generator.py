@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Literal
+from typing import Callable, Dict, List, Literal
 
 from cognite.client import data_modeling as dm
 from cognite.client._version import __version__ as cognite_sdk_version
@@ -16,7 +16,13 @@ from cognite.pygen.utils.text import to_pascal, to_snake
 
 
 class SDKGenerator:
-    def __init__(self, top_level_package: str, client_name: str, data_model: dm.DataModel):
+    def __init__(
+        self,
+        top_level_package: str,
+        client_name: str,
+        data_model: dm.DataModel,
+        logger: Callable[[str], None] | None = None,
+    ):
         self._data_model = data_model
         self._env = Environment(
             loader=PackageLoader("cognite.pygen._core", "templates"),
@@ -24,13 +30,14 @@ class SDKGenerator:
         )
         self.top_level_package = top_level_package
         self.client_name = client_name
+        self._logger = logger or print  # noqa: T202
 
         self.apis = []
         for view in data_model.views:
             try:
                 api_generator = APIGenerator(view)
             except Exception as e:
-                print(f"Failed to generate SDK for view {view.name}: {e}")  # noqa
+                self._logger(f"Failed to generate SDK for view {view.name}: {e}")
             else:
                 self.apis.append(api_generator)
         self._dependencies_by_class = find_dependencies(self.apis)
@@ -48,8 +55,8 @@ class SDKGenerator:
                 sdk[data_classes_dir / f"_{file_name}.py"] = api.generate_data_class_file()
                 sdk[api_dir / f"{file_name}.py"] = api.generate_api_file(self.top_level_package)
             except Exception as e:
-                print(f"Failed to generate SDK for view {view.name}: {e}")  # noqa
-                print(f"Skipping view {view.name}")  # noqa
+                self._logger(f"Failed to generate SDK for view {api.view.name}: {e}")
+                self._logger(f"Skipping view {api.view.name}")
                 self._dependencies_by_class.pop(api.class_, None)
 
         sdk[client_dir / "_api_client.py"] = self.generate_api_client_file()
