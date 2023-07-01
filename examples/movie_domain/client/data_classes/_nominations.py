@@ -23,19 +23,22 @@ class NominationApply(CircularModelApply):
     def _to_instances_apply(self, cache: set[str]) -> InstancesApply:
         if self.external_id in cache:
             return InstancesApply([], [])
-        node_data = dm.NodeOrEdgeData(
+
+        sources = []
+        source = dm.NodeOrEdgeData(
             source=dm.ContainerId("IntegrationTestsImmutable", "Nomination"),
             properties={
                 "name": self.name,
                 "year": self.year,
             },
         )
+        sources.append(source)
 
         this_node = dm.NodeApply(
             space=self.space,
             external_id=self.external_id,
             existing_version=self.existing_version,
-            sources=[node_data],
+            sources=sources,
         )
         nodes = [this_node]
         edges = []

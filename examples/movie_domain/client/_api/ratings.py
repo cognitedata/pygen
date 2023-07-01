@@ -6,7 +6,8 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client._constants import INSTANCES_LIST_LIMIT_DEFAULT
 
-from ..data_classes import Rating, RatingApply, RatingList
+from movie_domain.client.data_classes import Rating, RatingApply, RatingList
+
 from ._core import TypeAPI
 
 
@@ -42,9 +43,9 @@ class RatingsAPI(TypeAPI[Rating, RatingApply, RatingList]):
 
     def retrieve(self, external_id: str | Sequence[str]) -> Rating | RatingList:
         if isinstance(external_id, str):
-            return self._retrieve(("IntegrationTestsImmutable", external_id))
+            return self._retrieve((self.sources.space, external_id))
         else:
-            return self._retrieve([("IntegrationTestsImmutable", ext_id) for ext_id in external_id])
+            return self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
 
     def list(self, limit: int = INSTANCES_LIST_LIMIT_DEFAULT) -> RatingList:
         return self._list(limit=limit)

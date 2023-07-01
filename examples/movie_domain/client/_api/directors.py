@@ -7,7 +7,8 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client._constants import INSTANCES_LIST_LIMIT_DEFAULT
 
-from ..data_classes import Director, DirectorApply, DirectorList
+from movie_domain.client.data_classes import Director, DirectorApply, DirectorList
+
 from ._core import TypeAPI
 
 
@@ -111,18 +112,20 @@ class DirectorsAPI(TypeAPI[Director, DirectorApply, DirectorList]):
 
     def retrieve(self, external_id: str | Sequence[str]) -> Director | DirectorList:
         if isinstance(external_id, str):
-            director = self._retrieve(("IntegrationTestsImmutable", external_id))
+            director = self._retrieve((self.sources.space, external_id))
+
             movie_edges = self.movies.retrieve(external_id)
-            nomination_edges = self.nominations.retrieve(external_id)
             director.movies = [edge.end_node.external_id for edge in movie_edges]
-            director.nomination = [edge.end_node.external_id for edge in nomination_edges]
+            nomination_edges = self.nominations.retrieve(external_id)
+            director.nominations = [edge.end_node.external_id for edge in nomination_edges]
 
             return director
         else:
-            directors = self._retrieve([("IntegrationTestsImmutable", ext_id) for ext_id in external_id])
+            directors = self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
+
             movie_edges = self.movies.retrieve(external_id)
-            nomination_edges = self.nominations.retrieve(external_id)
             self._set_movies(directors, movie_edges)
+            nomination_edges = self.nominations.retrieve(external_id)
             self._set_nominations(directors, nomination_edges)
 
             return directors
@@ -131,8 +134,8 @@ class DirectorsAPI(TypeAPI[Director, DirectorApply, DirectorList]):
         directors = self._list(limit=limit)
 
         movie_edges = self.movies.list(limit=-1)
-        nomination_edges = self.nominations.list(limit=-1)
         self._set_movies(directors, movie_edges)
+        nomination_edges = self.nominations.list(limit=-1)
         self._set_nominations(directors, nomination_edges)
 
         return directors

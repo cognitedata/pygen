@@ -17,55 +17,53 @@ __all__ = ["Movie", "MovieApply", "MovieList"]
 
 class Movie(DomainModel):
     space: ClassVar[str] = "IntegrationTestsImmutable"
-    title: Optional[str] = None
-    release_year: Optional[int] = Field(None, alias="releaseYear")
-    rating: Optional[str] = None
-    run_time_minutes: Optional[float] = Field(None, alias="runTimeMinutes")
-    meta: Optional[dict] = None
     actors: list[str] = []
     directors: list[str] = []
+    meta: Optional[dict] = None
+    rating: Optional[str] = None
+    release_year: Optional[int] = Field(None, alias="releaseYear")
+    run_time_minute: Optional[float] = Field(None, alias="runTimeMinutes")
+    title: Optional[str] = None
 
 
 class MovieApply(CircularModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
-    title: str
-    release_year: Optional[int] = None
-    rating: Optional[Union[str, "RatingApply"]] = None
-    run_time_minutes: Optional[float] = None
-    meta: Optional[dict] = None
     actors: list[Union[str, "ActorApply"]] = []
     directors: list[Union[str, "DirectorApply"]] = []
+    meta: Optional[dict] = None
+    rating: Optional[Union[str, "RatingApply"]] = None
+    release_year: Optional[int] = None
+    run_time_minute: Optional[float] = None
+    title: str
 
     def _to_instances_apply(self, cache: set[str]) -> InstancesApply:
         if self.external_id in cache:
             return InstancesApply([], [])
-        node_data = dm.NodeOrEdgeData(
+
+        sources = []
+        source = dm.NodeOrEdgeData(
             source=dm.ContainerId("IntegrationTestsImmutable", "Movie"),
             properties={
-                "title": self.title,
-                "releaseYear": self.release_year,
-                "runTimeMinutes": self.run_time_minutes,
                 "meta": self.meta,
+                "rating": {
+                    "space": "IntegrationTestsImmutable",
+                    "externalId": self.rating if isinstance(self.rating, str) else self.rating.external_id,
+                },
+                "releaseYear": self.release_year,
+                "runTimeMinutes": self.run_time_minute,
+                "title": self.title,
             },
         )
-        if self.rating:
-            node_data.properties["rating"] = {
-                "space": "IntegrationTestsImmutable",
-                "externalId": self.rating if isinstance(self.rating, str) else self.rating.external_id,
-            }
+        sources.append(source)
+
         this_node = dm.NodeApply(
             space=self.space,
             external_id=self.external_id,
             existing_version=self.existing_version,
-            sources=[node_data],
+            sources=sources,
         )
         nodes = [this_node]
         edges = []
-
-        if self.rating is not None and isinstance(self.rating, DomainModelApply):
-            instances = self.rating._to_instances_apply(cache)
-            nodes.extend(instances.nodes)
-            edges.extend(instances.edges)
 
         for actor in self.actors:
             edge = self._create_actor_edge(actor)
@@ -88,6 +86,11 @@ class MovieApply(CircularModelApply):
                 instances = director._to_instances_apply(cache)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
+
+        if isinstance(self.rating, DomainModelApply):
+            instances = self.rating._to_instances_apply(cache)
+            nodes.extend(instances.nodes)
+            edges.extend(instances.edges)
 
         return InstancesApply(nodes, edges)
 

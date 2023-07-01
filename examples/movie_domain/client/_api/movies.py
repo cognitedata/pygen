@@ -7,7 +7,8 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client._constants import INSTANCES_LIST_LIMIT_DEFAULT
 
-from ..data_classes import Movie, MovieApply, MovieList
+from movie_domain.client.data_classes import Movie, MovieApply, MovieList
+
 from ._core import TypeAPI
 
 
@@ -111,18 +112,20 @@ class MoviesAPI(TypeAPI[Movie, MovieApply, MovieList]):
 
     def retrieve(self, external_id: str | Sequence[str]) -> Movie | MovieList:
         if isinstance(external_id, str):
-            movie = self._retrieve(("IntegrationTestsImmutable", external_id))
+            movie = self._retrieve((self.sources.space, external_id))
+
             actor_edges = self.actors.retrieve(external_id)
-            director_edges = self.directors.retrieve(external_id)
             movie.actors = [edge.end_node.external_id for edge in actor_edges]
+            director_edges = self.directors.retrieve(external_id)
             movie.directors = [edge.end_node.external_id for edge in director_edges]
 
             return movie
         else:
-            movies = self._retrieve([("IntegrationTestsImmutable", ext_id) for ext_id in external_id])
+            movies = self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
+
             actor_edges = self.actors.retrieve(external_id)
-            director_edges = self.directors.retrieve(external_id)
             self._set_actors(movies, actor_edges)
+            director_edges = self.directors.retrieve(external_id)
             self._set_directors(movies, director_edges)
 
             return movies
@@ -131,8 +134,8 @@ class MoviesAPI(TypeAPI[Movie, MovieApply, MovieList]):
         movies = self._list(limit=limit)
 
         actor_edges = self.actors.list(limit=-1)
-        director_edges = self.directors.list(limit=-1)
         self._set_actors(movies, actor_edges)
+        director_edges = self.directors.list(limit=-1)
         self._set_directors(movies, director_edges)
 
         return movies
