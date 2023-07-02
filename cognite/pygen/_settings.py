@@ -45,7 +45,7 @@ def load_settings(pyproject_toml_path: Path) -> PygenSettings:
     return PygenSettings()
 
 
-def get_cognite_client(cdf_project, cdf_cluster, tenant_id, client_id, client_secret):
+def get_cognite_client(project, cdf_cluster, tenant_id, client_id, client_secret):
     base_url = f"https://{cdf_cluster}.cognitedata.com/"
     credentials = OAuthClientCredentials(
         token_url=f"https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/token",
@@ -54,7 +54,7 @@ def get_cognite_client(cdf_project, cdf_cluster, tenant_id, client_id, client_se
         scopes=[f"{base_url}.default"],
     )
     config = ClientConfig(
-        project=cdf_project,
+        project=project,
         credentials=credentials,
         client_name=getpass.getuser(),
         base_url=base_url,
@@ -65,4 +65,4 @@ def get_cognite_client(cdf_project, cdf_cluster, tenant_id, client_id, client_se
 def load_cognite_client_from_toml(file_path: Path | str, section: str | None = "cognite") -> CogniteClient:
     import toml
 
-    return get_cognite_client(**toml.load(file_path))
+    return get_cognite_client(**toml.load(Path(file_path))[section])
