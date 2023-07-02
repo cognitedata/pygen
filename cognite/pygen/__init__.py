@@ -1,19 +1,13 @@
-from pathlib import Path
-
-from ._core.sdk_generator import SDKGenerator
+from ._core.dms_to_python import SDKGenerator
+from ._generator import generate_sdk, generate_sdk_notebook, write_sdk_to_disk
+from ._settings import get_cognite_client, load_cognite_client_from_toml
 from ._version import __version__
 
-__all__ = ["__version__", "SDKGenerator", "write_sdk_to_disk"]
-
-
-def write_sdk_to_disk(sdk: dict[Path, str], output_dir: Path):
-    """Write a generated SDK to disk.
-
-    Args:
-        sdk: The generated SDK.
-        output_dir: The output directory to write to.
-    """
-    for file_path, file_content in sdk.items():
-        path = output_dir / file_path
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(file_content)
+__all__ = [
+    "__version__",
+    "write_sdk_to_disk",
+    "SDKGenerator",
+    "generate_sdk_notebook",
+    "get_cognite_client",
+    "load_cognite_client_from_toml",
+]

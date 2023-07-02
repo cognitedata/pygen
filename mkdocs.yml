@@ -10,6 +10,8 @@ theme:
 nav:
     - Home: index.md
     - Getting Started: getting-started.md
+    - CLI: cli.md
+    - Experiment in Notebook: notebook.ipynb
     - Examples: examples/movie_domain.ipynb
     - Changelog: CHANGELOG.md
 

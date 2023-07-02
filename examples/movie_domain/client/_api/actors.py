@@ -112,19 +112,21 @@ class ActorsAPI(TypeAPI[Actor, ActorApply, ActorList]):
 
     def retrieve(self, external_id: str | Sequence[str]) -> Actor | ActorList:
         if isinstance(external_id, str):
-            actor = self._retrieve(("IntegrationTestsImmutable", external_id))
+            actor = self._retrieve((self.sources.space, external_id))
+
             movie_edges = self.movies.retrieve(external_id)
-            nomination_edges = self.nominations.retrieve(external_id)
             actor.movies = [edge.end_node.external_id for edge in movie_edges]
+            nomination_edges = self.nominations.retrieve(external_id)
             actor.nomination = [edge.end_node.external_id for edge in nomination_edges]
 
             return actor
         else:
-            actors = self._retrieve([("IntegrationTestsImmutable", ext_id) for ext_id in external_id])
+            actors = self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
+
             movie_edges = self.movies.retrieve(external_id)
-            nomination_edges = self.nominations.retrieve(external_id)
             self._set_movies(actors, movie_edges)
-            self._set_nominations(actors, nomination_edges)
+            nomination_edges = self.nominations.retrieve(external_id)
+            self._set_nomination(actors, nomination_edges)
 
             return actors
 
@@ -132,9 +134,9 @@ class ActorsAPI(TypeAPI[Actor, ActorApply, ActorList]):
         actors = self._list(limit=limit)
 
         movie_edges = self.movies.list(limit=-1)
-        nomination_edges = self.nominations.list(limit=-1)
         self._set_movies(actors, movie_edges)
-        self._set_nominations(actors, nomination_edges)
+        nomination_edges = self.nominations.list(limit=-1)
+        self._set_nomination(actors, nomination_edges)
 
         return actors
 
@@ -150,7 +152,7 @@ class ActorsAPI(TypeAPI[Actor, ActorApply, ActorList]):
                 actor.movies = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
 
     @staticmethod
-    def _set_nominations(actors: Sequence[Actor], nomination_edges: Sequence[dm.Edge]):
+    def _set_nomination(actors: Sequence[Actor], nomination_edges: Sequence[dm.Edge]):
         edges_by_start_node: Dict[Tuple, List] = defaultdict(list)
         for edge in nomination_edges:
             edges_by_start_node[edge.start_node.as_tuple()].append(edge)

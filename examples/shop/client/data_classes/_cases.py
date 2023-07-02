@@ -18,9 +18,9 @@ class Case(DomainModel):
     space: ClassVar[str] = "IntegrationTestsImmutable"
     arguments: Optional[str] = None
     bid: Optional[str] = None
-    bid_history: list[str] = None
+    bid_history: list[str] = []
     commands: Optional[str] = None
-    cut_files: list[str] = None
+    cut_files: list[str] = []
     end_time: Optional[datetime] = None
     name: Optional[str] = None
     run_status: Optional[str] = Field(None, alias="runStatus")
@@ -32,9 +32,9 @@ class CaseApply(CircularModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
     arguments: Optional[str] = None
     bid: Optional[str] = None
-    bid_history: list[str] = None
+    bid_history: list[str] = []
     commands: Optional[Union[str, "CommandConfigApply"]] = None
-    cut_files: list[str] = None
+    cut_files: list[str] = []
     end_time: Optional[datetime] = None
     name: str
     run_status: str
@@ -44,12 +44,18 @@ class CaseApply(CircularModelApply):
     def _to_instances_apply(self, cache: set[str]) -> InstancesApply:
         if self.external_id in cache:
             return InstancesApply([], [])
-        node_data = dm.NodeOrEdgeData(
+
+        sources = []
+        source = dm.NodeOrEdgeData(
             source=dm.ContainerId("IntegrationTestsImmutable", "Case"),
             properties={
                 "arguments": self.arguments,
                 "bid": self.bid,
                 "bid_history": self.bid_history,
+                "commands": {
+                    "space": "IntegrationTestsImmutable",
+                    "externalId": self.commands if isinstance(self.commands, str) else self.commands.external_id,
+                },
                 "cut_files": self.cut_files,
                 "end_time": self.end_time.isoformat(),
                 "name": self.name,
@@ -58,16 +64,13 @@ class CaseApply(CircularModelApply):
                 "start_time": self.start_time.isoformat(),
             },
         )
-        if self.commands:
-            node_data.properties["commands"] = {
-                "space": "IntegrationTestsImmutable",
-                "externalId": self.commands if isinstance(self.commands, str) else self.commands.external_id,
-            }
+        sources.append(source)
+
         this_node = dm.NodeApply(
             space=self.space,
             external_id=self.external_id,
             existing_version=self.existing_version,
-            sources=[node_data],
+            sources=sources,
         )
         nodes = [this_node]
         edges = []

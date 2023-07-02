@@ -17,9 +17,14 @@ def person_view(movie_model: dm.DataModel) -> dm.View:
     return next(v for v in movie_model.views if v.name == "Person")
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def actor_view(movie_model: dm.DataModel) -> dm.View:
     return next(v for v in movie_model.views if v.name == "Actor")
+
+
+@pytest.fixture(scope="session")
+def movie_views(movie_model: dm.DataModel) -> dm.ViewList:
+    return dm.ViewList(movie_model.views)
 
 
 @pytest.fixture
