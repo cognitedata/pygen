@@ -17,6 +17,7 @@ Changes are grouped as follows
 ### Added
 
 * Support for views with data in multiple containers in different spaces.
+*  Support for loading cli defaults from `pyproject.toml`.
 
 
 ### Improved
