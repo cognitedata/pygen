@@ -60,7 +60,7 @@ pygen --space movies --external-id Movie --tenant-id <tenant-id> --client-id <cl
 ### Dependencies for the generated SDK
 
 * [cognite-sdk](https://cognite-sdk-python.readthedocs-hosted.com/en/latest/) This is the basis for all requests to the Cognite Data Fusion API. This is a dependency for the generated SDK.
-* [pytandic](https://docs.pydantic.dev/latest/) This is used for all data classes in the generated SDK. This is a dependency for the generated SDK.
+* [pydandic](https://docs.pydantic.dev/latest/) This is used for all data classes in the generated SDK. This is a dependency for the generated SDK.
 
 ### Dependencies for the `pygen`
 
