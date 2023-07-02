@@ -1,11 +1,9 @@
 from pathlib import Path
-from typing import Callable
 
-from cognite.client import CogniteClient
 from cognite.client.exceptions import CogniteAPIError
 from typing_extensions import Annotated
 
-from cognite.pygen import SDKGenerator, write_sdk_to_disk
+from cognite.pygen._generator import generate_sdk
 from cognite.pygen._settings import PygenSettings, get_cognite_client, load_settings
 
 try:
@@ -15,35 +13,6 @@ except ImportError:
     typer = None
 else:
     _has_typer = True
-
-
-def create_sdk(
-    client: CogniteClient,
-    space: str,
-    external_id: str,
-    version: str,
-    output_dir: Path,
-    top_level_package: str,
-    client_name: str,
-    logger: Callable[[str], None] = None,
-):
-    model_id = (space, external_id, version)
-    try:
-        data_models = client.data_modeling.data_models.retrieve(model_id, inline_views=True)
-        data_model = data_models[0]
-    except CogniteAPIError as e:
-        logger(f"Error retrieving data model: {e}")
-        raise e
-    except IndexError as e:
-        logger(f"Cannot find {model_id}")
-        raise e
-    logger(f"Successfully retrieved data model {space}/{external_id}/{version}")
-    sdk_generator = SDKGenerator(top_level_package, client_name, data_model, logger=typer.echo)
-    sdk = sdk_generator.generate_sdk()
-    logger(f"Writing SDK to {output_dir}")
-    write_sdk_to_disk(sdk, output_dir)
-    logger("Done!")
-
 
 if _has_typer:
     app = typer.Typer()
@@ -71,8 +40,8 @@ if _has_typer:
         ):
             client = get_cognite_client(cdf_project, cdf_cluster, tenant_id, client_id, client_secret)
             try:
-                create_sdk(
-                    client, space, external_id, version, output_dir, top_level_package, client_name, logger=typer.echo
+                generate_sdk(
+                    client, (space, external_id, version), top_level_package, client_name, output_dir, typer.echo
                 )
             except (CogniteAPIError, IndexError) as e:
                 raise typer.Exit(code=1) from e
@@ -98,8 +67,8 @@ if _has_typer:
         ):
             client = get_cognite_client(cdf_project, cdf_cluster, tenant_id, client_id, client_secret)
             try:
-                create_sdk(
-                    client, space, external_id, version, output_dir, top_level_package, client_name, logger=typer.echo
+                generate_sdk(
+                    client, (space, external_id, version), top_level_package, client_name, output_dir, typer.echo
                 )
             except (CogniteAPIError, IndexError) as e:
                 raise typer.Exit(code=1) from e

@@ -16,6 +16,19 @@ from cognite.pygen.utils.text import to_pascal, to_snake
 
 
 class SDKGenerator:
+    """
+    SDK generator for a data model.
+
+     Parameters
+     ----------
+     top_level_package: str
+        The name of the top level package of the SDK. Example "movie.client"
+     client_name: str
+        The name of the client class. Example "MovieClient"
+     data_model: DataModel
+        The data model to generate id of the data model to generate the SDK from.
+    """
+
     def __init__(
         self,
         top_level_package: str,
@@ -37,7 +50,7 @@ class SDKGenerator:
             try:
                 api_generator = APIGenerator(view)
             except Exception as e:
-                self._logger(f"Failed to generate SDK for view {view.default}: {e}")
+                self._logger(f"Failed to generate SDK for view {view.name}: {e}")
             else:
                 self.apis.append(api_generator)
         self._dependencies_by_class = find_dependencies(self.apis)
@@ -293,7 +306,7 @@ class APIGenerator:
             autoescape=select_autoescape(),
         )
         self.fields = Fields(
-            sorted((Field.from_property(prop) for prop in view.properties.values()), key=lambda f: f.default)
+            sorted((Field.from_property(prop) for prop in view.properties.values()), key=lambda f: f.name)
         )
         self.class_ = APIClass.from_view(view.name)
 

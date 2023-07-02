@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import getpass
 from pathlib import Path
 from typing import Optional
@@ -58,3 +60,9 @@ def get_cognite_client(cdf_project, cdf_cluster, tenant_id, client_id, client_se
         base_url=base_url,
     )
     return CogniteClient(config)
+
+
+def load_cognite_client_from_toml(file_path: Path | str, section: str | None = "cognite") -> CogniteClient:
+    import toml
+
+    return get_cognite_client(**toml.load(file_path))

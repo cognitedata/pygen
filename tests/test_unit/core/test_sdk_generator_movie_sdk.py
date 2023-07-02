@@ -8,7 +8,7 @@ import pytest
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.views import ViewProperty
 
-from cognite.pygen._core.sdk_generator import APIClass, APIGenerator, Field, SDKGenerator, find_dependencies
+from cognite.pygen._core.dms_to_python import APIClass, APIGenerator, Field, SDKGenerator, find_dependencies
 from tests.constants import MovieSDKFiles
 
 

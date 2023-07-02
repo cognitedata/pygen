@@ -6,7 +6,7 @@ import pytest
 from cognite.client import data_modeling as dm
 
 from cognite import pygen
-from cognite.pygen._core.sdk_generator import APIGenerator, SDKGenerator
+from cognite.pygen._core.dms_to_python import APIGenerator, SDKGenerator
 from tests.constants import ShopSDKFiles, examples_dir
 
 
