@@ -1,10 +1,13 @@
+from pathlib import Path
+
 import pytest
 
 # from black import Mode, Report, WriteBack, reformat_one
 from cognite.client import data_modeling as dm
 
+from cognite import pygen
 from cognite.pygen._core.sdk_generator import APIGenerator, SDKGenerator
-from tests.constants import ShopSDKFiles
+from tests.constants import ShopSDKFiles, examples_dir
 
 
 @pytest.fixture
@@ -55,3 +58,15 @@ def test_create_api_classes(
 
     # Assert
     assert actual == expected
+
+
+def test_generate_sdk(sdk_generator: SDKGenerator, movie_model: dm.DataModel, tmp_path: Path):
+    # Act
+    files_by_path = sdk_generator.generate_sdk()
+    pygen.write_sdk_to_disk(files_by_path, tmp_path)
+
+    # Assert
+    for file_path in tmp_path.glob("**/*.py"):
+        relative_path = file_path.relative_to(tmp_path)
+        expected = (examples_dir / relative_path).read_text()
+        assert file_path.read_text() == expected

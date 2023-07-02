@@ -68,11 +68,11 @@ class SDKGenerator:
 
     def generate_api_core_file(self) -> str:
         api_core = self._env.get_template("_core_api.py.jinja")
-        return api_core.render(top_level_package=self.top_level_package)
+        return api_core.render(top_level_package=self.top_level_package) + "\n"
 
     def generate_client_init_file(self) -> str:
         client_init = self._env.get_template("_client_init.py.jinja")
-        return client_init.render(client_name=self.client_name)
+        return client_init.render(client_name=self.client_name) + "\n"
 
     def generate_api_client_file(self) -> str:
         api_client = self._env.get_template("_api_client.py.jinja")

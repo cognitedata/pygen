@@ -9,7 +9,7 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.views import ViewProperty
 
 from cognite.pygen._core.sdk_generator import APIClass, APIGenerator, Field, SDKGenerator, find_dependencies
-from tests.constants import MovieSDKFiles, examples_dir
+from tests.constants import MovieSDKFiles
 
 
 @pytest.fixture
@@ -184,17 +184,6 @@ def test_fields_from_property(
     assert actual == expected
     assert actual.as_type_hint("read") == expected_read_type_hint
     assert actual.as_type_hint("write") == expected_write_type_hint
-
-
-@pytest.mark.skip("Need to implement a AST comparison function as order of fields/methods/functions are not important")
-def test_generate_sdk(sdk_generator: SDKGenerator, movie_model: dm.DataModel, tmp_path: Path):
-    # Act
-    files_by_path = sdk_generator.generate_sdk()
-
-    # Assert
-    for file_path, file_content in files_by_path.items():
-        expected = (examples_dir / file_path).read_text()
-        assert file_content == expected
 
 
 def test_generate_data_class_file_persons(person_view: dm.View):
