@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cognite-pygen"
-version = "0.10.6"
+version = "0.11.0"
 description = "Cognite Python SDK Generator"
 readme = "README.md"
 authors = ["Cognite <support@cognite.com>"]

@@ -13,6 +13,20 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.11.0] - 02-07-23
+### Added
+
+* Support for views with data in multiple containers in different spaces.
+
+
+### Improved
+
+* Refactoring of the code generator ensuring consistency in field, class, and attribute names.
+
+### Fixed
+
+* Edge fields with camel cased a `AttributeError` in the generated code. This is now fixed.
+
 ## [0.10.6] - 30-06-23
 
 ### Fixed
