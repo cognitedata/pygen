@@ -13,7 +13,7 @@ def main():
         0
     ].views
     for view in views:
-        if view.name in ["Person", "Actor"]:
+        if view.default in ["Person", "Actor"]:
             # These classes are manually created and should not be overwritten
             continue
         api_generator = pygen.APIGenerator(view)

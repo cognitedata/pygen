@@ -14,12 +14,12 @@ def movie_model() -> dm.DataModel:
 
 @pytest.fixture(scope="session")
 def person_view(movie_model: dm.DataModel) -> dm.View:
-    return next(v for v in movie_model.views if v.name == "Person")
+    return next(v for v in movie_model.views if v.default == "Person")
 
 
 @pytest.fixture(scope="session")
 def actor_view(movie_model: dm.DataModel) -> dm.View:
-    return next(v for v in movie_model.views if v.name == "Actor")
+    return next(v for v in movie_model.views if v.default == "Actor")
 
 
 @pytest.fixture(scope="session")
@@ -36,9 +36,9 @@ def shop_model() -> dm.DataModel:
 
 @pytest.fixture
 def case_view(shop_model) -> dm.View:
-    return next(v for v in shop_model.views if v.name == "Case")
+    return next(v for v in shop_model.views if v.default == "Case")
 
 
 @pytest.fixture
 def command_config_view(shop_model) -> dm.View:
-    return next(v for v in shop_model.views if v.name == "Command_Config")
+    return next(v for v in shop_model.views if v.default == "Command_Config")

@@ -23,6 +23,17 @@ skip_glob = '^((?!py$).)*$'    # this makes sort all Python files
 known_third_party = []
 src_paths = [".", "examples"]
 
+[tool.pygen]
+space = "IntegrationTestsImmutable"
+external_id = "Movie"
+version = "2"
+tenant_id = "<cdf-project>"
+client_id = "<client-id>"
+cdf_cluster = "<cdf-cluster>"
+cdf_project = "<cdf-project>"
+top_level_package = "movie_domain.client"
+client_name = "MovieClient"
+
 [tool.poetry.scripts]
 pygen = "cognite.pygen.cli:main"
 

@@ -1,0 +1,60 @@
+import getpass
+from pathlib import Path
+from typing import Optional
+
+from cognite.client import ClientConfig, CogniteClient
+from cognite.client.credentials import OAuthClientCredentials
+from pydantic import BaseModel, validator
+
+
+class Argument(BaseModel):
+    default: Optional[str] = None
+    help: str
+
+
+class PygenSettings(BaseModel):
+    space: Argument = Argument(default=None, help="Location of Data Model")
+    external_id: Argument = Argument(default=None, help="External ID of Data Model")
+    version: Argument = Argument(default=None, help="Version of Data Model")
+    tenant_id: Argument = Argument(default=None, help="Azure Tenant ID for connecting to CDF")
+    client_id: Argument = Argument(default=None, help="Azure Client ID for connecting to CDF")
+    cdf_cluster: Argument = Argument(default=None, help="CDF Cluster to connect to")
+    cdf_project: Argument = Argument(default=None, help="CDF Project to connect to")
+    output_dir: Argument = Argument(default=None, help="Output directory for generated SDK")
+    top_level_package: Argument = Argument(default="my_domain.client", help="Package name for the generated client.")
+    client_name: Argument = Argument(default="MyClient", help="Client name for the generated client.")
+
+    @validator("*", pre=True)
+    def parse_string(cls, value, field) -> Argument:
+        if value and isinstance(value, str):
+            help_ = field.default.help
+            return Argument(default=value, help=help_)
+        return field.default
+
+
+def load_settings(pyproject_toml_path: Path) -> PygenSettings:
+    if not pyproject_toml_path.exists():
+        return PygenSettings()
+    import toml
+
+    pyproject_toml = toml.loads(pyproject_toml_path.read_text())
+    if "tool" in pyproject_toml and "pygen" in pyproject_toml["tool"]:
+        return PygenSettings(**pyproject_toml["tool"]["pygen"])
+    return PygenSettings()
+
+
+def get_cognite_client(cdf_project, cdf_cluster, tenant_id, client_id, client_secret):
+    base_url = f"https://{cdf_cluster}.cognitedata.com/"
+    credentials = OAuthClientCredentials(
+        token_url=f"https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/token",
+        client_id=client_id,
+        client_secret=client_secret,
+        scopes=[f"{base_url}.default"],
+    )
+    config = ClientConfig(
+        project=cdf_project,
+        credentials=credentials,
+        client_name=getpass.getuser(),
+        base_url=base_url,
+    )
+    return CogniteClient(config)

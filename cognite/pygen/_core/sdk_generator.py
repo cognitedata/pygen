@@ -37,7 +37,7 @@ class SDKGenerator:
             try:
                 api_generator = APIGenerator(view)
             except Exception as e:
-                self._logger(f"Failed to generate SDK for view {view.name}: {e}")
+                self._logger(f"Failed to generate SDK for view {view.default}: {e}")
             else:
                 self.apis.append(api_generator)
         self._dependencies_by_class = find_dependencies(self.apis)
@@ -293,7 +293,7 @@ class APIGenerator:
             autoescape=select_autoescape(),
         )
         self.fields = Fields(
-            sorted((Field.from_property(prop) for prop in view.properties.values()), key=lambda f: f.name)
+            sorted((Field.from_property(prop) for prop in view.properties.values()), key=lambda f: f.default)
         )
         self.class_ = APIClass.from_view(view.name)
 
