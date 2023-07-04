@@ -13,6 +13,13 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.11.1] - 04-07-23
+### Fixed
+
+* The optional `CLI` version was used in the presence of a `pyproject.toml` file, and not a `pyproject.toml` with
+  a `[tool.pygen]` section. This is now fixed.
+
+
 ## [0.11.0] - 02-07-23
 ### Added
 

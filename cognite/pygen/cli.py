@@ -18,9 +18,9 @@ if _has_typer:
     app = typer.Typer()
 
     pyproject_toml = Path.cwd() / "pyproject.toml"
-    if pyproject_toml.exists():
-        typer.echo("Found pyproject.toml loading configuration.")
-        settings = load_settings(pyproject_toml)
+    settings = load_settings(pyproject_toml)
+    if settings is not None:
+        typer.echo("Found pyproject.toml with [tools.pygen] section, loading configuration.")
 
         @app.command(help="Generate a Python SDK from Data Model")
         def generate(
