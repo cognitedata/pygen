@@ -7,6 +7,7 @@ __all__ = [
     "__version__",
     "write_sdk_to_disk",
     "SDKGenerator",
+    "generate_sdk",
     "generate_sdk_notebook",
     "get_cognite_client",
     "load_cognite_client_from_toml",

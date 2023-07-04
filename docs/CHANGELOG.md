@@ -13,6 +13,12 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.11.2] - 04-07-23
+### Fixed
+
+* Exposing the function `generate_sdk` in the `pygen` package. This is now fixed.
+
+
 ## [0.11.1] - 04-07-23
 ### Fixed
 
