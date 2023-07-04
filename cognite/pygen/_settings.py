@@ -34,15 +34,15 @@ class PygenSettings(BaseModel):
         return field.default
 
 
-def load_settings(pyproject_toml_path: Path) -> PygenSettings:
+def load_settings(pyproject_toml_path: Path) -> PygenSettings | None:
     if not pyproject_toml_path.exists():
-        return PygenSettings()
+        return None
     import toml
 
     pyproject_toml = toml.loads(pyproject_toml_path.read_text())
-    if "tool" in pyproject_toml and "pygen" in pyproject_toml["tool"]:
+    if "pygen" in pyproject_toml.get("tool", {}):
         return PygenSettings(**pyproject_toml["tool"]["pygen"])
-    return PygenSettings()
+    return None
 
 
 def get_cognite_client(project, cdf_cluster, tenant_id, client_id, client_secret):
