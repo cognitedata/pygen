@@ -55,7 +55,7 @@ class DomainModelCore(BaseModel):
 
 
 class DomainModel(DomainModelCore):
-    version: str
+    version: int
     last_updated_time: datetime
     created_time: datetime
     deleted_time: Optional[datetime] = None
