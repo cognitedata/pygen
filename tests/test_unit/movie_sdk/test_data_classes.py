@@ -13,7 +13,7 @@ def test_person_from_node():
             "instance_type": "node",
             "space": "IntegrationTestsImmutable",
             "external_id": "person:christoph_waltz",
-            "version": 1,
+            "version": "1",
             "last_updated_time": 1684170308732,
             "created_time": 1684170308732,
             "properties": {"IntegrationTestsImmutable": {"Person/2": {"name": "Christoph Waltz", "birthYear": 1956}}},

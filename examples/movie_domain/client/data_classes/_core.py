@@ -24,8 +24,7 @@ from typing import (
 import pandas as pd
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Properties, PropertyValue
-from pydantic import BaseModel, Extra, constr
-from pydantic.utils import DUNDER_ATTRIBUTES
+from pydantic import BaseModel, ConfigDict, Extra, constr
 
 # Todo - Move into SDK
 
@@ -59,7 +58,7 @@ class DomainModel(DomainModelCore):
     version: str
     last_updated_time: datetime
     created_time: datetime
-    deleted_time: Optional[datetime]
+    deleted_time: Optional[datetime] = None
 
     @classmethod
     def from_node(cls: Type[T_TypeNode], node: dm.Node) -> T_TypeNode:
@@ -71,8 +70,8 @@ class DomainModel(DomainModelCore):
     def one_to_many_fields(cls) -> list[str]:
         return [
             field_name
-            for field_name, field in cls.__fields__.items()
-            if isinstance(field.outer_type_, types.GenericAlias)
+            for field_name, field in cls.model_fields.items()
+            if isinstance(field.annotation, types.GenericAlias)
         ]
 
 
@@ -80,6 +79,7 @@ T_TypeNode = TypeVar("T_TypeNode", bound=DomainModel)
 
 
 class DomainModelApply(DomainModelCore):
+    model_config = ConfigDict(extra=Extra.forbid)
     existing_version: Optional[int] = None
 
     def to_instances_apply(self) -> InstancesApply:
@@ -88,9 +88,6 @@ class DomainModelApply(DomainModelCore):
     @abstractmethod
     def _to_instances_apply(self, cache: set[str]) -> InstancesApply:
         raise NotImplementedError()
-
-    class Config:
-        extra = Extra.forbid
 
 
 class DomainModelApplyResult(DomainModelCore):
@@ -107,7 +104,7 @@ def _is_subclass(class_type: Any, _class: Any) -> bool:
 class CircularModelCore(DomainModelCore):
     def _domain_fields(self) -> set[str]:
         domain_fields = set()
-        for field_name, field in self.__fields__.items():
+        for field_name, field in self.model_fields.items():
             is_forward_ref = isinstance(field.type_, ForwardRef)
             is_domain = _is_subclass(field.type_, DomainModelCore)
             is_list_domain = (

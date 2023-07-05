@@ -13,6 +13,12 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.11.3] - 05-07-23
+### Changed
+
+* Upgradet `pydantic` to `v2.0`.
+
+
 ## [0.11.2] - 04-07-23
 ### Fixed
 

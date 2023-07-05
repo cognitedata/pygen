@@ -13,7 +13,6 @@ import pandas as pd
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Properties, PropertyValue
 from pydantic import BaseModel, Extra, constr
-from pydantic.utils import DUNDER_ATTRIBUTES
 
 # Todo - Move into SDK
 

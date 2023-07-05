@@ -6,7 +6,7 @@ from typing import Optional
 
 from cognite.client import ClientConfig, CogniteClient
 from cognite.client.credentials import OAuthClientCredentials
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, field_validator
 
 
 class Argument(BaseModel):
@@ -26,7 +26,7 @@ class PygenSettings(BaseModel):
     top_level_package: Argument = Argument(default="my_domain.client", help="Package name for the generated client.")
     client_name: Argument = Argument(default="MyClient", help="Client name for the generated client.")
 
-    @validator("*", pre=True)
+    @field_validator("*")
     def parse_string(cls, value, field) -> Argument:
         if value and isinstance(value, str):
             help_ = field.default.help

@@ -9,29 +9,11 @@ from ._persons import Person, PersonApply, PersonList
 from ._ratings import Rating, RatingApply, RatingList
 from ._roles import Role, RoleApply, RoleList
 
-ActorApply.update_forward_refs(
-    MovieApply=MovieApply,
-    NominationApply=NominationApply,
-    PersonApply=PersonApply,
-)
-DirectorApply.update_forward_refs(
-    MovieApply=MovieApply,
-    NominationApply=NominationApply,
-    PersonApply=PersonApply,
-)
-MovieApply.update_forward_refs(
-    ActorApply=ActorApply,
-    DirectorApply=DirectorApply,
-    RatingApply=RatingApply,
-)
-PersonApply.update_forward_refs(
-    RoleApply=RoleApply,
-)
-RoleApply.update_forward_refs(
-    MovieApply=MovieApply,
-    NominationApply=NominationApply,
-    PersonApply=PersonApply,
-)
+ActorApply.model_rebuild()
+DirectorApply.model_rebuild()
+MovieApply.model_rebuild()
+PersonApply.model_rebuild()
+RoleApply.model_rebuild()
 
 __all__ = [
     "Actor",

@@ -1,9 +1,7 @@
 from ._cases import Case, CaseApply, CaseList
 from ._command_configs import CommandConfig, CommandConfigApply, CommandConfigList
 
-CaseApply.update_forward_refs(
-    CommandConfigApply=CommandConfigApply,
-)
+CaseApply.model_rebuild()
 
 __all__ = [
     "Case",
