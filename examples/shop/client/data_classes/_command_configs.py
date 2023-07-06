@@ -4,7 +4,7 @@ from typing import ClassVar, Optional
 
 from cognite.client import data_modeling as dm
 
-from ._core import CircularModelApply, DomainModel, InstancesApply, TypeList
+from ._core import DomainModel, DomainModelApply, InstancesApply, TypeList
 
 __all__ = ["CommandConfig", "CommandConfigApply", "CommandConfigList"]
 
@@ -15,7 +15,7 @@ class CommandConfig(DomainModel):
     source: Optional[str] = None
 
 
-class CommandConfigApply(CircularModelApply):
+class CommandConfigApply(DomainModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
     configs: list[str]
     source: Optional[str] = None

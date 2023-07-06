@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, ClassVar, Optional, Union
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import CircularModelApply, DomainModel, DomainModelApply, InstancesApply, TypeList
+from ._core import DomainModel, DomainModelApply, InstancesApply, TypeList
 
 if TYPE_CHECKING:
     from ._command_configs import CommandConfigApply
@@ -28,12 +28,12 @@ class Case(DomainModel):
     start_time: Optional[datetime] = None
 
 
-class CaseApply(CircularModelApply):
+class CaseApply(DomainModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
     arguments: Optional[str] = None
     bid: Optional[str] = None
     bid_history: list[str] = []
-    commands: Optional[Union[str, "CommandConfigApply"]] = None
+    commands: Optional[Union[str, "CommandConfigApply"]] = Field(None, repr=False)
     cut_files: list[str] = []
     end_time: Optional[datetime] = None
     name: str
