@@ -6,7 +6,7 @@ from datetime import {% if fields.has_datetime and fields.has_date %}date, datet
 from cognite.client import data_modeling as dm{% if fields.import_pydantic_field %}
 from pydantic import Field{% endif %}
 
-from ._core import CircularModelApply, DomainModel, {% if fields.import_dependencies %}DomainModelApply, {% endif %}InstancesApply, TypeList
+from ._core import DomainModel, {% if fields.import_dependencies %}DomainModelApply, {% endif %}InstancesApply, TypeList
 {% if fields.import_dependencies %}
 if TYPE_CHECKING:{% for field in fields.edges %}
     from ._{{ field.dependency_file }} import {{ field.dependency_class }}Apply{% endfor %}
@@ -19,7 +19,7 @@ class {{ class_name }}(DomainModel):
     {{ field.name }}: {{ field.as_type_hint('read') }}{% endfor %}
 
 
-class {{ class_name }}Apply(CircularModelApply):
+class {{ class_name }}Apply(DomainModelApply):
     space: ClassVar[str] = "{{ view.space }}"{% for field in fields %}
     {{ field.name }}: {{ field.as_type_hint('write') }}{% endfor %}
 

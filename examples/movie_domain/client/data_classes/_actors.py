@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, ClassVar, Optional, Union
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import CircularModelApply, DomainModel, DomainModelApply, InstancesApply, TypeList
+from ._core import DomainModel, DomainModelApply, InstancesApply, TypeList
 
 if TYPE_CHECKING:
     from ._movies import MovieApply
@@ -23,11 +23,11 @@ class Actor(DomainModel):
     won_oscar: Optional[bool] = Field(None, alias="wonOscar")
 
 
-class ActorApply(CircularModelApply):
+class ActorApply(DomainModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
-    movies: list[Union[str, "MovieApply"]] = []
-    nomination: list[Union[str, "NominationApply"]] = []
-    person: Optional[Union[str, "PersonApply"]] = None
+    movies: list[Union[str, "MovieApply"]] = Field(default_factory=lambda: [], repr=False)
+    nomination: list[Union[str, "NominationApply"]] = Field(default_factory=lambda: [], repr=False)
+    person: Optional[Union[str, "PersonApply"]] = Field(None, repr=False)
     won_oscar: Optional[bool] = None
 
     def _to_instances_apply(self, cache: set[str]) -> InstancesApply:

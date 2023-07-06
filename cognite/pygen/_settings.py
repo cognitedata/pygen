@@ -27,7 +27,7 @@ class PygenSettings(BaseModel):
     client_name: Argument = Argument(default="MyClient", help="Client name for the generated client.")
 
     @field_validator("*")
-    def parse_string(cls, value, field) -> Argument:
+    def parse_string(cls, value, field) -> Argument:  # noqa: N805
         if value and isinstance(value, str):
             help_ = field.default.help
             return Argument(default=value, help=help_)

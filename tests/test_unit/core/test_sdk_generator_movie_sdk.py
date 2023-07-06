@@ -73,7 +73,7 @@ def create_fields_test_cases():
             edge_api_attribute="roles",
         ),
         "list[str] = []",
-        'list[Union[str, "RoleApply"]] = []',
+        'list[Union[str, "RoleApply"]] = Field(default_factory=lambda: [], repr=False)',
         id="List of edges",
     )
     prop = {
@@ -135,7 +135,7 @@ def create_fields_test_cases():
             dependency_file="persons",
         ),
         "Optional[str] = None",
-        'Optional[Union[str, "PersonApply"]] = None',
+        'Optional[Union[str, "PersonApply"]] = Field(None, repr=False)',
         id="Edge to another view",
     )
 
