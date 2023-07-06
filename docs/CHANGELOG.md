@@ -13,10 +13,13 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## [0.11.3] - 05-07-23
+## [0.11.3] - 06-07-23
 ### Changed
 
-* Upgradet `pydantic` to `v2.0`.
+* Upgraded `pydantic` to `v2.0`.
+* Removed the `CircularModel` from the generated SDK. This was a workaround to avoid infinite recursion
+  when getting a string representation of a model. This is replaced by `repr=False` on fields that are
+  recursive.
 
 
 ## [0.11.2] - 04-07-23
