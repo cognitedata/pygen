@@ -261,7 +261,9 @@ class Fields:
 
     @property
     def import_pydantic_field(self) -> bool:
-        return any("Field" in field.as_type_hint("read") for field in self.data)
+        return any("Field" in field.as_type_hint("read") for field in self.data) or any(
+            field.is_edge for field in self.data
+        )
 
     @property
     def import_dependencies(self) -> bool:

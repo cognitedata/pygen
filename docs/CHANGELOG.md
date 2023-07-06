@@ -13,6 +13,12 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.11.4] - 06-07-23
+### Fixed
+
+* Missing `from pydantic import Field` occurring in the generated SDK. This is now fixed.
+
+
 ## [0.11.3] - 06-07-23
 ### Changed
 
