@@ -23,7 +23,7 @@ def test_create_view_data_classes_case(sdk_generator: SDKGenerator, case_view: d
     actual = APIGenerator(case_view).generate_data_class_file()
 
     # Assert
-    assert actual == expected
+    assert expected == actual
 
 
 def test_generate_data_class_file_command_configs(command_config_view: dm.View):

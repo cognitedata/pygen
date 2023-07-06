@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, ClassVar, Optional, Union
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import CircularModelApply, DomainModel, DomainModelApply, InstancesApply, TypeList
+from ._core import DomainModel, DomainModelApply, InstancesApply, TypeList
 
 if TYPE_CHECKING:
     from ._roles import RoleApply
@@ -20,11 +20,11 @@ class Person(DomainModel):
     roles: list[str] = []
 
 
-class PersonApply(CircularModelApply):
+class PersonApply(DomainModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
     birth_year: Optional[int] = None
     name: str
-    roles: list[Union[str, "RoleApply"]] = []
+    roles: list[Union[str, "RoleApply"]] = Field(default_factory=lambda: [], repr=False)
 
     def _to_instances_apply(self, cache: set[str]) -> InstancesApply:
         if self.external_id in cache:

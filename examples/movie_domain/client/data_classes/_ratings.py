@@ -5,7 +5,7 @@ from typing import ClassVar, Optional
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import CircularModelApply, DomainModel, InstancesApply, TypeList
+from ._core import DomainModel, DomainModelApply, InstancesApply, TypeList
 
 __all__ = ["Rating", "RatingApply", "RatingList"]
 
@@ -16,7 +16,7 @@ class Rating(DomainModel):
     vote: Optional[str] = Field(None, alias="votes")
 
 
-class RatingApply(CircularModelApply):
+class RatingApply(DomainModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
     score: Optional[str] = None
     vote: Optional[str] = None

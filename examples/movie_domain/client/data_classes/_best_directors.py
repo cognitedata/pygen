@@ -4,7 +4,7 @@ from typing import ClassVar, Optional
 
 from cognite.client import data_modeling as dm
 
-from ._core import CircularModelApply, DomainModel, InstancesApply, TypeList
+from ._core import DomainModel, DomainModelApply, InstancesApply, TypeList
 
 __all__ = ["BestDirector", "BestDirectorApply", "BestDirectorList"]
 
@@ -15,7 +15,7 @@ class BestDirector(DomainModel):
     year: Optional[int] = None
 
 
-class BestDirectorApply(CircularModelApply):
+class BestDirectorApply(DomainModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
     name: str
     year: int

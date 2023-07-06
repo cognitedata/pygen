@@ -204,7 +204,10 @@ class Field:
         default = self.default
         if self.name != self.prop.name and field_type == "read":
             default = f'Field({default}, alias="{self.prop.name}")'
-
+        elif field_type == "write" and self.is_edges:
+            default = "Field(default_factory=lambda: [], repr=False)"
+        elif field_type == "write" and self.is_edge:
+            default = f"Field({default}, repr=False)"
         rhs = f" = {default}" if is_nullable else ""
 
         type_ = self.read_type if field_type == "read" else self.write_type
