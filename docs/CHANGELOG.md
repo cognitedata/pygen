@@ -13,6 +13,16 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.11.5] - 11-07-23
+### Fixed
+
+* The variable `output_dir` was ignored if present in `pyproject.toml` this is now fixed.
+
+### Added
+
+* `pygen` version is now printed when running `pygen --version`.
+
+
 ## [0.11.4] - 06-07-23
 ### Fixed
 
