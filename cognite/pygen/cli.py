@@ -3,6 +3,7 @@ from pathlib import Path
 from cognite.client.exceptions import CogniteAPIError
 from typing_extensions import Annotated
 
+from cognite import pygen
 from cognite.pygen._generator import generate_sdk
 from cognite.pygen._settings import PygenSettings, get_cognite_client, load_settings
 
@@ -14,13 +15,26 @@ except ImportError:
 else:
     _has_typer = True
 
+
+def _version_callback(value: bool):
+    if value:
+        typer.echo(pygen.__version__)
+        raise typer.Exit()
+
+
 if _has_typer:
-    app = typer.Typer()
+    app = typer.Typer(add_completion=False)
+
+    @app.callback()
+    def common(
+        ctx: typer.Context,
+        version: bool = typer.Option(None, "--version", callback=_version_callback),
+    ):
+        ...
 
     pyproject_toml = Path.cwd() / "pyproject.toml"
     settings = load_settings(pyproject_toml)
     if settings is not None:
-        typer.echo("Found pyproject.toml with [tools.pygen] section, loading configuration.")
 
         @app.command(help="Generate a Python SDK from Data Model")
         def generate(
@@ -32,7 +46,9 @@ if _has_typer:
             client_id: str = typer.Option(default=settings.client_id.default, help=settings.client_id.help),
             cdf_cluster: str = typer.Option(default=settings.cdf_cluster.default, help=settings.cdf_cluster.help),
             cdf_project: str = typer.Option(default=settings.cdf_project.default, help=settings.cdf_project.help),
-            output_dir: Path = typer.Option(Path.cwd(), help=settings.output_dir.help),
+            output_dir: Path = typer.Option(
+                default=settings.output_dir.default or Path.cwd(), help=settings.output_dir.help
+            ),
             top_level_package: str = typer.Option(
                 settings.top_level_package.default, help=settings.top_level_package.help
             ),
