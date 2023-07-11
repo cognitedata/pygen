@@ -32,7 +32,9 @@ if _has_typer:
             client_id: str = typer.Option(default=settings.client_id.default, help=settings.client_id.help),
             cdf_cluster: str = typer.Option(default=settings.cdf_cluster.default, help=settings.cdf_cluster.help),
             cdf_project: str = typer.Option(default=settings.cdf_project.default, help=settings.cdf_project.help),
-            output_dir: Path = typer.Option(Path.cwd(), help=settings.output_dir.help),
+            output_dir: Path = typer.Option(
+                default_factory=lambda: settings.output_dir.default or Path.cwd(), help=settings.output_dir.help
+            ),
             top_level_package: str = typer.Option(
                 settings.top_level_package.default, help=settings.top_level_package.help
             ),
