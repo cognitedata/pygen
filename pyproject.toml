@@ -33,6 +33,7 @@ cdf_cluster = "<cdf-cluster>"
 cdf_project = "<cdf-project>"
 top_level_package = "movie_domain.client"
 client_name = "MovieClient"
+output_dir = "playground"
 
 [tool.poetry.scripts]
 pygen = "cognite.pygen.cli:main"
