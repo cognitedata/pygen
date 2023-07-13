@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from dataclasses import dataclass
+from itertools import product
 from pathlib import Path
 from typing import Callable, Dict, List, Literal
 
@@ -280,6 +281,12 @@ class Fields:
     @property
     def dependencies(self) -> set[str]:
         return {field.dependency_class for field in self.data if field.is_edge}
+
+    @property
+    def has_optional(self) -> bool:
+        return any(
+            "Optional" in field.as_type_hint(field_type) for field, field_type in product(self.data, ["read", "write"])
+        )
 
 
 @dataclass(frozen=True)
