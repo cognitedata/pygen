@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import ClassVar, Optional
 
 from cognite.client import data_modeling as dm
-from pydantic import Field
 
 from ._core import DomainModel, DomainModelApply, InstancesApply, TypeList
 
@@ -13,13 +12,13 @@ __all__ = ["Rating", "RatingApply", "RatingList"]
 class Rating(DomainModel):
     space: ClassVar[str] = "IntegrationTestsImmutable"
     score: Optional[str] = None
-    vote: Optional[str] = Field(None, alias="votes")
+    votes: Optional[str] = None
 
 
 class RatingApply(DomainModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
     score: Optional[str] = None
-    vote: Optional[str] = None
+    votes: Optional[str] = None
 
     def _to_instances_apply(self, cache: set[str]) -> InstancesApply:
         if self.external_id in cache:
@@ -30,7 +29,7 @@ class RatingApply(DomainModelApply):
             source=dm.ContainerId("IntegrationTestsImmutable", "Rating"),
             properties={
                 "score": self.score,
-                "votes": self.vote,
+                "votes": self.votes,
             },
         )
         sources.append(source)

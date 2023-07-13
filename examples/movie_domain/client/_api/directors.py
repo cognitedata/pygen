@@ -117,7 +117,7 @@ class DirectorsAPI(TypeAPI[Director, DirectorApply, DirectorList]):
             movie_edges = self.movies.retrieve(external_id)
             director.movies = [edge.end_node.external_id for edge in movie_edges]
             nomination_edges = self.nominations.retrieve(external_id)
-            director.nominations = [edge.end_node.external_id for edge in nomination_edges]
+            director.nomination = [edge.end_node.external_id for edge in nomination_edges]
 
             return director
         else:
@@ -126,7 +126,7 @@ class DirectorsAPI(TypeAPI[Director, DirectorApply, DirectorList]):
             movie_edges = self.movies.retrieve(external_id)
             self._set_movies(directors, movie_edges)
             nomination_edges = self.nominations.retrieve(external_id)
-            self._set_nominations(directors, nomination_edges)
+            self._set_nomination(directors, nomination_edges)
 
             return directors
 
@@ -136,7 +136,7 @@ class DirectorsAPI(TypeAPI[Director, DirectorApply, DirectorList]):
         movie_edges = self.movies.list(limit=-1)
         self._set_movies(directors, movie_edges)
         nomination_edges = self.nominations.list(limit=-1)
-        self._set_nominations(directors, nomination_edges)
+        self._set_nomination(directors, nomination_edges)
 
         return directors
 
@@ -152,7 +152,7 @@ class DirectorsAPI(TypeAPI[Director, DirectorApply, DirectorList]):
                 director.movies = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
 
     @staticmethod
-    def _set_nominations(directors: Sequence[Director], nomination_edges: Sequence[dm.Edge]):
+    def _set_nomination(directors: Sequence[Director], nomination_edges: Sequence[dm.Edge]):
         edges_by_start_node: Dict[Tuple, List] = defaultdict(list)
         for edge in nomination_edges:
             edges_by_start_node[edge.start_node.as_tuple()].append(edge)
@@ -160,4 +160,4 @@ class DirectorsAPI(TypeAPI[Director, DirectorApply, DirectorList]):
         for director in directors:
             node_id = director.id_tuple()
             if node_id in edges_by_start_node:
-                director.nominations = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
+                director.nomination = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]

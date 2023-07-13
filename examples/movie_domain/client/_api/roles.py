@@ -117,7 +117,7 @@ class RolesAPI(TypeAPI[Role, RoleApply, RoleList]):
             movie_edges = self.movies.retrieve(external_id)
             role.movies = [edge.end_node.external_id for edge in movie_edges]
             nomination_edges = self.nominations.retrieve(external_id)
-            role.nominations = [edge.end_node.external_id for edge in nomination_edges]
+            role.nomination = [edge.end_node.external_id for edge in nomination_edges]
 
             return role
         else:
@@ -126,7 +126,7 @@ class RolesAPI(TypeAPI[Role, RoleApply, RoleList]):
             movie_edges = self.movies.retrieve(external_id)
             self._set_movies(roles, movie_edges)
             nomination_edges = self.nominations.retrieve(external_id)
-            self._set_nominations(roles, nomination_edges)
+            self._set_nomination(roles, nomination_edges)
 
             return roles
 
@@ -136,7 +136,7 @@ class RolesAPI(TypeAPI[Role, RoleApply, RoleList]):
         movie_edges = self.movies.list(limit=-1)
         self._set_movies(roles, movie_edges)
         nomination_edges = self.nominations.list(limit=-1)
-        self._set_nominations(roles, nomination_edges)
+        self._set_nomination(roles, nomination_edges)
 
         return roles
 
@@ -152,7 +152,7 @@ class RolesAPI(TypeAPI[Role, RoleApply, RoleList]):
                 role.movies = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
 
     @staticmethod
-    def _set_nominations(roles: Sequence[Role], nomination_edges: Sequence[dm.Edge]):
+    def _set_nomination(roles: Sequence[Role], nomination_edges: Sequence[dm.Edge]):
         edges_by_start_node: Dict[Tuple, List] = defaultdict(list)
         for edge in nomination_edges:
             edges_by_start_node[edge.start_node.as_tuple()].append(edge)
@@ -160,4 +160,4 @@ class RolesAPI(TypeAPI[Role, RoleApply, RoleList]):
         for role in roles:
             node_id = role.id_tuple()
             if node_id in edges_by_start_node:
-                role.nominations = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
+                role.nomination = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
