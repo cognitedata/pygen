@@ -17,6 +17,8 @@ def to_camel(string: str, pluralize: bool = False, singularize: bool = False) ->
         string_split = string.split("_")
     else:
         # Assume is pascal/camel case
+        # Ensure pascal
+        string = string[0].upper() + string[1:]
         string_split = re.findall(r"[A-Z][a-z]*", string)
         if not string_split:
             string_split = [string]
