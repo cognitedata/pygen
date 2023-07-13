@@ -13,7 +13,7 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## [0.11.5] - 13-07-23
+## [0.11.6] - 13-07-23
 ### Fixed
 
 * Bug causing camelCase fields to be incorrectly converted to PascalCase. This is now fixed.
