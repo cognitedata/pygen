@@ -64,7 +64,7 @@ def create_fields_test_cases():
             is_list=True,
             is_nullable=True,
             default="[]",
-            write_type='Union[str, "RoleApply"]',
+            write_type='Union["RoleApply", str]',
             is_edge=True,
             variable="role",
             dependency_class="Role",
@@ -73,7 +73,7 @@ def create_fields_test_cases():
             edge_api_attribute="roles",
         ),
         "list[str] = []",
-        'list[Union[str, "RoleApply"]] = Field(default_factory=lambda: [], repr=False)',
+        'list[Union["RoleApply", str]] = Field(default_factory=list, repr=False)',
         id="List of edges",
     )
     prop = {
@@ -128,14 +128,14 @@ def create_fields_test_cases():
             read_type="str",
             is_list=False,
             is_nullable=True,
-            write_type='Union[str, "PersonApply"]',
+            write_type='Union["PersonApply", str]',
             default="None",
             is_edge=True,
             dependency_class="Person",
             dependency_file="persons",
         ),
         "Optional[str] = None",
-        'Optional[Union[str, "PersonApply"]] = Field(None, repr=False)',
+        'Optional[Union["PersonApply", str]] = Field(None, repr=False)',
         id="Edge to another view",
     )
 

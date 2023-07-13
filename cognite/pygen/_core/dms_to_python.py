@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from dataclasses import dataclass
+from itertools import product
 from pathlib import Path
 from typing import Callable, Dict, List, Literal
 
@@ -162,7 +163,7 @@ class Field:
             name = to_snake(property_.name)
             dependency_class = to_pascal(property_.source.external_id, singularize=True)
             dependency_file = to_snake(property_.source.external_id, pluralize=True)
-            write_type = f'Union[str, "{dependency_class}Apply"]'
+            write_type = f'Union["{dependency_class}Apply", str]'
             return cls(
                 name,
                 "str",
@@ -180,7 +181,7 @@ class Field:
             name = to_snake(property_.name)
             dependency_class = to_pascal(property_.source.external_id, singularize=True)
             dependency_file = to_snake(property_.source.external_id, pluralize=True)
-            write_type = f'Union[str, "{dependency_class}Apply"]'
+            write_type = f'Union["{dependency_class}Apply", str]'
             return cls(
                 name,
                 "str",
@@ -205,7 +206,7 @@ class Field:
         if self.name != self.prop.name and field_type == "read":
             default = f'Field({default}, alias="{self.prop.name}")'
         elif field_type == "write" and self.is_edges:
-            default = "Field(default_factory=lambda: [], repr=False)"
+            default = "Field(default_factory=list, repr=False)"
         elif field_type == "write" and self.is_edge:
             default = f"Field({default}, repr=False)"
         rhs = f" = {default}" if is_nullable else ""
@@ -280,6 +281,12 @@ class Fields:
     @property
     def dependencies(self) -> set[str]:
         return {field.dependency_class for field in self.data if field.is_edge}
+
+    @property
+    def has_optional(self) -> bool:
+        return any(
+            "Optional" in field.as_type_hint(field_type) for field, field_type in product(self.data, ["read", "write"])
+        )
 
 
 @dataclass(frozen=True)

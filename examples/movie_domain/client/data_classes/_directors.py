@@ -18,16 +18,16 @@ __all__ = ["Director", "DirectorApply", "DirectorList"]
 class Director(DomainModel):
     space: ClassVar[str] = "IntegrationTestsImmutable"
     movies: list[str] = []
-    nominations: list[str] = Field([], alias="nomination")
+    nomination: list[str] = []
     person: Optional[str] = None
     won_oscar: Optional[bool] = Field(None, alias="wonOscar")
 
 
 class DirectorApply(DomainModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
-    movies: list[Union[str, "MovieApply"]] = []
-    nominations: list[Union[str, "NominationApply"]] = []
-    person: Optional[Union[str, "PersonApply"]] = None
+    movies: list[Union["MovieApply", str]] = Field(default_factory=list, repr=False)
+    nomination: list[Union["NominationApply", str]] = Field(default_factory=list, repr=False)
+    person: Optional[Union["PersonApply", str]] = Field(None, repr=False)
     won_oscar: Optional[bool] = None
 
     def _to_instances_apply(self, cache: set[str]) -> InstancesApply:
@@ -67,7 +67,7 @@ class DirectorApply(DomainModelApply):
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
-        for nomination in self.nominations:
+        for nomination in self.nomination:
             edge = self._create_nomination_edge(nomination)
             if edge.external_id not in cache:
                 edges.append(edge)

@@ -13,6 +13,14 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.11.6] - 13-07-23
+### Fixed
+
+* Bug causing camelCase fields to be incorrectly converted to PascalCase. This is now fixed.
+* Order of type hints in write classes with one to many edges. Pydantic requires the str option to be last. This is now fixed.
+* `pydantic` requires the `Optional` to be imported, even if it is not used. This is now fixed.
+
+
 ## [0.11.5] - 11-07-23
 ### Fixed
 

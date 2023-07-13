@@ -33,7 +33,7 @@ class CaseApply(DomainModelApply):
     arguments: Optional[str] = None
     bid: Optional[str] = None
     bid_history: list[str] = []
-    commands: Optional[Union[str, "CommandConfigApply"]] = Field(None, repr=False)
+    commands: Optional[Union["CommandConfigApply", str]] = Field(None, repr=False)
     cut_files: list[str] = []
     end_time: Optional[datetime] = None
     name: str

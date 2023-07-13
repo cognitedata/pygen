@@ -1,6 +1,6 @@
 from cognite.client import CogniteClient
 
-from cognite import pygen
+from cognite.pygen._core.dms_to_python import APIGenerator
 from movie_domain.client import MovieClient
 from tests.constants import MovieSDKFiles
 
@@ -13,10 +13,10 @@ def main():
         0
     ].views
     for view in views:
-        if view.default in ["Person", "Actor"]:
+        if view.external_id in ["Person", "Actor"]:
             # These classes are manually created and should not be overwritten
             continue
-        api_generator = pygen.APIGenerator(view)
+        api_generator = APIGenerator(view)
         data_class = api_generator.generate_data_class_file()
 
         (MovieSDKFiles.data_classes / f"_{api_generator.class_.file_name}.py").write_text(data_class)

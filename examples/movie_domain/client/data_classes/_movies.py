@@ -22,18 +22,18 @@ class Movie(DomainModel):
     meta: Optional[dict] = None
     rating: Optional[str] = None
     release_year: Optional[int] = Field(None, alias="releaseYear")
-    run_time_minute: Optional[float] = Field(None, alias="runTimeMinutes")
+    run_time_minutes: Optional[float] = Field(None, alias="runTimeMinutes")
     title: Optional[str] = None
 
 
 class MovieApply(DomainModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
-    actors: list[Union[str, "ActorApply"]] = []
-    directors: list[Union[str, "DirectorApply"]] = []
+    actors: list[Union["ActorApply", str]] = Field(default_factory=list, repr=False)
+    directors: list[Union["DirectorApply", str]] = Field(default_factory=list, repr=False)
     meta: Optional[dict] = None
-    rating: Optional[Union[str, "RatingApply"]] = None
+    rating: Optional[Union["RatingApply", str]] = Field(None, repr=False)
     release_year: Optional[int] = None
-    run_time_minute: Optional[float] = None
+    run_time_minutes: Optional[float] = None
     title: str
 
     def _to_instances_apply(self, cache: set[str]) -> InstancesApply:
@@ -50,7 +50,7 @@ class MovieApply(DomainModelApply):
                     "externalId": self.rating if isinstance(self.rating, str) else self.rating.external_id,
                 },
                 "releaseYear": self.release_year,
-                "runTimeMinutes": self.run_time_minute,
+                "runTimeMinutes": self.run_time_minutes,
                 "title": self.title,
             },
         )

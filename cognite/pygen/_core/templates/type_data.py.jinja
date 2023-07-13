@@ -1,7 +1,7 @@
 from __future__ import annotations
 {%  if fields.has_datetime or fields.has_date %}
 from datetime import {% if fields.has_datetime and fields.has_date %}date, datetime{% elif fields.has_datetime %}datetime{% else %}date{% endif %}{% endif %}
-{% if fields.import_dependencies %}from typing import TYPE_CHECKING, ClassVar, Optional, Union{% else %}from typing import ClassVar, Optional{% endif %}
+{% if fields.import_dependencies %}from typing import TYPE_CHECKING, ClassVar, Optional, Union{% else %}from typing import ClassVar, Optional{% endif %}{% if not fields.has_optional %} # noqa: F401{% endif %}
 
 from cognite.client import data_modeling as dm{% if fields.import_pydantic_field %}
 from pydantic import Field{% endif %}

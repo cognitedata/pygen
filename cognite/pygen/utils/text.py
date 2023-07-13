@@ -17,6 +17,8 @@ def to_camel(string: str, pluralize: bool = False, singularize: bool = False) ->
         string_split = string.split("_")
     else:
         # Assume is pascal/camel case
+        # Ensure pascal
+        string = string[0].upper() + string[1:]
         string_split = re.findall(r"[A-Z][a-z]*", string)
         if not string_split:
             string_split = [string]
@@ -42,6 +44,10 @@ def to_pascal(string: str, pluralize=False, singularize: bool = False) -> str:
     'BestDirector'
     >>> to_pascal("BestLeadingActress", singularize=True)
     'BestLeadingActress'
+    >>> to_pascal("priceScenarios", pluralize=True)
+    'PriceScenarios'
+    >>> to_pascal("reserveScenarios", pluralize=True)
+    'ReserveScenarios'
     """
     camel = to_camel(string, pluralize, singularize)
     return f"{camel[0].upper()}{camel[1:]}" if camel else ""
