@@ -25,9 +25,9 @@ class Actor(DomainModel):
 
 class ActorApply(DomainModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
-    movies: list[Union[str, "MovieApply"]] = Field(default_factory=lambda: [], repr=False)
-    nomination: list[Union[str, "NominationApply"]] = Field(default_factory=lambda: [], repr=False)
-    person: Optional[Union[str, "PersonApply"]] = Field(None, repr=False)
+    movies: list[Union["MovieApply", str]] = Field(default_factory=list, repr=False)
+    nomination: list[Union["NominationApply", str]] = Field(default_factory=list, repr=False)
+    person: Optional[Union["PersonApply", str]] = Field(None, repr=False)
     won_oscar: Optional[bool] = None
 
     def _to_instances_apply(self, cache: set[str]) -> InstancesApply:
