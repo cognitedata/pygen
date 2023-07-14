@@ -49,7 +49,7 @@ class SDKGenerator:
         self.apis = []
         for view in data_model.views:
             try:
-                api_generator = APIGenerator(view)
+                api_generator = APIGenerator(view, self.top_level_package)
             except Exception as e:
                 self._logger(f"Failed to generate SDK for view {view.name}: {e}")
             else:
@@ -114,6 +114,7 @@ class SDKGenerator:
                         self._dependencies_by_class.items(), key=lambda x: x[0].data_class
                     )
                 },
+                top_level_package=self.top_level_package,
             )
             + "\n"
         )
@@ -297,9 +298,10 @@ class APIClass:
     client_attribute: str
     api_class: str
     file_name: str
+    _top_level_package: str
 
     @classmethod
-    def from_view(cls, view_name: str) -> APIClass:
+    def from_view(cls, view_name: str, top_level_package: str) -> APIClass:
         return cls(
             data_class=to_pascal(view_name, singularize=True),
             variable=to_snake(view_name, singularize=True),
@@ -307,12 +309,26 @@ class APIClass:
             client_attribute=to_snake(view_name, pluralize=True),
             api_class=to_pascal(view_name, pluralize=True),
             file_name=to_snake(view_name, pluralize=True),
+            _top_level_package=top_level_package,
         )
+
+    @property
+    def one_line_import(self) -> str:
+        return f"from {self._top_level_package}.data_classes._{self.file_name} import {self.data_class}, {self.data_class}Apply, {self.data_class}List"
+
+    @property
+    def multiline_import(self) -> str:
+        return f"from {self._top_level_package}.data_classes._{self.file_name} import (\n    {self.data_class},\n    {self.data_class}Apply,\n    {self.data_class}List,\n)"
+
+    @property
+    def is_line_length_above_120(self) -> bool:
+        return len(self.one_line_import) > 120
 
 
 class APIGenerator:
-    def __init__(self, view: dm.View):
+    def __init__(self, view: dm.View, top_level_package: str):
         self.view = view
+        self.top_level_package = top_level_package
         self._env = Environment(
             loader=PackageLoader("cognite.pygen._core", "templates"),
             autoescape=select_autoescape(),
@@ -320,7 +336,7 @@ class APIGenerator:
         self.fields = Fields(
             sorted((Field.from_property(prop) for prop in view.properties.values()), key=lambda f: f.name)
         )
-        self.class_ = APIClass.from_view(view.name)
+        self.class_ = APIClass.from_view(view.name, top_level_package)
 
     def generate_data_class_file(self) -> str:
         type_data = self._env.get_template("type_data.py.jinja")
@@ -330,6 +346,7 @@ class APIGenerator:
                 class_name=self.class_.data_class,
                 fields=self.fields,
                 view=self.view,
+                top_level_package=self.top_level_package,
             )
             + "\n"
         )

@@ -6,10 +6,10 @@ from datetime import {% if fields.has_datetime and fields.has_date %}date, datet
 from cognite.client import data_modeling as dm{% if fields.import_pydantic_field %}
 from pydantic import Field{% endif %}
 
-from ._core import DomainModel, DomainModelApply, InstancesApply, TypeList
+from {{ top_level_package }}.data_classes._core import DomainModel, DomainModelApply, InstancesApply, TypeList
 {% if fields.import_dependencies %}
 if TYPE_CHECKING:{% for field in fields.edges %}
-    from ._{{ field.dependency_file }} import {{ field.dependency_class }}Apply{% endfor %}
+    from {{ top_level_package }}.data_classes._{{ field.dependency_file }} import {{ field.dependency_class }}Apply{% endfor %}
 {% endif %}
 __all__ = ["{{ class_name }}", "{{ class_name }}Apply", "{{ class_name }}List"]
 

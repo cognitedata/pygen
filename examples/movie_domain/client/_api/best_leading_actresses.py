@@ -6,9 +6,8 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client._constants import INSTANCES_LIST_LIMIT_DEFAULT
 
+from movie_domain.client._api._core import TypeAPI
 from movie_domain.client.data_classes import BestLeadingActress, BestLeadingActressApply, BestLeadingActressList
-
-from ._core import TypeAPI
 
 
 class BestLeadingActressesAPI(TypeAPI[BestLeadingActress, BestLeadingActressApply, BestLeadingActressList]):

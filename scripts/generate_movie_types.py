@@ -16,7 +16,7 @@ def main():
         if view.external_id in ["Person", "Actor"]:
             # These classes are manually created and should not be overwritten
             continue
-        api_generator = APIGenerator(view)
+        api_generator = APIGenerator(view, "movie_domain.client")
         data_class = api_generator.generate_data_class_file()
 
         (MovieSDKFiles.data_classes / f"_{api_generator.class_.file_name}.py").write_text(data_class)

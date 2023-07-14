@@ -2,7 +2,7 @@ createdTime: 1687962394007
 description: 'A test model with snake_case and CDF specific fields. '
 externalId: SHOP_Model
 isGlobal: false
-lastUpdatedTime: 1687962394007
+lastUpdatedTime: 1689262760507
 name: SHOP_Model
 space: IntegrationTestsImmutable
 version: '2'

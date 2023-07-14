@@ -11,38 +11,43 @@ from tests.constants import ShopSDKFiles, examples_dir
 
 
 @pytest.fixture
-def sdk_generator(shop_model: dm.DataModel):
-    return SDKGenerator("shop.client", "ShopClient", shop_model)
+def top_level_package() -> str:
+    return "shop.client"
 
 
-def test_create_view_data_classes_case(sdk_generator: SDKGenerator, case_view: dm.View):
+@pytest.fixture
+def sdk_generator(shop_model: dm.DataModel, top_level_package: str):
+    return SDKGenerator(top_level_package, "ShopClient", shop_model)
+
+
+def test_create_view_data_classes_case(case_view: dm.View, top_level_package: str):
     # Arrange
     expected = ShopSDKFiles.cases_data.read_text()
 
     # Act
-    actual = APIGenerator(case_view).generate_data_class_file()
+    actual = APIGenerator(case_view, top_level_package).generate_data_class_file()
 
     # Assert
     assert expected == actual
 
 
-def test_generate_data_class_file_command_configs(command_config_view: dm.View):
+def test_generate_data_class_file_command_configs(command_config_view: dm.View, top_level_package: str):
     # Arrange
     expected = ShopSDKFiles.command_configs_data.read_text()
 
     # Act
-    actual = APIGenerator(command_config_view).generate_data_class_file()
+    actual = APIGenerator(command_config_view, top_level_package).generate_data_class_file()
 
     # Assert
     assert actual == expected
 
 
-def test_create_view_api_classes_command_configs(command_config_view: dm.View):
+def test_create_view_api_classes_command_configs(command_config_view: dm.View, top_level_package: str):
     # Arrange
     expected = ShopSDKFiles.command_configs_api.read_text()
 
     # Act
-    actual = APIGenerator(command_config_view).generate_api_file("shop.client")
+    actual = APIGenerator(command_config_view, top_level_package).generate_api_file("shop.client")
 
     assert actual == expected
 

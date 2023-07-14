@@ -4,7 +4,7 @@ from typing import ClassVar, Optional
 
 from cognite.client import data_modeling as dm
 
-from ._core import DomainModel, DomainModelApply, InstancesApply, TypeList
+from movie_domain.client.data_classes._core import DomainModel, DomainModelApply, InstancesApply, TypeList
 
 __all__ = ["Nomination", "NominationApply", "NominationList"]
 

@@ -13,8 +13,13 @@ from tests.constants import MovieSDKFiles
 
 
 @pytest.fixture
-def sdk_generator(movie_model):
-    return SDKGenerator("movie_domain.client", "MovieClient", movie_model)
+def top_level_package() -> str:
+    return "movie_domain.client"
+
+
+@pytest.fixture
+def sdk_generator(movie_model, top_level_package):
+    return SDKGenerator(top_level_package, "MovieClient", movie_model)
 
 
 def create_fields_test_cases():
@@ -186,34 +191,34 @@ def test_fields_from_property(
     assert actual.as_type_hint("write") == expected_write_type_hint
 
 
-def test_generate_data_class_file_persons(person_view: dm.View):
+def test_generate_data_class_file_persons(person_view: dm.View, top_level_package: str):
     # Arrange
     expected = MovieSDKFiles.persons_data.read_text()
 
     # Act
-    actual = APIGenerator(person_view).generate_data_class_file()
+    actual = APIGenerator(person_view, top_level_package).generate_data_class_file()
 
     # Assert
     assert actual == expected
 
 
-def test_create_view_data_class_actors(actor_view: dm.View):
+def test_create_view_data_class_actors(actor_view: dm.View, top_level_package: str):
     # Arrange
     expected = MovieSDKFiles.actors_data.read_text()
 
     # Act
-    actual = APIGenerator(actor_view).generate_data_class_file()
+    actual = APIGenerator(actor_view, top_level_package).generate_data_class_file()
 
     # Assert
     assert actual == expected
 
 
-def test_create_view_api_classes_actors(actor_view: dm.View, tmp_path: Path):
+def test_create_view_api_classes_actors(actor_view: dm.View, top_level_package: str, tmp_path: Path):
     # Arrange
     expected = MovieSDKFiles.actors_api.read_text()
 
     # Act
-    actual = APIGenerator(actor_view).generate_api_file("movie_domain.client")
+    actual = APIGenerator(actor_view, top_level_package).generate_api_file("movie_domain.client")
 
     # Assert
     # Reformat with black to make sure the formatting is correct
@@ -235,12 +240,12 @@ def test_create_view_api_classes_actors(actor_view: dm.View, tmp_path: Path):
     assert actual == expected
 
 
-def test_create_view_api_classes_persons(sdk_generator: SDKGenerator, person_view: dm.View):
+def test_create_view_api_classes_persons(person_view: dm.View, top_level_package: str):
     # Arrange
     expected = MovieSDKFiles.persons_api.read_text()
 
     # Act
-    actual = APIGenerator(person_view).generate_api_file("movie_domain.client")
+    actual = APIGenerator(person_view, top_level_package).generate_api_file("movie_domain.client")
 
     # Assert
     assert actual == expected
@@ -268,12 +273,12 @@ def test_create_api_client(sdk_generator: SDKGenerator):
     assert actual == expected
 
 
-def test_find_dependencies(movie_model: dm.DataModel):
+def test_find_dependencies(movie_model: dm.DataModel, top_level_package: str):
     # Arrange
     views = dm.ViewList(movie_model.views)
-    apis = [APIGenerator(view) for view in views]
+    apis = [APIGenerator(view, top_level_package) for view in views]
     expected = {
-        APIClass.from_view(k): {APIClass.from_view(v) for v in values}
+        APIClass.from_view(k, top_level_package): {APIClass.from_view(v, top_level_package) for v in values}
         for k, values in {
             "Person": {"Role"},
             "Actor": {"Nomination", "Movie", "Person"},

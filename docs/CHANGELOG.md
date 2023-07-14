@@ -13,6 +13,12 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.11.7] - 14-07-23
+### Fixed
+
+* Replace all relative imports with absolute imports as this was causing comparison issues in the generated code.
+
+
 ## [0.11.6] - 13-07-23
 ### Fixed
 
