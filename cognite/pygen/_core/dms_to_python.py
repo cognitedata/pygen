@@ -31,6 +31,10 @@ class MultiModelSDKGenerator:
         self.client_name = client_name
         unique_views = get_unique_views(*[view for dm in data_models for view in dm.views])
         self._apis = APIsGenerator(top_level_package, client_name, unique_views, logger)
+        api_by_view_external_id = {api.view.external_id: api.class_ for api in self._apis.apis}
+        self._apis_classes = sorted(
+            (APIsClass.from_data_model(dm, api_by_view_external_id) for dm in data_models), key=lambda a: a.name
+        )
 
     def generate_sdk(self) -> dict[Path, str]:
         client_dir = Path(self.top_level_package.replace(".", "/"))
@@ -50,6 +54,7 @@ class MultiModelSDKGenerator:
                 classes=sorted((api.class_ for api in self._apis.apis), key=lambda c: c.data_class),
                 is_single_model=False,
                 top_level_package=self.top_level_package,
+                api_classes=self._apis_classes,
             )
             + "\n"
         )
@@ -382,6 +387,26 @@ class APIClass:
     @property
     def is_line_length_above_120(self) -> bool:
         return len(self.one_line_import) > 120
+
+
+@dataclass(frozen=True)
+class APIsClass:
+    sub_apis: list[APIClass]
+    variable: str
+    name: str
+    model: dm.DataModelId
+
+    @classmethod
+    def from_data_model(cls, data_model: dm.DataModel, api_class_by_view_external_id: dict[str, APIClass]) -> APIsClass:
+        sub_apis = []
+        for view in data_model.views:
+            sub_apis.append(api_class_by_view_external_id[view.external_id])
+        return cls(
+            sub_apis=sorted(sub_apis, key=lambda api: api.data_class),
+            variable=to_snake(data_model.name, singularize=True),
+            name=f"{to_pascal(data_model.name, singularize=True)}APIs",
+            model=data_model.as_id(),
+        )
 
 
 class APIGenerator:

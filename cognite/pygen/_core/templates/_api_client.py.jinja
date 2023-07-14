@@ -7,7 +7,22 @@ from cognite.client.credentials import OAuthClientCredentials
 {% for class_ in classes %}
 from {{ top_level_package }}._api.{{ class_.file_name }} import {{ class_.api_class }}API{% endfor %}
 
+{% if not is_single_model %}{% for api_class in api_classes %}
+class {{ api_class.name }}:
+    """
+    {{ api_class.name }}
 
+    Data Model:
+        space: {{ api_class.model.space }}
+        externalId: {{ api_class.model.external_id }}
+        version: {{ api_class.model.version }}
+
+    """
+
+    def __init__(self, client: CogniteClient):{% for class_ in api_class.sub_apis %}
+        self.{{ class_.client_attribute }} = {{ class_.api_class }}API(client){% endfor %}
+
+{% endfor %}{% endif %}
 class {{ client_name }}:
     """
     {{ client_name }}
@@ -25,7 +40,8 @@ class {{ client_name }}:
 
     def __init__(self, config: ClientConfig | None = None):
         client = CogniteClient(config){% if is_single_model %}{% for class_ in classes %}
-        self.{{ class_.client_attribute }} = {{ class_.api_class }}API(client){% endfor %}{% endif %}
+        self.{{ class_.client_attribute }} = {{ class_.api_class }}API(client){% endfor %}{% else %}{% for api_class in api_classes %}
+        self.{{ api_class.variable }} = {{ api_class.name }}(client){% endfor %}{% endif %}
 
     @classmethod
     def azure_project(

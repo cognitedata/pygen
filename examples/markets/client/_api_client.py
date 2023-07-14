@@ -25,16 +25,17 @@ class CogPoolAPIs:
         space: market
         externalId: CogPool
         version: 1
+
     """
 
     def __init__(self, client: CogniteClient):
-        self.markets = MarketsAPI(client)
-        self.process = ProcessAPI(client)
         self.bids = BidsAPI(client)
-        self.value_transformations = ValueTransformationsAPI(client)
-        self.cog_process = CogProcessAPI(client)
         self.cog_bids = CogBidsAPI(client)
         self.cog_pools = CogPoolsAPI(client)
+        self.cog_process = CogProcessAPI(client)
+        self.markets = MarketsAPI(client)
+        self.process = ProcessAPI(client)
+        self.value_transformations = ValueTransformationsAPI(client)
 
 
 class PygenPoolAPIs:
@@ -45,16 +46,17 @@ class PygenPoolAPIs:
         space: market
         externalId: PygenPool
         version: 1
+
     """
 
     def __init__(self, client: CogniteClient):
+        self.bids = BidsAPI(client)
         self.markets = MarketsAPI(client)
         self.process = ProcessAPI(client)
-        self.bids = BidsAPI(client)
-        self.value_transformations = ValueTransformationsAPI(client)
         self.pygen_bids = PygenBidsAPI(client)
         self.pygen_pools = PygenPoolsAPI(client)
         self.pygen_process = PygenProcessAPI(client)
+        self.value_transformations = ValueTransformationsAPI(client)
 
 
 class MarketClient:
@@ -65,6 +67,7 @@ class MarketClient:
         pygen = 0.12.0
         cognite-sdk = 6.8.4
         pydantic = 2.0.3
+
     """
 
     def __init__(self, config: ClientConfig | None = None):
