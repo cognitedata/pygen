@@ -1,14 +1,16 @@
+from __future__ import annotations
+
 import sys
 import tempfile
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Sequence
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling import DataModelIdentifier
 from cognite.client.exceptions import CogniteAPIError
 
-from cognite.pygen._core.dms_to_python import SDKGenerator
+from cognite.pygen._core.dms_to_python import MultiModelSDKGenerator, SDKGenerator
 
 
 def generate_sdk_notebook(
@@ -53,14 +55,34 @@ def generate_sdk(
     logger("Done!")
 
 
+def generate_multimodel_sdk(
+    client: CogniteClient,
+    model_ids: Sequence[DataModelIdentifier],
+    top_level_package: str,
+    client_name: str,
+    output_dir: Path,
+    logger: Callable[[str], None],
+):
+    data_models = _load_data_model(client, model_ids, logger)
+    logger(f"Successfully retrieved data model(s) {model_ids}")
+    sdk_generator = MultiModelSDKGenerator(top_level_package, client_name, data_models, logger)
+    sdk = sdk_generator.generate_sdk()
+    logger(f"Writing SDK to {output_dir}")
+    write_sdk_to_disk(sdk, output_dir)
+    logger("Done!")
+
+
 def _load_data_model(
-    client: CogniteClient, model_id: DataModelIdentifier, logger: Callable[[str], None]
+    client: CogniteClient, model_id: DataModelIdentifier | Sequence[DataModelIdentifier], logger: Callable[[str], None]
 ) -> dm.DataModel:
     try:
         data_models = client.data_modeling.data_models.retrieve(model_id, inline_views=True)
-        data_model = data_models[0]
+        if len(model_id) == 1:
+            data_model = data_models[0]
+        else:
+            return data_models
     except CogniteAPIError as e:
-        logger(f"Error retrieving data model: {e}")
+        logger(f"Error retrieving data model(s): {e}")
         raise e
     except IndexError as e:
         logger(f"Cannot find {model_id}")

@@ -6,7 +6,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from itertools import product
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Literal
+from typing import Any, Callable, Dict, List, Literal, Sequence
 
 from cognite.client import data_modeling as dm
 from cognite.client._version import __version__ as cognite_sdk_version
@@ -16,6 +16,24 @@ from pydantic.version import VERSION as PYDANTIC_VERSION
 
 from cognite.pygen._version import __version__
 from cognite.pygen.utils.text import to_pascal, to_snake
+
+
+class MultiModelSDKGenerator:
+    def __init__(
+        self,
+        top_level_package: str,
+        client_name: str,
+        data_models: Sequence[dm.DataModel],
+        logger: Callable[[str], None] | None = None,
+    ):
+        self._data_models = data_models
+        self.top_level_package = top_level_package
+        self.client_name = client_name
+        unique_views = get_unique_views(*[view for dm in data_models for view in dm.views])
+        self._apis = APIsGenerator(top_level_package, client_name, unique_views, logger)
+
+    def generate_sdk(self) -> dict[Path, str]:
+        raise NotImplementedError()
 
 
 class SDKGenerator:
@@ -40,6 +58,40 @@ class SDKGenerator:
         logger: Callable[[str], None] | None = None,
     ):
         self._data_model = data_model
+        self.top_level_package = top_level_package
+        self.client_name = client_name
+        self._apis = APIsGenerator(top_level_package, client_name, data_model.views, logger)
+
+    def generate_sdk(self) -> dict[Path, str]:
+        client_dir = Path(self.top_level_package.replace(".", "/"))
+        sdk = self._apis.generate_apis(client_dir)
+        sdk[client_dir / "_api_client.py"] = self.generate_api_client_file()
+        return sdk
+
+    def generate_api_client_file(self) -> str:
+        api_client = self._apis._env.get_template("_api_client.py.jinja")
+
+        return (
+            api_client.render(
+                client_name=self.client_name,
+                pygen_version=__version__,
+                cognite_sdk_version=cognite_sdk_version,
+                pydantic_version=PYDANTIC_VERSION,
+                data_model=self._data_model,
+                classes=sorted((api.class_ for api in self._apis.apis), key=lambda c: c.data_class),
+            )
+            + "\n"
+        )
+
+
+class APIsGenerator:
+    def __init__(
+        self,
+        top_level_package: str,
+        client_name: str,
+        views: Sequence[dm.View],
+        logger: Callable[[str], None] | None = None,
+    ):
         self._env = Environment(
             loader=PackageLoader("cognite.pygen._core", "templates"),
             autoescape=select_autoescape(),
@@ -49,7 +101,7 @@ class SDKGenerator:
         self._logger = logger or print  # noqa: T202
 
         self.apis = []
-        for view in data_model.views:
+        for view in views:
             try:
                 api_generator = APIGenerator(view, self.top_level_package)
             except Exception as e:
@@ -59,8 +111,7 @@ class SDKGenerator:
         self._dependencies_by_class = find_dependencies(self.apis)
         self._static_dir = Path(__file__).parent / "static"
 
-    def generate_sdk(self) -> dict[Path, str]:
-        client_dir = Path(self.top_level_package.replace(".", "/"))
+    def generate_apis(self, client_dir: Path) -> dict[Path, str]:
         data_classes_dir = client_dir / "data_classes"
         api_dir = client_dir / "_api"
 
@@ -75,7 +126,6 @@ class SDKGenerator:
                 self._logger(f"Skipping view {api.view.name}")
                 self._dependencies_by_class.pop(api.class_, None)
 
-        sdk[client_dir / "_api_client.py"] = self.generate_api_client_file()
         sdk[client_dir / "__init__.py"] = self.generate_client_init_file()
         sdk[data_classes_dir / "__init__.py"] = self.generate_data_classes_init_file()
         sdk[api_dir / "_core.py"] = self.generate_api_core_file()
@@ -89,21 +139,6 @@ class SDKGenerator:
     def generate_client_init_file(self) -> str:
         client_init = self._env.get_template("_client_init.py.jinja")
         return client_init.render(client_name=self.client_name) + "\n"
-
-    def generate_api_client_file(self) -> str:
-        api_client = self._env.get_template("_api_client.py.jinja")
-
-        return (
-            api_client.render(
-                client_name=self.client_name,
-                pygen_version=__version__,
-                cognite_sdk_version=cognite_sdk_version,
-                pydantic_version=PYDANTIC_VERSION,
-                data_model=self._data_model,
-                classes=sorted((api.class_ for api in self.apis), key=lambda c: c.data_class),
-            )
-            + "\n"
-        )
 
     def generate_data_classes_init_file(self) -> str:
         data_class_init = self._env.get_template("data_classes_init.py.jinja")
