@@ -13,6 +13,12 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.12.1] - 14-07-23
+### Fixed
+
+* Getting the unique views fails if a property is `SingleHopConnectionDefinition`. This is now fixed.
+
+
 ## [0.12.0] - 14-07-23
 ### Added
 

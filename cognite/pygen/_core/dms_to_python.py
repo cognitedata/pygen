@@ -476,6 +476,26 @@ def find_dependencies(apis: List[APIGenerator]) -> dict[APIClass, set[APIClass]]
     }
 
 
+def _unique_properties(prop: dm.MappedProperty | dm.SingleHopConnectionDefinition) -> dict[str, Any]:
+    if isinstance(prop, dm.MappedProperty):
+        return {
+            "container": prop.container.dump(),
+            "container_property_identifier": prop.container_property_identifier,
+            "default_value": prop.default_value,
+            "name": prop.name,
+            "nullable": prop.nullable,
+            "type": prop.type.dump(),
+        }
+    elif isinstance(prop, dm.SingleHopConnectionDefinition):
+        return {
+            "direction": prop.direction,
+            "name": prop.name,
+            "type": prop.type.dump(),
+        }
+    else:
+        raise ValueError(f"Unknown property type {prop}")
+
+
 def _unique_views_properties(view: dm.View) -> dict[str, Any]:
     """
     Returns the properties from a view that uniquely defines it.
@@ -494,17 +514,7 @@ def _unique_views_properties(view: dm.View) -> dict[str, Any]:
     return {
         "name": view.name,
         "externalId": view.external_id,
-        "properties": {
-            name: {
-                "container": prop.container.dump(),
-                "container_property_identifier": prop.container_property_identifier,
-                "default_value": prop.default_value,
-                "name": prop.name,
-                "nullable": prop.nullable,
-                "type": prop.type.dump(),
-            }
-            for name, prop in view.properties.items()
-        },
+        "properties": {name: _unique_properties(prop) for name, prop in view.properties.items()},
     }
 
 
