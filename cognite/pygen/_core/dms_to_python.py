@@ -33,7 +33,9 @@ class MultiModelSDKGenerator:
         self._apis = APIsGenerator(top_level_package, client_name, unique_views, logger)
 
     def generate_sdk(self) -> dict[Path, str]:
-        raise NotImplementedError()
+        client_dir = Path(self.top_level_package.replace(".", "/"))
+        sdk = self._apis.generate_apis(client_dir)
+        return sdk
 
 
 class SDKGenerator:

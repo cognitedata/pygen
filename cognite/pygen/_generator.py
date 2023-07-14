@@ -3,7 +3,7 @@ from __future__ import annotations
 import sys
 import tempfile
 from pathlib import Path
-from typing import Callable, Sequence
+from typing import Callable, Sequence, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -72,9 +72,23 @@ def generate_multimodel_sdk(
     logger("Done!")
 
 
+@overload
+def _load_data_model(
+    client: CogniteClient, model_id: DataModelIdentifier, logger: Callable[[str], None]
+) -> dm.DataModel:
+    ...
+
+
+@overload
+def _load_data_model(
+    client: CogniteClient, model_id: Sequence[DataModelIdentifier], logger: Callable[[str], None]
+) -> dm.DataModelList:
+    ...
+
+
 def _load_data_model(
     client: CogniteClient, model_id: DataModelIdentifier | Sequence[DataModelIdentifier], logger: Callable[[str], None]
-) -> dm.DataModel:
+) -> dm.DataModel | dm.DataModelList:
     try:
         data_models = client.data_modeling.data_models.retrieve(model_id, inline_views=True)
         if len(model_id) == 1:
