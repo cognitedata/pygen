@@ -6,7 +6,7 @@ import pytest
 from cognite.client import data_modeling as dm
 
 from cognite import pygen
-from cognite.pygen._core.dms_to_python import APIGenerator, SDKGenerator
+from cognite.pygen._core.dms_to_python import APIGenerator, APIsGenerator, SDKGenerator
 from tests.constants import ShopSDKFiles, examples_dir
 
 
@@ -18,6 +18,11 @@ def top_level_package() -> str:
 @pytest.fixture
 def sdk_generator(shop_model: dm.DataModel, top_level_package: str):
     return SDKGenerator(top_level_package, "ShopClient", shop_model)
+
+
+@pytest.fixture
+def apis_generator(shop_model, top_level_package) -> APIsGenerator:
+    return APIsGenerator(top_level_package, "ShopClient", shop_model.views)
 
 
 def test_create_view_data_classes_case(case_view: dm.View, top_level_package: str):
@@ -53,13 +58,13 @@ def test_create_view_api_classes_command_configs(command_config_view: dm.View, t
 
 
 def test_create_api_classes(
-    sdk_generator: SDKGenerator,
+    apis_generator: APIsGenerator,
 ):
     # Arrange
     expected = ShopSDKFiles.data_init.read_text()
 
     # Act
-    actual = sdk_generator.generate_data_classes_init_file()
+    actual = apis_generator.generate_data_classes_init_file()
 
     # Assert
     assert actual == expected

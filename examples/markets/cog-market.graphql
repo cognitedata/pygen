@@ -1,0 +1,22 @@
+type CogPool implements Market {
+    name: String
+    timezone: String
+    maxPrice: Float
+    minPrice: Float
+    timeUnit: String
+}
+
+type CogBid implements Bid {
+    name: String
+    price: Float
+    quantity: Int
+    market: CogPool
+    date: Date
+    priceArea: String
+}
+
+type CogProcess implements Process {
+    name: String
+    bid: CogBid
+    transformation: ValueTransformation
+}

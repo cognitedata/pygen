@@ -8,7 +8,14 @@ import pytest
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.views import ViewProperty
 
-from cognite.pygen._core.dms_to_python import APIClass, APIGenerator, Field, SDKGenerator, find_dependencies
+from cognite.pygen._core.dms_to_python import (
+    APIClass,
+    APIGenerator,
+    APIsGenerator,
+    Field,
+    SDKGenerator,
+    find_dependencies,
+)
 from tests.constants import MovieSDKFiles
 
 
@@ -18,8 +25,13 @@ def top_level_package() -> str:
 
 
 @pytest.fixture
-def sdk_generator(movie_model, top_level_package):
+def sdk_generator(movie_model, top_level_package) -> SDKGenerator:
     return SDKGenerator(top_level_package, "MovieClient", movie_model)
+
+
+@pytest.fixture
+def apis_generator(movie_model, top_level_package) -> APIsGenerator:
+    return APIsGenerator(top_level_package, "MovieClient", movie_model.views)
 
 
 def create_fields_test_cases():
@@ -251,12 +263,12 @@ def test_create_view_api_classes_persons(person_view: dm.View, top_level_package
     assert actual == expected
 
 
-def test_create_api_classes(sdk_generator: SDKGenerator):
+def test_create_api_classes(apis_generator: APIsGenerator):
     # Arrange
     expected = MovieSDKFiles.data_init.read_text()
 
     # Act
-    actual = sdk_generator.generate_data_classes_init_file()
+    actual = apis_generator.generate_data_classes_init_file()
 
     # Assert
     assert actual == expected

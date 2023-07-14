@@ -1,0 +1,442 @@
+createdTime: 1689327973964
+description: ''
+externalId: CogPool
+isGlobal: false
+lastUpdatedTime: 1689328034370
+name: CogPool
+space: market
+version: '1'
+views:
+- createdTime: 1689328033812
+  externalId: ValueTransformation
+  isGlobal: false
+  lastUpdatedTime: 1689328033812
+  name: ValueTransformation
+  properties:
+    arguments:
+      autoIncrement: false
+      container:
+        externalId: ValueTransformation
+        space: market
+      containerPropertyIdentifier: arguments
+      defaultValue: null
+      description: null
+      name: arguments
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: json
+    method:
+      autoIncrement: false
+      container:
+        externalId: ValueTransformation
+        space: market
+      containerPropertyIdentifier: method
+      defaultValue: null
+      description: null
+      name: method
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+  space: market
+  usedFor: node
+  version: 147ebcf1583165
+  writable: true
+- createdTime: 1689328033812
+  externalId: Market
+  isGlobal: false
+  lastUpdatedTime: 1689328033812
+  name: Market
+  properties:
+    name:
+      autoIncrement: false
+      container:
+        externalId: Market
+        space: market
+      containerPropertyIdentifier: name
+      defaultValue: null
+      description: null
+      name: name
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    timezone:
+      autoIncrement: false
+      container:
+        externalId: Market
+        space: market
+      containerPropertyIdentifier: timezone
+      defaultValue: null
+      description: null
+      name: timezone
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+  space: market
+  usedFor: node
+  version: a5067899750188
+  writable: true
+- createdTime: 1689328033812
+  externalId: Process
+  isGlobal: false
+  lastUpdatedTime: 1689328033812
+  name: Process
+  properties:
+    bid:
+      autoIncrement: false
+      container:
+        externalId: Process
+        space: market
+      containerPropertyIdentifier: bid
+      defaultValue: null
+      description: null
+      name: bid
+      nullable: true
+      type:
+        container: null
+        source:
+          externalId: Bid
+          space: market
+          version: 34292a8398dde1
+        type: direct
+    name:
+      autoIncrement: false
+      container:
+        externalId: Process
+        space: market
+      containerPropertyIdentifier: name
+      defaultValue: null
+      description: null
+      name: name
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+  space: market
+  usedFor: node
+  version: 9074b7aa0c96f7
+  writable: true
+- createdTime: 1689328033812
+  externalId: Bid
+  isGlobal: false
+  lastUpdatedTime: 1689328033812
+  name: Bid
+  properties:
+    date:
+      autoIncrement: false
+      container:
+        externalId: Bid
+        space: market
+      containerPropertyIdentifier: date
+      defaultValue: null
+      description: null
+      name: date
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: date
+    market:
+      autoIncrement: false
+      container:
+        externalId: Bid
+        space: market
+      containerPropertyIdentifier: market
+      defaultValue: null
+      description: null
+      name: market
+      nullable: true
+      type:
+        container: null
+        source:
+          externalId: Market
+          space: market
+          version: a5067899750188
+        type: direct
+    name:
+      autoIncrement: false
+      container:
+        externalId: Bid
+        space: market
+      containerPropertyIdentifier: name
+      defaultValue: null
+      description: null
+      name: name
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+  space: market
+  usedFor: node
+  version: 34292a8398dde1
+  writable: true
+- createdTime: 1689328033812
+  externalId: CogPool
+  implements:
+  - externalId: Market
+    space: market
+    type: view
+    version: a5067899750188
+  isGlobal: false
+  lastUpdatedTime: 1689328033812
+  name: CogPool
+  properties:
+    maxPrice:
+      autoIncrement: false
+      container:
+        externalId: CogPool
+        space: market
+      containerPropertyIdentifier: maxPrice
+      defaultValue: null
+      description: null
+      name: maxPrice
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: float64
+    minPrice:
+      autoIncrement: false
+      container:
+        externalId: CogPool
+        space: market
+      containerPropertyIdentifier: minPrice
+      defaultValue: null
+      description: null
+      name: minPrice
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: float64
+    name:
+      autoIncrement: false
+      container:
+        externalId: Market
+        space: market
+      containerPropertyIdentifier: name
+      defaultValue: null
+      description: null
+      name: name
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    timeUnit:
+      autoIncrement: false
+      container:
+        externalId: CogPool
+        space: market
+      containerPropertyIdentifier: timeUnit
+      defaultValue: null
+      description: null
+      name: timeUnit
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    timezone:
+      autoIncrement: false
+      container:
+        externalId: Market
+        space: market
+      containerPropertyIdentifier: timezone
+      defaultValue: null
+      description: null
+      name: timezone
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+  space: market
+  usedFor: node
+  version: fde308158be67f
+  writable: true
+- createdTime: 1689328033812
+  externalId: CogBid
+  implements:
+  - externalId: Bid
+    space: market
+    type: view
+    version: 34292a8398dde1
+  isGlobal: false
+  lastUpdatedTime: 1689328033812
+  name: CogBid
+  properties:
+    date:
+      autoIncrement: false
+      container:
+        externalId: Bid
+        space: market
+      containerPropertyIdentifier: date
+      defaultValue: null
+      description: null
+      name: date
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: date
+    market:
+      autoIncrement: false
+      container:
+        externalId: Bid
+        space: market
+      containerPropertyIdentifier: market
+      defaultValue: null
+      description: null
+      name: market
+      nullable: true
+      type:
+        container: null
+        source:
+          externalId: Market
+          space: market
+          version: a5067899750188
+        type: direct
+    name:
+      autoIncrement: false
+      container:
+        externalId: Bid
+        space: market
+      containerPropertyIdentifier: name
+      defaultValue: null
+      description: null
+      name: name
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    price:
+      autoIncrement: false
+      container:
+        externalId: CogBid
+        space: market
+      containerPropertyIdentifier: price
+      defaultValue: null
+      description: null
+      name: price
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: float64
+    priceArea:
+      autoIncrement: false
+      container:
+        externalId: CogBid
+        space: market
+      containerPropertyIdentifier: priceArea
+      defaultValue: null
+      description: null
+      name: priceArea
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    quantity:
+      autoIncrement: false
+      container:
+        externalId: CogBid
+        space: market
+      containerPropertyIdentifier: quantity
+      defaultValue: null
+      description: null
+      name: quantity
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: int32
+  space: market
+  usedFor: node
+  version: d4c7938c383740
+  writable: true
+- createdTime: 1689328033812
+  externalId: CogProcess
+  implements:
+  - externalId: Process
+    space: market
+    type: view
+    version: 9074b7aa0c96f7
+  isGlobal: false
+  lastUpdatedTime: 1689328033812
+  name: CogProcess
+  properties:
+    bid:
+      autoIncrement: false
+      container:
+        externalId: Process
+        space: market
+      containerPropertyIdentifier: bid
+      defaultValue: null
+      description: null
+      name: bid
+      nullable: true
+      type:
+        container: null
+        source:
+          externalId: Bid
+          space: market
+          version: 34292a8398dde1
+        type: direct
+    name:
+      autoIncrement: false
+      container:
+        externalId: Process
+        space: market
+      containerPropertyIdentifier: name
+      defaultValue: null
+      description: null
+      name: name
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    transformation:
+      autoIncrement: false
+      container:
+        externalId: CogProcess
+        space: market
+      containerPropertyIdentifier: transformation
+      defaultValue: null
+      description: null
+      name: transformation
+      nullable: true
+      type:
+        container: null
+        source:
+          externalId: ValueTransformation
+          space: market
+          version: 147ebcf1583165
+        type: direct
+  space: market
+  usedFor: node
+  version: 83aa29f88291b7
+  writable: true

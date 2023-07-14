@@ -4,3 +4,4 @@ scalar JSONObject
 scalar TimeSeries
 scalar File
 scalar Sequence
+scalar Date

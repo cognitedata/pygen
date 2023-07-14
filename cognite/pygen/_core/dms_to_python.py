@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import hashlib
+import json
 from collections import defaultdict
 from dataclasses import dataclass
 from itertools import product
 from pathlib import Path
-from typing import Callable, Dict, List, Literal
+from typing import Any, Callable, Dict, List, Literal, Sequence
 
 from cognite.client import data_modeling as dm
 from cognite.client._version import __version__ as cognite_sdk_version
@@ -14,6 +16,48 @@ from pydantic.version import VERSION as PYDANTIC_VERSION
 
 from cognite.pygen._version import __version__
 from cognite.pygen.utils.text import to_pascal, to_snake
+
+
+class MultiModelSDKGenerator:
+    def __init__(
+        self,
+        top_level_package: str,
+        client_name: str,
+        data_models: Sequence[dm.DataModel],
+        logger: Callable[[str], None] | None = None,
+    ):
+        self._data_models = data_models
+        self.top_level_package = top_level_package
+        self.client_name = client_name
+        unique_views = get_unique_views(*[view for dm in data_models for view in dm.views])
+        self._apis = APIsGenerator(top_level_package, client_name, unique_views, logger)
+        api_by_view_external_id = {api.view.external_id: api.class_ for api in self._apis.apis}
+        self._apis_classes = sorted(
+            (APIsClass.from_data_model(dm, api_by_view_external_id) for dm in data_models), key=lambda a: a.name
+        )
+
+    def generate_sdk(self) -> dict[Path, str]:
+        client_dir = Path(self.top_level_package.replace(".", "/"))
+        sdk = self._apis.generate_apis(client_dir)
+        sdk[client_dir / "_api_client.py"] = self.generate_api_client_file()
+        return sdk
+
+    def generate_api_client_file(self) -> str:
+        api_client = self._apis.env.get_template("_api_client.py.jinja")
+
+        return (
+            api_client.render(
+                client_name=self.client_name,
+                pygen_version=__version__,
+                cognite_sdk_version=cognite_sdk_version,
+                pydantic_version=PYDANTIC_VERSION,
+                classes=sorted((api.class_ for api in self._apis.apis), key=lambda c: c.data_class),
+                is_single_model=False,
+                top_level_package=self.top_level_package,
+                api_classes=self._apis_classes,
+            )
+            + "\n"
+        )
 
 
 class SDKGenerator:
@@ -38,7 +82,43 @@ class SDKGenerator:
         logger: Callable[[str], None] | None = None,
     ):
         self._data_model = data_model
-        self._env = Environment(
+        self.top_level_package = top_level_package
+        self.client_name = client_name
+        self._apis = APIsGenerator(top_level_package, client_name, data_model.views, logger)
+
+    def generate_sdk(self) -> dict[Path, str]:
+        client_dir = Path(self.top_level_package.replace(".", "/"))
+        sdk = self._apis.generate_apis(client_dir)
+        sdk[client_dir / "_api_client.py"] = self.generate_api_client_file()
+        return sdk
+
+    def generate_api_client_file(self) -> str:
+        api_client = self._apis.env.get_template("_api_client.py.jinja")
+
+        return (
+            api_client.render(
+                client_name=self.client_name,
+                pygen_version=__version__,
+                cognite_sdk_version=cognite_sdk_version,
+                pydantic_version=PYDANTIC_VERSION,
+                data_model=self._data_model,
+                classes=sorted((api.class_ for api in self._apis.apis), key=lambda c: c.data_class),
+                top_level_package=self.top_level_package,
+                is_single_model=True,
+            )
+            + "\n"
+        )
+
+
+class APIsGenerator:
+    def __init__(
+        self,
+        top_level_package: str,
+        client_name: str,
+        views: Sequence[dm.View],
+        logger: Callable[[str], None] | None = None,
+    ):
+        self.env = Environment(
             loader=PackageLoader("cognite.pygen._core", "templates"),
             autoescape=select_autoescape(),
         )
@@ -47,7 +127,7 @@ class SDKGenerator:
         self._logger = logger or print  # noqa: T202
 
         self.apis = []
-        for view in data_model.views:
+        for view in views:
             try:
                 api_generator = APIGenerator(view, self.top_level_package)
             except Exception as e:
@@ -57,8 +137,7 @@ class SDKGenerator:
         self._dependencies_by_class = find_dependencies(self.apis)
         self._static_dir = Path(__file__).parent / "static"
 
-    def generate_sdk(self) -> dict[Path, str]:
-        client_dir = Path(self.top_level_package.replace(".", "/"))
+    def generate_apis(self, client_dir: Path) -> dict[Path, str]:
         data_classes_dir = client_dir / "data_classes"
         api_dir = client_dir / "_api"
 
@@ -73,7 +152,6 @@ class SDKGenerator:
                 self._logger(f"Skipping view {api.view.name}")
                 self._dependencies_by_class.pop(api.class_, None)
 
-        sdk[client_dir / "_api_client.py"] = self.generate_api_client_file()
         sdk[client_dir / "__init__.py"] = self.generate_client_init_file()
         sdk[data_classes_dir / "__init__.py"] = self.generate_data_classes_init_file()
         sdk[api_dir / "_core.py"] = self.generate_api_core_file()
@@ -81,30 +159,15 @@ class SDKGenerator:
         return sdk
 
     def generate_api_core_file(self) -> str:
-        api_core = self._env.get_template("_core_api.py.jinja")
+        api_core = self.env.get_template("_core_api.py.jinja")
         return api_core.render(top_level_package=self.top_level_package) + "\n"
 
     def generate_client_init_file(self) -> str:
-        client_init = self._env.get_template("_client_init.py.jinja")
-        return client_init.render(client_name=self.client_name) + "\n"
-
-    def generate_api_client_file(self) -> str:
-        api_client = self._env.get_template("_api_client.py.jinja")
-
-        return (
-            api_client.render(
-                client_name=self.client_name,
-                pygen_version=__version__,
-                cognite_sdk_version=cognite_sdk_version,
-                pydantic_version=PYDANTIC_VERSION,
-                data_model=self._data_model,
-                classes=sorted((api.class_ for api in self.apis), key=lambda c: c.data_class),
-            )
-            + "\n"
-        )
+        client_init = self.env.get_template("_client_init.py.jinja")
+        return client_init.render(client_name=self.client_name, top_level_package=self.top_level_package) + "\n"
 
     def generate_data_classes_init_file(self) -> str:
-        data_class_init = self._env.get_template("data_classes_init.py.jinja")
+        data_class_init = self.env.get_template("data_classes_init.py.jinja")
         return (
             data_class_init.render(
                 classes=sorted((api.class_ for api in self.apis), key=lambda c: c.data_class),
@@ -320,9 +383,30 @@ class APIClass:
     def multiline_import(self) -> str:
         return f"from {self._top_level_package}.data_classes._{self.file_name} import (\n    {self.data_class},\n    {self.data_class}Apply,\n    {self.data_class}List,\n)"
 
+    # Todo hack to get around black in unit tests
     @property
     def is_line_length_above_120(self) -> bool:
         return len(self.one_line_import) > 120
+
+
+@dataclass(frozen=True)
+class APIsClass:
+    sub_apis: list[APIClass]
+    variable: str
+    name: str
+    model: dm.DataModelId
+
+    @classmethod
+    def from_data_model(cls, data_model: dm.DataModel, api_class_by_view_external_id: dict[str, APIClass]) -> APIsClass:
+        sub_apis = []
+        for view in data_model.views:
+            sub_apis.append(api_class_by_view_external_id[view.external_id])
+        return cls(
+            sub_apis=sorted(sub_apis, key=lambda api: api.data_class),
+            variable=to_snake(data_model.name, singularize=True),
+            name=f"{to_pascal(data_model.name, singularize=True)}APIs",
+            model=data_model.as_id(),
+        )
 
 
 class APIGenerator:
@@ -390,3 +474,46 @@ def find_dependencies(apis: List[APIGenerator]) -> dict[APIClass, set[APIClass]]
         for api in apis
         if (dependencies := api.fields.dependencies)
     }
+
+
+def _unique_views_properties(view: dm.View) -> dict[str, Any]:
+    """
+    Returns the properties from a view that uniquely defines it.
+
+    This is necessary as there might be two views that have different versions, but all else is the same,
+    thus they can be used to create the same data classes and apis in the generated SDK.
+
+    Parameters
+    ----------
+    view (dm.View) : The View
+
+    Returns
+    -------
+        A dictionary with the properties that uniquely defines the view.
+    """
+    return {
+        "name": view.name,
+        "externalId": view.external_id,
+        "properties": {
+            name: {
+                "container": prop.container.dump(),
+                "container_property_identifier": prop.container_property_identifier,
+                "default_value": prop.default_value,
+                "name": prop.name,
+                "nullable": prop.nullable,
+                "type": prop.type.dump(),
+            }
+            for name, prop in view.properties.items()
+        },
+    }
+
+
+def get_unique_views(*views: dm.View) -> list[dm.View]:
+    view_hashes = set()
+    unique_views = []
+    for view in views:
+        view_hash = hashlib.shake_256(json.dumps(_unique_views_properties(view)).encode("utf-8")).hexdigest(16)
+        if view_hash not in view_hashes:
+            unique_views.append(view)
+            view_hashes.add(view_hash)
+    return unique_views

@@ -1,0 +1,427 @@
+createdTime: 1689328106500
+description: ''
+externalId: PygenPool
+isGlobal: false
+lastUpdatedTime: 1689328128421
+name: PygenPool
+space: market
+version: '1'
+views:
+- createdTime: 1689328127900
+  externalId: ValueTransformation
+  isGlobal: false
+  lastUpdatedTime: 1689328127900
+  name: ValueTransformation
+  properties:
+    arguments:
+      autoIncrement: false
+      container:
+        externalId: ValueTransformation
+        space: market
+      containerPropertyIdentifier: arguments
+      defaultValue: null
+      description: null
+      name: arguments
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: json
+    method:
+      autoIncrement: false
+      container:
+        externalId: ValueTransformation
+        space: market
+      containerPropertyIdentifier: method
+      defaultValue: null
+      description: null
+      name: method
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+  space: market
+  usedFor: node
+  version: 946587c592b44c
+  writable: true
+- createdTime: 1689328127900
+  externalId: Market
+  isGlobal: false
+  lastUpdatedTime: 1689328127900
+  name: Market
+  properties:
+    name:
+      autoIncrement: false
+      container:
+        externalId: Market
+        space: market
+      containerPropertyIdentifier: name
+      defaultValue: null
+      description: null
+      name: name
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    timezone:
+      autoIncrement: false
+      container:
+        externalId: Market
+        space: market
+      containerPropertyIdentifier: timezone
+      defaultValue: null
+      description: null
+      name: timezone
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+  space: market
+  usedFor: node
+  version: 5b43e98565d4d5
+  writable: true
+- createdTime: 1689328127900
+  externalId: Process
+  isGlobal: false
+  lastUpdatedTime: 1689328127900
+  name: Process
+  properties:
+    bid:
+      autoIncrement: false
+      container:
+        externalId: Process
+        space: market
+      containerPropertyIdentifier: bid
+      defaultValue: null
+      description: null
+      name: bid
+      nullable: true
+      type:
+        container: null
+        source:
+          externalId: Bid
+          space: market
+          version: bc96b2054006b2
+        type: direct
+    name:
+      autoIncrement: false
+      container:
+        externalId: Process
+        space: market
+      containerPropertyIdentifier: name
+      defaultValue: null
+      description: null
+      name: name
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+  space: market
+  usedFor: node
+  version: f65bbfb253390f
+  writable: true
+- createdTime: 1689328127900
+  externalId: Bid
+  isGlobal: false
+  lastUpdatedTime: 1689328127900
+  name: Bid
+  properties:
+    date:
+      autoIncrement: false
+      container:
+        externalId: Bid
+        space: market
+      containerPropertyIdentifier: date
+      defaultValue: null
+      description: null
+      name: date
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: date
+    market:
+      autoIncrement: false
+      container:
+        externalId: Bid
+        space: market
+      containerPropertyIdentifier: market
+      defaultValue: null
+      description: null
+      name: market
+      nullable: true
+      type:
+        container: null
+        source:
+          externalId: Market
+          space: market
+          version: 5b43e98565d4d5
+        type: direct
+    name:
+      autoIncrement: false
+      container:
+        externalId: Bid
+        space: market
+      containerPropertyIdentifier: name
+      defaultValue: null
+      description: null
+      name: name
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+  space: market
+  usedFor: node
+  version: bc96b2054006b2
+  writable: true
+- createdTime: 1689328127900
+  externalId: PygenPool
+  implements:
+  - externalId: Market
+    space: market
+    type: view
+    version: 5b43e98565d4d5
+  isGlobal: false
+  lastUpdatedTime: 1689328127900
+  name: PygenPool
+  properties:
+    dayOfWeek:
+      autoIncrement: false
+      container:
+        externalId: PygenPool
+        space: market
+      containerPropertyIdentifier: dayOfWeek
+      defaultValue: null
+      description: null
+      name: dayOfWeek
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: int32
+    name:
+      autoIncrement: false
+      container:
+        externalId: Market
+        space: market
+      containerPropertyIdentifier: name
+      defaultValue: null
+      description: null
+      name: name
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    timezone:
+      autoIncrement: false
+      container:
+        externalId: Market
+        space: market
+      containerPropertyIdentifier: timezone
+      defaultValue: null
+      description: null
+      name: timezone
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+  space: market
+  usedFor: node
+  version: 63c40784df7463
+  writable: true
+- createdTime: 1689328127900
+  externalId: PygenBid
+  implements:
+  - externalId: Bid
+    space: market
+    type: view
+    version: bc96b2054006b2
+  isGlobal: false
+  lastUpdatedTime: 1689328127900
+  name: PygenBid
+  properties:
+    date:
+      autoIncrement: false
+      container:
+        externalId: Bid
+        space: market
+      containerPropertyIdentifier: date
+      defaultValue: null
+      description: null
+      name: date
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: date
+    isBlock:
+      autoIncrement: false
+      container:
+        externalId: PygenBid
+        space: market
+      containerPropertyIdentifier: isBlock
+      defaultValue: null
+      description: null
+      name: isBlock
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: boolean
+    market:
+      autoIncrement: false
+      container:
+        externalId: Bid
+        space: market
+      containerPropertyIdentifier: market
+      defaultValue: null
+      description: null
+      name: market
+      nullable: true
+      type:
+        container: null
+        source:
+          externalId: Market
+          space: market
+          version: 5b43e98565d4d5
+        type: direct
+    minimumPrice:
+      autoIncrement: false
+      container:
+        externalId: PygenBid
+        space: market
+      containerPropertyIdentifier: minimumPrice
+      defaultValue: null
+      description: null
+      name: minimumPrice
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: float64
+    name:
+      autoIncrement: false
+      container:
+        externalId: Bid
+        space: market
+      containerPropertyIdentifier: name
+      defaultValue: null
+      description: null
+      name: name
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    pricePremium:
+      autoIncrement: false
+      container:
+        externalId: PygenBid
+        space: market
+      containerPropertyIdentifier: pricePremium
+      defaultValue: null
+      description: null
+      name: pricePremium
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: float64
+  space: market
+  usedFor: node
+  version: fb90adf1d89038
+  writable: true
+- createdTime: 1689328127900
+  externalId: PygenProcess
+  implements:
+  - externalId: Process
+    space: market
+    type: view
+    version: f65bbfb253390f
+  isGlobal: false
+  lastUpdatedTime: 1689328127900
+  name: PygenProcess
+  properties:
+    bid:
+      autoIncrement: false
+      container:
+        externalId: Process
+        space: market
+      containerPropertyIdentifier: bid
+      defaultValue: null
+      description: null
+      name: bid
+      nullable: true
+      type:
+        container: null
+        source:
+          externalId: Bid
+          space: market
+          version: bc96b2054006b2
+        type: direct
+    name:
+      autoIncrement: false
+      container:
+        externalId: Process
+        space: market
+      containerPropertyIdentifier: name
+      defaultValue: null
+      description: null
+      name: name
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    productionLocations:
+      autoIncrement: false
+      container:
+        externalId: PygenProcess
+        space: market
+      containerPropertyIdentifier: productionLocations
+      defaultValue: null
+      description: null
+      name: productionLocations
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: true
+        type: text
+    transformation:
+      autoIncrement: false
+      container:
+        externalId: PygenProcess
+        space: market
+      containerPropertyIdentifier: transformation
+      defaultValue: null
+      description: null
+      name: transformation
+      nullable: true
+      type:
+        container: null
+        source:
+          externalId: ValueTransformation
+          space: market
+          version: 946587c592b44c
+        type: direct
+  space: market
+  usedFor: node
+  version: a2b84652d1dc9d
+  writable: true

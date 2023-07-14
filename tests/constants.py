@@ -7,6 +7,7 @@ examples_dir = repo_root / "examples"
 movie_sdk = examples_dir / "movie_domain"
 schemas_dir = repo_root / "tests" / "schemas"
 shop_sdk = examples_dir / "shop"
+market_sdk = examples_dir / "markets"
 
 
 class TestSchemas:
@@ -17,6 +18,13 @@ class TestSchemas:
 class DataModels:
     movie_model = schemas_dir / "movie_data_model.yaml"
     shop_model = schemas_dir / "shop_data_model.yaml"
+    cog_pool = schemas_dir / "CogPool.yaml"
+    pygen_pool = schemas_dir / "PygenPool.yaml"
+
+
+class MarketSDKFiles:
+    client_dir = market_sdk / "client"
+    client = client_dir / "_api_client.py"
 
 
 class ShopSDKFiles:
