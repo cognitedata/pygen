@@ -17,6 +17,8 @@ class TestSchemas:
 class DataModels:
     movie_model = schemas_dir / "movie_data_model.yaml"
     shop_model = schemas_dir / "shop_data_model.yaml"
+    cog_pool = schemas_dir / "CogPool.yaml"
+    pygen_pool = schemas_dir / "PygenPool.yaml"
 
 
 class ShopSDKFiles:

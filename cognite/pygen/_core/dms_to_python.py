@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import hashlib
+import json
 from collections import defaultdict
 from dataclasses import dataclass
 from itertools import product
 from pathlib import Path
-from typing import Callable, Dict, List, Literal
+from typing import Any, Callable, Dict, List, Literal
 
 from cognite.client import data_modeling as dm
 from cognite.client._version import __version__ as cognite_sdk_version
@@ -391,3 +393,46 @@ def find_dependencies(apis: List[APIGenerator]) -> dict[APIClass, set[APIClass]]
         for api in apis
         if (dependencies := api.fields.dependencies)
     }
+
+
+def _unique_views_properties(view: dm.View) -> dict[str, Any]:
+    """
+    Returns the properties from a view that uniquely defines it.
+
+    This is necessary as there might be two views that have different versions, but all else is the same,
+    thus they can be used to create the same data classes and apis in the generated SDK.
+
+    Parameters
+    ----------
+    view (dm.View) : The View
+
+    Returns
+    -------
+        A dictionary with the properties that uniquely defines the view.
+    """
+    return {
+        "name": view.name,
+        "externalId": view.external_id,
+        "properties": {
+            name: {
+                "container": prop.container.dump(),
+                "container_property_identifier": prop.container_property_identifier,
+                "default_value": prop.default_value,
+                "name": prop.name,
+                "nullable": prop.nullable,
+                "type": prop.type.dump(),
+            }
+            for name, prop in view.properties.items()
+        },
+    }
+
+
+def get_unique_views(*views: dm.View) -> list[dm.View]:
+    view_hashes = set()
+    unique_views = []
+    for view in views:
+        view_hash = hashlib.shake_256(json.dumps(_unique_views_properties(view)).encode("utf-8")).hexdigest(16)
+        if view_hash not in view_hashes:
+            unique_views.append(view)
+            view_hashes.add(view_hash)
+    return unique_views

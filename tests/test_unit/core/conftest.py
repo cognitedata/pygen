@@ -42,3 +42,17 @@ def case_view(shop_model) -> dm.View:
 @pytest.fixture
 def command_config_view(shop_model) -> dm.View:
     return next(v for v in shop_model.views if v.name == "Command_Config")
+
+
+@pytest.fixture(scope="session")
+def cog_pool_model() -> dm.DataModel:
+    with DataModels.cog_pool.open("r") as f:
+        raw = safe_load(f)
+    return dm.DataModel.load(raw)
+
+
+@pytest.fixture(scope="session")
+def pygen_pool_model() -> dm.DataModel:
+    with DataModels.pygen_pool.open("r") as f:
+        raw = safe_load(f)
+    return dm.DataModel.load(raw)
