@@ -320,6 +320,7 @@ class APIClass:
     def multiline_import(self) -> str:
         return f"from {self._top_level_package}.data_classes._{self.file_name} import (\n    {self.data_class},\n    {self.data_class}Apply,\n    {self.data_class}List,\n)"
 
+    # Todo hack to get around black in unit tests
     @property
     def is_line_length_above_120(self) -> bool:
         return len(self.one_line_import) > 120
