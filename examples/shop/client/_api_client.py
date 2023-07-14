@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-import getpass
 from pathlib import Path
 
 from cognite.client import ClientConfig, CogniteClient
 from cognite.client.credentials import OAuthClientCredentials
 
-from ._api.cases import CasesAPI
-from ._api.command_configs import CommandConfigsAPI
+from shop.client._api.cases import CasesAPI
+from shop.client._api.command_configs import CommandConfigsAPI
 
 
 class ShopClient:
@@ -16,8 +15,8 @@ class ShopClient:
 
     Generated with:
         pygen = 0.11.7
-        cognite-sdk = 6.5.8
-        pydantic = 2.0.1
+        cognite-sdk = 6.8.4
+        pydantic = 2.0.3
 
     Data Model:
         space: IntegrationTestsImmutable
@@ -34,19 +33,8 @@ class ShopClient:
     def azure_project(
         cls, tenant_id: str, client_id: str, client_secret: str, cdf_cluster: str, project: str
     ) -> ShopClient:
-        base_url = f"https://{cdf_cluster}.cognitedata.com/"
-        credentials = OAuthClientCredentials(
-            token_url=f"https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/token",
-            client_id=client_id,
-            client_secret=client_secret,
-            scopes=[f"{base_url}.default"],
-        )
-        config = ClientConfig(
-            project=project,
-            credentials=credentials,
-            client_name=getpass.getuser(),
-            base_url=base_url,
-        )
+        credentials = OAuthClientCredentials.default_for_azure_ad(tenant_id, client_id, client_secret, cdf_cluster)
+        config = ClientConfig.default(project, cdf_cluster, credentials)
 
         return cls(config)
 

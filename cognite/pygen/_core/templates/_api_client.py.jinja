@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-import getpass
 from pathlib import Path
 
 from cognite.client import ClientConfig, CogniteClient
 from cognite.client.credentials import OAuthClientCredentials
 {% for class_ in classes %}
-from ._api.{{ class_.file_name }} import {{ class_.api_class }}API{% endfor %}
+from {{ top_level_package }}._api.{{ class_.file_name }} import {{ class_.api_class }}API{% endfor %}
 
 
 class {{ client_name }}:

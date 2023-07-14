@@ -1,21 +1,20 @@
 from __future__ import annotations
 
-import getpass
 from pathlib import Path
 
 from cognite.client import ClientConfig, CogniteClient
 from cognite.client.credentials import OAuthClientCredentials
 
-from ._api.actors import ActorsAPI
-from ._api.best_directors import BestDirectorsAPI
-from ._api.best_leading_actors import BestLeadingActorsAPI
-from ._api.best_leading_actresses import BestLeadingActressesAPI
-from ._api.directors import DirectorsAPI
-from ._api.movies import MoviesAPI
-from ._api.nominations import NominationsAPI
-from ._api.persons import PersonsAPI
-from ._api.ratings import RatingsAPI
-from ._api.roles import RolesAPI
+from movie_domain.client._api.actors import ActorsAPI
+from movie_domain.client._api.best_directors import BestDirectorsAPI
+from movie_domain.client._api.best_leading_actors import BestLeadingActorsAPI
+from movie_domain.client._api.best_leading_actresses import BestLeadingActressesAPI
+from movie_domain.client._api.directors import DirectorsAPI
+from movie_domain.client._api.movies import MoviesAPI
+from movie_domain.client._api.nominations import NominationsAPI
+from movie_domain.client._api.persons import PersonsAPI
+from movie_domain.client._api.ratings import RatingsAPI
+from movie_domain.client._api.roles import RolesAPI
 
 
 class MovieClient:
@@ -24,8 +23,8 @@ class MovieClient:
 
     Generated with:
         pygen = 0.11.7
-        cognite-sdk = 6.5.8
-        pydantic = 2.0.1
+        cognite-sdk = 6.8.4
+        pydantic = 2.0.3
 
     Data Model:
         space: IntegrationTestsImmutable
@@ -50,19 +49,8 @@ class MovieClient:
     def azure_project(
         cls, tenant_id: str, client_id: str, client_secret: str, cdf_cluster: str, project: str
     ) -> MovieClient:
-        base_url = f"https://{cdf_cluster}.cognitedata.com/"
-        credentials = OAuthClientCredentials(
-            token_url=f"https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/token",
-            client_id=client_id,
-            client_secret=client_secret,
-            scopes=[f"{base_url}.default"],
-        )
-        config = ClientConfig(
-            project=project,
-            credentials=credentials,
-            client_name=getpass.getuser(),
-            base_url=base_url,
-        )
+        credentials = OAuthClientCredentials.default_for_azure_ad(tenant_id, client_id, client_secret, cdf_cluster)
+        config = ClientConfig.default(project, cdf_cluster, credentials)
 
         return cls(config)
 

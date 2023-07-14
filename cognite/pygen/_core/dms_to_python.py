@@ -97,6 +97,7 @@ class SDKGenerator:
                 pydantic_version=PYDANTIC_VERSION,
                 data_model=self._data_model,
                 classes=sorted((api.class_ for api in self._apis.apis), key=lambda c: c.data_class),
+                top_level_package=self.top_level_package,
             )
             + "\n"
         )
@@ -156,7 +157,7 @@ class APIsGenerator:
 
     def generate_client_init_file(self) -> str:
         client_init = self.env.get_template("_client_init.py.jinja")
-        return client_init.render(client_name=self.client_name) + "\n"
+        return client_init.render(client_name=self.client_name, top_level_package=self.top_level_package) + "\n"
 
     def generate_data_classes_init_file(self) -> str:
         data_class_init = self.env.get_template("data_classes_init.py.jinja")
