@@ -13,6 +13,13 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.12.0] - 14-07-23
+### Added
+
+* Support for generating a client from multiple data models. This is currently an experimental feature and only exposed
+  through `cognite.pygen.generate_multimodel_sdk` and not available through the CLI.
+
+
 ## [0.11.7] - 14-07-23
 ### Fixed
 
