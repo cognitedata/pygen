@@ -49,7 +49,7 @@ class SDKGenerator:
         self.apis = []
         for view in data_model.views:
             try:
-                api_generator = APIGenerator(view)
+                api_generator = APIGenerator(view, self.top_level_package)
             except Exception as e:
                 self._logger(f"Failed to generate SDK for view {view.name}: {e}")
             else:
@@ -114,6 +114,7 @@ class SDKGenerator:
                         self._dependencies_by_class.items(), key=lambda x: x[0].data_class
                     )
                 },
+                top_level_package=self.top_level_package,
             )
             + "\n"
         )
@@ -311,8 +312,9 @@ class APIClass:
 
 
 class APIGenerator:
-    def __init__(self, view: dm.View):
+    def __init__(self, view: dm.View, top_level_package: str):
         self.view = view
+        self.top_level_package = top_level_package
         self._env = Environment(
             loader=PackageLoader("cognite.pygen._core", "templates"),
             autoescape=select_autoescape(),
@@ -330,6 +332,7 @@ class APIGenerator:
                 class_name=self.class_.data_class,
                 fields=self.fields,
                 view=self.view,
+                top_level_package=self.top_level_package,
             )
             + "\n"
         )

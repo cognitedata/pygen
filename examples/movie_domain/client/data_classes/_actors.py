@@ -5,12 +5,12 @@ from typing import TYPE_CHECKING, ClassVar, Optional, Union
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import DomainModel, DomainModelApply, InstancesApply, TypeList
+from movie_domain.client.data_classes._core import DomainModel, DomainModelApply, InstancesApply, TypeList
 
 if TYPE_CHECKING:
-    from ._movies import MovieApply
-    from ._nominations import NominationApply
-    from ._persons import PersonApply
+    from movie_domain.client.data_classes._movies import MovieApply
+    from movie_domain.client.data_classes._nominations import NominationApply
+    from movie_domain.client.data_classes._persons import PersonApply
 
 __all__ = ["Actor", "ActorApply", "ActorList"]
 

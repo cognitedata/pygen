@@ -9,7 +9,7 @@ from cognite.client._constants import INSTANCES_LIST_LIMIT_DEFAULT
 
 from {{ top_level_package }}.data_classes import {{ class_.data_class }}, {{ class_.data_class }}Apply, {{ class_.data_class }}List
 
-from ._core import TypeAPI
+from {{ top_level_package }}._api._core import TypeAPI
 
 {% for field in fields.edges_one_to_many %}
 class {{ class_.data_class }}{{ field.edge_api_class_suffix }}API:

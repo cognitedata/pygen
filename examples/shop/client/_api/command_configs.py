@@ -6,9 +6,8 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client._constants import INSTANCES_LIST_LIMIT_DEFAULT
 
+from shop.client._api._core import TypeAPI
 from shop.client.data_classes import CommandConfig, CommandConfigApply, CommandConfigList
-
-from ._core import TypeAPI
 
 
 class CommandConfigsAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigList]):
