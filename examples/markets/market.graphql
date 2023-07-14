@@ -1,0 +1,20 @@
+type ValueTransformation {
+    method: String
+    arguments: JSONObject
+}
+
+interface Market {
+    name: String
+    timezone: String
+}
+
+interface Process {
+    name: String
+    bid: Bid
+}
+
+interface Bid {
+    name: String
+    market: Market
+    date: Date
+}
