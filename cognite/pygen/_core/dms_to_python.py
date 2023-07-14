@@ -35,7 +35,23 @@ class MultiModelSDKGenerator:
     def generate_sdk(self) -> dict[Path, str]:
         client_dir = Path(self.top_level_package.replace(".", "/"))
         sdk = self._apis.generate_apis(client_dir)
+        sdk[client_dir / "_api_client.py"] = self.generate_api_client_file()
         return sdk
+
+    def generate_api_client_file(self) -> str:
+        api_client = self._apis.env.get_template("_api_client.py.jinja")
+
+        return (
+            api_client.render(
+                client_name=self.client_name,
+                pygen_version=__version__,
+                cognite_sdk_version=cognite_sdk_version,
+                pydantic_version=PYDANTIC_VERSION,
+                data_model=self._data_model,
+                classes=sorted((api.class_ for api in self._apis.apis), key=lambda c: c.data_class),
+            )
+            + "\n"
+        )
 
 
 class SDKGenerator:
@@ -71,7 +87,7 @@ class SDKGenerator:
         return sdk
 
     def generate_api_client_file(self) -> str:
-        api_client = self._apis._env.get_template("_api_client.py.jinja")
+        api_client = self._apis.env.get_template("_api_client.py.jinja")
 
         return (
             api_client.render(
@@ -94,7 +110,7 @@ class APIsGenerator:
         views: Sequence[dm.View],
         logger: Callable[[str], None] | None = None,
     ):
-        self._env = Environment(
+        self.env = Environment(
             loader=PackageLoader("cognite.pygen._core", "templates"),
             autoescape=select_autoescape(),
         )
@@ -135,15 +151,15 @@ class APIsGenerator:
         return sdk
 
     def generate_api_core_file(self) -> str:
-        api_core = self._env.get_template("_core_api.py.jinja")
+        api_core = self.env.get_template("_core_api.py.jinja")
         return api_core.render(top_level_package=self.top_level_package) + "\n"
 
     def generate_client_init_file(self) -> str:
-        client_init = self._env.get_template("_client_init.py.jinja")
+        client_init = self.env.get_template("_client_init.py.jinja")
         return client_init.render(client_name=self.client_name) + "\n"
 
     def generate_data_classes_init_file(self) -> str:
-        data_class_init = self._env.get_template("data_classes_init.py.jinja")
+        data_class_init = self.env.get_template("data_classes_init.py.jinja")
         return (
             data_class_init.render(
                 classes=sorted((api.class_ for api in self.apis), key=lambda c: c.data_class),
