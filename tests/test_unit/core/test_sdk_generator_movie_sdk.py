@@ -278,7 +278,7 @@ def test_find_dependencies(movie_model: dm.DataModel, top_level_package: str):
     views = dm.ViewList(movie_model.views)
     apis = [APIGenerator(view, top_level_package) for view in views]
     expected = {
-        APIClass.from_view(k): {APIClass.from_view(v) for v in values}
+        APIClass.from_view(k, top_level_package): {APIClass.from_view(v, top_level_package) for v in values}
         for k, values in {
             "Person": {"Role"},
             "Actor": {"Nomination", "Movie", "Person"},
