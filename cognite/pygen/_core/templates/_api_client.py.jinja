@@ -16,16 +16,16 @@ class {{ client_name }}:
         pygen = {{ pygen_version }}
         cognite-sdk = {{ cognite_sdk_version }}
         pydantic = {{ pydantic_version }}
-
+{% if is_single_model %}
     Data Model:
         space: {{ data_model.space }}
         externalId: {{ data_model.external_id }}
-        version: {{ data_model.version }}
+        version: {{ data_model.version }}{% endif %}
     """
 
     def __init__(self, config: ClientConfig | None = None):
-        client = CogniteClient(config){% for class_ in classes %}
-        self.{{ class_.client_attribute }} = {{ class_.api_class }}API(client){% endfor %}
+        client = CogniteClient(config){% if is_single_model %}{% for class_ in classes %}
+        self.{{ class_.client_attribute }} = {{ class_.api_class }}API(client){% endfor %}{% endif %}
 
     @classmethod
     def azure_project(

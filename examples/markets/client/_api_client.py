@@ -64,7 +64,7 @@ class MarketClient:
     Generated with:
         pygen = 0.12.0
         cognite-sdk = 6.8.4
-        pydantic = 2.3.0
+        pydantic = 2.0.3
     """
 
     def __init__(self, config: ClientConfig | None = None):

@@ -47,8 +47,9 @@ class MultiModelSDKGenerator:
                 pygen_version=__version__,
                 cognite_sdk_version=cognite_sdk_version,
                 pydantic_version=PYDANTIC_VERSION,
-                data_model=self._data_model,
                 classes=sorted((api.class_ for api in self._apis.apis), key=lambda c: c.data_class),
+                is_single_model=False,
+                top_level_package=self.top_level_package,
             )
             + "\n"
         )
@@ -98,6 +99,7 @@ class SDKGenerator:
                 data_model=self._data_model,
                 classes=sorted((api.class_ for api in self._apis.apis), key=lambda c: c.data_class),
                 top_level_package=self.top_level_package,
+                is_single_model=True,
             )
             + "\n"
         )
