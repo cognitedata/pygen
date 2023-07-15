@@ -9,7 +9,7 @@ EXAMPLES_DIR = REPO_ROOT / "examples"
 
 def main():
     last_version = "0.12.1"
-    new_version = "0.12.1"
+    new_version = "0.12.2"
 
     pyproject_toml = REPO_ROOT / "pyproject.toml"
     version_py = REPO_ROOT / "cognite" / "pygen" / "_version.py"

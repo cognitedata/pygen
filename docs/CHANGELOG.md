@@ -13,6 +13,12 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.12.2] - 15-07-23
+### Fixed
+
+* Marked `model_config` in `DomainModelApply` as class variable.
+
+
 ## [0.12.1] - 14-07-23
 ### Fixed
 
