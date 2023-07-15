@@ -66,7 +66,7 @@ T_TypeNode = TypeVar("T_TypeNode", bound=DomainModel)
 
 
 class DomainModelApply(DomainModelCore):
-    model_config = ConfigDict(extra=Extra.forbid)
+    model_config: ClassVar[ConfigDict] = ConfigDict(extra=Extra.forbid)
     existing_version: Optional[int] = None
 
     def to_instances_apply(self) -> InstancesApply:
