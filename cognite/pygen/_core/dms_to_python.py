@@ -309,6 +309,14 @@ class Fields:
         return [field for field in self.data if field.is_edge]
 
     @property
+    def unique_dependencies(self) -> list[tuple[str, str]]:
+        dependencies = set()
+        for field in self.edges:
+            if (field.dependency_file, field.dependency_class) not in dependencies:
+                dependencies.add((field.dependency_file, field.dependency_class))
+        return sorted(dependencies, key=lambda x: x[0])
+
+    @property
     def edges_one_to_one(self) -> list[Field]:
         return [field for field in self.data if field.is_edge and not field.is_list]
 
@@ -323,6 +331,10 @@ class Fields:
     @property
     def has_one_to_one_edges(self) -> bool:
         return any(field.is_edge and not field.is_list for field in self.data)
+
+    @property
+    def has_properties(self) -> bool:
+        return any(not field.is_edge for field in self.data)
 
     @property
     def import_pydantic_field(self) -> bool:

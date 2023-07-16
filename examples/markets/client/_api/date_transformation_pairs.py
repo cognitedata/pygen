@@ -103,6 +103,7 @@ class DateTransformationPairsAPI(
         self, date_transformation_pair: DateTransformationPairApply, replace: bool = False
     ) -> dm.InstancesApplyResult:
         instances = date_transformation_pair.to_instances_apply()
+
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

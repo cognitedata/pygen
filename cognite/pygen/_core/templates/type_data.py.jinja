@@ -1,15 +1,15 @@
 from __future__ import annotations
 {%  if fields.has_datetime or fields.has_date %}
 from datetime import {% if fields.has_datetime and fields.has_date %}date, datetime{% elif fields.has_datetime %}datetime{% else %}date{% endif %}{% endif %}
-{% if fields.import_dependencies %}from typing import TYPE_CHECKING, ClassVar, Optional, Union{% else %}from typing import ClassVar, Optional{% endif %}{% if not fields.has_optional %} # noqa: F401{% endif %}
+{% if fields.import_dependencies %}from typing import TYPE_CHECKING, ClassVar, Optional, Union{% else %}from typing import ClassVar, Optional{% endif %}{% if not fields.has_optional %}  # noqa: F401{% endif %}
 
 from cognite.client import data_modeling as dm{% if fields.import_pydantic_field %}
 from pydantic import Field{% endif %}
 
 from {{ top_level_package }}.data_classes._core import DomainModel, DomainModelApply, InstancesApply, TypeList
 {% if fields.import_dependencies %}
-if TYPE_CHECKING:{% for field in fields.edges %}
-    from {{ top_level_package }}.data_classes._{{ field.dependency_file }} import {{ field.dependency_class }}Apply{% endfor %}
+if TYPE_CHECKING:{% for dependency_file, dependency_class in fields.unique_dependencies %}
+    from {{ top_level_package }}.data_classes._{{ dependency_file }} import {{ dependency_class }}Apply{% endfor %}
 {% endif %}
 __all__ = ["{{ class_name }}", "{{ class_name }}Apply", "{{ class_name }}List"]
 
@@ -27,7 +27,7 @@ class {{ class_name }}Apply(DomainModelApply):
         if self.external_id in cache:
             return InstancesApply([], [])
 
-        sources = []{% for container, container_fields in fields.fields_by_container.items() %}
+        {% if fields.has_properties or fields.has_one_to_one_edges %}sources = []{% for container, container_fields in fields.fields_by_container.items() %}
         source = dm.NodeOrEdgeData(
             source=dm.ContainerId("{{ container.space }}", "{{ container.external_id }}"),
             properties={% raw %}{{% endraw %}{% for field in container_fields %}
@@ -45,7 +45,8 @@ class {{ class_name }}Apply(DomainModelApply):
             existing_version=self.existing_version,
             sources=sources,
         )
-        nodes = [this_node]
+        nodes = [this_node]{% else %}cache.add(self.external_id)
+        nodes = []{% endif %}
         edges = []
 {%  for field in fields.edges_one_to_many %}
         for {{ field.variable }} in self.{{ field.name }}:
