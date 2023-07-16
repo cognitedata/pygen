@@ -9,7 +9,7 @@ from cognite.client import ClientConfig, CogniteClient
 from cognite.client.credentials import OAuthClientCredentials
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def client_config() -> dict[str, str]:
     return toml.load(Path(__file__).parent / "config.toml")["cognite"]
 
