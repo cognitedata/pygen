@@ -19,5 +19,5 @@ type CogProcess implements Process {
     name: String
     bid: CogBid
     transformation: ValueTransformation
-    dateTransformations: DateTransformations
+    dateTransformations: DateTransformationPair
 }

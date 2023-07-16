@@ -14,7 +14,7 @@ class PygenPoolsAPI(TypeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
     def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,
-            sources=dm.ViewId("market", "PygenPool", "63c40784df7463"),
+            sources=dm.ViewId("market", "PygenPool", "23c71ba66bad9d"),
             class_type=PygenPool,
             class_apply_type=PygenPoolApply,
             class_list=PygenPoolList,

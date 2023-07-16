@@ -10,7 +10,7 @@ def main():
     c: CogniteClient = client.persons._client
     pygen.generate_multimodel_sdk(
         c,
-        model_ids=[("market", "CogPool", "1"), ("market", "PygenPool", "1")],
+        model_ids=[("market", "CogPool", "3"), ("market", "PygenPool", "3")],
         top_level_package="markets.client",
         client_name="MarketClient",
         output_dir=examples_dir,

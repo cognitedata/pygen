@@ -14,7 +14,7 @@ class BidsAPI(TypeAPI[Bid, BidApply, BidList]):
     def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,
-            sources=dm.ViewId("market", "Bid", "34292a8398dde1"),
+            sources=dm.ViewId("market", "Bid", "1add47c48cf88b"),
             class_type=Bid,
             class_apply_type=BidApply,
             class_list=BidList,

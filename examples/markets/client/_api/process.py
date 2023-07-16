@@ -14,7 +14,7 @@ class ProcessAPI(TypeAPI[Proces, ProcesApply, ProcesList]):
     def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,
-            sources=dm.ViewId("market", "Process", "9074b7aa0c96f7"),
+            sources=dm.ViewId("market", "Process", "98a2becd0f63ee"),
             class_type=Proces,
             class_apply_type=ProcesApply,
             class_list=ProcesList,

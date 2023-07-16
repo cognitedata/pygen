@@ -8,7 +8,7 @@ type DateTransformation {
     arguments: JSONObject
 }
 
-type DateTransformations {
+type DateTransformationPair {
     start: [DateTransformation]
     end: [DateTransformation]
 }

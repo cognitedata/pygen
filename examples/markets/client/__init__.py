@@ -1,3 +1,3 @@
-from ._api_client import MarketClient
+from markets.client._api_client import MarketClient
 
 __all__ = ["MarketClient"]

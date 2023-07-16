@@ -14,7 +14,7 @@ class CogBidsAPI(TypeAPI[CogBid, CogBidApply, CogBidList]):
     def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,
-            sources=dm.ViewId("market", "CogBid", "d4c7938c383740"),
+            sources=dm.ViewId("market", "CogBid", "3c04fa081c45d5"),
             class_type=CogBid,
             class_apply_type=CogBidApply,
             class_list=CogBidList,

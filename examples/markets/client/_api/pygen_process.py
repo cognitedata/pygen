@@ -14,7 +14,7 @@ class PygenProcessAPI(TypeAPI[PygenProces, PygenProcesApply, PygenProcesList]):
     def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,
-            sources=dm.ViewId("market", "PygenProcess", "a2b84652d1dc9d"),
+            sources=dm.ViewId("market", "PygenProcess", "477b68a858c7a8"),
             class_type=PygenProces,
             class_apply_type=PygenProcesApply,
             class_list=PygenProcesList,
