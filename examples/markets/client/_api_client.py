@@ -9,6 +9,8 @@ from markets.client._api.bids import BidsAPI
 from markets.client._api.cog_bids import CogBidsAPI
 from markets.client._api.cog_pools import CogPoolsAPI
 from markets.client._api.cog_process import CogProcessAPI
+from markets.client._api.date_transformation_pairs import DateTransformationPairsAPI
+from markets.client._api.date_transformations import DateTransformationsAPI
 from markets.client._api.markets import MarketsAPI
 from markets.client._api.process import ProcessAPI
 from markets.client._api.pygen_bids import PygenBidsAPI
@@ -24,7 +26,7 @@ class CogPoolAPIs:
     Data Model:
         space: market
         externalId: CogPool
-        version: 1
+        version: 3
 
     """
 
@@ -33,6 +35,8 @@ class CogPoolAPIs:
         self.cog_bids = CogBidsAPI(client)
         self.cog_pools = CogPoolsAPI(client)
         self.cog_process = CogProcessAPI(client)
+        self.date_transformations = DateTransformationsAPI(client)
+        self.date_transformation_pairs = DateTransformationPairsAPI(client)
         self.markets = MarketsAPI(client)
         self.process = ProcessAPI(client)
         self.value_transformations = ValueTransformationsAPI(client)
@@ -45,12 +49,14 @@ class PygenPoolAPIs:
     Data Model:
         space: market
         externalId: PygenPool
-        version: 1
+        version: 3
 
     """
 
     def __init__(self, client: CogniteClient):
         self.bids = BidsAPI(client)
+        self.date_transformations = DateTransformationsAPI(client)
+        self.date_transformation_pairs = DateTransformationPairsAPI(client)
         self.markets = MarketsAPI(client)
         self.process = ProcessAPI(client)
         self.pygen_bids = PygenBidsAPI(client)
@@ -64,7 +70,7 @@ class MarketClient:
     MarketClient
 
     Generated with:
-        pygen = 0.12.2
+        pygen = 0.12.3
         cognite-sdk = 6.8.4
         pydantic = 2.0.3
 

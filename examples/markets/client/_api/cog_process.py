@@ -14,7 +14,7 @@ class CogProcessAPI(TypeAPI[CogProces, CogProcesApply, CogProcesList]):
     def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,
-            sources=dm.ViewId("market", "CogProcess", "83aa29f88291b7"),
+            sources=dm.ViewId("market", "CogProcess", "b5df5d19e08fd0"),
             class_type=CogProces,
             class_apply_type=CogProcesApply,
             class_list=CogProcesList,

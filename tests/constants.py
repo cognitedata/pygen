@@ -25,6 +25,8 @@ class DataModels:
 class MarketSDKFiles:
     client_dir = market_sdk / "client"
     client = client_dir / "_api_client.py"
+    date_transformation_pair_data = client_dir / "data_classes" / "_date_transformation_pairs.py"
+    date_transformation_pair_api = client_dir / "_api" / "date_transformation_pairs.py"
 
 
 class ShopSDKFiles:

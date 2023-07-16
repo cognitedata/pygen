@@ -1,11 +1,11 @@
-createdTime: 1689328106500
+createdTime: 1689487620604
 description: ''
 externalId: PygenPool
 isGlobal: false
-lastUpdatedTime: 1689328128421
+lastUpdatedTime: 1689487620604
 name: PygenPool
 space: market
-version: '1'
+version: '3'
 views:
 - createdTime: 1689328127900
   externalId: ValueTransformation
@@ -46,6 +46,81 @@ views:
   usedFor: node
   version: 946587c592b44c
   writable: true
+- createdTime: 1689487094937
+  externalId: DateTransformation
+  isGlobal: false
+  lastUpdatedTime: 1689487094937
+  name: DateTransformation
+  properties:
+    arguments:
+      autoIncrement: false
+      container:
+        externalId: DateTransformation
+        space: market
+      containerPropertyIdentifier: arguments
+      defaultValue: null
+      description: null
+      name: arguments
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: json
+    method:
+      autoIncrement: false
+      container:
+        externalId: DateTransformation
+        space: market
+      containerPropertyIdentifier: method
+      defaultValue: null
+      description: null
+      name: method
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+  space: market
+  usedFor: node
+  version: 5248f7e87c4c96
+  writable: true
+- createdTime: 1689487619605
+  externalId: DateTransformationPair
+  isGlobal: false
+  lastUpdatedTime: 1689487619605
+  name: DateTransformationPair
+  properties:
+    end:
+      description: null
+      direction: outwards
+      edgeSource: null
+      name: end
+      source:
+        externalId: DateTransformation
+        space: market
+        type: view
+        version: 5248f7e87c4c96
+      type:
+        externalId: DateTransformationPair.end
+        space: market
+    start:
+      description: null
+      direction: outwards
+      edgeSource: null
+      name: start
+      source:
+        externalId: DateTransformation
+        space: market
+        type: view
+        version: 5248f7e87c4c96
+      type:
+        externalId: DateTransformationPair.start
+        space: market
+  space: market
+  usedFor: node
+  version: 310f933a9aca9b
+  writable: false
 - createdTime: 1689328127900
   externalId: Market
   isGlobal: false
@@ -86,10 +161,10 @@ views:
   usedFor: node
   version: 5b43e98565d4d5
   writable: true
-- createdTime: 1689328127900
+- createdTime: 1689487619605
   externalId: Process
   isGlobal: false
-  lastUpdatedTime: 1689328127900
+  lastUpdatedTime: 1689487619605
   name: Process
   properties:
     bid:
@@ -107,7 +182,7 @@ views:
         source:
           externalId: Bid
           space: market
-          version: bc96b2054006b2
+          version: 1ad3f030a8399f
         type: direct
     name:
       autoIncrement: false
@@ -126,12 +201,12 @@ views:
         type: text
   space: market
   usedFor: node
-  version: f65bbfb253390f
+  version: b3e0207c0bb510
   writable: true
-- createdTime: 1689328127900
+- createdTime: 1689487619605
   externalId: Bid
   isGlobal: false
-  lastUpdatedTime: 1689328127900
+  lastUpdatedTime: 1689487619605
   name: Bid
   properties:
     date:
@@ -182,9 +257,9 @@ views:
         type: text
   space: market
   usedFor: node
-  version: bc96b2054006b2
+  version: 1ad3f030a8399f
   writable: true
-- createdTime: 1689328127900
+- createdTime: 1689487619605
   externalId: PygenPool
   implements:
   - externalId: Market
@@ -192,7 +267,7 @@ views:
     type: view
     version: 5b43e98565d4d5
   isGlobal: false
-  lastUpdatedTime: 1689328127900
+  lastUpdatedTime: 1689487619605
   name: PygenPool
   properties:
     dayOfWeek:
@@ -241,17 +316,17 @@ views:
         type: text
   space: market
   usedFor: node
-  version: 63c40784df7463
+  version: 23c71ba66bad9d
   writable: true
-- createdTime: 1689328127900
+- createdTime: 1689487619605
   externalId: PygenBid
   implements:
   - externalId: Bid
     space: market
     type: view
-    version: bc96b2054006b2
+    version: 1ad3f030a8399f
   isGlobal: false
-  lastUpdatedTime: 1689328127900
+  lastUpdatedTime: 1689487619605
   name: PygenBid
   properties:
     date:
@@ -344,17 +419,17 @@ views:
         type: float64
   space: market
   usedFor: node
-  version: fb90adf1d89038
+  version: 57f9da2a1acf7e
   writable: true
-- createdTime: 1689328127900
+- createdTime: 1689487619605
   externalId: PygenProcess
   implements:
   - externalId: Process
     space: market
     type: view
-    version: f65bbfb253390f
+    version: b3e0207c0bb510
   isGlobal: false
-  lastUpdatedTime: 1689328127900
+  lastUpdatedTime: 1689487619605
   name: PygenProcess
   properties:
     bid:
@@ -372,7 +447,24 @@ views:
         source:
           externalId: Bid
           space: market
-          version: bc96b2054006b2
+          version: 1ad3f030a8399f
+        type: direct
+    dateTransformations:
+      autoIncrement: false
+      container:
+        externalId: PygenProcess
+        space: market
+      containerPropertyIdentifier: dateTransformations
+      defaultValue: null
+      description: null
+      name: dateTransformations
+      nullable: true
+      type:
+        container: null
+        source:
+          externalId: DateTransformationPair
+          space: market
+          version: 310f933a9aca9b
         type: direct
     name:
       autoIncrement: false
@@ -388,21 +480,6 @@ views:
       type:
         collation: ucs_basic
         list: false
-        type: text
-    productionLocations:
-      autoIncrement: false
-      container:
-        externalId: PygenProcess
-        space: market
-      containerPropertyIdentifier: productionLocations
-      defaultValue: null
-      description: null
-      name: productionLocations
-      nullable: true
-      source: null
-      type:
-        collation: ucs_basic
-        list: true
         type: text
     transformation:
       autoIncrement: false
@@ -423,5 +500,5 @@ views:
         type: direct
   space: market
   usedFor: node
-  version: a2b84652d1dc9d
+  version: 477b68a858c7a8
   writable: true

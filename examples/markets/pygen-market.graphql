@@ -17,5 +17,5 @@ type PygenProcess implements Process {
     name: String
     bid: PygenBid
     transformation: ValueTransformation
-    productionLocations: [String]
+    dateTransformations: DateTransformationPair
 }

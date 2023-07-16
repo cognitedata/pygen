@@ -57,7 +57,14 @@ class {{ class_.api_class }}API(TypeAPI[{{ class_.data_class }}, {{ class_.data_
 
     def apply(self, {{ class_.variable }}: {{ class_.data_class }}Apply, replace: bool = False) -> dm.InstancesApplyResult:
         instances = {{ class_.variable }}.to_instances_apply()
-        return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
+        {% if fields.has_properties or fields.has_one_to_one_edges %}return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace){% else %}
+        return self._client.data_modeling.instances.apply(
+            nodes=instances.nodes,
+            edges=instances.edges,
+            auto_create_start_nodes=True,
+            auto_create_end_nodes=True,
+            replace=replace,
+        ){% endif %}
 
     def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):

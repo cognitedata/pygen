@@ -14,7 +14,7 @@ class CogPoolsAPI(TypeAPI[CogPool, CogPoolApply, CogPoolList]):
     def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,
-            sources=dm.ViewId("market", "CogPool", "fde308158be67f"),
+            sources=dm.ViewId("market", "CogPool", "28af312f1d7093"),
             class_type=CogPool,
             class_apply_type=CogPoolApply,
             class_list=CogPoolList,

@@ -9,6 +9,7 @@ from markets.client.data_classes._core import DomainModel, DomainModelApply, Ins
 
 if TYPE_CHECKING:
     from markets.client.data_classes._bids import BidApply
+    from markets.client.data_classes._date_transformation_pairs import DateTransformationPairApply
     from markets.client.data_classes._value_transformations import ValueTransformationApply
 
 __all__ = ["PygenProces", "PygenProcesApply", "PygenProcesList"]
@@ -17,16 +18,16 @@ __all__ = ["PygenProces", "PygenProcesApply", "PygenProcesList"]
 class PygenProces(DomainModel):
     space: ClassVar[str] = "market"
     bid: Optional[str] = None
+    date_transformations: Optional[str] = Field(None, alias="dateTransformations")
     name: Optional[str] = None
-    production_locations: list[str] = Field([], alias="productionLocations")
     transformation: Optional[str] = None
 
 
 class PygenProcesApply(DomainModelApply):
     space: ClassVar[str] = "market"
     bid: Optional[Union["BidApply", str]] = Field(None, repr=False)
+    date_transformations: Optional[Union["DateTransformationPairApply", str]] = Field(None, repr=False)
     name: Optional[str] = None
-    production_locations: list[str] = []
     transformation: Optional[Union["ValueTransformationApply", str]] = Field(None, repr=False)
 
     def _to_instances_apply(self, cache: set[str]) -> InstancesApply:
@@ -49,7 +50,12 @@ class PygenProcesApply(DomainModelApply):
         source = dm.NodeOrEdgeData(
             source=dm.ContainerId("market", "PygenProcess"),
             properties={
-                "productionLocations": self.production_locations,
+                "dateTransformations": {
+                    "space": "market",
+                    "externalId": self.date_transformations
+                    if isinstance(self.date_transformations, str)
+                    else self.date_transformations.external_id,
+                },
                 "transformation": {
                     "space": "market",
                     "externalId": self.transformation
@@ -71,6 +77,11 @@ class PygenProcesApply(DomainModelApply):
 
         if isinstance(self.bid, DomainModelApply):
             instances = self.bid._to_instances_apply(cache)
+            nodes.extend(instances.nodes)
+            edges.extend(instances.edges)
+
+        if isinstance(self.date_transformations, DomainModelApply):
+            instances = self.date_transformations._to_instances_apply(cache)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 

@@ -46,6 +46,6 @@ class TypeAPI(Generic[T_TypeNode, T_TypeApplyNode, T_TypeNodeList]):
             return self.class_list([self.class_type.from_node(node) for node in instances.nodes])
         return self.class_type.from_node(instances.nodes[0])
 
-    def _list(self, limit: int = INSTANCES_LIST_LIMIT_DEFAULT) -> T_TypeNodeList:
-        nodes = self._client.data_modeling.instances.list("node", sources=self.sources, limit=limit)
+    def _list(self, limit: int = INSTANCES_LIST_LIMIT_DEFAULT, filter: dm.Filter | None = None) -> T_TypeNodeList:
+        nodes = self._client.data_modeling.instances.list("node", sources=self.sources, limit=limit, filter=filter)
         return self.class_list([self.class_type.from_node(node) for node in nodes])

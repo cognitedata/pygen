@@ -14,7 +14,7 @@ class PygenBidsAPI(TypeAPI[PygenBid, PygenBidApply, PygenBidList]):
     def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,
-            sources=dm.ViewId("market", "PygenBid", "fb90adf1d89038"),
+            sources=dm.ViewId("market", "PygenBid", "57f9da2a1acf7e"),
             class_type=PygenBid,
             class_apply_type=PygenBidApply,
             class_list=PygenBidList,

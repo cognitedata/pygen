@@ -56,3 +56,8 @@ def pygen_pool_model() -> dm.DataModel:
     with DataModels.pygen_pool.open("r") as f:
         raw = safe_load(f)
     return dm.DataModel.load(raw)
+
+
+@pytest.fixture(scope="session")
+def date_transformation_pair_view(cog_pool_model) -> dm.View:
+    return next(v for v in cog_pool_model.views if v.name == "DateTransformationPair")
