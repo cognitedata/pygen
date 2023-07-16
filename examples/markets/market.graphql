@@ -3,6 +3,16 @@ type ValueTransformation {
     arguments: JSONObject
 }
 
+type DateTransformation {
+    method: String
+    arguments: JSONObject
+}
+
+type DateTransformations {
+    start: [DateTransformation]
+    end: [DateTransformation]
+}
+
 interface Market {
     name: String
     timezone: String
