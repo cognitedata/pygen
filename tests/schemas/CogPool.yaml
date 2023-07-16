@@ -1,11 +1,11 @@
-createdTime: 1689327973964
+createdTime: 1689487537114
 description: ''
 externalId: CogPool
 isGlobal: false
-lastUpdatedTime: 1689328034370
+lastUpdatedTime: 1689487537114
 name: CogPool
 space: market
-version: '1'
+version: '3'
 views:
 - createdTime: 1689328033812
   externalId: ValueTransformation
@@ -46,6 +46,81 @@ views:
   usedFor: node
   version: 147ebcf1583165
   writable: true
+- createdTime: 1689487127627
+  externalId: DateTransformation
+  isGlobal: false
+  lastUpdatedTime: 1689487127627
+  name: DateTransformation
+  properties:
+    arguments:
+      autoIncrement: false
+      container:
+        externalId: DateTransformation
+        space: market
+      containerPropertyIdentifier: arguments
+      defaultValue: null
+      description: null
+      name: arguments
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: json
+    method:
+      autoIncrement: false
+      container:
+        externalId: DateTransformation
+        space: market
+      containerPropertyIdentifier: method
+      defaultValue: null
+      description: null
+      name: method
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+  space: market
+  usedFor: node
+  version: 482866112eb911
+  writable: true
+- createdTime: 1689487536422
+  externalId: DateTransformationPair
+  isGlobal: false
+  lastUpdatedTime: 1689487536422
+  name: DateTransformationPair
+  properties:
+    end:
+      description: null
+      direction: outwards
+      edgeSource: null
+      name: end
+      source:
+        externalId: DateTransformation
+        space: market
+        type: view
+        version: 482866112eb911
+      type:
+        externalId: DateTransformationPair.end
+        space: market
+    start:
+      description: null
+      direction: outwards
+      edgeSource: null
+      name: start
+      source:
+        externalId: DateTransformation
+        space: market
+        type: view
+        version: 482866112eb911
+      type:
+        externalId: DateTransformationPair.start
+        space: market
+  space: market
+  usedFor: node
+  version: bde9fd4428c26e
+  writable: false
 - createdTime: 1689328033812
   externalId: Market
   isGlobal: false
@@ -86,10 +161,10 @@ views:
   usedFor: node
   version: a5067899750188
   writable: true
-- createdTime: 1689328033812
+- createdTime: 1689487536422
   externalId: Process
   isGlobal: false
-  lastUpdatedTime: 1689328033812
+  lastUpdatedTime: 1689487536422
   name: Process
   properties:
     bid:
@@ -107,7 +182,7 @@ views:
         source:
           externalId: Bid
           space: market
-          version: 34292a8398dde1
+          version: 1add47c48cf88b
         type: direct
     name:
       autoIncrement: false
@@ -126,12 +201,12 @@ views:
         type: text
   space: market
   usedFor: node
-  version: 9074b7aa0c96f7
+  version: 98a2becd0f63ee
   writable: true
-- createdTime: 1689328033812
+- createdTime: 1689487536422
   externalId: Bid
   isGlobal: false
-  lastUpdatedTime: 1689328033812
+  lastUpdatedTime: 1689487536422
   name: Bid
   properties:
     date:
@@ -182,9 +257,9 @@ views:
         type: text
   space: market
   usedFor: node
-  version: 34292a8398dde1
+  version: 1add47c48cf88b
   writable: true
-- createdTime: 1689328033812
+- createdTime: 1689487536422
   externalId: CogPool
   implements:
   - externalId: Market
@@ -192,7 +267,7 @@ views:
     type: view
     version: a5067899750188
   isGlobal: false
-  lastUpdatedTime: 1689328033812
+  lastUpdatedTime: 1689487536422
   name: CogPool
   properties:
     maxPrice:
@@ -270,17 +345,17 @@ views:
         type: text
   space: market
   usedFor: node
-  version: fde308158be67f
+  version: 28af312f1d7093
   writable: true
-- createdTime: 1689328033812
+- createdTime: 1689487536422
   externalId: CogBid
   implements:
   - externalId: Bid
     space: market
     type: view
-    version: 34292a8398dde1
+    version: 1add47c48cf88b
   isGlobal: false
-  lastUpdatedTime: 1689328033812
+  lastUpdatedTime: 1689487536422
   name: CogBid
   properties:
     date:
@@ -374,17 +449,17 @@ views:
         type: int32
   space: market
   usedFor: node
-  version: d4c7938c383740
+  version: 3c04fa081c45d5
   writable: true
-- createdTime: 1689328033812
+- createdTime: 1689487536422
   externalId: CogProcess
   implements:
   - externalId: Process
     space: market
     type: view
-    version: 9074b7aa0c96f7
+    version: 98a2becd0f63ee
   isGlobal: false
-  lastUpdatedTime: 1689328033812
+  lastUpdatedTime: 1689487536422
   name: CogProcess
   properties:
     bid:
@@ -402,7 +477,24 @@ views:
         source:
           externalId: Bid
           space: market
-          version: 34292a8398dde1
+          version: 1add47c48cf88b
+        type: direct
+    dateTransformations:
+      autoIncrement: false
+      container:
+        externalId: CogProcess
+        space: market
+      containerPropertyIdentifier: dateTransformations
+      defaultValue: null
+      description: null
+      name: dateTransformations
+      nullable: true
+      type:
+        container: null
+        source:
+          externalId: DateTransformationPair
+          space: market
+          version: bde9fd4428c26e
         type: direct
     name:
       autoIncrement: false
@@ -438,5 +530,5 @@ views:
         type: direct
   space: market
   usedFor: node
-  version: 83aa29f88291b7
+  version: b5df5d19e08fd0
   writable: true

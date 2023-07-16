@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import pytest
+from cognite.client import data_modeling as dm
 
-from cognite.pygen._core.dms_to_python import MultiModelSDKGenerator
+from cognite.pygen._core.dms_to_python import APIGenerator, MultiModelSDKGenerator
 from tests.constants import MarketSDKFiles
 
 # from black import Mode, Report, WriteBack, reformat_one
@@ -24,6 +25,28 @@ def test_generate__api_client(sdk_generator: MultiModelSDKGenerator):
 
     # Act
     actual = sdk_generator.generate_api_client_file()
+
+    # Assert
+    assert actual == expected
+
+
+def test_generate_date_transformation_pairs_data_class(date_transformation_pair_view: dm.View, top_level_package: str):
+    # Arrange
+    expected = MarketSDKFiles.date_transformation_pair_data.read_text()
+
+    # Act
+    actual = APIGenerator(date_transformation_pair_view, top_level_package).generate_data_class_file()
+
+    # Assert
+    assert actual == expected
+
+
+def test_generate_date_transformation_pairs_data_api(date_transformation_pair_view: dm.View, top_level_package: str):
+    # Arrange
+    expected = MarketSDKFiles.date_transformation_pair_api.read_text()
+
+    # Act
+    actual = APIGenerator(date_transformation_pair_view, top_level_package).generate_api_file(top_level_package)
 
     # Assert
     assert actual == expected
