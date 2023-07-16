@@ -28,14 +28,8 @@ class DateTransformationPairApply(DomainModelApply):
         if self.external_id in cache:
             return InstancesApply([], [])
 
-        sources = []
-        this_node = dm.NodeApply(
-            space=self.space,
-            external_id=self.external_id,
-            existing_version=self.existing_version,
-            sources=sources,
-        )
-        nodes = [this_node]
+        cache.add(self.external_id)
+        nodes = []
         edges = []
 
         for end in self.end:
