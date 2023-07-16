@@ -13,6 +13,13 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.12.3] - 16-07-23
+### Fixed
+
+* Types with only edges of one to many caused a `CogniteAPIError` when trying to write. This is now fixed.
+* Types with multiple fields of the same type caused duplicated imports in the generated data classes. Thi is now fixed.
+
+
 ## [0.12.2] - 15-07-23
 ### Fixed
 
