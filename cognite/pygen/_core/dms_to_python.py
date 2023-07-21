@@ -178,6 +178,7 @@ class APIsGenerator:
                     )
                 },
                 top_level_package=self.top_level_package,
+                import_file="data_classes_init_import.py.jinja",
             )
             + "\n"
         )

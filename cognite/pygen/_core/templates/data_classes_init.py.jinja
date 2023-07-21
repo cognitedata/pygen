@@ -1,7 +1,6 @@
 {% for class_ in classes %}{% if class_.is_line_length_above_120 %}{{ class_.multiline_import }}{% else %}{{ class_.one_line_import }}{% endif %}
 {% endfor %}
-{% for class_, dependencies in dependencies_by_class.items() %}{{ class_.data_class }}Apply.model_rebuild()
-{% endfor %}
+{%  include import_file %}
 __all__ = [{% for class_ in classes %}
     "{{ class_.data_class }}",
     "{{ class_.data_class }}Apply",
