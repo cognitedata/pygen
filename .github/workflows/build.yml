@@ -70,6 +70,9 @@ jobs:
       - name: Test
         run: pytest cognite tests/test_unit
 
+      - name: Test CLI
+        run: pygen --help
+
       - uses: codecov/codecov-action@v3
         with:
           file: ./coverage.xml
@@ -94,3 +97,6 @@ jobs:
 
       - name: Test
         run: pytest cognite tests/test_unit
+
+      - name: Test CLI
+        run: pygen --help
