@@ -6,11 +6,14 @@ from typing import Optional
 
 from cognite.client import ClientConfig, CogniteClient
 from cognite.client.credentials import OAuthClientCredentials
+
 try:
     from pydantic import BaseModel, FieldValidationInfo, field_validator
+
     is_pydantic_v2 = True
 except ImportError:
     from pydantic import BaseModel, validator
+
     is_pydantic_v2 = False
 
 
@@ -39,13 +42,16 @@ class PygenSettings(BaseModel):
     client_name: Argument = Argument(default="MyClient", help="Client name for the generated client.")
 
     if is_pydantic_v2:
+
         @field_validator("*", mode="before")
         def parse_string(cls, value, info: FieldValidationInfo) -> Argument:  # noqa: N805
             field = cls.model_fields[info.field_name]
             return _parse_string(value, field)
+
     else:
+
         @validator("*", pre=True)
-        def parse_string(cls, value, field) -> Argument:  # noqa: N805
+        def parse_string(cls, value, field) -> Argument:
             return _parse_string(value, field)
 
 

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from typing import ClassVar, Optional
+
 import pytest
 from pydantic import Field
 
@@ -9,7 +10,6 @@ from cognite.pygen._core.static._core_data_classes import DomainModel
 
 
 class TestDomainModel:
-
     @pytest.mark.pydanticv2
     def test_repr(self):
         # Arrange
