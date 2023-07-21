@@ -93,7 +93,8 @@ jobs:
           python3 -m pip install --upgrade pip poetry
           poetry config virtualenvs.create false
           poetry install -E all
-          pip install pydantic==1.10.11
+          # This version is supported by Pyodide
+          pip install pydantic==1.10.7
 
       - name: Test
         run: pytest cognite tests/test_unit
