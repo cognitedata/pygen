@@ -97,7 +97,7 @@ jobs:
           pip install pydantic==1.10.7
 
       - name: Test
-        run: pytest cognite tests/test_unit
+        run: pytest cognite tests/test_unit -m "not pydanticv2"
 
       - name: Test CLI
         run: pygen --help
