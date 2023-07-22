@@ -5,10 +5,13 @@ from cognite.client.data_classes.data_modeling.instances import Properties
 try:
     from movie_domain.client import data_classes as movie
     from movie_domain.client.data_classes._core import InstancesApply, unpack_properties
-except AttributeError:
-    # is pydantic v1
-    from movie_domain_pydanticv1.client import data_classes as movie
-    from movie_domain_pydanticv1.client.data_classes._core import InstancesApply, unpack_properties
+except AttributeError as e:
+    if "has no attribute 'model_rebuild" in str(e):
+        # is pydantic v1
+        from movie_domain_pydantic_v1.client import data_classes as movie
+        from movie_domain_pydantic_v1.client.data_classes._core import InstancesApply, unpack_properties
+    else:
+        raise e
 
 
 def test_person_from_node():
