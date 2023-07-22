@@ -79,12 +79,13 @@ class SDKGenerator:
         top_level_package: str,
         client_name: str,
         data_model: dm.DataModel,
+        pydantic_version: Literal["v1", "v2", "infer"] = "infer",
         logger: Callable[[str], None] | None = None,
     ):
         self._data_model = data_model
         self.top_level_package = top_level_package
         self.client_name = client_name
-        self._apis = APIsGenerator(top_level_package, client_name, data_model.views, logger)
+        self._apis = APIsGenerator(top_level_package, client_name, data_model.views, pydantic_version, logger)
 
     def generate_sdk(self) -> dict[Path, str]:
         client_dir = Path(self.top_level_package.replace(".", "/"))
@@ -116,6 +117,7 @@ class APIsGenerator:
         top_level_package: str,
         client_name: str,
         views: Sequence[dm.View],
+        pydantic_version: Literal["v1", "v2", "infer"] = "infer",
         logger: Callable[[str], None] | None = None,
     ):
         self.env = Environment(
@@ -124,6 +126,10 @@ class APIsGenerator:
         )
         self.top_level_package = top_level_package
         self.client_name = client_name
+        if pydantic_version == "infer":
+            self.pydantic_version = "v2" if PYDANTIC_VERSION[0] == "2" else "v1"
+        else:
+            self.pydantic_version = pydantic_version
         self._logger = logger or print  # noqa: T202
 
         self.apis = []
@@ -178,7 +184,10 @@ class APIsGenerator:
                     )
                 },
                 top_level_package=self.top_level_package,
-                import_file="data_classes_init_import.py.jinja",
+                import_file={
+                    "v2": "data_classes_init_import.py.jinja",
+                    "v1": "data_classes_init_import.py_pydanticv1.jinja",
+                }[self.pydantic_version],
             )
             + "\n"
         )
@@ -423,9 +432,10 @@ class APIsClass:
 
 
 class APIGenerator:
-    def __init__(self, view: dm.View, top_level_package: str):
+    def __init__(self, view: dm.View, top_level_package: str, pydantic_version: Literal["v1", "v2"] = "v2"):
         self.view = view
         self.top_level_package = top_level_package
+        self.pydantic_version = pydantic_version
         self._env = Environment(
             loader=PackageLoader("cognite.pygen._core", "templates"),
             autoescape=select_autoescape(),
