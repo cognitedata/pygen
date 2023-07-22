@@ -135,7 +135,7 @@ class APIsGenerator:
         self.apis = []
         for view in views:
             try:
-                api_generator = APIGenerator(view, self.top_level_package, self.pydantic_version)
+                api_generator = APIGenerator(view, self.top_level_package)
             except Exception as e:
                 self._logger(f"Failed to generate SDK for view {view.name}: {e}")
             else:
@@ -432,10 +432,9 @@ class APIsClass:
 
 
 class APIGenerator:
-    def __init__(self, view: dm.View, top_level_package: str, pydantic_version: Literal["v1", "v2"] = "v2"):
+    def __init__(self, view: dm.View, top_level_package: str):
         self.view = view
         self.top_level_package = top_level_package
-        self.pydantic_version = pydantic_version
         self._env = Environment(
             loader=PackageLoader("cognite.pygen._core", "templates"),
             autoescape=select_autoescape(),
@@ -454,10 +453,6 @@ class APIGenerator:
                 fields=self.fields,
                 view=self.view,
                 top_level_package=self.top_level_package,
-                import_file={
-                    "v2": "type_data_import.py.jinja",
-                    "v1": "type_data_import.py_pydanticv1.jinja",
-                }[self.pydantic_version],
             )
             + "\n"
         )
