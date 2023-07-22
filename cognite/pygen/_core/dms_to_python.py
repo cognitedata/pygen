@@ -25,12 +25,13 @@ class MultiModelSDKGenerator:
         client_name: str,
         data_models: Sequence[dm.DataModel],
         logger: Callable[[str], None] | None = None,
+        pydantic_version: Literal["v1", "v2", "infer"] = "infer",
     ):
         self._data_models = data_models
         self.top_level_package = top_level_package
         self.client_name = client_name
         unique_views = get_unique_views(*[view for dm in data_models for view in dm.views])
-        self._apis = APIsGenerator(top_level_package, client_name, unique_views, logger)
+        self._apis = APIsGenerator(top_level_package, client_name, unique_views, pydantic_version, logger)
         api_by_view_external_id = {api.view.external_id: api.class_ for api in self._apis.apis}
         self._apis_classes = sorted(
             (APIsClass.from_data_model(dm, api_by_view_external_id) for dm in data_models), key=lambda a: a.name

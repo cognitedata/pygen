@@ -63,10 +63,17 @@ def generate_multimodel_sdk(
     client_name: str,
     output_dir: Path,
     logger: Callable[[str], None],
+    pydantic_version: Literal["v1", "v2", "infer"] = "infer",
 ):
     data_models = _load_data_model(client, model_ids, logger)
     logger(f"Successfully retrieved data model(s) {model_ids}")
-    sdk_generator = MultiModelSDKGenerator(top_level_package, client_name, data_models, logger)
+    sdk_generator = MultiModelSDKGenerator(
+        top_level_package,
+        client_name,
+        data_models,
+        logger,
+        pydantic_version,
+    )
     sdk = sdk_generator.generate_sdk()
     logger(f"Writing SDK to {output_dir}")
     write_sdk_to_disk(sdk, output_dir)
@@ -92,7 +99,7 @@ def _load_data_model(
 ) -> dm.DataModel | dm.DataModelList:
     try:
         data_models = client.data_modeling.data_models.retrieve(model_id, inline_views=True)
-        if len(model_id) == 1:
+        if len(data_models) == 1:
             data_model = data_models[0]
         else:
             return data_models
