@@ -3,7 +3,7 @@ from pathlib import Path
 repo_root = Path(__file__).resolve().parent.parent
 
 examples_dir = repo_root / "examples"
-
+examples_dir_pydantic_v1 = repo_root / "examples-pydantic-v1"
 movie_sdk = examples_dir / "movie_domain"
 schemas_dir = repo_root / "tests" / "schemas"
 shop_sdk = examples_dir / "shop"
