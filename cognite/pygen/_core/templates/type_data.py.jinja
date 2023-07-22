@@ -6,7 +6,7 @@ from datetime import {% if fields.has_datetime and fields.has_date %}date, datet
 from cognite.client import data_modeling as dm{% if fields.import_pydantic_field %}
 from pydantic import Field{% endif %}
 
-{% include 'type_data_import.py.jinja' %}
+{% include import_file %}
 {% if fields.import_dependencies %}
 if TYPE_CHECKING:{% for dependency_file, dependency_class in fields.unique_dependencies %}
     from {{ top_level_package }}.data_classes._{{ dependency_file }} import {{ dependency_class }}Apply{% endfor %}

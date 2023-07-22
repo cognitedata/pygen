@@ -135,7 +135,7 @@ class APIsGenerator:
         self.apis = []
         for view in views:
             try:
-                api_generator = APIGenerator(view, self.top_level_package)
+                api_generator = APIGenerator(view, self.top_level_package, self.pydantic_version)
             except Exception as e:
                 self._logger(f"Failed to generate SDK for view {view.name}: {e}")
             else:
@@ -454,6 +454,10 @@ class APIGenerator:
                 fields=self.fields,
                 view=self.view,
                 top_level_package=self.top_level_package,
+                import_file={
+                    "v2": "type_data_import.py.jinja",
+                    "v1": "type_data_import.py_pydanticv1.jinja",
+                }[self.pydantic_version],
             )
             + "\n"
         )
