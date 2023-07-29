@@ -3,8 +3,9 @@ from __future__ import annotations
 from typing import ClassVar, Optional
 
 from cognite.client import data_modeling as dm
-from markets_pydantic_v1.client.data_classes._core import DomainModel, DomainModelApply, InstancesApply, TypeList
 from pydantic import Field
+
+from markets_pydantic_v1.client.data_classes._core import DomainModel, DomainModelApply, InstancesApply, TypeList
 
 __all__ = ["CogPool", "CogPoolApply", "CogPoolList"]
 

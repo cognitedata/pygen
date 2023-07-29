@@ -4,6 +4,7 @@ from pathlib import Path
 
 from cognite.client import ClientConfig, CogniteClient
 from cognite.client.credentials import OAuthClientCredentials
+
 from shop_pydantic_v1.client._api.cases import CasesAPI
 from shop_pydantic_v1.client._api.command_configs import CommandConfigsAPI
 

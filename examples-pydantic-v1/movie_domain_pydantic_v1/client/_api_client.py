@@ -4,6 +4,7 @@ from pathlib import Path
 
 from cognite.client import ClientConfig, CogniteClient
 from cognite.client.credentials import OAuthClientCredentials
+
 from movie_domain_pydantic_v1.client._api.actors import ActorsAPI
 from movie_domain_pydantic_v1.client._api.best_directors import BestDirectorsAPI
 from movie_domain_pydantic_v1.client._api.best_leading_actors import BestLeadingActorsAPI

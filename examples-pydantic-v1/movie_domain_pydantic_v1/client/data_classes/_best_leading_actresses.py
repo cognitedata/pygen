@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import ClassVar, Optional
 
 from cognite.client import data_modeling as dm
+
 from movie_domain_pydantic_v1.client.data_classes._core import DomainModel, DomainModelApply, InstancesApply, TypeList
 
 __all__ = ["BestLeadingActress", "BestLeadingActressApply", "BestLeadingActressList"]

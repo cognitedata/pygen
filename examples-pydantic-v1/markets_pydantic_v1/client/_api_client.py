@@ -4,6 +4,7 @@ from pathlib import Path
 
 from cognite.client import ClientConfig, CogniteClient
 from cognite.client.credentials import OAuthClientCredentials
+
 from markets_pydantic_v1.client._api.bids import BidsAPI
 from markets_pydantic_v1.client._api.cog_bids import CogBidsAPI
 from markets_pydantic_v1.client._api.cog_pools import CogPoolsAPI
