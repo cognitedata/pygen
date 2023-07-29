@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+import datetime
 from typing import ClassVar, Optional
 
 from pydantic import Field
@@ -31,10 +31,16 @@ class TestDomainModel:
                 raise e
 
         foo = Foo(
-            external_id="foo", version=1, created_time=datetime(2023, 1, 1), last_updated_time=datetime(2024, 1, 1)
+            external_id="foo",
+            version=1,
+            created_time=datetime.datetime(2023, 1, 1),
+            last_updated_time=datetime.datetime(2024, 1, 1),
         )
         bar = Bar(
-            external_id="bar", version=1, created_time=datetime(2023, 1, 1), last_updated_time=datetime(2024, 1, 1)
+            external_id="bar",
+            version=1,
+            created_time=datetime.datetime(2023, 1, 1),
+            last_updated_time=datetime.datetime(2024, 1, 1),
         )
         foo.bar = bar
         bar.foo = foo

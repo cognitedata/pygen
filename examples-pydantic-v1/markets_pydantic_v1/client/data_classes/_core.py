@@ -1,11 +1,11 @@
 from __future__ import annotations
 
+import datetime
 import types
 from abc import abstractmethod
 from collections import UserList
 from collections.abc import Collection
 from dataclasses import dataclass
-from datetime import datetime
 from typing import Any, ClassVar, Generic, List, Optional, TypeVar, Union
 
 import pandas as pd
@@ -43,9 +43,9 @@ class DomainModelCore(BaseModel):
 
 class DomainModel(DomainModelCore):
     version: int
-    last_updated_time: datetime
-    created_time: datetime
-    deleted_time: Optional[datetime] = None
+    last_updated_time: datetime.datetime
+    created_time: datetime.datetime
+    deleted_time: Optional[datetime.datetime] = None
 
     @classmethod
     def from_node(cls, node: dm.Node) -> T_TypeNode:
@@ -82,8 +82,8 @@ class DomainModelApply(DomainModelCore):
 class DomainModelApplyResult(DomainModelCore):
     version: int
     was_modified: bool
-    last_updated_time: datetime
-    created_time: datetime
+    last_updated_time: datetime.datetime
+    created_time: datetime.datetime
 
 
 class DataPoint(BaseModel):
