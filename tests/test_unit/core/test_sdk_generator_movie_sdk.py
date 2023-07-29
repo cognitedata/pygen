@@ -16,12 +16,15 @@ from cognite.pygen._core.dms_to_python import (
     SDKGenerator,
     find_dependencies,
 )
-from tests.constants import MovieSDKFiles
+from tests.constants import IS_PYDANTIC_V1, MovieSDKFiles
 
 
 @pytest.fixture
 def top_level_package() -> str:
-    return "movie_domain.client"
+    if IS_PYDANTIC_V1:
+        return "movie_domain_pydantic_v1.client"
+    else:
+        return "movie_domain.client"
 
 
 @pytest.fixture
