@@ -1,7 +1,13 @@
 from datetime import datetime
 
-from shop.client import ShopClient
-from shop.client.data_classes import CaseApply, CommandConfigApply
+from tests.constants import IS_PYDANTIC_V1
+
+if IS_PYDANTIC_V1:
+    from shop_pydantic_v1.client import ShopClient
+    from shop_pydantic_v1.client.data_classes import CaseApply, CommandConfigApply
+else:
+    from shop.client import ShopClient
+    from shop.client.data_classes import CaseApply, CommandConfigApply
 
 
 def test_case_list(shop_client: ShopClient):

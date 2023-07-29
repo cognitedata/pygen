@@ -3,8 +3,14 @@ from __future__ import annotations
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
-from markets.client import MarketClient
-from markets.client.data_classes import DateTransformationApply, DateTransformationPairApply
+from tests.constants import IS_PYDANTIC_V1
+
+if IS_PYDANTIC_V1:
+    from markets_pydantic_v1.client import MarketClient
+    from markets_pydantic_v1.client.data_classes import DateTransformationApply, DateTransformationPairApply
+else:
+    from markets.client import MarketClient
+    from markets.client.data_classes import DateTransformationApply, DateTransformationPairApply
 
 
 def test_apply(market_client: MarketClient, cognite_client: CogniteClient) -> None:
