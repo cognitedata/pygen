@@ -89,7 +89,7 @@ addopts = "--doctest-modules"
 markers = [
     "full: Requiers all optional dependencies to run.",
 ]
-pythonpath = [".", "examples"]
+pythonpath = [".", "examples", "examples-pydantic-v1"]
 testpaths = ["tests", "cognite/pygen"]
 
 [build-system]
