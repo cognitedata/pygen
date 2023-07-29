@@ -1,16 +1,13 @@
 from pathlib import Path
 
-from cognite.client import CogniteClient
-
 from cognite.pygen import write_sdk_to_disk
 from cognite.pygen._generator import MultiModelSDKGenerator, _load_data_model
-from movie_domain.client import MovieClient
+from cognite.pygen.utils.cdf import get_cognite_client_from_toml
 from tests.constants import examples_dir
 
 
 def main():
-    client = MovieClient.from_toml("config.toml")
-    c: CogniteClient = client.persons._client
+    c = get_cognite_client_from_toml("config.toml")
     data_models = _load_data_model(c, [("market", "CogPool", "3"), ("market", "PygenPool", "3")], print)
 
     top_level_package = "markets.client"

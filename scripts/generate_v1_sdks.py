@@ -1,13 +1,10 @@
-from cognite.client import CogniteClient
-
 from cognite import pygen
-from movie_domain.client import MovieClient
+from cognite.pygen.utils.cdf import get_cognite_client_from_toml
 from tests.constants import examples_dir_pydantic_v1
 
 
 def main():
-    client = MovieClient.from_toml("config.toml")
-    c: CogniteClient = client.persons._client
+    c = get_cognite_client_from_toml("config.toml")
 
     pygen.generate_sdk(
         c,
