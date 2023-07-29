@@ -4,14 +4,17 @@ import pytest
 from cognite.client import data_modeling as dm
 
 from cognite.pygen._core.dms_to_python import APIGenerator, MultiModelSDKGenerator
-from tests.constants import MarketSDKFiles
+from tests.constants import IS_PYDANTIC_V1, MarketSDKFiles
 
 # from black import Mode, Report, WriteBack, reformat_one
 
 
 @pytest.fixture
 def top_level_package() -> str:
-    return "markets.client"
+    if IS_PYDANTIC_V1:
+        return "markets_pydantic_v1.client"
+    else:
+        return "markets.client"
 
 
 @pytest.fixture

@@ -35,8 +35,9 @@ if _has_typer:
     pyproject_toml = Path.cwd() / "pyproject.toml"
     settings = load_settings(pyproject_toml)
     if settings is not None:
+        help_text = "Generate a Python SDK from Data Model(s)"
 
-        @app.command(help="Generate a Python SDK from Data Model")
+        @app.command(help=help_text)
         def generate(
             client_secret: Annotated[str, typer.Option(..., help="Azure Client Secret for connecting to CDF")],
             space: str = typer.Option(default=settings.space.default, help=settings.space.help),
@@ -65,7 +66,7 @@ if _has_typer:
     else:
         settings = PygenSettings()
 
-        @app.command(help="Generate a Python SDK from Data Model")
+        @app.command(help=help_text)
         def generate(
             space: Annotated[str, typer.Option(..., help=settings.space.help)],
             external_id: Annotated[str, typer.Option(..., help=settings.external_id.help)],

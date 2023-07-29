@@ -7,12 +7,15 @@ from cognite.client import data_modeling as dm
 
 from cognite import pygen
 from cognite.pygen._core.dms_to_python import APIGenerator, APIsGenerator, SDKGenerator
-from tests.constants import ShopSDKFiles, examples_dir
+from tests.constants import IS_PYDANTIC_V1, ShopSDKFiles, examples_dir
 
 
 @pytest.fixture
 def top_level_package() -> str:
-    return "shop.client"
+    if IS_PYDANTIC_V1:
+        return "shop_pydantic_v1.client"
+    else:
+        return "shop.client"
 
 
 @pytest.fixture
@@ -52,7 +55,7 @@ def test_create_view_api_classes_command_configs(command_config_view: dm.View, t
     expected = ShopSDKFiles.command_configs_api.read_text()
 
     # Act
-    actual = APIGenerator(command_config_view, top_level_package).generate_api_file("shop.client")
+    actual = APIGenerator(command_config_view, top_level_package).generate_api_file(top_level_package)
 
     assert actual == expected
 

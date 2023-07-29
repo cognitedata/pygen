@@ -25,12 +25,13 @@ class MultiModelSDKGenerator:
         client_name: str,
         data_models: Sequence[dm.DataModel],
         logger: Callable[[str], None] | None = None,
+        pydantic_version: Literal["v1", "v2", "infer"] = "infer",
     ):
         self._data_models = data_models
         self.top_level_package = top_level_package
         self.client_name = client_name
         unique_views = get_unique_views(*[view for dm in data_models for view in dm.views])
-        self._apis = APIsGenerator(top_level_package, client_name, unique_views, logger)
+        self._apis = APIsGenerator(top_level_package, client_name, unique_views, pydantic_version, logger)
         api_by_view_external_id = {api.view.external_id: api.class_ for api in self._apis.apis}
         self._apis_classes = sorted(
             (APIsClass.from_data_model(dm, api_by_view_external_id) for dm in data_models), key=lambda a: a.name
@@ -79,12 +80,13 @@ class SDKGenerator:
         top_level_package: str,
         client_name: str,
         data_model: dm.DataModel,
+        pydantic_version: Literal["v1", "v2", "infer"] = "infer",
         logger: Callable[[str], None] | None = None,
     ):
         self._data_model = data_model
         self.top_level_package = top_level_package
         self.client_name = client_name
-        self._apis = APIsGenerator(top_level_package, client_name, data_model.views, logger)
+        self._apis = APIsGenerator(top_level_package, client_name, data_model.views, pydantic_version, logger)
 
     def generate_sdk(self) -> dict[Path, str]:
         client_dir = Path(self.top_level_package.replace(".", "/"))
@@ -116,6 +118,7 @@ class APIsGenerator:
         top_level_package: str,
         client_name: str,
         views: Sequence[dm.View],
+        pydantic_version: Literal["v1", "v2", "infer"] = "infer",
         logger: Callable[[str], None] | None = None,
     ):
         self.env = Environment(
@@ -124,6 +127,10 @@ class APIsGenerator:
         )
         self.top_level_package = top_level_package
         self.client_name = client_name
+        if pydantic_version == "infer":
+            self.pydantic_version = "v2" if PYDANTIC_VERSION[0] == "2" else "v1"
+        else:
+            self.pydantic_version = pydantic_version
         self._logger = logger or print  # noqa: T202
 
         self.apis = []
@@ -155,7 +162,11 @@ class APIsGenerator:
         sdk[client_dir / "__init__.py"] = self.generate_client_init_file()
         sdk[data_classes_dir / "__init__.py"] = self.generate_data_classes_init_file()
         sdk[api_dir / "_core.py"] = self.generate_api_core_file()
-        sdk[data_classes_dir / "_core.py"] = (self._static_dir / "_core_data_classes.py").read_text()
+        if self.pydantic_version == "v2":
+            core_data_classes = "_core_data_classes.py"
+        else:
+            core_data_classes = "_core_data_classes_pydantic_v1.py"
+        sdk[data_classes_dir / "_core.py"] = (self._static_dir / core_data_classes).read_text()
         return sdk
 
     def generate_api_core_file(self) -> str:
@@ -178,6 +189,10 @@ class APIsGenerator:
                     )
                 },
                 top_level_package=self.top_level_package,
+                import_file={
+                    "v2": "data_classes_init_import.py.jinja",
+                    "v1": "data_classes_init_import.py_pydanticv1.jinja",
+                }[self.pydantic_version],
             )
             + "\n"
         )
@@ -205,11 +220,11 @@ class Field:
 
     @property
     def is_datetime(self) -> bool:
-        return self.read_type == "datetime"
+        return self.read_type == "datetime.datetime"
 
     @property
     def is_date(self) -> bool:
-        return self.read_type == "date"
+        return self.read_type == "datetime.date"
 
     @classmethod
     def from_property(cls, property_: dm.MappedProperty | dm.ConnectionDefinition) -> Field:
@@ -466,9 +481,9 @@ def _to_python_type(type_: dm.DirectRelationReference | dm.PropertyType) -> str:
     elif isinstance(type_, (dm.Float32, dm.Float64)):
         out_type = "float"
     elif isinstance(type_, dm.Date):
-        out_type = "date"
+        out_type = "datetime.date"
     elif isinstance(type_, dm.Timestamp):
-        out_type = "datetime"
+        out_type = "datetime.datetime"
     elif isinstance(type_, dm.Json):
         out_type = "dict"
     elif isinstance(type_, (dm.Text, dm.DirectRelation, dm.CDFExternalIdReference, dm.DirectRelationReference)):

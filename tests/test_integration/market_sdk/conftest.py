@@ -1,7 +1,12 @@
 import pytest
 from cognite.client import CogniteClient
 
-from examples.markets.client import MarketClient
+from tests.constants import IS_PYDANTIC_V1
+
+if IS_PYDANTIC_V1:
+    from markets_pydantic_v1.client import MarketClient
+else:
+    from markets.client import MarketClient
 
 
 @pytest.fixture(scope="session")

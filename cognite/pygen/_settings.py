@@ -6,12 +6,27 @@ from typing import Optional
 
 from cognite.client import ClientConfig, CogniteClient
 from cognite.client.credentials import OAuthClientCredentials
-from pydantic import BaseModel, FieldValidationInfo, field_validator
+
+try:
+    from pydantic import BaseModel, FieldValidationInfo, field_validator
+
+    is_pydantic_v2 = True
+except ImportError:
+    from pydantic import BaseModel, validator
+
+    is_pydantic_v2 = False
 
 
 class Argument(BaseModel):
     default: Optional[str] = None
     help: str
+
+
+def _parse_string(value: str, field) -> Argument:
+    if value and isinstance(value, str):
+        help_ = field.default.help
+        return Argument(default=value, help=help_)
+    return field.default
 
 
 class PygenSettings(BaseModel):
@@ -26,13 +41,18 @@ class PygenSettings(BaseModel):
     top_level_package: Argument = Argument(default="my_domain.client", help="Package name for the generated client.")
     client_name: Argument = Argument(default="MyClient", help="Client name for the generated client.")
 
-    @field_validator("*", mode="before")
-    def parse_string(cls, value, info: FieldValidationInfo) -> Argument:  # noqa: N805
-        field = cls.model_fields[info.field_name]
-        if value and isinstance(value, str):
-            help_ = field.default.help
-            return Argument(default=value, help=help_)
-        return field.default
+    if is_pydantic_v2:
+
+        @field_validator("*", mode="before")
+        def parse_string(cls, value, info: FieldValidationInfo) -> Argument:  # noqa: N805
+            field = cls.model_fields[info.field_name]
+            return _parse_string(value, field)
+
+    else:
+
+        @validator("*", pre=True)
+        def parse_string(cls, value, field) -> Argument:
+            return _parse_string(value, field)
 
 
 def load_settings(pyproject_toml_path: Path) -> PygenSettings | None:

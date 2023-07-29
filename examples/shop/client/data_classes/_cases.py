@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+import datetime
 from typing import TYPE_CHECKING, ClassVar, Optional, Union
 
 from cognite.client import data_modeling as dm
@@ -21,11 +21,11 @@ class Case(DomainModel):
     bid_history: list[str] = []
     commands: Optional[str] = None
     cut_files: list[str] = []
-    end_time: Optional[datetime] = None
+    end_time: Optional[datetime.datetime] = None
     name: Optional[str] = None
     run_status: Optional[str] = Field(None, alias="runStatus")
     scenario: Optional[str] = None
-    start_time: Optional[datetime] = None
+    start_time: Optional[datetime.datetime] = None
 
 
 class CaseApply(DomainModelApply):
@@ -35,11 +35,11 @@ class CaseApply(DomainModelApply):
     bid_history: list[str] = []
     commands: Optional[Union["CommandConfigApply", str]] = Field(None, repr=False)
     cut_files: list[str] = []
-    end_time: Optional[datetime] = None
+    end_time: Optional[datetime.datetime] = None
     name: str
     run_status: str
     scenario: Optional[str] = None
-    start_time: datetime
+    start_time: datetime.datetime
 
     def _to_instances_apply(self, cache: set[str]) -> InstancesApply:
         if self.external_id in cache:

@@ -1,6 +1,11 @@
 import pytest
 
-from examples.movie_domain.client import MovieClient
+from tests.constants import IS_PYDANTIC_V1
+
+if IS_PYDANTIC_V1:
+    from movie_domain_pydantic_v1.client import MovieClient
+else:
+    from movie_domain.client import MovieClient
 
 
 @pytest.fixture()

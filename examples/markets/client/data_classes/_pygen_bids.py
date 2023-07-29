@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from typing import TYPE_CHECKING, ClassVar, Optional, Union
 
 from cognite.client import data_modeling as dm
@@ -15,7 +16,7 @@ __all__ = ["PygenBid", "PygenBidApply", "PygenBidList"]
 
 class PygenBid(DomainModel):
     space: ClassVar[str] = "market"
-    date: Optional[date] = None
+    date: Optional[datetime.date] = None
     is_block: Optional[bool] = Field(None, alias="isBlock")
     market: Optional[str] = None
     minimum_price: Optional[float] = Field(None, alias="minimumPrice")
@@ -25,7 +26,7 @@ class PygenBid(DomainModel):
 
 class PygenBidApply(DomainModelApply):
     space: ClassVar[str] = "market"
-    date: Optional[date] = None
+    date: Optional[datetime.date] = None
     is_block: Optional[bool] = None
     market: Optional[Union["MarketApply", str]] = Field(None, repr=False)
     minimum_price: Optional[float] = None

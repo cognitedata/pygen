@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cognite-pygen"
-version = "0.12.3"
+version = "0.13.0"
 description = "Cognite Python SDK Generator"
 readme = "README.md"
 authors = ["Cognite <support@cognite.com>"]
@@ -22,6 +22,7 @@ include_trailing_comma=true    # corresponds to -tc flag
 skip_glob = '^((?!py$).)*$'    # this makes sort all Python files
 known_third_party = []
 src_paths = [".", "examples"]
+known_first_party = ["markets_pydantic_v1", "movie_domain_pydantic_v1", "shop_pydantic_v1"]
 
 [tool.pygen]
 space = "IntegrationTestsImmutable"
@@ -42,7 +43,7 @@ pygen = "cognite.pygen.cli:main"
 [tool.poetry.dependencies]
 python = "^3.9"
 cognite-sdk = {version = ">=6.8.0"}
-pydantic = ">=2.0"
+pydantic = ">=1.10.7"
 Jinja2 = ">=3.1"
 inflect = ">=6.0"
 
@@ -88,7 +89,7 @@ addopts = "--doctest-modules"
 markers = [
     "full: Requiers all optional dependencies to run.",
 ]
-pythonpath = [".", "examples"]
+pythonpath = [".", "examples", "examples-pydantic-v1"]
 testpaths = ["tests", "cognite/pygen"]
 
 [build-system]

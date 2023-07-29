@@ -1,5 +1,11 @@
-from movie_domain.client import MovieClient
-from movie_domain.client import data_classes as m
+from tests.constants import IS_PYDANTIC_V1
+
+if IS_PYDANTIC_V1:
+    from movie_domain_pydantic_v1.client import MovieClient
+    from movie_domain_pydantic_v1.client import data_classes as m
+else:
+    from movie_domain.client import MovieClient
+    from movie_domain.client import data_classes as m
 
 
 def test_actor_list(movie_client: MovieClient):

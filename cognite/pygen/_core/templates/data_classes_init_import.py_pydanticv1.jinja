@@ -1,0 +1,4 @@
+{% for class_, dependencies in dependencies_by_class.items() %}{{ class_.data_class }}Apply.update_forward_refs({% for dependency in dependencies %}
+    {{ dependency.data_class }}Apply={{ dependency.data_class }}Apply,{%  endfor %}
+)
+{% endfor %}
