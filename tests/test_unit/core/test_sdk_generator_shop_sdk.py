@@ -55,7 +55,7 @@ def test_create_view_api_classes_command_configs(command_config_view: dm.View, t
     expected = ShopSDKFiles.command_configs_api.read_text()
 
     # Act
-    actual = APIGenerator(command_config_view, top_level_package).generate_api_file("shop.client")
+    actual = APIGenerator(command_config_view, top_level_package).generate_api_file(top_level_package)
 
     assert actual == expected
 

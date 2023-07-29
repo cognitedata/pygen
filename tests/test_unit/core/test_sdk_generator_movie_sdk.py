@@ -233,7 +233,7 @@ def test_create_view_api_classes_actors(actor_view: dm.View, top_level_package: 
     expected = MovieSDKFiles.actors_api.read_text()
 
     # Act
-    actual = APIGenerator(actor_view, top_level_package).generate_api_file("movie_domain.client")
+    actual = APIGenerator(actor_view, top_level_package).generate_api_file(top_level_package)
 
     # Assert
     # Reformat with black to make sure the formatting is correct
@@ -260,7 +260,7 @@ def test_create_view_api_classes_persons(person_view: dm.View, top_level_package
     expected = MovieSDKFiles.persons_api.read_text()
 
     # Act
-    actual = APIGenerator(person_view, top_level_package).generate_api_file("movie_domain.client")
+    actual = APIGenerator(person_view, top_level_package).generate_api_file(top_level_package)
 
     # Assert
     assert actual == expected
