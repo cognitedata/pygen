@@ -20,8 +20,7 @@ Changes are grouped as follows
 
 ### Fixed
 
-* Bug when having a field of type date causing `datetime.date` not to be imported in generated
-  dataclass
+* Bug when having a field of type date with name `date` causing `datetime.date` to be excluded by linters. This is now fixed.
 
 ## [0.12.3] - 16-07-23
 ### Fixed

@@ -8,8 +8,8 @@ EXAMPLES_DIR = REPO_ROOT / "examples"
 
 
 def main():
-    last_version = "0.12.2"
-    new_version = "0.12.3"
+    last_version = "0.12.3"
+    new_version = "0.13.0"
 
     pyproject_toml = REPO_ROOT / "pyproject.toml"
     version_py = REPO_ROOT / "cognite" / "pygen" / "_version.py"
