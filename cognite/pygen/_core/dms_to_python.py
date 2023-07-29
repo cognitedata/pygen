@@ -162,7 +162,11 @@ class APIsGenerator:
         sdk[client_dir / "__init__.py"] = self.generate_client_init_file()
         sdk[data_classes_dir / "__init__.py"] = self.generate_data_classes_init_file()
         sdk[api_dir / "_core.py"] = self.generate_api_core_file()
-        sdk[data_classes_dir / "_core.py"] = (self._static_dir / "_core_data_classes.py").read_text()
+        if self.pydantic_version == "v2":
+            core_data_classes = "_core_data_classes.py"
+        else:
+            core_data_classes = "_core_data_classes_pydantic_v1.py"
+        sdk[data_classes_dir / "_core.py"] = (self._static_dir / core_data_classes).read_text()
         return sdk
 
     def generate_api_core_file(self) -> str:

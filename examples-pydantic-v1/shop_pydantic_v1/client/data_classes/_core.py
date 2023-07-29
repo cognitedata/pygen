@@ -11,7 +11,7 @@ from typing import Any, ClassVar, Generic, List, Optional, TypeVar, Union
 import pandas as pd
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Properties, PropertyValue
-from pydantic import BaseModel, ConfigDict, Extra, constr
+from pydantic import BaseModel, Extra, constr
 
 # Todo - Move into SDK
 
@@ -57,7 +57,7 @@ class DomainModel(DomainModelCore):
     def one_to_many_fields(cls) -> list[str]:
         return [
             field_name
-            for field_name, field in cls.model_fields.items()
+            for field_name, field in cls.__fields__.items()
             if isinstance(field.annotation, types.GenericAlias)
         ]
 
@@ -66,7 +66,6 @@ T_TypeNode = TypeVar("T_TypeNode", bound=DomainModel)
 
 
 class DomainModelApply(DomainModelCore):
-    model_config: ClassVar[ConfigDict] = ConfigDict(extra=Extra.forbid)
     existing_version: Optional[int] = None
 
     def to_instances_apply(self) -> InstancesApply:
@@ -75,6 +74,9 @@ class DomainModelApply(DomainModelCore):
     @abstractmethod
     def _to_instances_apply(self, cache: set[str]) -> InstancesApply:
         raise NotImplementedError()
+
+    class Config:
+        extra = Extra.forbid
 
 
 class DomainModelApplyResult(DomainModelCore):
