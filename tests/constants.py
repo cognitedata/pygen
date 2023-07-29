@@ -1,13 +1,21 @@
 from pathlib import Path
 
+from pydantic.version import VERSION as PYDANTIC_VERSION
+
 repo_root = Path(__file__).resolve().parent.parent
 
 examples_dir = repo_root / "examples"
 examples_dir_pydantic_v1 = repo_root / "examples-pydantic-v1"
-movie_sdk = examples_dir / "movie_domain"
 schemas_dir = repo_root / "tests" / "schemas"
-shop_sdk = examples_dir / "shop"
-market_sdk = examples_dir / "markets"
+
+if PYDANTIC_VERSION.startswith("2."):
+    movie_sdk = examples_dir / "movie_domain"
+    shop_sdk = examples_dir / "shop"
+    market_sdk = examples_dir / "markets"
+else:
+    movie_sdk = examples_dir_pydantic_v1 / "movie_domain_pydantic_v1"
+    shop_sdk = examples_dir_pydantic_v1 / "shop_pydantic_v1"
+    market_sdk = examples_dir_pydantic_v1 / "markets_pydantic_v1"
 
 
 class TestSchemas:

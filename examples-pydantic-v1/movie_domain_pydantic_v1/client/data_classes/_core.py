@@ -55,11 +55,22 @@ class DomainModel(DomainModelCore):
 
     @classmethod
     def one_to_many_fields(cls) -> list[str]:
-        return [
-            field_name
-            for field_name, field in cls.model_fields.items()
-            if isinstance(field.annotation, types.GenericAlias)
-        ]
+        try:
+            return [
+                field_name
+                for field_name, field in cls.model_fields.items()
+                if isinstance(field.annotation, types.GenericAlias)
+            ]
+        except AttributeError as e:
+            if "has no attribute 'model_fields'" in str(e):
+                # is pydantic v1
+                return [
+                    field_name
+                    for field_name, field in cls.__fields__.items()
+                    if isinstance(field.type_, types.GenericAlias)
+                ]
+            else:
+                raise e
 
 
 T_TypeNode = TypeVar("T_TypeNode", bound=DomainModel)
