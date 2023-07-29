@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from typing import TYPE_CHECKING, ClassVar, Optional, Union
 
 from cognite.client import data_modeling as dm
@@ -15,14 +16,14 @@ __all__ = ["Bid", "BidApply", "BidList"]
 
 class Bid(DomainModel):
     space: ClassVar[str] = "market"
-    date: Optional[date] = None
+    date: Optional[datetime.date] = None
     market: Optional[str] = None
     name: Optional[str] = None
 
 
 class BidApply(DomainModelApply):
     space: ClassVar[str] = "market"
-    date: Optional[date] = None
+    date: Optional[datetime.date] = None
     market: Optional[Union["MarketApply", str]] = Field(None, repr=False)
     name: Optional[str] = None
 

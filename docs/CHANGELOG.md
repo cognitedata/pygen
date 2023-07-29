@@ -13,6 +13,16 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.13.0] - 29-07-23
+### Added
+
+* Support for `pydantic` v1 to support using `pygen` with `pyodide`.
+
+### Fixed
+
+* Bug when having a field of type date causing `datetime.date` not to be imported in generated
+  dataclass
+
 ## [0.12.3] - 16-07-23
 ### Fixed
 

@@ -61,3 +61,8 @@ def pygen_pool_model() -> dm.DataModel:
 @pytest.fixture(scope="session")
 def date_transformation_pair_view(cog_pool_model) -> dm.View:
     return next(v for v in cog_pool_model.views if v.name == "DateTransformationPair")
+
+
+@pytest.fixture(scope="session")
+def bid_view(pygen_pool_model) -> dm.View:
+    return next(v for v in pygen_pool_model.views if v.name == "Bid")

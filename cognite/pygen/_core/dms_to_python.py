@@ -220,11 +220,11 @@ class Field:
 
     @property
     def is_datetime(self) -> bool:
-        return self.read_type == "datetime"
+        return self.read_type == "datetime.datetime"
 
     @property
     def is_date(self) -> bool:
-        return self.read_type == "date"
+        return self.read_type == "datetime.date"
 
     @classmethod
     def from_property(cls, property_: dm.MappedProperty | dm.ConnectionDefinition) -> Field:
@@ -481,9 +481,9 @@ def _to_python_type(type_: dm.DirectRelationReference | dm.PropertyType) -> str:
     elif isinstance(type_, (dm.Float32, dm.Float64)):
         out_type = "float"
     elif isinstance(type_, dm.Date):
-        out_type = "date"
+        out_type = "datetime.date"
     elif isinstance(type_, dm.Timestamp):
-        out_type = "datetime"
+        out_type = "datetime.datetime"
     elif isinstance(type_, dm.Json):
         out_type = "dict"
     elif isinstance(type_, (dm.Text, dm.DirectRelation, dm.CDFExternalIdReference, dm.DirectRelationReference)):
