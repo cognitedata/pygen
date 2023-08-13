@@ -16,7 +16,7 @@ def main():
     try:
         sdk = generator.generate_sdk()
 
-        pygen.write_sdk_to_disk(sdk, examples_dir, overwrite=True)
+        pygen.write_sdk_to_disk(sdk, examples_dir, overwrite=True, format_code=True)
     except Exception:
         print("Failed to generate SDK")  # noqa
         raise

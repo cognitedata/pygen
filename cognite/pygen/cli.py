@@ -33,8 +33,7 @@ if _has_typer:
     ):
         ...
 
-    pyproject_toml = Path.cwd() / "pyproject.toml"
-    settings = load_settings(pyproject_toml)
+    settings = load_settings()
     if settings is not None:
         help_text = "Generate a Python SDK from Data Model(s)"
 

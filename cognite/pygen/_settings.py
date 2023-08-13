@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 try:
     from pydantic import BaseModel, FieldValidationInfo, field_validator
@@ -51,12 +51,18 @@ class PygenSettings(BaseModel):
             return _parse_string(value, field)
 
 
-def load_settings(pyproject_toml_path: Path) -> PygenSettings | None:
+def _load_pyproject_toml(pyproject_toml_path: Path | None = None) -> dict[str, Any]:
+    if pyproject_toml_path is None:
+        pyproject_toml_path = Path.cwd() / "pyproject.toml"
     if not pyproject_toml_path.exists():
-        return None
+        return {}
     import toml
 
-    pyproject_toml = toml.loads(pyproject_toml_path.read_text())
+    return toml.loads(pyproject_toml_path.read_text())
+
+
+def load_settings(pyproject_toml_path: Path | None = None) -> PygenSettings | None:
+    pyproject_toml = _load_pyproject_toml(pyproject_toml_path)
     if "pygen" in pyproject_toml.get("tool", {}):
         return PygenSettings(**pyproject_toml["tool"]["pygen"])
     return None

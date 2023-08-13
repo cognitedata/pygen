@@ -5,7 +5,7 @@ import sys
 import tempfile
 from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Callable, Literal, overload
+from typing import Any, Callable, Literal, Optional, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -13,6 +13,8 @@ from cognite.client.data_classes.data_modeling import DataModelIdentifier
 from cognite.client.exceptions import CogniteAPIError
 
 from cognite.pygen._core.dms_to_python import SDKGenerator
+
+from ._settings import _load_pyproject_toml
 
 
 def generate_sdk_notebook(
@@ -73,7 +75,7 @@ def generate_sdk(
     top_level_package: str,
     client_name: str,
     output_dir: Path,
-    logger: Callable[[str], None],
+    logger: Optional[Callable[[str], None]] = None,
     pydantic_version: Literal["v1", "v2", "infer"] = "infer",
     overwrite: bool = False,
 ) -> None:
@@ -101,6 +103,7 @@ def generate_sdk(
         Whether to overwrite the output directory if it already exists. Defaults to False.
 
     """
+    logger = logger or print
     data_model = _load_data_model(client, model_id, logger)
     logger(f"Successfully retrieved data model(s) {model_id}")
     sdk_generator = SDKGenerator(top_level_package, client_name, data_model, pydantic_version, logger)
@@ -142,14 +145,52 @@ def _load_data_model(
     return data_model
 
 
-def write_sdk_to_disk(sdk: dict[Path, str], output_dir: Path, overwrite: bool):
+class _CodeFormatter:
+    def __init__(self, format_code: bool, logger: Callable[[str], None], default_line_length: int = 120) -> None:
+        self._mode = None
+        self._format_code = False
+
+        if format_code:
+            try:
+                import black
+            except ImportError:
+                logger("black not installed. Skipping code formatting.")
+            else:
+                line_length = default_line_length
+                target_version = f"pys{sys.version_info[0]}{sys.version_info[1]}"
+                pyproject_toml = _load_pyproject_toml()
+                if pyproject_toml and "black" in pyproject_toml.get("tool", {}):
+                    line_length = pyproject_toml["tool"]["black"].get("line-length", line_length)
+                    target_version = pyproject_toml["tool"]["black"].get("target_version", target_version)
+
+                self._mode = black.Mode(target_versions={black.TargetVersion[target_version]}, line_length=line_length)
+                self._format_code = True
+
+    def format_code(self, code: str) -> str:
+        if self._format_code:
+            import black
+
+            return black.format_str(code, fast=False, mode=self._mode)
+
+        return code
+
+
+def write_sdk_to_disk(
+    sdk: dict[Path, str],
+    output_dir: Path,
+    overwrite: bool,
+    format_code: bool = True,
+) -> None:
     """Write a generated SDK to disk.
 
     Args:
         sdk: The generated SDK.
         output_dir: The output directory to write to.
         overwrite: Whether to overwrite existing files.
+        format_code: Whether to format the generated code using black.
     """
+    formatter = _CodeFormatter(format_code, print)
+
     for file_path, file_content in sdk.items():
         path = output_dir / file_path
         if path.exists() and not overwrite:
@@ -157,4 +198,6 @@ def write_sdk_to_disk(sdk: dict[Path, str], output_dir: Path, overwrite: bool):
         elif path.exists():
             path.unlink()
         path.parent.mkdir(parents=True, exist_ok=True)
+        if format_code:
+            file_content = formatter.format_code(file_content)
         path.write_text(file_content)
