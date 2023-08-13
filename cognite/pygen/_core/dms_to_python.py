@@ -486,7 +486,9 @@ def find_dependencies(apis: list[APIGenerator]) -> dict[APIClass, set[APIClass]]
     }
 
 
-def _unique_properties(prop: dm.MappedProperty | dm.SingleHopConnectionDefinition) -> dict[str, Any]:
+def _unique_properties(
+    prop: dm.MappedProperty | dm.SingleHopConnectionDefinition | dm.MappedProperty,
+) -> dict[str, Any]:
     if isinstance(prop, dm.MappedProperty):
         return {
             "container": prop.container.dump(),

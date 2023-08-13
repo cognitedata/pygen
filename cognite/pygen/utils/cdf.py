@@ -20,4 +20,8 @@ def load_cognite_client_from_toml(
     """
     import toml
 
-    return CogniteClient.default_oauth_client_credentials(**toml.load(toml_file)[section])
+    toml_content = toml.load(toml_file)
+    if section is not None:
+        toml_content = toml_content[section]
+
+    return CogniteClient.default_oauth_client_credentials(**toml_content)

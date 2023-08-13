@@ -46,7 +46,7 @@ class PygenSettings(BaseModel):
 
     else:
 
-        @validator("*", pre=True)
+        @validator("*", pre=True)  # type: ignore[type-var]
         def parse_string(cls, value, field) -> Argument:
             return _parse_string(value, field)
 
