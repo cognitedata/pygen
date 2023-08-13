@@ -3,10 +3,11 @@ from __future__ import annotations
 import hashlib
 import json
 from collections import defaultdict
+from collections.abc import Sequence
 from dataclasses import dataclass
 from itertools import product
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Literal, Sequence
+from typing import Any, Callable, Literal
 
 from cognite.client import data_modeling as dm
 from cognite.client._version import __version__ as cognite_sdk_version
@@ -288,7 +289,7 @@ class Fields:
 
     @property
     def fields_by_container(self) -> dict[dm.ContainerId, list[Field]]:
-        result: Dict[dm.ContainerId, List[Field]] = defaultdict(list)
+        result: dict[dm.ContainerId, list[Field]] = defaultdict(list)
         for field in self:
             if isinstance(field.prop, dm.MappedProperty):
                 result[field.prop.container].append(field)
@@ -475,7 +476,7 @@ def _to_python_type(type_: dm.DirectRelationReference | dm.PropertyType) -> str:
     return out_type
 
 
-def find_dependencies(apis: List[APIGenerator]) -> dict[APIClass, set[APIClass]]:
+def find_dependencies(apis: list[APIGenerator]) -> dict[APIClass, set[APIClass]]:
     class_by_data_class_name = {api.class_.data_class: api.class_ for api in apis}
     return {
         api.class_: {class_by_data_class_name[d] for d in dependencies}

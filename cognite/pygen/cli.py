@@ -1,7 +1,7 @@
 from pathlib import Path
+from typing import Annotated
 
 from cognite.client.exceptions import CogniteAPIError
-from typing_extensions import Annotated
 
 from cognite import pygen
 from cognite.pygen._generator import generate_sdk

@@ -3,8 +3,9 @@ from __future__ import annotations
 import importlib
 import sys
 import tempfile
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Callable, Literal, Sequence, overload
+from typing import Any, Callable, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -48,7 +49,7 @@ def generate_sdk_notebook(
         Any: The instantiated generated client class.
     """
     output_dir = Path(tempfile.gettempdir()) / "pygen"
-    logger = logger or print  # noqa: T202
+    logger = logger or print
     generate_sdk(
         client,
         model_id,
