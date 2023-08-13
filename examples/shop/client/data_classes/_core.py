@@ -114,10 +114,6 @@ class TypeList(UserList, Generic[T_TypeNode]):
     _NODE: type[T_TypeNode]
 
     def __init__(self, nodes: Collection[type[DomainModelCore]]):
-        # if any(not isinstance(node, self._NODE) for node in nodes):
-        # raise TypeError(
-        #     f"All nodes for class {type(self).__name__} must be of type " f"{type(self._NODE).__name__}."
-        # )
         super().__init__(nodes)
 
     def dump(self) -> list[dict[str, Any]]:
