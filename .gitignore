@@ -60,3 +60,4 @@ config.toml
 playground
 examples/playground.ipynb
 playground.py
+.dmypy.json
