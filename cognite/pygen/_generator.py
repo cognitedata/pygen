@@ -32,26 +32,17 @@ def generate_sdk_notebook(
     The SDK is generated in a temporary directory and added to the sys.path. This is such that it becomes available
     to be imported in the current Python session.
 
-     Parameters
-     ----------
-     client: CogniteClient
-        The cognite client used for fetching the data model.
-     model_id: DataModelIdentifier | Sequence[DataModelIdentifier]
-        The id(s) of the data model(s) to generate the SDK from.
-     top_level_package: str
-        The name of the top level package for the SDK. Example "movie.client"
-     client_name: str
-        The name of the client class. Example "MovieClient"
-     logger: Callable[[str], None]
-        A logger function that will be called with the progress of the generation.
-     overwrite: bool
-        Whether to overwrite the output directory if it already exists. Defaults to False.
-     format_code: bool
-        Whether to format the generated code using black. Defaults to False.
+    Args:
+        client: The cognite client used for fetching the data model.
+        model_id: The id(s) of the data model(s) to generate the SDK from.
+        top_level_package: The name of the top level package for the SDK. Example "movie.client"
+        client_name: The name of the client class. Example "MovieClient"
+        logger: A logger function that will be called with the progress of the generation.
+        overwrite: Whether to overwrite the output directory if it already exists. Defaults to False.
+        format_code: Whether to format the generated code using black. Defaults to False.
 
-    Returns
-    -------
-        Any: The instantiated generated client class.
+    Returns:
+        The instantiated generated client class.
     """
     output_dir = Path(tempfile.gettempdir()) / "pygen"
     logger = logger or print
@@ -87,27 +78,17 @@ def generate_sdk(
     """
     Generates a Python SDK from the given Data Model(s).
 
-    Parameters
-    ----------
-    client: CogniteClient
-        The cognite client used for fetching the data model.
-    model_id: DataModelIdentifier | Sequence[DataModelIdentifier]
-        The id(s) of the data model(s) to generate the SDK from.
-    top_level_package : str
-        The name of the top level package for the SDK. Example "movie.client"
-    client_name: str
-        The name of the client class. Example "MovieClient"
-    output_dir: Path
-        The directory to write the SDK to.
-    logger: Callable[[str], None]
-        A logger function to log progress.
-    pydantic_version: Literal["v1", "v2", "infer"]
-        The version of pydantic to use. Defaults to "infer" which will use the environment to detect the installed
-        version of pydantic.
-    overwrite: bool
-        Whether to overwrite the output directory if it already exists. Defaults to False.
-    format_code: bool
-        Whether to format the generated code using black. Defaults to True.
+    Args:
+        client: The cognite client used for fetching the data model.
+        model_id: The id(s) of the data model(s) to generate the SDK from.
+        top_level_package: The name of the top level package for the SDK. Example "movie.client"
+        client_name: The name of the client class. Example "MovieClient"
+        output_dir: The directory to write the SDK to.
+        logger: A logger function to log progress. Defaults to print.
+        pydantic_version: The version of pydantic to use. Defaults to "infer" which will use
+                          the environment to detect the installed version of pydantic.
+        overwrite: Whether to overwrite the output directory if it already exists. Defaults to False.
+        format_code: Whether to format the generated code using black. Defaults to True.
 
     """
     logger = logger or print
@@ -206,10 +187,14 @@ def write_sdk_to_disk(
     """Write a generated SDK to disk.
 
     Args:
-        sdk: The generated SDK.
-        output_dir: The output directory to write to.
-        overwrite: Whether to overwrite existing files.
-        format_code: Whether to format the generated code using black.
+        sdk (dict[Path, str]):
+            The generated SDK.
+        output_dir (Path):
+            The output directory to write to.
+        overwrite (bool):
+            Whether to overwrite existing files.
+        format_code (bool):
+            Whether to format the generated code using black.
     """
     formatter = CodeFormatter(format_code, print)
 

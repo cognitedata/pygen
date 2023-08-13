@@ -23,18 +23,13 @@ class SDKGenerator:
     """
     SDK generator for a data model.
 
-     Parameters
-     ----------
-     top_level_package: str
-        The name of the top level package of the SDK. Example "movie.client"
-     client_name: str
-        The name of the client class. Example "MovieClient"
-     data_model: dm.DataModel | Sequence[dm.DataModel]
-        The data model(s) to generate id of the data model to generate the SDK from.
-    pydantic_version: Literal["v1", "v2", "infer"]
-        The version of pydantic to use. "infer" will use the version of pydantic installed in the environment.
-    logger: Callable[[str], None] | None
-        A logger function to use for logging. If None, print will be done.
+    Args:
+        top_level_package: The name of the top level package for the SDK. Example "movie.client"
+        client_name: The name of the client class. Example "MovieClient"
+        data_model: The data model(s) to generate a SDK for.
+        pydantic_version: The version of pydantic to use. "infer" will use the version of pydantic installed in
+                          the environment.
+        logger: A logger function to use for logging. If None, print will be done.
     """
 
     def __init__(
@@ -67,9 +62,8 @@ class SDKGenerator:
         """
         Generate the SDK.
 
-        Returns
-        -------
-        dict[Path, str]: A dictionary of file paths and file contents, which can be written to disk.
+        Returns:
+            A Python SDK given as a dictionary of file paths and file contents, which can be written to disk.
         """
         client_dir = Path(self.top_level_package.replace(".", "/"))
         sdk = self._apis.generate_apis(client_dir)
