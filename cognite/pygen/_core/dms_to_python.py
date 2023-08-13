@@ -379,11 +379,17 @@ class APIClass:
 
     @property
     def one_line_import(self) -> str:
-        return f"from {self._top_level_package}.data_classes._{self.file_name} import {self.data_class}, {self.data_class}Apply, {self.data_class}List"
+        return (
+            f"from {self._top_level_package}.data_classes._{self.file_name} "
+            f"import {self.data_class}, {self.data_class}Apply, {self.data_class}List"
+        )
 
     @property
     def multiline_import(self) -> str:
-        return f"from {self._top_level_package}.data_classes._{self.file_name} import (\n    {self.data_class},\n    {self.data_class}Apply,\n    {self.data_class}List,\n)"
+        return (
+            f"from {self._top_level_package}.data_classes._{self.file_name} "
+            f"import (\n    {self.data_class},\n    {self.data_class}Apply,\n    {self.data_class}List,\n)"
+        )
 
     # Todo hack to get around black in unit tests
     @property
