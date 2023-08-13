@@ -59,3 +59,4 @@ examples/movie_domain/data/settings.toml
 config.toml
 playground
 examples/playground.ipynb
+playground.py

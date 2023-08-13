@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-import shutil
+import importlib
 import sys
 import tempfile
 from pathlib import Path
-from typing import Callable, Literal, Sequence, overload
+from typing import Any, Callable, Literal, Sequence, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -19,8 +19,9 @@ def generate_sdk_notebook(
     model_id: DataModelIdentifier | Sequence[DataModelIdentifier],
     top_level_package: str,
     client_name: str,
+    logger: Callable[[str], None] | None = None,
     overwrite: bool = False,
-) -> None:
+) -> Any:
     """
     Generates a Python SDK from the given Data Model(s).
 
@@ -34,24 +35,35 @@ def generate_sdk_notebook(
      model_id: DataModelIdentifier | Sequence[DataModelIdentifier]
         The id(s) of the data model(s) to generate the SDK from.
      top_level_package: str
-        The name of the top level package of the SDK. Example "movie.client"
+        The name of the top level package for the SDK. Example "movie.client"
      client_name: str
         The name of the client class. Example "MovieClient"
-    overwrite: bool
+     logger: Callable[[str], None]
+        A logger function that will be called with the progress of the generation.
+     overwrite: bool
         Whether to overwrite the output directory if it already exists. Defaults to False.
+
+    Returns
+    -------
+        Any: The instantiated generated client class.
     """
     output_dir = Path(tempfile.gettempdir()) / "pygen"
+    logger = logger or print  # noqa: T202
     generate_sdk(
         client,
         model_id,
         top_level_package,
         client_name,
         output_dir,
-        print,  # noqa: T202
+        logger,
         pydantic_version="infer",
         overwrite=overwrite,
     )
     sys.path.append(str(output_dir))
+    logger(f"Added {output_dir} to sys.path to enable import")
+    module = vars(importlib.import_module(top_level_package))
+    logger(f"Imported {top_level_package}")
+    return module[client_name](client)
 
 
 def generate_sdk(
@@ -74,7 +86,7 @@ def generate_sdk(
     model_id: DataModelIdentifier | Sequence[DataModelIdentifier]
         The id(s) of the data model(s) to generate the SDK from.
     top_level_package : str
-        The name of the top level package of the SDK. Example "movie.client"
+        The name of the top level package for the SDK. Example "movie.client"
     client_name: str
         The name of the client class. Example "MovieClient"
     output_dir: Path
@@ -142,6 +154,6 @@ def write_sdk_to_disk(sdk: dict[Path, str], output_dir: Path, overwrite: bool):
         if path.exists() and not overwrite:
             raise FileExistsError(f"File {path} already exists. Set overwrite=True to overwrite.")
         elif path.exists():
-            shutil.rmtree(path)
+            path.unlink()
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(file_content)
