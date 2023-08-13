@@ -106,7 +106,7 @@ class APIsGenerator:
             self.pydantic_version = "v2" if PYDANTIC_VERSION[0] == "2" else "v1"
         else:
             self.pydantic_version = pydantic_version
-        self._logger = logger or print  # noqa: T202
+        self._logger = logger or print
 
         self.apis = []
         for view in views:

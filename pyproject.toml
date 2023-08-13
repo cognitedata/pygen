@@ -32,7 +32,7 @@ ignore = [
 [tool.ruff.isort]
 known-first-party = ["markets_pydantic_v1", "movie_domain_pydantic_v1", "shop_pydantic_v1"]
 
-known-third-party = []
+known-third-party = ["cognite.client"]
 #[tool.isort]
 #line_length=120                # corresponds to -w  flag
 #multi_line_output=3            # corresponds to -m  flag
