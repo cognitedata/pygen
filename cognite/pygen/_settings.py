@@ -1,11 +1,7 @@
 from __future__ import annotations
 
-import getpass
 from pathlib import Path
 from typing import Optional
-
-from cognite.client import ClientConfig, CogniteClient
-from cognite.client.credentials import OAuthClientCredentials
 
 try:
     from pydantic import BaseModel, FieldValidationInfo, field_validator
@@ -64,20 +60,3 @@ def load_settings(pyproject_toml_path: Path) -> PygenSettings | None:
     if "pygen" in pyproject_toml.get("tool", {}):
         return PygenSettings(**pyproject_toml["tool"]["pygen"])
     return None
-
-
-def get_cognite_client(project, cdf_cluster, tenant_id, client_id, client_secret):
-    base_url = f"https://{cdf_cluster}.cognitedata.com/"
-    credentials = OAuthClientCredentials(
-        token_url=f"https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/token",
-        client_id=client_id,
-        client_secret=client_secret,
-        scopes=[f"{base_url}.default"],
-    )
-    config = ClientConfig(
-        project=project,
-        credentials=credentials,
-        client_name=getpass.getuser(),
-        base_url=base_url,
-    )
-    return CogniteClient(config)
