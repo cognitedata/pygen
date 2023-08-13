@@ -1,10 +1,12 @@
 from cognite.pygen._core.dms_to_python import APIGenerator
 from cognite.pygen.utils.cdf import load_cognite_client_from_toml
 from tests.constants import MovieSDKFiles
+from cognite.pygen._generator import CodeFormatter
 
 
 def main():
     c = load_cognite_client_from_toml("config.toml")
+    formatter = CodeFormatter(True, print)
 
     views = c.data_modeling.data_models.retrieve(("IntegrationTestsImmutable", "Movie", "2"), inline_views=True)[
         0
@@ -18,6 +20,7 @@ def main():
 
         (MovieSDKFiles.data_classes / f"_{api_generator.class_.file_name}.py").write_text(data_class)
         type_api = api_generator.generate_api_file("movie_domain.client")
+        type_api = formatter.format_code(type_api)
         (MovieSDKFiles.api / f"{api_generator.class_.file_name}.py").write_text(type_api)
     print("Done")
 

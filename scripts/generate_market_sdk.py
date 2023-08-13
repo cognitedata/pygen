@@ -21,7 +21,7 @@ def main():
     sdk.pop(client_dir / "data_classes" / "_date_transformation_pairs.py")
     sdk.pop(client_dir / "_api" / "date_transformation_pairs.py")
 
-    write_sdk_to_disk(sdk, examples_dir, overwrite=True)
+    write_sdk_to_disk(sdk, examples_dir, overwrite=True, format_code=True)
     print("Market SDK Created!")
 
 
