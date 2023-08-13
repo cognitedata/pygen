@@ -15,6 +15,7 @@ def main():
         examples_dir_pydantic_v1,
         print,
         pydantic_version="v1",
+        overwrite=True,
     )
     pygen.generate_sdk(
         c,
@@ -24,6 +25,7 @@ def main():
         examples_dir_pydantic_v1,
         print,
         pydantic_version="v1",
+        overwrite=True,
     )
     pygen.generate_sdk(
         c,
@@ -33,6 +35,7 @@ def main():
         examples_dir_pydantic_v1,
         print,
         pydantic_version="v1",
+        overwrite=True,
     )
 
 

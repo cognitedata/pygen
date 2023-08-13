@@ -71,13 +71,18 @@ class MarketClient:
 
     Generated with:
         pygen = 0.14.0
-        cognite-sdk = 6.13.2
-        pydantic = 2.1.1
+        cognite-sdk = 6.8.4
+        pydantic = 1.10.7
 
     """
 
-    def __init__(self, config: ClientConfig | None = None):
-        client = CogniteClient(config)
+    def __init__(self, config_or_client: CogniteClient | ClientConfig):
+        if isinstance(config_or_client, CogniteClient):
+            client = config_or_client
+        elif isinstance(config_or_client, ClientConfig):
+            client = CogniteClient(config_or_client)
+        else:
+            raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         self.cog_pool = CogPoolAPIs(client)
         self.pygen_pool = PygenPoolAPIs(client)
 
@@ -91,7 +96,14 @@ class MarketClient:
         return cls(config)
 
     @classmethod
-    def from_toml(cls, file_path: Path | str) -> MarketClient:
+    def from_toml(cls, file_path: Path | str, section: str | None = "cognite") -> MarketClient:
         import toml
 
-        return cls.azure_project(**toml.load(file_path)["cognite"])
+        toml_content = toml.load(file_path)
+        if section is not None:
+            try:
+                toml_content = toml_content[section]
+            except KeyError:
+                raise ValueError(f"Could not find section '{section}' in {file_path}")
+
+        return cls.azure_project(**toml_content)
