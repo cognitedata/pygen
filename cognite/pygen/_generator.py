@@ -10,7 +10,7 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling import DataModelIdentifier
 from cognite.client.exceptions import CogniteAPIError
 
-from cognite.pygen._core.dms_to_python import MultiModelSDKGenerator, SDKGenerator
+from cognite.pygen._core.dms_to_python import SDKGenerator
 
 
 def generate_sdk_notebook(
@@ -67,12 +67,12 @@ def generate_multimodel_sdk(
 ):
     data_models = _load_data_model(client, model_ids, logger)
     logger(f"Successfully retrieved data model(s) {model_ids}")
-    sdk_generator = MultiModelSDKGenerator(
-        top_level_package,
-        client_name,
-        data_models,
-        logger,
-        pydantic_version,
+    sdk_generator = SDKGenerator(
+        top_level_package=top_level_package,
+        client_name=client_name,
+        data_model=data_models,
+        logger=logger,
+        pydantic_version=pydantic_version,
     )
     sdk = sdk_generator.generate_sdk()
     logger(f"Writing SDK to {output_dir}")
