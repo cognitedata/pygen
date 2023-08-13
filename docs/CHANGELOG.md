@@ -13,6 +13,21 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.15.0] - 13-08-23
+### Added
+
+* Support for formatting the generated SDK with `black`. This is available through the `format_code` parameter
+  in `cognite.pygen.generate_sdk` and `cognite.pygen.generate_sdk_notebook` functions.
+* Added section in the documentation with `Installation Options`.
+* Added section in the documentation with `API` documentation.
+
+### Removed
+
+* `get_cognite_client` this is now obsolete as the factory methods `CogniteClientdefault_oauth_client_credentials`
+  does the same.
+* `InstancesApply` in the generated SDK `data_classes._core.py`. This is now available in the `cognite-sdk`.
+
+
 ## [0.14.0] - 13-08-23
 ### Added
 
