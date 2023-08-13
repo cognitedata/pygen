@@ -40,7 +40,7 @@ def generate_sdk_notebook(
 
 def generate_sdk(
     client: CogniteClient,
-    model_id: DataModelIdentifier,
+    model_id: DataModelIdentifier | Sequence[DataModelIdentifier],
     top_level_package: str,
     client_name: str,
     output_dir: Path,
