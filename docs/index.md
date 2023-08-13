@@ -1,6 +1,13 @@
 # Welcome to Pygen Docs
+[![release](https://img.shields.io/github/actions/workflow/status/cognitedata/pygen/release.yaml?style=for-the-badge)](https://github.com/cognitedata/pygen/actions/workflows/release.yaml)
+[![Documentation Status](https://readthedocs.com/projects/cognite-pygen/badge/?version=latest&style=for-the-badge)](https://cognite-pygen.readthedocs-hosted.com/en/latest/?badge=latest)
+[![PyPI](https://img.shields.io/pypi/v/cognite-pygen?style=for-the-badge)](https://pypi.org/project/cognite-pygen/)
+[![Downloads](https://img.shields.io/pypi/dm/cognite-pygen?style=for-the-badge)](https://pypistats.org/packages/cognite-pygen)
+[![GitHub](https://img.shields.io/github/license/cognitedata/pygen?style=for-the-badge)](https://github.com/cognitedata/pygen/blob/master/LICENSE)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg?style=for-the-badge)](https://github.com/ambv/black)
 
 This is the Cognite Python SDK Generator, `pygen`. The purpose of this package is to help developers to
+
 work with Cognite Data Fusion's (CDF) Data Models (DM) in Python.
 
 **[DISCLAIMER!]** This project is in a highly experimental state, and no guarantees are made for consistency between
