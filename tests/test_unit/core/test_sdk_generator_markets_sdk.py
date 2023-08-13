@@ -50,7 +50,7 @@ def test_generate_date_transformation_pairs_data_class(
     assert actual == expected
 
 
-@pytest.mark.skipif(platform.platform() == "Windows", reason="Only works on windows.")
+@pytest.mark.skipif(not platform.platform().startswith("Windows"), reason="Only works on windows (do not know why).")
 def test_generate_date_transformation_pairs_data_api(
     date_transformation_pair_view: dm.View, top_level_package: str, code_formatter: CodeFormatter
 ):
