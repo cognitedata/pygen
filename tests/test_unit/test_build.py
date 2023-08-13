@@ -26,4 +26,4 @@ def test_index_matching_readme():
     index = (repo_root / "docs" / "index.md").read_text()
 
     # Assert
-    assert remove_top_lines(readme, 5) == remove_top_lines(index, 1)
+    assert remove_top_lines(readme, 2) == remove_top_lines(index, 1)
