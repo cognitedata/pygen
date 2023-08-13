@@ -34,7 +34,9 @@ def test_generate__api_client(sdk_generator: SDKGenerator):
     assert actual == expected
 
 
-def test_generate_date_transformation_pairs_data_class(date_transformation_pair_view: dm.View, top_level_package: str):
+def test_generate_date_transformation_pairs_data_class(
+    date_transformation_pair_view: dm.View, top_level_package: str, code_formatter: CodeFormatter
+):
     # Arrange
     expected = MarketSDKFiles.date_transformation_pair_data.read_text()
 
@@ -42,6 +44,7 @@ def test_generate_date_transformation_pairs_data_class(date_transformation_pair_
     actual = APIGenerator(date_transformation_pair_view, top_level_package).generate_data_class_file()
 
     # Assert
+    actual = code_formatter.format_code(actual)
     assert actual == expected
 
 
