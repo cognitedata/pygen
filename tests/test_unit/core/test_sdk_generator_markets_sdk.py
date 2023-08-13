@@ -4,6 +4,7 @@ import pytest
 from cognite.client import data_modeling as dm
 
 from cognite.pygen._core.dms_to_python import APIGenerator, SDKGenerator
+from cognite.pygen._generator import CodeFormatter
 from tests.constants import IS_PYDANTIC_V1, MarketSDKFiles
 
 
@@ -28,7 +29,7 @@ def test_generate__api_client(sdk_generator: SDKGenerator):
     expected = MarketSDKFiles.client.read_text()
 
     # Act
-    actual = sdk_generator.generate_api_client_file()
+    actual = sdk_generator._generate_api_client_file()
 
     # Assert
     assert actual == expected
@@ -45,8 +46,9 @@ def test_generate_date_transformation_pairs_data_class(date_transformation_pair_
     assert actual == expected
 
 
-@pytest.mark.skip("Black causes this one to fail.")
-def test_generate_date_transformation_pairs_data_api(date_transformation_pair_view: dm.View, top_level_package: str):
+def test_generate_date_transformation_pairs_data_api(
+    date_transformation_pair_view: dm.View, top_level_package: str, code_formatter: CodeFormatter
+):
     # Arrange
     expected = MarketSDKFiles.date_transformation_pair_api.read_text()
 
@@ -54,4 +56,5 @@ def test_generate_date_transformation_pairs_data_api(date_transformation_pair_vi
     actual = APIGenerator(date_transformation_pair_view, top_level_package).generate_api_file(top_level_package)
 
     # Assert
+    actual = code_formatter.format_code(actual)
     assert actual == expected

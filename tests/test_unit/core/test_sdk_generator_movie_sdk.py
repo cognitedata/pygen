@@ -270,7 +270,7 @@ def test_create_api_client(sdk_generator: SDKGenerator):
     expected = MovieSDKFiles.client.read_text()
 
     # Act
-    actual = sdk_generator.generate_api_client_file()
+    actual = sdk_generator._generate_api_client_file()
 
     # Assert
     assert actual == expected
