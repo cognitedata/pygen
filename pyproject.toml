@@ -91,6 +91,7 @@ faker = "*"
 toml = "*"
 pandas = "*"
 pyyaml = "*"
+mypy = "^1.4"
 
 [tool.pytest.ini_options]
 filterwarnings = [
