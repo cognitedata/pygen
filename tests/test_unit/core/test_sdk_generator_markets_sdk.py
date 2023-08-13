@@ -23,7 +23,6 @@ def sdk_generator(pygen_pool_model, cog_pool_model, top_level_package) -> SDKGen
     )
 
 
-@pytest.mark.skip("iSort sorts differently than sort.")
 def test_generate__api_client(sdk_generator: SDKGenerator):
     # Arrange
     expected = MarketSDKFiles.client.read_text()
