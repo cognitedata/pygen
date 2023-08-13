@@ -64,6 +64,30 @@ def generate_sdk(
     pydantic_version: Literal["v1", "v2", "infer"] = "infer",
     overwrite: bool = False,
 ) -> None:
+    """
+    Generates a Python SDK from the given Data Model(s).
+
+    Parameters
+    ----------
+    client: CogniteClient
+        The cognite client used for fetching the data model.
+    model_id: DataModelIdentifier | Sequence[DataModelIdentifier]
+        The id(s) of the data model(s) to generate the SDK from.
+    top_level_package : str
+        The name of the top level package of the SDK. Example "movie.client"
+    client_name: str
+        The name of the client class. Example "MovieClient"
+    output_dir: Path
+        The directory to write the SDK to.
+    logger: Callable[[str], None]
+        A logger function to log progress.
+    pydantic_version: Literal["v1", "v2", "infer"]
+        The version of pydantic to use. Defaults to "infer" which will use the environment to detect the installed
+        version of pydantic.
+    overwrite: bool
+        Whether to overwrite the output directory if it already exists. Defaults to False.
+
+    """
     data_model = _load_data_model(client, model_id, logger)
     logger(f"Successfully retrieved data model {model_id}")
     sdk_generator = SDKGenerator(top_level_package, client_name, data_model, pydantic_version, logger)
