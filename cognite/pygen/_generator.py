@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import shutil
 import sys
 import tempfile
 from pathlib import Path
@@ -18,6 +19,7 @@ def generate_sdk_notebook(
     model_id: DataModelIdentifier | Sequence[DataModelIdentifier],
     top_level_package: str,
     client_name: str,
+    overwrite: bool = False,
 ) -> None:
     """
     Generates a Python SDK from the given Data Model(s).
@@ -35,9 +37,20 @@ def generate_sdk_notebook(
         The name of the top level package of the SDK. Example "movie.client"
      client_name: str
         The name of the client class. Example "MovieClient"
+    overwrite: bool
+        Whether to overwrite the output directory if it already exists. Defaults to False.
     """
     output_dir = Path(tempfile.gettempdir()) / "pygen"
-    generate_sdk(client, model_id, top_level_package, client_name, output_dir, print)  # noqa: T202
+    generate_sdk(
+        client,
+        model_id,
+        top_level_package,
+        client_name,
+        output_dir,
+        print,  # noqa: T202
+        pydantic_version="infer",
+        overwrite=overwrite,
+    )
     sys.path.append(str(output_dir))
 
 
@@ -49,13 +62,14 @@ def generate_sdk(
     output_dir: Path,
     logger: Callable[[str], None],
     pydantic_version: Literal["v1", "v2", "infer"] = "infer",
-):
+    overwrite: bool = False,
+) -> None:
     data_model = _load_data_model(client, model_id, logger)
     logger(f"Successfully retrieved data model {model_id}")
     sdk_generator = SDKGenerator(top_level_package, client_name, data_model, pydantic_version, logger)
     sdk = sdk_generator.generate_sdk()
     logger(f"Writing SDK to {output_dir}")
-    write_sdk_to_disk(sdk, output_dir)
+    write_sdk_to_disk(sdk, output_dir, overwrite)
     logger("Done!")
 
 
@@ -91,14 +105,19 @@ def _load_data_model(
     return data_model
 
 
-def write_sdk_to_disk(sdk: dict[Path, str], output_dir: Path):
+def write_sdk_to_disk(sdk: dict[Path, str], output_dir: Path, overwrite: bool):
     """Write a generated SDK to disk.
 
     Args:
         sdk: The generated SDK.
         output_dir: The output directory to write to.
+        overwrite: Whether to overwrite existing files.
     """
     for file_path, file_content in sdk.items():
         path = output_dir / file_path
+        if path.exists() and not overwrite:
+            raise FileExistsError(f"File {path} already exists. Set overwrite=True to overwrite.")
+        elif path.exists():
+            shutil.rmtree(path)
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(file_content)
