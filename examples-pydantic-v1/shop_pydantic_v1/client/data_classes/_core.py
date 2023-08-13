@@ -6,12 +6,12 @@ from abc import abstractmethod
 from collections import UserList
 from collections.abc import Collection
 from dataclasses import dataclass
-from typing import Any, ClassVar, Generic, List, Optional, TypeVar, Union
+from typing import Any, ClassVar, Generic, Optional, TypeVar, Union
 
 import pandas as pd
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Properties, PropertyValue
-from pydantic import BaseModel, Extra, constr
+from pydantic import BaseModel, Extra, Field, constr
 
 # Todo - Move into SDK
 
@@ -102,14 +102,14 @@ class TimeSeries(DomainModelCore):
     id: Optional[int] = None
     name: Optional[str] = None
     is_string: bool = False
-    metadata: dict = {}
+    metadata: dict[str, str] = Field(default_factory=dict)
     unit: Optional[str] = None
     asset_id: Optional[int] = None
     is_step: bool = False
     description: Optional[str] = None
     security_categories: Optional[str] = None
     dataset_id: Optional[int] = None
-    data_points: Union[List[NumericDataPoint], List[StringDataPoint]]
+    data_points: Union[list[NumericDataPoint], list[StringDataPoint]]
 
 
 class TypeList(UserList, Generic[T_TypeNode]):
