@@ -24,6 +24,7 @@ def generate_sdk_notebook(
     client_name: str,
     logger: Callable[[str], None] | None = None,
     overwrite: bool = False,
+    format_code: bool = False,
 ) -> Any:
     """
     Generates a Python SDK from the given Data Model(s).
@@ -45,6 +46,8 @@ def generate_sdk_notebook(
         A logger function that will be called with the progress of the generation.
      overwrite: bool
         Whether to overwrite the output directory if it already exists. Defaults to False.
+     format_code: bool
+        Whether to format the generated code using black. Defaults to False.
 
     Returns
     -------
@@ -61,6 +64,7 @@ def generate_sdk_notebook(
         logger,
         pydantic_version="infer",
         overwrite=overwrite,
+        format_code=format_code,
     )
     sys.path.append(str(output_dir))
     logger(f"Added {output_dir} to sys.path to enable import")
@@ -78,6 +82,7 @@ def generate_sdk(
     logger: Optional[Callable[[str], None]] = None,
     pydantic_version: Literal["v1", "v2", "infer"] = "infer",
     overwrite: bool = False,
+    format_code: bool = True,
 ) -> None:
     """
     Generates a Python SDK from the given Data Model(s).
@@ -101,6 +106,8 @@ def generate_sdk(
         version of pydantic.
     overwrite: bool
         Whether to overwrite the output directory if it already exists. Defaults to False.
+    format_code: bool
+        Whether to format the generated code using black. Defaults to True.
 
     """
     logger = logger or print
@@ -109,7 +116,7 @@ def generate_sdk(
     sdk_generator = SDKGenerator(top_level_package, client_name, data_model, pydantic_version, logger)
     sdk = sdk_generator.generate_sdk()
     logger(f"Writing SDK to {output_dir}")
-    write_sdk_to_disk(sdk, output_dir, overwrite)
+    write_sdk_to_disk(sdk, output_dir, overwrite, format_code)
     logger("Done!")
 
 
@@ -157,20 +164,35 @@ class _CodeFormatter:
                 logger("black not installed. Skipping code formatting.")
             else:
                 line_length = default_line_length
-                target_version = f"pys{sys.version_info[0]}{sys.version_info[1]}"
+                target_version = f"py{sys.version_info[0]}{sys.version_info[1]}"
                 pyproject_toml = _load_pyproject_toml()
                 if pyproject_toml and "black" in pyproject_toml.get("tool", {}):
+                    logger("Found black configuration in pyproject.toml")
                     line_length = pyproject_toml["tool"]["black"].get("line-length", line_length)
                     target_version = pyproject_toml["tool"]["black"].get("target_version", target_version)
 
-                self._mode = black.Mode(target_versions={black.TargetVersion[target_version]}, line_length=line_length)
+                self._mode = black.Mode(
+                    target_versions={black.TargetVersion(int(target_version.removeprefix("py3")))},
+                    line_length=line_length,
+                )
                 self._format_code = True
+                logger(
+                    f"Black code formatter enabled with the following settings: "
+                    f"target_version: {target_version}, line_length: {line_length}"
+                )
 
     def format_code(self, code: str) -> str:
         if self._format_code:
             import black
 
-            return black.format_str(code, fast=False, mode=self._mode)
+            try:
+                code = black.format_file_contents(code, fast=False, mode=self._mode)
+            except black.NothingChanged:
+                pass
+            finally:
+                # Make sure there's a newline after the content
+                if code and code[-1] != "\n":
+                    code += "\n"
 
         return code
 
