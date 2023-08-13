@@ -5,7 +5,7 @@ from typing import ClassVar, Optional
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from markets.client.data_classes._core import DomainModel, DomainModelApply, InstancesApply, TypeList
+from markets.client.data_classes._core import DomainModel, DomainModelApply, TypeList
 
 __all__ = ["PygenPool", "PygenPoolApply", "PygenPoolList"]
 
@@ -23,9 +23,9 @@ class PygenPoolApply(DomainModelApply):
     name: Optional[str] = None
     timezone: Optional[str] = None
 
-    def _to_instances_apply(self, cache: set[str]) -> InstancesApply:
+    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:
-            return InstancesApply([], [])
+            return dm.InstancesApply([], [])
 
         sources = []
         source = dm.NodeOrEdgeData(
@@ -54,7 +54,7 @@ class PygenPoolApply(DomainModelApply):
         nodes = [this_node]
         edges = []
 
-        return InstancesApply(nodes, edges)
+        return dm.InstancesApply(nodes, edges)
 
 
 class PygenPoolList(TypeList[PygenPool]):

@@ -4,12 +4,12 @@ from cognite.client.data_classes.data_modeling.instances import Properties
 
 try:
     from movie_domain.client import data_classes as movie
-    from movie_domain.client.data_classes._core import InstancesApply, unpack_properties
+    from movie_domain.client.data_classes._core import unpack_properties
 except AttributeError as e:
     if "has no attribute 'model_rebuild" in str(e):
         # is pydantic v1
         from movie_domain_pydantic_v1.client import data_classes as movie
-        from movie_domain_pydantic_v1.client.data_classes._core import InstancesApply, unpack_properties
+        from movie_domain_pydantic_v1.client.data_classes._core import unpack_properties
     else:
         raise e
 
@@ -48,7 +48,7 @@ def test_person_one_to_many_fields():
 
 def person_apply_to_instances_test_cases():
     person = movie.PersonApply(name="Christoph Waltz", birth_year=1956, external_id="person:christoph_waltz")
-    expected = InstancesApply(
+    expected = dm.InstancesApply(
         [
             dm.NodeApply(
                 "IntegrationTestsImmutable",
@@ -236,7 +236,7 @@ def person_apply_to_instances_test_cases():
 
     yield pytest.param(
         person,
-        InstancesApply(
+        dm.InstancesApply(
             nodes=[dm.NodeApply.load(e) for e in expected_nodes], edges=[dm.EdgeApply.load(e) for e in expected_edges]
         ),
         id="Person with extra dependencies",
@@ -244,7 +244,7 @@ def person_apply_to_instances_test_cases():
 
 
 @pytest.mark.parametrize("person, expected", list(person_apply_to_instances_test_cases()))
-def test_person_to_apply_instances(person: movie.PersonApply, expected: InstancesApply):
+def test_person_to_apply_instances(person: movie.PersonApply, expected: dm.InstancesApply):
     # Act
     actual = person.to_instances_apply()
 

@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, ClassVar, Optional, Union
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from movie_domain_pydantic_v1.client.data_classes._core import DomainModel, DomainModelApply, InstancesApply, TypeList
+from movie_domain_pydantic_v1.client.data_classes._core import DomainModel, DomainModelApply, TypeList
 
 if TYPE_CHECKING:
     from movie_domain_pydantic_v1.client.data_classes._actors import ActorApply
@@ -36,9 +36,9 @@ class MovieApply(DomainModelApply):
     run_time_minutes: Optional[float] = None
     title: str
 
-    def _to_instances_apply(self, cache: set[str]) -> InstancesApply:
+    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:
-            return InstancesApply([], [])
+            return dm.InstancesApply([], [])
 
         sources = []
         source = dm.NodeOrEdgeData(
@@ -92,7 +92,7 @@ class MovieApply(DomainModelApply):
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 
-        return InstancesApply(nodes, edges)
+        return dm.InstancesApply(nodes, edges)
 
     def _create_actor_edge(self, actor: Union[str, "ActorApply"]) -> dm.EdgeApply:
         if isinstance(actor, str):

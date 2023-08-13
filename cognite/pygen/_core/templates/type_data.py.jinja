@@ -6,7 +6,7 @@ import datetime{% endif %}
 from cognite.client import data_modeling as dm{% if fields.import_pydantic_field %}
 from pydantic import Field{% endif %}
 
-from {{ top_level_package }}.data_classes._core import DomainModel, DomainModelApply, InstancesApply, TypeList
+from {{ top_level_package }}.data_classes._core import DomainModel, DomainModelApply, TypeList
 {% if fields.import_dependencies %}
 if TYPE_CHECKING:{% for dependency_file, dependency_class in fields.unique_dependencies %}
     from {{ top_level_package }}.data_classes._{{ dependency_file }} import {{ dependency_class }}Apply{% endfor %}
@@ -23,9 +23,9 @@ class {{ class_name }}Apply(DomainModelApply):
     space: ClassVar[str] = "{{ view.space }}"{% for field in fields %}
     {{ field.name }}: {{ field.as_type_hint('write') }}{% endfor %}
 
-    def _to_instances_apply(self, cache: set[str]) -> InstancesApply:
+    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:
-            return InstancesApply([], [])
+            return dm.InstancesApply([], [])
 
         {% if fields.has_properties or fields.has_one_to_one_edges %}sources = []{% for container, container_fields in fields.fields_by_container.items() %}
         source = dm.NodeOrEdgeData(
@@ -65,7 +65,7 @@ class {{ class_name }}Apply(DomainModelApply):
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 {% endfor %}
-        return InstancesApply(nodes, edges)
+        return dm.InstancesApply(nodes, edges)
 {%  for field in fields.edges_one_to_many %}
     def _create_{{ field.variable }}_edge(self, {{ field.variable }}: Union[str, "{{ field.prop.source.external_id }}Apply"]) -> dm.EdgeApply:
         if isinstance({{ field.variable }}, str):

@@ -4,7 +4,7 @@ from typing import ClassVar, Optional
 
 from cognite.client import data_modeling as dm
 
-from markets.client.data_classes._core import DomainModel, DomainModelApply, InstancesApply, TypeList
+from markets.client.data_classes._core import DomainModel, DomainModelApply, TypeList
 
 __all__ = ["DateTransformation", "DateTransformationApply", "DateTransformationList"]
 
@@ -20,9 +20,9 @@ class DateTransformationApply(DomainModelApply):
     arguments: Optional[dict] = None
     method: Optional[str] = None
 
-    def _to_instances_apply(self, cache: set[str]) -> InstancesApply:
+    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:
-            return InstancesApply([], [])
+            return dm.InstancesApply([], [])
 
         sources = []
         source = dm.NodeOrEdgeData(
@@ -43,7 +43,7 @@ class DateTransformationApply(DomainModelApply):
         nodes = [this_node]
         edges = []
 
-        return InstancesApply(nodes, edges)
+        return dm.InstancesApply(nodes, edges)
 
 
 class DateTransformationList(TypeList[DateTransformation]):

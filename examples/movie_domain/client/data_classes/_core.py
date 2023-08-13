@@ -5,29 +5,12 @@ import types
 from abc import abstractmethod
 from collections import UserList
 from collections.abc import Collection
-from dataclasses import dataclass
 from typing import Any, ClassVar, Generic, Optional, TypeVar, Union
 
 import pandas as pd
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Properties, PropertyValue
 from pydantic import BaseModel, ConfigDict, Extra, Field, constr
-
-# Todo - Move into SDK
-
-
-@dataclass
-class InstancesApply:
-    """This represents the read result of an instance query
-
-    Args:
-        nodes (dm.NodeApplyList): A list of nodes.
-        edges (dm.EdgeApply): A list of edges.
-
-    """
-
-    nodes: list[dm.NodeApply]
-    edges: list[dm.EdgeApply]
 
 
 ExternalId = constr(min_length=1, max_length=255)
@@ -69,11 +52,11 @@ class DomainModelApply(DomainModelCore):
     model_config: ClassVar[ConfigDict] = ConfigDict(extra=Extra.forbid)
     existing_version: Optional[int] = None
 
-    def to_instances_apply(self) -> InstancesApply:
+    def to_instances_apply(self) -> dm.InstancesApply:
         return self._to_instances_apply(set())
 
     @abstractmethod
-    def _to_instances_apply(self, cache: set[str]) -> InstancesApply:
+    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         raise NotImplementedError()
 
 

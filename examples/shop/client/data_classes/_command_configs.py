@@ -4,7 +4,7 @@ from typing import ClassVar, Optional
 
 from cognite.client import data_modeling as dm
 
-from shop.client.data_classes._core import DomainModel, DomainModelApply, InstancesApply, TypeList
+from shop.client.data_classes._core import DomainModel, DomainModelApply, TypeList
 
 __all__ = ["CommandConfig", "CommandConfigApply", "CommandConfigList"]
 
@@ -20,9 +20,9 @@ class CommandConfigApply(DomainModelApply):
     configs: list[str]
     source: Optional[str] = None
 
-    def _to_instances_apply(self, cache: set[str]) -> InstancesApply:
+    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:
-            return InstancesApply([], [])
+            return dm.InstancesApply([], [])
 
         sources = []
         source = dm.NodeOrEdgeData(
@@ -43,7 +43,7 @@ class CommandConfigApply(DomainModelApply):
         nodes = [this_node]
         edges = []
 
-        return InstancesApply(nodes, edges)
+        return dm.InstancesApply(nodes, edges)
 
 
 class CommandConfigList(TypeList[CommandConfig]):
