@@ -6,6 +6,7 @@
 [![Downloads](https://img.shields.io/pypi/dm/cognite-pygen?style=for-the-badge)](https://pypistats.org/packages/cognite-pygen)
 [![GitHub](https://img.shields.io/github/license/cognitedata/pygen?style=for-the-badge)](https://github.com/cognitedata/pygen/blob/master/LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg?style=for-the-badge)](https://github.com/ambv/black)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json&style=for-the-badge)](https://github.com/astral-sh/ruff)
 
 This is the Cognite Python SDK Generator, `pygen`. The purpose of this package is to help developers to
 work with Cognite Data Fusion's (CDF) Data Models (DM) in Python.
