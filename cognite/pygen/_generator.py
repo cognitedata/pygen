@@ -56,30 +56,6 @@ def generate_sdk(
     logger("Done!")
 
 
-def generate_multimodel_sdk(
-    client: CogniteClient,
-    model_ids: Sequence[DataModelIdentifier],
-    top_level_package: str,
-    client_name: str,
-    output_dir: Path,
-    logger: Callable[[str], None],
-    pydantic_version: Literal["v1", "v2", "infer"] = "infer",
-):
-    data_models = _load_data_model(client, model_ids, logger)
-    logger(f"Successfully retrieved data model(s) {model_ids}")
-    sdk_generator = SDKGenerator(
-        top_level_package=top_level_package,
-        client_name=client_name,
-        data_model=data_models,
-        logger=logger,
-        pydantic_version=pydantic_version,
-    )
-    sdk = sdk_generator.generate_sdk()
-    logger(f"Writing SDK to {output_dir}")
-    write_sdk_to_disk(sdk, output_dir)
-    logger("Done!")
-
-
 @overload
 def _load_data_model(
     client: CogniteClient, model_id: DataModelIdentifier, logger: Callable[[str], None]

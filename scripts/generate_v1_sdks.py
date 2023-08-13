@@ -25,7 +25,7 @@ def main():
         print,
         pydantic_version="v1",
     )
-    pygen.generate_multimodel_sdk(
+    pygen.generate_sdk(
         c,
         [("market", "CogPool", "3"), ("market", "PygenPool", "3")],
         "markets_pydantic_v1.client",
