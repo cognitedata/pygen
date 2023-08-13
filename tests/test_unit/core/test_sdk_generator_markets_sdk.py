@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import platform
+
 import pytest
 from cognite.client import data_modeling as dm
 
@@ -48,6 +50,7 @@ def test_generate_date_transformation_pairs_data_class(
     assert actual == expected
 
 
+@pytest.mark.skipif(platform.platform() == "Windows", reason="Only works on windows.")
 def test_generate_date_transformation_pairs_data_api(
     date_transformation_pair_view: dm.View, top_level_package: str, code_formatter: CodeFormatter
 ):
