@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: pre-commit/action@v2.0.0
+      - uses: pre-commit/action@v2.0.3
 
   build-docs:
     runs-on: ubuntu-latest
