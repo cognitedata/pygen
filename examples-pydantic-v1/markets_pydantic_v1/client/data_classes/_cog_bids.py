@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, ClassVar, Optional, Union
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from markets_pydantic_v1.client.data_classes._core import DomainModel, DomainModelApply, InstancesApply, TypeList
+from markets_pydantic_v1.client.data_classes._core import DomainModel, DomainModelApply, TypeList
 
 if TYPE_CHECKING:
     from markets_pydantic_v1.client.data_classes._markets import MarketApply
@@ -33,9 +33,9 @@ class CogBidApply(DomainModelApply):
     price_area: Optional[str] = None
     quantity: Optional[int] = None
 
-    def _to_instances_apply(self, cache: set[str]) -> InstancesApply:
+    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:
-            return InstancesApply([], [])
+            return dm.InstancesApply([], [])
 
         sources = []
         source = dm.NodeOrEdgeData(
@@ -75,7 +75,7 @@ class CogBidApply(DomainModelApply):
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 
-        return InstancesApply(nodes, edges)
+        return dm.InstancesApply(nodes, edges)
 
 
 class CogBidList(TypeList[CogBid]):

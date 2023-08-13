@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, ClassVar, Optional, Union  # noqa: F401
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from markets_pydantic_v1.client.data_classes._core import DomainModel, DomainModelApply, InstancesApply, TypeList
+from markets_pydantic_v1.client.data_classes._core import DomainModel, DomainModelApply, TypeList
 
 if TYPE_CHECKING:
     from markets_pydantic_v1.client.data_classes._date_transformations import DateTransformationApply
@@ -24,9 +24,9 @@ class DateTransformationPairApply(DomainModelApply):
     end: list[Union["DateTransformationApply", str]] = Field(default_factory=list, repr=False)
     start: list[Union["DateTransformationApply", str]] = Field(default_factory=list, repr=False)
 
-    def _to_instances_apply(self, cache: set[str]) -> InstancesApply:
+    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:
-            return InstancesApply([], [])
+            return dm.InstancesApply([], [])
 
         cache.add(self.external_id)
         nodes = []
@@ -54,7 +54,7 @@ class DateTransformationPairApply(DomainModelApply):
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
-        return InstancesApply(nodes, edges)
+        return dm.InstancesApply(nodes, edges)
 
     def _create_end_edge(self, end: Union[str, "DateTransformationApply"]) -> dm.EdgeApply:
         if isinstance(end, str):
