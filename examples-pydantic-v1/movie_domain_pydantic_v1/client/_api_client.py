@@ -22,8 +22,8 @@ class MovieClient:
     MovieClient
 
     Generated with:
-        pygen = 0.13.0
-        cognite-sdk = 6.8.4
+        pygen = 0.14.0
+        cognite-sdk = 6.13.2
         pydantic = 1.10.7
 
     Data Model:
@@ -32,8 +32,13 @@ class MovieClient:
         version: 2
     """
 
-    def __init__(self, config: ClientConfig | None = None):
-        client = CogniteClient(config)
+    def __init__(self, config_or_client: CogniteClient | ClientConfig):
+        if isinstance(config_or_client, CogniteClient):
+            client = config_or_client
+        elif isinstance(config_or_client, ClientConfig):
+            client = CogniteClient(config_or_client)
+        else:
+            raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         self.actors = ActorsAPI(client)
         self.best_directors = BestDirectorsAPI(client)
         self.best_leading_actors = BestLeadingActorsAPI(client)
@@ -55,7 +60,14 @@ class MovieClient:
         return cls(config)
 
     @classmethod
-    def from_toml(cls, file_path: Path | str) -> MovieClient:
+    def from_toml(cls, file_path: Path | str, section: str | None = "cognite") -> MovieClient:
         import toml
 
-        return cls.azure_project(**toml.load(file_path)["cognite"])
+        toml_content = toml.load(file_path)
+        if section is not None:
+            try:
+                toml_content = toml_content[section]
+            except KeyError:
+                raise ValueError(f"Could not find section '{section}' in {file_path}")
+
+        return cls.azure_project(**toml_content)

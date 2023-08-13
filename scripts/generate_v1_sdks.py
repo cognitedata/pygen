@@ -15,6 +15,7 @@ def main():
         examples_dir_pydantic_v1,
         print,
         pydantic_version="v1",
+        overwrite=True,
     )
     pygen.generate_sdk(
         c,
@@ -24,8 +25,9 @@ def main():
         examples_dir_pydantic_v1,
         print,
         pydantic_version="v1",
+        overwrite=True,
     )
-    pygen.generate_multimodel_sdk(
+    pygen.generate_sdk(
         c,
         [("market", "CogPool", "3"), ("market", "PygenPool", "3")],
         "markets_pydantic_v1.client",
@@ -33,6 +35,7 @@ def main():
         examples_dir_pydantic_v1,
         print,
         pydantic_version="v1",
+        overwrite=True,
     )
 
 

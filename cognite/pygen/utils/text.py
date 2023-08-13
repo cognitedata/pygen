@@ -34,7 +34,7 @@ def to_camel(string: str, pluralize: bool = False, singularize: bool = False) ->
         return ""
 
 
-def to_pascal(string: str, pluralize=False, singularize: bool = False) -> str:
+def to_pascal(string: str, pluralize: bool = False, singularize: bool = False) -> str:
     """Convert snake_case_name to PascalCaseName.
     >>> to_pascal("a_b")
     'AB'

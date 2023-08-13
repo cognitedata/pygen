@@ -76,7 +76,7 @@ def test_create_api_classes(
 def test_generate_sdk(sdk_generator: SDKGenerator, movie_model: dm.DataModel, tmp_path: Path):
     # Act
     files_by_path = sdk_generator.generate_sdk()
-    pygen.write_sdk_to_disk(files_by_path, tmp_path)
+    pygen.write_sdk_to_disk(files_by_path, tmp_path, overwrite=True)
 
     # Assert
     for file_path in tmp_path.glob("**/*.py"):

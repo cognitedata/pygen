@@ -18,49 +18,6 @@ from cognite.pygen._version import __version__
 from cognite.pygen.utils.text import to_pascal, to_snake
 
 
-class MultiModelSDKGenerator:
-    def __init__(
-        self,
-        top_level_package: str,
-        client_name: str,
-        data_models: Sequence[dm.DataModel],
-        logger: Callable[[str], None] | None = None,
-        pydantic_version: Literal["v1", "v2", "infer"] = "infer",
-    ):
-        self._data_models = data_models
-        self.top_level_package = top_level_package
-        self.client_name = client_name
-        unique_views = get_unique_views(*[view for dm in data_models for view in dm.views])
-        self._apis = APIsGenerator(top_level_package, client_name, unique_views, pydantic_version, logger)
-        api_by_view_external_id = {api.view.external_id: api.class_ for api in self._apis.apis}
-        self._apis_classes = sorted(
-            (APIsClass.from_data_model(dm, api_by_view_external_id) for dm in data_models), key=lambda a: a.name
-        )
-
-    def generate_sdk(self) -> dict[Path, str]:
-        client_dir = Path(self.top_level_package.replace(".", "/"))
-        sdk = self._apis.generate_apis(client_dir)
-        sdk[client_dir / "_api_client.py"] = self.generate_api_client_file()
-        return sdk
-
-    def generate_api_client_file(self) -> str:
-        api_client = self._apis.env.get_template("_api_client.py.jinja")
-
-        return (
-            api_client.render(
-                client_name=self.client_name,
-                pygen_version=__version__,
-                cognite_sdk_version=cognite_sdk_version,
-                pydantic_version=PYDANTIC_VERSION,
-                classes=sorted((api.class_ for api in self._apis.apis), key=lambda c: c.data_class),
-                is_single_model=False,
-                top_level_package=self.top_level_package,
-                api_classes=self._apis_classes,
-            )
-            + "\n"
-        )
-
-
 class SDKGenerator:
     """
     SDK generator for a data model.
@@ -71,22 +28,39 @@ class SDKGenerator:
         The name of the top level package of the SDK. Example "movie.client"
      client_name: str
         The name of the client class. Example "MovieClient"
-     data_model: DataModel
-        The data model to generate id of the data model to generate the SDK from.
+     data_model: dm.DataModel | Sequence[dm.DataModel]
+        The data model(s) to generate id of the data model to generate the SDK from.
+    pydantic_version: Literal["v1", "v2", "infer"]
+        The version of pydantic to use. "infer" will use the version of pydantic installed in the environment.
+    logger: Callable[[str], None] | None
+        A logger function to use for logging. If None, print will be done.
     """
 
     def __init__(
         self,
         top_level_package: str,
         client_name: str,
-        data_model: dm.DataModel,
+        data_model: dm.DataModel | Sequence[dm.DataModel],
         pydantic_version: Literal["v1", "v2", "infer"] = "infer",
         logger: Callable[[str], None] | None = None,
     ):
         self._data_model = data_model
         self.top_level_package = top_level_package
         self.client_name = client_name
-        self._apis = APIsGenerator(top_level_package, client_name, data_model.views, pydantic_version, logger)
+        if isinstance(data_model, dm.DataModel):
+            self._is_single_model = True
+            self._apis = APIsGenerator(top_level_package, client_name, data_model.views, pydantic_version, logger)
+            self._apis_classes = []
+        elif isinstance(data_model, Sequence):
+            self._is_single_model = False
+            unique_views = get_unique_views(*[view for dm in data_model for view in dm.views])
+            self._apis = APIsGenerator(top_level_package, client_name, unique_views, pydantic_version, logger)
+            api_by_view_external_id = {api.view.external_id: api.class_ for api in self._apis.apis}
+            self._apis_classes = sorted(
+                (APIsClass.from_data_model(dm, api_by_view_external_id) for dm in data_model), key=lambda a: a.name
+            )
+        else:
+            raise ValueError("data_model must be a DataModel or a sequence of DataModels")
 
     def generate_sdk(self) -> dict[Path, str]:
         client_dir = Path(self.top_level_package.replace(".", "/"))
@@ -103,10 +77,11 @@ class SDKGenerator:
                 pygen_version=__version__,
                 cognite_sdk_version=cognite_sdk_version,
                 pydantic_version=PYDANTIC_VERSION,
-                data_model=self._data_model,
                 classes=sorted((api.class_ for api in self._apis.apis), key=lambda c: c.data_class),
+                is_single_model=self._is_single_model,
                 top_level_package=self.top_level_package,
-                is_single_model=True,
+                api_classes=self._apis_classes,
+                data_model=self._data_model,
             )
             + "\n"
         )

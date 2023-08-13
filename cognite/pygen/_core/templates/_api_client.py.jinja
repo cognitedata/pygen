@@ -38,8 +38,13 @@ class {{ client_name }}:
         version: {{ data_model.version }}{% endif %}
     """
 
-    def __init__(self, config: ClientConfig | None = None):
-        client = CogniteClient(config){% if is_single_model %}{% for class_ in classes %}
+    def __init__(self, config_or_client: CogniteClient | ClientConfig):
+        if isinstance(config_or_client, CogniteClient):
+            client = config_or_client
+        elif isinstance(config_or_client, ClientConfig):
+            client = CogniteClient(config_or_client)
+        else:
+            raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}"){% if is_single_model %}{% for class_ in classes %}
         self.{{ class_.client_attribute }} = {{ class_.api_class }}API(client){% endfor %}{% else %}{% for api_class in api_classes %}
         self.{{ api_class.variable }} = {{ api_class.name }}(client){% endfor %}{% endif %}
 
@@ -53,7 +58,14 @@ class {{ client_name }}:
         return cls(config)
 
     @classmethod
-    def from_toml(cls, file_path: Path | str) -> {{ client_name }}:
+    def from_toml(cls, file_path: Path | str, section: str | None = "cognite") -> {{ client_name }}:
         import toml
 
-        return cls.azure_project(**toml.load(file_path)["cognite"])
+        toml_content = toml.load(file_path)
+        if section is not None:
+            try:
+                toml_content = toml_content[section]
+            except KeyError:
+                raise ValueError(f"Could not find section '{section}' in {file_path}")
+
+        return cls.azure_project(**toml_content)

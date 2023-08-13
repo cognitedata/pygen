@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 from cognite.client import data_modeling as dm
 
-from cognite.pygen._core.dms_to_python import APIGenerator, MultiModelSDKGenerator
+from cognite.pygen._core.dms_to_python import APIGenerator, SDKGenerator
 from tests.constants import IS_PYDANTIC_V1, MarketSDKFiles
 
 # from black import Mode, Report, WriteBack, reformat_one
@@ -18,12 +18,14 @@ def top_level_package() -> str:
 
 
 @pytest.fixture
-def sdk_generator(pygen_pool_model, cog_pool_model, top_level_package) -> MultiModelSDKGenerator:
-    return MultiModelSDKGenerator(top_level_package, "MarketClient", [pygen_pool_model, cog_pool_model])
+def sdk_generator(pygen_pool_model, cog_pool_model, top_level_package) -> SDKGenerator:
+    return SDKGenerator(
+        top_level_package=top_level_package, client_name="MarketClient", data_model=[pygen_pool_model, cog_pool_model]
+    )
 
 
 @pytest.mark.skip("iSort sorts differently than sort.")
-def test_generate__api_client(sdk_generator: MultiModelSDKGenerator):
+def test_generate__api_client(sdk_generator: SDKGenerator):
     # Arrange
     expected = MarketSDKFiles.client.read_text()
 
