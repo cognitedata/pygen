@@ -6,8 +6,6 @@ from cognite.client import data_modeling as dm
 from cognite.pygen._core.dms_to_python import APIGenerator, SDKGenerator
 from tests.constants import IS_PYDANTIC_V1, MarketSDKFiles
 
-# from black import Mode, Report, WriteBack, reformat_one
-
 
 @pytest.fixture
 def top_level_package() -> str:
