@@ -101,7 +101,7 @@ def generate_sdk(
 
     """
     data_model = _load_data_model(client, model_id, logger)
-    logger(f"Successfully retrieved data model {model_id}")
+    logger(f"Successfully retrieved data model(s) {model_id}")
     sdk_generator = SDKGenerator(top_level_package, client_name, data_model, pydantic_version, logger)
     sdk = sdk_generator.generate_sdk()
     logger(f"Writing SDK to {output_dir}")
