@@ -5,7 +5,7 @@ import sys
 import tempfile
 from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Callable, Literal, Optional, overload
+from typing import Any, Callable, Literal, Optional, cast, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -167,7 +167,7 @@ class CodeFormatter:
             import black
 
             try:
-                code = black.format_file_contents(code, fast=False, mode=self._mode)
+                code = black.format_file_contents(code, fast=False, mode=cast(black.Mode, self._mode))
             except black.NothingChanged:
                 pass
             finally:

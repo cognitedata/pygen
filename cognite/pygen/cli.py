@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, cast
 
 from cognite.client import CogniteClient
 from cognite.client.exceptions import CogniteAPIError
@@ -12,7 +12,6 @@ try:
     import typer
 except ImportError:
     _has_typer = False
-    typer = None
 else:
     _has_typer = True
 
@@ -34,26 +33,37 @@ if _has_typer:
         ...
 
     settings = load_settings()
+    help_text = "Generate a Python SDK from Data Model(s)"
     if settings is not None:
-        help_text = "Generate a Python SDK from Data Model(s)"
+        loaded_settings = cast(PygenSettings, settings)
 
         @app.command(help=help_text)
         def generate(
             client_secret: Annotated[str, typer.Option(..., help="Azure Client Secret for connecting to CDF")],
-            space: str = typer.Option(default=settings.space.default, help=settings.space.help),
-            external_id: str = typer.Option(default=settings.external_id.default, help=settings.external_id.help),
-            version: str = typer.Option(default=settings.version.default, help=settings.version.help),
-            tenant_id: str = typer.Option(default=settings.tenant_id.default, help=settings.tenant_id.help),
-            client_id: str = typer.Option(default=settings.client_id.default, help=settings.client_id.help),
-            cdf_cluster: str = typer.Option(default=settings.cdf_cluster.default, help=settings.cdf_cluster.help),
-            cdf_project: str = typer.Option(default=settings.cdf_project.default, help=settings.cdf_project.help),
+            space: str = typer.Option(default=loaded_settings.space.default, help=loaded_settings.space.help),
+            external_id: str = typer.Option(
+                default=loaded_settings.external_id.default, help=loaded_settings.external_id.help
+            ),
+            version: str = typer.Option(default=loaded_settings.version.default, help=loaded_settings.version.help),
+            tenant_id: str = typer.Option(
+                default=loaded_settings.tenant_id.default, help=loaded_settings.tenant_id.help
+            ),
+            client_id: str = typer.Option(
+                default=loaded_settings.client_id.default, help=loaded_settings.client_id.help
+            ),
+            cdf_cluster: str = typer.Option(
+                default=loaded_settings.cdf_cluster.default, help=loaded_settings.cdf_cluster.help
+            ),
+            cdf_project: str = typer.Option(
+                default=loaded_settings.cdf_project.default, help=loaded_settings.cdf_project.help
+            ),
             output_dir: Path = typer.Option(
-                default=settings.output_dir.default or Path.cwd(), help=settings.output_dir.help
+                default=loaded_settings.output_dir.default or Path.cwd(), help=loaded_settings.output_dir.help
             ),
             top_level_package: str = typer.Option(
-                settings.top_level_package.default, help=settings.top_level_package.help
+                loaded_settings.top_level_package.default, help=loaded_settings.top_level_package.help
             ),
-            client_name: str = typer.Option(settings.client_name.default, help=settings.client_name.help),
+            client_name: str = typer.Option(loaded_settings.client_name.default, help=loaded_settings.client_name.help),
         ):
             client = CogniteClient.default_oauth_client_credentials(
                 cdf_project, cdf_cluster, tenant_id, client_id, client_secret
@@ -66,23 +76,25 @@ if _has_typer:
                 raise typer.Exit(code=1) from e
 
     else:
-        settings = PygenSettings()
+        default_settings = PygenSettings()
 
         @app.command(help=help_text)
         def generate(
-            space: Annotated[str, typer.Option(..., help=settings.space.help)],
-            external_id: Annotated[str, typer.Option(..., help=settings.external_id.help)],
-            version: Annotated[str, typer.Option(..., help=settings.version.help)],
-            tenant_id: Annotated[str, typer.Option(..., help=settings.tenant_id.help)],
-            client_id: Annotated[str, typer.Option(..., help=settings.client_id.help)],
+            space: Annotated[str, typer.Option(..., help=default_settings.space.help)],
+            external_id: Annotated[str, typer.Option(..., help=default_settings.external_id.help)],
+            version: Annotated[str, typer.Option(..., help=default_settings.version.help)],
+            tenant_id: Annotated[str, typer.Option(..., help=default_settings.tenant_id.help)],
+            client_id: Annotated[str, typer.Option(..., help=default_settings.client_id.help)],
             client_secret: Annotated[str, typer.Option(..., help="Azure Client Secret for connecting to CDF")],
-            cdf_cluster: Annotated[str, typer.Option(..., help=settings.cdf_cluster.help)],
-            cdf_project: Annotated[str, typer.Option(..., help=settings.cdf_project.help)],
-            output_dir: Path = typer.Option(Path.cwd(), help=settings.output_dir.help),
+            cdf_cluster: Annotated[str, typer.Option(..., help=default_settings.cdf_cluster.help)],
+            cdf_project: Annotated[str, typer.Option(..., help=default_settings.cdf_project.help)],
+            output_dir: Path = typer.Option(Path.cwd(), help=default_settings.output_dir.help),
             top_level_package: str = typer.Option(
-                settings.top_level_package.default, help=settings.top_level_package.help
+                default_settings.top_level_package.default, help=default_settings.top_level_package.help
             ),
-            client_name: str = typer.Option(settings.client_name.default, help=settings.client_name.help),
+            client_name: str = typer.Option(
+                default_settings.client_name.default, help=default_settings.client_name.help
+            ),
         ):
             client = CogniteClient.default_oauth_client_credentials(
                 cdf_project, cdf_cluster, tenant_id, client_id, client_secret
