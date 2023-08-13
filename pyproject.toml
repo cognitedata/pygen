@@ -34,6 +34,9 @@ ignore = [
 known-first-party = ["markets_pydantic_v1", "movie_domain_pydantic_v1", "shop_pydantic_v1"]
 known-third-party = ["cognite.client"]
 
+[tool.mypy]
+explicit_package_bases = true
+
 [tool.pygen]
 space = "IntegrationTestsImmutable"
 external_id = "Movie"
@@ -92,6 +95,8 @@ toml = "*"
 pandas = "*"
 pyyaml = "*"
 mypy = "^1.4"
+pandas-stubs = "^2"
+types-PyYAML = "^6"
 
 [tool.pytest.ini_options]
 filterwarnings = [
