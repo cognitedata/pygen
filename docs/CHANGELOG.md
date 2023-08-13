@@ -13,6 +13,22 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.14.0] - 13-08-23
+### Added
+
+* Support for generating an SDK for multiple data models `generate_sdk_notebook`.
+* `generate_sdk_notebook` now returns the generated SDK client readily instantiated.
+* Allow the generated SDK client to be instantiated with a `CogniteClient` instance.
+* When loading a generated SDK from `toml` or using `get_cognite_client_from_toml` you can now specify the section
+  to load from.
+* `overwrite` parameter to `generate_sdk_notebook` and `generate_sdk` to allow overwriting the existing generated SDK
+  if it already exists.
+
+### Removed
+
+* `generate_multimodel_sdk` is removed as it is functionality has been included in `generate_sdk`.
+
+
 ## [0.13.0] - 29-07-23
 ### Added
 

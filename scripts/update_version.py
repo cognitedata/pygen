@@ -9,8 +9,8 @@ EXAMPLES_DIR_PYDANTIC_V1 = REPO_ROOT / "examples-pydantic-v1"
 
 
 def main():
-    last_version = "0.12.3"
-    new_version = "0.13.0"
+    last_version = "0.13.0"
+    new_version = "0.14.0"
 
     pyproject_toml = REPO_ROOT / "pyproject.toml"
     version_py = REPO_ROOT / "cognite" / "pygen" / "_version.py"
