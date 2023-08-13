@@ -152,7 +152,7 @@ def _load_data_model(
     return data_model
 
 
-class _CodeFormatter:
+class CodeFormatter:
     def __init__(self, format_code: bool, logger: Callable[[str], None], default_line_length: int = 120) -> None:
         self._mode = None
         self._format_code = False
@@ -211,7 +211,7 @@ def write_sdk_to_disk(
         overwrite: Whether to overwrite existing files.
         format_code: Whether to format the generated code using black.
     """
-    formatter = _CodeFormatter(format_code, print)
+    formatter = CodeFormatter(format_code, print)
 
     for file_path, file_content in sdk.items():
         path = output_dir / file_path

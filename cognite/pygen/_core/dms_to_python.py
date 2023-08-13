@@ -64,12 +64,19 @@ class SDKGenerator:
             raise ValueError("data_model must be a DataModel or a sequence of DataModels")
 
     def generate_sdk(self) -> dict[Path, str]:
+        """
+        Generate the SDK.
+
+        Returns
+        -------
+        dict[Path, str]: A dictionary of file paths and file contents, which can be written to disk.
+        """
         client_dir = Path(self.top_level_package.replace(".", "/"))
         sdk = self._apis.generate_apis(client_dir)
-        sdk[client_dir / "_api_client.py"] = self.generate_api_client_file()
+        sdk[client_dir / "_api_client.py"] = self._generate_api_client_file()
         return sdk
 
-    def generate_api_client_file(self) -> str:
+    def _generate_api_client_file(self) -> str:
         api_client = self._apis.env.get_template("_api_client.py.jinja")
 
         return (
