@@ -1,36 +1,16 @@
 ---
 repos:
-  - repo: https://github.com/PyCQA/autoflake
-    rev: v2.0.0
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
     hooks:
-      - id: autoflake
-        args:
-          - --remove-all-unused-imports
-          - --ignore-init-module-imports
-          - --remove-unused-variables
-          - --in-place
-
-  - repo: https://github.com/timothycrosley/isort
-    rev: 5.12.0
-    hooks:
-      - id: isort
-        additional_dependencies: [toml]
-        args: ["--profile", "black"]
+      -   id: ruff
+          args:
+            - --exit-non-zero-on-fix
+    rev: v0.0.284
 
   - repo: https://github.com/psf/black
     rev: 23.3.0
     hooks:
       - id: black
-
-  - repo: https://github.com/PyCQA/flake8
-    rev: 6.0.0
-    hooks:
-      - id: flake8
-        exclude: ^scripts/
-        additional_dependencies:
-          - flake8-bugbear
-          - flake8-print
-          - pep8-naming
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
@@ -52,15 +32,6 @@ repos:
     hooks:
       - id: yamllint
         args: [-d, "{extends: relaxed, rules: {line-length: {max: 120}, new-lines: disable}}"]
-
-#  - repo: https://github.com/asottile/pyupgrade
-#    rev: v3.3.1
-#    hooks:
-#    - id: pyupgrade
-#      exclude: ^(cognite/pygen/dm_clients/.*)|(examples/.*)|(tests/test_dm_clients/.*)$
-#      # ^^ Correctly updates thing like `Optional[]` with `| None` but Pydantic chokes on this on Python<3.10 :(
-#      args:
-#          - --py39-plus
 
   - repo: https://github.com/ikamensh/flynt/
     rev: '0.77'
