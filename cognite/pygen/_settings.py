@@ -81,9 +81,3 @@ def get_cognite_client(project, cdf_cluster, tenant_id, client_id, client_secret
         base_url=base_url,
     )
     return CogniteClient(config)
-
-
-def load_cognite_client_from_toml(file_path: Path | str, section: str | None = "cognite") -> CogniteClient:
-    import toml
-
-    return get_cognite_client(**toml.load(Path(file_path))[section])

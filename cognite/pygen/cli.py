@@ -1,11 +1,12 @@
 from pathlib import Path
 from typing import Annotated
 
+from cognite.client import CogniteClient
 from cognite.client.exceptions import CogniteAPIError
 
 from cognite import pygen
 from cognite.pygen._generator import generate_sdk
-from cognite.pygen._settings import PygenSettings, get_cognite_client, load_settings
+from cognite.pygen._settings import PygenSettings, load_settings
 
 try:
     import typer
@@ -55,7 +56,9 @@ if _has_typer:
             ),
             client_name: str = typer.Option(settings.client_name.default, help=settings.client_name.help),
         ):
-            client = get_cognite_client(cdf_project, cdf_cluster, tenant_id, client_id, client_secret)
+            client = CogniteClient.default_oauth_client_credentials(
+                cdf_project, cdf_cluster, tenant_id, client_id, client_secret
+            )
             try:
                 generate_sdk(
                     client, (space, external_id, version), top_level_package, client_name, output_dir, typer.echo
@@ -82,7 +85,9 @@ if _has_typer:
             ),
             client_name: str = typer.Option(settings.client_name.default, help=settings.client_name.help),
         ):
-            client = get_cognite_client(cdf_project, cdf_cluster, tenant_id, client_id, client_secret)
+            client = CogniteClient.default_oauth_client_credentials(
+                cdf_project, cdf_cluster, tenant_id, client_id, client_secret
+            )
             try:
                 generate_sdk(
                     client, (space, external_id, version), top_level_package, client_name, output_dir, typer.echo

@@ -5,7 +5,7 @@ from pathlib import Path
 from cognite.client import CogniteClient
 
 
-def get_cognite_client_from_toml(
+def load_cognite_client_from_toml(
     toml_file: Path | str = "config.toml", section: str | None = "cognite"
 ) -> CogniteClient:
     """
@@ -13,7 +13,7 @@ def get_cognite_client_from_toml(
 
     Parameters
     ----------
-    toml_file : Path | str
+    toml_file: Path | str
         Path to toml file
     section: str | None
         Name of the section in the toml file to use. If None, use the top level of the toml file.

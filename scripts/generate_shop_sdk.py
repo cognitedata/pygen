@@ -1,12 +1,12 @@
 from yaml import safe_dump
 
 from cognite import pygen
-from cognite.pygen.utils.cdf import get_cognite_client_from_toml
+from cognite.pygen.utils.cdf import load_cognite_client_from_toml
 from tests.constants import examples_dir, schemas_dir
 
 
 def main():
-    c = get_cognite_client_from_toml("config.toml")
+    c = load_cognite_client_from_toml("config.toml")
     data_model = c.data_modeling.data_models.retrieve(
         ("IntegrationTestsImmutable", "SHOP_Model", "2"), inline_views=True
     )[0]

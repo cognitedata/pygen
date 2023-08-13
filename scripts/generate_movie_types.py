@@ -1,10 +1,10 @@
 from cognite.pygen._core.dms_to_python import APIGenerator
-from cognite.pygen.utils.cdf import get_cognite_client_from_toml
+from cognite.pygen.utils.cdf import load_cognite_client_from_toml
 from tests.constants import MovieSDKFiles
 
 
 def main():
-    c = get_cognite_client_from_toml("config.toml")
+    c = load_cognite_client_from_toml("config.toml")
 
     views = c.data_modeling.data_models.retrieve(("IntegrationTestsImmutable", "Movie", "2"), inline_views=True)[
         0
