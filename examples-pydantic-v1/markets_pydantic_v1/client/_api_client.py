@@ -9,8 +9,8 @@ from markets_pydantic_v1.client._api.bids import BidsAPI
 from markets_pydantic_v1.client._api.cog_bids import CogBidsAPI
 from markets_pydantic_v1.client._api.cog_pools import CogPoolsAPI
 from markets_pydantic_v1.client._api.cog_process import CogProcessAPI
-from markets_pydantic_v1.client._api.date_transformation_pairs import DateTransformationPairsAPI
 from markets_pydantic_v1.client._api.date_transformations import DateTransformationsAPI
+from markets_pydantic_v1.client._api.date_transformation_pairs import DateTransformationPairsAPI
 from markets_pydantic_v1.client._api.markets import MarketsAPI
 from markets_pydantic_v1.client._api.process import ProcessAPI
 from markets_pydantic_v1.client._api.pygen_bids import PygenBidsAPI

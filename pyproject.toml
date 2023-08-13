@@ -15,14 +15,34 @@ line-length = 120
 target_version = ['py39']
 include = '\.py$'
 
-[tool.isort]
-line_length=120                # corresponds to -w  flag
-multi_line_output=3            # corresponds to -m  flag
-include_trailing_comma=true    # corresponds to -tc flag
-skip_glob = '^((?!py$).)*$'    # this makes sort all Python files
-known_third_party = []
-src_paths = [".", "examples"]
-known_first_party = ["markets_pydantic_v1", "movie_domain_pydantic_v1", "shop_pydantic_v1"]
+[tool.ruff]
+# See https://beta.ruff.rs/docs/rules for an overview of ruff rules
+line-length = 120
+target-version = "py39"
+exclude = ["examples","examples-pydantic-v1", "scripts"]
+select = ["E","W","F","I","RUF","TID","UP", "B", "FLY", "PTH", "ERA"]
+fixable = ["E","W","F","I","RUF","TID","UP", "B", "FLY", "PTH", "ERA"]
+fix = true
+ignore = [
+    # This is causing issues for pydantic which does not support use of X | Y for type annotations before 3.10
+    "UP007", # Use X | Y for type annotations
+    # Typer do function calls when setting up the CLI.
+    "B008", # Do not perform function call {name} in argument defaults
+]
+
+
+[tool.ruff.isort]
+known-first-party = ["markets_pydantic_v1", "movie_domain_pydantic_v1", "shop_pydantic_v1"]
+
+known-third-party = ["cognite.client"]
+#[tool.isort]
+#line_length=120                # corresponds to -w  flag
+#multi_line_output=3            # corresponds to -m  flag
+#include_trailing_comma=true    # corresponds to -tc flag
+#skip_glob = '^((?!py$).)*$'    # this makes sort all Python files
+#known_third_party = []
+#src_paths = [".", "examples"]
+#known_first_party = ["markets_pydantic_v1", "movie_domain_pydantic_v1", "shop_pydantic_v1"]
 
 [tool.pygen]
 space = "IntegrationTestsImmutable"

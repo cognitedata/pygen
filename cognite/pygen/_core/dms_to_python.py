@@ -3,10 +3,11 @@ from __future__ import annotations
 import hashlib
 import json
 from collections import defaultdict
+from collections.abc import Sequence
 from dataclasses import dataclass
 from itertools import product
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Literal, Sequence
+from typing import Any, Callable, Literal
 
 from cognite.client import data_modeling as dm
 from cognite.client._version import __version__ as cognite_sdk_version
@@ -106,7 +107,7 @@ class APIsGenerator:
             self.pydantic_version = "v2" if PYDANTIC_VERSION[0] == "2" else "v1"
         else:
             self.pydantic_version = pydantic_version
-        self._logger = logger or print  # noqa: T202
+        self._logger = logger or print
 
         self.apis = []
         for view in views:
@@ -288,7 +289,7 @@ class Fields:
 
     @property
     def fields_by_container(self) -> dict[dm.ContainerId, list[Field]]:
-        result: Dict[dm.ContainerId, List[Field]] = defaultdict(list)
+        result: dict[dm.ContainerId, list[Field]] = defaultdict(list)
         for field in self:
             if isinstance(field.prop, dm.MappedProperty):
                 result[field.prop.container].append(field)
@@ -379,11 +380,17 @@ class APIClass:
 
     @property
     def one_line_import(self) -> str:
-        return f"from {self._top_level_package}.data_classes._{self.file_name} import {self.data_class}, {self.data_class}Apply, {self.data_class}List"
+        return (
+            f"from {self._top_level_package}.data_classes._{self.file_name} "
+            f"import {self.data_class}, {self.data_class}Apply, {self.data_class}List"
+        )
 
     @property
     def multiline_import(self) -> str:
-        return f"from {self._top_level_package}.data_classes._{self.file_name} import (\n    {self.data_class},\n    {self.data_class}Apply,\n    {self.data_class}List,\n)"
+        return (
+            f"from {self._top_level_package}.data_classes._{self.file_name} "
+            f"import (\n    {self.data_class},\n    {self.data_class}Apply,\n    {self.data_class}List,\n)"
+        )
 
     # Todo hack to get around black in unit tests
     @property
@@ -469,7 +476,7 @@ def _to_python_type(type_: dm.DirectRelationReference | dm.PropertyType) -> str:
     return out_type
 
 
-def find_dependencies(apis: List[APIGenerator]) -> dict[APIClass, set[APIClass]]:
+def find_dependencies(apis: list[APIGenerator]) -> dict[APIClass, set[APIClass]]:
     class_by_data_class_name = {api.class_.data_class: api.class_ for api in apis}
     return {
         api.class_: {class_by_data_class_name[d] for d in dependencies}

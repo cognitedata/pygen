@@ -1,7 +1,7 @@
 from pathlib import Path
+from typing import Annotated
 
 from cognite.client.exceptions import CogniteAPIError
-from typing_extensions import Annotated
 
 from cognite import pygen
 from cognite.pygen._generator import generate_sdk
@@ -96,7 +96,7 @@ if _has_typer:
 else:
 
     def main():
-        print("THE CLI requires typer to be available, install with `pip install cognite-pygen[cli]")  # noqa
+        print("THE CLI requires typer to be available, install with `pip install cognite-pygen[cli]")
 
 
 if __name__ == "__main__":

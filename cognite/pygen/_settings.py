@@ -44,7 +44,7 @@ class PygenSettings(BaseModel):
     if is_pydantic_v2:
 
         @field_validator("*", mode="before")
-        def parse_string(cls, value, info: FieldValidationInfo) -> Argument:  # noqa: N805
+        def parse_string(cls, value, info: FieldValidationInfo) -> Argument:
             field = cls.model_fields[info.field_name]
             return _parse_string(value, field)
 

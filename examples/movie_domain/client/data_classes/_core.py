@@ -1,17 +1,17 @@
 from __future__ import annotations
 
+import datetime
 import types
 from abc import abstractmethod
 from collections import UserList
 from collections.abc import Collection
 from dataclasses import dataclass
-from datetime import datetime
-from typing import Any, ClassVar, Generic, List, Optional, TypeVar, Union
+from typing import Any, ClassVar, Generic, Optional, TypeVar, Union
 
 import pandas as pd
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Properties, PropertyValue
-from pydantic import BaseModel, ConfigDict, Extra, constr
+from pydantic import BaseModel, ConfigDict, Extra, Field, constr
 
 # Todo - Move into SDK
 
@@ -43,9 +43,9 @@ class DomainModelCore(BaseModel):
 
 class DomainModel(DomainModelCore):
     version: int
-    last_updated_time: datetime
-    created_time: datetime
-    deleted_time: Optional[datetime] = None
+    last_updated_time: datetime.datetime
+    created_time: datetime.datetime
+    deleted_time: Optional[datetime.datetime] = None
 
     @classmethod
     def from_node(cls, node: dm.Node) -> T_TypeNode:
@@ -80,8 +80,8 @@ class DomainModelApply(DomainModelCore):
 class DomainModelApplyResult(DomainModelCore):
     version: int
     was_modified: bool
-    last_updated_time: datetime
-    created_time: datetime
+    last_updated_time: datetime.datetime
+    created_time: datetime.datetime
 
 
 class DataPoint(BaseModel):
@@ -100,24 +100,20 @@ class TimeSeries(DomainModelCore):
     id: Optional[int] = None
     name: Optional[str] = None
     is_string: bool = False
-    metadata: dict = {}
+    metadata: dict[str, str] = Field(default_factory=dict)
     unit: Optional[str] = None
     asset_id: Optional[int] = None
     is_step: bool = False
     description: Optional[str] = None
     security_categories: Optional[str] = None
     dataset_id: Optional[int] = None
-    data_points: Union[List[NumericDataPoint], List[StringDataPoint]]
+    data_points: Union[list[NumericDataPoint], list[StringDataPoint]]
 
 
 class TypeList(UserList, Generic[T_TypeNode]):
     _NODE: type[T_TypeNode]
 
     def __init__(self, nodes: Collection[type[DomainModelCore]]):
-        # if any(not isinstance(node, self._NODE) for node in nodes):
-        # raise TypeError(
-        #     f"All nodes for class {type(self).__name__} must be of type " f"{type(self._NODE).__name__}."
-        # )
         super().__init__(nodes)
 
     def dump(self) -> list[dict[str, Any]]:

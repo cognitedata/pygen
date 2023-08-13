@@ -1,8 +1,6 @@
 from pathlib import Path
 
 import pytest
-
-# from black import Mode, Report, WriteBack, reformat_one
 from cognite.client import data_modeling as dm
 
 from cognite import pygen

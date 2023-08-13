@@ -3,8 +3,6 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-
-# from black import Mode, Report, WriteBack, reformat_one
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.views import ViewProperty
 
@@ -237,20 +235,10 @@ def test_create_view_api_classes_actors(actor_view: dm.View, top_level_package: 
 
     # Assert
     # Reformat with black to make sure the formatting is correct
-    # tmp_actors = tmp_path / "actors.py"
-    # tmp_actors.write_text(actual)
     # reformat_one(
     #     tmp_actors,
-    #     fast=True,
-    #     write_back=WriteBack.YES,
-    #     mode=Mode(
-    #         target_versions={"py39"},
-    #         line_length=120
     #
     #     ),
-    #     report=Report(quiet=True),
-    # )
-    # actual = tmp_actors.read_text()
 
     assert actual == expected
 

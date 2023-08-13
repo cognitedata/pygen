@@ -18,7 +18,7 @@ def main():
         EXAMPLES_DIR_PYDANTIC_V1.glob("**/_api_client.py")
     )
 
-    for file in [pyproject_toml, version_py] + api_client_files:
+    for file in [pyproject_toml, version_py, *api_client_files]:
         content = file.read_text().replace(last_version, new_version)
         file.write_text(content)
         print(f"Updated {file.relative_to(REPO_ROOT)}, replacing {last_version} with {new_version}.")
