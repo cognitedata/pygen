@@ -12,7 +12,6 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Properties, PropertyValue
 from pydantic import BaseModel, ConfigDict, Extra, Field, constr
 
-
 ExternalId = constr(min_length=1, max_length=255)
 
 
