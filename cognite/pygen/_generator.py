@@ -14,10 +14,13 @@ from cognite.pygen._core.dms_to_python import SDKGenerator
 
 
 def generate_sdk_notebook(
-    client: CogniteClient, model_id: DataModelIdentifier, top_level_package: str, client_name: str
+    client: CogniteClient,
+    model_id: DataModelIdentifier | Sequence[DataModelIdentifier],
+    top_level_package: str,
+    client_name: str,
 ) -> None:
     """
-    Generates a Python SDK from the given Data Model.
+    Generates a Python SDK from the given Data Model(s).
 
     The SDK is generated in a temporary directory and added to the sys.path. This is such that it becomes available
     to be imported in the current Python session.
@@ -26,8 +29,8 @@ def generate_sdk_notebook(
      ----------
      client: CogniteClient
         The cognite client used for fetching the data model.
-     model_id: DataModelIdentifier
-        The id of the data model to generate the SDK from.
+     model_id: DataModelIdentifier | Sequence[DataModelIdentifier]
+        The id(s) of the data model(s) to generate the SDK from.
      top_level_package: str
         The name of the top level package of the SDK. Example "movie.client"
      client_name: str
