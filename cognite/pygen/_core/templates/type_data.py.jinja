@@ -45,7 +45,7 @@ class {{ class_name }}Apply(DomainModelApply):
             existing_version=self.existing_version,
             sources=sources,
         )
-        nodes = [this_node]{% else %}cache.add(self.external_id)
+        nodes = [this_node]{% else %}
         nodes = []{% endif %}
         edges = []
         cache.add(self.external_id)

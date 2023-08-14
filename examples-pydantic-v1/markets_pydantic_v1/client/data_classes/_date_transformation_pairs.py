@@ -28,7 +28,6 @@ class DateTransformationPairApply(DomainModelApply):
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
 
-        cache.add(self.external_id)
         nodes = []
         edges = []
         cache.add(self.external_id)
