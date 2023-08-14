@@ -56,7 +56,7 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip poetry
           poetry config virtualenvs.create false
-          poetry install
+          poetry install -E format
 
       - name: Test Core
         run: pytest -m "not cli" cognite tests/test_unit
