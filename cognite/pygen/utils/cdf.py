@@ -13,11 +13,16 @@ def load_cognite_client_from_toml(
 
     Args:
         toml_file: Path to toml file
-        section: Name of the section in the toml file to use. If None, use the "cognite" level of the toml file.
+        section: Name of the section in the toml file to use. If None, use the top level of the toml file.
+                 Defaults to "cognite".
 
     Returns:
         A CogniteClient with configurations from the toml file.
     """
     import toml
 
-    return CogniteClient.default_oauth_client_credentials(**toml.load(toml_file)[section])
+    toml_content = toml.load(toml_file)
+    if section is not None:
+        toml_content = toml_content[section]
+
+    return CogniteClient.default_oauth_client_credentials(**toml_content)

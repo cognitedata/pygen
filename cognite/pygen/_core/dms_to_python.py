@@ -182,8 +182,8 @@ class Field:
     is_list: bool
     is_nullable: bool
     default: str | None
-    prop: dm.MappedProperty | dm.ConnectionDefinition
-    write_type: str | None = None
+    prop: dm.MappedProperty | dm.SingleHopConnectionDefinition
+    write_type: str
     is_edge: bool = False
     variable: str | None = None
     dependency_class: str | None = None
@@ -205,20 +205,38 @@ class Field:
 
     @classmethod
     def from_property(cls, property_: dm.MappedProperty | dm.ConnectionDefinition) -> Field:
+        if not isinstance(property_, (dm.MappedProperty, dm.SingleHopConnectionDefinition)):
+            raise NotImplementedError(f"Property type={type(property_)!r} is not supported")
+        if property_.name is None:
+            raise ValueError("Property must have a name")
+        property_name = property_.name
         if isinstance(property_, dm.MappedProperty) and not isinstance(property_.type, dm.DirectRelation):
             # Is primary field
             is_list = isinstance(property_.type, ListablePropertyType) and property_.type.is_list
-            name = to_snake(property_.name)
+            name = to_snake(property_name)
             type_ = _to_python_type(property_.type)
             is_nullable = property_.nullable
             default = property_.default_value or ("[]" if is_list else ("None" if is_nullable else None))
-            variable = to_snake(property_.name, singularize=True) if is_list else None
-            return cls(name, type_, is_list, is_nullable, default, property_, write_type=type_, variable=variable)
-        elif isinstance(property_, dm.MappedProperty):
+            variable = to_snake(property_name, singularize=True) if is_list else None
+            return cls(
+                name,
+                type_,
+                is_list,
+                is_nullable,
+                str(default) if default else None,
+                property_,
+                write_type=type_,
+                variable=variable,
+            )
+
+        if property_.source is None:
+            raise ValueError("Property must have a source")
+        property_source = property_.source
+        if isinstance(property_, dm.MappedProperty):
             # Edge One to One
-            name = to_snake(property_.name)
-            dependency_class = to_pascal(property_.source.external_id, singularize=True)
-            dependency_file = to_snake(property_.source.external_id, pluralize=True)
+            name = to_snake(property_name)
+            dependency_class = to_pascal(property_source.external_id, singularize=True)
+            dependency_file = to_snake(property_source.external_id, pluralize=True)
             write_type = f'Union["{dependency_class}Apply", str]'
             return cls(
                 name,
@@ -234,9 +252,9 @@ class Field:
             )
         elif isinstance(property_, dm.SingleHopConnectionDefinition):
             # One to Many
-            name = to_snake(property_.name)
-            dependency_class = to_pascal(property_.source.external_id, singularize=True)
-            dependency_file = to_snake(property_.source.external_id, pluralize=True)
+            name = to_snake(property_name)
+            dependency_class = to_pascal(property_source.external_id, singularize=True)
+            dependency_file = to_snake(property_source.external_id, pluralize=True)
             write_type = f'Union["{dependency_class}Apply", str]'
             return cls(
                 name,
@@ -257,7 +275,7 @@ class Field:
             raise NotImplementedError(f"Property type={type(property_)} is not supported")
 
     def as_type_hint(self, field_type: Literal["read", "write"]) -> str:
-        is_nullable = self.is_nullable or (field_type == "read")
+        is_nullable: bool = self.is_nullable or (field_type == "read")
         default = self.default
         if self.name != self.prop.name and field_type == "read":
             default = f'Field({default}, alias="{self.prop.name}")'
@@ -305,7 +323,8 @@ class Fields:
         dependencies = set()
         for field in self.edges:
             if (field.dependency_file, field.dependency_class) not in dependencies:
-                dependencies.add((field.dependency_file, field.dependency_class))
+                if field.dependency_file and field.dependency_class:
+                    dependencies.add((field.dependency_file, field.dependency_class))
         return sorted(dependencies, key=lambda x: x[0])
 
     @property
@@ -348,12 +367,13 @@ class Fields:
 
     @property
     def dependencies(self) -> set[str]:
-        return {field.dependency_class for field in self.data if field.is_edge}
+        return {field.dependency_class for field in self.data if field.is_edge and field.dependency_class}
 
     @property
     def has_optional(self) -> bool:
         return any(
-            "Optional" in field.as_type_hint(field_type) for field, field_type in product(self.data, ["read", "write"])
+            "Optional" in field.as_type_hint(field_type)  # type: ignore[arg-type]
+            for field, field_type in product(self.data, ["read", "write"])
         )
 
 
@@ -411,10 +431,12 @@ class APIsClass:
         sub_apis = []
         for view in data_model.views:
             sub_apis.append(api_class_by_view_external_id[view.external_id])
+        data_model_name = data_model.name or data_model.external_id
+
         return cls(
             sub_apis=sorted(sub_apis, key=lambda api: api.data_class),
-            variable=to_snake(data_model.name, singularize=True),
-            name=f"{to_pascal(data_model.name, singularize=True)}APIs",
+            variable=to_snake(data_model_name, singularize=True),
+            name=f"{to_pascal(data_model_name, singularize=True)}APIs",
             model=data_model.as_id(),
         )
 
@@ -430,7 +452,7 @@ class APIGenerator:
         self.fields = Fields(
             sorted((Field.from_property(prop) for prop in view.properties.values()), key=lambda f: f.name)
         )
-        self.class_ = APIClass.from_view(view.name, top_level_package)
+        self.class_ = APIClass.from_view(view.name or view.external_id, top_level_package)
 
     def generate_data_class_file(self) -> str:
         type_data = self._env.get_template("type_data.py.jinja")
@@ -486,7 +508,9 @@ def find_dependencies(apis: list[APIGenerator]) -> dict[APIClass, set[APIClass]]
     }
 
 
-def _unique_properties(prop: dm.MappedProperty | dm.SingleHopConnectionDefinition) -> dict[str, Any]:
+def _unique_properties(
+    prop: dm.MappedProperty | dm.SingleHopConnectionDefinition | dm.MappedProperty | dm.ConnectionDefinition,
+) -> dict[str, Any]:
     if isinstance(prop, dm.MappedProperty):
         return {
             "container": prop.container.dump(),

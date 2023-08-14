@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import re
 
 import inflect
@@ -112,7 +114,7 @@ _SINGULAR_BY_PLURAL = {v: k for k, v in _PLURAL_BY_SINGULAR.items()}
 
 
 class _Inflect:
-    _engine = None
+    _engine: inflect.engine | None = None
 
     @classmethod
     def engine(cls) -> inflect.engine:

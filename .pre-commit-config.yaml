@@ -32,3 +32,13 @@ repos:
     hooks:
       - id: yamllint
         args: [-d, "{extends: relaxed, rules: {line-length: {max: 120}, new-lines: disable}}"]
+
+# Mypy must be run in the local system environment, not in the pre-commit environment.
+  - hooks:
+    - id: mypy
+      name: mypy
+      entry: dmypy run -- cognite/
+      files: ^.*.(py|pyi)$
+      language: system
+      pass_filenames: false
+    repo: local

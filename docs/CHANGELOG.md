@@ -13,6 +13,12 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.15.1] - 14-08-23
+### Fixed
+
+* Bug causing `cognite.pygen.load_cognite_client_from_toml` to fail for `section = None`. This is now fixed.
+
+
 ## [0.15.0] - 13-08-23
 ### Added
 
