@@ -13,6 +13,12 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.15.2] - 14-08-23
+### Fixed
+
+* When using an Apply type from the generated SDKs, recursive relationships caused an infinite loop. This is now fixed.
+* Use correct input types in the generated SDK `InstancesApply` class.
+
 ## [0.15.1] - 14-08-23
 ### Fixed
 

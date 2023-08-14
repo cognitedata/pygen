@@ -32,7 +32,7 @@ class DirectorApply(DomainModelApply):
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:
-            return dm.InstancesApply([], [])
+            return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
 
         sources = []
         source = dm.NodeOrEdgeData(
@@ -55,6 +55,7 @@ class DirectorApply(DomainModelApply):
         )
         nodes = [this_node]
         edges = []
+        cache.add(self.external_id)
 
         for movie in self.movies:
             edge = self._create_movie_edge(movie)
@@ -83,7 +84,7 @@ class DirectorApply(DomainModelApply):
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 
-        return dm.InstancesApply(nodes, edges)
+        return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
 
     def _create_movie_edge(self, movie: Union[str, "MovieApply"]) -> dm.EdgeApply:
         if isinstance(movie, str):

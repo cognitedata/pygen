@@ -290,3 +290,17 @@ def test_unpack_properties(raw_properties: dict, expected: dict):
 
     # Assert
     assert actual == expected
+
+
+def test_to_instances_with_recursive():
+    # Arrange
+    person = movie.PersonApply(external_id="person:anders", name="Anders", birth_year=0)
+    actor = movie.ActorApply(external_id="actor:anders", movies=[], nomination=[], person=person, won_oscar=False)
+    person.roles.append(actor)
+
+    # Act
+    instances = person.to_instances_apply()
+
+    # Assert
+    assert len(instances.nodes) == 2
+    assert len(instances.edges) == 1
