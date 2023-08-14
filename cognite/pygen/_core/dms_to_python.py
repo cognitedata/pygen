@@ -204,14 +204,13 @@ class Field:
         return self.read_type == "datetime.date"
 
     @classmethod
-    def from_property(
-        cls, property_: dm.MappedProperty | dm.SingleHopConnectionDefinition | dm.ConnectionDefinition
-    ) -> Field:
-        property_name: str
+    def from_property(cls, property_: dm.MappedProperty | dm.ConnectionDefinition) -> Field:
+        if not isinstance(property_, (dm.MappedProperty, dm.SingleHopConnectionDefinition)):
+            raise NotImplementedError(f"Property type={type(property_)!r} is not supported")
+        if property_.name is None:
+            raise ValueError("Property must have a name")
+        property_name = property_.name
         if isinstance(property_, dm.MappedProperty) and not isinstance(property_.type, dm.DirectRelation):
-            if property_.name is None:
-                raise ValueError("Property must have a name")
-            property_name = property_.name
             # Is primary field
             is_list = isinstance(property_.type, ListablePropertyType) and property_.type.is_list
             name = to_snake(property_name)
@@ -230,16 +229,10 @@ class Field:
                 variable=variable,
             )
 
-        property_source: dm.ViewId
-
+        if property_.source is None:
+            raise ValueError("Property must have a source")
+        property_source = property_.source
         if isinstance(property_, dm.MappedProperty):
-            if property_.name is None:
-                raise ValueError("Property must have a name")
-            property_name = property_.name
-            if property_.source is None:
-                raise ValueError("Property must have a source")
-            property_source = property_.source
-
             # Edge One to One
             name = to_snake(property_name)
             dependency_class = to_pascal(property_source.external_id, singularize=True)
@@ -258,13 +251,6 @@ class Field:
                 dependency_file=dependency_file,
             )
         elif isinstance(property_, dm.SingleHopConnectionDefinition):
-            if property_.name is None:
-                raise ValueError("Property must have a name")
-            property_name = property_.name
-            if property_.source is None:
-                raise ValueError("Property must have a source")
-            property_source = property_.source
-
             # One to Many
             name = to_snake(property_name)
             dependency_class = to_pascal(property_source.external_id, singularize=True)
