@@ -4,21 +4,18 @@ import datetime
 import types
 from abc import abstractmethod
 from collections import UserList
-from collections.abc import Collection
+from collections.abc import Collection, Mapping
 from typing import Any, ClassVar, Generic, Optional, TypeVar, Union
 
 import pandas as pd
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Properties, PropertyValue
-from pydantic import BaseModel, ConfigDict, Extra, Field, constr
-
-
-ExternalId = constr(min_length=1, max_length=255)
+from pydantic import BaseModel, ConfigDict, Extra, Field
 
 
 class DomainModelCore(BaseModel):
     space: ClassVar[str]
-    external_id: ExternalId
+    external_id: str = Field(min_length=1, max_length=255)
 
     def id_tuple(self) -> tuple[str, str]:
         return self.space, self.external_id
@@ -31,10 +28,10 @@ class DomainModel(DomainModelCore):
     deleted_time: Optional[datetime.datetime] = None
 
     @classmethod
-    def from_node(cls, node: dm.Node) -> T_TypeNode:
+    def from_node(cls: type[T_TypeNode], node: dm.Node) -> T_TypeNode:
         data = node.dump(camel_case=False)
 
-        return cls(**data, **unpack_properties(node.properties))
+        return cls(**data, **unpack_properties(node.properties))  # type: ignore[arg-type]
 
     @classmethod
     def one_to_many_fields(cls) -> list[str]:
@@ -106,31 +103,15 @@ class TypeList(UserList, Generic[T_TypeNode]):
         return pd.DataFrame(self.dump())
 
     def _repr_html_(self) -> str:
-        return self.to_pandas()._repr_html_()
+        return self.to_pandas()._repr_html_()  # type: ignore[operator]
 
 
 T_TypeApplyNode = TypeVar("T_TypeApplyNode", bound=DomainModelApply)
 T_TypeNodeList = TypeVar("T_TypeNodeList", bound=TypeList)
 
 
-class Identifier(BaseModel):
-    _instance_type: ClassVar[str] = "node"
-    space: constr(min_length=1, max_length=255)
-    external_id: constr(min_length=1, max_length=255)
-
-    @classmethod
-    def from_direct_relation(cls, relation: dm.DirectRelationReference) -> T_Identifier:
-        return cls(space=relation.space, external_id=relation.external_id)
-
-    def __str__(self):
-        return f"{self.space}/{self.external_id}"
-
-
-T_Identifier = TypeVar("T_Identifier", bound=Identifier)
-
-
-def unpack_properties(properties: Properties) -> dict[str, PropertyValue]:
-    unpacked = {}
+def unpack_properties(properties: Properties) -> Mapping[str, PropertyValue]:
+    unpacked: dict[str, PropertyValue] = {}
     for view_properties in properties.values():
         for prop_name, prop_value in view_properties.items():
             if isinstance(prop_value, (str, int, float, bool, list)):
