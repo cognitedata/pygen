@@ -149,8 +149,12 @@ class CodeFormatter:
                 pyproject_toml = _load_pyproject_toml()
                 if pyproject_toml and "black" in pyproject_toml.get("tool", {}):
                     logger("Found black configuration in pyproject.toml")
-                    line_length = pyproject_toml["tool"]["black"].get("line-length", line_length)
-                    target_version = pyproject_toml["tool"]["black"].get("target_version", target_version)
+                    black_config = pyproject_toml["tool"]["black"]
+                    line_length = black_config.get("line-length", black_config.get("line_length", line_length))
+                    target_versions = black_config.get(
+                        "target-version", black_config.get("target_version", [target_version])
+                    )
+                    target_version = target_versions[0] if isinstance(target_versions, list) else target_versions
 
                 self._mode = black.Mode(
                     target_versions={black.TargetVersion(int(target_version.removeprefix("py3")))},
