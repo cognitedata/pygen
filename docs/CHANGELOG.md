@@ -17,7 +17,7 @@ Changes are grouped as follows
 ### Fixed
 
 * When using an Apply type from the generated SDKs, recursive relationships caused an infinite loop. This is now fixed.
-
+* Use correct input types in the generated SDK `InstancesApply` class.
 
 ## [0.15.1] - 14-08-23
 ### Fixed
