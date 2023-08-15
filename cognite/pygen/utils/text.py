@@ -27,9 +27,9 @@ def to_camel(string: str, pluralize: bool = False, singularize: bool = False) ->
     if pluralize and singularize:
         raise ValueError("Cannot pluralize and singularize at the same time")
     elif pluralize:
-        string_split[-1] = as_plural(string_split[-1])
+        string_split[-1] = as_plural(string_split[-1].casefold())
     elif singularize:
-        string_split[-1] = as_singular(string_split[-1])
+        string_split[-1] = as_singular(string_split[-1].casefold())
     try:
         return string_split[0] + "".join(word.capitalize() for word in string_split[1:])
     except IndexError:
@@ -92,14 +92,28 @@ def to_snake(string: str, pluralize: bool = False, singularize: bool = False) ->
     'best_director'
     >>> to_snake('BestLeadingActress', pluralize=True)
     'best_leading_actresses'
+    >>> to_snake('APM_Activity', pluralize=True)
+    'apm_activities'
+    >>> to_snake('APM_Activities', singularize=True)
+    'apm_activity'
+    >>> to_snake('APM_Operation', pluralize=True)
+    'apm_operations'
+    >>> to_snake('APM_Asset', pluralize=True)
+    'apm_assets'
+    >>> to_snake('APM_Material', pluralize=True)
+    'apm_materials'
     """
-    words = re.findall(r"[A-Z]?[a-z]+|[A-Z]+(?=[A-Z][a-z]|\d|\W|$)|\d+", string)
+    pattern = re.compile(r"[A-Z]?[a-z]+|[A-Z]+(?=[A-Z][a-z]|\d|\W|$)|\d+")
+    if "_" in string:
+        words = [word for section in string.split("_") for word in pattern.findall(section)]
+    else:
+        words = pattern.findall(string)
     if pluralize and singularize:
         raise ValueError("Cannot pluralize and singularize at the same time")
     elif pluralize:
-        words[-1] = as_plural(words[-1])
+        words[-1] = as_plural(words[-1].casefold())
     elif singularize:
-        words[-1] = as_singular(words[-1])
+        words[-1] = as_singular(words[-1].casefold())
     return "_".join(map(str.lower, words))
 
 
@@ -129,6 +143,8 @@ def as_plural(noun: str) -> str:
     'persons'
     >>> as_plural('Roles')
     'Roles'
+    >>> as_plural('activity')
+    'activities'
     """
     if noun.lower() in _S_EXCEPTIONS:
         return f"{noun}s" if noun[-1] != "s" else noun
