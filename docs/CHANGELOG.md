@@ -13,6 +13,13 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.15.3] - 15-08-23
+### Fixed
+
+* Bug for pluralization of capitalized snake words, example, `APM_Activity` got pluralized as `activitys` instead
+  of `apm_activities`. This is now fixed.
+
+
 ## [0.15.2] - 14-08-23
 ### Fixed
 

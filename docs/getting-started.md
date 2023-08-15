@@ -72,7 +72,14 @@
 Given a Data Model with external id `Movie` in the space `movies` in CDF, the following command will generate a Python SDK
 
 ```bash
-pygen --space movies --external-id Movie --tenant-id <tenant-id> --client-id <client-id> --client-secret <client-secret> --cdf-cluster <cdf-cluster> --cdf-procect <cdf-project>
+pygen generate --space movies \
+    --external-id Movie \
+    --version 1 \
+    --tenant-id <tenant-id> \
+    --client-id <client-id> \
+    --client-secret <client-secret> \
+    --cdf-cluster <cdf-cluster> \
+    --cdf-procect <cdf-project>
 ```
 
 In addition, the following options are available and recommended to be used:
