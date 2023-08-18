@@ -9,14 +9,16 @@ theme:
 
 nav:
     - Home: index.md
-    - Getting Started: getting-started.md
-    - CLI: cli.md
-    - Experiment in Notebook: notebook.ipynb
+    - Quickstart:
+        - CDF Hosted Notebook: quickstart/cdf_notebook.ipynb
+        - Local Notebook: quickstart/notebook.ipynb
+        - Python Application: quickstart/project.md
+    - Installation: getting-started.md
     - Examples: examples/movie_domain.ipynb
-    - Changelog: CHANGELOG.md
     - API:
         - Core: api/api.md
         - Exceptions: api/exceptions.md
+    - Changelog: CHANGELOG.md
 
 markdown_extensions:
   - pymdownx.superfences
