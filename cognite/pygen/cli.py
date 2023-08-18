@@ -39,7 +39,6 @@ if _has_typer:
 
         @app.command(help=help_text)
         def generate(
-            client_secret: Annotated[str, typer.Option(..., help="Azure Client Secret for connecting to CDF")],
             space: str = typer.Option(default=loaded_settings.space.default, help=loaded_settings.space.help),
             external_id: str = typer.Option(
                 default=loaded_settings.external_id.default, help=loaded_settings.external_id.help
@@ -50,6 +49,11 @@ if _has_typer:
             ),
             client_id: str = typer.Option(
                 default=loaded_settings.client_id.default, help=loaded_settings.client_id.help
+            ),
+            client_secret: str = typer.Option(
+                default=loaded_settings.client_secret.default,
+                help=loaded_settings.client_secret.help,
+                show_default=False,
             ),
             cdf_cluster: str = typer.Option(
                 default=loaded_settings.cdf_cluster.default, help=loaded_settings.cdf_cluster.help
