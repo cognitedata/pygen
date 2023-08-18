@@ -13,12 +13,24 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.16.0] - 18-08-23
+### Improved
+* Made the parameters `top_level_package` and `client_name` optional in `generate_sdk_notebook`. If not provided,
+  default values will be created based on the data model external id.
+
+### Added
+* Support for specifying multiple data models in the configuration given in `pyproject.toml`.
+* Provide `client-secret` in a `.secret.toml` instead as a CLI argument.
+
+### Fixed
+* Raising `DataModelNotFound` if the data model is not found when calling the `generate_sdk` and `generate_sdk_notebook`.
+* Avoid adding `tmp/pygen` to path more than once when calling `generate_sdk_notebook`.
+
 ## [0.15.3] - 15-08-23
 ### Fixed
 
 * Bug for pluralization of capitalized snake words, example, `APM_Activity` got pluralized as `activitys` instead
   of `apm_activities`. This is now fixed.
-
 
 ## [0.15.2] - 14-08-23
 ### Fixed
@@ -30,7 +42,6 @@ Changes are grouped as follows
 ### Fixed
 
 * Bug causing `cognite.pygen.load_cognite_client_from_toml` to fail for `section = None`. This is now fixed.
-
 
 ## [0.15.0] - 13-08-23
 ### Added
@@ -45,7 +56,6 @@ Changes are grouped as follows
 * `get_cognite_client` this is now obsolete as the factory methods `CogniteClientdefault_oauth_client_credentials`
   does the same.
 * `InstancesApply` in the generated SDK `data_classes._core.py`. This is now available in the `cognite-sdk`.
-
 
 ## [0.14.0] - 13-08-23
 ### Added
@@ -62,7 +72,6 @@ Changes are grouped as follows
 
 * `generate_multimodel_sdk` is removed as it is functionality has been included in `generate_sdk`.
 
-
 ## [0.13.0] - 29-07-23
 ### Added
 
@@ -78,18 +87,15 @@ Changes are grouped as follows
 * Types with only edges of one to many caused a `CogniteAPIError` when trying to write. This is now fixed.
 * Types with multiple fields of the same type caused duplicated imports in the generated data classes. Thi is now fixed.
 
-
 ## [0.12.2] - 15-07-23
 ### Fixed
 
 * Marked `model_config` in `DomainModelApply` as class variable.
 
-
 ## [0.12.1] - 14-07-23
 ### Fixed
 
 * Getting the unique views fails if a property is `SingleHopConnectionDefinition`. This is now fixed.
-
 
 ## [0.12.0] - 14-07-23
 ### Added
@@ -97,12 +103,10 @@ Changes are grouped as follows
 * Support for generating a client from multiple data models. This is currently an experimental feature and only exposed
   through `cognite.pygen.generate_multimodel_sdk` and not available through the CLI.
 
-
 ## [0.11.7] - 14-07-23
 ### Fixed
 
 * Replace all relative imports with absolute imports as this was causing comparison issues in the generated code.
-
 
 ## [0.11.6] - 13-07-23
 ### Fixed
@@ -110,7 +114,6 @@ Changes are grouped as follows
 * Bug causing camelCase fields to be incorrectly converted to PascalCase. This is now fixed.
 * Order of type hints in write classes with one to many edges. Pydantic requires the str option to be last. This is now fixed.
 * `pydantic` requires the `Optional` to be imported, even if it is not used. This is now fixed.
-
 
 ## [0.11.5] - 11-07-23
 ### Fixed
@@ -121,12 +124,10 @@ Changes are grouped as follows
 
 * `pygen` version is now printed when running `pygen --version`.
 
-
 ## [0.11.4] - 06-07-23
 ### Fixed
 
 * Missing `from pydantic import Field` occurring in the generated SDK. This is now fixed.
-
 
 ## [0.11.3] - 06-07-23
 ### Changed
@@ -136,19 +137,16 @@ Changes are grouped as follows
   when getting a string representation of a model. This is replaced by `repr=False` on fields that are
   recursive.
 
-
 ## [0.11.2] - 04-07-23
 ### Fixed
 
 * Exposing the function `generate_sdk` in the `pygen` package. This is now fixed.
-
 
 ## [0.11.1] - 04-07-23
 ### Fixed
 
 * The optional `CLI` version was used in the presence of a `pyproject.toml` file, and not a `pyproject.toml` with
   a `[tool.pygen]` section. This is now fixed.
-
 
 ## [0.11.0] - 02-07-23
 ### Added
@@ -187,7 +185,6 @@ Changes are grouped as follows
   `movie_sdk` package and the client in the `movie_sdk.client` package. Earlier the `.client` was automatically
   appended to the `---sdk-name-snake` argument.
 * The argument `--client-name-pascal` is renamed to `--client-name` and the word `Client` is no longer appended to it.
-
 
 ## [0.10.4] - 29-06-23
 
@@ -237,7 +234,6 @@ A complete rewrite of the package. It is now DMS based instead of graphql schema
 
 * Allow properties to be optional in dms API.
 
-
 ## [0.9.0] - 22-05-23
 
 ### Changed
@@ -245,7 +241,6 @@ A complete rewrite of the package. It is now DMS based instead of graphql schema
 * Package name from `cognite-gql-pygen` to `pygen`.
 * Moved `dm_client` into the main `pygen` package.
 * CLI command going from `dm` to `pygen` for consistency.
-
 
 ## [0.8.0] - 14-05-23
 
@@ -255,34 +250,28 @@ A complete rewrite of the package. It is now DMS based instead of graphql schema
 * Removed all unused dependencies.
 * Updated documentation to reflect non-CLI usage.
 
-
 ## [0.7.0] - 13-05-23
 
 ### Fix
-
 * Less strict versioning of other packages to support usage in streamlit pyodide runtime.
 
 ## [0.6.0] - 13-05-23
 
 ### Fix
-
 * Less strict `packaging` versioning (>=21) to support usage in streamlit pyodide runtime.
 
 ## [0.5.0] - 10-05-23
 
 ### Added
-
 * Testing Client
 
 ### Fix
-
 * Issue when the output folder is not relative to the current working directory.
 
 
 ## [0.4.5] - 10-05-23
 
 ### Fixed
-
 * Support for nested types
 * Typo for `Int` built-in type, was incorrecly `Integer`
 
@@ -290,82 +279,61 @@ A complete rewrite of the package. It is now DMS based instead of graphql schema
 
 * Items that are references are now showing this in __repr__ and __str__.
 
-
 ## [0.4.4] - 09-05-23
 
 ### Added
-
 * Added compatibility with cognite-sdk 6.x.x
 
 
 ## [0.4.3] - 05-05-23
-
 ### Fixed
-
 * Set the license of the package in poetry build.
 
 
 ## [0.4.2] - 05-05-23
-
 ### Added
-
 * Support for basic built-in types for the parser (`bool`, `int`, `float`, with `str` from before)
 
 
 ## [0.4.1] - 03-05-23
-
 ### Added
-
 * Support for adding relationships via `.connect`
 
 ### Changed
-
-* Optimised use of cache internally.
+* Optmised use of cache internally.
 
 
 ## [0.4.0] - 26-04-23
-
 ### Added
-
 * Support for `pip install -e` for local development.
 
 ### Changed
-
 * In the CLI, all commands are not under one `dm` tool.
 
 ### Removed
-
 * All bash scripts have been removed (under `dm_clinents/bin`).
 * CLI tool `dm_clients` was removed (functions moved to `dm`).
 
 ### Fixed
-
 * Added a lock around usages of non-thread-safe cache.
 
 
 ## [0.3.0] - 24-04-23
-
 ### Fixed
-
 * In the CLI, `dm topython` the argument `name` is now a option instead of a positional argument. This matched the
   documentation in the README.
 
 ### Changed
-
 * Renamed `DomainModelAPI.create` to `DomainModelAPI.apply`, to reflect the usage of the underlying endpoint.
 
 
 ## [0.2.1] - 24-04-23
-
 ### Fixed
-
 * Fixed a problem with reading annotations caused by reverse ordering of dataclasses (forward refs).
 
 
 ## [0.2.0] - 19-04-23
-
 ### Added
-
 * Support for converting from `.graphql` to `pydantic`. This means you can now write your types in a `.graphql` file
   and automatically generate the `pytandic` counterpart.
 * CLI for doing the conversion between GraphQL and `pydantic`. The following two commands
@@ -376,26 +344,19 @@ A complete rewrite of the package. It is now DMS based instead of graphql schema
 * Documentation of motivation and usage of package.
 
 ### Changed
-
 * CLI command going from `gqlpygen` to `pygen`. This is for ease of use.
 
 
 ## [0.1.4]
-
 Changed configuration / settings from a static `config.yaml` to dynaconf and `settings.toml`.
 
 ## [0.1.3]
-
 Changed package name from `fdm` to `dm_clients`.
-
 ## [0.1.2]
-
 Added support for `Timestamp` and `JSONObject` types.
 
 ## [0.1.1]
-
 Added `dm_clients` package.
 
 ## [0.1.0]
-
 Initial commit.

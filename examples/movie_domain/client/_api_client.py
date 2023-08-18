@@ -22,9 +22,9 @@ class MovieClient:
     MovieClient
 
     Generated with:
-        pygen = 0.15.3
-        cognite-sdk = 6.13.2
-        pydantic = 2.1.1
+        pygen = 0.16.0
+        cognite-sdk = 6.14.0
+        pydantic = 2.2.1
 
     Data Model:
         space: IntegrationTestsImmutable

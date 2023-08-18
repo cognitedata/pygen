@@ -1,5 +1,3 @@
-## Installation
-
 **Prerequisites**: Installed Python 3.9 or newer, see [python.org](https://www.python.org/downloads/)
 
 1. Create a virtual environment.
@@ -30,7 +28,7 @@
     pip install "cognite-pygen[all]"
     ```
 
-### Installation Options
+## Installation Options
 
 === "No extras"
 
@@ -66,26 +64,3 @@
     ```
 
     This installs the core dependencies for `cognite-pygen`, as well as the CLI and code formatting dependencies.
-
-## Create Python SDK
-
-Given a Data Model with external id `Movie` in the space `movies` in CDF, the following command will generate a Python SDK
-
-```bash
-pygen generate --space movies \
-    --external-id Movie \
-    --version 1 \
-    --tenant-id <tenant-id> \
-    --client-id <client-id> \
-    --client-secret <client-secret> \
-    --cdf-cluster <cdf-cluster> \
-    --cdf-procect <cdf-project>
-```
-
-In addition, the following options are available and recommended to be used:
-
-* `--output-dir` This is the directory where the generated SDK will be placed.
-* `--top-level-package` The top level package for where to place the SDK, for example `movie_sdk.client`.
-* `--client-name` Client name for the generated client expected to be given in `PascalCase`, for example `MovieClient`.
-
-For more information about the available options, see `pygen --help`.

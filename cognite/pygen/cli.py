@@ -39,7 +39,6 @@ if _has_typer:
 
         @app.command(help=help_text)
         def generate(
-            client_secret: Annotated[str, typer.Option(..., help="Azure Client Secret for connecting to CDF")],
             space: str = typer.Option(default=loaded_settings.space.default, help=loaded_settings.space.help),
             external_id: str = typer.Option(
                 default=loaded_settings.external_id.default, help=loaded_settings.external_id.help
@@ -50,6 +49,11 @@ if _has_typer:
             ),
             client_id: str = typer.Option(
                 default=loaded_settings.client_id.default, help=loaded_settings.client_id.help
+            ),
+            client_secret: str = typer.Option(
+                default=loaded_settings.client_secret.default,
+                help=loaded_settings.client_secret.help,
+                show_default=False,
             ),
             cdf_cluster: str = typer.Option(
                 default=loaded_settings.cdf_cluster.default, help=loaded_settings.cdf_cluster.help
@@ -68,10 +72,20 @@ if _has_typer:
             client = CogniteClient.default_oauth_client_credentials(
                 cdf_project, cdf_cluster, tenant_id, client_id, client_secret
             )
-            try:
-                generate_sdk(
-                    client, (space, external_id, version), top_level_package, client_name, output_dir, typer.echo
+            data_models: list[tuple[str, str, str]]
+            if settings and settings.data_models:
+                data_models = settings.data_models
+            else:
+                data_models = []
+            if space is not None and external_id is not None and version is not None:
+                data_models = [(space, external_id, version)]
+            if not data_models:
+                raise ValueError(
+                    "No data model(s) specified. Please either with --space --external-id --version "
+                    "or 'data_models' in the 'pyproject.toml' file."
                 )
+            try:
+                generate_sdk(client, data_models, top_level_package, client_name, output_dir, typer.echo)
             except (CogniteAPIError, IndexError) as e:
                 raise typer.Exit(code=1) from e
 

@@ -10,18 +10,21 @@ from typing import Any, Callable, Literal, Optional, cast, overload
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling import DataModelIdentifier
+from cognite.client.data_classes.data_modeling.ids import DataModelId
 from cognite.client.exceptions import CogniteAPIError
 
 from cognite.pygen._core.dms_to_python import SDKGenerator
 
 from ._settings import _load_pyproject_toml
+from .exceptions import DataModelNotFound
+from .utils.text import to_pascal, to_snake
 
 
 def generate_sdk_notebook(
     client: CogniteClient,
     model_id: DataModelIdentifier | Sequence[DataModelIdentifier],
-    top_level_package: str,
-    client_name: str,
+    top_level_package: Optional[str] = None,
+    client_name: Optional[str] = None,
     logger: Callable[[str], None] | None = None,
     overwrite: bool = False,
     format_code: bool = False,
@@ -35,8 +38,10 @@ def generate_sdk_notebook(
     Args:
         client: The cognite client used for fetching the data model.
         model_id: The id(s) of the data model(s) to generate the SDK from.
-        top_level_package: The name of the top level package for the SDK. Example "movie.client"
-        client_name: The name of the client class. Example "MovieClient"
+        top_level_package: The name of the top level package for the SDK. Example "movie.client". If nothing is passed
+                            the package will [external_id:snake].client of the first data model given.
+        client_name: The name of the client class. Example "MovieClient". If nothing is passed the clien name will be
+                     [external_id:pascal_case]Client of the first data model given.
         logger: A logger function that will be called with the progress of the generation.
         overwrite: Whether to overwrite the output directory if it already exists. Defaults to False.
         format_code: Whether to format the generated code using black. Defaults to False.
@@ -46,6 +51,13 @@ def generate_sdk_notebook(
     """
     output_dir = Path(tempfile.gettempdir()) / "pygen"
     logger = logger or print
+    identifier = _load_data_model_identifier(model_id)
+    external_id = identifier[0].external_id.replace(" ", "_")
+    if top_level_package is None:
+        top_level_package = f"{to_snake(external_id)}.client"
+    if client_name is None:
+        client_name = f"{to_pascal(external_id)}Client"
+
     generate_sdk(
         client,
         model_id,
@@ -57,8 +69,11 @@ def generate_sdk_notebook(
         overwrite=overwrite,
         format_code=format_code,
     )
-    sys.path.append(str(output_dir))
-    logger(f"Added {output_dir} to sys.path to enable import")
+    if str(output_dir) not in sys.path:
+        sys.path.append(str(output_dir))
+        logger(f"Added {output_dir} to sys.path to enable import")
+    else:
+        logger(f"{output_dir} already in sys.path")
     module = vars(importlib.import_module(top_level_package))
     logger(f"Imported {top_level_package}")
     return module[client_name](client)
@@ -118,19 +133,26 @@ def _load_data_model(
 def _load_data_model(
     client: CogniteClient, model_id: DataModelIdentifier | Sequence[DataModelIdentifier], logger: Callable[[str], None]
 ) -> dm.DataModel | dm.DataModelList:
+    identifier = _load_data_model_identifier(model_id)
     try:
         data_models = client.data_modeling.data_models.retrieve(model_id, inline_views=True)
-        if len(data_models) == 1:
-            data_model = data_models[0]
-        else:
-            return data_models
     except CogniteAPIError as e:
         logger(f"Error retrieving data model(s): {e}")
         raise e
-    except IndexError as e:
-        logger(f"Cannot find {model_id}")
-        raise e
-    return data_model
+    if len(data_models) == 1 == len(identifier):
+        return data_models[0]
+    elif len(data_models) == len(identifier):
+        return data_models
+    missing_ids = set(identifier) - set(data_models.as_ids())
+    raise DataModelNotFound(list(missing_ids))
+
+
+def _load_data_model_identifier(model_id: DataModelIdentifier | Sequence[DataModelIdentifier]) -> list[DataModelId]:
+    is_sequence = isinstance(model_id, Sequence) and not (isinstance(model_id, tuple) and isinstance(model_id[0], str))
+    model_ids: list[DataModelIdentifier] = (
+        model_id if is_sequence else [model_id]  # type: ignore[list-item, assignment]
+    )
+    return [DataModelId.load(id_) for id_ in model_ids]
 
 
 class CodeFormatter:
