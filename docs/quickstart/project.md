@@ -57,6 +57,7 @@ The following is the recommended project structure for a CDF SDK project:
 
 === ".secret.toml"
 
+    **IMPORTANT:** The `.secret.toml` file contains secrets and should not be committed to version history.
     ``` bash
     [cognite]
       client_secret = "<client-id>"
@@ -69,6 +70,7 @@ The instructions below assume you use `git` for version control.
 **Prerequisites:** Instantiated a git repository and added the `pyproject.toml`, `.gitignore` and `.secret.toml`
 in the root of the repository. (Create the files and run `git init && git add . &&  git commit -m "initial commit"`)
 
+### Generating the SDK
 1. Check out a new branch for the SDK generation. (e.g. `git checkout -b sdk-generation`)
 2. Ensure that `pygen` is installed and configured. (See [Installation](#installation))
 3. Run `pygen generate` to generate the SDK. (e.g. `pygen`). `pygen` will pick ut the configuration from the

@@ -13,7 +13,8 @@ nav:
         - CDF Hosted Notebook: quickstart/cdf_notebook.ipynb
         - Local Notebook: quickstart/notebook.ipynb
         - Python Application: quickstart/project.md
-    - Installation: getting-started.md
+    - Installation: installation.md
+    - CLI: cli.md
     - Examples: examples/movie_domain.ipynb
     - API:
         - Core: api/api.md
@@ -33,7 +34,9 @@ markdown_extensions:
   - tables
   - abbr
   - attr_list
-
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
 
 plugins:
   - mkdocs-jupyter:
