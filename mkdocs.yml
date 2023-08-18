@@ -14,7 +14,9 @@ nav:
     - Experiment in Notebook: notebook.ipynb
     - Examples: examples/movie_domain.ipynb
     - Changelog: CHANGELOG.md
-    - API: api/api.md
+    - API:
+        - Core: api/api.md
+        - Exceptions: api/exceptions.md
 
 markdown_extensions:
   - pymdownx.superfences
