@@ -13,6 +13,21 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.16.0] - 18-08-23
+### Improved
+
+* Made the parameters `top_level_package` and `client_name` optional in `generate_sdk_notebook`. If not provided,
+  default values will be created based on the data model external id.
+* Support for specifying multiple data models in the configuration given in `pyproject.toml` and the `pygen generate`
+  command.
+* Provide `client-secret` in a `.secret.toml` instead as a CLI argument.
+
+### Fixed
+
+* Raising `DataModelNotFound` if the data model is not found when calling the `generate_sdk` and `generate_sdk_notebook`.
+* Avoid adding `tmp/pygen` to path more than once when calling `generate_sdk_notebook`.
+
+
 ## [0.15.3] - 15-08-23
 ### Fixed
 

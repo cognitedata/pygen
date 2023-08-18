@@ -17,13 +17,14 @@ from cognite.pygen._core.dms_to_python import SDKGenerator
 
 from ._settings import _load_pyproject_toml
 from .exceptions import DataModelNotFound
+from .utils.text import to_pascal, to_snake
 
 
 def generate_sdk_notebook(
     client: CogniteClient,
     model_id: DataModelIdentifier | Sequence[DataModelIdentifier],
-    top_level_package: str,
-    client_name: str,
+    top_level_package: Optional[str] = None,
+    client_name: Optional[str] = None,
     logger: Callable[[str], None] | None = None,
     overwrite: bool = False,
     format_code: bool = False,
@@ -37,8 +38,10 @@ def generate_sdk_notebook(
     Args:
         client: The cognite client used for fetching the data model.
         model_id: The id(s) of the data model(s) to generate the SDK from.
-        top_level_package: The name of the top level package for the SDK. Example "movie.client"
-        client_name: The name of the client class. Example "MovieClient"
+        top_level_package: The name of the top level package for the SDK. Example "movie.client". If nothing is passed
+                            the package will [external_id:snake].client of the first data model given.
+        client_name: The name of the client class. Example "MovieClient". If nothing is passed the clien name will be
+                     [external_id:pascal_case]Client of the first data model given.
         logger: A logger function that will be called with the progress of the generation.
         overwrite: Whether to overwrite the output directory if it already exists. Defaults to False.
         format_code: Whether to format the generated code using black. Defaults to False.
@@ -48,6 +51,13 @@ def generate_sdk_notebook(
     """
     output_dir = Path(tempfile.gettempdir()) / "pygen"
     logger = logger or print
+    identifier = _load_data_model_identifier(model_id)
+    external_id = identifier[0].external_id.replace(" ", "_")
+    if top_level_package is None:
+        top_level_package = f"{to_snake(external_id)}.client"
+    if client_name is None:
+        client_name = f"{to_pascal(external_id)}Client"
+
     generate_sdk(
         client,
         model_id,
