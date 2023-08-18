@@ -4,11 +4,11 @@ from pathlib import Path
 from typing import Any, Optional
 
 try:
-    from pydantic import BaseModel, FieldValidationInfo, field_validator
+    from pydantic import BaseModel, Field, FieldValidationInfo, field_validator
 
     is_pydantic_v2 = True
 except ImportError:
-    from pydantic import BaseModel, validator
+    from pydantic import BaseModel, Field, validator
 
     is_pydantic_v2 = False
 
@@ -37,11 +37,14 @@ class PygenSettings(BaseModel):
     output_dir: Argument = Argument(default=None, help="Output directory for generated SDK")
     top_level_package: Argument = Argument(default="my_domain.client", help="Package name for the generated client.")
     client_name: Argument = Argument(default="MyClient", help="Client name for the generated client.")
+    data_models: list[tuple[str, str, str]] = Field(default_factory=list, help="Data models to generate SDK for.")
 
     if is_pydantic_v2:
 
         @field_validator("*", mode="before")
         def parse_string(cls, value, info: FieldValidationInfo) -> Argument:
+            if info.field_name == "data_models":
+                return value
             field = cls.model_fields[info.field_name]
             return _parse_string(value, field)
 
@@ -80,6 +83,8 @@ def load_settings(
 ) -> PygenSettings | None:
     pyproject_toml = _load_pyproject_toml(pyproject_toml_path)
     secret_toml = _load_secret_toml(secret_toml_path)
-    if "pygen" in pyproject_toml.get("tool", {}):
-        return PygenSettings(**{**pyproject_toml["tool"]["pygen"], **secret_toml})
+    if settings := pyproject_toml.get("tool", {}).get("pygen", {}):
+        if "client_secret" in settings:
+            raise ValueError("client_secret should not be set in pyproject.toml")
+        return PygenSettings(**{**settings, **secret_toml})
     return None
