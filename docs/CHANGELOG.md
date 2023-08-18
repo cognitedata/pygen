@@ -18,6 +18,8 @@ Changes are grouped as follows
 
 * Made the parameters `top_level_package` and `client_name` optional in `generate_sdk_notebook`. If not provided,
   default values will be created based on the data model external id.
+
+### Added
 * Support for specifying multiple data models in the configuration given in `pyproject.toml`.
 * Provide `client-secret` in a `.secret.toml` instead as a CLI argument.
 
