@@ -59,8 +59,11 @@ def generate_sdk_notebook(
         overwrite=overwrite,
         format_code=format_code,
     )
-    sys.path.append(str(output_dir))
-    logger(f"Added {output_dir} to sys.path to enable import")
+    if str(output_dir) not in sys.path:
+        sys.path.append(str(output_dir))
+        logger(f"Added {output_dir} to sys.path to enable import")
+    else:
+        logger(f"{output_dir} already in sys.path")
     module = vars(importlib.import_module(top_level_package))
     logger(f"Imported {top_level_package}")
     return module[client_name](client)
