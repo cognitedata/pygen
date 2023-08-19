@@ -4,7 +4,7 @@ import pathlib
 from typing import Any, Callable
 
 from cognite.client import CogniteClient
-from cognite.client.data_classes.data_modeling import DataModel, SpaceApply
+from cognite.client.data_classes.data_modeling import DataModel, MappedProperty, SpaceApply
 from cognite.client.data_classes.data_modeling.ids import DataModelId, ViewId
 
 from cognite.pygen import generate_sdk_notebook
@@ -127,4 +127,26 @@ class APM:
                           space does not contain any other data models, views or containers.
 
         """
-        ...
+        data_models = client.data_modeling.data_models.retrieve(self._data_model_id, inline_views=True)
+        if not data_models:
+            self._echo(f"Data model {self._data_model_id} does not exist, skipping clean")
+            return
+        data_model = data_models.latest_version()
+        view_ids = list({view.as_id() for view in data_model.views})
+        container_ids = list(
+            {
+                prop.container
+                for view in data_model.views
+                for prop in view.properties.values()
+                if isinstance(prop, MappedProperty)
+            }
+        )
+        client.data_modeling.data_models.delete(self._data_model_id)
+        self._echo(f"Deleted data model {self._data_model_id}")
+        client.data_modeling.views.delete(view_ids)
+        self._echo(f"Deleted views {view_ids}")
+        client.data_modeling.containers.delete(container_ids)
+        self._echo(f"Deleted containers {container_ids}")
+        if delete_space:
+            client.data_modeling.spaces.delete(self._data_model_id.space)
+            self._echo(f"Deleted space {self._data_model_id.space}")
