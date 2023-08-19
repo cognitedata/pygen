@@ -142,9 +142,13 @@ class SolarFarmAPM:
             An instantiated SDK client for the APM model.
         """
         self._data_model = self.deploy(client)
+        self._echo("\n✅  Data Model Ready!")
         if populate:
             self.populate(client)
-        return self.generate_sdk(client)
+            self._echo("\n✅  Population Complete!")
+        client = self.generate_sdk(client)
+        self._echo("\n✅  SDK Generated!")
+        return client
 
     def deploy(self, client: CogniteClient) -> DataModel[View]:
         """
@@ -234,7 +238,7 @@ class SolarFarmAPM:
             An instantiated SDK client for the APM model.
 
         """
-        return generate_sdk_notebook(client, self._data_model_id)
+        return generate_sdk_notebook(client, self._data_model_id, logger=self._echo, overwrite=True)
 
     def clean(self, client: CogniteClient, delete_space: bool = True, auto_confirm: bool = False):
         """
@@ -353,7 +357,13 @@ class CSVLoader:
             return NodeApplyResultList([])
 
         created = client.data_modeling.instances.apply(nodes=all_nodes)
-        self._echo(f"Created/Modified {sum(1 for n in created.nodes if n.was_modified)} nodes")
+        created_nodes = sum(1 for n in created.nodes if n.was_modified)
+        if created_nodes == len(all_nodes):
+            self._echo(f"Created {created_nodes} nodes")
+        elif created_nodes == 0:
+            self._echo(f"All {len(all_nodes)} nodes already exists")
+        else:
+            self._echo(f"Created {created_nodes} nodes, {len(all_nodes) - created_nodes} already exists.")
         return created.nodes
 
     def populate_edges(self, client: CogniteClient) -> EdgeApplyResultList:
@@ -380,7 +390,13 @@ class CSVLoader:
             self._echo("No edges to create")
             return EdgeApplyResultList([])
         created = client.data_modeling.instances.apply(edges=all_edges)
-        self._echo(f"Created {sum(1 for e in created.edges if e.was_modified)} edges")
+        created_edges = sum(1 for e in created.edges if e.was_modified)
+        if created_edges == len(all_edges):
+            self._echo(f"Created {created_edges} edges")
+        elif created_edges == 0:
+            self._echo(f"All {len(all_edges)} edges already exists")
+        else:
+            self._echo(f"Created {created_edges} edges, {len(all_edges)-created_edges} edges already exists")
         return created.edges
 
     @staticmethod
@@ -629,6 +645,3 @@ if __name__ == "__main__":
     apm = SolarFarmAPM()
     apm.create(c)
     apm.clean(c, auto_confirm=True)
-
-    # if not local.exists():
-    #
