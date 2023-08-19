@@ -17,7 +17,7 @@ nav:
     - CLI: cli.md
     - Examples: examples/movie_domain.ipynb
     - API:
-        - Core: api/api.md
+        - Pygen: api/api.md
         - Exceptions: api/exceptions.md
     - Changelog: CHANGELOG.md
 
