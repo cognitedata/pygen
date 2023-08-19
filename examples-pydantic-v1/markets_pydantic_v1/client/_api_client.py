@@ -71,7 +71,7 @@ class MarketClient:
 
     Generated with:
         pygen = 0.17.1
-        cognite-sdk = 6.13.2
+        cognite-sdk = 6.14.0
         pydantic = 1.10.7
 
     """
