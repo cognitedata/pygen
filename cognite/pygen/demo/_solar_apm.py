@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import pathlib
-from typing import Any, Callable
+from typing import Any, Callable, Optional
 
 from cognite.client import CogniteClient
 from cognite.client.data_classes.data_modeling import DataModel, MappedProperty, SpaceApply
@@ -14,9 +14,9 @@ from ._constants import DEFAULT_SPACE
 _DATA_FOLDER = pathlib.Path(__file__).parent / "apm_data"
 
 
-class APM:
+class SolarAPM:
     """
-    Demo class for generating an APM model in Python.
+    Demo class for generating Solar Farm APM model in Python.
 
     Args:
         space: The space to deploy the APM model to.
@@ -150,3 +150,37 @@ class APM:
         if delete_space:
             client.data_modeling.spaces.delete(self._data_model_id.space)
             self._echo(f"Deleted space {self._data_model_id.space}")
+
+
+class _Populator:
+    def __init__(
+        self,
+        source_dir: pathlib.Path,
+        echo: Optional[Callable[[str], None]] = None,
+        data_set_id: int | None = None,
+    ):
+        self._source_dir = source_dir
+        self._data_set_id = data_set_id
+        self._echo: Callable[[str], None] = echo or print
+
+    def populate(self, client: CogniteClient):
+        ...
+
+    def populate_timeseries(self, client: CogniteClient):
+        if not (file_path := self._source_dir / "TimeSeries").exists():
+            self._echo(f"Skipping timeseries population, no data found in {file_path}")
+            return
+
+    def populate_files(self, client: CogniteClient):
+        if not (file_path := self._source_dir / "Files").exists():
+            self._echo(f"Skipping files population, no data found in {file_path}")
+            return
+
+    def populate_nodes(self, client: CogniteClient):
+        ...
+
+    def populate_edges(self, client: CogniteClient):
+        ...
+
+    def _read_csv(self, file_path: pathlib.Path) -> tuple[list[str], list[dict[str, Any]]]:
+        raise NotImplementedError()

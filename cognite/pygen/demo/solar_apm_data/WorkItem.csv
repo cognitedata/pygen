@@ -1,0 +1,4 @@
+externalId,title,description,method,itemInfo,itemName,isCompleted,toBeDone,criticality,workOrder
+work:inspection:1001,Inspected solar panels,The panels are dusty and requires cleaning,Visual inspection,,Solar panel inspection,TRUE,FALSE,medium,planned:1001
+work:cleaning:1001,Clean solar panels,The panels have been cleaned,Surface cleaning,,Solar panel cleaning,FALSE,FALSE,high,planned:1001
+work:fix:1001,Ground Failure Inverter,The inverter has been fixed,Ground failure,,Inverter fix,TRUE,FALSE,high,unplanned:1001

@@ -1,0 +1,5 @@
+sourceExternalId,targetExternalId
+solarfarm:fornebu,production:fornebu
+solarpanel:sunny,production:sunny
+solarpanel:cloudy,production:cloudy
+battery:winterstorage:fornebu

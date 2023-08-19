@@ -1,0 +1,5 @@
+sourceExternalId,targetExternalId
+work:inspection:1001,solarpanel:sunny
+work:inspection:1001,solarpanel:cloudy
+work:cleaning:1001,solarpanel:sunny
+work:fix:1001,inverter:cloudy

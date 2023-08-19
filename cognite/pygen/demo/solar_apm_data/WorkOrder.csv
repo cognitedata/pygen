@@ -1,0 +1,4 @@
+externalId,startTime,endTime,title,description,programNumber,workOrderNumber,status,dueDate,isActive,workPackageNumber,createdDate,plannedStart,priorityDescription,durationHours,actualHours,isCancelled,isCompleted,percentageProgress,isSafetyCritical
+planned:1001,2023-01-01T00:00:00Z,2023-01-02T00:00:00Z,Planned Inspection,Inspect solar panels,1,1,Done,2023-01-01T00:00:00Z,FALSE,1,2023-01-01T00:00:00Z,2023-01-01T00:00:00Z,Medium Planned Priority,5,3,FALSE,TRUE,100,FALSE
+planned:1002,2023-02-01T00:00:00Z,2023-02-02T00:00:00Z,Planned Inspection,Inspect solar panels,1,2,Done,2023-02-03T00:00:00Z,FALSE,1,2023-01-01T00:00:00Z,2023-02-01T00:00:00Z,Medium Planned Priority,5,7,FALSE,TRUE,100,FALSE
+unplanned:1001,2023-04-01T00:00:00Z,2023-04-01T12:00:00Z,Unplanned Inverter Failure,Failure on Inverter Sunny,2,1,Done,2023-04-01T00:00:00Z,FALSE,2,2023-04-01T00:00:00Z,2023-04-01T00:00:00Z,High,10,12,FALSE,TRUE,100,TRUE

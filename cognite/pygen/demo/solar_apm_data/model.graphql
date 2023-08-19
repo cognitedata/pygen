@@ -1,6 +1,7 @@
 type Asset {
+  name: String
   parent: Asset
-  children: [Asset]
+  linkedAsset: [Asset]
   tag: String
   description: String
   sourceDb: String
