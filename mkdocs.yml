@@ -18,6 +18,7 @@ nav:
     - Examples: examples/movie_domain.ipynb
     - API:
         - Pygen: api/api.md
+        - Demo: api/demo.md
         - Exceptions: api/exceptions.md
     - Changelog: CHANGELOG.md
 
