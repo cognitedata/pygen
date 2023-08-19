@@ -130,7 +130,6 @@ class SolarFarmAPM:
             _DATA_FOLDER,
             self._echo,
             data_set_id,
-            self._data_model.space,
             self._data_model,
         )
         return loader

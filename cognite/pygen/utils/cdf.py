@@ -30,9 +30,8 @@ from cognite.client.data_classes.data_modeling import (
     data_types,
 )
 from cognite.client.exceptions import CogniteNotFoundError
-from cognite.client.utils._text import to_snake_case
 
-from cognite.pygen.demo._constants import DEFAULT_SPACE
+from cognite.pygen.utils.text import to_snake
 
 
 def load_cognite_client_from_toml(
@@ -118,7 +117,6 @@ class CSVLoader:
         echo: Function to echo progress to. Defaults to print.
         data_set_id: ID of the data set to connect to CDF resources such as TimeSeries and Files . Defaults to None
                      meaning that no data set will be used.
-        space: Name of the space to use. Defaults to "pygen".
         data_model: Data model to use. Defaults to None meaning that no data model will be used. This means you can
                     only load TimeSeries and Files.
 
@@ -129,14 +127,13 @@ class CSVLoader:
         source_dir: pathlib.Path,
         echo: Optional[Callable[[str], None]] = None,
         data_set_id: int | None = None,
-        space: str = DEFAULT_SPACE,
         data_model: DataModel[View] | None = None,
     ):
         self._source_dir = source_dir
         self._data_set_id = data_set_id
         self._echo: Callable[[str], None] = echo or print
-        self._space = space
         self._data_model = data_model
+        self._space = data_model.space if data_model else ""
 
     def populate(self, client: CogniteClient) -> None:
         """
@@ -151,8 +148,9 @@ class CSVLoader:
         """
         self.populate_timeseries(client)
         self.populate_files(client)
-        self.populate_nodes(client)
-        self.populate_edges(client)
+        if self._data_model:
+            self.populate_nodes(client)
+            self.populate_edges(client)
 
     def populate_timeseries(self, client: CogniteClient) -> TimeSeriesList:
         """
@@ -378,7 +376,7 @@ class CSVLoader:
     def _pop_or_raise(d: dict, camel_case: str) -> Any:
         if camel_case in d:
             return d.pop(camel_case)
-        elif (snake := to_snake_case(camel_case)) in d:
+        elif (snake := to_snake(camel_case)) in d:
             return d.pop(snake)
         else:
             raise ValueError(f"Missing {camel_case} in {d}")
@@ -515,7 +513,7 @@ class CogniteResourceDataTypesConverter:
         if not self._type_hint_by_name and not self._property_by_name:
             return entry
         for key, value in list(entry.items()):
-            snake_key = to_snake_case(key)
+            snake_key = to_snake(key)
             if type_hint := self._type_hint_by_name.get(snake_key):
                 entry[key] = self._convert_type_hint(value, type_hint)
             elif (pair := self._property_by_name.get(key)) or (pair := self._property_by_name.get(snake_key)):
