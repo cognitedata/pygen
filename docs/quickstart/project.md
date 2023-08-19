@@ -52,7 +52,7 @@ The following is the recommended project structure for a CDF SDK project:
     ...
 
     [tool.poetry.group.dev.dependencies]
-    cognite-pygen = "*"
+    cognite-pygen = {version="*", optional=true, extras=["all"]}
     ```
 
 === ".secret.toml"
