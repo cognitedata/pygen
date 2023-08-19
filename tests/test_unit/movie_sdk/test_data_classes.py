@@ -35,6 +35,30 @@ def test_person_from_node():
     assert person.name == "Christoph Waltz"
 
 
+def test_person_to_pandas():
+    # Arrange
+    node = dm.Node.load(
+        {
+            "instance_type": "node",
+            "space": "IntegrationTestsImmutable",
+            "external_id": "person:christoph_waltz",
+            "version": 1,
+            "last_updated_time": 1684170308732,
+            "created_time": 1684170308732,
+            "properties": {"IntegrationTestsImmutable": {"Person/2": {"name": "Christoph Waltz", "birthYear": 1956}}},
+        }
+    )
+    person = movie.Person.from_node(node)
+    persons = movie.PersonList([person])
+
+    # Act
+    df = persons.to_pandas()
+
+    # Assert
+    assert not df.empty
+    assert len(df) == 1
+
+
 def test_person_one_to_many_fields():
     # Arrange
     expected = ["roles"]
