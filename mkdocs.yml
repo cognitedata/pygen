@@ -20,6 +20,9 @@ nav:
         - Pygen: api/api.md
         - Demo: api/demo.md
         - Exceptions: api/exceptions.md
+        - Utilities:
+            - CDF: api/utils_cdf.md
+            - Text: api/utils_text.md
     - Changelog: CHANGELOG.md
 
 markdown_extensions:
