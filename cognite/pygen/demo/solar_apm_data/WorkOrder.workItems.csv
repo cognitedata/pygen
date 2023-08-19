@@ -1,0 +1,4 @@
+sourceExternalId,targetExternalId
+planned:1001,work:inspection:1001
+planned:1001,work:cleaning:1001
+unplanned:1001,work:fix:1001

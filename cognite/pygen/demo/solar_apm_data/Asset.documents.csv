@@ -1,0 +1,7 @@
+sourceExternalId,targetExternalId
+solarfarm:fornebu,schematic:fornebu
+inverter:sunny,spec:inverterII
+inverter:cloudy,spec:inverterII
+inverter:saver,spec:inverterII
+solarpanel:sunny,spec:panel3000
+solarpanel:cloudy,spec:panel3000

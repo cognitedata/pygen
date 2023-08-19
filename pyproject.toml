@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cognite-pygen"
-version = "0.16.0"
+version = "0.17.0"
 description = "Cognite Python SDK Generator"
 readme = "README.md"
 authors = ["Cognite <support@cognite.com>"]
@@ -98,6 +98,7 @@ mypy = "^1.4"
 pandas-stubs = "^2"
 types-PyYAML = "^6"
 types-toml = "^0.10"
+IPython = "*"
 
 [tool.pytest.ini_options]
 filterwarnings = [

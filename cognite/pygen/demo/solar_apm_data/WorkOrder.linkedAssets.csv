@@ -1,0 +1,6 @@
+sourceExternalId,targetExternalId
+planned:1001,solarpanel:sunny
+planned:1001,solarpanel:cloudy
+planned:1002,solarpanel:sunny
+planned:1002,solarpanel:cloudy
+unplanned:1001,inverter:cloudy

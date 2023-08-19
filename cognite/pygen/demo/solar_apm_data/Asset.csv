@@ -1,0 +1,12 @@
+externalId,name,parent,tag,description,sourceDb,areaId,categoryId,createdDate,isCriticalLine,isActive,updatedDate
+solarfarm:fornebu,Fornebu,,,The most sunny place in Norway,AlbertCerebrum,1,1,01/01/2017,TRUE,TRUE,01/01/2023
+solarpanel:sunny,Solar Panel Sunny,solarfarm:fornebu,,The panel on the first building,AlbertCerebrum,2,2,01/01/2017,FALSE,TRUE,01/01/2022
+solarpanel:cloudy,Solar Panel Cloudy,solarfarm:fornebu,,The panel on the second building,AlbertCerebrum,3,2,01/01/2020,TRUE,TRUE,01/01/2022
+transformer:sunny,Transformer Sunny,solarfarm:fornebu,,The transformer connected to sunny,AlbertCerebrum,2,3,01/01/2017,FALSE,TRUE,01/01/2022
+transformer:cloudy,Transformer Cloudy,solarfarm:fornebu,,The transformer connected to cloudy,AlbertCerebrum,3,3,01/01/2017,FALSE,TRUE,01/01/2021
+transformer:saver,Transformer Saver,solarfarm:fornebu,,The transformer connected to battery,AlbertCerebrum,4,3,01/01/2022,TRUE,TRUE,01/03/2023
+inverter:sunny,Inverter Sunny,solarfarm:fornebu,,The inverter connected to sunny,AlbertCerebrum,2,4,01/01/2017,FALSE,TRUE,01/01/2022
+inverter:cloudy,Inverter Cloudy,solarfarm:fornebu,,The inverter connected to cloudy,AlbertCerebrum,3,4,01/01/2017,FALSE,TRUE,01/01/2021
+inverter:saver,Inverter Saver,solarfarm:fornebu,,The inverter connected to battery,AlbertCerebrum,4,4,01/01/2022,TRUE,TRUE,01/03/2023
+substation:fornebu,Fornebu station,solarfarm:fornebu,,The substation for the solar farm,AlbertCerebrum,1,4,01/01/2017,TRUE,TRUE,01/03/2023
+battery:winter,Saver,solarfarm:fornebu,,The battery for the solar farm,AlbertCerebrum,4,5,01/01/2020,TRUE,TRUE,01/06/2020

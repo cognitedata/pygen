@@ -1,0 +1,1 @@
+::: cognite.pygen.demo

@@ -1,0 +1,5 @@
+externalId,name,isString,unit,isStep,description
+production:fornebu,"Production Fornebu",FALSE,MW,FALSE,"The total production of the Fornebu power plant"
+production:sunny,"Production Sunny",FALSE,kW,FALSE,"The production of the sunny panel"
+production:cloudy,"Production Sunny",FALSE,kW,FALSE,"The production of the sunny panel"
+storage:fornebu,"Storage Fornebu",FALSE,%,FALSE,"The current storage of battery at Fornebu"

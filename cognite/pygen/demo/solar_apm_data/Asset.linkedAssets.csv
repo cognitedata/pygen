@@ -1,0 +1,10 @@
+sourceExternalId,targetExternalId
+solarpanel:sunny,inverter:sunny
+inverter:sunny,transformer:sunny
+transformer:sunny,substation:fornebu
+solarpanel:cloudy,inverter:cloudy
+inverter:cloudy,transformer:cloudy
+transformer:cloudy,substation:fornebu
+battery:winter,inverter:saver
+inverter:saver,transformer:saver
+transformer:saver,substation:fornebu

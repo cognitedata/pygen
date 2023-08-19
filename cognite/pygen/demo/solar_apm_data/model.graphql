@@ -1,0 +1,53 @@
+type Asset {
+  name: String
+  parent: Asset
+  linkedAssets: [Asset]
+  tag: String
+  description: String
+  sourceDb: String
+  areaId: Int
+  categoryId: Int
+  createdDate: Timestamp
+  isCriticalLine: Boolean
+  isActive: Boolean
+  updatedDate: Timestamp
+  metrics:[TimeSeries]
+  documents: [File]
+}
+
+type WorkOrder {
+    startTime: Timestamp
+    endTime: Timestamp
+    title: String
+    description: String
+    programNumber: String
+    workOrderNumber: String
+    status: String
+    dueDate: Timestamp
+    isActive: Boolean
+    workPackageNumber: String
+    createdDate: Timestamp
+    plannedStart: Timestamp
+    priorityDescription: String
+    durationHours: Int
+    actualHours: Int
+    isCancelled: Boolean
+    isCompleted: Boolean
+    percentageProgress: Int
+    isSafetyCritical: Boolean
+    linkedAssets: [Asset]
+    workItems: [WorkItem]
+}
+
+type WorkItem {
+    title: String
+    description: String
+    method: String
+    itemInfo: String
+    itemName: String
+    isCompleted: Boolean
+    toBeDone: Boolean
+    criticality: String
+    workOrder: WorkOrder
+    linkedAssets: [Asset]
+}
