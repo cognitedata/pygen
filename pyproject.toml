@@ -98,6 +98,7 @@ mypy = "^1.4"
 pandas-stubs = "^2"
 types-PyYAML = "^6"
 types-toml = "^0.10"
+IPython = "*"
 
 [tool.pytest.ini_options]
 filterwarnings = [
