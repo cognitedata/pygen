@@ -13,6 +13,10 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.17.1] - 19-08-23
+### Fixed
+* Bug causing `.to_pandas()` to fail with `pydantic` v1. This is now fixed.
+
 ## [0.17.0] - 19-08-23
 ### Added
 * Include demo model `SolarFarmAPM` with data in `cognite.pygen.demo` package.

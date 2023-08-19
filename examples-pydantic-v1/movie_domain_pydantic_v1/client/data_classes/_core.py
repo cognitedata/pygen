@@ -104,11 +104,11 @@ class TypeList(UserList, Generic[T_TypeNode]):
     def to_pandas(self) -> pd.DataFrame:
         df = pd.DataFrame(self.dump())
         # Reorder columns to have the custom columns first
-        fixed_columns = set(DomainModel.model_fields)
+        fixed_columns = set(DomainModel.__fields__)  # type: ignore[attr-defined]
         columns = (
             ["external_id"]
             + [col for col in df if col not in fixed_columns]
-            + [col for col in DomainModel.model_fields if col != "external_id"]
+            + [col for col in DomainModel.__fields__ if col != "external_id"]  # type: ignore[attr-defined]
         )
         return df[columns]
 
