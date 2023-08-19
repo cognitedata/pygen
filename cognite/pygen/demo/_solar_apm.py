@@ -4,6 +4,7 @@ import csv
 import pathlib
 from collections import defaultdict
 from collections.abc import Sequence
+from contextlib import suppress
 from datetime import datetime
 from typing import Any, Callable, Optional, Protocol, Union, get_args, get_origin, get_type_hints
 
@@ -30,7 +31,7 @@ from cognite.client.data_classes.data_modeling import (
     data_types,
 )
 from cognite.client.data_classes.data_modeling.ids import ContainerId, DataModelId, EdgeId, NodeId
-from cognite.client.exceptions import CogniteAPIError
+from cognite.client.exceptions import CogniteAPIError, CogniteNotFoundError
 from cognite.client.utils._text import to_snake_case
 
 from cognite.pygen import generate_sdk_notebook
@@ -86,7 +87,8 @@ class _FileAPIAdapter(_CogniteCoreResourceAPI[FileMetadataList]):
         external_id: Optional[Union[str, Sequence[str]]] = None,
         ignore_unknown_ids: bool = False,
     ) -> None:
-        self._files_api.delete(id=id, external_id=external_id)
+        with suppress(CogniteNotFoundError):
+            self._files_api.delete(id=id, external_id=external_id)
 
 
 class SolarFarmAPM:
@@ -142,12 +144,12 @@ class SolarFarmAPM:
             An instantiated SDK client for the APM model.
         """
         self._data_model = self.deploy(client)
-        self._echo("\n✅  Data Model Ready!")
+        self._echo("✅  Data Model Ready!")
         if populate:
             self.populate(client)
-            self._echo("\n✅  Population Complete!")
+            self._echo("✅  Population Complete!")
         client = self.generate_sdk(client)
-        self._echo("\n✅  SDK Generated!")
+        self._echo("✅  SDK Generated!")
         return client
 
     def deploy(self, client: CogniteClient) -> DataModel[View]:
@@ -267,6 +269,7 @@ class SolarFarmAPM:
                 if isinstance(prop, MappedProperty)
             }
         )
+        self._data_model = data_model
         loader = self._create_csv_loader(client)
         if not auto_confirm:
             self._echo(f"About to delete data model {self._data_model_id}")
@@ -442,6 +445,8 @@ class CSVLoader:
         if not self._data_model:
             raise ValueError("Missing data model, please pass it to the constructor")
         edge_ids = []
+        # Each type of connection is stored in a node.
+        node_ids = []
         for view in self._data_model.views:
             for name, prop in view.properties.items():
                 if not isinstance(prop, SingleHopConnectionDefinition):
@@ -458,11 +463,14 @@ class CSVLoader:
                         for edge in self._load_resource(EdgeApply, file_name=f"{view.external_id}.{name}")
                     ]
                 )
-        if not edge_ids:
+                node_ids.append(NodeId(self._space, external_id=f"{view.external_id}.{name}"))
+
+        if not edge_ids and not node_ids:
             self._echo("No edges to delete")
             return
-        result = client.data_modeling.instances.delete(edges=edge_ids)
+        result = client.data_modeling.instances.delete(edges=edge_ids, nodes=node_ids)
         self._echo(f"Deleted {len(result.edges)} edges")
+        self._echo(f"Deleted {len(result.nodes)} type nodes")
 
     @staticmethod
     def _pop_or_raise(d: dict, camel_case: str) -> Any:
