@@ -57,10 +57,10 @@ The following is the recommended project structure for a CDF SDK project:
 
 === ".secret.toml"
 
-    **IMPORTANT:** The `.secret.toml` file contains secrets and should not be committed to version history.
+    **IMPORTANT:** The `.secret.toml` file contains secrets and must **NOT** be committed to version history.
     ``` bash
     [cognite]
-      client_secret = "<client-id>"
+      client_secret = "<client-secret>"
     ```
 
 ## Generating the SDK and Checking it into Version History
