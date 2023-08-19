@@ -1,3 +1,3 @@
-from ._solar_apm import SolarAPM
+from ._solar_apm import SolarFarmAPM
 
-__all__ = ["SolarAPM"]
+__all__ = ["SolarFarmAPM"]

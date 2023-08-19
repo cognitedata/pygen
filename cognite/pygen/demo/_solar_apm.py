@@ -5,11 +5,11 @@ import pathlib
 from collections import defaultdict
 from collections.abc import Sequence
 from datetime import datetime
-from typing import Any, Callable, Optional, Protocol, Union, cast, get_args, get_origin, get_type_hints
+from typing import Any, Callable, Optional, Protocol, Union, get_args, get_origin, get_type_hints
 
 from cognite.client import CogniteClient
 from cognite.client._api.files import FilesAPI
-from cognite.client.data_classes import FileMetadata, FileMetadataList, TimeSeries, TimeSeriesList
+from cognite.client.data_classes import DataSet, FileMetadata, FileMetadataList, TimeSeries, TimeSeriesList
 from cognite.client.data_classes._base import (
     CogniteResource,
     T_CogniteResource,
@@ -29,16 +29,17 @@ from cognite.client.data_classes.data_modeling import (
     View,
     data_types,
 )
-from cognite.client.data_classes.data_modeling.ids import ContainerId, DataModelId
+from cognite.client.data_classes.data_modeling.ids import ContainerId, DataModelId, EdgeId, NodeId
+from cognite.client.exceptions import CogniteAPIError
 from cognite.client.utils._text import to_snake_case
 
 from cognite.pygen import generate_sdk_notebook
-from cognite.pygen.demo._constants import DEFAULT_SPACE
+from cognite.pygen.demo._constants import DEFAULT_DATA_SET, DEFAULT_SPACE
 
 _DATA_FOLDER = pathlib.Path(__file__).parent / "solar_apm_data"
 
 
-class CogniteCoreResourceAPI(Protocol[T_CogniteResourceList]):
+class _CogniteCoreResourceAPI(Protocol[T_CogniteResourceList]):
     def retrieve_multiple(
         self,
         ids: Optional[Sequence[int]] = None,
@@ -50,8 +51,45 @@ class CogniteCoreResourceAPI(Protocol[T_CogniteResourceList]):
     def create(self, items: T_CogniteResourceList) -> T_CogniteResourceList:
         ...
 
+    def delete(
+        self,
+        id: Optional[Union[int, Sequence[int]]] = None,
+        external_id: Optional[Union[str, Sequence[str]]] = None,
+        ignore_unknown_ids: bool = False,
+    ) -> None:
+        ...
 
-class SolarAPM:
+
+class _FileAPIAdapter(_CogniteCoreResourceAPI[FileMetadataList]):
+    def __init__(self, files_api: FilesAPI):
+        self._files_api = files_api
+
+    def retrieve_multiple(
+        self,
+        ids: Optional[Sequence[int]] = None,
+        external_ids: Optional[Sequence[str]] = None,
+        ignore_unknown_ids: bool = False,
+    ) -> FileMetadataList:
+        return self._files_api.retrieve_multiple(
+            ids=ids, external_ids=external_ids, ignore_unknown_ids=ignore_unknown_ids
+        )
+
+    def create(self, items: FileMetadataList) -> FileMetadataList:
+        created = []
+        for item in items:
+            created.append(self._files_api.create(item, overwrite=True)[0])
+        return FileMetadataList(created)
+
+    def delete(
+        self,
+        id: Optional[Union[int, Sequence[int]]] = None,
+        external_id: Optional[Union[str, Sequence[str]]] = None,
+        ignore_unknown_ids: bool = False,
+    ) -> None:
+        self._files_api.delete(id=id, external_id=external_id)
+
+
+class SolarFarmAPM:
     """
     Demo class for generating Solar Farm APM model in Python.
 
@@ -59,13 +97,21 @@ class SolarAPM:
         space: The space to deploy the APM model to.
         model_external_id: The external ID of the APM model.
         model_version: The version of the APM model.
+        data_set_external_id: The external ID of the data set to use for CDF Resources such as Time Series and Files.
     """
 
-    def __init__(self, space: str = DEFAULT_SPACE, model_external_id: str = "ApmModel", model_version: str = "1"):
+    def __init__(
+        self,
+        space: str = DEFAULT_SPACE,
+        model_external_id: str = "SolarFarmAPM",
+        model_version: str = "1",
+        data_set_external_id: str | None = DEFAULT_DATA_SET,
+    ):
         self._graphql = (_DATA_FOLDER / "model.graphql").read_text()
         self._data_model_id = DataModelId(space=space, external_id=model_external_id, version=model_version)
         self._echo: Callable[[str], None] = print
         self._data_model: DataModel[View] | None = None
+        self._data_set_external_id = data_set_external_id
 
     def display(self):
         """
@@ -137,8 +183,42 @@ class SolarAPM:
     def populate(self, client: CogniteClient):
         if self._data_model is None:
             raise ValueError("Cannot populate model before deploying it, please call deploy() first")
+        loader = self._create_csv_loader(client)
+        loader.populate(client)
 
-        CSVLoader(_DATA_FOLDER, self._echo, None, self._data_model.space)
+    def _create_csv_loader(self, client: CogniteClient) -> CSVLoader:
+        if self._data_model is None:
+            raise ValueError("Cannot populate model before deploying it, please call deploy() first")
+        data_set_id = self._data_set_id(client)
+        loader = CSVLoader(
+            _DATA_FOLDER,
+            self._echo,
+            data_set_id,
+            self._data_model.space,
+            self._data_model,
+        )
+        return loader
+
+    def _data_set_id(self, client: CogniteClient) -> int | None:
+        if self._data_set_external_id is None:
+            return None
+        dataset = client.data_sets.retrieve(external_id=self._data_set_external_id)
+        if dataset:
+            return dataset.id
+
+        try:
+            new_dataset = client.data_sets.create(
+                DataSet(
+                    external_id=self._data_set_external_id,
+                    name=self._data_set_external_id,
+                    description="This data set was created by pygen for demo purposes.",
+                )
+            )
+        except CogniteAPIError as e:
+            self._echo(f"Failed to create data set {self._data_set_external_id}: {e}")
+            return None
+        self._echo(f"Created data set {new_dataset.external_id}")
+        return new_dataset.id
 
     def generate_sdk(self, client: CogniteClient) -> Any:
         """
@@ -156,7 +236,7 @@ class SolarAPM:
         """
         return generate_sdk_notebook(client, self._data_model_id)
 
-    def clean(self, client: CogniteClient, delete_space: bool = True):
+    def clean(self, client: CogniteClient, delete_space: bool = True, auto_confirm: bool = False):
         """
         Clean the APM model from the CDF project the client is connected to.
 
@@ -166,6 +246,7 @@ class SolarAPM:
             client: Connected CogniteClient
             delete_space: Whether to try to delete the space the APM model was deployed to. This will only work if the
                           space does not contain any other data models, views or containers.
+            auto_confirm: Whether to skip the confirmation prompt.
 
         """
         data_models = client.data_modeling.data_models.retrieve(self._data_model_id, inline_views=True)
@@ -182,6 +263,17 @@ class SolarAPM:
                 if isinstance(prop, MappedProperty)
             }
         )
+        loader = self._create_csv_loader(client)
+        if not auto_confirm:
+            self._echo(f"About to delete data model {self._data_model_id}")
+            self._echo(f"About to delete views {view_ids}")
+            self._echo(f"About to delete containers {container_ids} along with all nodes and edges")
+            if delete_space:
+                self._echo(f"About to delete space {self._data_model_id.space}")
+            if not input("Are you sure? [n/y] ").lower().startswith("y"):
+                self._echo("Aborting")
+                return
+        loader.clean(client)
         client.data_modeling.data_models.delete(self._data_model_id)
         self._echo(f"Deleted data model {self._data_model_id}")
         client.data_modeling.views.delete(view_ids)
@@ -208,9 +300,9 @@ class CSVLoader:
         self._space = space
         self._data_model = data_model
 
-    def populate(self, client: CogniteClient):
+    def populate(self, client: CogniteClient) -> None:
         """
-        Populate the APM model with mock data included in pygen.
+        Populate CDF with data found in the source directory passed in the constructor.
 
         Args:
             client: Connected CogniteClient
@@ -226,9 +318,7 @@ class CSVLoader:
         return self._populate_cdf_resource(client.time_series, TimeSeries, TimeSeriesList)
 
     def populate_files(self, client: CogniteClient) -> FileMetadataList:
-        return self._populate_cdf_resource(
-            cast(CogniteCoreResourceAPI[FileMetadataList], client.files), FileMetadata, FileMetadataList
-        )
+        return self._populate_cdf_resource(_FileAPIAdapter(client.files), FileMetadata, FileMetadataList)
 
     def populate_nodes(self, client: CogniteClient) -> NodeApplyResultList:
         if not self._data_model:
@@ -263,17 +353,8 @@ class CSVLoader:
             return NodeApplyResultList([])
 
         created = client.data_modeling.instances.apply(nodes=all_nodes)
-        self._echo(f"Created {len(created.nodes)} nodes")
+        self._echo(f"Created/Modified {sum(1 for n in created.nodes if n.was_modified)} nodes")
         return created.nodes
-
-    @staticmethod
-    def _pop_or_raise(d: dict, camel_case: str) -> Any:
-        if camel_case in d:
-            return d.pop(camel_case)
-        elif (snake := to_snake_case(camel_case)) in d:
-            return d.pop(snake)
-        else:
-            raise ValueError(f"Missing {camel_case} in {d}")
 
     def populate_edges(self, client: CogniteClient) -> EdgeApplyResultList:
         if not self._data_model:
@@ -288,7 +369,7 @@ class CSVLoader:
                     source_id = self._pop_or_raise(raw_edge, "sourceExternalId")
                     target_id = self._pop_or_raise(raw_edge, "targetExternalId")
                     edge = EdgeApply(
-                        external_id=f"{source_id}.{target_id}",
+                        external_id=self._create_edge_external_id(source_id, target_id),
                         space=self._space,
                         type=prop.type,
                         start_node=DirectRelationReference(self._space, source_id),
@@ -299,8 +380,82 @@ class CSVLoader:
             self._echo("No edges to create")
             return EdgeApplyResultList([])
         created = client.data_modeling.instances.apply(edges=all_edges)
-        self._echo(f"Created {len(created.edges)} edges")
+        self._echo(f"Created {sum(1 for e in created.edges if e.was_modified)} edges")
         return created.edges
+
+    @staticmethod
+    def _create_edge_external_id(source_id: str, target_id: str) -> str:
+        return f"{source_id}.{target_id}"
+
+    def clean(self, client: CogniteClient) -> None:
+        """
+        Delete all data created by this loader.
+
+        Args:
+            client: Connected CogniteClient
+
+        Returns:
+        """
+        self.clean_timeseries(client)
+        self.clean_files(client)
+        self.clean_nodes(client)
+        self.clean_edges(client)
+
+    def clean_timeseries(self, client: CogniteClient) -> None:
+        self._clean_cdf_resource(client.time_series, TimeSeries)
+
+    def clean_files(self, client: CogniteClient) -> None:
+        self._clean_cdf_resource(_FileAPIAdapter(client.files), FileMetadata)
+
+    def clean_nodes(self, client: CogniteClient) -> None:
+        if not self._data_model:
+            raise ValueError("Missing data model, please pass it to the constructor")
+        node_ids: list[NodeId] = []
+        for view in self._data_model.views:
+            raw_nodes = self._load_resource(NodeApply, file_name=view.external_id)
+            node_ids.extend(
+                [NodeId(self._space, external_id=self._pop_or_raise(node, "externalId")) for node in raw_nodes]
+            )
+        if not node_ids:
+            self._echo("No nodes to delete")
+            return
+        result = client.data_modeling.instances.delete(nodes=node_ids)
+        self._echo(f"Deleted {len(result.nodes)} nodes")
+
+    def clean_edges(self, client: CogniteClient) -> None:
+        if not self._data_model:
+            raise ValueError("Missing data model, please pass it to the constructor")
+        edge_ids = []
+        for view in self._data_model.views:
+            for name, prop in view.properties.items():
+                if not isinstance(prop, SingleHopConnectionDefinition):
+                    continue
+                edge_ids.extend(
+                    [
+                        EdgeId(
+                            self._space,
+                            external_id=self._create_edge_external_id(
+                                self._pop_or_raise(edge, "sourceExternalId"),
+                                self._pop_or_raise(edge, "targetExternalId"),
+                            ),
+                        )
+                        for edge in self._load_resource(EdgeApply, file_name=f"{view.external_id}.{name}")
+                    ]
+                )
+        if not edge_ids:
+            self._echo("No edges to delete")
+            return
+        result = client.data_modeling.instances.delete(edges=edge_ids)
+        self._echo(f"Deleted {len(result.edges)} edges")
+
+    @staticmethod
+    def _pop_or_raise(d: dict, camel_case: str) -> Any:
+        if camel_case in d:
+            return d.pop(camel_case)
+        elif (snake := to_snake_case(camel_case)) in d:
+            return d.pop(snake)
+        else:
+            raise ValueError(f"Missing {camel_case} in {d}")
 
     @staticmethod
     def _read_csv(
@@ -308,7 +463,7 @@ class CSVLoader:
         resource_cls: type[T_CogniteResource] | None = None,
         properties: dict[str, MappedProperty] | None = None,
     ) -> list[dict[str, Any]]:
-        converter = DataTypesConverter(resource_cls=resource_cls, properties=properties)
+        converter = CogniteResourceDataTypesConverter(resource_cls=resource_cls, properties=properties)
         with file_path.open() as file:
             reader = csv.reader(file)
             columns = next(reader)
@@ -331,7 +486,7 @@ class CSVLoader:
         return self._read_csv(file_path, resource_cls=resource_cls, properties=properties)
 
     def _create_resource(
-        self, api: CogniteCoreResourceAPI[T_CogniteResourceList], resources: T_CogniteResourceList
+        self, api: _CogniteCoreResourceAPI[T_CogniteResourceList], resources: T_CogniteResourceList
     ) -> T_CogniteResourceList:
         if not resources:
             return resources
@@ -342,31 +497,37 @@ class CSVLoader:
         if not (missing := set(new_ids) - set(existing)):
             self._echo(f"Skipping {resource_name} creation, all {len(existing)} {resource_name} already exist")
             return retrieved
-        if isinstance(api, FilesAPI):
-            created = []
-            for file in resources:
-                if file.external_id in missing:
-                    created.append(api.create(file))
-        else:
-            created = api.create(type(resources)([item for item in resources if item.external_id in missing]))
+
+        created = api.create(type(resources)([item for item in resources if item.external_id in missing]))
         self._echo(f"Created {len(created)} {resource_name}")
         return type(resources)(created + retrieved)
 
     def _populate_cdf_resource(
         self,
-        api: CogniteCoreResourceAPI[T_CogniteResourceList],
+        api: _CogniteCoreResourceAPI[T_CogniteResourceList],
         resource_cls: type[T_CogniteResource],
         cls_list: type[T_CogniteResourceList],
     ) -> T_CogniteResourceList:
         raw_data = self._load_resource(resource_cls=resource_cls)
+        for item in raw_data:
+            if "dataSetId" not in item:
+                item["dataSetId"] = self._data_set_id
         resources = cls_list._load(raw_data)
         if not resources:
             self._echo(f"Skipping {type(resource_cls.__name__)} population, no data found in {self._source_dir}")
             return resources
         return self._create_resource(api=api, resources=resources)
 
+    def _clean_cdf_resource(
+        self, api: _CogniteCoreResourceAPI[T_CogniteResourceList], resource_cls: type[T_CogniteResource]
+    ):
+        raw_data = self._load_resource(resource_cls)
+        external_ids = [self._pop_or_raise(item, "externalId") for item in raw_data]
+        api.delete(external_id=external_ids, ignore_unknown_ids=True)
+        self._echo(f"Deleted {len(external_ids)} {resource_cls.__name__}")
 
-class DataTypesConverter:
+
+class CogniteResourceDataTypesConverter:
     supported_timestamp_formats = ("%Y-%m-%dT%H:%M:%SZ", "%d/%m/%Y", "%Y-%m-%dT%H:%M:%S.%fZ")
 
     def __init__(
@@ -401,7 +562,15 @@ class DataTypesConverter:
                 row[key] = self._convert_type_hint(value, type_hint)
             elif (entry := self._property_by_name.get(key)) or (entry := self._property_by_name.get(snake_key)):
                 container, property_type = entry
-                row[key] = self._convert_property(value, property_type, container)
+                try:
+                    row[key] = self._convert_property(value, property_type, container)
+                except ValueError as e:
+                    if "cannot be empty" in str(e):
+                        # Removing empty values
+                        del row[key]
+                    else:
+                        raise e
+
         return row
 
     @staticmethod
@@ -440,8 +609,12 @@ class DataTypesConverter:
                     pass
             raise ValueError(f"Unsupported timestamp format: {value}")
         elif isinstance(property_type, data_types.DirectRelation):
+            if not value:
+                raise ValueError("Direct relation cannot be empty")
             return {"externalId": str(value), "space": container_id.space}
         elif isinstance(property_type, data_types.CDFExternalIdReference):
+            if not value:
+                raise ValueError("CDF external ID reference cannot be empty")
             return {"externalId": str(value)}
 
         return value
@@ -449,18 +622,13 @@ class DataTypesConverter:
 
 if __name__ == "__main__":
     # Quick and dirty way to do local ad-hoc testing
-    from yaml import safe_dump, safe_load
 
     from cognite.pygen import load_cognite_client_from_toml
 
     c = load_cognite_client_from_toml("../../../config.toml")
+    apm = SolarFarmAPM()
+    apm.create(c)
+    apm.clean(c, auto_confirm=True)
 
-    local = pathlib.Path(__file__).parent / "model.yaml"
-    if not local.exists():
-        apm = SolarAPM()
-        model = apm.deploy(c)
-        local.write_text(safe_dump(model.dump(camel_case=True)))
-    else:
-        model = DataModel._load(safe_load(local.read_text()))
-
-    CSVLoader(_DATA_FOLDER, data_model=model).populate_edges(c)
+    # if not local.exists():
+    #

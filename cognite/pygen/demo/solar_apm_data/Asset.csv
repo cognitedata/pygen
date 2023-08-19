@@ -3,7 +3,7 @@ solarfarm:fornebu,Fornebu,,,The most sunny place in Norway,AlbertCerebrum,1,1,01
 solarpanel:sunny,Solar Panel Sunny,solarfarm:fornebu,,The panel on the first building,AlbertCerebrum,2,2,01/01/2017,FALSE,TRUE,01/01/2022
 solarpanel:cloudy,Solar Panel Cloudy,solarfarm:fornebu,,The panel on the second building,AlbertCerebrum,3,2,01/01/2020,TRUE,TRUE,01/01/2022
 transformer:sunny,Transformer Sunny,solarfarm:fornebu,,The transformer connected to sunny,AlbertCerebrum,2,3,01/01/2017,FALSE,TRUE,01/01/2022
-transformer:cloud,Transformer Cloudy,solarfarm:fornebu,,The transformer connected to cloudy,AlbertCerebrum,3,3,01/01/2017,FALSE,TRUE,01/01/2021
+transformer:cloudy,Transformer Cloudy,solarfarm:fornebu,,The transformer connected to cloudy,AlbertCerebrum,3,3,01/01/2017,FALSE,TRUE,01/01/2021
 transformer:saver,Transformer Saver,solarfarm:fornebu,,The transformer connected to battery,AlbertCerebrum,4,3,01/01/2022,TRUE,TRUE,01/03/2023
 inverter:sunny,Inverter Sunny,solarfarm:fornebu,,The inverter connected to sunny,AlbertCerebrum,2,4,01/01/2017,FALSE,TRUE,01/01/2022
 inverter:cloudy,Inverter Cloudy,solarfarm:fornebu,,The inverter connected to cloudy,AlbertCerebrum,3,4,01/01/2017,FALSE,TRUE,01/01/2021

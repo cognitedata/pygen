@@ -1,1 +1,2 @@
 DEFAULT_SPACE = "pygen"
+DEFAULT_DATA_SET = "PygenDemo"
