@@ -13,6 +13,14 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.17.0] - 19-08-23
+### Added
+* Include demo model `SolarFarmAPM` with data in `cognite.pygen.demo` package.
+
+### Documentation
+* Updated documentation with `utils` section.
+* Updated documentation with `demo` section.
+
 ## [0.16.0] - 18-08-23
 ### Improved
 * Made the parameters `top_level_package` and `client_name` optional in `generate_sdk_notebook`. If not provided,

@@ -97,10 +97,18 @@ class TypeList(UserList, Generic[T_TypeNode]):
         super().__init__(nodes)
 
     def dump(self) -> list[dict[str, Any]]:
-        return [node.dict() for node in self.data]
+        return [node.model_dump() for node in self.data]
 
     def to_pandas(self) -> pd.DataFrame:
-        return pd.DataFrame(self.dump())
+        df = pd.DataFrame(self.dump())
+        # Reorder columns to have the custom columns first
+        fixed_columns = set(DomainModel.model_fields)
+        columns = (
+            ["external_id"]
+            + [col for col in df if col not in fixed_columns]
+            + [col for col in DomainModel.model_fields if col != "external_id"]
+        )
+        return df[columns]
 
     def _repr_html_(self) -> str:
         return self.to_pandas()._repr_html_()  # type: ignore[operator]
