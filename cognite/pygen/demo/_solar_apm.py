@@ -212,7 +212,11 @@ class SolarFarmAPM:
             answer = input("Are you sure you want to continue? [y/N] ")
             if not isinstance(answer, str) and hasattr(answer, "result"):
                 # PyodideFuture
-                answer = answer.result()
+                self._echo(
+                    "The parameter auto_confirm is not supported in a Pyodide environment,"
+                    "please set auto_confirm=True"
+                )
+                answer = "n"
 
             if not answer.lower().startswith("y"):
                 self._echo("Aborting")
