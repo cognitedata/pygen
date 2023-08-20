@@ -13,6 +13,11 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.17.3] - 20-08-23
+### Fixed
+* The last fix `SolarFarmAPM.clean()` raising `AttributeError` in `CDF notebook`, did not work as intended.
+  Instead, the parameter `auto_confirm` must be set to `True` when calling `SolarFarmAPM.clean()` in a `CDF notebook`.
+
 ## [0.17.2] - 20-08-23
 ### Improved
 * Allow `DataModel` and `DataModelList` to be passed directly for `generate_sdk_notebook` and `generate_sdk`,
