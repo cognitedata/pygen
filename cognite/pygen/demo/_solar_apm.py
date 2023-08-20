@@ -209,13 +209,15 @@ class SolarFarmAPM:
             self._echo(f"About to delete containers {container_ids} along with all nodes and edges")
             if delete_space:
                 self._echo(f"About to delete space {self._data_model_id.space}")
-            try:
-                if not input("Are you sure? [n/y] ").lower().startswith("y"):
-                    self._echo("Aborting")
-                    return
-            except AttributeError:
-                self._echo("Pyodide does not support input, aborting. Please set auto_confirm=True")
+            answer = input("Are you sure you want to continue? [y/N] ")
+            if not isinstance(answer, str) and hasattr(answer, "result"):
+                # PyodideFuture
+                answer = answer.result()
+
+            if not answer.lower().startswith("y"):
+                self._echo("Aborting")
                 return
+
         loader.clean(client)
         client.data_modeling.data_models.delete(self._data_model_id)
         self._echo(f"Deleted data model {self._data_model_id}")
