@@ -13,6 +13,14 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.17.2] - 20-08-23
+### Improved
+* Allow `DataModel` and `DataModelList` to be passed directly for `generate_sdk_notebook` and `generate_sdk`,
+  which is speeds up the generation time with the demo data and data model.
+
+### Fixed
+* `SolarFarmAPM.clean()` raising `AttributeError` in `CDF notebook`. This is now fixed.
+
 ## [0.17.1] - 19-08-23
 ### Fixed
 * Bug causing `.to_pandas()` to fail with `pydantic` v1. This is now fixed.

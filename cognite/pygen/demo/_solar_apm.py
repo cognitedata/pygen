@@ -169,7 +169,9 @@ class SolarFarmAPM:
             An instantiated SDK client for the APM model.
 
         """
-        return generate_sdk_notebook(client, self._data_model_id, logger=self._echo, overwrite=True)
+        if self._data_model is None:
+            return generate_sdk_notebook(client, self._data_model_id, logger=self._echo, overwrite=True)
+        return generate_sdk_notebook(client, self._data_model, logger=self._echo, overwrite=True)
 
     def clean(self, client: CogniteClient, delete_space: bool = True, auto_confirm: bool = False):
         """
@@ -207,9 +209,15 @@ class SolarFarmAPM:
             self._echo(f"About to delete containers {container_ids} along with all nodes and edges")
             if delete_space:
                 self._echo(f"About to delete space {self._data_model_id.space}")
-            if not input("Are you sure? [n/y] ").lower().startswith("y"):
+            answer = input("Are you sure you want to continue? [y/N] ")
+            if not isinstance(answer, str) and hasattr(answer, "result"):
+                # PyodideFuture
+                answer = answer.result()
+
+            if not answer.lower().startswith("y"):
                 self._echo("Aborting")
                 return
+
         loader.clean(client)
         client.data_modeling.data_models.delete(self._data_model_id)
         self._echo(f"Deleted data model {self._data_model_id}")
