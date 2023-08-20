@@ -22,7 +22,7 @@ from .utils.text import to_pascal, to_snake
 
 def generate_sdk_notebook(
     client: CogniteClient,
-    model_id: DataModelIdentifier | Sequence[DataModelIdentifier],
+    model_id: DataModelIdentifier | Sequence[DataModelIdentifier] | dm.DataModel[dm.View] | dm.DataModelList[dm.View],
     top_level_package: Optional[str] = None,
     client_name: Optional[str] = None,
     logger: Callable[[str], None] | None = None,
@@ -37,7 +37,8 @@ def generate_sdk_notebook(
 
     Args:
         client: The cognite client used for fetching the data model.
-        model_id: The id(s) of the data model(s) to generate the SDK from.
+        model_id: The id(s) of the data model(s) to generate the SDK from. You can also pass in the data model(s)
+                  directly to avoid fetching them from CDF.
         top_level_package: The name of the top level package for the SDK. Example "movie.client". If nothing is passed
                             the package will [external_id:snake].client of the first data model given.
         client_name: The name of the client class. Example "MovieClient". If nothing is passed the clien name will be
@@ -81,7 +82,7 @@ def generate_sdk_notebook(
 
 def generate_sdk(
     client: CogniteClient,
-    model_id: DataModelIdentifier | Sequence[DataModelIdentifier],
+    model_id: DataModelIdentifier | Sequence[DataModelIdentifier] | dm.DataModel[dm.View] | dm.DataModelList[dm.View],
     top_level_package: str,
     client_name: str,
     output_dir: Path,
@@ -95,7 +96,8 @@ def generate_sdk(
 
     Args:
         client: The cognite client used for fetching the data model.
-        model_id: The id(s) of the data model(s) to generate the SDK from.
+        model_id: The id(s) of the data model(s) to generate the SDK from. You can also pass in the data model(s)
+                  directly to avoid fetching them from CDF.
         top_level_package: The name of the top level package for the SDK. Example "movie.client"
         client_name: The name of the client class. Example "MovieClient"
         output_dir: The directory to write the SDK to.
@@ -107,8 +109,11 @@ def generate_sdk(
 
     """
     logger = logger or print
-    data_model = _load_data_model(client, model_id, logger)
-    logger(f"Successfully retrieved data model(s) {model_id}")
+    if isinstance(model_id, (dm.DataModel, dm.DataModelList)):
+        data_model = model_id
+    else:
+        data_model = _load_data_model(client, model_id, logger)
+        logger(f"Successfully retrieved data model(s) {model_id}")
     sdk_generator = SDKGenerator(top_level_package, client_name, data_model, pydantic_version, logger)
     sdk = sdk_generator.generate_sdk()
     logger(f"Writing SDK to {output_dir}")
@@ -132,7 +137,7 @@ def _load_data_model(
 
 def _load_data_model(
     client: CogniteClient, model_id: DataModelIdentifier | Sequence[DataModelIdentifier], logger: Callable[[str], None]
-) -> dm.DataModel | dm.DataModelList:
+) -> dm.DataModel[dm.View] | dm.DataModelList[dm.View]:
     identifier = _load_data_model_identifier(model_id)
     try:
         data_models = client.data_modeling.data_models.retrieve(model_id, inline_views=True)
@@ -147,10 +152,22 @@ def _load_data_model(
     raise DataModelNotFound(list(missing_ids))
 
 
-def _load_data_model_identifier(model_id: DataModelIdentifier | Sequence[DataModelIdentifier]) -> list[DataModelId]:
-    is_sequence = isinstance(model_id, Sequence) and not (isinstance(model_id, tuple) and isinstance(model_id[0], str))
+def _load_data_model_identifier(
+    model_id: DataModelIdentifier | Sequence[DataModelIdentifier] | dm.DataModel[dm.View] | dm.DataModelList[dm.View],
+) -> list[DataModelId]:
+    model_id_only: DataModelIdentifier | Sequence[DataModelIdentifier]
+    if isinstance(model_id, dm.DataModel):
+        model_id_only = model_id.as_id()
+    elif isinstance(model_id, dm.DataModelList):
+        model_id_only = model_id.as_ids()
+    else:
+        model_id_only = model_id
+
+    is_sequence = isinstance(model_id_only, Sequence) and not (
+        isinstance(model_id_only, tuple) and isinstance(model_id_only[0], str)
+    )
     model_ids: list[DataModelIdentifier] = (
-        model_id if is_sequence else [model_id]  # type: ignore[list-item, assignment]
+        model_id_only if is_sequence else [model_id_only]  # type: ignore[list-item, assignment]
     )
     return [DataModelId.load(id_) for id_ in model_ids]
 

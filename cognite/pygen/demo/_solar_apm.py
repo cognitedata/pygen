@@ -169,7 +169,9 @@ class SolarFarmAPM:
             An instantiated SDK client for the APM model.
 
         """
-        return generate_sdk_notebook(client, self._data_model_id, logger=self._echo, overwrite=True)
+        if self._data_model is None:
+            return generate_sdk_notebook(client, self._data_model_id, logger=self._echo, overwrite=True)
+        return generate_sdk_notebook(client, self._data_model, logger=self._echo, overwrite=True)
 
     def clean(self, client: CogniteClient, delete_space: bool = True, auto_confirm: bool = False):
         """
