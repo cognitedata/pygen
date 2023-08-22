@@ -58,3 +58,26 @@ def test_case_apply_and_delete(shop_client: ShopClient):
     finally:
         if result is not None:
             shop_client.cases.delete([n.external_id for n in result.nodes])
+
+
+def test_case_apply_with_empty_datetime(shop_client: ShopClient):
+    # Arrange
+    date_format = "%Y-%m-%dT%H:%M:%SZ"
+    case = CaseApply(
+        external_id="shop:case:integration_test:no_end_time",
+        name="Integration test",
+        scenario="Integration test",
+        start_time=datetime.strptime("2021-01-01T00:00:00Z", date_format),
+        run_status="Running",
+    )
+
+    # Act
+    result = None
+    try:
+        result = shop_client.cases.apply(case, replace=True)
+
+        assert len(result.nodes) == 1
+        assert len(result.edges) == 0
+    finally:
+        if result is not None:
+            shop_client.cases.delete([n.external_id for n in result.nodes])
