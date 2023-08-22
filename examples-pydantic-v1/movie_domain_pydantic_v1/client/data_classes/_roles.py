@@ -35,25 +35,31 @@ class RoleApply(DomainModelApply):
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
 
         sources = []
-        source = dm.NodeOrEdgeData(
-            source=dm.ContainerId("IntegrationTestsImmutable", "Role"),
-            properties={
-                "person": {
-                    "space": "IntegrationTestsImmutable",
-                    "externalId": self.person if isinstance(self.person, str) else self.person.external_id,
-                },
-                "wonOscar": self.won_oscar,
-            },
-        )
-        sources.append(source)
+        properties = {}
+        if self.person is not None:
+            properties["person"] = {
+                "space": "IntegrationTestsImmutable",
+                "externalId": self.person if isinstance(self.person, str) else self.person.external_id,
+            }
+        if self.won_oscar is not None:
+            properties["wonOscar"] = self.won_oscar
+        if properties:
+            source = dm.NodeOrEdgeData(
+                source=dm.ContainerId("IntegrationTestsImmutable", "Role"),
+                properties=properties,
+            )
+            sources.append(source)
+        if sources:
+            this_node = dm.NodeApply(
+                space=self.space,
+                external_id=self.external_id,
+                existing_version=self.existing_version,
+                sources=sources,
+            )
+            nodes = [this_node]
+        else:
+            nodes = []
 
-        this_node = dm.NodeApply(
-            space=self.space,
-            external_id=self.external_id,
-            existing_version=self.existing_version,
-            sources=sources,
-        )
-        nodes = [this_node]
         edges = []
         cache.add(self.external_id)
 

@@ -46,33 +46,47 @@ class CaseApply(DomainModelApply):
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
 
         sources = []
-        source = dm.NodeOrEdgeData(
-            source=dm.ContainerId("IntegrationTestsImmutable", "Case"),
-            properties={
-                "arguments": self.arguments,
-                "bid": self.bid,
-                "bid_history": self.bid_history,
-                "commands": {
-                    "space": "IntegrationTestsImmutable",
-                    "externalId": self.commands if isinstance(self.commands, str) else self.commands.external_id,
-                },
-                "cut_files": self.cut_files,
-                "end_time": self.end_time.isoformat(),
-                "name": self.name,
-                "runStatus": self.run_status,
-                "scenario": self.scenario,
-                "start_time": self.start_time.isoformat(),
-            },
-        )
-        sources.append(source)
+        properties = {}
+        if self.arguments is not None:
+            properties["arguments"] = self.arguments
+        if self.bid is not None:
+            properties["bid"] = self.bid
+        if self.bid_history is not None:
+            properties["bid_history"] = self.bid_history
+        if self.commands is not None:
+            properties["commands"] = {
+                "space": "IntegrationTestsImmutable",
+                "externalId": self.commands if isinstance(self.commands, str) else self.commands.external_id,
+            }
+        if self.cut_files is not None:
+            properties["cut_files"] = self.cut_files
+        if self.end_time is not None:
+            properties["end_time"] = self.end_time.isoformat()
+        if self.name is not None:
+            properties["name"] = self.name
+        if self.run_status is not None:
+            properties["runStatus"] = self.run_status
+        if self.scenario is not None:
+            properties["scenario"] = self.scenario
+        if self.start_time is not None:
+            properties["start_time"] = self.start_time.isoformat()
+        if properties:
+            source = dm.NodeOrEdgeData(
+                source=dm.ContainerId("IntegrationTestsImmutable", "Case"),
+                properties=properties,
+            )
+            sources.append(source)
+        if sources:
+            this_node = dm.NodeApply(
+                space=self.space,
+                external_id=self.external_id,
+                existing_version=self.existing_version,
+                sources=sources,
+            )
+            nodes = [this_node]
+        else:
+            nodes = []
 
-        this_node = dm.NodeApply(
-            space=self.space,
-            external_id=self.external_id,
-            existing_version=self.existing_version,
-            sources=sources,
-        )
-        nodes = [this_node]
         edges = []
         cache.add(self.external_id)
 

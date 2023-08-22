@@ -38,36 +38,46 @@ class PygenBidApply(DomainModelApply):
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
 
         sources = []
-        source = dm.NodeOrEdgeData(
-            source=dm.ContainerId("market", "Bid"),
-            properties={
-                "date": self.date,
-                "market": {
-                    "space": "market",
-                    "externalId": self.market if isinstance(self.market, str) else self.market.external_id,
-                },
-                "name": self.name,
-            },
-        )
-        sources.append(source)
+        properties = {}
+        if self.date is not None:
+            properties["date"] = self.date.isoformat()
+        if self.market is not None:
+            properties["market"] = {
+                "space": "market",
+                "externalId": self.market if isinstance(self.market, str) else self.market.external_id,
+            }
+        if self.name is not None:
+            properties["name"] = self.name
+        if properties:
+            source = dm.NodeOrEdgeData(
+                source=dm.ContainerId("market", "Bid"),
+                properties=properties,
+            )
+            sources.append(source)
+        properties = {}
+        if self.is_block is not None:
+            properties["isBlock"] = self.is_block
+        if self.minimum_price is not None:
+            properties["minimumPrice"] = self.minimum_price
+        if self.price_premium is not None:
+            properties["pricePremium"] = self.price_premium
+        if properties:
+            source = dm.NodeOrEdgeData(
+                source=dm.ContainerId("market", "PygenBid"),
+                properties=properties,
+            )
+            sources.append(source)
+        if sources:
+            this_node = dm.NodeApply(
+                space=self.space,
+                external_id=self.external_id,
+                existing_version=self.existing_version,
+                sources=sources,
+            )
+            nodes = [this_node]
+        else:
+            nodes = []
 
-        source = dm.NodeOrEdgeData(
-            source=dm.ContainerId("market", "PygenBid"),
-            properties={
-                "isBlock": self.is_block,
-                "minimumPrice": self.minimum_price,
-                "pricePremium": self.price_premium,
-            },
-        )
-        sources.append(source)
-
-        this_node = dm.NodeApply(
-            space=self.space,
-            external_id=self.external_id,
-            existing_version=self.existing_version,
-            sources=sources,
-        )
-        nodes = [this_node]
         edges = []
         cache.add(self.external_id)
 

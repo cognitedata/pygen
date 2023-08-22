@@ -25,22 +25,28 @@ class MarketApply(DomainModelApply):
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
 
         sources = []
-        source = dm.NodeOrEdgeData(
-            source=dm.ContainerId("market", "Market"),
-            properties={
-                "name": self.name,
-                "timezone": self.timezone,
-            },
-        )
-        sources.append(source)
+        properties = {}
+        if self.name is not None:
+            properties["name"] = self.name
+        if self.timezone is not None:
+            properties["timezone"] = self.timezone
+        if properties:
+            source = dm.NodeOrEdgeData(
+                source=dm.ContainerId("market", "Market"),
+                properties=properties,
+            )
+            sources.append(source)
+        if sources:
+            this_node = dm.NodeApply(
+                space=self.space,
+                external_id=self.external_id,
+                existing_version=self.existing_version,
+                sources=sources,
+            )
+            nodes = [this_node]
+        else:
+            nodes = []
 
-        this_node = dm.NodeApply(
-            space=self.space,
-            external_id=self.external_id,
-            existing_version=self.existing_version,
-            sources=sources,
-        )
-        nodes = [this_node]
         edges = []
         cache.add(self.external_id)
 

@@ -25,22 +25,28 @@ class NominationApply(DomainModelApply):
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
 
         sources = []
-        source = dm.NodeOrEdgeData(
-            source=dm.ContainerId("IntegrationTestsImmutable", "Nomination"),
-            properties={
-                "name": self.name,
-                "year": self.year,
-            },
-        )
-        sources.append(source)
+        properties = {}
+        if self.name is not None:
+            properties["name"] = self.name
+        if self.year is not None:
+            properties["year"] = self.year
+        if properties:
+            source = dm.NodeOrEdgeData(
+                source=dm.ContainerId("IntegrationTestsImmutable", "Nomination"),
+                properties=properties,
+            )
+            sources.append(source)
+        if sources:
+            this_node = dm.NodeApply(
+                space=self.space,
+                external_id=self.external_id,
+                existing_version=self.existing_version,
+                sources=sources,
+            )
+            nodes = [this_node]
+        else:
+            nodes = []
 
-        this_node = dm.NodeApply(
-            space=self.space,
-            external_id=self.external_id,
-            existing_version=self.existing_version,
-            sources=sources,
-        )
-        nodes = [this_node]
         edges = []
         cache.add(self.external_id)
 
