@@ -101,6 +101,8 @@ class TypeList(UserList, Generic[T_TypeNode]):
 
     def to_pandas(self) -> pd.DataFrame:
         df = pd.DataFrame(self.dump())
+        if df.empty:
+            df = pd.DataFrame(columns=self._NODE.model_fields)
         # Reorder columns to have the custom columns first
         fixed_columns = set(DomainModel.model_fields)
         columns = (
