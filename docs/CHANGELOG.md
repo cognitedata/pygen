@@ -17,6 +17,8 @@ Changes are grouped as follows
 ### Fixed
 * The `.to_pandas()` of generated list resource failed with `KeyError` if there were no items returned. This is now
   fixed.
+* The generated SDK for types with `Date`, `DateTime` or one-to-one relationship fails the `.apply()` method with
+  `AttributeError`. This is now fixed.
 
 ## [0.17.3] - 20-08-23
 ### Fixed
