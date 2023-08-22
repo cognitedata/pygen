@@ -32,32 +32,41 @@ class CogPoolApply(DomainModelApply):
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
 
         sources = []
-        source = dm.NodeOrEdgeData(
-            source=dm.ContainerId("market", "CogPool"),
-            properties={
-                "maxPrice": self.max_price,
-                "minPrice": self.min_price,
-                "timeUnit": self.time_unit,
-            },
-        )
-        sources.append(source)
+        properties = {}
+        if self.max_price is not None:
+            properties["maxPrice"] = self.max_price
+        if self.min_price is not None:
+            properties["minPrice"] = self.min_price
+        if self.time_unit is not None:
+            properties["timeUnit"] = self.time_unit
+        if properties:
+            source = dm.NodeOrEdgeData(
+                source=dm.ContainerId("market", "CogPool"),
+                properties=properties,
+            )
+            sources.append(source)
+        properties = {}
+        if self.name is not None:
+            properties["name"] = self.name
+        if self.timezone is not None:
+            properties["timezone"] = self.timezone
+        if properties:
+            source = dm.NodeOrEdgeData(
+                source=dm.ContainerId("market", "Market"),
+                properties=properties,
+            )
+            sources.append(source)
+        if sources:
+            this_node = dm.NodeApply(
+                space=self.space,
+                external_id=self.external_id,
+                existing_version=self.existing_version,
+                sources=sources,
+            )
+            nodes = [this_node]
+        else:
+            nodes = []
 
-        source = dm.NodeOrEdgeData(
-            source=dm.ContainerId("market", "Market"),
-            properties={
-                "name": self.name,
-                "timezone": self.timezone,
-            },
-        )
-        sources.append(source)
-
-        this_node = dm.NodeApply(
-            space=self.space,
-            external_id=self.external_id,
-            existing_version=self.existing_version,
-            sources=sources,
-        )
-        nodes = [this_node]
         edges = []
         cache.add(self.external_id)
 

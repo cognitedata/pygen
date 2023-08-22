@@ -29,25 +29,31 @@ class ProcesApply(DomainModelApply):
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
 
         sources = []
-        source = dm.NodeOrEdgeData(
-            source=dm.ContainerId("market", "Process"),
-            properties={
-                "bid": {
-                    "space": "market",
-                    "externalId": self.bid if isinstance(self.bid, str) else self.bid.external_id,
-                },
-                "name": self.name,
-            },
-        )
-        sources.append(source)
+        properties = {}
+        if self.bid is not None:
+            properties["bid"] = {
+                "space": "market",
+                "externalId": self.bid if isinstance(self.bid, str) else self.bid.external_id,
+            }
+        if self.name is not None:
+            properties["name"] = self.name
+        if properties:
+            source = dm.NodeOrEdgeData(
+                source=dm.ContainerId("market", "Process"),
+                properties=properties,
+            )
+            sources.append(source)
+        if sources:
+            this_node = dm.NodeApply(
+                space=self.space,
+                external_id=self.external_id,
+                existing_version=self.existing_version,
+                sources=sources,
+            )
+            nodes = [this_node]
+        else:
+            nodes = []
 
-        this_node = dm.NodeApply(
-            space=self.space,
-            external_id=self.external_id,
-            existing_version=self.existing_version,
-            sources=sources,
-        )
-        nodes = [this_node]
         edges = []
         cache.add(self.external_id)
 
