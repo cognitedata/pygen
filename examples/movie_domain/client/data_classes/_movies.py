@@ -38,32 +38,42 @@ class MovieApply(DomainModelApply):
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:
-            return dm.InstancesApply([], [])
+            return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
 
         sources = []
-        source = dm.NodeOrEdgeData(
-            source=dm.ContainerId("IntegrationTestsImmutable", "Movie"),
-            properties={
-                "meta": self.meta,
-                "rating": {
-                    "space": "IntegrationTestsImmutable",
-                    "externalId": self.rating if isinstance(self.rating, str) else self.rating.external_id,
-                },
-                "releaseYear": self.release_year,
-                "runTimeMinutes": self.run_time_minutes,
-                "title": self.title,
-            },
-        )
-        sources.append(source)
+        properties = {}
+        if self.meta is not None:
+            properties["meta"] = self.meta
+        if self.rating is not None:
+            properties["rating"] = {
+                "space": "IntegrationTestsImmutable",
+                "externalId": self.rating if isinstance(self.rating, str) else self.rating.external_id,
+            }
+        if self.release_year is not None:
+            properties["releaseYear"] = self.release_year
+        if self.run_time_minutes is not None:
+            properties["runTimeMinutes"] = self.run_time_minutes
+        if self.title is not None:
+            properties["title"] = self.title
+        if properties:
+            source = dm.NodeOrEdgeData(
+                source=dm.ContainerId("IntegrationTestsImmutable", "Movie"),
+                properties=properties,
+            )
+            sources.append(source)
+        if sources:
+            this_node = dm.NodeApply(
+                space=self.space,
+                external_id=self.external_id,
+                existing_version=self.existing_version,
+                sources=sources,
+            )
+            nodes = [this_node]
+        else:
+            nodes = []
 
-        this_node = dm.NodeApply(
-            space=self.space,
-            external_id=self.external_id,
-            existing_version=self.existing_version,
-            sources=sources,
-        )
-        nodes = [this_node]
         edges = []
+        cache.add(self.external_id)
 
         for actor in self.actors:
             edge = self._create_actor_edge(actor)
@@ -92,7 +102,7 @@ class MovieApply(DomainModelApply):
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 
-        return dm.InstancesApply(nodes, edges)
+        return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
 
     def _create_actor_edge(self, actor: Union[str, "ActorApply"]) -> dm.EdgeApply:
         if isinstance(actor, str):

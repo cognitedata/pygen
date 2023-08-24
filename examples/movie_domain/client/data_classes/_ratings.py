@@ -22,28 +22,35 @@ class RatingApply(DomainModelApply):
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:
-            return dm.InstancesApply([], [])
+            return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
 
         sources = []
-        source = dm.NodeOrEdgeData(
-            source=dm.ContainerId("IntegrationTestsImmutable", "Rating"),
-            properties={
-                "score": self.score,
-                "votes": self.votes,
-            },
-        )
-        sources.append(source)
+        properties = {}
+        if self.score is not None:
+            properties["score"] = self.score
+        if self.votes is not None:
+            properties["votes"] = self.votes
+        if properties:
+            source = dm.NodeOrEdgeData(
+                source=dm.ContainerId("IntegrationTestsImmutable", "Rating"),
+                properties=properties,
+            )
+            sources.append(source)
+        if sources:
+            this_node = dm.NodeApply(
+                space=self.space,
+                external_id=self.external_id,
+                existing_version=self.existing_version,
+                sources=sources,
+            )
+            nodes = [this_node]
+        else:
+            nodes = []
 
-        this_node = dm.NodeApply(
-            space=self.space,
-            external_id=self.external_id,
-            existing_version=self.existing_version,
-            sources=sources,
-        )
-        nodes = [this_node]
         edges = []
+        cache.add(self.external_id)
 
-        return dm.InstancesApply(nodes, edges)
+        return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
 
 
 class RatingList(TypeList[Rating]):
