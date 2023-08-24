@@ -13,6 +13,11 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.17.5] - 20-08-24
+### Fixed
+* `utils.cdf.CSVLoader` failed for data type `date`.
+
+
 ## [0.17.4] - 22-08-23
 ### Fixed
 * The `.to_pandas()` of generated list resource failed with `KeyError` if there were no items returned. This is now
