@@ -471,6 +471,7 @@ class CogniteResourceDataTypesConverter:
     """
 
     supported_timestamp_formats = ("%Y-%m-%dT%H:%M:%SZ", "%d/%m/%Y", "%Y-%m-%dT%H:%M:%S.%fZ")
+    supported_date_formats = ("%Y-%m-%d", "%m/%d/%Y")
 
     def __init__(
         self, resource_cls: type[CogniteResource] | None = None, properties: dict[str, MappedProperty] | None = None
@@ -564,6 +565,12 @@ class CogniteResourceDataTypesConverter:
                 except ValueError:
                     pass
             raise ValueError(f"Unsupported timestamp format: {value}")
+        elif isinstance(property_type, data_types.Date):
+            for supported_format in cls.supported_date_formats:
+                try:
+                    return datetime.strptime(value, supported_format).date().isoformat()
+                except ValueError:
+                    pass
         elif isinstance(property_type, data_types.DirectRelation):
             if not value:
                 raise ValueError("Direct relation cannot be empty")
