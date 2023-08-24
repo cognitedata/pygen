@@ -26,7 +26,7 @@ def generate_sdk_notebook(
     top_level_package: Optional[str] = None,
     client_name: Optional[str] = None,
     logger: Callable[[str], None] | None = None,
-    overwrite: bool = False,
+    overwrite: bool = True,
     format_code: bool = False,
 ) -> Any:
     """
@@ -44,7 +44,7 @@ def generate_sdk_notebook(
         client_name: The name of the client class. Example "MovieClient". If nothing is passed the clien name will be
                      [external_id:pascal_case]Client of the first data model given.
         logger: A logger function that will be called with the progress of the generation.
-        overwrite: Whether to overwrite the output directory if it already exists. Defaults to False.
+        overwrite: Whether to overwrite the output directory if it already exists. Defaults to True.
         format_code: Whether to format the generated code using black. Defaults to False.
 
     Returns:
