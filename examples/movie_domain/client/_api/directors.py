@@ -5,7 +5,7 @@ from typing import Dict, List, Sequence, Tuple, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
-from cognite.client._constants import INSTANCES_LIST_LIMIT_DEFAULT
+from cognite.client._constants import DEFAULT_LIMIT_READ
 
 from movie_domain.client._api._core import TypeAPI
 from movie_domain.client.data_classes import Director, DirectorApply, DirectorList
@@ -35,7 +35,7 @@ class DirectorMoviesAPI:
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_directors))
 
-    def list(self, limit=INSTANCES_LIST_LIMIT_DEFAULT) -> dm.EdgeList:
+    def list(self, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -68,7 +68,7 @@ class DirectorNominationsAPI:
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_directors))
 
-    def list(self, limit=INSTANCES_LIST_LIMIT_DEFAULT) -> dm.EdgeList:
+    def list(self, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -129,7 +129,7 @@ class DirectorsAPI(TypeAPI[Director, DirectorApply, DirectorList]):
 
             return directors
 
-    def list(self, limit: int = INSTANCES_LIST_LIMIT_DEFAULT) -> DirectorList:
+    def list(self, limit: int = DEFAULT_LIMIT_READ) -> DirectorList:
         directors = self._list(limit=limit)
 
         movie_edges = self.movies.list(limit=-1)

@@ -4,7 +4,7 @@ from typing import Sequence, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
-from cognite.client._constants import INSTANCES_LIST_LIMIT_DEFAULT
+from cognite.client._constants import DEFAULT_LIMIT_READ
 
 from markets_pydantic_v1.client._api._core import TypeAPI
 from markets_pydantic_v1.client.data_classes import Proces, ProcesApply, ProcesList
@@ -46,5 +46,5 @@ class ProcessAPI(TypeAPI[Proces, ProcesApply, ProcesList]):
         else:
             return self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
 
-    def list(self, limit: int = INSTANCES_LIST_LIMIT_DEFAULT) -> ProcesList:
+    def list(self, limit: int = DEFAULT_LIMIT_READ) -> ProcesList:
         return self._list(limit=limit)

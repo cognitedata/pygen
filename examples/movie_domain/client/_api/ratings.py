@@ -4,7 +4,7 @@ from typing import Sequence, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
-from cognite.client._constants import INSTANCES_LIST_LIMIT_DEFAULT
+from cognite.client._constants import DEFAULT_LIMIT_READ
 
 from movie_domain.client._api._core import TypeAPI
 from movie_domain.client.data_classes import Rating, RatingApply, RatingList
@@ -46,5 +46,5 @@ class RatingsAPI(TypeAPI[Rating, RatingApply, RatingList]):
         else:
             return self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
 
-    def list(self, limit: int = INSTANCES_LIST_LIMIT_DEFAULT) -> RatingList:
+    def list(self, limit: int = DEFAULT_LIMIT_READ) -> RatingList:
         return self._list(limit=limit)

@@ -5,7 +5,7 @@ from typing import Dict, List, Sequence, Tuple, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
-from cognite.client._constants import INSTANCES_LIST_LIMIT_DEFAULT
+from cognite.client._constants import DEFAULT_LIMIT_READ
 
 from markets_pydantic_v1.client._api._core import TypeAPI
 from markets_pydantic_v1.client.data_classes import (
@@ -43,7 +43,7 @@ class DateTransformationPairEndsAPI:
                 "edge", limit=-1, filter=f.And(is_edge_type, is_date_transformation_pairs)
             )
 
-    def list(self, limit=INSTANCES_LIST_LIMIT_DEFAULT) -> dm.EdgeList:
+    def list(self, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -80,7 +80,7 @@ class DateTransformationPairStartsAPI:
                 "edge", limit=-1, filter=f.And(is_edge_type, is_date_transformation_pairs)
             )
 
-    def list(self, limit=INSTANCES_LIST_LIMIT_DEFAULT) -> dm.EdgeList:
+    def list(self, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -152,7 +152,7 @@ class DateTransformationPairsAPI(
 
             return date_transformation_pairs
 
-    def list(self, limit: int = INSTANCES_LIST_LIMIT_DEFAULT) -> DateTransformationPairList:
+    def list(self, limit: int = DEFAULT_LIMIT_READ) -> DateTransformationPairList:
         date_transformation_pairs = self._list(limit=limit)
 
         end_edges = self.ends.list(limit=-1)

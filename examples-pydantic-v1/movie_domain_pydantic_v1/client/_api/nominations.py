@@ -4,7 +4,7 @@ from typing import Sequence, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
-from cognite.client._constants import INSTANCES_LIST_LIMIT_DEFAULT
+from cognite.client._constants import DEFAULT_LIMIT_READ
 
 from movie_domain_pydantic_v1.client._api._core import TypeAPI
 from movie_domain_pydantic_v1.client.data_classes import Nomination, NominationApply, NominationList
@@ -46,5 +46,5 @@ class NominationsAPI(TypeAPI[Nomination, NominationApply, NominationList]):
         else:
             return self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
 
-    def list(self, limit: int = INSTANCES_LIST_LIMIT_DEFAULT) -> NominationList:
+    def list(self, limit: int = DEFAULT_LIMIT_READ) -> NominationList:
         return self._list(limit=limit)
