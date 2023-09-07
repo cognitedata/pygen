@@ -4,7 +4,7 @@ from typing import Sequence, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
-from cognite.client._constants import INSTANCES_LIST_LIMIT_DEFAULT
+from cognite.client._constants import DEFAULT_LIMIT_READ
 
 from markets_pydantic_v1.client._api._core import TypeAPI
 from markets_pydantic_v1.client.data_classes import PygenProces, PygenProcesApply, PygenProcesList
