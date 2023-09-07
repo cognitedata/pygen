@@ -35,7 +35,7 @@ class PersonRolesAPI:
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_persons))
 
-    def list(self, limit=INSTANCES_LIST_LIMIT_DEFAULT) -> dm.EdgeList:
+    def list(self, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -91,7 +91,7 @@ class PersonsAPI(TypeAPI[Person, PersonApply, PersonList]):
 
             return persons
 
-    def list(self, limit: int = INSTANCES_LIST_LIMIT_DEFAULT) -> PersonList:
+    def list(self, limit: int = DEFAULT_LIMIT_READ) -> PersonList:
         persons = self._list(limit=limit)
 
         role_edges = self.roles.list(limit=-1)

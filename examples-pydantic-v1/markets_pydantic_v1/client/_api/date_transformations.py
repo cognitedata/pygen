@@ -46,5 +46,5 @@ class DateTransformationsAPI(TypeAPI[DateTransformation, DateTransformationApply
         else:
             return self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
 
-    def list(self, limit: int = INSTANCES_LIST_LIMIT_DEFAULT) -> DateTransformationList:
+    def list(self, limit: int = DEFAULT_LIMIT_READ) -> DateTransformationList:
         return self._list(limit=limit)

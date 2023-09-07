@@ -35,7 +35,7 @@ class RoleMoviesAPI:
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_roles))
 
-    def list(self, limit=INSTANCES_LIST_LIMIT_DEFAULT) -> dm.EdgeList:
+    def list(self, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -68,7 +68,7 @@ class RoleNominationsAPI:
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_roles))
 
-    def list(self, limit=INSTANCES_LIST_LIMIT_DEFAULT) -> dm.EdgeList:
+    def list(self, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -129,7 +129,7 @@ class RolesAPI(TypeAPI[Role, RoleApply, RoleList]):
 
             return roles
 
-    def list(self, limit: int = INSTANCES_LIST_LIMIT_DEFAULT) -> RoleList:
+    def list(self, limit: int = DEFAULT_LIMIT_READ) -> RoleList:
         roles = self._list(limit=limit)
 
         movie_edges = self.movies.list(limit=-1)

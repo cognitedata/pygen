@@ -46,5 +46,5 @@ class RatingsAPI(TypeAPI[Rating, RatingApply, RatingList]):
         else:
             return self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
 
-    def list(self, limit: int = INSTANCES_LIST_LIMIT_DEFAULT) -> RatingList:
+    def list(self, limit: int = DEFAULT_LIMIT_READ) -> RatingList:
         return self._list(limit=limit)

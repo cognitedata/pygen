@@ -35,7 +35,7 @@ class MovieActorsAPI:
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_movies))
 
-    def list(self, limit=INSTANCES_LIST_LIMIT_DEFAULT) -> dm.EdgeList:
+    def list(self, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -68,7 +68,7 @@ class MovieDirectorsAPI:
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_movies))
 
-    def list(self, limit=INSTANCES_LIST_LIMIT_DEFAULT) -> dm.EdgeList:
+    def list(self, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -129,7 +129,7 @@ class MoviesAPI(TypeAPI[Movie, MovieApply, MovieList]):
 
             return movies
 
-    def list(self, limit: int = INSTANCES_LIST_LIMIT_DEFAULT) -> MovieList:
+    def list(self, limit: int = DEFAULT_LIMIT_READ) -> MovieList:
         movies = self._list(limit=limit)
 
         actor_edges = self.actors.list(limit=-1)

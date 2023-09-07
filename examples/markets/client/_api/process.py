@@ -46,5 +46,5 @@ class ProcessAPI(TypeAPI[Proces, ProcesApply, ProcesList]):
         else:
             return self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
 
-    def list(self, limit: int = INSTANCES_LIST_LIMIT_DEFAULT) -> ProcesList:
+    def list(self, limit: int = DEFAULT_LIMIT_READ) -> ProcesList:
         return self._list(limit=limit)

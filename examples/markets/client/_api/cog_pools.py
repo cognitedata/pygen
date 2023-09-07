@@ -46,5 +46,5 @@ class CogPoolsAPI(TypeAPI[CogPool, CogPoolApply, CogPoolList]):
         else:
             return self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
 
-    def list(self, limit: int = INSTANCES_LIST_LIMIT_DEFAULT) -> CogPoolList:
+    def list(self, limit: int = DEFAULT_LIMIT_READ) -> CogPoolList:
         return self._list(limit=limit)

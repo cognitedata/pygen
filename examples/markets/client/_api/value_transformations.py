@@ -46,5 +46,5 @@ class ValueTransformationsAPI(TypeAPI[ValueTransformation, ValueTransformationAp
         else:
             return self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
 
-    def list(self, limit: int = INSTANCES_LIST_LIMIT_DEFAULT) -> ValueTransformationList:
+    def list(self, limit: int = DEFAULT_LIMIT_READ) -> ValueTransformationList:
         return self._list(limit=limit)

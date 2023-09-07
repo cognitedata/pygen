@@ -4,7 +4,7 @@ from typing import Generic, Sequence, Type, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
-from cognite.client._constants import INSTANCES_LIST_LIMIT_DEFAULT
+from cognite.client._constants import DEFAULT_LIMIT_READ
 
 from movie_domain.client.data_classes._core import T_TypeApplyNode, T_TypeNode, T_TypeNodeList
 
@@ -45,6 +45,6 @@ class TypeAPI(Generic[T_TypeNode, T_TypeApplyNode, T_TypeNodeList]):
             return self.class_list([self.class_type.from_node(node) for node in instances.nodes])
         return self.class_type.from_node(instances.nodes[0])
 
-    def _list(self, limit: int = INSTANCES_LIST_LIMIT_DEFAULT) -> T_TypeNodeList:
+    def _list(self, limit: int = DEFAULT_LIMIT_READ) -> T_TypeNodeList:
         nodes = self._client.data_modeling.instances.list("node", sources=self.sources, limit=limit)
         return self.class_list([self.class_type.from_node(node) for node in nodes])

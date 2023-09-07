@@ -46,5 +46,5 @@ class BidsAPI(TypeAPI[Bid, BidApply, BidList]):
         else:
             return self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
 
-    def list(self, limit: int = INSTANCES_LIST_LIMIT_DEFAULT) -> BidList:
+    def list(self, limit: int = DEFAULT_LIMIT_READ) -> BidList:
         return self._list(limit=limit)
