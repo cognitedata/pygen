@@ -13,6 +13,11 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.17.7] - 20-09-07
+### Fixed
+* Removed import of `INSTANCES_LIST_LIMIT_DEFAULT` from `cognite-sdk` which no longer exists. This is a private
+  constant in the `cognite-sdk` which was removed in `v6.20.0`.
+
 ## [0.17.6] - 20-08-24
 ### Fixed
 * `cognite.pygen.generate_sdk_notebook` parameter `overwrite` from `False` to `True`.
