@@ -22,7 +22,7 @@ class MovieClient:
     MovieClient
 
     Generated with:
-        pygen = 0.17.6
+        pygen = 0.17.7
         cognite-sdk = 6.14.0
         pydantic = 1.10.7
 
