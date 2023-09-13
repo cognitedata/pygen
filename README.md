@@ -20,12 +20,12 @@ versions. The project may also become deprecated if the experimentation turns ou
 The core functionality is to provide a Python client that matches a data model. This enables the developer for the following
 benefits
 
-* Client side validation of the data before writing it to CDF.
+* Client-side validation of the data before writing it to CDF.
 * Autocompletion is matching the data model in the integrated developer environment (IDE). This is important as it enables:
   * Discoverability of a data model through Python.
   * Reduced typing errors in development.
 * Keeping the language domain specific for the developer. Instead of working with generic concepts such as instances,
-  nodes, edges, the developer can work with the concepts in the data model.
+  nodes and edges, the developer can work with the concepts in the data model.
 
 ## Documentation
 
@@ -69,7 +69,7 @@ pygen generate --space movies \
     --client-id <client-id> \
     --client-secret <client-secret> \
     --cdf-cluster <cdf-cluster> \
-    --cdf-procect <cdf-project>
+    --cdf-project <cdf-project>
 ```
 
 ## Dependencies
@@ -77,7 +77,7 @@ pygen generate --space movies \
 ### Dependencies for the generated SDK
 
 * [cognite-sdk](https://cognite-sdk-python.readthedocs-hosted.com/en/latest/) This is the basis for all requests to the Cognite Data Fusion API. This is a dependency for the generated SDK.
-* [pydandic](https://docs.pydantic.dev/latest/) This is used for all data classes in the generated SDK. This is a dependency for the generated SDK.
+* [pydantic](https://docs.pydantic.dev/latest/) This is used for all data classes in the generated SDK. This is a dependency for the generated SDK.
 
 ### Dependencies for the `pygen`
 
