@@ -126,7 +126,7 @@ if _has_typer:
 else:
 
     def main():
-        print("THE CLI requires typer to be available, install with `pip install cognite-pygen[cli]")
+        print("THE CLI requires typer to be available, install with `pip install cognite-pygen[cli]`")
 
 
 if __name__ == "__main__":
