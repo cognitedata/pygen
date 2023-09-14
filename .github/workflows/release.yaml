@@ -41,7 +41,7 @@ jobs:
       - name: Test
         run: pytest cognite tests/test_unit
 
-      - uses: codecov/codecov-action@v3
+      - uses: codecov/codecov-action@v4
         with:
           file: ./coverage.xml
 
