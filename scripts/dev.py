@@ -2,6 +2,8 @@
 This is a small CLI used for development of Pygen.
 
 """
+import re
+
 import typer
 
 from cognite.pygen import SDKGenerator, write_sdk_to_disk
@@ -9,6 +11,9 @@ from cognite.pygen.utils.cdf import load_cognite_client_from_toml
 from tests.constants import EXAMPLE_SDKS, EXAMPLES_DIR, REPO_ROOT
 from cognite.client.data_classes.data_modeling import DataModel
 from yaml import safe_load, safe_dump
+import toml
+from cognite.client._version import __version__ as cognite_sdk_version
+from pydantic.version import VERSION as PYDANTIC_VERSION
 
 app = typer.Typer(add_completion=False, help=__doc__)
 
@@ -51,31 +56,64 @@ def download():
 
 
 @app.command(
-    "bump", help="Bump the version of Pygen. This also updates the Python-SDK and Pydantic version in all examples"
+    "bump", help="Bump the version of Pygen. This also updates the cognite-sdk and pydantic version in all examples"
 )
 def bump(major: bool = False, minor: bool = False, patch: bool = False):
     if sum([major, minor, patch]) != 1:
         raise typer.BadParameter("Exactly one of --major, --minor, or --patch must be set")
-    last_version = "0.17.6"
-    new_version = "0.17.7"
 
     pyproject_toml = REPO_ROOT / "pyproject.toml"
     version_py = REPO_ROOT / "cognite" / "pygen" / "_version.py"
-    api_client_files = list(EXAMPLES_DIR.glob("**/_api_client.py")) + list(
-        EXAMPLES_DIR_PYDANTIC_V1.glob("**/_api_client.py")
+    api_client_files = list((REPO_ROOT / "examples").glob("**/_api_client.py")) + list(
+        (REPO_ROOT / "examples-pydantic-v1").glob("**/_api_client.py")
     )
+    current_version = toml.loads(pyproject_toml.read_text())["tool"]["poetry"]["version"]
+
+    major, minor, patch = [int(x) for x in current_version.split(".")]
+    if major:
+        major += 1
+        minor = 0
+        patch = 0
+    elif minor:
+        minor += 1
+        patch = 0
+    elif patch:
+        patch += 1
+    new_version = f"{major}.{minor}.{patch}"
+    typer.echo(f"Bumping version from {current_version} to {new_version}...")
+    typer.echo(f"And setting {cognite_sdk_version} and {PYDANTIC_VERSION} as the Python-SDK and Pydantic versions")
+    answer = typer.confirm("Are you sure you want to continue?")
+    if not answer:
+        typer.echo("Aborting")
+        raise typer.Abort()
+
+    if current_version != cognite_sdk_version or current_version != PYDANTIC_VERSION:
+        raise ValueError(f"Edge case not handled: {current_version=}, {cognite_sdk_version=}, {PYDANTIC_VERSION=}")
 
     for file in [pyproject_toml, version_py, *api_client_files]:
-        content = file.read_text().replace(last_version, new_version)
+        content = file.read_text().replace(current_version, new_version)
+        content = re.sub(r"cognite-sdk = \d+.\d+.\d+", f"cognite-sdk = {cognite_sdk_version}", content)
+        content = re.sub(r"pydantic = \d+.\d+.\d+", f"pydantic = {PYDANTIC_VERSION}", content)
         file.write_text(content)
-        print(f"Updated {file.relative_to(REPO_ROOT)}, replacing {last_version} with {new_version}.")
-    print("Done")
+        typer.echo(f"Updated {file.relative_to(REPO_ROOT)}, replaced {current_version} with {new_version}.")
+    typer.echo("Done")
 
 
-@app.command("readme", help="Update the README.md file")
-def readme(readme: bool, index: bool):
-    if sum([readme, index]) != 1:
-        raise typer.BadParameter("Exactly one of --readme or --index must be set")
+@app.command(
+    "overwrite-index", help="README.md and docs/index.md must match. This commands copies from README.md to index.md"
+)
+def overwrite_index():
+    readme = (REPO_ROOT / "README.md").read_text()
+    index_path = REPO_ROOT / "docs" / "index.md"
+    index = index_path.read_text()
+
+    copy = _remove_top_lines(readme, 2)
+    new_index = "\n".join(index.split("\n")[:1] + copy.split("\n"))
+    index_path.write_text(new_index)
+
+
+def _remove_top_lines(text: str, lines: int) -> str:
+    return "\n".join(text.split("\n")[lines:])
 
 
 if __name__ == "__main__":
