@@ -66,9 +66,9 @@ def list_manual_files():
 @app.command(
     "bump", help="Bump the version of Pygen. This also updates the cognite-sdk and pydantic version in all examples"
 )
-def bump(major: bool = False, minor: bool = False, patch: bool = False):
-    if sum([major, minor, patch]) != 1:
-        raise typer.BadParameter("Exactly one of --major, --minor, or --patch must be set")
+def bump(major: bool = False, minor: bool = False, patch: bool = False, skip: bool = False):
+    if sum([major, minor, patch, skip]) != 1:
+        raise typer.BadParameter("Exactly one of --major, --minor, --patch, or --skip must be set")
 
     pyproject_toml = REPO_ROOT / "pyproject.toml"
     version_py = REPO_ROOT / "cognite" / "pygen" / "_version.py"
@@ -89,7 +89,7 @@ def bump(major: bool = False, minor: bool = False, patch: bool = False):
         patch += 1
     new_version = f"{major}.{minor}.{patch}"
     typer.echo(f"Bumping version from {current_version} to {new_version}...")
-    typer.echo(f"And setting {cognite_sdk_version} and {PYDANTIC_VERSION} as the Python-SDK and Pydantic versions")
+    typer.echo(f"And setting cognite-sdk={cognite_sdk_version} and pydantic={PYDANTIC_VERSION} versions in examples")
     answer = typer.confirm("Are you sure you want to continue?")
     if not answer:
         typer.echo("Aborting")
@@ -99,7 +99,8 @@ def bump(major: bool = False, minor: bool = False, patch: bool = False):
         raise ValueError(f"Edge case not handled: {current_version=}, {cognite_sdk_version=}, {PYDANTIC_VERSION=}")
 
     for file in [pyproject_toml, version_py, *api_client_files]:
-        content = file.read_text().replace(current_version, new_version)
+        if not skip:
+            content = file.read_text().replace(current_version, new_version)
         content = re.sub(r"cognite-sdk = \d+.\d+.\d+", f"cognite-sdk = {cognite_sdk_version}", content)
         content = re.sub(r"pydantic = \d+.\d+.\d+", f"pydantic = {PYDANTIC_VERSION}", content)
         file.write_text(content)
