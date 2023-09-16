@@ -55,6 +55,14 @@ def download():
             typer.echo(f"Downloaded {dms_file.relative_to(REPO_ROOT)}")
 
 
+@app.command("list", help="List all example files which are expected to be changed manually")
+def list_manual_files():
+    for example_sdk in EXAMPLE_SDKS:
+        typer.echo(f"{example_sdk.client_name} SDK:")
+        for manual_file in example_sdk.manual_files:
+            typer.echo(f" - {manual_file.relative_to(EXAMPLES_DIR)}")
+
+
 @app.command(
     "bump", help="Bump the version of Pygen. This also updates the cognite-sdk and pydantic version in all examples"
 )
