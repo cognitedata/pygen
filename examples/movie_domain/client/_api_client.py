@@ -17,28 +17,18 @@ from movie_domain.client._api.ratings import RatingsAPI
 from movie_domain.client._api.roles import RolesAPI
 
 
-class MovieClient:
+class MovieAPIs:
     """
-    MovieClient
-
-    Generated with:
-        pygen = 0.17.7
-        cognite-sdk = 6.25.1
-        pydantic = 2.3.0
+    MovieAPIs
 
     Data Model:
         space: IntegrationTestsImmutable
         externalId: Movie
         version: 2
+
     """
 
-    def __init__(self, config_or_client: CogniteClient | ClientConfig):
-        if isinstance(config_or_client, CogniteClient):
-            client = config_or_client
-        elif isinstance(config_or_client, ClientConfig):
-            client = CogniteClient(config_or_client)
-        else:
-            raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
+    def __init__(self, client: CogniteClient):
         self.actors = ActorsAPI(client)
         self.best_directors = BestDirectorsAPI(client)
         self.best_leading_actors = BestLeadingActorsAPI(client)
@@ -49,6 +39,27 @@ class MovieClient:
         self.persons = PersonsAPI(client)
         self.ratings = RatingsAPI(client)
         self.roles = RolesAPI(client)
+
+
+class MovieClient:
+    """
+    MovieClient
+
+    Generated with:
+        pygen = 0.17.7
+        cognite-sdk = 6.25.1
+        pydantic = 2.3.0
+
+    """
+
+    def __init__(self, config_or_client: CogniteClient | ClientConfig):
+        if isinstance(config_or_client, CogniteClient):
+            client = config_or_client
+        elif isinstance(config_or_client, ClientConfig):
+            client = CogniteClient(config_or_client)
+        else:
+            raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
+        self.movie = MovieAPIs(client)
 
     @classmethod
     def azure_project(

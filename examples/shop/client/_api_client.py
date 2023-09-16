@@ -9,6 +9,22 @@ from shop.client._api.cases import CasesAPI
 from shop.client._api.command_configs import CommandConfigsAPI
 
 
+class SHOPModelAPIs:
+    """
+    SHOPModelAPIs
+
+    Data Model:
+        space: IntegrationTestsImmutable
+        externalId: SHOP_Model
+        version: 2
+
+    """
+
+    def __init__(self, client: CogniteClient):
+        self.cases = CasesAPI(client)
+        self.command_configs = CommandConfigsAPI(client)
+
+
 class ShopClient:
     """
     ShopClient
@@ -18,10 +34,6 @@ class ShopClient:
         cognite-sdk = 6.25.1
         pydantic = 2.3.0
 
-    Data Model:
-        space: IntegrationTestsImmutable
-        externalId: SHOP_Model
-        version: 2
     """
 
     def __init__(self, config_or_client: CogniteClient | ClientConfig):
@@ -31,8 +43,7 @@ class ShopClient:
             client = CogniteClient(config_or_client)
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
-        self.cases = CasesAPI(client)
-        self.command_configs = CommandConfigsAPI(client)
+        self.shop_model = SHOPModelAPIs(client)
 
     @classmethod
     def azure_project(
