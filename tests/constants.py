@@ -3,7 +3,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling import DataModelId
+from yaml import safe_load
 
 from cognite.pygen.utils.helper import get_pydantic_version
 
@@ -44,6 +46,18 @@ class ExampleSDK:
     def client_dir(self) -> Path:
         return EXAMPLES_DIR / self.top_level_package.replace(".", "/")
 
+    def load_data_models(self) -> list[dm.DataModel[dm.View]]:
+        models = []
+        for dms_file in self.dms_files:
+            models.append(dm.DataModel.load(safe_load(dms_file.read_text())[0]))
+        return models
+
+    def load_data_model(self) -> dm.DataModel[dm.View]:
+        models = self.load_data_models()
+        if len(models) == 1:
+            return models[0]
+        raise ValueError(f"Expected exactly one data model, got {len(models)}")
+
     def append_manual_files(self, manual_files_cls: type):
         for var in vars(manual_files_cls).values():
             if isinstance(var, Path) and var.is_file():
@@ -73,13 +87,6 @@ APM_SDK = ExampleSDK(
     _top_level_package="tutorial_apm_simple.client",
     client_name="ApmSimpleClient",
 )
-
-
-class DMSModels:
-    movie_model = MOVIE_SDK.dms_files[0]
-    shop_model = SHOP_SDK.dms_files[0]
-    cog_pool = MARKET_SDK.dms_files[0]
-    pygen_pool = MARKET_SDK.dms_files[1]
 
 
 # The following files are manually controlled and should not be overwritten by the generator.

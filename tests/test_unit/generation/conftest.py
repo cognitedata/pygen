@@ -1,15 +1,12 @@
 import pytest
 from cognite.client import data_modeling as dm
-from yaml import safe_load
 
-from tests.constants import APM_SDK, DMSModels
+from tests.constants import APM_SDK, MARKET_SDK, MOVIE_SDK, SHOP_SDK
 
 
 @pytest.fixture(scope="session")
-def movie_model() -> dm.DataModel:
-    with DMSModels.movie_model.open("r") as f:
-        raw = safe_load(f)
-    return dm.DataModel.load(raw)
+def movie_model() -> dm.DataModel[dm.View]:
+    return MOVIE_SDK.load_data_model()
 
 
 @pytest.fixture(scope="session")
@@ -28,34 +25,33 @@ def movie_views(movie_model: dm.DataModel) -> dm.ViewList:
 
 
 @pytest.fixture
-def shop_model() -> dm.DataModel:
-    with DMSModels.shop_model.open("r") as f:
-        raw = safe_load(f)
-    return dm.DataModel.load(raw)
+def shop_model() -> dm.DataModel[dm.DataModel]:
+    return SHOP_SDK.load_data_model()
 
 
 @pytest.fixture
-def case_view(shop_model) -> dm.View:
+def case_view(shop_model: dm.DataModel[dm.View]) -> dm.View:
     return next(v for v in shop_model.views if v.name == "Case")
 
 
 @pytest.fixture
-def command_config_view(shop_model) -> dm.View:
+def command_config_view(shop_model: dm.DataModel[dm.View]) -> dm.View:
     return next(v for v in shop_model.views if v.name == "Command_Config")
 
 
 @pytest.fixture(scope="session")
-def cog_pool_model() -> dm.DataModel:
-    with DMSModels.cog_pool.open("r") as f:
-        raw = safe_load(f)
-    return dm.DataModel.load(raw)
+def market_models() -> list[dm.DataModel[dm.View]]:
+    return MARKET_SDK.load_data_models()
 
 
 @pytest.fixture(scope="session")
-def pygen_pool_model() -> dm.DataModel:
-    with DMSModels.pygen_pool.open("r") as f:
-        raw = safe_load(f)
-    return dm.DataModel.load(raw)
+def cog_pool_model(market_models: list[dm.DataModel[dm.View]]) -> dm.DataModel[dm.View]:
+    return next(m for m in market_models if m.name == "CogPool")
+
+
+@pytest.fixture(scope="session")
+def pygen_pool_model(market_models: list[dm.DataModel[dm.View]]) -> dm.DataModel[dm.View]:
+    return next(m for m in market_models if m.name == "PygenPool")
 
 
 @pytest.fixture(scope="session")
@@ -70,4 +66,4 @@ def bid_view(pygen_pool_model) -> dm.View:
 
 @pytest.fixture(scope="session")
 def apm_data_model() -> dm.DataModel[dm.View]:
-    return dm.DataModel.load(APM_SDK.dms_files[0])
+    return APM_SDK.load_data_model()
