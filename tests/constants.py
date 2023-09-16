@@ -68,6 +68,12 @@ MOVIE_SDK = ExampleSDK(
     client_name="MovieClient",
 )
 
+APM_SDK = ExampleSDK(
+    data_models=[DataModelId("tutorial_apm_simple", "ApmSimple", "6")],
+    _top_level_package="tutorial_apm_simple.client",
+    client_name="ApmSimpleClient",
+)
+
 
 class DMSModels:
     movie_model = MOVIE_SDK.dms_files[0]
@@ -122,4 +128,4 @@ class MovieSDKFiles:
 MOVIE_SDK.append_manual_files(MovieSDKFiles)
 
 
-EXAMPLE_SDKS = [MARKET_SDK, SHOP_SDK, MOVIE_SDK]
+EXAMPLE_SDKS = [MARKET_SDK, SHOP_SDK, MOVIE_SDK, APM_SDK]

@@ -52,8 +52,8 @@ def download():
     client = load_cognite_client_from_toml("config.toml")
     for example_sdk in EXAMPLE_SDKS:
         for datamodel_id, dms_file in zip(example_sdk.data_models, example_sdk.dms_files):
-            dms_model = client.data_modeling.data_models.retrieve(model_id=datamodel_id, inline_views=True)
-            dms_file.write_text(safe_dump(dms_model.dump(), sort_keys=False))
+            dms_model = client.data_modeling.data_models.retrieve(datamodel_id, inline_views=True)
+            dms_file.write_text(safe_dump(dms_model.dump(), sort_keys=True))
             typer.echo(f"Downloaded {dms_file.relative_to(REPO_ROOT)}")
 
 

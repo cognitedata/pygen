@@ -1,205 +1,205 @@
-createdTime: 1687962394007
-description: 'A test model with snake_case and CDF specific fields. '
-externalId: SHOP_Model
-isGlobal: false
-lastUpdatedTime: 1689262760507
-name: SHOP_Model
-space: IntegrationTestsImmutable
-version: '2'
-views:
-- createdTime: 1687962393258
-  externalId: Case
-  isGlobal: false
-  lastUpdatedTime: 1687962393258
-  name: Case
-  properties:
-    arguments:
-      autoIncrement: false
-      container:
-        externalId: Case
-        space: IntegrationTestsImmutable
-      containerPropertyIdentifier: arguments
-      defaultValue: null
-      description: null
-      name: arguments
-      nullable: true
-      source: null
-      type:
-        collation: ucs_basic
-        list: false
-        type: text
-    bid:
-      autoIncrement: false
-      container:
-        externalId: Case
-        space: IntegrationTestsImmutable
-      containerPropertyIdentifier: bid
-      defaultValue: null
-      description: null
-      name: bid
-      nullable: true
-      source: null
-      type:
-        list: false
-        type: sequence
-    bid_history:
-      autoIncrement: false
-      container:
-        externalId: Case
-        space: IntegrationTestsImmutable
-      containerPropertyIdentifier: bid_history
-      defaultValue: null
-      description: null
-      name: bid_history
-      nullable: true
-      source: null
-      type:
-        list: true
-        type: sequence
-    commands:
-      autoIncrement: false
-      container:
-        externalId: Case
-        space: IntegrationTestsImmutable
-      containerPropertyIdentifier: commands
-      defaultValue: null
-      description: null
-      name: commands
-      nullable: true
-      type:
-        container: null
-        source:
-          externalId: Command_Config
+- created_time: 1687962394007
+  description: 'A test model with snake_case and CDF specific fields. '
+  external_id: SHOP_Model
+  is_global: false
+  last_updated_time: 1689262760507
+  name: SHOP_Model
+  space: IntegrationTestsImmutable
+  version: '2'
+  views:
+  - created_time: 1687962393258
+    external_id: Case
+    is_global: false
+    last_updated_time: 1687962393258
+    name: Case
+    properties:
+      arguments:
+        auto_increment: false
+        container:
+          external_id: Case
           space: IntegrationTestsImmutable
-          version: 4727b5ad34b608
-        type: direct
-    cut_files:
-      autoIncrement: false
-      container:
-        externalId: Case
-        space: IntegrationTestsImmutable
-      containerPropertyIdentifier: cut_files
-      defaultValue: null
-      description: null
-      name: cut_files
-      nullable: true
-      source: null
-      type:
-        list: true
-        type: file
-    end_time:
-      autoIncrement: false
-      container:
-        externalId: Case
-        space: IntegrationTestsImmutable
-      containerPropertyIdentifier: end_time
-      defaultValue: null
-      description: null
-      name: end_time
-      nullable: true
-      source: null
-      type:
-        list: false
-        type: timestamp
-    name:
-      autoIncrement: false
-      container:
-        externalId: Case
-        space: IntegrationTestsImmutable
-      containerPropertyIdentifier: name
-      defaultValue: null
-      description: null
-      name: name
-      nullable: false
-      source: null
-      type:
-        collation: ucs_basic
-        list: false
-        type: text
-    runStatus:
-      autoIncrement: false
-      container:
-        externalId: Case
-        space: IntegrationTestsImmutable
-      containerPropertyIdentifier: runStatus
-      defaultValue: null
-      description: null
-      name: runStatus
-      nullable: false
-      source: null
-      type:
-        collation: ucs_basic
-        list: false
-        type: text
-    scenario:
-      autoIncrement: false
-      container:
-        externalId: Case
-        space: IntegrationTestsImmutable
-      containerPropertyIdentifier: scenario
-      defaultValue: null
-      description: null
-      name: scenario
-      nullable: true
-      source: null
-      type:
-        collation: ucs_basic
-        list: false
-        type: text
-    start_time:
-      autoIncrement: false
-      container:
-        externalId: Case
-        space: IntegrationTestsImmutable
-      containerPropertyIdentifier: start_time
-      defaultValue: null
-      description: null
-      name: start_time
-      nullable: false
-      source: null
-      type:
-        list: false
-        type: timestamp
-  space: IntegrationTestsImmutable
-  usedFor: node
-  version: 366b75cc4e699f
-  writable: true
-- createdTime: 1687962231207
-  externalId: Command_Config
-  isGlobal: false
-  lastUpdatedTime: 1687962231207
-  name: Command_Config
-  properties:
-    configs:
-      autoIncrement: false
-      container:
-        externalId: Command_Config
-        space: IntegrationTestsImmutable
-      containerPropertyIdentifier: configs
-      defaultValue: null
-      description: null
-      name: configs
-      nullable: false
-      source: null
-      type:
-        collation: ucs_basic
-        list: true
-        type: text
-    source:
-      autoIncrement: false
-      container:
-        externalId: Command_Config
-        space: IntegrationTestsImmutable
-      containerPropertyIdentifier: source
-      defaultValue: null
-      description: null
-      name: source
-      nullable: true
-      source: null
-      type:
-        list: false
-        type: file
-  space: IntegrationTestsImmutable
-  usedFor: node
-  version: 4727b5ad34b608
-  writable: true
+        container_property_identifier: arguments
+        default_value: null
+        description: null
+        name: arguments
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      bid:
+        auto_increment: false
+        container:
+          external_id: Case
+          space: IntegrationTestsImmutable
+        container_property_identifier: bid
+        default_value: null
+        description: null
+        name: bid
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: sequence
+      bid_history:
+        auto_increment: false
+        container:
+          external_id: Case
+          space: IntegrationTestsImmutable
+        container_property_identifier: bid_history
+        default_value: null
+        description: null
+        name: bid_history
+        nullable: true
+        source: null
+        type:
+          list: true
+          type: sequence
+      commands:
+        auto_increment: false
+        container:
+          external_id: Case
+          space: IntegrationTestsImmutable
+        container_property_identifier: commands
+        default_value: null
+        description: null
+        name: commands
+        nullable: true
+        type:
+          container: null
+          source:
+            external_id: Command_Config
+            space: IntegrationTestsImmutable
+            version: 4727b5ad34b608
+          type: direct
+      cut_files:
+        auto_increment: false
+        container:
+          external_id: Case
+          space: IntegrationTestsImmutable
+        container_property_identifier: cut_files
+        default_value: null
+        description: null
+        name: cut_files
+        nullable: true
+        source: null
+        type:
+          list: true
+          type: file
+      end_time:
+        auto_increment: false
+        container:
+          external_id: Case
+          space: IntegrationTestsImmutable
+        container_property_identifier: end_time
+        default_value: null
+        description: null
+        name: end_time
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: timestamp
+      name:
+        auto_increment: false
+        container:
+          external_id: Case
+          space: IntegrationTestsImmutable
+        container_property_identifier: name
+        default_value: null
+        description: null
+        name: name
+        nullable: false
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      runStatus:
+        auto_increment: false
+        container:
+          external_id: Case
+          space: IntegrationTestsImmutable
+        container_property_identifier: runStatus
+        default_value: null
+        description: null
+        name: runStatus
+        nullable: false
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      scenario:
+        auto_increment: false
+        container:
+          external_id: Case
+          space: IntegrationTestsImmutable
+        container_property_identifier: scenario
+        default_value: null
+        description: null
+        name: scenario
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      start_time:
+        auto_increment: false
+        container:
+          external_id: Case
+          space: IntegrationTestsImmutable
+        container_property_identifier: start_time
+        default_value: null
+        description: null
+        name: start_time
+        nullable: false
+        source: null
+        type:
+          list: false
+          type: timestamp
+    space: IntegrationTestsImmutable
+    used_for: node
+    version: 366b75cc4e699f
+    writable: true
+  - created_time: 1687962231207
+    external_id: Command_Config
+    is_global: false
+    last_updated_time: 1687962231207
+    name: Command_Config
+    properties:
+      configs:
+        auto_increment: false
+        container:
+          external_id: Command_Config
+          space: IntegrationTestsImmutable
+        container_property_identifier: configs
+        default_value: null
+        description: null
+        name: configs
+        nullable: false
+        source: null
+        type:
+          collation: ucs_basic
+          list: true
+          type: text
+      source:
+        auto_increment: false
+        container:
+          external_id: Command_Config
+          space: IntegrationTestsImmutable
+        container_property_identifier: source
+        default_value: null
+        description: null
+        name: source
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: file
+    space: IntegrationTestsImmutable
+    used_for: node
+    version: 4727b5ad34b608
+    writable: true

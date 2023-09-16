@@ -2,7 +2,7 @@ import pytest
 from cognite.client import data_modeling as dm
 from yaml import safe_load
 
-from tests.constants import DMSModels
+from tests.constants import APM_SDK, DMSModels
 
 
 @pytest.fixture(scope="session")
@@ -66,3 +66,8 @@ def date_transformation_pair_view(cog_pool_model) -> dm.View:
 @pytest.fixture(scope="session")
 def bid_view(pygen_pool_model) -> dm.View:
     return next(v for v in pygen_pool_model.views if v.name == "Bid")
+
+
+@pytest.fixture(scope="session")
+def apm_data_model() -> dm.DataModel[dm.View]:
+    return dm.DataModel.load(APM_SDK.dms_files[0])
