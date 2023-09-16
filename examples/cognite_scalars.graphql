@@ -5,3 +5,4 @@ scalar TimeSeries
 scalar File
 scalar Sequence
 scalar Date
+scalar Int64
