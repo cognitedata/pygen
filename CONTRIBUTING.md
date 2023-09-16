@@ -60,12 +60,14 @@ See [PyCharm docs](https://www.jetbrains.com/help/pycharm/creating-virtual-envir
 There are two set categories of tests in `pygen`, the `tests` folder structure reflects this:
 ```
 📦tests
+ ┣ 📂dms_data_models - The Domain Model Storage representation of the data models used in the examples.
  ┣ 📂test_integration - Tests that requires CDF.
  ┃ ┣ 📂generation - Test that check that pygen generates SDK(s) as expected.
  ┃ ┗ 📂sdks - Test that checks the that the generated SDK work as expected.
- ┗ 📂test_unit - Tests that can be run locally without any external connection.
-   ┣ 📂generation
-   ┗ 📂sdks
+ ┣ 📂test_unit - Tests that can be run locally without any external connection.
+ ┃ ┣ 📂generation
+ ┃ ┗ 📂sdks
+ ┗ 📜constants.py - Defines the Example SDKs and which files are manually maintained.
 ```
 
 Note the distinction between the `generation` and `sdks` tests. The generated SDKs are checked into the repository and
@@ -92,7 +94,8 @@ First make sure you have discussed the changes with the `BDFL`,
 this will save you the risk of getting all your hard work rejected later.
 
 #### GitHub Workflow
-Then, create a new branch for your changes, and make sure you are up-to-date with the `main` branch.
+Create a new branch for your changes, and make sure you are up-to-date with the `main` branch. After first,
+commit push to GitHub and create a draft PR:
 
 1. Create a new branch
 ```bash
@@ -104,19 +107,26 @@ git checkout -b my-new-feature
 #### Coding Workflow
 
 1. Write a test for one of the example SDKs for the feature you are implementing. Or in the case of a bugfix,
-   write a test that fails without your changes.
+   write a test that fails without your changes. Check which of the generated SDK files that are manually maintained
+   in [constants.py](/tests/constants.py).
 2. Implement the fix/feature in the example SDK.
 3. Ensure there is a generation test that checks that the SDK is generated as expected.
 4. Update the `pygen` itself to support generating the SDK.
 
 
-
 ### Generating Example SDKs
 When you are developing `pygen` you will likely need to generate the example SDKs. To do this run the following command from the root directory:
-```
-pytest scripts/generate_example_sdks.py
+```bash
+python scripts/dev.py generate-sdks
 ```
 This command must be run with both Python environments, `pydantic` `v1` and `v2`.
+
+### Developer CLI
+Note that `python scrips/dev.py` is a CLI with a few commands that can be useful when developing `pygen`.
+To see the available commands run:
+```bash
+python scripts/dev.py --help
+```
 
 ### Documentation
 
