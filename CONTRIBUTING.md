@@ -84,12 +84,12 @@ To run only the unit tests
 ```
 pytest tests/test_unit cognite/
 ```
-**Note** The `cognite/` is required to run the doc tests in the `pygen` package.
+**Note** The `cognite/` is required to run the doctests in the `pygen` package.
 
 ### Recommended Development Workflow
 
 First make sure you have discussed the changes with the `BDFL`,
-this will save you from getting all your hard work rejected later.
+this will save you the risk of getting all your hard work rejected later.
 
 #### GitHub Workflow
 Then, create a new branch for your changes, and make sure you are up-to-date with the `main` branch.
@@ -99,7 +99,7 @@ Then, create a new branch for your changes, and make sure you are up-to-date wit
 git checkout -b my-new-feature
 ```
 2. Create a draft PR on GitHub. This will allow you to get feedback on your changes early,
-   as well as communicating that you are working on a feature.
+   as well as communicating that you are working on a feature/bugfix.
 
 #### Coding Workflow
 
@@ -109,8 +109,10 @@ git checkout -b my-new-feature
 3. Ensure there is a generation test that checks that the SDK is generated as expected.
 4. Update the `pygen` itself to support generating the SDK.
 
-When you are done there are likely many generation tests that are failing as you changed what code that `pygen` is generating.
-To fix this, run the following command from the root directory:
+
+
+### Generating Example SDKs
+When you are developing `pygen` you will likely need to generate the example SDKs. To do this run the following command from the root directory:
 ```
 pytest scripts/generate_example_sdks.py
 ```

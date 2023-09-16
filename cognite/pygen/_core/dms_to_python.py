@@ -16,6 +16,7 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 from pydantic.version import VERSION as PYDANTIC_VERSION
 
 from cognite.pygen._version import __version__
+from cognite.pygen.utils.helper import get_pydantic_version
 from cognite.pygen.utils.text import to_pascal, to_snake
 
 
@@ -105,7 +106,7 @@ class APIsGenerator:
         self.top_level_package = top_level_package
         self.client_name = client_name
         if pydantic_version == "infer":
-            self.pydantic_version = "v2" if PYDANTIC_VERSION[0] == "2" else "v1"
+            self.pydantic_version = get_pydantic_version()
         else:
             self.pydantic_version = pydantic_version
         self._logger = logger or print

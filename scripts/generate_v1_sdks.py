@@ -1,11 +1,11 @@
 from cognite import pygen
 from cognite.pygen.utils.cdf import load_cognite_client_from_toml
-from tests.constants import repo_root
+from tests.constants import REPO_ROOT
 
 
 def main():
     c = load_cognite_client_from_toml("config.toml")
-    examples_dir_pydantic_v1 = repo_root / "examples-pydantic-v1"
+    examples_dir_pydantic_v1 = REPO_ROOT / "examples-pydantic-v1"
 
     pygen.generate_sdk(
         c,

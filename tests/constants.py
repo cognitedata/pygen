@@ -1,49 +1,95 @@
+from __future__ import annotations
+
+from dataclasses import dataclass, field
 from pathlib import Path
 
-from pydantic.version import VERSION as PYDANTIC_VERSION
+from cognite.client.data_classes.data_modeling import DataModelId
 
-repo_root = Path(__file__).resolve().parent.parent
-IS_PYDANTIC_V1 = PYDANTIC_VERSION.startswith("1.")
+from cognite.pygen.utils.helper import get_pydantic_version
 
-if IS_PYDANTIC_V1:
-    examples_dir = repo_root / "examples-pydantic-v1"
-else:
-    examples_dir = repo_root / "examples"
+REPO_ROOT = Path(__file__).resolve().parent.parent
+DMS_DATA_MODELS = REPO_ROOT / "tests" / "example_data_models"
 
-schemas_dir = repo_root / "tests" / "schemas"
+_pydantic_version = get_pydantic_version()
+IS_PYDANTIC_V1 = get_pydantic_version() == _pydantic_version
 
-
-if IS_PYDANTIC_V1:
-    movie_sdk = examples_dir / "movie_domain_pydantic_v1"
-    shop_sdk = examples_dir / "shop_pydantic_v1"
-    market_sdk = examples_dir / "markets_pydantic_v1"
-else:
-    movie_sdk = examples_dir / "movie_domain"
-    shop_sdk = examples_dir / "shop"
-    market_sdk = examples_dir / "markets"
+EXAMPLES_DIR = {
+    "v1": REPO_ROOT / "examples-pydantic-v1",
+    "v2": REPO_ROOT / "examples",
+}[_pydantic_version]
 
 
-class TestSchemas:
-    foobar = schemas_dir / "foobar.graphql"
-    case_scenario = schemas_dir / "case_scenario.graphql"
+@dataclass
+class ExampleSDK:
+    data_models: list[DataModelId]
+    client_name: str
+    _top_level_package: str
+    manual_files: list[Path] = field(default_factory=list, init=False)
+
+    @property
+    def dms_files(self) -> list[Path]:
+        return [
+            DMS_DATA_MODELS / f"{model_id.space}-{model_id.external_id}-{model_id.version}.yaml"
+            for model_id in self.data_models
+        ]
+
+    @property
+    def top_level_package(self) -> str:
+        if IS_PYDANTIC_V1:
+            return self._top_level_package + "_pydantic_v1"
+        return self._top_level_package
+
+    @property
+    def client_dir(self) -> Path:
+        return EXAMPLES_DIR / self.top_level_package.replace(".", "/")
+
+    def append_manual_files(self, manual_files_cls: type):
+        for var in vars(manual_files_cls).values():
+            if isinstance(var, Path) and var.is_file():
+                self.manual_files.append(var)
 
 
-class DataModels:
-    movie_model = schemas_dir / "movie_data_model.yaml"
-    shop_model = schemas_dir / "shop_data_model.yaml"
-    cog_pool = schemas_dir / "CogPool.yaml"
-    pygen_pool = schemas_dir / "PygenPool.yaml"
+MARKET_SDK = ExampleSDK(
+    data_models=[DataModelId("market", "CogPool", "3"), DataModelId("market", "PygenPool", "3")],
+    _top_level_package="markets.client",
+    client_name="MarketClient",
+)
+
+SHOP_SDK = ExampleSDK(
+    data_models=[DataModelId("IntegrationTestsImmutable", "SHOP_Model", "2")],
+    _top_level_package="shop.client",
+    client_name="ShopClient",
+)
+
+MOVIE_SDK = ExampleSDK(
+    data_models=[DataModelId("IntegrationTestsImmutable", "Movie", "2")],
+    _top_level_package="movie_domain.client",
+    client_name="MovieClient",
+)
+
+
+class DMSModels:
+    movie_model = MOVIE_SDK.dms_files[0]
+    shop_model = SHOP_SDK.dms_files[0]
+    cog_pool = MARKET_SDK.dms_files[0]
+    pygen_pool = MARKET_SDK.dms_files[1]
+
+
+# The following files are manually controlled and should not be overwritten by the generator.
 
 
 class MarketSDKFiles:
-    client_dir = market_sdk / "client"
+    client_dir = MARKET_SDK.client_dir / "client"
     client = client_dir / "_api_client.py"
     date_transformation_pair_data = client_dir / "data_classes" / "_date_transformation_pairs.py"
     date_transformation_pair_api = client_dir / "_api" / "date_transformation_pairs.py"
 
 
+MARKET_SDK.append_manual_files(MarketSDKFiles)
+
+
 class ShopSDKFiles:
-    client_dir = shop_sdk / "client"
+    client_dir = SHOP_SDK.client_dir / "client"
     data_classes = client_dir / "data_classes"
     api = client_dir / "_api"
     cases_data = data_classes / "_cases.py"
@@ -52,8 +98,11 @@ class ShopSDKFiles:
     command_configs_api = api / "command_configs.py"
 
 
+SHOP_SDK.append_manual_files(ShopSDKFiles)
+
+
 class MovieSDKFiles:
-    client_dir = movie_sdk / "client"
+    client_dir = MOVIE_SDK.client_dir / "client"
 
     data_classes = client_dir / "data_classes"
     persons_data = data_classes / "_persons.py"
@@ -67,3 +116,9 @@ class MovieSDKFiles:
     client_init = client_dir / "__init__.py"
     data_init = data_classes / "__init__.py"
     api_init = api / "__init__.py"
+
+
+MOVIE_SDK.append_manual_files(MovieSDKFiles)
+
+
+EXAMPLE_SDKS = [MARKET_SDK, SHOP_SDK, MOVIE_SDK]
