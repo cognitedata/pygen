@@ -22,6 +22,11 @@ class Field(ABC):
     """
 
     name: str
+    prop_name: str
+
+    @property
+    def need_alias(self) -> bool:
+        return self.name != self.prop_name
 
     @classmethod
     def from_property(
@@ -33,7 +38,7 @@ class Field(ABC):
     ) -> Field:
         name = create_name(prop_name, config.naming.data_class.field)
         if isinstance(prop, dm.SingleHopConnectionDefinition):
-            return ManyEdgeField(name=name, data_class=data_class_by_view_id[prop.source])
+            return ManyEdgeField(name=name, prop_name=prop_name, data_class=data_class_by_view_id[prop.source])
         if not isinstance(prop, dm.MappedProperty):
             raise ValueError(f"Property type={type(prop)!r} is not supported")
 
@@ -41,14 +46,23 @@ class Field(ABC):
             type_ = _to_python_type(prop.type)
             if isinstance(prop.type, ListablePropertyType) and prop.type.is_list:
                 return PrimitiveListField(
-                    name=name, type_=type_, is_nullable=prop.nullable, default=prop.default_value, prop=prop
+                    name=name,
+                    prop_name=prop_name,
+                    type_=type_,
+                    is_nullable=prop.nullable,
+                    prop=prop,
                 )
 
             return PrimitiveField(
-                name=name, type_=type_, is_nullable=prop.nullable, default=prop.default_value, prop=prop
+                name=name,
+                prop_name=prop_name,
+                type_=type_,
+                is_nullable=prop.nullable,
+                default=prop.default_value,
+                prop=prop,
             )
         elif isinstance(prop.type, dm.DirectRelationReference):
-            return EdgeField(name=name, data_class=data_class_by_view_id[prop.source])
+            return EdgeField(name=name, prop_name=prop_name, data_class=data_class_by_view_id[prop.source])
         else:
             raise NotImplementedError(f"Property type={type(prop)!r} is not supported")
 
@@ -62,30 +76,52 @@ class Field(ABC):
 
 
 @dataclass(frozen=True)
-class PrimitiveField(Field):
-    """
-    This represents a basic type such as str, int, float, bool, datetime.datetime, datetime.date.
-    """
-
-    def as_read_type_hint(self) -> str:
-        pass
-
-    def as_write_type_hint(self) -> str:
-        pass
-
+class PrimitiveFieldCore(Field, ABC):
     type_: str
     is_nullable: bool
-    default: str | int | dict | None
     prop: dm.MappedProperty
 
 
 @dataclass(frozen=True)
-class PrimitiveListField(PrimitiveField):
+class PrimitiveField(PrimitiveFieldCore):
+    """
+    This represents a basic type such as str, int, float, bool, datetime.datetime, datetime.date.
+    """
+
+    default: str | int | dict | None = None
+
+    def as_read_type_hint(self) -> str:
+        rhs = str(self.default)
+        if self.need_alias:
+            rhs = f'Field({rhs}, alias="{self.prop_name}")'
+
+        return f"Optional[{self.type_}] = {rhs}"
+
+    def as_write_type_hint(self) -> str:
+        out_type = self.type_
+        if self.is_nullable:
+            out_type = f"Optional[{out_type}]"
+        return out_type
+
+
+@dataclass(frozen=True)
+class PrimitiveListField(PrimitiveFieldCore):
     """
     This represents a list of basic types such as list[str], list[int], list[float], list[bool], list[datetime.datetime], list[datetime.date].
     """
 
-    ...
+    def as_read_type_hint(self) -> str:
+        rhs = ""
+        if self.need_alias:
+            rhs = f', alias="{self.prop_name}"'
+
+        return f"list[{self.type_}] = Field(default_factory=list{rhs})"
+
+    def as_write_type_hint(self) -> str:
+        rhs = ""
+        if self.is_nullable:
+            rhs = f" = Field(default_factory=list)"
+        return f"list[{self.type_}]{rhs}"
 
 
 @dataclass(frozen=True)

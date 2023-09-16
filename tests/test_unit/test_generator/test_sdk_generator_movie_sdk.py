@@ -65,6 +65,7 @@ def create_fields_test_cases():
         {},
         PrimitiveField(
             name="name",
+            prop_name="name",
             type_="str",
             prop=cast(dm.MappedProperty, prop),
             is_nullable=False,
@@ -100,6 +101,7 @@ def create_fields_test_cases():
         data_class_by_view_id,
         ManyEdgeField(
             name="roles",
+            prop_name="roles",
             prop=cast(dm.SingleHopConnectionDefinition, prop),
             data_class=data_class,
         ),
@@ -125,12 +127,12 @@ def create_fields_test_cases():
         {},
         PrimitiveListField(
             name="configs",
+            prop_name="configs",
             prop=cast(dm.MappedProperty, prop),
             type_="str",
             is_nullable=False,
-            default="[]",
         ),
-        "list[str] = []",
+        "list[str] = Field(default_factory=list)",
         "list[str]",
         id="List of strings",
     )
@@ -167,6 +169,7 @@ def create_fields_test_cases():
         data_class_by_view_id,
         OneEdgeField(
             name="person",
+            prop_name="person",
             prop=cast(dm.MappedProperty, prop),
             data_class=data_class,
         ),
@@ -193,7 +196,12 @@ def create_fields_test_cases():
         prop,
         {},
         PrimitiveField(
-            name="won_oscar", prop=cast(dm.MappedProperty, prop), is_nullable=True, default="None", type_="bool"
+            name="won_oscar",
+            prop_name="wonOscar",
+            prop=cast(dm.MappedProperty, prop),
+            is_nullable=True,
+            default="None",
+            type_="bool",
         ),
         'Optional[bool] = Field(None, alias="wonOscar")',
         "Optional[bool] = None",
