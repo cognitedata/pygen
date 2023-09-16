@@ -1,3 +1,8 @@
+"""
+These test are used to ensure that the pygen build is setup correctly.
+For example, that version in pyproject.toml matches the version in cognite/pygen/_version.py
+"""
+
 import toml
 
 from cognite import pygen
