@@ -77,19 +77,19 @@ def bump(major: bool = False, minor: bool = False, patch: bool = False, skip: bo
     )
     current_version = toml.loads(pyproject_toml.read_text())["tool"]["poetry"]["version"]
 
-    major, minor, patch = [int(x) for x in current_version.split(".")]
+    current_major, current_minor, current_patch = [int(x) for x in current_version.split(".")]
     if major:
-        major += 1
-        minor = 0
-        patch = 0
+        current_major += 1
+        current_minor = 0
+        current_patch = 0
     elif minor:
-        minor += 1
-        patch = 0
+        current_minor += 1
+        current_patch = 0
     elif patch:
-        patch += 1
-    new_version = f"{major}.{minor}.{patch}"
+        current_patch += 1
+    new_version = f"{current_major}.{current_minor}.{current_patch}"
     typer.echo(f"Bumping version from {current_version} to {new_version}...")
-    typer.echo(f"And setting cognite-sdk={cognite_sdk_version} and pydantic={PYDANTIC_VERSION} versions in examples")
+    typer.echo(f"...and setting cognite-sdk={cognite_sdk_version} and pydantic={PYDANTIC_VERSION} in examples.")
     answer = typer.confirm("Are you sure you want to continue?")
     if not answer:
         typer.echo("Aborting")
