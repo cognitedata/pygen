@@ -8,10 +8,10 @@ from cognite.client.data_classes.data_modeling import DataModelId
 from cognite.pygen.utils.helper import get_pydantic_version
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-DMS_DATA_MODELS = REPO_ROOT / "tests" / "example_data_models"
+DMS_DATA_MODELS = REPO_ROOT / "tests" / "dms_data_models"
 
 _pydantic_version = get_pydantic_version()
-IS_PYDANTIC_V1 = get_pydantic_version() == _pydantic_version
+IS_PYDANTIC_V1 = _pydantic_version == "v1"
 
 EXAMPLES_DIR = {
     "v1": REPO_ROOT / "examples-pydantic-v1",
@@ -36,7 +36,8 @@ class ExampleSDK:
     @property
     def top_level_package(self) -> str:
         if IS_PYDANTIC_V1:
-            return self._top_level_package + "_pydantic_v1"
+            first, *rest = self._top_level_package.split(".")
+            return f"{first}_pydantic_v1." + ".".join(rest)
         return self._top_level_package
 
     @property
@@ -79,7 +80,7 @@ class DMSModels:
 
 
 class MarketSDKFiles:
-    client_dir = MARKET_SDK.client_dir / "client"
+    client_dir = MARKET_SDK.client_dir
     client = client_dir / "_api_client.py"
     date_transformation_pair_data = client_dir / "data_classes" / "_date_transformation_pairs.py"
     date_transformation_pair_api = client_dir / "_api" / "date_transformation_pairs.py"
@@ -89,7 +90,7 @@ MARKET_SDK.append_manual_files(MarketSDKFiles)
 
 
 class ShopSDKFiles:
-    client_dir = SHOP_SDK.client_dir / "client"
+    client_dir = SHOP_SDK.client_dir
     data_classes = client_dir / "data_classes"
     api = client_dir / "_api"
     cases_data = data_classes / "_cases.py"
@@ -102,7 +103,7 @@ SHOP_SDK.append_manual_files(ShopSDKFiles)
 
 
 class MovieSDKFiles:
-    client_dir = MOVIE_SDK.client_dir / "client"
+    client_dir = MOVIE_SDK.client_dir
 
     data_classes = client_dir / "data_classes"
     persons_data = data_classes / "_persons.py"
