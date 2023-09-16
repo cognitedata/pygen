@@ -176,8 +176,12 @@ class APIsGenerator:
         )
 
 
-@dataclass
+@dataclass(frozen=True)
 class Field:
+    """
+    A field represents a pydantic field in the generated pydantic class.
+    """
+
     name: str
     read_type: str
     is_list: bool
