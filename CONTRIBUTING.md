@@ -57,13 +57,80 @@ See [PyCharm docs](https://www.jetbrains.com/help/pycharm/creating-virtual-envir
 
 ### Testing
 
-Initiate unit tests by running the following command from the root directory:
+There are two set categories of tests in `pygen`, the `tests` folder structure reflects this:
+```
+📦tests
+ ┣ 📂test_integration - Tests that requires CDF.
+ ┃ ┣ 📂generation - Test that check that pygen generates SDK(s) as expected.
+ ┃ ┗ 📂sdks - Test that checks the that the generated SDK work as expected.
+ ┗ 📂test_unit - Tests that can be run locally without any external connection.
+   ┣ 📂generation
+   ┗ 📂sdks
+```
 
-`pytest`
+Note the distinction between the `generation` and `sdks` tests. The generated SDKs are checked into the repository and
+are found in
+
+ * [examples](/examples) - SDKs generated for `pydantic` `v2`
+ * [examples-pydantic-v1](/examples-pydantic-v1) - SDKs generated for `pydantic` `v1`
 
 
-### Generating Example SDKs
+To run all tests, run the following command from the root directory:
+```
+pytest
+```
 
+To run only the unit tests
+```
+pytest tests/test_unit cognite/
+```
+**Note** The `cognite/` is required to run the doc tests in the `pygen` package.
+
+### Recommended Development Workflow
+
+First make sure you have discussed the changes with the `BDFL`,
+this will save you from getting all your hard work rejected later.
+
+#### GitHub Workflow
+Then, create a new branch for your changes, and make sure you are up-to-date with the `main` branch.
+
+1. Create a new branch
+```bash
+git checkout -b my-new-feature
+```
+2. Create a draft PR on GitHub. This will allow you to get feedback on your changes early,
+   as well as communicating that you are working on a feature.
+
+#### Coding Workflow
+
+1. Write a test for one of the example SDKs for the feature you are implementing. Or in the case of a bugfix,
+   write a test that fails without your changes.
+2. Implement the fix/feature in the example SDK.
+3. Ensure there is a generation test that checks that the SDK is generated as expected.
+4. Update the `pygen` itself to support generating the SDK.
+
+When you are done there are likely many generation tests that are failing as you changed what code that `pygen` is generating.
+To fix this, run the following command from the root directory:
+```
+pytest scripts/generate_example_sdks.py
+```
+This command must be run with both Python environments, `pydantic` `v1` and `v2`.
+
+### Documentation
+
+We use material docs for the documentation. First, ensure that you have installed the `docs` extra dependencies with `poetry`:
+
+```bash
+poetry install --extras docs
+```
+
+You can build and serve the documentation locally with:
+
+```bash
+mkdocs serve
+```
+
+The documentation is kept in the `docs` folder, while the `mkdocs.yml` file contains the configuration for the documentation.
 
 ### Release version conventions
 
