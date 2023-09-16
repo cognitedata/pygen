@@ -11,8 +11,8 @@ please join the `#topic-pygen` channel on Slack and post issues there.
 Get the code!
 
 ```bash
-https://github.com/cognitedata/pygen.git
-cd cognite-pygen
+git clone https://github.com/cognitedata/pygen.git
+cd pygen
 ```
 
 We use [poetry](https://pypi.org/project/poetry/) for dependency- and virtual environment management.
