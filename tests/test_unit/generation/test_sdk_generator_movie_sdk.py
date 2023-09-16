@@ -14,6 +14,7 @@ from cognite.pygen._core.dms_to_python import (
     SDKGenerator,
     find_dependencies,
 )
+from cognite.pygen._generator import CodeFormatter
 from tests.constants import IS_PYDANTIC_V1, MovieSDKFiles
 
 
@@ -254,12 +255,13 @@ def test_create_view_api_classes_persons(person_view: dm.View, top_level_package
     assert actual == expected
 
 
-def test_create_api_classes(apis_generator: APIsGenerator):
+def test_create_api_classes(apis_generator: APIsGenerator, code_formatter: CodeFormatter):
     # Arrange
     expected = MovieSDKFiles.data_init.read_text()
 
     # Act
     actual = apis_generator.generate_data_classes_init_file()
+    actual = code_formatter.format_code(actual)
 
     # Assert
     assert actual == expected

@@ -1,4 +1,4 @@
-{% for class_ in classes %}{% if class_.is_line_length_above_120 %}{{ class_.multiline_import }}{% else %}{{ class_.one_line_import }}{% endif %}
+{% for class_ in classes %}{{ class_.import_ }}
 {% endfor %}
 {%  include import_file %}
 __all__ = [{% for class_ in classes %}
