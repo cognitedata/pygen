@@ -72,9 +72,9 @@ def bump(major: bool = False, minor: bool = False, patch: bool = False, skip: bo
 
     pyproject_toml = REPO_ROOT / "pyproject.toml"
     version_py = REPO_ROOT / "cognite" / "pygen" / "_version.py"
-    api_client_files = list((REPO_ROOT / "examples").glob("**/_api_client.py")) + list(
-        (REPO_ROOT / "examples-pydantic-v1").glob("**/_api_client.py")
-    )
+    api_client_files_v2 = list((REPO_ROOT / "examples").glob("**/_api_client.py"))
+    api_client_files_v1 = list((REPO_ROOT / "examples-pydantic-v1").glob("**/_api_client.py"))
+    api_client_files = api_client_files_v1 + api_client_files_v2
     current_version = toml.loads(pyproject_toml.read_text())["tool"]["poetry"]["version"]
 
     current_major, current_minor, current_patch = [int(x) for x in current_version.split(".")]
@@ -95,14 +95,17 @@ def bump(major: bool = False, minor: bool = False, patch: bool = False, skip: bo
         typer.echo("Aborting")
         raise typer.Abort()
 
-    if current_version != cognite_sdk_version or current_version != PYDANTIC_VERSION:
+    if current_version == cognite_sdk_version or current_version == PYDANTIC_VERSION:
         raise ValueError(f"Edge case not handled: {current_version=}, {cognite_sdk_version=}, {PYDANTIC_VERSION=}")
 
     for file in [pyproject_toml, version_py, *api_client_files]:
+        content = file.read_text()
         if not skip:
-            content = file.read_text().replace(current_version, new_version)
+            content = content.replace(current_version, new_version)
         content = re.sub(r"cognite-sdk = \d+.\d+.\d+", f"cognite-sdk = {cognite_sdk_version}", content)
-        content = re.sub(r"pydantic = \d+.\d+.\d+", f"pydantic = {PYDANTIC_VERSION}", content)
+        if file not in api_client_files_v1:
+            # pydantic v1 is frozen at 1.10.7
+            content = re.sub(r"pydantic = \d+.\d+.\d+", f"pydantic = {PYDANTIC_VERSION}", content)
         file.write_text(content)
         typer.echo(f"Updated {file.relative_to(REPO_ROOT)}, replaced {current_version} with {new_version}.")
     typer.echo("Done")
