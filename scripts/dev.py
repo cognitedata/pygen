@@ -22,6 +22,8 @@ app = typer.Typer(add_completion=False, help=__doc__)
 def generate_sdks(overwrite_manual_files: bool = typer.Option(False, help="Overwrite manual files in examples")):
     for example_sdk in EXAMPLE_SDKS:
         data_models = [DataModel.load(safe_load(dms_file.read_text())) for dms_file in example_sdk.dms_files]
+        if len(data_models) == 1:
+            data_models = data_models[0]
         sdk_generator = SDKGenerator(
             example_sdk.top_level_package, example_sdk.client_name, data_models, logger=typer.echo
         )
