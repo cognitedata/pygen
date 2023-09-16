@@ -9,7 +9,7 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 from pydantic.version import VERSION as PYDANTIC_VERSION
 
 from cognite.pygen._core.data_classes import DataClass, APIClass, APIsClass
-from cognite.pygen._core.logic import find_dependencies, get_unique_views
+from cognite.pygen._core.logic import get_unique_views
 from cognite.pygen._version import __version__
 from cognite.pygen.config import PygenConfig
 from cognite.pygen.utils.helper import get_pydantic_version
@@ -42,16 +42,18 @@ class SDKGenerator:
         self.client_name = client_name
         if isinstance(data_model, dm.DataModel):
             self._is_single_model = True
-            self._apis = APIsGenerator(top_level_package, client_name, data_model.views, pydantic_version, logger)
+            self._apis = APIsGenerator(
+                top_level_package, client_name, data_model.views, pydantic_version, logger, config
+            )
             self._apis_classes = []
         elif isinstance(data_model, Sequence):
             self._is_single_model = False
             unique_views = get_unique_views(*[view for model in data_model for view in model.views])
 
-            self._apis = APIsGenerator(top_level_package, client_name, unique_views, pydantic_version, logger)
-            api_by_view_external_id = {api.view.external_id: api.api_class for api in self._apis.apis}
+            self._apis = APIsGenerator(top_level_package, client_name, unique_views, pydantic_version, logger, config)
+            api_by_view_id = {api.view.as_id(): api.api_class for api in self._apis.apis}
             self._apis_classes = sorted(
-                (APIsClass.from_data_model(model, api_by_view_external_id) for model in data_model),
+                (APIsClass.from_data_model(model, api_by_view_id, config) for model in data_model),
                 key=lambda a: a.name,
             )
         else:
@@ -108,6 +110,9 @@ class APIsGenerator:
         self._logger = logger or print
 
         self.apis = [APIGenerator(view, config) for view in views]
+        data_class_by_view_id = {api.view.as_id(): api.data_class for api in self.apis}
+        for api in self.apis:
+            api.data_class.update_fields(api.view.properties, data_class_by_view_id, config)
 
         # Validation
         # 1. Unique variable names for API and data classes.
@@ -211,3 +216,12 @@ class APIGenerator:
             fields=self.fields,
             view=self.view,
         )
+
+
+def find_dependencies(apis: list[APIGenerator]) -> dict[APIClass, set[APIClass]]:
+    class_by_data_class_name = {api.api_class.data_class: api.api_class for api in apis}
+    return {
+        api.api_class: {class_by_data_class_name[d] for d in dependencies}
+        for api in apis
+        if (dependencies := api.fields.dependencies)
+    }

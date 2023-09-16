@@ -1,19 +1,29 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import cast
 
 import pytest
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.views import ViewProperty
 
+from cognite.pygen._core.data_classes import (
+    APIClass,
+    Field,
+    PrimitiveField,
+    PrimitiveListField,
+    OneEdgeField,
+    ManyEdgeField,
+    DataClass,
+)
 from cognite.pygen._core.generators import (
     APIGenerator,
     APIsGenerator,
     SDKGenerator,
+    find_dependencies,
 )
-from cognite.pygen._core.logic import find_dependencies
-from cognite.pygen._core.data_classes import Field, APIClass
 from cognite.pygen._generator import CodeFormatter
+from cognite.pygen.config import PygenConfig
 from tests.constants import IS_PYDANTIC_V1, MovieSDKFiles
 
 
@@ -48,22 +58,22 @@ def create_fields_test_cases():
         "description": None,
     }
     prop = ViewProperty.load(prop)
+    #
     yield pytest.param(
+        "name",
         prop,
-        Field(
+        {},
+        PrimitiveField(
             name="name",
-            prop=prop,
-            read_type="str",
+            type_="str",
+            prop=cast(dm.MappedProperty, prop),
             is_nullable=False,
-            is_list=False,
             default=None,
-            write_type="str",
         ),
         "Optional[str] = None",
         "str",
         id="String property",
     )
-
     prop = {
         "type": {"space": "IntegrationTestsImmutable", "externalId": "Person.roles"},
         "source": {"space": "IntegrationTestsImmutable", "externalId": "Role", "version": "2", "type": "view"},
@@ -73,25 +83,28 @@ def create_fields_test_cases():
         "direction": "outwards",
     }
     prop = ViewProperty.load(prop)
+    data_class = DataClass(
+        read_class_name="Role",
+        write_class_name="RoleApply",
+        read_list_class_name="RoleList",
+        write_list_class_name="RoleListApply",
+        variable_name="role",
+        file_name="_roles",
+        view_id=dm.ViewId("IntegrationTestsImmutable", "Role", "2"),
+    )
+
+    data_class_by_view_id = {dm.ViewId("IntegrationTestsImmutable", "Role", "2"): data_class}
     yield pytest.param(
+        "roles",
         prop,
-        Field(
+        data_class_by_view_id,
+        ManyEdgeField(
             name="roles",
-            prop=prop,
-            read_type="str",
-            is_list=True,
-            is_nullable=True,
-            default="[]",
-            write_type='Union["RoleApply", str]',
-            is_edge=True,
-            variable="role",
-            dependency_class="Role",
-            dependency_file="roles",
-            edge_api_class_suffix="Roles",
-            edge_api_attribute="roles",
+            prop=cast(dm.SingleHopConnectionDefinition, prop),
+            data_class=data_class,
         ),
         "list[str] = []",
-        'list[Union["RoleApply", str]] = Field(default_factory=list, repr=False)',
+        "Union[list[RoleApply], list[str]] = Field(default_factory=list, repr=False)",
         id="List of edges",
     )
     prop = {
@@ -107,16 +120,15 @@ def create_fields_test_cases():
     }
     prop = ViewProperty.load(prop)
     yield pytest.param(
+        "configs",
         prop,
-        Field(
+        {},
+        PrimitiveListField(
             name="configs",
-            prop=prop,
-            read_type="str",
-            is_list=True,
+            prop=cast(dm.MappedProperty, prop),
+            type_="str",
             is_nullable=False,
             default="[]",
-            write_type="str",
-            variable="config",
         ),
         "list[str] = []",
         "list[str]",
@@ -137,20 +149,26 @@ def create_fields_test_cases():
         "name": "person",
         "description": None,
     }
+    data_class = DataClass(
+        read_class_name="Person",
+        write_class_name="PersonApply",
+        read_list_class_name="PersonList",
+        write_list_class_name="PersonListApply",
+        variable_name="person",
+        file_name="_persons",
+        view_id=dm.ViewId("IntegrationTestsImmutable", "Person", "2"),
+    )
+    data_class_by_view_id = {dm.ViewId("IntegrationTestsImmutable", "Person", "2"): data_class}
+
     prop = ViewProperty.load(prop)
     yield pytest.param(
+        "person",
         prop,
-        Field(
+        data_class_by_view_id,
+        OneEdgeField(
             name="person",
-            prop=prop,
-            read_type="str",
-            is_list=False,
-            is_nullable=True,
-            write_type='Union["PersonApply", str]',
-            default="None",
-            is_edge=True,
-            dependency_class="Person",
-            dependency_file="persons",
+            prop=cast(dm.MappedProperty, prop),
+            data_class=data_class,
         ),
         "Optional[str] = None",
         'Optional[Union["PersonApply", str]] = Field(None, repr=False)',
@@ -169,16 +187,13 @@ def create_fields_test_cases():
         "description": None,
     }
     prop = ViewProperty.load(prop)
+
     yield pytest.param(
+        "wonOscar",
         prop,
-        Field(
-            name="won_oscar",
-            prop=prop,
-            read_type="bool",
-            is_list=False,
-            is_nullable=True,
-            write_type="bool",
-            default="None",
+        {},
+        PrimitiveField(
+            name="won_oscar", prop=cast(dm.MappedProperty, prop), is_nullable=True, default="None", type_="bool"
         ),
         'Optional[bool] = Field(None, alias="wonOscar")',
         "Optional[bool] = None",
@@ -187,29 +202,33 @@ def create_fields_test_cases():
 
 
 @pytest.mark.parametrize(
-    "property_, expected, expected_read_type_hint,expected_write_type_hint", list(create_fields_test_cases())
+    "prop_name, property_, data_class_by_view_id, expected, expected_read_type_hint, expected_write_type_hint",
+    list(create_fields_test_cases()),
 )
 def test_fields_from_property(
+    prop_name: str,
     property_: dm.MappedProperty | dm.ConnectionDefinition,
+    data_class_by_view_id: dict[dm.ViewId, DataClass],
     expected: Field,
     expected_read_type_hint: str,
     expected_write_type_hint: str,
+    pygen_config: PygenConfig,
 ):
     # Act
-    actual = Field.from_property(property_)
+    actual = Field.from_property(prop_name, property_, data_class_by_view_id, pygen_config)
 
     # Assert
     assert actual == expected
-    assert actual.as_type_hint("read") == expected_read_type_hint
-    assert actual.as_type_hint("write") == expected_write_type_hint
+    assert actual.as_read_type_hint() == expected_read_type_hint
+    assert actual.as_write_type_hint() == expected_write_type_hint
 
 
-def test_generate_data_class_file_persons(person_view: dm.View, top_level_package: str):
+def test_generate_data_class_file_persons(person_view: dm.View, pygen_config: PygenConfig):
     # Arrange
     expected = MovieSDKFiles.persons_data.read_text()
 
     # Act
-    actual = APIGenerator(person_view, top_level_package).generate_data_class_file()
+    actual = APIGenerator(person_view, pygen_config).generate_data_class_file()
 
     # Assert
     assert actual == expected

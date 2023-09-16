@@ -1,7 +1,9 @@
 from __future__ import annotations
 
-from abc import ABC
+from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
+
+from cognite.client.data_classes.data_modeling.data_types import ListablePropertyType
 from typing_extensions import Self
 
 from cognite.client.data_classes import data_modeling as dm
@@ -9,8 +11,8 @@ from cognite.client.data_classes import data_modeling as dm
 from cognite.pygen.config import PygenConfig
 from cognite.pygen.utils.text import create_name
 
-_PRIMITIVE_TYPES = {"text", "boolean" "float32" "float64" "int32" "int64" "timestamp" "date" "json"}
-_EXTERNAL_TYPES = {"timeseries" "file" "sequence"}
+_PRIMITIVE_TYPES = (dm.Text, dm.Boolean, dm.Float32, dm.Float64, dm.Int32, dm.Int64, dm.Timestamp, dm.Date, dm.Json)
+_EXTERNAL_TYPES = (dm.TimeSeriesReference, dm.FileReference, dm.SequenceReference)
 
 
 @dataclass(frozen=True)
@@ -22,17 +24,41 @@ class Field(ABC):
     name: str
 
     @classmethod
-    def from_property(cls, prop: dm.MappedProperty | dm.ConnectionDefinition, config: PygenConfig) -> Field:
-        if prop.type in _PRIMITIVE_TYPES and isinstance(prop, dm.MappedProperty):
-            ...
-        elif prop.type in _EXTERNAL_TYPES and isinstance(prop, dm.MappedProperty):
-            ...
-        elif prop.type == "direct" and isinstance(prop, dm.MappedProperty):
-            return EdgeField()
-        elif isinstance(prop, dm.SingleHopConnectionDefinition):
-            return EdgesField()
+    def from_property(
+        cls,
+        prop_name: str,
+        prop: dm.MappedProperty | dm.ConnectionDefinition,
+        data_class_by_view_id: dict[dm.ViewId, DataClass],
+        config: PygenConfig,
+    ) -> Field:
+        name = create_name(prop_name, config.naming.data_class.field)
+        if isinstance(prop, dm.SingleHopConnectionDefinition):
+            return ManyEdgeField(name=name, data_class=data_class_by_view_id[prop.source])
+        if not isinstance(prop, dm.MappedProperty):
+            raise ValueError(f"Property type={type(prop)!r} is not supported")
+
+        if isinstance(prop.type, _PRIMITIVE_TYPES) or isinstance(prop.type, _EXTERNAL_TYPES):
+            type_ = _to_python_type(prop.type)
+            if isinstance(prop.type, ListablePropertyType) and prop.type.is_list:
+                return PrimitiveListField(
+                    name=name, type_=type_, is_nullable=prop.nullable, default=prop.default_value, prop=prop
+                )
+
+            return PrimitiveField(
+                name=name, type_=type_, is_nullable=prop.nullable, default=prop.default_value, prop=prop
+            )
+        elif isinstance(prop.type, dm.DirectRelationReference):
+            return EdgeField(name=name, data_class=data_class_by_view_id[prop.source])
         else:
             raise NotImplementedError(f"Property type={type(prop)!r} is not supported")
+
+    @abstractmethod
+    def as_read_type_hint(self) -> str:
+        ...
+
+    @abstractmethod
+    def as_write_type_hint(self) -> str:
+        ...
 
 
 @dataclass(frozen=True)
@@ -41,11 +67,20 @@ class PrimitiveField(Field):
     This represents a basic type such as str, int, float, bool, datetime.datetime, datetime.date.
     """
 
-    ...
+    def as_read_type_hint(self) -> str:
+        pass
+
+    def as_write_type_hint(self) -> str:
+        pass
+
+    type_: str
+    is_nullable: bool
+    default: str | int | dict | None
+    prop: dm.MappedProperty
 
 
 @dataclass(frozen=True)
-class PrimitiveListField(Field):
+class PrimitiveListField(PrimitiveField):
     """
     This represents a list of basic types such as list[str], list[int], list[float], list[bool], list[datetime.datetime], list[datetime.date].
     """
@@ -54,22 +89,42 @@ class PrimitiveListField(Field):
 
 
 @dataclass(frozen=True)
-class EdgeField(Field):
+class EdgeField(Field, ABC):
     """
     This represents an edge field linking to another data class.
     """
 
     data_class: DataClass
-    ...
 
 
 @dataclass(frozen=True)
-class EdgesField(Field):
+class OneEdgeField(EdgeField):
+    """
+    This represents an edge field linking to another data class.
+    """
+
+    prop: dm.MappedProperty
+
+    def as_read_type_hint(self) -> str:
+        pass
+
+    def as_write_type_hint(self) -> str:
+        pass
+
+
+@dataclass(frozen=True)
+class ManyEdgeField(EdgeField):
     """
     This represents a list of edge fields linking to another data class.
     """
 
-    ...
+    prop: dm.SingleHopConnectionDefinition
+
+    def as_read_type_hint(self) -> str:
+        pass
+
+    def as_write_type_hint(self) -> str:
+        pass
 
 
 @dataclass(frozen=True)
@@ -84,7 +139,7 @@ class DataClass:
     write_list_class_name: str
     variable_name: str
     file_name: str
-    view: dm.ViewId
+    view_id: dm.ViewId
     fields: list[Field] = field(default_factory=list)
 
     @classmethod
@@ -100,14 +155,24 @@ class DataClass:
             write_list_class_name=f"{class_name}ApplyList",
             variable_name=variable_name,
             file_name=file_name,
-            view=view.as_id(),
+            view_id=view.as_id(),
         )
+
+    def update_fields(
+        self,
+        properties: dict[str, dm.MappedProperty | dm.ConnectionDefinition],
+        data_class_by_view_id: dict[dm.ViewId, DataClass],
+        config: PygenConfig,
+    ) -> None:
+        for prop_name, prop in properties.items():
+            field_ = Field.from_property(prop_name, prop, data_class_by_view_id, config)
+            self.fields.append(field_)
 
     @property
     def import_(self) -> str:
         return (
             f"from .{self.file_name} "
-            f"import {self.read_class_name}, {self.read_class_name}Apply, {self.read_class_name}List"
+            f"import {self.read_class_name}, {self.write_list_class_name}, {self.read_list_class_name}"
         )
 
 

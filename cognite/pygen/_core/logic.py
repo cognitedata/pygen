@@ -7,18 +7,6 @@ from typing import Any
 
 from cognite.client.data_classes import data_modeling as dm
 
-from cognite.pygen._core.data_classes import APIClass
-from cognite.pygen._core.generators import APIGenerator
-
-
-def find_dependencies(apis: list[APIGenerator]) -> dict[APIClass, set[APIClass]]:
-    class_by_data_class_name = {api.api_class.data_class: api.api_class for api in apis}
-    return {
-        api.api_class: {class_by_data_class_name[d] for d in dependencies}
-        for api in apis
-        if (dependencies := api.fields.dependencies)
-    }
-
 
 def _unique_properties(
     prop: dm.MappedProperty | dm.SingleHopConnectionDefinition | dm.MappedProperty | dm.ConnectionDefinition,
