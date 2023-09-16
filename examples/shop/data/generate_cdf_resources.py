@@ -31,7 +31,7 @@ def main(sequence_count: int = 10, file_count: int = 10):
         df = pd.DataFrame(rows, columns=columns, index=range(1, 25))
 
         client.sequences.create(sequence)
-        client.sequences.data.insert_dataframe(df, external_id=sequence.external_id)
+        client.sequences.fields.insert_dataframe(df, external_id=sequence.external_id)
         print(f"Uploaded {sequence.name}")  # noqa: T201
 
     commands_file = THIS / "commands.yaml"

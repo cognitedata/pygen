@@ -1,5 +1,20 @@
 from dataclasses import dataclass, field
 from typing import Literal
+from enum import Enum
+
+# Make into pydantic models and require validation on assigment.
+
+
+class Case(Enum):
+    pascal = "pascal"
+    snake = "snake"
+    camel = "camel"
+
+
+class Number(Enum):
+    plural = "plural"
+    singular = "singular"
+    unchanged = "unchanged"
 
 
 @dataclass(frozen=True)
@@ -12,8 +27,74 @@ class Naming:
         number: Number convention. One of "plural", "singular", "unchanged".
     """
 
-    case: Literal["pascal", "snake", "unchanged"]
-    number: Literal["plural", "singular", "unchanged"] = "unchanged"
+    case: Case
+    number: Number = Number.unchanged
+
+
+# @dataclass(frozen=True)
+# class APIClassNaming:
+#     """
+#     The configuration of the naming used by pygen.
+#
+#     Args:
+#         api_class_name: Naming convention for API class names. The api class name will be suffixed with "API".
+#                         For example, a view with external id "MyView" will generate an API class named "MyViewAPI".
+#         data_class: The naming convention for the generated data classes.
+#         api_class_variable: Naming convention for API class variable. This is used when writing, for example,
+#                         my_client.[api_class_variable].list().
+#     """
+#
+#     data_class: DataClassNaming = field(default_factory=DataClassNaming)
+
+
+@dataclass(frozen=True)
+class DataClassNaming:
+    """
+    Naming convention for data classes.
+
+    Args:
+        name: Naming convention for data class names. Pygen will create two data classes one for reading
+            and one for writing. The writing class will be suffixed with "Apply".
+        variable: Naming convention for data class variable. This is used, for example, in as the
+            parameter name in the apply method of the API class.
+        file: Naming convention for data class file.
+        field: Naming convention for data class fields. Data class fields are the attributes of the
+                        data classes and are generated from the properties of the view.
+    """
+
+    name: Naming = field(default_factory=lambda: Naming(Case.pascal, Number.singular))
+    variable: Naming = field(default_factory=lambda: Naming(Case.snake, Number.singular))
+    file: Naming = field(default_factory=lambda: Naming(Case.snake, Number.plural))
+    field: Naming = field(default_factory=lambda: Naming(Case.snake, Number.unchanged))
+
+
+@dataclass(frozen=True)
+class APIClassNaming:
+    """
+    Naming convention for API classes.
+
+    Args:
+        name: Naming convention for API class names. The api class name will be suffixed with "API".
+                        For example, a view with external id "MyView" will generate an API class named "MyViewAPI".
+        variable: Naming convention for API class variable. This is used when writing, for example,
+                        my_client.[api_class_variable].list().
+    """
+
+    name: Naming = field(default_factory=lambda: Naming(Case.pascal, Number.singular))
+    variable: Naming = field(default_factory=lambda: Naming(Case.snake, Number.singular))
+    variable_list: Naming = field(default_factory=lambda: Naming(Case.snake, Number.plural))
+    file_name: Naming = field(default_factory=lambda: Naming(Case.snake, Number.plural))
+    client_attribute: Naming = field(default_factory=lambda: Naming(Case.snake, Number.plural))
+
+
+@dataclass(frozen=True)
+class APIsClassNaming:
+    """
+    Naming convention for a set of API classes created from a data model
+    """
+
+    name = Naming(Case.pascal, Number.singular)
+    variable = Naming(Case.snake, Number.singular)
 
 
 @dataclass(frozen=True)
@@ -22,22 +103,14 @@ class NamingConfig:
     The configuration of the naming used by pygen.
 
     Args:
-        api_class_name: Naming convention for API class names. The api class name will be suffixed with "API".
-                        For example, a view with external id "MyView" will generate an API class named "MyViewAPI".
-        api_class_variable: Naming convention for API class variable. This is used when writing, for example,
-                        my_client.[api_class_variable].list().
-        data_class_name: Naming convention for data class names. Pygen will create two data classes one for reading
-                        and one for writing. The writing class will be suffixed with "Apply".
-        data_class_field: Naming convention for data class fields. Data class fields are the attributes of the
-                        data classes and are generated from the properties of the view.
+        data_class: The naming convention for the generated data classes.
     """
 
-    api_class_name: Naming = field(default_factory=lambda: Naming("pascal", "plural"))
-    api_class_variable: Naming = field(default_factory=lambda: Naming("snake", "plural"))
-    data_class_name: Naming = field(default_factory=lambda: Naming("pascal", "singular"))
-    data_class_field: Naming = field(default_factory=lambda: Naming("snake"))
+    data_class: DataClassNaming = field(default_factory=DataClassNaming)
+    api_class: APIClassNaming = field(default_factory=APIClassNaming)
+    apis_class: APIsClassNaming = field(default_factory=APIsClassNaming)
 
 
-@dataclass
+@dataclass(frozen=True)
 class PygenConfig:
-    naming: NamingConfig
+    naming: NamingConfig = field(default_factory=NamingConfig)

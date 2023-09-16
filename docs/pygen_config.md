@@ -1,3 +1,4 @@
 # Pygen Configuration
 
-::: cognite.pygen.config.NamingConfig
+::: cognite.pygen.config.DataClassNaming
+

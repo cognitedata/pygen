@@ -1,7 +1,7 @@
 import pytest
 from cognite.client import data_modeling as dm
 
-from cognite.pygen._core.dms_to_python import SDKGenerator
+from cognite.pygen._core.generators import SDKGenerator
 from tests.constants import APM_SDK
 
 

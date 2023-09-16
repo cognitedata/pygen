@@ -1,6 +1,6 @@
 from cognite.client import data_modeling as dm
 
-from cognite.pygen._core.dms_to_python import get_unique_views
+from cognite.pygen._core.logic import get_unique_views
 
 
 def test_get_unique_views(cog_pool_model: dm.DataModel, pygen_pool_model: dm.DataModel) -> None:

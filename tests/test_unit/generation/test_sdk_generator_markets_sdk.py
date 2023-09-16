@@ -5,7 +5,7 @@ import platform
 import pytest
 from cognite.client import data_modeling as dm
 
-from cognite.pygen._core.dms_to_python import APIGenerator, SDKGenerator
+from cognite.pygen._core.generators import APIGenerator, SDKGenerator
 from cognite.pygen._generator import CodeFormatter
 from tests.constants import IS_PYDANTIC_V1, MarketSDKFiles
 

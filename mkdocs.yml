@@ -16,6 +16,7 @@ nav:
     - Installation: installation.md
     - CLI: cli.md
     - Examples: examples/movie_domain.ipynb
+    - Configuration: pygen_config.md
     - API:
         - Pygen: api/api.md
         - Demo: api/demo.md

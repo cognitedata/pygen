@@ -6,14 +6,13 @@ import pytest
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.views import ViewProperty
 
-from cognite.pygen._core.dms_to_python import (
-    APIClass,
+from cognite.pygen._core.generators import (
     APIGenerator,
     APIsGenerator,
-    Field,
     SDKGenerator,
-    find_dependencies,
 )
+from cognite.pygen._core.logic import find_dependencies
+from cognite.pygen._core.data_classes import Field, APIClass
 from cognite.pygen._generator import CodeFormatter
 from tests.constants import IS_PYDANTIC_V1, MovieSDKFiles
 
