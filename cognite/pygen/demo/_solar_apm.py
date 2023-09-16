@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import pathlib
-from typing import Any, Callable
+from typing import Any, Callable, cast
 
 from cognite.client import CogniteClient
 from cognite.client.data_classes import DataSet
@@ -142,12 +142,15 @@ class SolarFarmAPM:
             return dataset.id
 
         try:
-            new_dataset = client.data_sets.create(
-                DataSet(
-                    external_id=self._data_set_external_id,
-                    name=self._data_set_external_id,
-                    description="This data set was created by pygen for demo purposes.",
-                )
+            new_dataset = cast(
+                DataSet,
+                client.data_sets.create(
+                    DataSet(
+                        external_id=self._data_set_external_id,
+                        name=self._data_set_external_id,
+                        description="This data set was created by pygen for demo purposes.",
+                    )
+                ),
             )
         except CogniteAPIError as e:
             self._echo(f"Failed to create data set {self._data_set_external_id}: {e}")

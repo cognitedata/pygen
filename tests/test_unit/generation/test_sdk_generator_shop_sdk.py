@@ -5,7 +5,7 @@ from cognite.client import data_modeling as dm
 
 from cognite import pygen
 from cognite.pygen._core.dms_to_python import APIGenerator, APIsGenerator, SDKGenerator
-from tests.constants import IS_PYDANTIC_V1, ShopSDKFiles, examples_dir
+from tests.constants import EXAMPLES_DIR, IS_PYDANTIC_V1, ShopSDKFiles
 
 
 @pytest.fixture
@@ -79,5 +79,5 @@ def test_generate_sdk(sdk_generator: SDKGenerator, movie_model: dm.DataModel, tm
     # Assert
     for file_path in tmp_path.glob("**/*.py"):
         relative_path = file_path.relative_to(tmp_path)
-        expected = (examples_dir / relative_path).read_text()
+        expected = (EXAMPLES_DIR / relative_path).read_text()
         assert file_path.read_text() == expected

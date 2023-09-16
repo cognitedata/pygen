@@ -1,22 +1,36 @@
 ## Development Instructions
 
-### Setup
+`pygen` is currently mainly developed by [@doctrino](https://github.com/doctrino) which also functions as
+the `BDFL` of the project.
+
+Contributions are welcome, but please open an issue first to discuss the proposed changes. If you are a Cognite employee,
+please join the `#topic-pygen` channel on Slack and post issues there.
+
+### Installation
 
 Get the code!
 
 ```bash
-git clone https://github.com/cognitedata/cognite-gql-pygen.git
-cd cognite-gql-pygen
+https://github.com/cognitedata/pygen.git
+cd cognite-pygen
 ```
 
 We use [poetry](https://pypi.org/project/poetry/) for dependency- and virtual environment management.
 
-Install dependencies and initialize a shell within the virtual environment, with these commands:
+When developing `pygen` use Python `3.9`. To specify the python version with `poetry` you can use the command
+```bash
+poetry env use 3.9
+```
+See [poetry docs](https://python-poetry.org/docs/managing-environments/) for more information on managing environments.
+
+Install `pygen` with all the extra dependencies and then activate the virtual environment, with these commands:
 
 ```bash
-poetry install
+poetry install --all-extras
 poetry shell
 ```
+
+`pygen` is using [pre-commit](https://pre-commit.com/) to run static code checks.
 
 Install pre-commit hooks to run static code checks on every commit:
 
@@ -30,22 +44,105 @@ You can also manually trigger the static checks with:
 pre-commit run --all-files
 ```
 
+### Installation `pydantic` `v1`
+
+`pygen` is supporting `pydantic` `v1` and `v2`. It is recommended that you have two virtual environments, one for each version of `pydantic`.
+To create a virtual environment for `pydantic` `v1` follow the steps above and then run the following command:
+
+```bash
+pip install pydantic==1.10.7
+```
+**Note** IDEs such as PyCharm supports multiple virtual environments, so you can have one project with two virtual environments, one for each version of `pydantic`.
+See [PyCharm docs](https://www.jetbrains.com/help/pycharm/creating-virtual-environment.html) for more information on how to create virtual environments in PyCharm.
 
 ### Testing
 
-Initiate unit tests by running the following command from the root directory:
-
-`pytest`
-
-If you want to generate code coverage reports run:
-
+There are two set categories of tests in `pygen`, the `tests` folder structure reflects this:
 ```
-pytest --cov-report html \
-       --cov-report xml \
-       --cov cognite
+📦tests
+ ┣ 📂dms_data_models - The Domain Model Storage representation of the data models used in the examples.
+ ┣ 📂test_integration - Tests that requires CDF.
+ ┃ ┣ 📂generation - Test that check that pygen generates SDK(s) as expected.
+ ┃ ┗ 📂sdks - Test that checks the that the generated SDK work as expected.
+ ┣ 📂test_unit - Tests that can be run locally without any external connection.
+ ┃ ┣ 📂generation
+ ┃ ┗ 📂sdks
+ ┗ 📜constants.py - Defines the Example SDKs and which files are manually maintained.
 ```
 
-Open `htmlcov/index.html` in the browser to navigate through the report.
+Note the distinction between the `generation` and `sdks` tests. The generated SDKs are checked into the repository and
+are found in
+
+ * [examples](/examples) - SDKs generated for `pydantic` `v2`
+ * [examples-pydantic-v1](/examples-pydantic-v1) - SDKs generated for `pydantic` `v1`
+
+
+To run all tests, run the following command from the root directory:
+```
+pytest
+```
+
+To run only the unit tests
+```
+pytest tests/test_unit cognite/
+```
+**Note** The `cognite/` is required to run the doctests in the `pygen` package.
+
+### Recommended Development Workflow
+
+First make sure you have discussed the changes with the `BDFL`,
+this will save you the risk of getting all your hard work rejected later.
+
+#### GitHub Workflow
+Create a new branch for your changes, and make sure you are up-to-date with the `main` branch. After first,
+commit push to GitHub and create a draft PR:
+
+1. Create a new branch
+```bash
+git checkout -b my-new-feature
+```
+2. Create a draft PR on GitHub. This will allow you to get feedback on your changes early,
+   as well as communicating that you are working on a feature/bugfix.
+
+#### Coding Workflow
+
+1. Write a test for one of the example SDKs for the feature you are implementing. Or in the case of a bugfix,
+   write a test that fails without your changes. Check which of the generated SDK files that are manually maintained
+   in [constants.py](/tests/constants.py).
+2. Implement the fix/feature in the example SDK.
+3. Ensure there is a generation test that checks that the SDK is generated as expected.
+4. Update the `pygen` itself to support generating the SDK.
+
+
+### Generating Example SDKs
+When you are developing `pygen` you will likely need to generate the example SDKs. To do this run the following command from the root directory:
+```bash
+python scripts/dev.py generate-sdks
+```
+This command must be run with both Python environments, `pydantic` `v1` and `v2`.
+
+### Developer CLI
+Note that `python scrips/dev.py` is a CLI with a few commands that can be useful when developing `pygen`.
+To see the available commands run:
+```bash
+python scripts/dev.py --help
+```
+
+### Documentation
+
+We use material docs for the documentation. First, ensure that you have installed the `docs` extra dependencies with `poetry`:
+
+```bash
+poetry install --extras docs
+```
+
+You can build and serve the documentation locally with:
+
+```bash
+mkdocs serve
+```
+
+The documentation is kept in the `docs` folder, while the `mkdocs.yml` file contains the configuration for the documentation.
 
 ### Release version conventions
 

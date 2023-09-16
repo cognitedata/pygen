@@ -2,12 +2,12 @@ import pytest
 from cognite.client import data_modeling as dm
 from yaml import safe_load
 
-from tests.constants import DataModels
+from tests.constants import DMSModels
 
 
 @pytest.fixture(scope="session")
 def movie_model() -> dm.DataModel:
-    with DataModels.movie_model.open("r") as f:
+    with DMSModels.movie_model.open("r") as f:
         raw = safe_load(f)
     return dm.DataModel.load(raw)
 
@@ -29,7 +29,7 @@ def movie_views(movie_model: dm.DataModel) -> dm.ViewList:
 
 @pytest.fixture
 def shop_model() -> dm.DataModel:
-    with DataModels.shop_model.open("r") as f:
+    with DMSModels.shop_model.open("r") as f:
         raw = safe_load(f)
     return dm.DataModel.load(raw)
 
@@ -46,14 +46,14 @@ def command_config_view(shop_model) -> dm.View:
 
 @pytest.fixture(scope="session")
 def cog_pool_model() -> dm.DataModel:
-    with DataModels.cog_pool.open("r") as f:
+    with DMSModels.cog_pool.open("r") as f:
         raw = safe_load(f)
     return dm.DataModel.load(raw)
 
 
 @pytest.fixture(scope="session")
 def pygen_pool_model() -> dm.DataModel:
-    with DataModels.pygen_pool.open("r") as f:
+    with DMSModels.pygen_pool.open("r") as f:
         raw = safe_load(f)
     return dm.DataModel.load(raw)
 

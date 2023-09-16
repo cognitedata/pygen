@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Generic, Sequence, Type, overload
+from collections.abc import Sequence
+from typing import Generic, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -14,9 +15,9 @@ class TypeAPI(Generic[T_TypeNode, T_TypeApplyNode, T_TypeNodeList]):
         self,
         client: CogniteClient,
         sources: dm.ViewIdentifier | Sequence[dm.ViewIdentifier] | dm.View | Sequence[dm.View],
-        class_type: Type[T_TypeNode],
-        class_apply_type: Type[T_TypeApplyNode],
-        class_list: Type[T_TypeNodeList],
+        class_type: type[T_TypeNode],
+        class_apply_type: type[T_TypeApplyNode],
+        class_list: type[T_TypeNodeList],
     ):
         self._client = client
         self.sources = sources
@@ -45,6 +46,6 @@ class TypeAPI(Generic[T_TypeNode, T_TypeApplyNode, T_TypeNodeList]):
             return self.class_list([self.class_type.from_node(node) for node in instances.nodes])
         return self.class_type.from_node(instances.nodes[0])
 
-    def _list(self, limit: int = DEFAULT_LIMIT_READ) -> T_TypeNodeList:
-        nodes = self._client.data_modeling.instances.list("node", sources=self.sources, limit=limit)
+    def _list(self, limit: int = DEFAULT_LIMIT_READ, filter: dm.Filter | None = None) -> T_TypeNodeList:
+        nodes = self._client.data_modeling.instances.list("node", sources=self.sources, limit=limit, filter=filter)
         return self.class_list([self.class_type.from_node(node) for node in nodes])
