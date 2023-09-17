@@ -57,6 +57,7 @@ def create_fields_test_cases():
         "name",
         prop,
         {},
+        "Person",
         PrimitiveField(
             name="name",
             prop_name="name",
@@ -96,6 +97,7 @@ def create_fields_test_cases():
         "roles",
         prop,
         data_class_by_view_id,
+        "Person",
         EdgeOneToMany(
             name="roles",
             prop_name="roles",
@@ -126,6 +128,7 @@ def create_fields_test_cases():
         "configs",
         prop,
         {},
+        "Command_Config",
         PrimitiveListField(
             name="configs",
             prop_name="configs",
@@ -171,6 +174,7 @@ def create_fields_test_cases():
         "person",
         prop,
         data_class_by_view_id,
+        "Person",
         EdgeOneToOne(
             name="person",
             prop_name="person",
@@ -200,6 +204,7 @@ def create_fields_test_cases():
         "wonOscar",
         prop,
         {},
+        "Person",
         PrimitiveField(
             name="won_oscar",
             prop_name="wonOscar",
@@ -216,20 +221,22 @@ def create_fields_test_cases():
 
 
 @pytest.mark.parametrize(
-    "prop_name, property_, data_class_by_view_id, expected, expected_read_type_hint, expected_write_type_hint",
+    "prop_name, property_, data_class_by_view_id, view_name, expected, "
+    "expected_read_type_hint, expected_write_type_hint",
     list(create_fields_test_cases()),
 )
 def test_fields_from_property(
     prop_name: str,
     property_: dm.MappedProperty | dm.ConnectionDefinition,
     data_class_by_view_id: dict[dm.ViewId, DataClass],
+    view_name: str,
     expected: Field,
     expected_read_type_hint: str,
     expected_write_type_hint: str,
     pygen_config: PygenConfig,
 ):
     # Act
-    actual = Field.from_property(prop_name, property_, data_class_by_view_id, pygen_config)
+    actual = Field.from_property(prop_name, property_, data_class_by_view_id, pygen_config, view_name)
 
     # Assert
     assert actual == expected
@@ -265,7 +272,7 @@ def test_create_view_data_class_actors(apis_generator: APIsGenerator, actor_view
     assert actual == expected
 
 
-def test_create_view_api_classes_actors(apis_generator, actor_view: dm.View, top_level_package: str):
+def test_create_view_api_classes_actors(apis_generator: APIsGenerator, actor_view: dm.View, top_level_package: str):
     # Arrange
     expected = MovieSDKFiles.actors_api.read_text()
     api_generator = next((api for api in apis_generator.apis if api.view.as_id() == actor_view.as_id()), None)
@@ -278,18 +285,20 @@ def test_create_view_api_classes_actors(apis_generator, actor_view: dm.View, top
     assert actual == expected
 
 
-def test_create_view_api_classes_persons(person_view: dm.View, top_level_package: str):
+def test_create_view_api_classes_persons(apis_generator: APIsGenerator, person_view: dm.View, top_level_package: str):
     # Arrange
     expected = MovieSDKFiles.persons_api.read_text()
+    api_generator = next((api for api in apis_generator.apis if api.view.as_id() == person_view.as_id()), None)
+    assert api_generator is not None, "Could not find API generator for actor view"
 
     # Act
-    actual = APIGenerator(person_view, top_level_package).generate_api_file(top_level_package)
+    actual = api_generator.generate_api_file(top_level_package)
 
     # Assert
     assert actual == expected
 
 
-def test_create_api_classes(apis_generator: APIsGenerator, code_formatter: CodeFormatter):
+def test_generate_data_class_init_file(apis_generator: APIsGenerator, code_formatter: CodeFormatter):
     # Arrange
     expected = MovieSDKFiles.data_init.read_text()
 
@@ -312,12 +321,12 @@ def test_create_api_client(sdk_generator: SDKGenerator):
     assert actual == expected
 
 
-def test_find_dependencies(movie_model: dm.DataModel, top_level_package: str):
+def test_find_dependencies(movie_model: dm.DataModel, top_level_package: str, config: PygenConfig):
     # Arrange
     views = dm.ViewList(movie_model.views)
-    apis = [APIGenerator(view, top_level_package) for view in views]
+    apis = [APIGenerator(view, config) for view in views]
     expected = {
-        APIClass.from_view(k, top_level_package): {APIClass.from_view(v, top_level_package) for v in values}
+        APIClass.from_view(k, config): {APIClass.from_view(v, config) for v in values}
         for k, values in {
             "Person": {"Role"},
             "Actor": {"Nomination", "Movie", "Person"},

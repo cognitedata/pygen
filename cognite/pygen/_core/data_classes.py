@@ -45,14 +45,14 @@ class Field(ABC):
         prop: dm.MappedProperty | dm.ConnectionDefinition,
         data_class_by_view_id: dict[dm.ViewId, DataClass],
         config: PygenConfig,
-        data_class: DataClass,
+        view_name: str,
         pydantic_field: str = "Field",
     ) -> Field:
         name = create_name(prop_name, config.naming.field_.name)
         if isinstance(prop, dm.SingleHopConnectionDefinition):
             variable = create_name(prop_name, config.naming.field_.variable)
 
-            edge_api_class_input = f"{data_class.view_name}_{prop_name}"
+            edge_api_class_input = f"{view_name}_{prop_name}"
             edge_api_class = f"{create_name(edge_api_class_input, config.naming.field_.edge_api_class)}API"
             edge_api_attribute = create_name(prop_name, config.naming.field_.edge_api_attribute)
             return EdgeOneToMany(
@@ -281,7 +281,7 @@ class DataClass:
         pydantic_field = self.pydantic_field
         for prop_name, prop in properties.items():
             field_ = Field.from_property(
-                prop_name, prop, data_class_by_view_id, config, self, pydantic_field=pydantic_field
+                prop_name, prop, data_class_by_view_id, config, self.view_name, pydantic_field=pydantic_field
             )
             self.fields.append(field_)
 
@@ -295,8 +295,8 @@ class DataClass:
             return "Field"
 
     @property
-    def import_(self) -> str:
-        return f"from .{self.file_name} " f"import {self.read_name}, {self.write_list_name}, {self.read_list_name}"
+    def init_import(self) -> str:
+        return f"from .{self.file_name} " f"import {self.read_name}, {self.write_name}, {self.read_list_name}"
 
     def __iter__(self) -> Iterator[Field]:
         return iter(self.fields)
@@ -354,7 +354,7 @@ class DataClass:
             return "import pydantic"
 
     @property
-    def data_class_dependencies(self) -> list[DataClass]:
+    def dependencies(self) -> list[DataClass]:
         unique: dict[dm.ViewId, DataClass] = {}
         for field_ in self.fields:
             if isinstance(field_, EdgeField):

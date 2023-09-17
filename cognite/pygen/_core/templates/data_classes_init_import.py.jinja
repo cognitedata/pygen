@@ -1,2 +1,2 @@
-{% for class_, dependencies in dependencies_by_class.items() %}{{ class_.data_class }}Apply.model_rebuild()
+{% for write_name in dependencies_by_data_class_write_name %}{{ write_name }}.model_rebuild()
 {% endfor %}

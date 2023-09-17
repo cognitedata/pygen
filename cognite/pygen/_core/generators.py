@@ -106,7 +106,7 @@ class APIsGenerator:
         self._pydantic_version = pydantic_version
         self._logger = logger or print
 
-        self.apis = [APIGenerator(view, config) for view in views]
+        self.apis: list[APIGenerator] = [APIGenerator(view, config) for view in views]
         data_class_by_view_id = {api.view.as_id(): api.data_class for api in self.apis}
         for api in self.apis:
             api.data_class.update_fields(api.view.properties, data_class_by_view_id, config)
@@ -156,15 +156,19 @@ class APIsGenerator:
 
     def generate_data_classes_init_file(self) -> str:
         data_class_init = self.env.get_template("data_classes_init.py.jinja")
+
+        data_classes_with_dependencies = sorted(
+            (api.data_class for api in self.apis if api.data_class.has_edges), key=lambda d: d.read_name
+        )
+        dependencies_by_data_class_write_name = {
+            data_class.write_name: sorted(data_class.dependencies, key=lambda d: d.read_name)
+            for data_class in data_classes_with_dependencies
+        }
+
         return (
             data_class_init.render(
-                classes=sorted((api.api_class for api in self.apis), key=lambda c: c.data_class),
-                dependencies_by_class={
-                    class_: sorted(dependencies, key=lambda c: c.data_class)
-                    for class_, dependencies in sorted(
-                        self._dependencies_by_class.items(), key=lambda x: x[0].data_class
-                    )
-                },
+                classes=sorted((api.data_class for api in self.apis), key=lambda d: d.read_name),
+                dependencies_by_data_class_write_name=dependencies_by_data_class_write_name,
                 top_level_package=self.top_level_package,
                 import_file={
                     "v2": "data_classes_init_import.py.jinja",

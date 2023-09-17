@@ -8,7 +8,7 @@ from cognite.client import data_modeling as dm{% if data_class.use_pydantic_fiel
 
 from ._core import DomainModel, DomainModelApply, TypeList
 {% if data_class.has_edges %}
-if TYPE_CHECKING:{% for dependency_class in data_class.data_class_dependencies %}
+if TYPE_CHECKING:{% for dependency_class in data_class.dependencies %}
     from .{{ dependency_class.file_name }} import {{ dependency_class.write_name }}{% endfor %}
 {% endif %}
 __all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data_class.read_list_name }}"]
