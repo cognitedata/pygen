@@ -13,6 +13,16 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.18.0] - 20-09-17
+### Added
+* Support for configuring naming convention used for the generated SDK.
+* Validation of the naming used in the generated SDK. This is to avoid name collisions between data and API classes.
+
+### Fixed
+* Data models containing views with properties without specified `name` caused a `KeyError`. This is now fixed.
+* Data models containing views with named `Field` caused namespace collision with `pydantic.Field` in
+  the generated data class. This is now fixed.
+
 ## [0.17.7] - 20-09-07
 ### Fixed
 * Removed import of `INSTANCES_LIST_LIMIT_DEFAULT` from `cognite-sdk` which no longer exists. This is a private
