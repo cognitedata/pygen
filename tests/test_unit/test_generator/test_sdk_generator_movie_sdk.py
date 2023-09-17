@@ -101,7 +101,7 @@ def create_fields_test_cases():
             prop=cast(dm.SingleHopConnectionDefinition, prop),
             data_class=data_class,
             variable="role",
-            pydantic_field=("Field",),
+            pydantic_field="Field",
         ),
         "list[str] = []",
         "Union[list[RoleApply], list[str]] = Field(default_factory=list, repr=False)",
@@ -232,12 +232,16 @@ def test_fields_from_property(
     assert actual.as_write_type_hint() == expected_write_type_hint
 
 
-def test_generate_data_class_file_persons(person_view: dm.View, pygen_config: PygenConfig):
+def test_generate_data_class_file_persons(
+    apis_generator: APIsGenerator, person_view: dm.View, pygen_config: PygenConfig
+):
     # Arrange
     expected = MovieSDKFiles.persons_data.read_text()
+    api_generator = next((api for api in apis_generator.apis if api.view.as_id() == person_view.as_id()), None)
+    assert api_generator is not None, "Could not find API generator for actor view"
 
     # Act
-    actual = APIGenerator(person_view, pygen_config).generate_data_class_file()
+    actual = api_generator.generate_data_class_file()
 
     # Assert
     assert actual == expected
@@ -256,22 +260,16 @@ def test_create_view_data_class_actors(apis_generator: APIsGenerator, actor_view
     assert actual == expected
 
 
-def test_create_view_api_classes_actors(apis_generator, actor_view: dm.View, top_level_package: str, tmp_path: Path):
+def test_create_view_api_classes_actors(apis_generator, actor_view: dm.View, top_level_package: str):
     # Arrange
     expected = MovieSDKFiles.actors_api.read_text()
     api_generator = next((api for api in apis_generator.apis if api.view.as_id() == actor_view.as_id()), None)
     assert api_generator is not None, "Could not find API generator for actor view"
 
     # Act
-    actual = APIGenerator(actor_view, top_level_package).generate_api_file(top_level_package)
+    actual = api_generator.generate_api_file(top_level_package)
 
     # Assert
-    # Reformat with black to make sure the formatting is correct
-    # reformat_one(
-    #     tmp_actors,
-    #
-    #     ),
-
     assert actual == expected
 
 
