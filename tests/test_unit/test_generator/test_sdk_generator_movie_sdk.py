@@ -12,8 +12,8 @@ from cognite.pygen._core.data_classes import (
     Field,
     PrimitiveField,
     PrimitiveListField,
-    OneEdgeField,
-    ManyEdgeField,
+    EdgeOneToOne,
+    EdgeOneToMany,
     DataClass,
 )
 from cognite.pygen._core.generators import (
@@ -99,13 +99,13 @@ def create_fields_test_cases():
         "roles",
         prop,
         data_class_by_view_id,
-        ManyEdgeField(
+        EdgeOneToMany(
             name="roles",
             prop_name="roles",
             prop=cast(dm.SingleHopConnectionDefinition, prop),
             data_class=data_class,
         ),
-        "list[str] = []",
+        "list[str] = Field(default_factory=list)",
         "Union[list[RoleApply], list[str]] = Field(default_factory=list, repr=False)",
         id="List of edges",
     )
@@ -167,14 +167,14 @@ def create_fields_test_cases():
         "person",
         prop,
         data_class_by_view_id,
-        OneEdgeField(
+        EdgeOneToOne(
             name="person",
             prop_name="person",
             prop=cast(dm.MappedProperty, prop),
             data_class=data_class,
         ),
         "Optional[str] = None",
-        'Optional[Union["PersonApply", str]] = Field(None, repr=False)',
+        "Union[PersonApply, str, None] = Field(None, repr=False)",
         id="Edge to another view",
     )
 
@@ -200,7 +200,7 @@ def create_fields_test_cases():
             prop_name="wonOscar",
             prop=cast(dm.MappedProperty, prop),
             is_nullable=True,
-            default="None",
+            default=None,
             type_="bool",
         ),
         'Optional[bool] = Field(None, alias="wonOscar")',

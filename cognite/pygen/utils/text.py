@@ -19,11 +19,11 @@ def create_name(raw_name: str, naming: Naming) -> str:
     """
     is_plural = naming.number == Number.plural
     is_singular = naming.number == Number.singular
-    if naming == Case.pascal:
+    if naming.case is Case.pascal:
         return to_pascal(raw_name, is_plural, is_singular)
-    elif naming == Case.snake:
+    elif naming.case is Case.snake:
         return to_snake(raw_name, is_plural, is_singular)
-    elif naming == Case.camel:
+    elif naming.case is Case.camel:
         return to_camel(raw_name, is_plural, is_singular)
     else:
         return raw_name

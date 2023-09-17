@@ -38,7 +38,9 @@ class Field(ABC):
     ) -> Field:
         name = create_name(prop_name, config.naming.data_class.field)
         if isinstance(prop, dm.SingleHopConnectionDefinition):
-            return ManyEdgeField(name=name, prop_name=prop_name, data_class=data_class_by_view_id[prop.source])
+            return EdgeOneToMany(
+                name=name, prop_name=prop_name, prop=prop, data_class=data_class_by_view_id[prop.source]
+            )
         if not isinstance(prop, dm.MappedProperty):
             raise ValueError(f"Property type={type(prop)!r} is not supported")
 
@@ -61,8 +63,10 @@ class Field(ABC):
                 default=prop.default_value,
                 prop=prop,
             )
-        elif isinstance(prop.type, dm.DirectRelationReference):
-            return EdgeField(name=name, prop_name=prop_name, data_class=data_class_by_view_id[prop.source])
+        elif isinstance(prop.type, dm.DirectRelation):
+            return EdgeOneToOne(
+                name=name, prop_name=prop_name, prop=prop, data_class=data_class_by_view_id[prop.source]
+            )
         else:
             raise NotImplementedError(f"Property type={type(prop)!r} is not supported")
 
@@ -100,7 +104,7 @@ class PrimitiveField(PrimitiveFieldCore):
     def as_write_type_hint(self) -> str:
         out_type = self.type_
         if self.is_nullable:
-            out_type = f"Optional[{out_type}]"
+            out_type = f"Optional[{out_type}] = {self.default}"
         return out_type
 
 
@@ -134,7 +138,7 @@ class EdgeField(Field, ABC):
 
 
 @dataclass(frozen=True)
-class OneEdgeField(EdgeField):
+class EdgeOneToOne(EdgeField):
     """
     This represents an edge field linking to another data class.
     """
@@ -142,14 +146,14 @@ class OneEdgeField(EdgeField):
     prop: dm.MappedProperty
 
     def as_read_type_hint(self) -> str:
-        pass
+        return "Optional[str] = None"
 
     def as_write_type_hint(self) -> str:
-        pass
+        return f"Union[{self.data_class.write_class_name}, str, None] = Field(None, repr=False)"
 
 
 @dataclass(frozen=True)
-class ManyEdgeField(EdgeField):
+class EdgeOneToMany(EdgeField):
     """
     This represents a list of edge fields linking to another data class.
     """
@@ -157,10 +161,10 @@ class ManyEdgeField(EdgeField):
     prop: dm.SingleHopConnectionDefinition
 
     def as_read_type_hint(self) -> str:
-        pass
+        return "list[str] = Field(default_factory=list)"
 
     def as_write_type_hint(self) -> str:
-        pass
+        return f"Union[list[{self.data_class.write_class_name}], list[str]] = Field(default_factory=list, repr=False)"
 
 
 @dataclass(frozen=True)
