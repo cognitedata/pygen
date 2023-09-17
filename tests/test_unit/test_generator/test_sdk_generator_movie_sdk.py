@@ -14,7 +14,7 @@ from cognite.pygen._core.data_classes import (
     PrimitiveField,
     PrimitiveListField,
 )
-from cognite.pygen._core.generators import APIsGenerator, SDKGenerator
+from cognite.pygen._core.generators import MultiAPIGenerator, SDKGenerator
 from cognite.pygen._generator import CodeFormatter
 from cognite.pygen.config import PygenConfig
 from tests.constants import IS_PYDANTIC_V1, MovieSDKFiles
@@ -34,8 +34,8 @@ def sdk_generator(movie_model, top_level_package) -> SDKGenerator:
 
 
 @pytest.fixture
-def apis_generator(movie_model, top_level_package, pygen_config: PygenConfig) -> APIsGenerator:
-    return APIsGenerator(top_level_package, "MovieClient", movie_model.views, config=pygen_config)
+def apis_generator(movie_model, top_level_package, pygen_config: PygenConfig) -> MultiAPIGenerator:
+    return MultiAPIGenerator(top_level_package, "MovieClient", movie_model.views, config=pygen_config)
 
 
 def create_fields_test_cases():
@@ -244,11 +244,11 @@ def test_fields_from_property(
 
 
 def test_generate_data_class_file_persons(
-    apis_generator: APIsGenerator, person_view: dm.View, pygen_config: PygenConfig
+    apis_generator: MultiAPIGenerator, person_view: dm.View, pygen_config: PygenConfig
 ):
     # Arrange
     expected = MovieSDKFiles.persons_data.read_text()
-    api_generator = next((api for api in apis_generator.apis if api.view.as_id() == person_view.as_id()), None)
+    api_generator = next((api for api in apis_generator.sub_apis if api.view.as_id() == person_view.as_id()), None)
     assert api_generator is not None, "Could not find API generator for actor view"
 
     # Act
@@ -258,10 +258,12 @@ def test_generate_data_class_file_persons(
     assert actual == expected
 
 
-def test_create_view_data_class_actors(apis_generator: APIsGenerator, actor_view: dm.View, pygen_config: PygenConfig):
+def test_create_view_data_class_actors(
+    apis_generator: MultiAPIGenerator, actor_view: dm.View, pygen_config: PygenConfig
+):
     # Arrange
     expected = MovieSDKFiles.actors_data.read_text()
-    api_generator = next((api for api in apis_generator.apis if api.view.as_id() == actor_view.as_id()), None)
+    api_generator = next((api for api in apis_generator.sub_apis if api.view.as_id() == actor_view.as_id()), None)
     assert api_generator is not None, "Could not find API generator for actor view"
 
     # Act
@@ -271,10 +273,10 @@ def test_create_view_data_class_actors(apis_generator: APIsGenerator, actor_view
     assert actual == expected
 
 
-def test_create_view_api_classes_actors(apis_generator: APIsGenerator, actor_view: dm.View, top_level_package: str):
+def test_create_view_api_classes_actors(apis_generator: MultiAPIGenerator, actor_view: dm.View, top_level_package: str):
     # Arrange
     expected = MovieSDKFiles.actors_api.read_text()
-    api_generator = next((api for api in apis_generator.apis if api.view.as_id() == actor_view.as_id()), None)
+    api_generator = next((api for api in apis_generator.sub_apis if api.view.as_id() == actor_view.as_id()), None)
     assert api_generator is not None, "Could not find API generator for actor view"
 
     # Act
@@ -284,10 +286,12 @@ def test_create_view_api_classes_actors(apis_generator: APIsGenerator, actor_vie
     assert actual == expected
 
 
-def test_create_view_api_classes_persons(apis_generator: APIsGenerator, person_view: dm.View, top_level_package: str):
+def test_create_view_api_classes_persons(
+    apis_generator: MultiAPIGenerator, person_view: dm.View, top_level_package: str
+):
     # Arrange
     expected = MovieSDKFiles.persons_api.read_text()
-    api_generator = next((api for api in apis_generator.apis if api.view.as_id() == person_view.as_id()), None)
+    api_generator = next((api for api in apis_generator.sub_apis if api.view.as_id() == person_view.as_id()), None)
     assert api_generator is not None, "Could not find API generator for actor view"
 
     # Act
@@ -297,7 +301,7 @@ def test_create_view_api_classes_persons(apis_generator: APIsGenerator, person_v
     assert actual == expected
 
 
-def test_generate_data_class_init_file(apis_generator: APIsGenerator, code_formatter: CodeFormatter):
+def test_generate_data_class_init_file(apis_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
     # Arrange
     expected = MovieSDKFiles.data_init.read_text()
 

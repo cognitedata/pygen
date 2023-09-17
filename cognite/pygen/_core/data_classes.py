@@ -380,13 +380,13 @@ class APIClass:
             variable=create_name(raw_name, config.naming.api_class.variable),
             variable_list=create_name(raw_name, config.naming.api_class.variable_list),
             client_attribute=create_name(raw_name, config.naming.api_class.client_attribute),
-            name=create_name(raw_name, config.naming.api_class.name),
+            name=f"{create_name(raw_name, config.naming.api_class.name)}API",
             file_name=create_name(raw_name, config.naming.api_class.file_name),
         )
 
 
 @dataclass(frozen=True)
-class APIsClass:
+class MultiAPIClass:
     """
     This represents a set of APIs which are generated from a single data model.
 
@@ -394,21 +394,21 @@ class APIsClass:
     """
 
     sub_apis: list[APIClass]
-    variable: str
+    client_attribute: str
     name: str
     model: dm.DataModelId
 
     @classmethod
     def from_data_model(
         cls, data_model: dm.DataModel, api_class_by_view_id: dict[dm.ViewId, APIClass], config: PygenConfig
-    ) -> APIsClass:
+    ) -> MultiAPIClass:
         sub_apis = sorted([api_class_by_view_id[view.as_id()] for view in data_model.views], key=lambda api: api.name)
 
         data_model_name = data_model.name or data_model.external_id
 
         return cls(
             sub_apis=sub_apis,
-            variable=create_name(data_model_name, config.naming.apis_class.variable),
+            client_attribute=create_name(data_model_name, config.naming.apis_class.client_attribute),
             name=f"{create_name(data_model_name, config.naming.apis_class.name)}APIs",
             model=data_model.as_id(),
         )

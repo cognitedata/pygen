@@ -4,7 +4,7 @@ import pytest
 from cognite.client import data_modeling as dm
 
 from cognite import pygen
-from cognite.pygen._core.generators import APIGenerator, APIsGenerator, SDKGenerator
+from cognite.pygen._core.generators import APIGenerator, MultiAPIGenerator, SDKGenerator
 from tests.constants import EXAMPLES_DIR, IS_PYDANTIC_V1, ShopSDKFiles
 
 
@@ -22,8 +22,8 @@ def sdk_generator(shop_model: dm.DataModel, top_level_package: str):
 
 
 @pytest.fixture
-def apis_generator(shop_model, top_level_package) -> APIsGenerator:
-    return APIsGenerator(top_level_package, "ShopClient", shop_model.views)
+def apis_generator(shop_model, top_level_package) -> MultiAPIGenerator:
+    return MultiAPIGenerator(top_level_package, "ShopClient", shop_model.views)
 
 
 def test_create_view_data_classes_case(case_view: dm.View, top_level_package: str):
@@ -59,7 +59,7 @@ def test_create_view_api_classes_command_configs(command_config_view: dm.View, t
 
 
 def test_create_api_classes(
-    apis_generator: APIsGenerator,
+    apis_generator: MultiAPIGenerator,
 ):
     # Arrange
     expected = ShopSDKFiles.data_init.read_text()

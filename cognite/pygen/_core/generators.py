@@ -9,7 +9,7 @@ from cognite.client._version import __version__ as cognite_sdk_version
 from jinja2 import Environment, PackageLoader, select_autoescape
 from pydantic.version import VERSION as PYDANTIC_VERSION
 
-from cognite.pygen._core.data_classes import APIClass, APIsClass, DataClass
+from cognite.pygen._core.data_classes import APIClass, DataClass, MultiAPIClass
 from cognite.pygen._core.logic import get_unique_views
 from cognite.pygen._version import __version__
 from cognite.pygen.config import PygenConfig
@@ -41,20 +41,25 @@ class SDKGenerator:
         self._data_model = data_model
         self.top_level_package = top_level_package
         self.client_name = client_name
+        self._multi_api_classes: list[MultiAPIClass]
         if isinstance(data_model, dm.DataModel):
             self._is_single_model = True
-            self._apis = APIsGenerator(
+            self._generator_APIs = MultiAPIGenerator(
                 top_level_package, client_name, data_model.views, pydantic_version, logger, config
             )
-            self._apis_classes = []
+            self._multi_api_classes = []
         elif isinstance(data_model, Sequence):
             self._is_single_model = False
             unique_views = get_unique_views(*[view for model in data_model for view in model.views])
 
-            self._apis = APIsGenerator(top_level_package, client_name, unique_views, pydantic_version, logger, config)
-            api_by_view_id = {api.view.as_id(): api.api_class for api in self._apis.apis}
-            self._apis_classes = sorted(
-                (APIsClass.from_data_model(model, api_by_view_id, config) for model in data_model), key=lambda a: a.name
+            self._generator_APIs = MultiAPIGenerator(
+                top_level_package, client_name, unique_views, pydantic_version, logger, config
+            )
+            api_by_view_id = {api.view.as_id(): api.api_class for api in self._generator_APIs.sub_apis}
+
+            self._multi_api_classes = sorted(
+                (MultiAPIClass.from_data_model(model, api_by_view_id, config) for model in data_model),
+                key=lambda a: a.name,
             )
         else:
             raise ValueError("data_model must be a DataModel or a sequence of DataModels")
@@ -67,12 +72,16 @@ class SDKGenerator:
             A Python SDK given as a dictionary of file paths and file contents, which can be written to disk.
         """
         client_dir = Path(self.top_level_package.replace(".", "/"))
-        sdk = self._apis.generate_apis(client_dir)
+        sdk = self._generator_APIs.generate_apis(client_dir)
         sdk[client_dir / "_api_client.py"] = self._generate_api_client_file()
         return sdk
 
     def _generate_api_client_file(self) -> str:
-        api_client = self._apis.env.get_template("_api_client.py.jinja")
+        api_client = self._generator_APIs.env.get_template("_api_client.py.jinja")
+
+        api_classes = sorted(
+            (sub_api.api_class for sub_api in self._generator_APIs.sub_apis), key=lambda api_class: api_class.name
+        )
 
         return (
             api_client.render(
@@ -80,17 +89,17 @@ class SDKGenerator:
                 pygen_version=__version__,
                 cognite_sdk_version=cognite_sdk_version,
                 pydantic_version=PYDANTIC_VERSION,
-                classes=sorted((api.api_class for api in self._apis.apis), key=lambda c: c.data_class),
+                api_classes=api_classes,
                 is_single_model=self._is_single_model,
                 top_level_package=self.top_level_package,
-                api_classes=self._apis_classes,
                 data_model=self._data_model,
+                multi_api_classes=self._multi_api_classes,
             )
             + "\n"
         )
 
 
-class APIsGenerator:
+class MultiAPIGenerator:
     def __init__(
         self,
         top_level_package: str,
@@ -106,9 +115,9 @@ class APIsGenerator:
         self._pydantic_version = pydantic_version
         self._logger = logger or print
 
-        self.apis: list[APIGenerator] = [APIGenerator(view, config) for view in views]
-        data_class_by_view_id = {api.view.as_id(): api.data_class for api in self.apis}
-        for api in self.apis:
+        self.sub_apis: list[APIGenerator] = [APIGenerator(view, config) for view in views]
+        data_class_by_view_id = {api.view.as_id(): api.data_class for api in self.sub_apis}
+        for api in self.sub_apis:
             api.data_class.update_fields(api.view.properties, data_class_by_view_id, config)
 
         # Validation
@@ -131,7 +140,7 @@ class APIsGenerator:
         api_dir = client_dir / "_api"
 
         sdk = {(api_dir / "__init__.py"): ""}
-        for api in self.apis:
+        for api in self.sub_apis:
             file_name = api.api_class.file_name
             sdk[data_classes_dir / f"_{file_name}.py"] = api.generate_data_class_file()
             sdk[api_dir / f"{file_name}.py"] = api.generate_api_file(self.top_level_package)
@@ -158,7 +167,7 @@ class APIsGenerator:
         data_class_init = self.env.get_template("data_classes_init.py.jinja")
 
         data_classes_with_dependencies = sorted(
-            (api.data_class for api in self.apis if api.data_class.has_edges), key=lambda d: d.read_name
+            (api.data_class for api in self.sub_apis if api.data_class.has_edges), key=lambda d: d.read_name
         )
         dependencies_by_data_class_write_name = {
             data_class.write_name: sorted(data_class.dependencies, key=lambda d: d.read_name)
@@ -167,7 +176,7 @@ class APIsGenerator:
 
         return (
             data_class_init.render(
-                classes=sorted((api.data_class for api in self.apis), key=lambda d: d.read_name),
+                classes=sorted((api.data_class for api in self.sub_apis), key=lambda d: d.read_name),
                 dependencies_by_data_class_write_name=dependencies_by_data_class_write_name,
                 top_level_package=self.top_level_package,
                 import_file={
@@ -190,12 +199,12 @@ class APIGenerator:
         self.api_class = APIClass.from_view(view, config)
 
     def generate_data_class_file(self) -> str:
-        type_data = self._env.get_template("type_data.py.jinja")
+        type_data = self._env.get_template("data_class.py.jinja")
 
         return type_data.render(data_class=self.data_class, view=self.view) + "\n"
 
     def generate_api_file(self, top_level_package: str) -> str:
-        type_api = self._env.get_template("type_api.py.jinja")
+        type_api = self._env.get_template("api_class.py.jinja")
 
         return type_api.render(
             top_level_package=top_level_package, api_class=self.api_class, data_class=self.data_class, view=self.view

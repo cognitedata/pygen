@@ -107,7 +107,7 @@ class APIsClassNaming:
     """
 
     name = Naming(Case.pascal, Number.singular)
-    variable = Naming(Case.snake, Number.singular)
+    client_attribute = Naming(Case.snake, Number.singular)
 
 
 @dataclass(frozen=True)

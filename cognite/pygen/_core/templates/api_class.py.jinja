@@ -43,7 +43,7 @@ class {{ field.edge_api_class }}:
         return self._client.data_modeling.instances.list("edge", limit=limit, filter=is_edge_type)
 
 {% endfor %}
-class {{ api_class.name }}API(TypeAPI[{{ data_class.read_name }}, {{ data_class.write_name }}, {{ data_class.read_list_name }}]):
+class {{ api_class.name }}(TypeAPI[{{ data_class.read_name }}, {{ data_class.write_name }}, {{ data_class.read_list_name }}]):
     def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,
