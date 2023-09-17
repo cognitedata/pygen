@@ -3,7 +3,8 @@ from __future__ import annotations
 import re
 
 import inflect
-from cognite.pygen.config import Naming, Case, Number
+
+from cognite.pygen.config import Case, Naming, Number
 
 
 def create_name(raw_name: str, naming: Naming) -> str:

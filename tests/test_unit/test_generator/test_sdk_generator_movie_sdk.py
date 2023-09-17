@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from pathlib import Path
 from typing import cast
 
 import pytest
@@ -9,12 +8,12 @@ from cognite.client.data_classes.data_modeling.views import ViewProperty
 
 from cognite.pygen._core.data_classes import (
     APIClass,
+    DataClass,
+    EdgeOneToMany,
+    EdgeOneToOne,
     Field,
     PrimitiveField,
     PrimitiveListField,
-    EdgeOneToOne,
-    EdgeOneToMany,
-    DataClass,
 )
 from cognite.pygen._core.generators import APIGenerator, APIsGenerator, SDKGenerator, find_dependencies
 from cognite.pygen._generator import CodeFormatter

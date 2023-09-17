@@ -3,12 +3,13 @@ from __future__ import annotations
 from collections.abc import Sequence
 from pathlib import Path
 from typing import Callable, Literal
+
 from cognite.client import data_modeling as dm
 from cognite.client._version import __version__ as cognite_sdk_version
 from jinja2 import Environment, PackageLoader, select_autoescape
 from pydantic.version import VERSION as PYDANTIC_VERSION
 
-from cognite.pygen._core.data_classes import DataClass, APIClass, APIsClass
+from cognite.pygen._core.data_classes import APIClass, APIsClass, DataClass
 from cognite.pygen._core.logic import get_unique_views
 from cognite.pygen._version import __version__
 from cognite.pygen.config import PygenConfig
@@ -114,9 +115,7 @@ class APIsGenerator:
         # 1. Unique variable names for API and data classes.
         # 2. Unique file names for data classes.
         # 3. Unique file names for API classes.
-
-        # self._dependencies_by_class = find_dependencies(self.apis)
-        # self._static_dir = Path(__file__).parent / "static"
+        self._static_dir = Path(__file__).parent / "static"
 
     @property
     def pydantic_version(self) -> Literal["v1", "v2"]:
@@ -134,13 +133,8 @@ class APIsGenerator:
         sdk = {(api_dir / "__init__.py"): ""}
         for api in self.apis:
             file_name = api.api_class.file_name
-            try:
-                sdk[data_classes_dir / f"_{file_name}.py"] = api.generate_data_class_file()
-                sdk[api_dir / f"{file_name}.py"] = api.generate_api_file(self.top_level_package)
-            except Exception as e:
-                self._logger(f"Failed to generate SDK for view {api.view.name}: {e}")
-                self._logger(f"Skipping view {api.view.name}")
-                self._dependencies_by_class.pop(api.api_class, None)
+            sdk[data_classes_dir / f"_{file_name}.py"] = api.generate_data_class_file()
+            sdk[api_dir / f"{file_name}.py"] = api.generate_api_file(self.top_level_package)
 
         sdk[client_dir / "__init__.py"] = self.generate_client_init_file()
         sdk[data_classes_dir / "__init__.py"] = self.generate_data_classes_init_file()

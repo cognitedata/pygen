@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from typing import Literal
 from enum import Enum
 
 # Make into pydantic models and require validation on assigment.
@@ -44,7 +43,6 @@ class Naming:
 #                         my_client.[api_class_variable].list().
 #     """
 #
-#     data_class: DataClassNaming = field(default_factory=DataClassNaming)
 
 
 @dataclass(frozen=True)

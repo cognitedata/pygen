@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from collections import defaultdict
+from collections.abc import Iterable, Iterator
 from dataclasses import dataclass, field
-from typing import Iterable
-
-from cognite.client.data_classes.data_modeling.data_types import ListablePropertyType
-from typing_extensions import Self
+from typing import cast
 
 from cognite.client.data_classes import data_modeling as dm
+from cognite.client.data_classes.data_modeling.data_types import ListablePropertyType
+from typing_extensions import Self
 
 from cognite.pygen.config import PygenConfig
 from cognite.pygen.utils.text import create_name
@@ -90,11 +90,13 @@ class Field(ABC):
                 pydantic_field=pydantic_field,
             )
         elif isinstance(prop.type, dm.DirectRelation):
+            # For direct relation the source is required.
+            view_id = cast(dm.ViewId, prop.source)
             return EdgeOneToOne(
                 name=name,
                 prop_name=prop_name,
                 prop=prop,
-                data_class=data_class_by_view_id[prop.source],
+                data_class=data_class_by_view_id[view_id],
                 pydantic_field=pydantic_field,
             )
         else:
@@ -159,7 +161,8 @@ class PrimitiveField(PrimitiveFieldCore):
 @dataclass(frozen=True)
 class PrimitiveListField(PrimitiveFieldCore):
     """
-    This represents a list of basic types such as list[str], list[int], list[float], list[bool], list[datetime.datetime], list[datetime.date].
+    This represents a list of basic types such as list[str], list[int], list[float], list[bool],
+    list[datetime.datetime], list[datetime.date].
     """
 
     def as_read_type_hint(self) -> str:
@@ -227,7 +230,10 @@ class EdgeOneToMany(EdgeField):
         return "list[str] = []"
 
     def as_write_type_hint(self) -> str:
-        return f"Union[list[{self.data_class.write_name}], list[str]] = {self.pydantic_field}(default_factory=list, repr=False)"
+        return (
+            f"Union[list[{self.data_class.write_name}], list[str]] "
+            f"= {self.pydantic_field}(default_factory=list, repr=False)"
+        )
 
 
 @dataclass(frozen=True)
@@ -292,7 +298,7 @@ class DataClass:
     def import_(self) -> str:
         return f"from .{self.file_name} " f"import {self.read_name}, {self.write_list_name}, {self.read_list_name}"
 
-    def __iter__(self) -> Iterable[Field]:
+    def __iter__(self) -> Iterator[Field]:
         return iter(self.fields)
 
     @property
