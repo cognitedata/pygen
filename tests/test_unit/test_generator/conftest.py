@@ -65,5 +65,10 @@ def bid_view(pygen_pool_model) -> dm.View:
 
 
 @pytest.fixture(scope="session")
+def market_view(pygen_pool_model) -> dm.View:
+    return next(v for v in pygen_pool_model.views if v.name == "Market")
+
+
+@pytest.fixture(scope="session")
 def apm_data_model() -> dm.DataModel[dm.View]:
     return APM_SDK.load_data_model()

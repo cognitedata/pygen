@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
+from typing import Iterable
 
 from cognite.client.data_classes.data_modeling.data_types import ListablePropertyType
 from typing_extensions import Self
@@ -48,11 +49,7 @@ class Field(ABC):
             type_ = _to_python_type(prop.type)
             if isinstance(prop.type, ListablePropertyType) and prop.type.is_list:
                 return PrimitiveListField(
-                    name=name,
-                    prop_name=prop_name,
-                    type_=type_,
-                    is_nullable=prop.nullable,
-                    prop=prop,
+                    name=name, prop_name=prop_name, type_=type_, is_nullable=prop.nullable, prop=prop
                 )
 
             return PrimitiveField(
@@ -115,16 +112,20 @@ class PrimitiveListField(PrimitiveFieldCore):
     """
 
     def as_read_type_hint(self) -> str:
-        rhs = ""
+        alias = ""
         if self.need_alias:
-            rhs = f', alias="{self.prop_name}"'
+            alias = f', alias="{self.prop_name}"'
 
-        return f"list[{self.type_}] = Field(default_factory=list{rhs})"
+        if alias:
+            rhs = f", Field(default_factory=list{alias})"
+        else:
+            rhs = " = []"
+        return f"list[{self.type_}]{rhs}"
 
     def as_write_type_hint(self) -> str:
         rhs = ""
         if self.is_nullable:
-            rhs = f" = Field(default_factory=list)"
+            rhs = " = []"
         return f"list[{self.type_}]{rhs}"
 
 
@@ -149,7 +150,7 @@ class EdgeOneToOne(EdgeField):
         return "Optional[str] = None"
 
     def as_write_type_hint(self) -> str:
-        return f"Union[{self.data_class.write_class_name}, str, None] = Field(None, repr=False)"
+        return f"Union[{self.data_class.write_name}, str, None] = Field(None, repr=False)"
 
 
 @dataclass(frozen=True)
@@ -161,10 +162,10 @@ class EdgeOneToMany(EdgeField):
     prop: dm.SingleHopConnectionDefinition
 
     def as_read_type_hint(self) -> str:
-        return "list[str] = Field(default_factory=list)"
+        return "list[str] = []"
 
     def as_write_type_hint(self) -> str:
-        return f"Union[list[{self.data_class.write_class_name}], list[str]] = Field(default_factory=list, repr=False)"
+        return f"Union[list[{self.data_class.write_name}], list[str]] = Field(default_factory=list, repr=False)"
 
 
 @dataclass(frozen=True)
@@ -173,10 +174,10 @@ class DataClass:
     This represents a data class. It is created from a view.
     """
 
-    read_class_name: str
-    write_class_name: str
-    read_list_class_name: str
-    write_list_class_name: str
+    read_name: str
+    write_name: str
+    read_list_name: str
+    write_list_name: str
     variable_name: str
     file_name: str
     view_id: dm.ViewId
@@ -189,10 +190,10 @@ class DataClass:
         variable_name = create_name(raw_name, config.naming.data_class.variable)
         file_name = f"_{create_name(raw_name, config.naming.data_class.file)}"
         return cls(
-            read_class_name=class_name,
-            write_class_name=f"{class_name}Apply",
-            read_list_class_name=f"{class_name}List",
-            write_list_class_name=f"{class_name}ApplyList",
+            read_name=class_name,
+            write_name=f"{class_name}Apply",
+            read_list_name=f"{class_name}List",
+            write_list_name=f"{class_name}ApplyList",
             variable_name=variable_name,
             file_name=file_name,
             view_id=view.as_id(),
@@ -210,10 +211,16 @@ class DataClass:
 
     @property
     def import_(self) -> str:
-        return (
-            f"from .{self.file_name} "
-            f"import {self.read_class_name}, {self.write_list_class_name}, {self.read_list_class_name}"
-        )
+        return f"from .{self.file_name} " f"import {self.read_name}, {self.write_list_name}, {self.read_list_name}"
+
+    def __iter__(self) -> Iterable[Field]:
+        return iter(self.fields)
+
+    def one_to_one_edges(self) -> Iterable[EdgeOneToOne]:
+        return (f for f in self.fields if isinstance(f, EdgeOneToOne))
+
+    def one_to_many_edges(self) -> Iterable[EdgeOneToMany]:
+        return (f for f in self.fields if isinstance(f, EdgeOneToMany))
 
 
 @dataclass(frozen=True)

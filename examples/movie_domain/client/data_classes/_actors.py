@@ -25,9 +25,9 @@ class Actor(DomainModel):
 
 class ActorApply(DomainModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
-    movies: list[Union["MovieApply", str]] = Field(default_factory=list, repr=False)
-    nomination: list[Union["NominationApply", str]] = Field(default_factory=list, repr=False)
-    person: Optional[Union["PersonApply", str]] = Field(None, repr=False)
+    movies: Union[list[MovieApply], list[str]] = Field(default_factory=list, repr=False)
+    nomination: Union[list[NominationApply], list[str]] = Field(default_factory=list, repr=False)
+    person: Union[PersonApply, str, None] = Field(None, repr=False)
     won_oscar: Optional[bool] = None
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
@@ -45,16 +45,12 @@ class ActorApply(DomainModelApply):
             properties["wonOscar"] = self.won_oscar
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("IntegrationTestsImmutable", "Role"),
-                properties=properties,
+                source=dm.ContainerId("IntegrationTestsImmutable", "Role"), properties=properties
             )
             sources.append(source)
         if sources:
             this_node = dm.NodeApply(
-                space=self.space,
-                external_id=self.external_id,
-                existing_version=self.existing_version,
-                sources=sources,
+                space=self.space, external_id=self.external_id, existing_version=self.existing_version, sources=sources
             )
             nodes = [this_node]
         else:

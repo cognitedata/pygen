@@ -16,12 +16,7 @@ from cognite.pygen._core.data_classes import (
     EdgeOneToMany,
     DataClass,
 )
-from cognite.pygen._core.generators import (
-    APIGenerator,
-    APIsGenerator,
-    SDKGenerator,
-    find_dependencies,
-)
+from cognite.pygen._core.generators import APIGenerator, APIsGenerator, SDKGenerator, find_dependencies
 from cognite.pygen._generator import CodeFormatter
 from cognite.pygen.config import PygenConfig
 from tests.constants import IS_PYDANTIC_V1, MovieSDKFiles
@@ -41,8 +36,8 @@ def sdk_generator(movie_model, top_level_package) -> SDKGenerator:
 
 
 @pytest.fixture
-def apis_generator(movie_model, top_level_package) -> APIsGenerator:
-    return APIsGenerator(top_level_package, "MovieClient", movie_model.views)
+def apis_generator(movie_model, top_level_package, pygen_config: PygenConfig) -> APIsGenerator:
+    return APIsGenerator(top_level_package, "MovieClient", movie_model.views, config=pygen_config)
 
 
 def create_fields_test_cases():
@@ -85,10 +80,10 @@ def create_fields_test_cases():
     }
     prop = ViewProperty.load(prop)
     data_class = DataClass(
-        read_class_name="Role",
-        write_class_name="RoleApply",
-        read_list_class_name="RoleList",
-        write_list_class_name="RoleListApply",
+        read_name="Role",
+        write_name="RoleApply",
+        read_list_name="RoleList",
+        write_list_name="RoleListApply",
         variable_name="role",
         file_name="_roles",
         view_id=dm.ViewId("IntegrationTestsImmutable", "Role", "2"),
@@ -100,12 +95,9 @@ def create_fields_test_cases():
         prop,
         data_class_by_view_id,
         EdgeOneToMany(
-            name="roles",
-            prop_name="roles",
-            prop=cast(dm.SingleHopConnectionDefinition, prop),
-            data_class=data_class,
+            name="roles", prop_name="roles", prop=cast(dm.SingleHopConnectionDefinition, prop), data_class=data_class
         ),
-        "list[str] = Field(default_factory=list)",
+        "list[str] = []",
         "Union[list[RoleApply], list[str]] = Field(default_factory=list, repr=False)",
         id="List of edges",
     )
@@ -126,13 +118,9 @@ def create_fields_test_cases():
         prop,
         {},
         PrimitiveListField(
-            name="configs",
-            prop_name="configs",
-            prop=cast(dm.MappedProperty, prop),
-            type_="str",
-            is_nullable=False,
+            name="configs", prop_name="configs", prop=cast(dm.MappedProperty, prop), type_="str", is_nullable=False
         ),
-        "list[str] = Field(default_factory=list)",
+        "list[str] = []",
         "list[str]",
         id="List of strings",
     )
@@ -152,10 +140,10 @@ def create_fields_test_cases():
         "description": None,
     }
     data_class = DataClass(
-        read_class_name="Person",
-        write_class_name="PersonApply",
-        read_list_class_name="PersonList",
-        write_list_class_name="PersonListApply",
+        read_name="Person",
+        write_name="PersonApply",
+        read_list_name="PersonList",
+        write_list_name="PersonListApply",
         variable_name="person",
         file_name="_persons",
         view_id=dm.ViewId("IntegrationTestsImmutable", "Person", "2"),
@@ -167,12 +155,7 @@ def create_fields_test_cases():
         "person",
         prop,
         data_class_by_view_id,
-        EdgeOneToOne(
-            name="person",
-            prop_name="person",
-            prop=cast(dm.MappedProperty, prop),
-            data_class=data_class,
-        ),
+        EdgeOneToOne(name="person", prop_name="person", prop=cast(dm.MappedProperty, prop), data_class=data_class),
         "Optional[str] = None",
         "Union[PersonApply, str, None] = Field(None, repr=False)",
         id="Edge to another view",
@@ -242,20 +225,24 @@ def test_generate_data_class_file_persons(person_view: dm.View, pygen_config: Py
     assert actual == expected
 
 
-def test_create_view_data_class_actors(actor_view: dm.View, top_level_package: str):
+def test_create_view_data_class_actors(apis_generator: APIsGenerator, actor_view: dm.View, pygen_config: PygenConfig):
     # Arrange
     expected = MovieSDKFiles.actors_data.read_text()
+    api_generator = next((api for api in apis_generator.apis if api.view.as_id() == actor_view.as_id()), None)
+    assert api_generator is not None, "Could not find API generator for actor view"
 
     # Act
-    actual = APIGenerator(actor_view, top_level_package).generate_data_class_file()
+    actual = api_generator.generate_data_class_file()
 
     # Assert
     assert actual == expected
 
 
-def test_create_view_api_classes_actors(actor_view: dm.View, top_level_package: str, tmp_path: Path):
+def test_create_view_api_classes_actors(apis_generator, actor_view: dm.View, top_level_package: str, tmp_path: Path):
     # Arrange
     expected = MovieSDKFiles.actors_api.read_text()
+    api_generator = next((api for api in apis_generator.apis if api.view.as_id() == actor_view.as_id()), None)
+    assert api_generator is not None, "Could not find API generator for actor view"
 
     # Act
     actual = APIGenerator(actor_view, top_level_package).generate_api_file(top_level_package)

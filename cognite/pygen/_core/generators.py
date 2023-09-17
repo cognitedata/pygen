@@ -53,8 +53,7 @@ class SDKGenerator:
             self._apis = APIsGenerator(top_level_package, client_name, unique_views, pydantic_version, logger, config)
             api_by_view_id = {api.view.as_id(): api.api_class for api in self._apis.apis}
             self._apis_classes = sorted(
-                (APIsClass.from_data_model(model, api_by_view_id, config) for model in data_model),
-                key=lambda a: a.name,
+                (APIsClass.from_data_model(model, api_by_view_id, config) for model in data_model), key=lambda a: a.name
             )
         else:
             raise ValueError("data_model must be a DataModel or a sequence of DataModels")
@@ -100,10 +99,7 @@ class APIsGenerator:
         logger: Callable[[str], None] | None = None,
         config: PygenConfig = PygenConfig(),
     ):
-        self.env = Environment(
-            loader=PackageLoader("cognite.pygen._core", "templates"),
-            autoescape=select_autoescape(),
-        )
+        self.env = Environment(loader=PackageLoader("cognite.pygen._core", "templates"), autoescape=select_autoescape())
         self.top_level_package = top_level_package
         self.client_name = client_name
         self._pydantic_version = pydantic_version
@@ -119,8 +115,8 @@ class APIsGenerator:
         # 2. Unique file names for data classes.
         # 3. Unique file names for API classes.
 
-        self._dependencies_by_class = find_dependencies(self.apis)
-        self._static_dir = Path(__file__).parent / "static"
+        # self._dependencies_by_class = find_dependencies(self.apis)
+        # self._static_dir = Path(__file__).parent / "static"
 
     @property
     def pydantic_version(self) -> Literal["v1", "v2"]:
@@ -188,8 +184,7 @@ class APIsGenerator:
 class APIGenerator:
     def __init__(self, view: dm.View, config: PygenConfig):
         self._env = Environment(
-            loader=PackageLoader("cognite.pygen._core", "templates"),
-            autoescape=select_autoescape(),
+            loader=PackageLoader("cognite.pygen._core", "templates"), autoescape=select_autoescape()
         )
 
         self.view = view
@@ -199,22 +194,13 @@ class APIGenerator:
     def generate_data_class_file(self) -> str:
         type_data = self._env.get_template("type_data.py.jinja")
 
-        return (
-            type_data.render(
-                data_class=self.data_class,
-                view=self.view,
-            )
-            + "\n"
-        )
+        return type_data.render(data_class=self.data_class, view=self.view) + "\n"
 
     def generate_api_file(self, top_level_package: str) -> str:
         type_api = self._env.get_template("type_api.py.jinja")
 
         return type_api.render(
-            top_level_package=top_level_package,
-            class_=self.api_class,
-            fields=self.fields,
-            view=self.view,
+            top_level_package=top_level_package, class_=self.api_class, fields=self.fields, view=self.view
         )
 
 

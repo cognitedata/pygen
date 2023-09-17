@@ -1,33 +1,33 @@
 from __future__ import annotations
-{% if fields.has_datetime or fields.has_date %}
+{% if data_class.has_datetime or data_class.has_date %}
 import datetime{% endif %}
-{% if fields.import_dependencies %}from typing import TYPE_CHECKING, ClassVar, Optional, Union{% else %}from typing import ClassVar, Optional{% endif %}{% if not fields.has_optional %}  # noqa: F401{% endif %}
+{% if data_class.import_dependencies %}from typing import TYPE_CHECKING, ClassVar, Optional, Union{% else %}from typing import ClassVar, Optional{% endif %}{% if not data_class.has_optional %}  # noqa: F401{% endif %}
 
-from cognite.client import data_modeling as dm{% if fields.import_pydantic_field %}
+from cognite.client import data_modeling as dm{% if data_class.import_pydantic_field %}
 from pydantic import Field{% endif %}
 
-from {{ top_level_package }}.data_classes._core import DomainModel, DomainModelApply, TypeList
-{% if fields.import_dependencies %}
-if TYPE_CHECKING:{% for dependency_file, dependency_class in fields.unique_dependencies %}
-    from {{ top_level_package }}.data_classes._{{ dependency_file }} import {{ dependency_class }}Apply{% endfor %}
+from ._core import DomainModel, DomainModelApply, TypeList
+{% if data_class.import_dependencies %}
+if TYPE_CHECKING:{% for dependency_file, dependency_class in data_class.unique_dependencies %}
+    from ._{{ dependency_file }} import {{ dependency_class }}Apply{% endfor %}
 {% endif %}
-__all__ = ["{{ class_name }}", "{{ class_name }}Apply", "{{ class_name }}List"]
+__all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data_class.read_list_name }}"]
 
 
-class {{ class_name }}(DomainModel):
-    space: ClassVar[str] = "{{ view.space }}"{% for field in fields %}
-    {{ field.name }}: {{ field.as_type_hint('read') }}{% endfor %}
+class {{ data_class.read_name }}(DomainModel):
+    space: ClassVar[str] = "{{ view.space }}"{% for field in data_class %}
+    {{ field.name }}: {{ field.as_read_type_hint() }}{% endfor %}
 
 
-class {{ class_name }}Apply(DomainModelApply):
-    space: ClassVar[str] = "{{ view.space }}"{% for field in fields %}
-    {{ field.name }}: {{ field.as_type_hint('write') }}{% endfor %}
+class {{ data_class.write_name }}(DomainModelApply):
+    space: ClassVar[str] = "{{ view.space }}"{% for field in data_class %}
+    {{ field.name }}: {{ field.as_write_type_hint() }}{% endfor %}
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
 
-        {% if fields.has_properties or fields.has_one_to_one_edges %}sources = []{% for container, container_fields in fields.fields_by_container.items() %}
+        {% if data_class.has_properties or data_class.has_one_to_one_edges %}sources = []{% for container, container_fields in data_class.fields_by_container.items() %}
         properties = {}{% for field in container_fields %}
         if self.{{ field.name }} is not None:
             properties["{{ field.prop.name }}"] = {% if field.is_edge %}{
@@ -53,7 +53,7 @@ class {{ class_name }}Apply(DomainModelApply):
 
         edges = []
         cache.add(self.external_id)
-{%  for field in fields.edges_one_to_many %}
+{%  for field in data_class.edges_one_to_many %}
         for {{ field.variable }} in self.{{ field.name }}:
             edge = self._create_{{field.variable}}_edge({{ field.variable }})
             if edge.external_id not in cache:
@@ -64,14 +64,14 @@ class {{ class_name }}Apply(DomainModelApply):
                 instances = {{ field.variable }}._to_instances_apply(cache)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
-{% endfor %}{% for field in fields.edges_one_to_one %}
+{% endfor %}{% for field in data_class.edges_one_to_one %}
         if isinstance(self.{{ field.name }}, DomainModelApply):
             instances = self.{{ field.name }}._to_instances_apply(cache)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 {% endfor %}
         return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
-{%  for field in fields.edges_one_to_many %}
+{%  for field in data_class.edges_one_to_many %}
     def _create_{{ field.variable }}_edge(self, {{ field.variable }}: Union[str, "{{ field.prop.source.external_id }}Apply"]) -> dm.EdgeApply:
         if isinstance({{ field.variable }}, str):
             end_node_ext_id = {{ field.variable }}
@@ -89,5 +89,5 @@ class {{ class_name }}Apply(DomainModelApply):
         )
 {% endfor %}
 
-class {{ class_name }}List(TypeList[{{ class_name }}]):
-    _NODE = {{ class_name }}
+class {{ data_class.read_list_name }}(TypeList[{{ data_class.read_name }}]):
+    _NODE = {{ data_class.read_name }}
