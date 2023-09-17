@@ -9,8 +9,8 @@ from ._api.bids import BidsAPI
 from ._api.cog_bids import CogBidsAPI
 from ._api.cog_pools import CogPoolsAPI
 from ._api.cog_process import CogProcessAPI
-from ._api.date_transformations import DateTransformationsAPI
 from ._api.date_transformation_pairs import DateTransformationPairsAPI
+from ._api.date_transformations import DateTransformationsAPI
 from ._api.markets import MarketsAPI
 from ._api.process import ProcessAPI
 from ._api.pygen_bids import PygenBidsAPI
@@ -35,8 +35,8 @@ class CogPoolAPIs:
         self.cog_bids = CogBidsAPI(client)
         self.cog_pools = CogPoolsAPI(client)
         self.cog_process = CogProcessAPI(client)
-        self.date_transformations = DateTransformationsAPI(client)
         self.date_transformation_pairs = DateTransformationPairsAPI(client)
+        self.date_transformations = DateTransformationsAPI(client)
         self.markets = MarketsAPI(client)
         self.process = ProcessAPI(client)
         self.value_transformations = ValueTransformationsAPI(client)
@@ -55,8 +55,8 @@ class PygenPoolAPIs:
 
     def __init__(self, client: CogniteClient):
         self.bids = BidsAPI(client)
-        self.date_transformations = DateTransformationsAPI(client)
         self.date_transformation_pairs = DateTransformationPairsAPI(client)
+        self.date_transformations = DateTransformationsAPI(client)
         self.markets = MarketsAPI(client)
         self.process = ProcessAPI(client)
         self.pygen_bids = PygenBidsAPI(client)

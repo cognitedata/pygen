@@ -34,10 +34,10 @@ def multi_api_generator(sdk_generator: SDKGenerator) -> SDKGenerator:
 def date_transformation_generator(
     multi_api_generator: MultiAPIGenerator, date_transformation_pair_view: dm.View
 ) -> APIGenerator:
-    api_generator = next(
-        (api for api in multi_api_generator.sub_apis if api.view.as_id() == date_transformation_pair_view.as_id()), None
-    )
+    identifier = (date_transformation_pair_view.space, date_transformation_pair_view.external_id)
+    api_generator = next((api for api in multi_api_generator.sub_apis if api.view_identifier == identifier), None)
     assert api_generator is not None, "Could not find API generator for date transformation view"
+    return api_generator
 
 
 def test_generate_api_client(sdk_generator: SDKGenerator):

@@ -6,7 +6,6 @@ from typing import Dict, List, Sequence, Tuple, overload
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
-
 from ._core import DEFAULT_LIMIT_READ, TypeAPI
 from markets.client.data_classes import DateTransformationPair, DateTransformationPairApply, DateTransformationPairList
 
@@ -91,7 +90,7 @@ class DateTransformationPairsAPI(
     def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,
-            sources=dm.ViewId("market", "DateTransformationPair", "bde9fd4428c26e"),
+            sources=dm.ViewId("market", "DateTransformationPair", "310f933a9aca9b"),
             class_type=DateTransformationPair,
             class_apply_type=DateTransformationPairApply,
             class_list=DateTransformationPairList,
@@ -103,7 +102,6 @@ class DateTransformationPairsAPI(
         self, date_transformation_pair: DateTransformationPairApply, replace: bool = False
     ) -> dm.InstancesApplyResult:
         instances = date_transformation_pair.to_instances_apply()
-
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

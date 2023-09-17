@@ -80,7 +80,8 @@ class SDKGenerator:
         api_client = self._multi_api_generator.env.get_template("_api_client.py.jinja")
 
         api_classes = sorted(
-            (sub_api.api_class for sub_api in self._multi_api_generator.sub_apis), key=lambda api_class: api_class.name
+            (sub_api.api_class for sub_api in self._multi_api_generator.sub_apis),
+            key=lambda api_class: api_class.name.lower(),
         )
 
         return (
