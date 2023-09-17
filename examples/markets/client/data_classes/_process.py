@@ -5,10 +5,10 @@ from typing import TYPE_CHECKING, ClassVar, Optional, Union
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from markets.client.data_classes._core import DomainModel, DomainModelApply, TypeList
+from ._core import DomainModel, DomainModelApply, TypeList
 
 if TYPE_CHECKING:
-    from markets.client.data_classes._bids import BidApply
+    from ._bids import BidApply
 
 __all__ = ["Proces", "ProcesApply", "ProcesList"]
 
@@ -21,7 +21,7 @@ class Proces(DomainModel):
 
 class ProcesApply(DomainModelApply):
     space: ClassVar[str] = "market"
-    bid: Optional[Union["BidApply", str]] = Field(None, repr=False)
+    bid: Union[BidApply, str, None] = Field(None, repr=False)
     name: Optional[str] = None
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:

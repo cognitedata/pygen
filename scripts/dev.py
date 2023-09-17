@@ -15,13 +15,19 @@ import toml
 from cognite.client._version import __version__ as cognite_sdk_version
 from pydantic.version import VERSION as PYDANTIC_VERSION
 
-app = typer.Typer(add_completion=False, help=__doc__)
+app = typer.Typer(
+    add_completion=False,
+    help=__doc__,
+    pretty_exceptions_short=False,
+    pretty_exceptions_show_locals=False,
+    pretty_exceptions_enable=False,
+)
 
 
 @app.command("generate-sdks", help=f"Generate all example SDKs in directory '{EXAMPLES_DIR.relative_to(REPO_ROOT)}/'")
 def generate_sdks(overwrite_manual_files: bool = typer.Option(False, help="Overwrite manual files in examples")):
     for example_sdk in EXAMPLE_SDKS:
-        data_models = [DataModel.load(safe_load(dms_file.read_text())) for dms_file in example_sdk.dms_files]
+        data_models = [DataModel.load(safe_load(dms_file.read_text())[0]) for dms_file in example_sdk.dms_files]
         if len(data_models) == 1:
             data_models = data_models[0]
         sdk_generator = SDKGenerator(

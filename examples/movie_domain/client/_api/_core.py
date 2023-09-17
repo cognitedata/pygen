@@ -8,6 +8,7 @@ from cognite.client import data_modeling as dm
 
 from movie_domain.client.data_classes._core import T_TypeApplyNode, T_TypeNode, T_TypeNodeList
 
+
 DEFAULT_LIMIT_READ = 25
 
 

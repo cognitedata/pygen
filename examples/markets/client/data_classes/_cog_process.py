@@ -5,12 +5,12 @@ from typing import TYPE_CHECKING, ClassVar, Optional, Union
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from markets.client.data_classes._core import DomainModel, DomainModelApply, TypeList
+from ._core import DomainModel, DomainModelApply, TypeList
 
 if TYPE_CHECKING:
-    from markets.client.data_classes._bids import BidApply
-    from markets.client.data_classes._date_transformation_pairs import DateTransformationPairApply
-    from markets.client.data_classes._value_transformations import ValueTransformationApply
+    from ._bids import BidApply
+    from ._date_transformation_pairs import DateTransformationPairApply
+    from ._value_transformations import ValueTransformationApply
 
 __all__ = ["CogProces", "CogProcesApply", "CogProcesList"]
 
@@ -18,17 +18,17 @@ __all__ = ["CogProces", "CogProcesApply", "CogProcesList"]
 class CogProces(DomainModel):
     space: ClassVar[str] = "market"
     bid: Optional[str] = None
-    date_transformations: Optional[str] = Field(None, alias="dateTransformations")
+    date_transformations: Optional[str] = None
     name: Optional[str] = None
     transformation: Optional[str] = None
 
 
 class CogProcesApply(DomainModelApply):
     space: ClassVar[str] = "market"
-    bid: Optional[Union["BidApply", str]] = Field(None, repr=False)
-    date_transformations: Optional[Union["DateTransformationPairApply", str]] = Field(None, repr=False)
+    bid: Union[BidApply, str, None] = Field(None, repr=False)
+    date_transformations: Union[DateTransformationPairApply, str, None] = Field(None, repr=False)
     name: Optional[str] = None
-    transformation: Optional[Union["ValueTransformationApply", str]] = Field(None, repr=False)
+    transformation: Union[ValueTransformationApply, str, None] = Field(None, repr=False)
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:
