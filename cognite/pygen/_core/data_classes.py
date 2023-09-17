@@ -257,7 +257,7 @@ class DataClass:
 
     @classmethod
     def from_view(cls, view: dm.View, config: PygenConfig) -> Self:
-        view_name = view.name or view.external_id
+        view_name = (view.name or view.external_id).replace(" ", "_")
         class_name = create_name(view_name, config.naming.data_class.name)
         variable_name = create_name(view_name, config.naming.data_class.variable)
         variable_list = create_name(view_name, config.naming.data_class.variable_list)

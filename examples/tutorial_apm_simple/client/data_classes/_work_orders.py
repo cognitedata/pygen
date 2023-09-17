@@ -10,12 +10,12 @@ from ._core import DomainModel, DomainModelApply, TypeList
 
 if TYPE_CHECKING:
     from ._assets import AssetApply
-    from ._work_items import WorkApply
+    from ._work_items import WorkItemApply
 
-__all__ = ["Work", "WorkApply", "WorkList"]
+__all__ = ["WorkOrder", "WorkOrderApply", "WorkOrderList"]
 
 
-class Work(DomainModel):
+class WorkOrder(DomainModel):
     space: ClassVar[str] = "tutorial_apm_simple"
     actual_hours: Optional[int] = Field(None, alias="actualHours")
     created_date: Optional[datetime.datetime] = Field(None, alias="createdDate")
@@ -40,7 +40,7 @@ class Work(DomainModel):
     work_package_number: Optional[str] = Field(None, alias="workPackageNumber")
 
 
-class WorkApply(DomainModelApply):
+class WorkOrderApply(DomainModelApply):
     space: ClassVar[str] = "tutorial_apm_simple"
     actual_hours: Optional[int] = None
     created_date: Optional[datetime.datetime] = None
@@ -60,7 +60,7 @@ class WorkApply(DomainModelApply):
     start_time: Optional[datetime.datetime] = None
     status: Optional[str] = None
     title: Optional[str] = None
-    work_items: Union[list[WorkApply], list[str]] = Field(default_factory=list, repr=False)
+    work_items: Union[list[WorkItemApply], list[str]] = Field(default_factory=list, repr=False)
     work_order_number: Optional[str] = None
     work_package_number: Optional[str] = None
 
@@ -168,13 +168,13 @@ class WorkApply(DomainModelApply):
             end_node=dm.DirectRelationReference("tutorial_apm_simple", end_node_ext_id),
         )
 
-    def _create_work_item_edge(self, work_item: Union[str, WorkApply]) -> dm.EdgeApply:
+    def _create_work_item_edge(self, work_item: Union[str, WorkItemApply]) -> dm.EdgeApply:
         if isinstance(work_item, str):
             end_node_ext_id = work_item
         elif isinstance(work_item, DomainModelApply):
             end_node_ext_id = work_item.external_id
         else:
-            raise TypeError(f"Expected str or WorkApply, got {type(work_item)}")
+            raise TypeError(f"Expected str or WorkItemApply, got {type(work_item)}")
 
         return dm.EdgeApply(
             space="tutorial_apm_simple",
@@ -185,5 +185,5 @@ class WorkApply(DomainModelApply):
         )
 
 
-class WorkList(TypeList[Work]):
-    _NODE = Work
+class WorkOrderList(TypeList[WorkOrder]):
+    _NODE = WorkOrder
