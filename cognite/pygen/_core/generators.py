@@ -189,7 +189,7 @@ class APIGenerator:
 
         self.view = view
         self.data_class = DataClass.from_view(view, config)
-        self.api_class = APIClass.from_view(view, self.data_class, config)
+        self.api_class = APIClass.from_view(view, config)
 
     def generate_data_class_file(self) -> str:
         type_data = self._env.get_template("type_data.py.jinja")
@@ -200,7 +200,7 @@ class APIGenerator:
         type_api = self._env.get_template("type_api.py.jinja")
 
         return type_api.render(
-            top_level_package=top_level_package, class_=self.api_class, fields=self.fields, view=self.view
+            top_level_package=top_level_package, api_class=self.api_class, data_class=self.data_class, view=self.view
         )
 
 

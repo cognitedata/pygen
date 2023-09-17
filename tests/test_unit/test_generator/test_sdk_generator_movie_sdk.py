@@ -85,9 +85,11 @@ def create_fields_test_cases():
         write_name="RoleApply",
         read_list_name="RoleList",
         write_list_name="RoleListApply",
-        variable_name="role",
+        variable="role",
+        variable_list="roles",
         file_name="_roles",
         view_id=dm.ViewId("IntegrationTestsImmutable", "Role", "2"),
+        view_name="Role",
     )
 
     data_class_by_view_id = {dm.ViewId("IntegrationTestsImmutable", "Role", "2"): data_class}
@@ -102,6 +104,8 @@ def create_fields_test_cases():
             data_class=data_class,
             variable="role",
             pydantic_field="Field",
+            edge_api_attribute="roles",
+            edge_api_class="PersonRolesAPI",
         ),
         "list[str] = []",
         "Union[list[RoleApply], list[str]] = Field(default_factory=list, repr=False)",
@@ -155,9 +159,11 @@ def create_fields_test_cases():
         write_name="PersonApply",
         read_list_name="PersonList",
         write_list_name="PersonListApply",
-        variable_name="person",
+        variable="person",
         file_name="_persons",
         view_id=dm.ViewId("IntegrationTestsImmutable", "Person", "2"),
+        variable_list="persons",
+        view_name="Person",
     )
     data_class_by_view_id = {dm.ViewId("IntegrationTestsImmutable", "Person", "2"): data_class}
 

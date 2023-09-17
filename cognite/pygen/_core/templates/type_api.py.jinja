@@ -1,17 +1,16 @@
 from __future__ import annotations
 
-{% if fields.has_one_to_many_edges %}from collections import defaultdict
+{% if data_class.has_one_to_many_edges %}from collections import defaultdict
 from typing import Dict, List, Sequence, Tuple, overload{% else %}from typing import Sequence, overload{% endif %}
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
-from cognite.client._constants import DEFAULT_LIMIT_READ
 
-from {{ top_level_package }}._api._core import TypeAPI
-from {{ top_level_package }}.data_classes import {{ class_.data_class }}, {{ class_.data_class }}Apply, {{ class_.data_class }}List
+from ._core import DEFAULT_LIMIT_READ, TypeAPI
+from {{ top_level_package }}.data_classes import {{ data_class.read_name }}, {{ data_class.write_name }}, {{ data_class.read_list_name }}
 
-{% for field in fields.edges_one_to_many %}
-class {{ class_.data_class }}{{ field.edge_api_class_suffix }}API:
+{% for field in data_class.one_to_many_edges %}
+class {{ field.edge_api_class }}:
     def __init__(self, client: CogniteClient):
         self._client = client
 
@@ -22,18 +21,18 @@ class {{ class_.data_class }}{{ field.edge_api_class_suffix }}API:
             {"space": "{{ field.prop.type.space }}", "externalId": "{{ field.prop.type.external_id }}"},
         )
         if isinstance(external_id, str):
-            is_{{ class_.variable }} = f.Equals(
+            is_{{ data_class.variable }} = f.Equals(
                 ["edge", "startNode"],
                 {"space": "{{ field.prop.source.space }}", "externalId": external_id},
             )
-            return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_{{ class_.variable }}))
+            return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_{{ data_class.variable }}))
 
         else:
-            is_{{ class_.variable_list }} = f.In(
+            is_{{ data_class.variable_list }} = f.In(
                 ["edge", "startNode"],
                 [{"space": "{{ field.prop.source.space }}", "externalId": ext_id} for ext_id in external_id],
             )
-            return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_{{ class_.variable_list }}))
+            return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_{{ data_class.variable_list }}))
 
     def list(self, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
         f = dm.filters
@@ -44,76 +43,75 @@ class {{ class_.data_class }}{{ field.edge_api_class_suffix }}API:
         return self._client.data_modeling.instances.list("edge", limit=limit, filter=is_edge_type)
 
 {% endfor %}
-class {{ class_.api_class }}API(TypeAPI[{{ class_.data_class }}, {{ class_.data_class }}Apply, {{ class_.data_class }}List]):
+class {{ api_class.name }}API(TypeAPI[{{ data_class.read_name }}, {{ data_class.write_name }}, {{ data_class.read_list_name }}]):
     def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,
             sources=dm.ViewId("{{ view.space }}", "{{ view.external_id }}", "{{ view.version }}"),
-            class_type={{ class_.data_class }},
-            class_apply_type={{ class_.data_class }}Apply,
-            class_list={{ class_.data_class }}List,
-        ){% for field in fields.edges_one_to_many %}
-        self.{{ field.edge_api_attribute }} = {{ class_.data_class }}{{ field.edge_api_class_suffix }}API(client){% endfor %}
+            class_type={{ data_class.read_name }},
+            class_apply_type={{ data_class.write_name }},
+            class_list={{ data_class.read_list_name }},
+        ){% for field in data_class.one_to_many_edges %}
+        self.{{ field.edge_api_attribute }} = {{ field.edge_api_class }}(client){% endfor %}
 
-    def apply(self, {{ class_.variable }}: {{ class_.data_class }}Apply, replace: bool = False) -> dm.InstancesApplyResult:
-        instances = {{ class_.variable }}.to_instances_apply()
-        {% if fields.has_properties or fields.has_one_to_one_edges %}return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace){% else %}
-        return self._client.data_modeling.instances.apply(
+    def apply(self, {{ data_class.variable }}: {{ data_class.write_name }}, replace: bool = False) -> dm.InstancesApplyResult:
+        instances = {{ data_class.variable }}.to_instances_apply()
+        {% if data_class.has_only_one_to_many_edges %}return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
             auto_create_start_nodes=True,
             auto_create_end_nodes=True,
             replace=replace,
-        ){% endif %}
+        ){% else %}return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace){% endif %}
 
     def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=({{ class_.data_class }}Apply.space, external_id))
+            return self._client.data_modeling.instances.delete(nodes=({{ data_class.write_name }}.space, external_id))
         else:
             return self._client.data_modeling.instances.delete(
-                nodes=[({{ class_.data_class }}Apply.space, id) for id in external_id],
+                nodes=[({{ data_class.write_name }}.space, id) for id in external_id],
             )
 
     @overload
-    def retrieve(self, external_id: str) -> {{ class_.data_class }}:
+    def retrieve(self, external_id: str) -> {{ data_class.read_name }}:
         ...
 
     @overload
-    def retrieve(self, external_id: Sequence[str]) -> {{ class_.data_class }}List:
+    def retrieve(self, external_id: Sequence[str]) -> {{ data_class.read_list_name }}:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> {{ class_.data_class }} | {{ class_.data_class }}List:
+    def retrieve(self, external_id: str | Sequence[str]) -> {{ data_class.read_name }} | {{ data_class.read_list_name }}:
         if isinstance(external_id, str):
-            {% if fields.has_one_to_many_edges %}{{ class_.variable }} = self._retrieve((self.sources.space, external_id))
-{% for field in fields.edges_one_to_many %}
+            {% if data_class.has_one_to_many_edges %}{{ data_class.variable }} = self._retrieve((self.sources.space, external_id))
+{% for field in data_class.one_to_many_edges %}
             {{ field.variable }}_edges = self.{{ field.edge_api_attribute }}.retrieve(external_id)
-            {{ class_.variable }}.{{ field.name }} = [edge.end_node.external_id for edge in {{ field.variable }}_edges]{% endfor %}
+            {{ data_class.variable }}.{{ field.name }} = [edge.end_node.external_id for edge in {{ field.variable }}_edges]{% endfor %}
 
-            return {{ class_.variable }}{% else %}return self._retrieve((self.sources.space, external_id)){% endif %}
+            return {{ data_class.variable }}{% else %}return self._retrieve((self.sources.space, external_id)){% endif %}
         else:
-            {% if fields.has_one_to_many_edges %}{{ class_.variable_list }} = self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
-{% for field in fields.edges_one_to_many %}
+            {% if data_class.has_one_to_many_edges %}{{ data_class.variable_list }} = self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
+{% for field in data_class.one_to_many_edges %}
             {{ field.variable }}_edges = self.{{ field.edge_api_attribute }}.retrieve(external_id)
-            self._set_{{ field.name }}({{ class_.variable_list }}, {{ field.variable }}_edges){% endfor %}
+            self._set_{{ field.name }}({{ data_class.variable_list }}, {{ field.variable }}_edges){% endfor %}
 
-            return {{ class_.variable_list }}{% else %}return self._retrieve([(self.sources.space, ext_id) for ext_id in external_id]){% endif %}
+            return {{ data_class.variable_list }}{% else %}return self._retrieve([(self.sources.space, ext_id) for ext_id in external_id]){% endif %}
 
-    def list(self, limit: int = DEFAULT_LIMIT_READ) -> {{ class_.data_class }}List:
-        {% if fields.has_one_to_many_edges %}{{ class_.variable_list }} = self._list(limit=limit)
-{% for field in fields.edges_one_to_many %}
+    def list(self, limit: int = DEFAULT_LIMIT_READ) -> {{ data_class.read_list_name }}:
+        {% if data_class.has_one_to_many_edges %}{{ data_class.variable_list }} = self._list(limit=limit)
+{% for field in data_class.one_to_many_edges %}
         {{ field.variable }}_edges = self.{{ field.edge_api_attribute }}.list(limit=-1)
-        self._set_{{ field.name }}({{ class_.variable_list }}, {{ field.variable }}_edges){% endfor %}
+        self._set_{{ field.name }}({{ data_class.variable_list }}, {{ field.variable }}_edges){% endfor %}
 
-        return {{ class_.variable_list }}{% else %}return self._list(limit=limit){% endif %}
-{% for field in fields.edges_one_to_many %}
+        return {{ data_class.variable_list }}{% else %}return self._list(limit=limit){% endif %}
+{% for field in data_class.one_to_many_edges %}
     @staticmethod
-    def _set_{{ field.name }}({{ class_.variable_list }}: Sequence[{{ class_.data_class }}], {{ field.variable }}_edges: Sequence[dm.Edge]):
+    def _set_{{ field.name }}({{ data_class.variable_list }}: Sequence[{{ data_class.read_name }}], {{ field.variable }}_edges: Sequence[dm.Edge]):
         edges_by_start_node: Dict[Tuple, List] = defaultdict(list)
         for edge in {{ field.variable }}_edges:
             edges_by_start_node[edge.start_node.as_tuple()].append(edge)
 
-        for {{ class_.variable }} in {{ class_.variable_list }}:
-            node_id = {{ class_.variable }}.id_tuple()
+        for {{ data_class.variable }} in {{ data_class.variable_list }}:
+            node_id = {{ data_class.variable }}.id_tuple()
             if node_id in edges_by_start_node:
-                {{ class_.variable }}.{{ field.name }} = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
+                {{ data_class.variable }}.{{ field.name }} = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
 {% endfor %}

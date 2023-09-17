@@ -48,6 +48,23 @@ class Naming:
 
 
 @dataclass(frozen=True)
+class FieldNaming:
+    """
+    Naming convention for fields.
+
+    Args:
+        name: Naming convention for data class fields. Data class fields are the attributes of the
+                data classes and are generated from the properties of the view.
+
+    """
+
+    name: Naming = field(default_factory=lambda: Naming(Case.snake, Number.unchanged))
+    variable: Naming = field(default_factory=lambda: Naming(Case.snake, Number.singular))
+    edge_api_class: Naming = field(default_factory=lambda: Naming(Case.pascal, Number.plural))
+    edge_api_attribute: Naming = field(default_factory=lambda: Naming(Case.snake, Number.plural))
+
+
+@dataclass(frozen=True)
 class DataClassNaming:
     """
     Naming convention for data classes.
@@ -58,15 +75,12 @@ class DataClassNaming:
         variable: Naming convention for data class variable. This is used, for example, in as the
             parameter name in the apply method of the API class.
         file: Naming convention for data class file.
-        field: Naming convention for data class fields. Data class fields are the attributes of the
-                        data classes and are generated from the properties of the view.
     """
 
     name: Naming = field(default_factory=lambda: Naming(Case.pascal, Number.singular))
     variable: Naming = field(default_factory=lambda: Naming(Case.snake, Number.singular))
+    variable_list: Naming = field(default_factory=lambda: Naming(Case.snake, Number.plural))
     file: Naming = field(default_factory=lambda: Naming(Case.snake, Number.plural))
-    field_variable: Naming = field(default_factory=lambda: Naming(Case.snake, Number.singular))
-    field_name: Naming = field(default_factory=lambda: Naming(Case.snake, Number.unchanged))
 
 
 @dataclass(frozen=True)
@@ -81,7 +95,7 @@ class APIClassNaming:
                         my_client.[api_class_variable].list().
     """
 
-    name: Naming = field(default_factory=lambda: Naming(Case.pascal, Number.singular))
+    name: Naming = field(default_factory=lambda: Naming(Case.pascal, Number.plural))
     variable: Naming = field(default_factory=lambda: Naming(Case.snake, Number.singular))
     variable_list: Naming = field(default_factory=lambda: Naming(Case.snake, Number.plural))
     file_name: Naming = field(default_factory=lambda: Naming(Case.snake, Number.plural))
@@ -107,6 +121,7 @@ class NamingConfig:
         data_class: The naming convention for the generated data classes.
     """
 
+    field_: FieldNaming = field(default_factory=FieldNaming)
     data_class: DataClassNaming = field(default_factory=DataClassNaming)
     api_class: APIClassNaming = field(default_factory=APIClassNaming)
     apis_class: APIsClassNaming = field(default_factory=APIsClassNaming)

@@ -45,11 +45,16 @@ class Field(ABC):
         prop: dm.MappedProperty | dm.ConnectionDefinition,
         data_class_by_view_id: dict[dm.ViewId, DataClass],
         config: PygenConfig,
+        data_class: DataClass,
         pydantic_field: str = "Field",
     ) -> Field:
-        name = create_name(prop_name, config.naming.data_class.field_name)
+        name = create_name(prop_name, config.naming.field_.name)
         if isinstance(prop, dm.SingleHopConnectionDefinition):
-            variable = create_name(prop_name, config.naming.data_class.field_variable)
+            variable = create_name(prop_name, config.naming.field_.variable)
+
+            edge_api_class_input = f"{data_class.view_name}_{prop_name}"
+            edge_api_class = f"{create_name(edge_api_class_input, config.naming.field_.edge_api_class)}API"
+            edge_api_attribute = create_name(prop_name, config.naming.field_.edge_api_attribute)
             return EdgeOneToMany(
                 name=name,
                 prop_name=prop_name,
@@ -57,6 +62,8 @@ class Field(ABC):
                 data_class=data_class_by_view_id[prop.source],
                 variable=variable,
                 pydantic_field=pydantic_field,
+                edge_api_class=edge_api_class,
+                edge_api_attribute=edge_api_attribute,
             )
         if not isinstance(prop, dm.MappedProperty):
             raise ValueError(f"Property type={type(prop)!r} is not supported")
@@ -212,6 +219,8 @@ class EdgeOneToMany(EdgeField):
     """
 
     variable: str
+    edge_api_class: str
+    edge_api_attribute: str
     prop: dm.SingleHopConnectionDefinition
 
     def as_read_type_hint(self) -> str:
@@ -227,27 +236,32 @@ class DataClass:
     This represents a data class. It is created from a view.
     """
 
+    view_name: str
     read_name: str
     write_name: str
     read_list_name: str
     write_list_name: str
-    variable_name: str
+    variable: str
+    variable_list: str
     file_name: str
     view_id: dm.ViewId
     fields: list[Field] = field(default_factory=list)
 
     @classmethod
     def from_view(cls, view: dm.View, config: PygenConfig) -> Self:
-        raw_name = view.name or view.external_id
-        class_name = create_name(raw_name, config.naming.data_class.name)
-        variable_name = create_name(raw_name, config.naming.data_class.variable)
-        file_name = f"_{create_name(raw_name, config.naming.data_class.file)}"
+        view_name = view.name or view.external_id
+        class_name = create_name(view_name, config.naming.data_class.name)
+        variable_name = create_name(view_name, config.naming.data_class.variable)
+        variable_list = create_name(view_name, config.naming.data_class.variable_list)
+        file_name = f"_{create_name(view_name, config.naming.data_class.file)}"
         return cls(
+            view_name=view_name,
             read_name=class_name,
             write_name=f"{class_name}Apply",
             read_list_name=f"{class_name}List",
             write_list_name=f"{class_name}ApplyList",
-            variable_name=variable_name,
+            variable=variable_name,
+            variable_list=variable_list,
             file_name=file_name,
             view_id=view.as_id(),
         )
@@ -260,7 +274,9 @@ class DataClass:
     ) -> None:
         pydantic_field = self.pydantic_field
         for prop_name, prop in properties.items():
-            field_ = Field.from_property(prop_name, prop, data_class_by_view_id, config, pydantic_field=pydantic_field)
+            field_ = Field.from_property(
+                prop_name, prop, data_class_by_view_id, config, self, pydantic_field=pydantic_field
+            )
             self.fields.append(field_)
 
     @property
@@ -286,6 +302,10 @@ class DataClass:
     @property
     def one_to_many_edges(self) -> Iterable[EdgeOneToMany]:
         return (field_ for field_ in self.fields if isinstance(field_, EdgeOneToMany))
+
+    @property
+    def has_one_to_many_edges(self) -> bool:
+        return any(isinstance(field_, EdgeOneToMany) for field_ in self.fields)
 
     @property
     def has_edges(self) -> bool:
@@ -343,21 +363,19 @@ class APIClass:
     variable: str
     variable_list: str
     client_attribute: str
-    api_class: str
+    name: str
     file_name: str
-    data_class: DataClass
 
     @classmethod
-    def from_view(cls, view: dm.View, data_class: DataClass, config: PygenConfig) -> APIClass:
+    def from_view(cls, view: dm.View, config: PygenConfig) -> APIClass:
         raw_name = view.name or view.external_id
 
         return cls(
             variable=create_name(raw_name, config.naming.api_class.variable),
             variable_list=create_name(raw_name, config.naming.api_class.variable_list),
             client_attribute=create_name(raw_name, config.naming.api_class.client_attribute),
-            api_class=create_name(raw_name, config.naming.api_class.name),
+            name=create_name(raw_name, config.naming.api_class.name),
             file_name=create_name(raw_name, config.naming.api_class.file_name),
-            data_class=data_class,
         )
 
 
