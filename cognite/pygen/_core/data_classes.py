@@ -308,19 +308,17 @@ class DataClass:
         return any(field_.is_time_field for field_ in self.fields)
 
     @property
+    def _field_type_hints(self) -> Iterable[str]:
+        return (hint for field_ in self.fields for hint in (field_.as_read_type_hint(), field_.as_write_type_hint()))
+
+    @property
     def use_optional_type(self) -> bool:
-        return any(
-            "Optional" in field_.as_read_type_hint() or "Optional" in field_.as_write_type_hint()
-            for field_ in self.fields
-        )
+        return any("Optional" in hint for hint in self._field_type_hints)
 
     @property
     def use_pydantic_field(self) -> bool:
         pydantic_field = self.pydantic_field
-        return any(
-            pydantic_field in field_.as_read_type_hint() or pydantic_field in field_.as_write_type_hint()
-            for field_ in self.fields
-        )
+        return any(pydantic_field in hint for hint in self._field_type_hints)
 
     @property
     def import_pydantic_field(self) -> str:
