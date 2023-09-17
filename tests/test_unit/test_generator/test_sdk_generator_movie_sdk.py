@@ -91,7 +91,7 @@ def create_fields_test_cases():
         view_name="Role",
     )
 
-    data_class_by_view_id = {dm.ViewId("IntegrationTestsImmutable", "Role", "2"): data_class}
+    data_class_by_view_id = {("IntegrationTestsImmutable", "Role"): data_class}
     yield pytest.param(
         "roles",
         prop,
@@ -166,7 +166,7 @@ def create_fields_test_cases():
         variable_list="persons",
         view_name="Person",
     )
-    data_class_by_view_id = {dm.ViewId("IntegrationTestsImmutable", "Person", "2"): data_class}
+    data_class_by_view_id = {("IntegrationTestsImmutable", "Person"): data_class}
 
     prop = ViewProperty.load(prop)
     yield pytest.param(
@@ -227,7 +227,7 @@ def create_fields_test_cases():
 def test_fields_from_property(
     prop_name: str,
     property_: dm.MappedProperty | dm.ConnectionDefinition,
-    data_class_by_view_id: dict[dm.ViewId, DataClass],
+    data_class_by_view_id: dict[tuple[str, str], DataClass],
     view_name: str,
     expected: Field,
     expected_read_type_hint: str,

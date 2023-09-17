@@ -5,18 +5,18 @@ from pathlib import Path
 from cognite.client import ClientConfig, CogniteClient
 from cognite.client.credentials import OAuthClientCredentials
 
-from markets.client._api.bids import BidsAPI
-from markets.client._api.cog_bids import CogBidsAPI
-from markets.client._api.cog_pools import CogPoolsAPI
-from markets.client._api.cog_process import CogProcessAPI
-from markets.client._api.date_transformations import DateTransformationsAPI
-from markets.client._api.date_transformation_pairs import DateTransformationPairsAPI
-from markets.client._api.markets import MarketsAPI
-from markets.client._api.process import ProcessAPI
-from markets.client._api.pygen_bids import PygenBidsAPI
-from markets.client._api.pygen_pools import PygenPoolsAPI
-from markets.client._api.pygen_process import PygenProcessAPI
-from markets.client._api.value_transformations import ValueTransformationsAPI
+from ._api.bids import BidsAPI
+from ._api.cog_bids import CogBidsAPI
+from ._api.cog_pools import CogPoolsAPI
+from ._api.cog_process import CogProcessAPI
+from ._api.date_transformations import DateTransformationsAPI
+from ._api.date_transformation_pairs import DateTransformationPairsAPI
+from ._api.markets import MarketsAPI
+from ._api.process import ProcessAPI
+from ._api.pygen_bids import PygenBidsAPI
+from ._api.pygen_pools import PygenPoolsAPI
+from ._api.pygen_process import PygenProcessAPI
+from ._api.value_transformations import ValueTransformationsAPI
 
 
 class CogPoolAPIs:

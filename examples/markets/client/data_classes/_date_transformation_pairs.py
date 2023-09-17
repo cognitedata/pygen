@@ -5,10 +5,10 @@ from typing import TYPE_CHECKING, ClassVar, Optional, Union  # noqa: F401
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from markets.client.data_classes._core import DomainModel, DomainModelApply, TypeList
+from ._core import DomainModel, DomainModelApply, TypeList
 
 if TYPE_CHECKING:
-    from markets.client.data_classes._date_transformations import DateTransformationApply
+    from ._date_transformations import DateTransformationApply
 
 __all__ = ["DateTransformationPair", "DateTransformationPairApply", "DateTransformationPairList"]
 

@@ -5,7 +5,7 @@ import platform
 import pytest
 from cognite.client import data_modeling as dm
 
-from cognite.pygen._core.generators import APIGenerator, SDKGenerator
+from cognite.pygen._core.generators import APIGenerator, MultiAPIGenerator, SDKGenerator
 from cognite.pygen._generator import CodeFormatter
 from tests.constants import IS_PYDANTIC_V1, MarketSDKFiles
 
@@ -25,7 +25,22 @@ def sdk_generator(pygen_pool_model, cog_pool_model, top_level_package) -> SDKGen
     )
 
 
-def test_generate__api_client(sdk_generator: SDKGenerator):
+@pytest.fixture
+def multi_api_generator(sdk_generator: SDKGenerator) -> SDKGenerator:
+    return sdk_generator._multi_api_generator
+
+
+@pytest.fixture
+def date_transformation_generator(
+    multi_api_generator: MultiAPIGenerator, date_transformation_pair_view: dm.View
+) -> APIGenerator:
+    api_generator = next(
+        (api for api in multi_api_generator.sub_apis if api.view.as_id() == date_transformation_pair_view.as_id()), None
+    )
+    assert api_generator is not None, "Could not find API generator for date transformation view"
+
+
+def test_generate_api_client(sdk_generator: SDKGenerator):
     # Arrange
     expected = MarketSDKFiles.client.read_text()
 
@@ -37,13 +52,13 @@ def test_generate__api_client(sdk_generator: SDKGenerator):
 
 
 def test_generate_date_transformation_pairs_data_class(
-    date_transformation_pair_view: dm.View, top_level_package: str, code_formatter: CodeFormatter
+    date_transformation_generator: APIGenerator, code_formatter: CodeFormatter
 ):
     # Arrange
     expected = MarketSDKFiles.date_transformation_pair_data.read_text()
 
     # Act
-    actual = APIGenerator(date_transformation_pair_view, top_level_package).generate_data_class_file()
+    actual = date_transformation_generator.generate_data_class_file()
 
     # Assert
     actual = code_formatter.format_code(actual)
@@ -52,13 +67,13 @@ def test_generate_date_transformation_pairs_data_class(
 
 @pytest.mark.skipif(not platform.platform().startswith("Windows"), reason="Only works on windows (do not know why).")
 def test_generate_date_transformation_pairs_data_api(
-    date_transformation_pair_view: dm.View, top_level_package: str, code_formatter: CodeFormatter
+    date_transformation_generator: APIGenerator, top_level_package: str, code_formatter: CodeFormatter
 ):
     # Arrange
     expected = MarketSDKFiles.date_transformation_pair_api.read_text()
 
     # Act
-    actual = APIGenerator(date_transformation_pair_view, top_level_package).generate_api_file(top_level_package)
+    actual = date_transformation_generator.generate_api_file(top_level_package)
 
     # Assert
     actual = code_formatter.format_code(actual)

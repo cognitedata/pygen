@@ -44,7 +44,7 @@ class SDKGenerator:
         self._multi_api_classes: list[MultiAPIClass]
         if isinstance(data_model, dm.DataModel):
             self._is_single_model = True
-            self._generator_APIs = MultiAPIGenerator(
+            self._multi_api_generator = MultiAPIGenerator(
                 top_level_package, client_name, data_model.views, pydantic_version, logger, config
             )
             self._multi_api_classes = []
@@ -52,10 +52,10 @@ class SDKGenerator:
             self._is_single_model = False
             unique_views = get_unique_views(*[view for model in data_model for view in model.views])
 
-            self._generator_APIs = MultiAPIGenerator(
+            self._multi_api_generator = MultiAPIGenerator(
                 top_level_package, client_name, unique_views, pydantic_version, logger, config
             )
-            api_by_view_id = {api.view.as_id(): api.api_class for api in self._generator_APIs.sub_apis}
+            api_by_view_id = {api.view_identifier: api.api_class for api in self._multi_api_generator.sub_apis}
 
             self._multi_api_classes = sorted(
                 (MultiAPIClass.from_data_model(model, api_by_view_id, config) for model in data_model),
@@ -72,15 +72,15 @@ class SDKGenerator:
             A Python SDK given as a dictionary of file paths and file contents, which can be written to disk.
         """
         client_dir = Path(self.top_level_package.replace(".", "/"))
-        sdk = self._generator_APIs.generate_apis(client_dir)
+        sdk = self._multi_api_generator.generate_apis(client_dir)
         sdk[client_dir / "_api_client.py"] = self._generate_api_client_file()
         return sdk
 
     def _generate_api_client_file(self) -> str:
-        api_client = self._generator_APIs.env.get_template("_api_client.py.jinja")
+        api_client = self._multi_api_generator.env.get_template("_api_client.py.jinja")
 
         api_classes = sorted(
-            (sub_api.api_class for sub_api in self._generator_APIs.sub_apis), key=lambda api_class: api_class.name
+            (sub_api.api_class for sub_api in self._multi_api_generator.sub_apis), key=lambda api_class: api_class.name
         )
 
         return (
@@ -116,7 +116,9 @@ class MultiAPIGenerator:
         self._logger = logger or print
 
         self.sub_apis: list[APIGenerator] = [APIGenerator(view, config) for view in views]
-        data_class_by_view_id = {api.view.as_id(): api.data_class for api in self.sub_apis}
+        data_class_by_view_id: dict[tuple[str, str], DataClass] = {
+            (api.view.space, api.view.external_id): api.data_class for api in self.sub_apis
+        }
         for api in self.sub_apis:
             api.data_class.update_fields(api.view.properties, data_class_by_view_id, config)
 
@@ -195,6 +197,7 @@ class APIGenerator:
         )
 
         self.view = view
+        self.view_identifier: tuple[str, str] = view.space, view.external_id
         self.data_class = DataClass.from_view(view, config)
         self.api_class = APIClass.from_view(view, config)
 

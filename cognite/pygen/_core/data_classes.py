@@ -43,7 +43,7 @@ class Field(ABC):
         cls,
         prop_name: str,
         prop: dm.MappedProperty | dm.ConnectionDefinition,
-        data_class_by_view_id: dict[dm.ViewId, DataClass],
+        data_class_by_view_id: dict[tuple[str, str], DataClass],
         config: PygenConfig,
         view_name: str,
         pydantic_field: str = "Field",
@@ -59,7 +59,7 @@ class Field(ABC):
                 name=name,
                 prop_name=prop_name,
                 prop=prop,
-                data_class=data_class_by_view_id[prop.source],
+                data_class=data_class_by_view_id[(prop.source.space, prop.source.external_id)],
                 variable=variable,
                 pydantic_field=pydantic_field,
                 edge_api_class=edge_api_class,
@@ -92,13 +92,15 @@ class Field(ABC):
         elif isinstance(prop.type, dm.DirectRelation):
             # For direct relation the source is required.
             view_id = cast(dm.ViewId, prop.source)
+            target_data_class = data_class_by_view_id[(view_id.space, view_id.external_id)]
             return EdgeOneToOne(
                 name=name,
                 prop_name=prop_name,
                 prop=prop,
-                data_class=data_class_by_view_id[view_id],
+                data_class=target_data_class,
                 pydantic_field=pydantic_field,
             )
+
         else:
             raise NotImplementedError(f"Property type={type(prop)!r} is not supported")
 
@@ -275,7 +277,7 @@ class DataClass:
     def update_fields(
         self,
         properties: dict[str, dm.MappedProperty | dm.ConnectionDefinition],
-        data_class_by_view_id: dict[dm.ViewId, DataClass],
+        data_class_by_view_id: dict[tuple[str, str], DataClass],
         config: PygenConfig,
     ) -> None:
         pydantic_field = self.pydantic_field
@@ -400,9 +402,12 @@ class MultiAPIClass:
 
     @classmethod
     def from_data_model(
-        cls, data_model: dm.DataModel, api_class_by_view_id: dict[dm.ViewId, APIClass], config: PygenConfig
+        cls, data_model: dm.DataModel, api_class_by_view_id: dict[tuple[str, str], APIClass], config: PygenConfig
     ) -> MultiAPIClass:
-        sub_apis = sorted([api_class_by_view_id[view.as_id()] for view in data_model.views], key=lambda api: api.name)
+        sub_apis = sorted(
+            [api_class_by_view_id[(view.space, view.external_id)] for view in data_model.views],
+            key=lambda api: api.name,
+        )
 
         data_model_name = data_model.name or data_model.external_id
 
