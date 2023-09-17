@@ -6,7 +6,7 @@ from typing import Generic, overload
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
-from shop_pydantic_v1.client.data_classes._core import T_TypeApplyNode, T_TypeNode, T_TypeNodeList
+from tutorial_apm_simple_pydantic_v1.client.data_classes._core import T_TypeApplyNode, T_TypeNode, T_TypeNodeList
 
 
 DEFAULT_LIMIT_READ = 25

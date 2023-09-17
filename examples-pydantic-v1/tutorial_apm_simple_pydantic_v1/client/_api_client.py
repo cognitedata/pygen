@@ -5,13 +5,17 @@ from pathlib import Path
 from cognite.client import ClientConfig, CogniteClient
 from cognite.client.credentials import OAuthClientCredentials
 
-from ._api.cases import CasesAPI
-from ._api.command_configs import CommandConfigsAPI
+from ._api.assets import AssetsAPI
+from ._api.cdf_3_d_connection_properties import CdfConnectionPropertiesAPI
+from ._api.cdf_3_d_entities import CdfEntitiesAPI
+from ._api.cdf_3_d_models import CdfModelsAPI
+from ._api.work_orders import WorksAPI
+from ._api.work_items import WorksAPI
 
 
-class ShopClient:
+class ApmSimpleClient:
     """
-    ShopClient
+    ApmSimpleClient
 
     Generated with:
         pygen = 0.17.7
@@ -19,9 +23,9 @@ class ShopClient:
         pydantic = 1.10.7
 
     Data Model:
-        space: IntegrationTestsImmutable
-        externalId: SHOP_Model
-        version: 2
+        space: tutorial_apm_simple
+        externalId: ApmSimple
+        version: 6
     """
 
     def __init__(self, config_or_client: CogniteClient | ClientConfig):
@@ -31,20 +35,24 @@ class ShopClient:
             client = CogniteClient(config_or_client)
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
-        self.cases = CasesAPI(client)
-        self.command_configs = CommandConfigsAPI(client)
+        self.assets = AssetsAPI(client)
+        self.cdf_3_d_connection_properties = CdfConnectionPropertiesAPI(client)
+        self.cdf_3_d_entities = CdfEntitiesAPI(client)
+        self.cdf_3_d_models = CdfModelsAPI(client)
+        self.work_orders = WorksAPI(client)
+        self.work_items = WorksAPI(client)
 
     @classmethod
     def azure_project(
         cls, tenant_id: str, client_id: str, client_secret: str, cdf_cluster: str, project: str
-    ) -> ShopClient:
+    ) -> ApmSimpleClient:
         credentials = OAuthClientCredentials.default_for_azure_ad(tenant_id, client_id, client_secret, cdf_cluster)
         config = ClientConfig.default(project, cdf_cluster, credentials)
 
         return cls(config)
 
     @classmethod
-    def from_toml(cls, file_path: Path | str, section: str | None = "cognite") -> ShopClient:
+    def from_toml(cls, file_path: Path | str, section: str | None = "cognite") -> ApmSimpleClient:
         import toml
 
         toml_content = toml.load(file_path)

@@ -4,9 +4,8 @@ from typing import Sequence, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
-from cognite.client._constants import DEFAULT_LIMIT_READ
 
-from markets_pydantic_v1.client._api._core import TypeAPI
+from ._core import DEFAULT_LIMIT_READ, TypeAPI
 from markets_pydantic_v1.client.data_classes import DateTransformation, DateTransformationApply, DateTransformationList
 
 

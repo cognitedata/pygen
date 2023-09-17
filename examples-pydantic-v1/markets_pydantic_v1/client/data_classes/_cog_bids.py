@@ -6,10 +6,10 @@ from typing import TYPE_CHECKING, ClassVar, Optional, Union
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from markets_pydantic_v1.client.data_classes._core import DomainModel, DomainModelApply, TypeList
+from ._core import DomainModel, DomainModelApply, TypeList
 
 if TYPE_CHECKING:
-    from markets_pydantic_v1.client.data_classes._markets import MarketApply
+    from ._markets import MarketApply
 
 __all__ = ["CogBid", "CogBidApply", "CogBidList"]
 
@@ -27,7 +27,7 @@ class CogBid(DomainModel):
 class CogBidApply(DomainModelApply):
     space: ClassVar[str] = "market"
     date: Optional[datetime.date] = None
-    market: Optional[Union["MarketApply", str]] = Field(None, repr=False)
+    market: Union[MarketApply, str, None] = Field(None, repr=False)
     name: Optional[str] = None
     price: Optional[float] = None
     price_area: Optional[str] = None

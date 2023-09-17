@@ -1,27 +1,15 @@
-from markets_pydantic_v1.client.data_classes._bids import Bid, BidApply, BidList
-from markets_pydantic_v1.client.data_classes._cog_bids import CogBid, CogBidApply, CogBidList
-from markets_pydantic_v1.client.data_classes._cog_pools import CogPool, CogPoolApply, CogPoolList
-from markets_pydantic_v1.client.data_classes._cog_process import CogProces, CogProcesApply, CogProcesList
-from markets_pydantic_v1.client.data_classes._date_transformations import (
-    DateTransformation,
-    DateTransformationApply,
-    DateTransformationList,
-)
-from markets_pydantic_v1.client.data_classes._date_transformation_pairs import (
-    DateTransformationPair,
-    DateTransformationPairApply,
-    DateTransformationPairList,
-)
-from markets_pydantic_v1.client.data_classes._markets import Market, MarketApply, MarketList
-from markets_pydantic_v1.client.data_classes._process import Proces, ProcesApply, ProcesList
-from markets_pydantic_v1.client.data_classes._pygen_bids import PygenBid, PygenBidApply, PygenBidList
-from markets_pydantic_v1.client.data_classes._pygen_pools import PygenPool, PygenPoolApply, PygenPoolList
-from markets_pydantic_v1.client.data_classes._pygen_process import PygenProces, PygenProcesApply, PygenProcesList
-from markets_pydantic_v1.client.data_classes._value_transformations import (
-    ValueTransformation,
-    ValueTransformationApply,
-    ValueTransformationList,
-)
+from ._bids import Bid, BidApply, BidList
+from ._cog_bids import CogBid, CogBidApply, CogBidList
+from ._cog_pools import CogPool, CogPoolApply, CogPoolList
+from ._cog_process import CogProces, CogProcesApply, CogProcesList
+from ._date_transformations import DateTransformation, DateTransformationApply, DateTransformationList
+from ._date_transformation_pairs import DateTransformationPair, DateTransformationPairApply, DateTransformationPairList
+from ._markets import Market, MarketApply, MarketList
+from ._process import Proces, ProcesApply, ProcesList
+from ._pygen_bids import PygenBid, PygenBidApply, PygenBidList
+from ._pygen_pools import PygenPool, PygenPoolApply, PygenPoolList
+from ._pygen_process import PygenProces, PygenProcesApply, PygenProcesList
+from ._value_transformations import ValueTransformation, ValueTransformationApply, ValueTransformationList
 
 BidApply.update_forward_refs(
     MarketApply=MarketApply,

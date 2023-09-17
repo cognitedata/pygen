@@ -5,12 +5,12 @@ from typing import TYPE_CHECKING, ClassVar, Optional, Union
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from movie_domain_pydantic_v1.client.data_classes._core import DomainModel, DomainModelApply, TypeList
+from ._core import DomainModel, DomainModelApply, TypeList
 
 if TYPE_CHECKING:
-    from movie_domain_pydantic_v1.client.data_classes._movies import MovieApply
-    from movie_domain_pydantic_v1.client.data_classes._nominations import NominationApply
-    from movie_domain_pydantic_v1.client.data_classes._persons import PersonApply
+    from ._movies import MovieApply
+    from ._nominations import NominationApply
+    from ._persons import PersonApply
 
 __all__ = ["Director", "DirectorApply", "DirectorList"]
 
@@ -25,9 +25,9 @@ class Director(DomainModel):
 
 class DirectorApply(DomainModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
-    movies: list[Union["MovieApply", str]] = Field(default_factory=list, repr=False)
-    nomination: list[Union["NominationApply", str]] = Field(default_factory=list, repr=False)
-    person: Optional[Union["PersonApply", str]] = Field(None, repr=False)
+    movies: Union[list[MovieApply], list[str]] = Field(default_factory=list, repr=False)
+    nomination: Union[list[NominationApply], list[str]] = Field(default_factory=list, repr=False)
+    person: Union[PersonApply, str, None] = Field(None, repr=False)
     won_oscar: Optional[bool] = None
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
@@ -92,7 +92,7 @@ class DirectorApply(DomainModelApply):
 
         return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
 
-    def _create_movie_edge(self, movie: Union[str, "MovieApply"]) -> dm.EdgeApply:
+    def _create_movie_edge(self, movie: Union[str, MovieApply]) -> dm.EdgeApply:
         if isinstance(movie, str):
             end_node_ext_id = movie
         elif isinstance(movie, DomainModelApply):
@@ -108,7 +108,7 @@ class DirectorApply(DomainModelApply):
             end_node=dm.DirectRelationReference("IntegrationTestsImmutable", end_node_ext_id),
         )
 
-    def _create_nomination_edge(self, nomination: Union[str, "NominationApply"]) -> dm.EdgeApply:
+    def _create_nomination_edge(self, nomination: Union[str, NominationApply]) -> dm.EdgeApply:
         if isinstance(nomination, str):
             end_node_ext_id = nomination
         elif isinstance(nomination, DomainModelApply):

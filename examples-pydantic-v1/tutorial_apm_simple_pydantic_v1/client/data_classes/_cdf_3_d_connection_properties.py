@@ -3,22 +3,23 @@ from __future__ import annotations
 from typing import ClassVar, Optional
 
 from cognite.client import data_modeling as dm
+from pydantic import Field
 
 from ._core import DomainModel, DomainModelApply, TypeList
 
-__all__ = ["DateTransformation", "DateTransformationApply", "DateTransformationList"]
+__all__ = ["CdfConnectionProperty", "CdfConnectionPropertyApply", "CdfConnectionPropertyList"]
 
 
-class DateTransformation(DomainModel):
-    space: ClassVar[str] = "market"
-    arguments: Optional[dict] = None
-    method: Optional[str] = None
+class CdfConnectionProperty(DomainModel):
+    space: ClassVar[str] = "cdf_3d_schema"
+    revision_id: Optional[int] = Field(None, alias="revisionId")
+    revision_node_id: Optional[int] = Field(None, alias="revisionNodeId")
 
 
-class DateTransformationApply(DomainModelApply):
-    space: ClassVar[str] = "market"
-    arguments: Optional[dict] = None
-    method: Optional[str] = None
+class CdfConnectionPropertyApply(DomainModelApply):
+    space: ClassVar[str] = "cdf_3d_schema"
+    revision_id: int
+    revision_node_id: int
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:
@@ -26,13 +27,13 @@ class DateTransformationApply(DomainModelApply):
 
         sources = []
         properties = {}
-        if self.arguments is not None:
-            properties["arguments"] = self.arguments
-        if self.method is not None:
-            properties["method"] = self.method
+        if self.revision_id is not None:
+            properties["revisionId"] = self.revision_id
+        if self.revision_node_id is not None:
+            properties["revisionNodeId"] = self.revision_node_id
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("market", "DateTransformation"),
+                source=dm.ContainerId("cdf_3d_schema", "Cdf3dConnectionProperties"),
                 properties=properties,
             )
             sources.append(source)
@@ -53,5 +54,5 @@ class DateTransformationApply(DomainModelApply):
         return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
 
 
-class DateTransformationList(TypeList[DateTransformation]):
-    _NODE = DateTransformation
+class CdfConnectionPropertyList(TypeList[CdfConnectionProperty]):
+    _NODE = CdfConnectionProperty
