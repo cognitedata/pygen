@@ -6,10 +6,10 @@ from typing import TYPE_CHECKING, ClassVar, Optional, Union
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from shop.client.data_classes._core import DomainModel, DomainModelApply, TypeList
+from ._core import DomainModel, DomainModelApply, TypeList
 
 if TYPE_CHECKING:
-    from shop.client.data_classes._command_configs import CommandConfigApply
+    from ._command_configs import CommandConfigApply
 
 __all__ = ["Case", "CaseApply", "CaseList"]
 

@@ -5,8 +5,8 @@ from pathlib import Path
 from cognite.client import ClientConfig, CogniteClient
 from cognite.client.credentials import OAuthClientCredentials
 
-from shop.client._api.cases import CasesAPI
-from shop.client._api.command_configs import CommandConfigsAPI
+from ._api.cases import CasesAPI
+from ._api.command_configs import CommandConfigsAPI
 
 
 class ShopClient:

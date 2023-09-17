@@ -1,5 +1,5 @@
-from shop.client.data_classes._cases import Case, CaseApply, CaseList
-from shop.client.data_classes._command_configs import CommandConfig, CommandConfigApply, CommandConfigList
+from ._cases import Case, CaseApply, CaseList
+from ._command_configs import CommandConfig, CommandConfigApply, CommandConfigList
 
 CaseApply.model_rebuild()
 
