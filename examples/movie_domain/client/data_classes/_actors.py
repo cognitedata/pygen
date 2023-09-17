@@ -45,12 +45,16 @@ class ActorApply(DomainModelApply):
             properties["wonOscar"] = self.won_oscar
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("IntegrationTestsImmutable", "Role"), properties=properties
+                source=dm.ContainerId("IntegrationTestsImmutable", "Role"),
+                properties=properties,
             )
             sources.append(source)
         if sources:
             this_node = dm.NodeApply(
-                space=self.space, external_id=self.external_id, existing_version=self.existing_version, sources=sources
+                space=self.space,
+                external_id=self.external_id,
+                existing_version=self.existing_version,
+                sources=sources,
             )
             nodes = [this_node]
         else:

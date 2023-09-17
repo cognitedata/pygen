@@ -27,13 +27,13 @@ class {{ data_class.write_name }}(DomainModelApply):
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
 
-        {% if data_class.has_properties or data_class.has_one_to_one_edges %}sources = []{% for container, container_fields in data_class.fields_by_container.items() %}
+        {% if not data_class.has_only_one_to_many_edges %}sources = []{% for container, container_fields in data_class.fields_by_container.items() %}
         properties = {}{% for field in container_fields %}
         if self.{{ field.name }} is not None:
-            properties["{{ field.prop.name }}"] = {% if field.is_edge %}{
+            properties["{{ field.prop_name }}"] = {% if field.is_edge %}{
                 "space": "{{ field.prop.source.space }}",
                 "externalId": self.{{ field.name }} if isinstance(self.{{ field.name }}, str) else self.{{ field.name }}.external_id,
-            }{% else %}self.{{ field.name }}{% if field.is_datetime or field.is_date %}.isoformat(){% endif %}{% endif %}{% endfor %}
+            }{% else %}self.{{ field.name }}{% if field.is_time_field %}.isoformat(){% endif %}{% endif %}{% endfor %}
         if properties:
             source = dm.NodeOrEdgeData(
                 source=dm.ContainerId("{{ container.space }}", "{{ container.external_id }}"),

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import Iterable
 
@@ -69,11 +70,21 @@ class Field(ABC):
 
     @abstractmethod
     def as_read_type_hint(self) -> str:
-        ...
+        raise NotImplementedError()
 
     @abstractmethod
     def as_write_type_hint(self) -> str:
-        ...
+        raise NotImplementedError()
+
+    @property
+    @abstractmethod
+    def is_edge(self) -> bool:
+        raise NotImplementedError()
+
+    @property
+    @abstractmethod
+    def is_time_field(self) -> bool:
+        raise NotImplementedError()
 
 
 @dataclass(frozen=True)
@@ -81,6 +92,14 @@ class PrimitiveFieldCore(Field, ABC):
     type_: str
     is_nullable: bool
     prop: dm.MappedProperty
+
+    @property
+    def is_edge(self) -> bool:
+        return False
+
+    @property
+    def is_time_field(self) -> bool:
+        return self.type_ in ("datetime.datetime", "datetime.date")
 
 
 @dataclass(frozen=True)
@@ -136,6 +155,14 @@ class EdgeField(Field, ABC):
     """
 
     data_class: DataClass
+
+    @property
+    def is_edge(self) -> bool:
+        return True
+
+    @property
+    def is_time_field(self) -> bool:
+        return False
 
 
 @dataclass(frozen=True)
@@ -221,6 +248,18 @@ class DataClass:
 
     def one_to_many_edges(self) -> Iterable[EdgeOneToMany]:
         return (f for f in self.fields if isinstance(f, EdgeOneToMany))
+
+    @property
+    def has_only_one_to_many_edges(self) -> bool:
+        return all(isinstance(f, EdgeOneToMany) for f in self.fields)
+
+    @property
+    def fields_by_container(self) -> dict[dm.ContainerId, list[PrimitiveFieldCore | EdgeOneToOne]]:
+        result: dict[dm.ContainerId, list[PrimitiveFieldCore | EdgeOneToOne]] = defaultdict(list)
+        for field_ in self:
+            if isinstance(field_, (PrimitiveFieldCore, EdgeOneToOne)):
+                result[field_.prop.container].append(field_)
+        return dict(result)
 
 
 @dataclass(frozen=True)
