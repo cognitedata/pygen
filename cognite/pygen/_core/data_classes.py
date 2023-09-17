@@ -21,10 +21,18 @@ _EXTERNAL_TYPES = (dm.TimeSeriesReference, dm.FileReference, dm.SequenceReferenc
 class Field(ABC):
     """
     A field represents a pydantic field in the generated pydantic class.
+
+    Args:
+        name: The name of the field. This is used in the generated Python code.
+        prop_name: The name of the property in the data model. This is used when reading and writing to CDF.
+        pydantic_field: The name to use for the import 'from pydantic import Field'. This is used in the edge case
+                        when the name 'Field' name clashes with the data model class name.
+
     """
 
     name: str
     prop_name: str
+    pydantic_field: str
 
     @property
     def need_alias(self) -> bool:
@@ -37,6 +45,7 @@ class Field(ABC):
         prop: dm.MappedProperty | dm.ConnectionDefinition,
         data_class_by_view_id: dict[dm.ViewId, DataClass],
         config: PygenConfig,
+        pydantic_field: str = "Field",
     ) -> Field:
         name = create_name(prop_name, config.naming.data_class.field_name)
         if isinstance(prop, dm.SingleHopConnectionDefinition):
@@ -47,6 +56,7 @@ class Field(ABC):
                 prop=prop,
                 data_class=data_class_by_view_id[prop.source],
                 variable=variable,
+                pydantic_field=pydantic_field,
             )
         if not isinstance(prop, dm.MappedProperty):
             raise ValueError(f"Property type={type(prop)!r} is not supported")
@@ -55,7 +65,12 @@ class Field(ABC):
             type_ = _to_python_type(prop.type)
             if isinstance(prop.type, ListablePropertyType) and prop.type.is_list:
                 return PrimitiveListField(
-                    name=name, prop_name=prop_name, type_=type_, is_nullable=prop.nullable, prop=prop
+                    name=name,
+                    prop_name=prop_name,
+                    type_=type_,
+                    is_nullable=prop.nullable,
+                    prop=prop,
+                    pydantic_field=pydantic_field,
                 )
 
             return PrimitiveField(
@@ -65,10 +80,15 @@ class Field(ABC):
                 is_nullable=prop.nullable,
                 default=prop.default_value,
                 prop=prop,
+                pydantic_field=pydantic_field,
             )
         elif isinstance(prop.type, dm.DirectRelation):
             return EdgeOneToOne(
-                name=name, prop_name=prop_name, prop=prop, data_class=data_class_by_view_id[prop.source]
+                name=name,
+                prop_name=prop_name,
+                prop=prop,
+                data_class=data_class_by_view_id[prop.source],
+                pydantic_field=pydantic_field,
             )
         else:
             raise NotImplementedError(f"Property type={type(prop)!r} is not supported")
@@ -118,7 +138,7 @@ class PrimitiveField(PrimitiveFieldCore):
     def as_read_type_hint(self) -> str:
         rhs = str(self.default)
         if self.need_alias:
-            rhs = f'Field({rhs}, alias="{self.prop_name}")'
+            rhs = f'{self.pydantic_field}({rhs}, alias="{self.prop_name}")'
 
         return f"Optional[{self.type_}] = {rhs}"
 
@@ -141,7 +161,7 @@ class PrimitiveListField(PrimitiveFieldCore):
             alias = f', alias="{self.prop_name}"'
 
         if alias:
-            rhs = f", Field(default_factory=list{alias})"
+            rhs = f", {self.pydantic_field}(default_factory=list{alias})"
         else:
             rhs = " = []"
         return f"list[{self.type_}]{rhs}"
@@ -182,7 +202,7 @@ class EdgeOneToOne(EdgeField):
         return "Optional[str] = None"
 
     def as_write_type_hint(self) -> str:
-        return f"Union[{self.data_class.write_name}, str, None] = Field(None, repr=False)"
+        return f"Union[{self.data_class.write_name}, str, None] = {self.pydantic_field}(None, repr=False)"
 
 
 @dataclass(frozen=True)
@@ -198,7 +218,7 @@ class EdgeOneToMany(EdgeField):
         return "list[str] = []"
 
     def as_write_type_hint(self) -> str:
-        return f"Union[list[{self.data_class.write_name}], list[str]] = Field(default_factory=list, repr=False)"
+        return f"Union[list[{self.data_class.write_name}], list[str]] = {self.pydantic_field}(default_factory=list, repr=False)"
 
 
 @dataclass(frozen=True)
@@ -238,9 +258,19 @@ class DataClass:
         data_class_by_view_id: dict[dm.ViewId, DataClass],
         config: PygenConfig,
     ) -> None:
+        pydantic_field = self.pydantic_field
         for prop_name, prop in properties.items():
-            field_ = Field.from_property(prop_name, prop, data_class_by_view_id, config)
+            field_ = Field.from_property(prop_name, prop, data_class_by_view_id, config, pydantic_field=pydantic_field)
             self.fields.append(field_)
+
+    @property
+    def pydantic_field(self) -> str:
+        if any(
+            name == "Field" for name in [self.read_name, self.write_name, self.read_list_name, self.write_list_name]
+        ):
+            return "pydantic.Field"
+        else:
+            return "Field"
 
     @property
     def import_(self) -> str:
@@ -251,15 +281,19 @@ class DataClass:
 
     @property
     def one_to_one_edges(self) -> Iterable[EdgeOneToOne]:
-        return (f for f in self.fields if isinstance(f, EdgeOneToOne))
+        return (field_ for field_ in self.fields if isinstance(field_, EdgeOneToOne))
 
     @property
     def one_to_many_edges(self) -> Iterable[EdgeOneToMany]:
-        return (f for f in self.fields if isinstance(f, EdgeOneToMany))
+        return (field_ for field_ in self.fields if isinstance(field_, EdgeOneToMany))
+
+    @property
+    def has_edges(self) -> bool:
+        return any(isinstance(field_, EdgeField) for field_ in self.fields)
 
     @property
     def has_only_one_to_many_edges(self) -> bool:
-        return all(isinstance(f, EdgeOneToMany) for f in self.fields)
+        return all(isinstance(field_, EdgeOneToMany) for field_ in self.fields)
 
     @property
     def fields_by_container(self) -> dict[dm.ContainerId, list[PrimitiveFieldCore | EdgeOneToOne]]:
@@ -268,6 +302,42 @@ class DataClass:
             if isinstance(field_, (PrimitiveFieldCore, EdgeOneToOne)):
                 result[field_.prop.container].append(field_)
         return dict(result)
+
+    @property
+    def has_time_field(self) -> bool:
+        return any(field_.is_time_field for field_ in self.fields)
+
+    @property
+    def use_optional_type(self) -> bool:
+        return any(
+            "Optional" in field_.as_read_type_hint() or "Optional" in field_.as_write_type_hint()
+            for field_ in self.fields
+        )
+
+    @property
+    def use_pydantic_field(self) -> bool:
+        pydantic_field = self.pydantic_field
+        return any(
+            pydantic_field in field_.as_read_type_hint() or pydantic_field in field_.as_write_type_hint()
+            for field_ in self.fields
+        )
+
+    @property
+    def import_pydantic_field(self) -> str:
+        if self.pydantic_field == "Field":
+            return "from pydantic import Field"
+        else:
+            return "import pydantic"
+
+    @property
+    def data_class_dependencies(self) -> list[DataClass]:
+        unique: dict[dm.ViewId, DataClass] = {}
+        for field_ in self.fields:
+            if isinstance(field_, EdgeField):
+                # This will overwrite any existing data class with the same view id
+                # however, this is not a problem as all data classes are uniquely identified by their view id
+                unique[field_.data_class.view_id] = field_.data_class
+        return sorted(unique.values(), key=lambda x: x.write_name)
 
 
 @dataclass(frozen=True)

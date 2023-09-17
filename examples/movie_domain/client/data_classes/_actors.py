@@ -92,7 +92,7 @@ class ActorApply(DomainModelApply):
 
         return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
 
-    def _create_movie_edge(self, movie: Union[str, "MovieApply"]) -> dm.EdgeApply:
+    def _create_movie_edge(self, movie: Union[str, MovieApply]) -> dm.EdgeApply:
         if isinstance(movie, str):
             end_node_ext_id = movie
         elif isinstance(movie, DomainModelApply):

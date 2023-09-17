@@ -1,15 +1,15 @@
 from __future__ import annotations
-{% if data_class.has_datetime or data_class.has_date %}
+{% if data_class.has_time_field %}
 import datetime{% endif %}
-{% if data_class.import_dependencies %}from typing import TYPE_CHECKING, ClassVar, Optional, Union{% else %}from typing import ClassVar, Optional{% endif %}{% if not data_class.has_optional %}  # noqa: F401{% endif %}
+{% if data_class.has_edges %}from typing import TYPE_CHECKING, ClassVar, Optional, Union{% else %}from typing import ClassVar, Optional{% endif %}{% if not data_class.use_optional_type %}  # noqa: F401{% endif %}
 
-from cognite.client import data_modeling as dm{% if data_class.import_pydantic_field %}
-from pydantic import Field{% endif %}
+from cognite.client import data_modeling as dm{% if data_class.use_pydantic_field %}
+{{ data_class.import_pydantic_field }}{% endif %}
 
 from ._core import DomainModel, DomainModelApply, TypeList
-{% if data_class.import_dependencies %}
-if TYPE_CHECKING:{% for dependency_file, dependency_class in data_class.unique_dependencies %}
-    from ._{{ dependency_file }} import {{ dependency_class }}Apply{% endfor %}
+{% if data_class.has_edges %}
+if TYPE_CHECKING:{% for dependency_class in data_class.data_class_dependencies %}
+    from .{{ dependency_class.file_name }} import {{ dependency_class.write_name }}{% endfor %}
 {% endif %}
 __all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data_class.read_list_name }}"]
 
