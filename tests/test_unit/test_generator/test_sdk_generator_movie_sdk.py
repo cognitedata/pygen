@@ -7,7 +7,6 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.views import ViewProperty
 
 from cognite.pygen._core.data_classes import (
-    APIClass,
     DataClass,
     EdgeOneToMany,
     EdgeOneToOne,
@@ -15,7 +14,7 @@ from cognite.pygen._core.data_classes import (
     PrimitiveField,
     PrimitiveListField,
 )
-from cognite.pygen._core.generators import APIGenerator, APIsGenerator, SDKGenerator, find_dependencies
+from cognite.pygen._core.generators import APIsGenerator, SDKGenerator
 from cognite.pygen._generator import CodeFormatter
 from cognite.pygen.config import PygenConfig
 from tests.constants import IS_PYDANTIC_V1, MovieSDKFiles
@@ -316,28 +315,6 @@ def test_create_api_client(sdk_generator: SDKGenerator):
 
     # Act
     actual = sdk_generator._generate_api_client_file()
-
-    # Assert
-    assert actual == expected
-
-
-def test_find_dependencies(movie_model: dm.DataModel, top_level_package: str, config: PygenConfig):
-    # Arrange
-    views = dm.ViewList(movie_model.views)
-    apis = [APIGenerator(view, config) for view in views]
-    expected = {
-        APIClass.from_view(k, config): {APIClass.from_view(v, config) for v in values}
-        for k, values in {
-            "Person": {"Role"},
-            "Actor": {"Nomination", "Movie", "Person"},
-            "Director": {"Nomination", "Movie", "Person"},
-            "Movie": {"Actor", "Director", "Rating"},
-            "Role": {"Nomination", "Movie", "Person"},
-        }.items()
-    }
-
-    # Act
-    actual = find_dependencies(apis)
 
     # Assert
     assert actual == expected

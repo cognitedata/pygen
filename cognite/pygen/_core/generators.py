@@ -200,12 +200,3 @@ class APIGenerator:
         return type_api.render(
             top_level_package=top_level_package, api_class=self.api_class, data_class=self.data_class, view=self.view
         )
-
-
-def find_dependencies(apis: list[APIGenerator]) -> dict[APIClass, set[APIClass]]:
-    class_by_data_class_name = {api.api_class.data_class: api.api_class for api in apis}
-    return {
-        api.api_class: {class_by_data_class_name[d] for d in dependencies}
-        for api in apis
-        if (dependencies := api.fields.dependencies)
-    }
