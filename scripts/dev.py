@@ -36,20 +36,22 @@ def generate_sdks(overwrite_manual_files: bool = typer.Option(False, help="Overw
 
         sdk = sdk_generator.generate_sdk()
         manual_files = []
-        if overwrite_manual_files is True:
+        if overwrite_manual_files is not True:
             for manual_file in example_sdk.manual_files:
                 manual_path = manual_file.relative_to(EXAMPLES_DIR)
                 popped = sdk.pop(manual_path, None)
                 if popped is None:
                     typer.echo(f"Could not find {manual_path} in generated SDK", err=True, color=True)
                 else:
-                    manual_files.append(popped)
+                    manual_files.append(manual_path)
         write_sdk_to_disk(sdk, EXAMPLES_DIR, overwrite=True, format_code=True)
         typer.echo(f"{example_sdk.client_name} SDK Created in {example_sdk.client_dir}")
         if manual_files:
             typer.echo(
                 f"The following files were not updated, as they are expected to be changed manually: {manual_files}"
             )
+        else:
+            typer.echo("All files updated! Including files assumed to be manually maintained.")
     typer.echo("All SDKs Created!")
 
 

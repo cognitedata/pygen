@@ -5,10 +5,10 @@ from typing import TYPE_CHECKING, ClassVar, Optional, Union  # noqa: F401
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from markets_pydantic_v1.client.data_classes._core import DomainModel, DomainModelApply, TypeList
+from ._core import DomainModel, DomainModelApply, TypeList
 
 if TYPE_CHECKING:
-    from markets_pydantic_v1.client.data_classes._date_transformations import DateTransformationApply
+    from ._date_transformations import DateTransformationApply
 
 __all__ = ["DateTransformationPair", "DateTransformationPairApply", "DateTransformationPairList"]
 
@@ -21,8 +21,8 @@ class DateTransformationPair(DomainModel):
 
 class DateTransformationPairApply(DomainModelApply):
     space: ClassVar[str] = "market"
-    end: list[Union["DateTransformationApply", str]] = Field(default_factory=list, repr=False)
-    start: list[Union["DateTransformationApply", str]] = Field(default_factory=list, repr=False)
+    end: Union[list[DateTransformationApply], list[str]] = Field(default_factory=list, repr=False)
+    start: Union[list[DateTransformationApply], list[str]] = Field(default_factory=list, repr=False)
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:
@@ -57,7 +57,7 @@ class DateTransformationPairApply(DomainModelApply):
 
         return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
 
-    def _create_end_edge(self, end: Union[str, "DateTransformationApply"]) -> dm.EdgeApply:
+    def _create_end_edge(self, end: Union[str, DateTransformationApply]) -> dm.EdgeApply:
         if isinstance(end, str):
             end_node_ext_id = end
         elif isinstance(end, DomainModelApply):
@@ -73,7 +73,7 @@ class DateTransformationPairApply(DomainModelApply):
             end_node=dm.DirectRelationReference("market", end_node_ext_id),
         )
 
-    def _create_start_edge(self, start: Union[str, "DateTransformationApply"]) -> dm.EdgeApply:
+    def _create_start_edge(self, start: Union[str, DateTransformationApply]) -> dm.EdgeApply:
         if isinstance(start, str):
             end_node_ext_id = start
         elif isinstance(start, DomainModelApply):

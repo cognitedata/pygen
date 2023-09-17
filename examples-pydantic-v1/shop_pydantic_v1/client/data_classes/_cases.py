@@ -6,10 +6,10 @@ from typing import TYPE_CHECKING, ClassVar, Optional, Union
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from shop_pydantic_v1.client.data_classes._core import DomainModel, DomainModelApply, TypeList
+from ._core import DomainModel, DomainModelApply, TypeList
 
 if TYPE_CHECKING:
-    from shop_pydantic_v1.client.data_classes._command_configs import CommandConfigApply
+    from ._command_configs import CommandConfigApply
 
 __all__ = ["Case", "CaseApply", "CaseList"]
 
@@ -33,7 +33,7 @@ class CaseApply(DomainModelApply):
     arguments: Optional[str] = None
     bid: Optional[str] = None
     bid_history: list[str] = []
-    commands: Optional[Union["CommandConfigApply", str]] = Field(None, repr=False)
+    commands: Union[CommandConfigApply, str, None] = Field(None, repr=False)
     cut_files: list[str] = []
     end_time: Optional[datetime.datetime] = None
     name: str

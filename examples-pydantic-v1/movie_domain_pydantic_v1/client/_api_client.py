@@ -5,16 +5,16 @@ from pathlib import Path
 from cognite.client import ClientConfig, CogniteClient
 from cognite.client.credentials import OAuthClientCredentials
 
-from movie_domain_pydantic_v1.client._api.actors import ActorsAPI
-from movie_domain_pydantic_v1.client._api.best_directors import BestDirectorsAPI
-from movie_domain_pydantic_v1.client._api.best_leading_actors import BestLeadingActorsAPI
-from movie_domain_pydantic_v1.client._api.best_leading_actresses import BestLeadingActressesAPI
-from movie_domain_pydantic_v1.client._api.directors import DirectorsAPI
-from movie_domain_pydantic_v1.client._api.movies import MoviesAPI
-from movie_domain_pydantic_v1.client._api.nominations import NominationsAPI
-from movie_domain_pydantic_v1.client._api.persons import PersonsAPI
-from movie_domain_pydantic_v1.client._api.ratings import RatingsAPI
-from movie_domain_pydantic_v1.client._api.roles import RolesAPI
+from ._api.actors import ActorsAPI
+from ._api.best_directors import BestDirectorsAPI
+from ._api.best_leading_actors import BestLeadingActorsAPI
+from ._api.best_leading_actresses import BestLeadingActressesAPI
+from ._api.directors import DirectorsAPI
+from ._api.movies import MoviesAPI
+from ._api.nominations import NominationsAPI
+from ._api.persons import PersonsAPI
+from ._api.ratings import RatingsAPI
+from ._api.roles import RolesAPI
 
 
 class MovieClient:
@@ -23,7 +23,7 @@ class MovieClient:
 
     Generated with:
         pygen = 0.17.7
-        cognite-sdk = 6.25.1
+        cognite-sdk = 6.21.0
         pydantic = 1.10.7
 
     Data Model:

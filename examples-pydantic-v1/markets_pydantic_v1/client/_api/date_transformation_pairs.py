@@ -5,9 +5,8 @@ from typing import Dict, List, Sequence, Tuple, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
-from cognite.client._constants import DEFAULT_LIMIT_READ
 
-from markets_pydantic_v1.client._api._core import TypeAPI
+from ._core import DEFAULT_LIMIT_READ, TypeAPI
 from markets_pydantic_v1.client.data_classes import (
     DateTransformationPair,
     DateTransformationPairApply,
@@ -107,7 +106,6 @@ class DateTransformationPairsAPI(
         self, date_transformation_pair: DateTransformationPairApply, replace: bool = False
     ) -> dm.InstancesApplyResult:
         instances = date_transformation_pair.to_instances_apply()
-
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
