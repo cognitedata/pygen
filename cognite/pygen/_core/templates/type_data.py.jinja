@@ -53,7 +53,7 @@ class {{ data_class.write_name }}(DomainModelApply):
 
         edges = []
         cache.add(self.external_id)
-{%  for field in data_class.edges_one_to_many %}
+{%  for field in data_class.one_to_many_edges %}
         for {{ field.variable }} in self.{{ field.name }}:
             edge = self._create_{{field.variable}}_edge({{ field.variable }})
             if edge.external_id not in cache:
@@ -64,21 +64,21 @@ class {{ data_class.write_name }}(DomainModelApply):
                 instances = {{ field.variable }}._to_instances_apply(cache)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
-{% endfor %}{% for field in data_class.edges_one_to_one %}
+{% endfor %}{% for field in data_class.one_to_one_edges %}
         if isinstance(self.{{ field.name }}, DomainModelApply):
             instances = self.{{ field.name }}._to_instances_apply(cache)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 {% endfor %}
         return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
-{%  for field in data_class.edges_one_to_many %}
-    def _create_{{ field.variable }}_edge(self, {{ field.variable }}: Union[str, "{{ field.prop.source.external_id }}Apply"]) -> dm.EdgeApply:
+{%  for field in data_class.one_to_many_edges %}
+    def _create_{{ field.variable }}_edge(self, {{ field.variable }}: Union[str, {{ field.data_class.write_name }}]) -> dm.EdgeApply:
         if isinstance({{ field.variable }}, str):
             end_node_ext_id = {{ field.variable }}
         elif isinstance({{ field.variable }}, DomainModelApply):
             end_node_ext_id = {{ field.variable }}.external_id
         else:
-            raise TypeError(f"Expected str or {{ field.prop.source.external_id }}Apply, got {type({{ field.variable }})}")
+            raise TypeError(f"Expected str or {{ field.data_class.write_name }}, got {type({{ field.variable }})}")
 
         return dm.EdgeApply(
             space="{{ view.space }}",

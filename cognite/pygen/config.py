@@ -65,7 +65,8 @@ class DataClassNaming:
     name: Naming = field(default_factory=lambda: Naming(Case.pascal, Number.singular))
     variable: Naming = field(default_factory=lambda: Naming(Case.snake, Number.singular))
     file: Naming = field(default_factory=lambda: Naming(Case.snake, Number.plural))
-    field: Naming = field(default_factory=lambda: Naming(Case.snake, Number.unchanged))
+    field_variable: Naming = field(default_factory=lambda: Naming(Case.snake, Number.singular))
+    field_name: Naming = field(default_factory=lambda: Naming(Case.snake, Number.unchanged))
 
 
 @dataclass(frozen=True)

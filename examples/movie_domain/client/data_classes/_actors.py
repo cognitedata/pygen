@@ -108,7 +108,7 @@ class ActorApply(DomainModelApply):
             end_node=dm.DirectRelationReference("IntegrationTestsImmutable", end_node_ext_id),
         )
 
-    def _create_nomination_edge(self, nomination: Union[str, "NominationApply"]) -> dm.EdgeApply:
+    def _create_nomination_edge(self, nomination: Union[str, NominationApply]) -> dm.EdgeApply:
         if isinstance(nomination, str):
             end_node_ext_id = nomination
         elif isinstance(nomination, DomainModelApply):

@@ -95,7 +95,11 @@ def create_fields_test_cases():
         prop,
         data_class_by_view_id,
         EdgeOneToMany(
-            name="roles", prop_name="roles", prop=cast(dm.SingleHopConnectionDefinition, prop), data_class=data_class
+            name="roles",
+            prop_name="roles",
+            prop=cast(dm.SingleHopConnectionDefinition, prop),
+            data_class=data_class,
+            variable="role",
         ),
         "list[str] = []",
         "Union[list[RoleApply], list[str]] = Field(default_factory=list, repr=False)",

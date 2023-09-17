@@ -38,10 +38,15 @@ class Field(ABC):
         data_class_by_view_id: dict[dm.ViewId, DataClass],
         config: PygenConfig,
     ) -> Field:
-        name = create_name(prop_name, config.naming.data_class.field)
+        name = create_name(prop_name, config.naming.data_class.field_name)
         if isinstance(prop, dm.SingleHopConnectionDefinition):
+            variable = create_name(prop_name, config.naming.data_class.field_variable)
             return EdgeOneToMany(
-                name=name, prop_name=prop_name, prop=prop, data_class=data_class_by_view_id[prop.source]
+                name=name,
+                prop_name=prop_name,
+                prop=prop,
+                data_class=data_class_by_view_id[prop.source],
+                variable=variable,
             )
         if not isinstance(prop, dm.MappedProperty):
             raise ValueError(f"Property type={type(prop)!r} is not supported")
@@ -186,6 +191,7 @@ class EdgeOneToMany(EdgeField):
     This represents a list of edge fields linking to another data class.
     """
 
+    variable: str
     prop: dm.SingleHopConnectionDefinition
 
     def as_read_type_hint(self) -> str:
@@ -243,9 +249,11 @@ class DataClass:
     def __iter__(self) -> Iterable[Field]:
         return iter(self.fields)
 
+    @property
     def one_to_one_edges(self) -> Iterable[EdgeOneToOne]:
         return (f for f in self.fields if isinstance(f, EdgeOneToOne))
 
+    @property
     def one_to_many_edges(self) -> Iterable[EdgeOneToMany]:
         return (f for f in self.fields if isinstance(f, EdgeOneToMany))
 
