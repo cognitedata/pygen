@@ -45,13 +45,11 @@ class SDKGenerator:
         self.client_name = client_name
         self._multi_api_classes: list[MultiAPIClass]
         if isinstance(data_model, dm.DataModel):
-            self._is_single_model = True
             self._multi_api_generator = MultiAPIGenerator(
                 top_level_package, client_name, data_model.views, pydantic_version, logger, config
             )
             self._multi_api_classes = []
         elif isinstance(data_model, Sequence):
-            self._is_single_model = False
             unique_views = get_unique_views(*[view for model in data_model for view in model.views])
 
             self._multi_api_generator = MultiAPIGenerator(
@@ -98,7 +96,7 @@ class SDKGenerator:
                 cognite_sdk_version=cognite_sdk_version,
                 pydantic_version=PYDANTIC_VERSION,
                 api_classes=api_classes,
-                is_single_model=self._is_single_model,
+                is_single_model=isinstance(self._data_model, dm.DataModel),
                 top_level_package=self.top_level_package,
                 data_model=self._data_model,
                 multi_api_classes=self._multi_api_classes,
