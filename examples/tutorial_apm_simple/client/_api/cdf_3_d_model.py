@@ -48,10 +48,10 @@ class Cdf3dModelEntitiesAPI:
 
 
 class CdfModelAPI(TypeAPI[CdfModel, CdfModelApply, CdfModelList]):
-    def __init__(self, client: CogniteClient):
+    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
         super().__init__(
             client=client,
-            sources=dm.ViewId("cdf_3d_schema", "Cdf3dModel", "1"),
+            sources=view_id,
             class_type=CdfModel,
             class_apply_type=CdfModelApply,
             class_list=CdfModelList,

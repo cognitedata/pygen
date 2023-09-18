@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from cognite.client import ClientConfig, CogniteClient
+from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
 from cognite.client.credentials import OAuthClientCredentials
 
 from ._api.actor import ActorAPI
@@ -39,16 +39,20 @@ class MovieClient:
             client = CogniteClient(config_or_client)
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
-        self.actor = ActorAPI(client)
-        self.best_director = BestDirectorAPI(client)
-        self.best_leading_actor = BestLeadingActorAPI(client)
-        self.best_leading_actress = BestLeadingActressAPI(client)
-        self.director = DirectorAPI(client)
-        self.movie = MovieAPI(client)
-        self.nomination = NominationAPI(client)
-        self.person = PersonAPI(client)
-        self.rating = RatingAPI(client)
-        self.role = RoleAPI(client)
+        self.actor = ActorAPI(client, dm.ViewId("IntegrationTestsImmutable", "Actor", "2"))
+        self.best_director = BestDirectorAPI(client, dm.ViewId("IntegrationTestsImmutable", "BestDirector", "2"))
+        self.best_leading_actor = BestLeadingActorAPI(
+            client, dm.ViewId("IntegrationTestsImmutable", "BestLeadingActor", "2")
+        )
+        self.best_leading_actress = BestLeadingActressAPI(
+            client, dm.ViewId("IntegrationTestsImmutable", "BestLeadingActress", "2")
+        )
+        self.director = DirectorAPI(client, dm.ViewId("IntegrationTestsImmutable", "Director", "2"))
+        self.movie = MovieAPI(client, dm.ViewId("IntegrationTestsImmutable", "Movie", "2"))
+        self.nomination = NominationAPI(client, dm.ViewId("IntegrationTestsImmutable", "Nomination", "2"))
+        self.person = PersonAPI(client, dm.ViewId("IntegrationTestsImmutable", "Person", "2"))
+        self.rating = RatingAPI(client, dm.ViewId("IntegrationTestsImmutable", "Rating", "2"))
+        self.role = RoleAPI(client, dm.ViewId("IntegrationTestsImmutable", "Role", "2"))
 
     @classmethod
     def azure_project(

@@ -10,10 +10,10 @@ from markets.client.data_classes import PygenBid, PygenBidApply, PygenBidList
 
 
 class PygenBidAPI(TypeAPI[PygenBid, PygenBidApply, PygenBidList]):
-    def __init__(self, client: CogniteClient):
+    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
         super().__init__(
             client=client,
-            sources=dm.ViewId("market", "PygenBid", "57f9da2a1acf7e"),
+            sources=view_id,
             class_type=PygenBid,
             class_apply_type=PygenBidApply,
             class_list=PygenBidList,

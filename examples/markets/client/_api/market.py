@@ -10,10 +10,10 @@ from markets.client.data_classes import Market, MarketApply, MarketList
 
 
 class MarketAPI(TypeAPI[Market, MarketApply, MarketList]):
-    def __init__(self, client: CogniteClient):
+    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
         super().__init__(
             client=client,
-            sources=dm.ViewId("market", "Market", "a5067899750188"),
+            sources=view_id,
             class_type=Market,
             class_apply_type=MarketApply,
             class_list=MarketList,

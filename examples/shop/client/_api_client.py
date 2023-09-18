@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from cognite.client import ClientConfig, CogniteClient
+from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
 from cognite.client.credentials import OAuthClientCredentials
 
 from ._api.case import CaseAPI
@@ -31,8 +31,10 @@ class ShopClient:
             client = CogniteClient(config_or_client)
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
-        self.case = CaseAPI(client)
-        self.command_config = CommandConfigAPI(client)
+        self.case = CaseAPI(client, dm.ViewId("IntegrationTestsImmutable", "Case", "366b75cc4e699f"))
+        self.command_config = CommandConfigAPI(
+            client, dm.ViewId("IntegrationTestsImmutable", "Command_Config", "4727b5ad34b608")
+        )
 
     @classmethod
     def azure_project(

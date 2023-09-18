@@ -10,10 +10,10 @@ from movie_domain.client.data_classes import BestLeadingActress, BestLeadingActr
 
 
 class BestLeadingActressAPI(TypeAPI[BestLeadingActress, BestLeadingActressApply, BestLeadingActressList]):
-    def __init__(self, client: CogniteClient):
+    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
         super().__init__(
             client=client,
-            sources=dm.ViewId("IntegrationTestsImmutable", "BestLeadingActress", "2"),
+            sources=view_id,
             class_type=BestLeadingActress,
             class_apply_type=BestLeadingActressApply,
             class_list=BestLeadingActressList,

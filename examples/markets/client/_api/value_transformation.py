@@ -10,10 +10,10 @@ from markets.client.data_classes import ValueTransformation, ValueTransformation
 
 
 class ValueTransformationAPI(TypeAPI[ValueTransformation, ValueTransformationApply, ValueTransformationList]):
-    def __init__(self, client: CogniteClient):
+    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
         super().__init__(
             client=client,
-            sources=dm.ViewId("market", "ValueTransformation", "147ebcf1583165"),
+            sources=view_id,
             class_type=ValueTransformation,
             class_apply_type=ValueTransformationApply,
             class_list=ValueTransformationList,
