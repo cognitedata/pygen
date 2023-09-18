@@ -13,6 +13,10 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.18.1] - 20-09-18
+### Fixed
+* Default naming convention for API class name set to unchanged plurality.
+
 ## [0.18.0] - 20-09-18
 ### Added
 * Support for configuring naming convention used for the generated SDK.
