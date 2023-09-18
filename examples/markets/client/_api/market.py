@@ -9,7 +9,7 @@ from ._core import DEFAULT_LIMIT_READ, TypeAPI
 from markets.client.data_classes import Market, MarketApply, MarketList
 
 
-class MarketsAPI(TypeAPI[Market, MarketApply, MarketList]):
+class MarketAPI(TypeAPI[Market, MarketApply, MarketList]):
     def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,

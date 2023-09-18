@@ -9,7 +9,7 @@ from ._core import DEFAULT_LIMIT_READ, TypeAPI
 from shop.client.data_classes import Case, CaseApply, CaseList
 
 
-class CasesAPI(TypeAPI[Case, CaseApply, CaseList]):
+class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
     def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,

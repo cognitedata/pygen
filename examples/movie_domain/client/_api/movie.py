@@ -76,7 +76,7 @@ class MovieDirectorsAPI:
         return self._client.data_modeling.instances.list("edge", limit=limit, filter=is_edge_type)
 
 
-class MoviesAPI(TypeAPI[Movie, MovieApply, MovieList]):
+class MovieAPI(TypeAPI[Movie, MovieApply, MovieList]):
     def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,

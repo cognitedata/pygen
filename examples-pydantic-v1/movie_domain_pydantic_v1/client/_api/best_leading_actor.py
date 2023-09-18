@@ -9,7 +9,7 @@ from ._core import DEFAULT_LIMIT_READ, TypeAPI
 from movie_domain_pydantic_v1.client.data_classes import BestLeadingActor, BestLeadingActorApply, BestLeadingActorList
 
 
-class BestLeadingActorsAPI(TypeAPI[BestLeadingActor, BestLeadingActorApply, BestLeadingActorList]):
+class BestLeadingActorAPI(TypeAPI[BestLeadingActor, BestLeadingActorApply, BestLeadingActorList]):
     def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,

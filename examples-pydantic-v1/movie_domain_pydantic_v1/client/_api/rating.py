@@ -9,7 +9,7 @@ from ._core import DEFAULT_LIMIT_READ, TypeAPI
 from movie_domain_pydantic_v1.client.data_classes import Rating, RatingApply, RatingList
 
 
-class RatingsAPI(TypeAPI[Rating, RatingApply, RatingList]):
+class RatingAPI(TypeAPI[Rating, RatingApply, RatingList]):
     def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,

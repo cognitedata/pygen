@@ -9,7 +9,7 @@ from ._core import DEFAULT_LIMIT_READ, TypeAPI
 from shop_pydantic_v1.client.data_classes import CommandConfig, CommandConfigApply, CommandConfigList
 
 
-class CommandConfigsAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigList]):
+class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigList]):
     def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,

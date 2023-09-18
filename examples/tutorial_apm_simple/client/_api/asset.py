@@ -76,7 +76,7 @@ class AssetInmodel3dAPI:
         return self._client.data_modeling.instances.list("edge", limit=limit, filter=is_edge_type)
 
 
-class AssetsAPI(TypeAPI[Asset, AssetApply, AssetList]):
+class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
     def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,

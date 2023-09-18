@@ -13,7 +13,7 @@ from markets_pydantic_v1.client.data_classes import (
 )
 
 
-class ValueTransformationsAPI(TypeAPI[ValueTransformation, ValueTransformationApply, ValueTransformationList]):
+class ValueTransformationAPI(TypeAPI[ValueTransformation, ValueTransformationApply, ValueTransformationList]):
     def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,

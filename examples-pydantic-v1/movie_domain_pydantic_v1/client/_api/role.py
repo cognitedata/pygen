@@ -76,7 +76,7 @@ class RoleNominationAPI:
         return self._client.data_modeling.instances.list("edge", limit=limit, filter=is_edge_type)
 
 
-class RolesAPI(TypeAPI[Role, RoleApply, RoleList]):
+class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
     def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,

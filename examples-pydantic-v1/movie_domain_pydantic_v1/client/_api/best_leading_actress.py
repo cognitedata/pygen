@@ -13,7 +13,7 @@ from movie_domain_pydantic_v1.client.data_classes import (
 )
 
 
-class BestLeadingActressesAPI(TypeAPI[BestLeadingActress, BestLeadingActressApply, BestLeadingActressList]):
+class BestLeadingActressAPI(TypeAPI[BestLeadingActress, BestLeadingActressApply, BestLeadingActressList]):
     def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,

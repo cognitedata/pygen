@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from dataclasses import field as dataclass_field
 from enum import Enum
 
 
@@ -143,7 +144,7 @@ class APIClassNaming:
 
     """
 
-    name: Naming = Naming(Case.pascal, Number.plural)
+    name: Naming = Naming(Case.pascal, Number.unchanged)
     variable = Naming(Case.snake, Number.singular)
     variable_list = Naming(Case.snake, Number.plural)
     file_name: Naming = Naming(Case.snake, Number.unchanged)
@@ -181,7 +182,7 @@ class MultiAPIClassNaming:
     name: Naming = Naming(Case.pascal, Number.singular)
 
 
-@dataclass(frozen=True)
+@dataclass
 class NamingConfig:
     """
     The configuration of the naming used by pygen.
@@ -194,19 +195,19 @@ class NamingConfig:
             an SDK for multiple data models).
     """
 
-    field: FieldNaming = FieldNaming()
-    data_class: DataClassNaming = DataClassNaming()
-    api_class: APIClassNaming = APIClassNaming()
-    multi_api_class: MultiAPIClassNaming = MultiAPIClassNaming()
+    field: FieldNaming = dataclass_field(default_factory=FieldNaming)
+    data_class: DataClassNaming = dataclass_field(default_factory=DataClassNaming)
+    api_class: APIClassNaming = dataclass_field(default_factory=APIClassNaming)
+    multi_api_class: MultiAPIClassNaming = dataclass_field(default_factory=MultiAPIClassNaming)
 
 
-@dataclass(frozen=True)
+@dataclass
 class PygenConfig:
-    """ "
+    """
     Configuration for how pygen should generate the SDK.
 
     Args:
         naming: The naming convention used by pygen.
     """
 
-    naming: NamingConfig = NamingConfig()
+    naming: NamingConfig = dataclass_field(default_factory=NamingConfig)

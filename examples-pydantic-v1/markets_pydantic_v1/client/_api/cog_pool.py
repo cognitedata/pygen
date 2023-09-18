@@ -9,7 +9,7 @@ from ._core import DEFAULT_LIMIT_READ, TypeAPI
 from markets_pydantic_v1.client.data_classes import CogPool, CogPoolApply, CogPoolList
 
 
-class CogPoolsAPI(TypeAPI[CogPool, CogPoolApply, CogPoolList]):
+class CogPoolAPI(TypeAPI[CogPool, CogPoolApply, CogPoolList]):
     def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,
