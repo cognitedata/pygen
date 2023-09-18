@@ -9,7 +9,7 @@ from ._core import DEFAULT_LIMIT_READ, TypeAPI
 from markets.client.data_classes import DateTransformation, DateTransformationApply, DateTransformationList
 
 
-class DateTransformationsAPI(TypeAPI[DateTransformation, DateTransformationApply, DateTransformationList]):
+class DateTransformationAPI(TypeAPI[DateTransformation, DateTransformationApply, DateTransformationList]):
     def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,

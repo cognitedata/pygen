@@ -47,7 +47,7 @@ class Cdf3dModelEntitiesAPI:
         return self._client.data_modeling.instances.list("edge", limit=limit, filter=is_edge_type)
 
 
-class CdfModelsAPI(TypeAPI[CdfModel, CdfModelApply, CdfModelList]):
+class CdfModelAPI(TypeAPI[CdfModel, CdfModelApply, CdfModelList]):
     def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,

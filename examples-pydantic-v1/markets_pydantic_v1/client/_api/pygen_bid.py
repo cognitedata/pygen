@@ -9,7 +9,7 @@ from ._core import DEFAULT_LIMIT_READ, TypeAPI
 from markets_pydantic_v1.client.data_classes import PygenBid, PygenBidApply, PygenBidList
 
 
-class PygenBidsAPI(TypeAPI[PygenBid, PygenBidApply, PygenBidList]):
+class PygenBidAPI(TypeAPI[PygenBid, PygenBidApply, PygenBidList]):
     def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,

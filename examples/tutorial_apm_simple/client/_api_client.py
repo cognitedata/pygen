@@ -5,12 +5,12 @@ from pathlib import Path
 from cognite.client import ClientConfig, CogniteClient
 from cognite.client.credentials import OAuthClientCredentials
 
-from ._api.asset import AssetsAPI
+from ._api.asset import AssetAPI
 from ._api.cdf_3_d_connection_properties import CdfConnectionPropertiesAPI
-from ._api.cdf_3_d_entity import CdfEntitiesAPI
-from ._api.cdf_3_d_model import CdfModelsAPI
-from ._api.work_item import WorkItemsAPI
-from ._api.work_order import WorkOrdersAPI
+from ._api.cdf_3_d_entity import CdfEntityAPI
+from ._api.cdf_3_d_model import CdfModelAPI
+from ._api.work_item import WorkItemAPI
+from ._api.work_order import WorkOrderAPI
 
 
 class ApmSimpleClient:
@@ -35,12 +35,12 @@ class ApmSimpleClient:
             client = CogniteClient(config_or_client)
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
-        self.asset = AssetsAPI(client)
+        self.asset = AssetAPI(client)
         self.cdf_3_d_connection_properties = CdfConnectionPropertiesAPI(client)
-        self.cdf_3_d_entity = CdfEntitiesAPI(client)
-        self.cdf_3_d_model = CdfModelsAPI(client)
-        self.work_item = WorkItemsAPI(client)
-        self.work_order = WorkOrdersAPI(client)
+        self.cdf_3_d_entity = CdfEntityAPI(client)
+        self.cdf_3_d_model = CdfModelAPI(client)
+        self.work_item = WorkItemAPI(client)
+        self.work_order = WorkOrderAPI(client)
 
     @classmethod
     def azure_project(

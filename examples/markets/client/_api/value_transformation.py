@@ -9,7 +9,7 @@ from ._core import DEFAULT_LIMIT_READ, TypeAPI
 from markets.client.data_classes import ValueTransformation, ValueTransformationApply, ValueTransformationList
 
 
-class ValueTransformationsAPI(TypeAPI[ValueTransformation, ValueTransformationApply, ValueTransformationList]):
+class ValueTransformationAPI(TypeAPI[ValueTransformation, ValueTransformationApply, ValueTransformationList]):
     def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,

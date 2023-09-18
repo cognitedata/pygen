@@ -9,7 +9,7 @@ from ._core import DEFAULT_LIMIT_READ, TypeAPI
 from movie_domain.client.data_classes import BestLeadingActress, BestLeadingActressApply, BestLeadingActressList
 
 
-class BestLeadingActressesAPI(TypeAPI[BestLeadingActress, BestLeadingActressApply, BestLeadingActressList]):
+class BestLeadingActressAPI(TypeAPI[BestLeadingActress, BestLeadingActressApply, BestLeadingActressList]):
     def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,

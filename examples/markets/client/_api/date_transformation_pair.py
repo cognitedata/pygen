@@ -84,7 +84,7 @@ class DateTransformationPairStartAPI:
         return self._client.data_modeling.instances.list("edge", limit=limit, filter=is_edge_type)
 
 
-class DateTransformationPairsAPI(
+class DateTransformationPairAPI(
     TypeAPI[DateTransformationPair, DateTransformationPairApply, DateTransformationPairList]
 ):
     def __init__(self, client: CogniteClient):
