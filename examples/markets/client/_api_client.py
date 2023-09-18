@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from cognite.client import ClientConfig, CogniteClient
+from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
 from cognite.client.credentials import OAuthClientCredentials
-from cognite.client import data_modeling as dm
+
 from ._api.bid import BidAPI
 from ._api.cog_bid import CogBidAPI
 from ._api.cog_pool import CogPoolAPI

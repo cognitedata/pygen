@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from cognite.client import ClientConfig, CogniteClient
+from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
 from cognite.client.credentials import OAuthClientCredentials
 {% for class_ in api_classes %}
 from ._api.{{ class_.file_name }} import {{ class_.name }}{% endfor %}
@@ -20,7 +20,7 @@ class {{ multi_api_class.name }}:
     """
 
     def __init__(self, client: CogniteClient):{% for sub in multi_api_class.sub_apis %}
-        self.{{ sub.client_attribute }} = {{ sub.name }}(client){% endfor %}
+        self.{{ sub.client_attribute }} = {{ sub.name }}(client, dm.ViewId("{{ sub.view_id.space }}", "{{ sub.view_id.external_id }}", "{{ sub.view_id.version }}")){% endfor %}
 
 {% endfor %}{% endif %}
 class {{ client_name }}:
@@ -45,7 +45,7 @@ class {{ client_name }}:
             client = CogniteClient(config_or_client)
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}"){% if is_single_model %}{% for api_class in api_classes %}
-        self.{{ api_class.client_attribute }} = {{ api_class.name }}(client){% endfor %}{% else %}{% for multi_api_class in multi_api_classes %}
+        self.{{ api_class.client_attribute }} = {{ api_class.name }}(client, dm.ViewId("{{ api_class.view_id.space }}", "{{ api_class.view_id.external_id }}", "{{ api_class.view_id.version }}")){% endfor %}{% else %}{% for multi_api_class in multi_api_classes %}
         self.{{ multi_api_class.client_attribute }} = {{ multi_api_class.name }}(client){% endfor %}{% endif %}
 
     @classmethod
