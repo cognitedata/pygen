@@ -18,6 +18,23 @@ _EXTERNAL_TYPES = (dm.TimeSeriesReference, dm.FileReference, dm.SequenceReferenc
 
 
 @dataclass(frozen=True)
+class ViewSpaceExternalId:
+    """
+    This represents a view id.
+
+    The motivation for this class is that API class and data classes are independent of view version (given
+    that all properties are equal). This enables reuse of data classes and APIs across view versions.
+    """
+
+    space: str
+    external_id: str
+
+    @classmethod
+    def from_(cls, view_id: dm.ViewId | dm.View) -> Self:
+        return cls(space=view_id.space, external_id=view_id.external_id)
+
+
+@dataclass(frozen=True)
 class Field(ABC):
     """
     A field represents a pydantic field in the generated pydantic class.
@@ -43,7 +60,7 @@ class Field(ABC):
         cls,
         prop_name: str,
         prop: dm.MappedProperty | dm.ConnectionDefinition,
-        data_class_by_view_id: dict[tuple[str, str], DataClass],
+        data_class_by_view_id: dict[ViewSpaceExternalId, DataClass],
         config: PygenConfig,
         view_name: str,
         pydantic_field: str = "Field",
@@ -59,16 +76,15 @@ class Field(ABC):
                 name=name,
                 prop_name=prop_name,
                 prop=prop,
-                data_class=data_class_by_view_id[(prop.source.space, prop.source.external_id)],
+                data_class=data_class_by_view_id[ViewSpaceExternalId(prop.source.space, prop.source.external_id)],
                 variable=variable,
                 pydantic_field=pydantic_field,
                 edge_api_class=edge_api_class,
                 edge_api_attribute=edge_api_attribute,
             )
-        if not isinstance(prop, dm.MappedProperty):
-            raise ValueError(f"Property type={type(prop)!r} is not supported")
-
-        if isinstance(prop.type, _PRIMITIVE_TYPES) or isinstance(prop.type, _EXTERNAL_TYPES):
+        elif isinstance(prop, dm.MappedProperty) and (
+            isinstance(prop.type, _PRIMITIVE_TYPES) or isinstance(prop.type, _EXTERNAL_TYPES)
+        ):
             type_ = _to_python_type(prop.type)
             if isinstance(prop.type, ListablePropertyType) and prop.type.is_list:
                 return PrimitiveListField(
@@ -89,10 +105,10 @@ class Field(ABC):
                 prop=prop,
                 pydantic_field=pydantic_field,
             )
-        elif isinstance(prop.type, dm.DirectRelation):
+        elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation):
             # For direct relation the source is required.
             view_id = cast(dm.ViewId, prop.source)
-            target_data_class = data_class_by_view_id[(view_id.space, view_id.external_id)]
+            target_data_class = data_class_by_view_id[ViewSpaceExternalId(view_id.space, view_id.external_id)]
             return EdgeOneToOne(
                 name=name,
                 prop_name=prop_name,
@@ -252,7 +268,7 @@ class DataClass:
     variable: str
     variable_list: str
     file_name: str
-    view_id: dm.ViewId
+    view_id: ViewSpaceExternalId
     fields: list[Field] = field(default_factory=list)
 
     @classmethod
@@ -271,13 +287,13 @@ class DataClass:
             variable=variable_name,
             variable_list=variable_list,
             file_name=file_name,
-            view_id=view.as_id(),
+            view_id=ViewSpaceExternalId.from_(view),
         )
 
     def update_fields(
         self,
         properties: dict[str, dm.MappedProperty | dm.ConnectionDefinition],
-        data_class_by_view_id: dict[tuple[str, str], DataClass],
+        data_class_by_view_id: dict[ViewSpaceExternalId, DataClass],
         config: PygenConfig,
     ) -> None:
         pydantic_field = self.pydantic_field
@@ -357,7 +373,7 @@ class DataClass:
 
     @property
     def dependencies(self) -> list[DataClass]:
-        unique: dict[dm.ViewId, DataClass] = {}
+        unique: dict[ViewSpaceExternalId, DataClass] = {}
         for field_ in self.fields:
             if isinstance(field_, EdgeField):
                 # This will overwrite any existing data class with the same view id
@@ -371,7 +387,7 @@ class APIClass:
     client_attribute: str
     name: str
     file_name: str
-    view_id: dm.ViewId
+    view_id: ViewSpaceExternalId
 
     @classmethod
     def from_view(cls, view: dm.View, config: PygenConfig) -> APIClass:
@@ -383,7 +399,7 @@ class APIClass:
             client_attribute=create_name(raw_name, config.naming.api_class.client_attribute),
             name=f"{create_name(raw_name, config.naming.api_class.name)}API",
             file_name=create_name(raw_name, config.naming.api_class.file_name),
-            view_id=view.as_id(),
+            view_id=ViewSpaceExternalId.from_(view),
         )
 
 
@@ -398,14 +414,21 @@ class MultiAPIClass:
     sub_apis: list[APIClass]
     client_attribute: str
     name: str
-    model_id: dm.DataModelId
+    model: dm.DataModel[dm.View]
+
+    @property
+    def model_id(self) -> dm.DataModelId:
+        return self.model.as_id()
 
     @classmethod
     def from_data_model(
-        cls, data_model: dm.DataModel, api_class_by_view_id: dict[tuple[str, str], APIClass], config: PygenConfig
+        cls,
+        data_model: dm.DataModel[dm.View],
+        api_class_by_view_id: dict[ViewSpaceExternalId, APIClass],
+        config: PygenConfig,
     ) -> MultiAPIClass:
         sub_apis = sorted(
-            [api_class_by_view_id[(view.space, view.external_id)] for view in data_model.views],
+            [api_class_by_view_id[ViewSpaceExternalId.from_(view)] for view in data_model.views],
             key=lambda api: api.name,
         )
 
@@ -415,7 +438,7 @@ class MultiAPIClass:
             sub_apis=sub_apis,
             client_attribute=create_name(data_model_name, config.naming.multi_api_class.client_attribute),
             name=f"{create_name(data_model_name, config.naming.multi_api_class.name)}APIs",
-            model_id=data_model.as_id(),
+            model=data_model,
         )
 
 

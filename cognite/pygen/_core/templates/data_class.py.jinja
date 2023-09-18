@@ -15,12 +15,12 @@ __all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data
 
 
 class {{ data_class.read_name }}(DomainModel):
-    space: ClassVar[str] = "{{ view.space }}"{% for field in data_class %}
+    space: ClassVar[str] = "{{ space }}"{% for field in data_class %}
     {{ field.name }}: {{ field.as_read_type_hint() }}{% endfor %}
 
 
 class {{ data_class.write_name }}(DomainModelApply):
-    space: ClassVar[str] = "{{ view.space }}"{% for field in data_class %}
+    space: ClassVar[str] = "{{ space }}"{% for field in data_class %}
     {{ field.name }}: {{ field.as_write_type_hint() }}{% endfor %}
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
@@ -81,7 +81,7 @@ class {{ data_class.write_name }}(DomainModelApply):
             raise TypeError(f"Expected str or {{ field.data_class.write_name }}, got {type({{ field.variable }})}")
 
         return dm.EdgeApply(
-            space="{{ view.space }}",
+            space="{{ space }}",
             external_id=f"{self.external_id}:{end_node_ext_id}",
             type=dm.DirectRelationReference("{{ field.prop.type.space }}", "{{ field.prop.type.external_id }}"),
             start_node=dm.DirectRelationReference(self.space, self.external_id),

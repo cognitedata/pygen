@@ -14,7 +14,7 @@ from cognite.pygen.config import PygenConfig
 from cognite.pygen.utils.helper import get_pydantic_version
 
 from . import validation
-from .data_classes import APIClass, DataClass, MultiAPIClass
+from .data_classes import APIClass, DataClass, MultiAPIClass, ViewSpaceExternalId
 from .logic import get_unique_views
 
 
@@ -57,10 +57,10 @@ class SDKGenerator:
             self._multi_api_generator = MultiAPIGenerator(
                 top_level_package, client_name, unique_views, pydantic_version, logger, config
             )
-            api_by_view_id = {api.view_identifier: api.api_class for api in self._multi_api_generator.sub_apis}
+            api_by_view_identifier = {api.view_identifier: api.api_class for api in self._multi_api_generator.sub_apis}
 
             self._multi_api_classes = sorted(
-                (MultiAPIClass.from_data_model(model, api_by_view_id, config) for model in data_model),
+                (MultiAPIClass.from_data_model(model, api_by_view_identifier, config) for model in data_model),
                 key=lambda a: a.name,
             )
             validation.validate_multi_api_classes(self._multi_api_classes)
@@ -87,6 +87,10 @@ class SDKGenerator:
             key=lambda api_class: api_class.name.lower(),
         )
 
+        # In the template, we run zip(api_classes, views) and zip(multi_api_classes, view_sets)
+        # thus it is important that the order is the same for both.
+        views, view_sets = self._create_view_lists_in_order_of_api_classes(api_classes)
+
         return (
             api_client.render(
                 client_name=self.client_name,
@@ -98,9 +102,39 @@ class SDKGenerator:
                 top_level_package=self.top_level_package,
                 data_model=self._data_model,
                 multi_api_classes=self._multi_api_classes,
+                view_sets=view_sets,
+                views=views,
+                zip=zip,
             )
             + "\n"
         )
+
+    def _create_view_lists_in_order_of_api_classes(
+        self, api_classes: list[APIClass]
+    ) -> tuple[list[dm.View], list[list[dm.View]]]:
+        api_class_order: dict[ViewSpaceExternalId, int] = {
+            api_class.view_id: i for i, api_class in enumerate(api_classes)
+        }
+
+        if isinstance(self._data_model, dm.DataModel):
+            views = sorted(
+                self._data_model.views,
+                key=lambda v: api_class_order[ViewSpaceExternalId.from_(v)],
+            )
+            return views, []
+        elif isinstance(self._data_model, Sequence):
+            multi_api_class_order = {api_class.model_id: i for i, api_class in enumerate(self._multi_api_classes)}
+            sorted_data_models = sorted(  # type: ignore[arg-type]
+                self._data_model,
+                key=lambda m: multi_api_class_order[m.as_id()],
+            )
+            view_sets: list[list[dm.View]] = []
+            for data_model in sorted_data_models:
+                views = sorted(data_model.views, key=lambda v: api_class_order[ViewSpaceExternalId.from_(v)])
+                view_sets.append(views)
+            return [], view_sets
+        else:
+            raise ValueError("data_model must be a DataModel or a sequence of DataModels")
 
 
 class MultiAPIGenerator:
@@ -120,14 +154,20 @@ class MultiAPIGenerator:
         self._logger = logger or print
 
         self.sub_apis: list[APIGenerator] = [APIGenerator(view, config) for view in views]
-        data_class_by_view_id: dict[tuple[str, str], DataClass] = {
-            (api.view.space, api.view.external_id): api.data_class for api in self.sub_apis
+        data_class_by_view_id: dict[ViewSpaceExternalId, DataClass] = {
+            api.view_identifier: api.data_class for api in self.sub_apis
         }
-        for api in self.sub_apis:
-            api.data_class.update_fields(api.view.properties, data_class_by_view_id, config)
+        for api, view in zip(self.sub_apis, views):
+            api.data_class.update_fields(view.properties, data_class_by_view_id, config)
 
         validation.validate_data_classes([api.data_class for api in self.sub_apis])
         validation.validate_api_classes([api.api_class for api in self.sub_apis])
+
+    def __getitem__(self, item: dm.View | dm.ViewId) -> APIGenerator | None:
+        return next(
+            (api for api in self.sub_apis if api.view_identifier == ViewSpaceExternalId.from_(item)),
+            None,
+        )
 
     @property
     def pydantic_version(self) -> Literal["v1", "v2"]:
@@ -198,16 +238,14 @@ class APIGenerator:
         self._env = Environment(
             loader=PackageLoader("cognite.pygen._core", "templates"), autoescape=select_autoescape()
         )
-
-        self.view = view
-        self.view_identifier: tuple[str, str] = view.space, view.external_id
+        self.view_identifier = ViewSpaceExternalId.from_(view)
         self.data_class = DataClass.from_view(view, config)
         self.api_class = APIClass.from_view(view, config)
 
     def generate_data_class_file(self) -> str:
         type_data = self._env.get_template("data_class.py.jinja")
 
-        return type_data.render(data_class=self.data_class, view=self.view) + "\n"
+        return type_data.render(data_class=self.data_class, space=self.view_identifier.space) + "\n"
 
     def generate_api_file(self, top_level_package: str) -> str:
         type_api = self._env.get_template("api_class.py.jinja")

@@ -34,7 +34,8 @@ def _unique_views_properties(view: dm.View) -> dict[str, Any]:
     Returns the properties from a view that uniquely defines it.
 
     This is necessary as there might be two views that have different versions, but all else is the same,
-    thus they can be used to create the same data classes and apis in the generated SDK.
+    thus they can be used to create the same data classes and APIs in the generated SDK. In other words,
+    a data class and API class can be reused for two views if they have the same properties.
 
     Args:
         view: The View
@@ -43,6 +44,7 @@ def _unique_views_properties(view: dm.View) -> dict[str, Any]:
         A dictionary with the properties that uniquely defines the view.
     """
     return {
+        "space": view.space,
         "name": view.name,
         "externalId": view.external_id,
         "properties": {name: _unique_properties(prop) for name, prop in view.properties.items()},

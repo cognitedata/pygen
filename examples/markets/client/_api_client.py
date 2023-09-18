@@ -60,20 +60,20 @@ class PygenPoolAPIs:
     """
 
     def __init__(self, client: CogniteClient):
-        self.bid = BidAPI(client, dm.ViewId("market", "Bid", "1add47c48cf88b"))
+        self.bid = BidAPI(client, dm.ViewId("market", "Bid", "1ad3f030a8399f"))
         self.date_transformation = DateTransformationAPI(
-            client, dm.ViewId("market", "DateTransformation", "482866112eb911")
+            client, dm.ViewId("market", "DateTransformation", "5248f7e87c4c96")
         )
         self.date_transformation_pair = DateTransformationPairAPI(
-            client, dm.ViewId("market", "DateTransformationPair", "bde9fd4428c26e")
+            client, dm.ViewId("market", "DateTransformationPair", "310f933a9aca9b")
         )
-        self.market = MarketAPI(client, dm.ViewId("market", "Market", "a5067899750188"))
-        self.process = ProcessAPI(client, dm.ViewId("market", "Process", "98a2becd0f63ee"))
+        self.market = MarketAPI(client, dm.ViewId("market", "Market", "5b43e98565d4d5"))
+        self.process = ProcessAPI(client, dm.ViewId("market", "Process", "b3e0207c0bb510"))
         self.pygen_bid = PygenBidAPI(client, dm.ViewId("market", "PygenBid", "57f9da2a1acf7e"))
         self.pygen_pool = PygenPoolAPI(client, dm.ViewId("market", "PygenPool", "23c71ba66bad9d"))
         self.pygen_process = PygenProcessAPI(client, dm.ViewId("market", "PygenProcess", "477b68a858c7a8"))
         self.value_transformation = ValueTransformationAPI(
-            client, dm.ViewId("market", "ValueTransformation", "147ebcf1583165")
+            client, dm.ViewId("market", "ValueTransformation", "946587c592b44c")
         )
 
 
