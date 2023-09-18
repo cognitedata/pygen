@@ -35,16 +35,14 @@ def test_apply(market_client: MarketClient, cognite_client: CogniteClient) -> No
     created: dm.InstancesApplyResult | None = None
     try:
         # Act
-        created = market_client.pygen_pool.date_transformation_pairs.apply(new_date_transformation_pair)
+        created = market_client.pygen_pool.date_transformation_pair.apply(new_date_transformation_pair)
 
         # Assert
         assert len(created.nodes) == 2
         assert len(created.edges) == 2
 
         # Act
-        retrieved = market_client.pygen_pool.date_transformation_pairs.retrieve(
-            new_date_transformation_pair.external_id
-        )
+        retrieved = market_client.pygen_pool.date_transformation_pair.retrieve(new_date_transformation_pair.external_id)
 
         # Assert
         assert retrieved.external_id == new_date_transformation_pair.external_id

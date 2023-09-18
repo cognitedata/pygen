@@ -11,13 +11,13 @@ else:
 
 
 def test_case_list(shop_client: ShopClient):
-    cases = shop_client.cases.list(limit=-1)
+    cases = shop_client.case.list(limit=-1)
 
     assert len(cases) > 1, "There should be more than one case in the cdf"
 
 
 def test_case_retrieve(shop_client: ShopClient):
-    kelly = shop_client.cases.retrieve("shop:case:4:Kelly")
+    kelly = shop_client.case.retrieve("shop:case:4:Kelly")
 
     assert kelly.external_id == "shop:case:4:Kelly"
     assert len(kelly.cut_files) == 8
@@ -25,7 +25,7 @@ def test_case_retrieve(shop_client: ShopClient):
 
 
 def test_case_retrieve_multiple(shop_client: ShopClient):
-    cases = shop_client.cases.retrieve(["shop:case:4:Kelly", "shop:case:3:Frederick"])
+    cases = shop_client.case.retrieve(["shop:case:4:Kelly", "shop:case:3:Frederick"])
 
     assert sorted([c.external_id for c in cases]) == sorted(["shop:case:4:Kelly", "shop:case:3:Frederick"])
     assert len(cases) == 2
@@ -51,13 +51,13 @@ def test_case_apply_and_delete(shop_client: ShopClient):
     # Act
     result = None
     try:
-        result = shop_client.cases.apply(case, replace=True)
+        result = shop_client.case.apply(case, replace=True)
 
         assert len(result.nodes) == 2
         assert len(result.edges) == 0
     finally:
         if result is not None:
-            shop_client.cases.delete([n.external_id for n in result.nodes])
+            shop_client.case.delete([n.external_id for n in result.nodes])
 
 
 def test_case_apply_with_empty_datetime(shop_client: ShopClient):
@@ -74,10 +74,10 @@ def test_case_apply_with_empty_datetime(shop_client: ShopClient):
     # Act
     result = None
     try:
-        result = shop_client.cases.apply(case, replace=True)
+        result = shop_client.case.apply(case, replace=True)
 
         assert len(result.nodes) == 1
         assert len(result.edges) == 0
     finally:
         if result is not None:
-            shop_client.cases.delete([n.external_id for n in result.nodes])
+            shop_client.case.delete([n.external_id for n in result.nodes])

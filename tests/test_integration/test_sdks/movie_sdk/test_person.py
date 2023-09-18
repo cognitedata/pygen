@@ -9,21 +9,21 @@ else:
 
 
 def test_person_list(movie_client: MovieClient):
-    people = movie_client.persons.list(limit=-1)
+    people = movie_client.person.list(limit=-1)
 
     assert len(people) > 0
     assert all(isinstance(role, str) for person in people for role in person.roles)
 
 
 def test_person_retrieve(movie_client: MovieClient):
-    quentin = movie_client.persons.retrieve("person:quentin_tarantino")
+    quentin = movie_client.person.retrieve("person:quentin_tarantino")
 
     assert quentin.external_id == "person:quentin_tarantino"
     assert len(quentin.roles) == 2
 
 
 def test_person_retrieve_multiple(movie_client: MovieClient):
-    people = movie_client.persons.retrieve(["person:quentin_tarantino", "person:john_travolta"])
+    people = movie_client.person.retrieve(["person:quentin_tarantino", "person:john_travolta"])
 
     assert len(people) == 2
     assert all(isinstance(role, str) for person in people for role in person.roles)
@@ -35,8 +35,8 @@ def test_person_apply_and_delete(movie_client: MovieClient):
 
     # Act
     try:
-        result = movie_client.persons.apply(person)
+        result = movie_client.person.apply(person)
 
         assert len(result.nodes) == 1
     finally:
-        movie_client.persons.delete(person.external_id)
+        movie_client.person.delete(person.external_id)

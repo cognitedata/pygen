@@ -27,13 +27,13 @@ def test_apply_with_date(market_client: MarketClient, cognite_client: CogniteCli
     # Act
     created: None | dm.InstancesApplyResult = None
     try:
-        created = market_client.pygen_pool.pygen_bids.apply(bid, replace=True)
+        created = market_client.pygen_pool.pygen_bid.apply(bid, replace=True)
 
         # Assert
         assert len(created.nodes) == 1
     finally:
         if created is not None:
-            market_client.pygen_pool.pygen_bids.delete(bid.external_id)
+            market_client.pygen_pool.pygen_bid.delete(bid.external_id)
 
 
 def test_apply_without_date(market_client: MarketClient) -> None:
@@ -47,10 +47,10 @@ def test_apply_without_date(market_client: MarketClient) -> None:
     # Act
     created: None | dm.InstancesApplyResult = None
     try:
-        created = market_client.pygen_pool.pygen_bids.apply(bid, replace=True)
+        created = market_client.pygen_pool.pygen_bid.apply(bid, replace=True)
 
         # Assert
         assert len(created.nodes) == 1
     finally:
         if created is not None:
-            market_client.pygen_pool.pygen_bids.delete(bid.external_id)
+            market_client.pygen_pool.pygen_bid.delete(bid.external_id)

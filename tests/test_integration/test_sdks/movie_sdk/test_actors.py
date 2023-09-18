@@ -9,7 +9,7 @@ else:
 
 
 def test_actor_list(movie_client: MovieClient):
-    actors = movie_client.actors.list(limit=-1)
+    actors = movie_client.actor.list(limit=-1)
 
     assert len(actors) > 0
     assert all(isinstance(movie, str) for actor in actors for movie in actor.movies)
@@ -27,11 +27,11 @@ def test_actor_apply_with_person(movie_client: MovieClient):
 
     try:
         # Act
-        created = movie_client.actors.apply(actor)
+        created = movie_client.actor.apply(actor)
 
         # Assert
         assert len(created.nodes) == 2
         assert len(created.edges) == 0
     finally:
-        movie_client.actors.delete(actor.external_id)
-        movie_client.persons.delete(actor.person.external_id)
+        movie_client.actor.delete(actor.external_id)
+        movie_client.person.delete(actor.person.external_id)

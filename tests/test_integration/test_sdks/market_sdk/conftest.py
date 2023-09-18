@@ -16,4 +16,4 @@ def market_client(client_config) -> MarketClient:
 
 @pytest.fixture(scope="session")
 def cognite_client(market_client: MarketClient) -> CogniteClient:
-    return market_client.pygen_pool.markets._client
+    return market_client.pygen_pool.market._client

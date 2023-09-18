@@ -14,7 +14,7 @@ else:
 
 def test_list_empty_to_pandas(market_client: MarketClient, cognite_client: CogniteClient) -> None:
     # Act
-    market_df = market_client.pygen_pool.pygen_pools.list().to_pandas()
+    market_df = market_client.pygen_pool.pygen_pool.list().to_pandas()
 
     # Assert
     assert market_df.empty
