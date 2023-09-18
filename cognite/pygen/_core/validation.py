@@ -21,18 +21,18 @@ _MULTIAPICLASS_UNIQUE_PROPERTIES = ["name", "client_attribute"]
 
 
 def validate_data_classes(data_classes: list[DataClass]) -> None:
-    _validate(data_classes, _DATACLASS_UNIQUE_PROPERTIES, "view_id")
+    _validate(data_classes, _DATACLASS_UNIQUE_PROPERTIES, "view_id", DataClass.__name__)
 
 
 def validate_api_classes(api_classes: list[APIClass]) -> None:
-    _validate(api_classes, _APICLASS_UNIQUE_PROPERTIES, "view_id")
+    _validate(api_classes, _APICLASS_UNIQUE_PROPERTIES, "view_id", APIClass.__name__)
 
 
 def validate_multi_api_classes(multi_api_classes: list[MultiAPIClass]) -> None:
-    _validate(multi_api_classes, _MULTIAPICLASS_UNIQUE_PROPERTIES, "model_id")
+    _validate(multi_api_classes, _MULTIAPICLASS_UNIQUE_PROPERTIES, "model_id", MultiAPIClass.__name__)
 
 
-def _validate(items: list[Any], attributes: list[str], id_attribute: str) -> None:
+def _validate(items: list[Any], attributes: list[str], id_attribute: str, class_name: str) -> None:
     name_conflicts: list[tuple[str, list[dm.VersionedDataModelingId]]] = []
     for prop in attributes:
         ids_by_value = defaultdict(list)
@@ -44,4 +44,4 @@ def _validate(items: list[Any], attributes: list[str], id_attribute: str) -> Non
             if len(view_ids) > 1:
                 name_conflicts.append((prop, view_ids))
     if name_conflicts:
-        raise NameConflict(name_conflicts)
+        raise NameConflict(name_conflicts, class_name)

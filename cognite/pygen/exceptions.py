@@ -31,11 +31,12 @@ class NameConflict(PygenException):
     Raised when a name conflict is detected.
     """
 
-    def __init__(self, conflicting_names: list[tuple[str, list[dm.VersionedDataModelingId]]]) -> None:
+    def __init__(self, conflicting_names: list[tuple[str, list[dm.VersionedDataModelingId]]], class_name: str) -> None:
         self.conflicting_names = conflicting_names
+        self.class_name = class_name
 
     def __str__(self) -> str:
         return (
-            "Name conflict detected. The following names are used by multiple views/data models: "
+            f"Name conflict detected in {self.class_name}. The following names are used by multiple views/data models: "
             f"{self.conflicting_names}"
         )
