@@ -7,16 +7,16 @@ from pydantic import Field
 
 from ._core import DomainModel, DomainModelApply, TypeList
 
-__all__ = ["CdfConnectionProperty", "CdfConnectionPropertyApply", "CdfConnectionPropertyList"]
+__all__ = ["CdfConnectionProperties", "CdfConnectionPropertiesApply", "CdfConnectionPropertiesList"]
 
 
-class CdfConnectionProperty(DomainModel):
+class CdfConnectionProperties(DomainModel):
     space: ClassVar[str] = "cdf_3d_schema"
     revision_id: Optional[int] = Field(None, alias="revisionId")
     revision_node_id: Optional[int] = Field(None, alias="revisionNodeId")
 
 
-class CdfConnectionPropertyApply(DomainModelApply):
+class CdfConnectionPropertiesApply(DomainModelApply):
     space: ClassVar[str] = "cdf_3d_schema"
     revision_id: int
     revision_node_id: int
@@ -54,5 +54,5 @@ class CdfConnectionPropertyApply(DomainModelApply):
         return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
 
 
-class CdfConnectionPropertyList(TypeList[CdfConnectionProperty]):
-    _NODE = CdfConnectionProperty
+class CdfConnectionPropertiesList(TypeList[CdfConnectionProperties]):
+    _NODE = CdfConnectionProperties

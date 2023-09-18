@@ -8,21 +8,23 @@ from pydantic import Field
 from ._core import DomainModel, DomainModelApply, TypeList
 
 if TYPE_CHECKING:
-    from ._cdf_3_d_entities import CdfEntityApply
+    from ._role import RoleApply
 
-__all__ = ["CdfModel", "CdfModelApply", "CdfModelList"]
+__all__ = ["Person", "PersonApply", "PersonList"]
 
 
-class CdfModel(DomainModel):
-    space: ClassVar[str] = "cdf_3d_schema"
-    entities: list[str] = []
+class Person(DomainModel):
+    space: ClassVar[str] = "IntegrationTestsImmutable"
+    birth_year: Optional[int] = Field(None, alias="birthYear")
     name: Optional[str] = None
+    roles: list[str] = []
 
 
-class CdfModelApply(DomainModelApply):
-    space: ClassVar[str] = "cdf_3d_schema"
-    entities: Union[list[CdfEntityApply], list[str]] = Field(default_factory=list, repr=False)
+class PersonApply(DomainModelApply):
+    space: ClassVar[str] = "IntegrationTestsImmutable"
+    birth_year: Optional[int] = None
     name: str
+    roles: Union[list[RoleApply], list[str]] = Field(default_factory=list, repr=False)
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:
@@ -30,11 +32,13 @@ class CdfModelApply(DomainModelApply):
 
         sources = []
         properties = {}
+        if self.birth_year is not None:
+            properties["birthYear"] = self.birth_year
         if self.name is not None:
             properties["name"] = self.name
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("cdf_3d_schema", "Cdf3dModel"),
+                source=dm.ContainerId("IntegrationTestsImmutable", "Person"),
                 properties=properties,
             )
             sources.append(source)
@@ -52,35 +56,35 @@ class CdfModelApply(DomainModelApply):
         edges = []
         cache.add(self.external_id)
 
-        for entity in self.entities:
-            edge = self._create_entity_edge(entity)
+        for role in self.roles:
+            edge = self._create_role_edge(role)
             if edge.external_id not in cache:
                 edges.append(edge)
                 cache.add(edge.external_id)
 
-            if isinstance(entity, DomainModelApply):
-                instances = entity._to_instances_apply(cache)
+            if isinstance(role, DomainModelApply):
+                instances = role._to_instances_apply(cache)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
         return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
 
-    def _create_entity_edge(self, entity: Union[str, CdfEntityApply]) -> dm.EdgeApply:
-        if isinstance(entity, str):
-            end_node_ext_id = entity
-        elif isinstance(entity, DomainModelApply):
-            end_node_ext_id = entity.external_id
+    def _create_role_edge(self, role: Union[str, RoleApply]) -> dm.EdgeApply:
+        if isinstance(role, str):
+            end_node_ext_id = role
+        elif isinstance(role, DomainModelApply):
+            end_node_ext_id = role.external_id
         else:
-            raise TypeError(f"Expected str or CdfEntityApply, got {type(entity)}")
+            raise TypeError(f"Expected str or RoleApply, got {type(role)}")
 
         return dm.EdgeApply(
-            space="cdf_3d_schema",
+            space="IntegrationTestsImmutable",
             external_id=f"{self.external_id}:{end_node_ext_id}",
-            type=dm.DirectRelationReference("cdf_3d_schema", "cdf3dEntityConnection"),
+            type=dm.DirectRelationReference("IntegrationTestsImmutable", "Person.roles"),
             start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference("cdf_3d_schema", end_node_ext_id),
+            end_node=dm.DirectRelationReference("IntegrationTestsImmutable", end_node_ext_id),
         )
 
 
-class CdfModelList(TypeList[CdfModel]):
-    _NODE = CdfModel
+class PersonList(TypeList[Person]):
+    _NODE = Person

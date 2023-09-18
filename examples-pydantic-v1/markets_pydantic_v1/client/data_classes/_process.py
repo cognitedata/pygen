@@ -8,18 +8,18 @@ from pydantic import Field
 from ._core import DomainModel, DomainModelApply, TypeList
 
 if TYPE_CHECKING:
-    from ._bids import BidApply
+    from ._bid import BidApply
 
-__all__ = ["Proces", "ProcesApply", "ProcesList"]
+__all__ = ["Process", "ProcessApply", "ProcessList"]
 
 
-class Proces(DomainModel):
+class Process(DomainModel):
     space: ClassVar[str] = "market"
     bid: Optional[str] = None
     name: Optional[str] = None
 
 
-class ProcesApply(DomainModelApply):
+class ProcessApply(DomainModelApply):
     space: ClassVar[str] = "market"
     bid: Union[BidApply, str, None] = Field(None, repr=False)
     name: Optional[str] = None
@@ -65,5 +65,5 @@ class ProcesApply(DomainModelApply):
         return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
 
 
-class ProcesList(TypeList[Proces]):
-    _NODE = Proces
+class ProcessList(TypeList[Process]):
+    _NODE = Process

@@ -9,8 +9,8 @@ from pydantic import Field
 from ._core import DomainModel, DomainModelApply, TypeList
 
 if TYPE_CHECKING:
-    from ._assets import AssetApply
-    from ._work_items import WorkItemApply
+    from ._asset import AssetApply
+    from ._work_item import WorkItemApply
 
 __all__ = ["WorkOrder", "WorkOrderApply", "WorkOrderList"]
 

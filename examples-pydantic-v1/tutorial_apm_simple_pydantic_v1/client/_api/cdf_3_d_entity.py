@@ -10,7 +10,7 @@ from ._core import DEFAULT_LIMIT_READ, TypeAPI
 from tutorial_apm_simple_pydantic_v1.client.data_classes import CdfEntity, CdfEntityApply, CdfEntityList
 
 
-class Cdf3dEntityInmodel3dsAPI:
+class Cdf3dEntityInmodel3dAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
@@ -56,7 +56,7 @@ class CdfEntitiesAPI(TypeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
             class_apply_type=CdfEntityApply,
             class_list=CdfEntityList,
         )
-        self.in_model_3_ds = Cdf3dEntityInmodel3dsAPI(client)
+        self.in_model_3_d = Cdf3dEntityInmodel3dAPI(client)
 
     def apply(self, cdf_3_d_entity: CdfEntityApply, replace: bool = False) -> dm.InstancesApplyResult:
         instances = cdf_3_d_entity.to_instances_apply()
@@ -88,14 +88,14 @@ class CdfEntitiesAPI(TypeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
         if isinstance(external_id, str):
             cdf_3_d_entity = self._retrieve((self.sources.space, external_id))
 
-            in_model_3_d_edges = self.in_model_3_ds.retrieve(external_id)
+            in_model_3_d_edges = self.in_model_3_d.retrieve(external_id)
             cdf_3_d_entity.in_model_3_d = [edge.end_node.external_id for edge in in_model_3_d_edges]
 
             return cdf_3_d_entity
         else:
             cdf_3_d_entities = self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
 
-            in_model_3_d_edges = self.in_model_3_ds.retrieve(external_id)
+            in_model_3_d_edges = self.in_model_3_d.retrieve(external_id)
             self._set_in_model_3_d(cdf_3_d_entities, in_model_3_d_edges)
 
             return cdf_3_d_entities
@@ -103,7 +103,7 @@ class CdfEntitiesAPI(TypeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
     def list(self, limit: int = DEFAULT_LIMIT_READ) -> CdfEntityList:
         cdf_3_d_entities = self._list(limit=limit)
 
-        in_model_3_d_edges = self.in_model_3_ds.list(limit=-1)
+        in_model_3_d_edges = self.in_model_3_d.list(limit=-1)
         self._set_in_model_3_d(cdf_3_d_entities, in_model_3_d_edges)
 
         return cdf_3_d_entities

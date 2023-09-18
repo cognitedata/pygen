@@ -5,18 +5,18 @@ from pathlib import Path
 from cognite.client import ClientConfig, CogniteClient
 from cognite.client.credentials import OAuthClientCredentials
 
-from ._api.bids import BidsAPI
-from ._api.cog_bids import CogBidsAPI
-from ._api.cog_pools import CogPoolsAPI
+from ._api.bid import BidsAPI
+from ._api.cog_bid import CogBidsAPI
+from ._api.cog_pool import CogPoolsAPI
 from ._api.cog_process import CogProcessAPI
-from ._api.date_transformation_pairs import DateTransformationPairsAPI
-from ._api.date_transformations import DateTransformationsAPI
-from ._api.markets import MarketsAPI
+from ._api.date_transformation_pair import DateTransformationPairsAPI
+from ._api.date_transformation import DateTransformationsAPI
+from ._api.market import MarketsAPI
 from ._api.process import ProcessAPI
-from ._api.pygen_bids import PygenBidsAPI
-from ._api.pygen_pools import PygenPoolsAPI
+from ._api.pygen_bid import PygenBidsAPI
+from ._api.pygen_pool import PygenPoolsAPI
 from ._api.pygen_process import PygenProcessAPI
-from ._api.value_transformations import ValueTransformationsAPI
+from ._api.value_transformation import ValueTransformationsAPI
 
 
 class CogPoolAPIs:
@@ -31,15 +31,15 @@ class CogPoolAPIs:
     """
 
     def __init__(self, client: CogniteClient):
-        self.bids = BidsAPI(client)
-        self.cog_bids = CogBidsAPI(client)
-        self.cog_pools = CogPoolsAPI(client)
+        self.bid = BidsAPI(client)
+        self.cog_bid = CogBidsAPI(client)
+        self.cog_pool = CogPoolsAPI(client)
         self.cog_process = CogProcessAPI(client)
-        self.date_transformation_pairs = DateTransformationPairsAPI(client)
-        self.date_transformations = DateTransformationsAPI(client)
-        self.markets = MarketsAPI(client)
+        self.date_transformation_pair = DateTransformationPairsAPI(client)
+        self.date_transformation = DateTransformationsAPI(client)
+        self.market = MarketsAPI(client)
         self.process = ProcessAPI(client)
-        self.value_transformations = ValueTransformationsAPI(client)
+        self.value_transformation = ValueTransformationsAPI(client)
 
 
 class PygenPoolAPIs:
@@ -54,15 +54,15 @@ class PygenPoolAPIs:
     """
 
     def __init__(self, client: CogniteClient):
-        self.bids = BidsAPI(client)
-        self.date_transformation_pairs = DateTransformationPairsAPI(client)
-        self.date_transformations = DateTransformationsAPI(client)
-        self.markets = MarketsAPI(client)
+        self.bid = BidsAPI(client)
+        self.date_transformation_pair = DateTransformationPairsAPI(client)
+        self.date_transformation = DateTransformationsAPI(client)
+        self.market = MarketsAPI(client)
         self.process = ProcessAPI(client)
-        self.pygen_bids = PygenBidsAPI(client)
-        self.pygen_pools = PygenPoolsAPI(client)
+        self.pygen_bid = PygenBidsAPI(client)
+        self.pygen_pool = PygenPoolsAPI(client)
         self.pygen_process = PygenProcessAPI(client)
-        self.value_transformations = ValueTransformationsAPI(client)
+        self.value_transformation = ValueTransformationsAPI(client)
 
 
 class MarketClient:

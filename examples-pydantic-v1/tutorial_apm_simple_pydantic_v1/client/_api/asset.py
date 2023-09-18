@@ -43,7 +43,7 @@ class AssetChildrenAPI:
         return self._client.data_modeling.instances.list("edge", limit=limit, filter=is_edge_type)
 
 
-class AssetInmodel3dsAPI:
+class AssetInmodel3dAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
@@ -86,7 +86,7 @@ class AssetsAPI(TypeAPI[Asset, AssetApply, AssetList]):
             class_list=AssetList,
         )
         self.children = AssetChildrenAPI(client)
-        self.in_model_3_ds = AssetInmodel3dsAPI(client)
+        self.in_model_3_d = AssetInmodel3dAPI(client)
 
     def apply(self, asset: AssetApply, replace: bool = False) -> dm.InstancesApplyResult:
         instances = asset.to_instances_apply()
@@ -114,7 +114,7 @@ class AssetsAPI(TypeAPI[Asset, AssetApply, AssetList]):
 
             child_edges = self.children.retrieve(external_id)
             asset.children = [edge.end_node.external_id for edge in child_edges]
-            in_model_3_d_edges = self.in_model_3_ds.retrieve(external_id)
+            in_model_3_d_edges = self.in_model_3_d.retrieve(external_id)
             asset.in_model_3_d = [edge.end_node.external_id for edge in in_model_3_d_edges]
 
             return asset
@@ -123,7 +123,7 @@ class AssetsAPI(TypeAPI[Asset, AssetApply, AssetList]):
 
             child_edges = self.children.retrieve(external_id)
             self._set_children(assets, child_edges)
-            in_model_3_d_edges = self.in_model_3_ds.retrieve(external_id)
+            in_model_3_d_edges = self.in_model_3_d.retrieve(external_id)
             self._set_in_model_3_d(assets, in_model_3_d_edges)
 
             return assets
@@ -133,7 +133,7 @@ class AssetsAPI(TypeAPI[Asset, AssetApply, AssetList]):
 
         child_edges = self.children.list(limit=-1)
         self._set_children(assets, child_edges)
-        in_model_3_d_edges = self.in_model_3_ds.list(limit=-1)
+        in_model_3_d_edges = self.in_model_3_d.list(limit=-1)
         self._set_in_model_3_d(assets, in_model_3_d_edges)
 
         return assets

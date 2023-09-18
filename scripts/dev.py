@@ -3,7 +3,6 @@ This is a small CLI used for development of Pygen.
 
 """
 import re
-
 import typer
 
 from cognite.pygen import SDKGenerator, write_sdk_to_disk

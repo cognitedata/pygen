@@ -8,14 +8,14 @@ from pydantic import Field
 from ._core import DomainModel, DomainModelApply, TypeList
 
 if TYPE_CHECKING:
-    from ._bids import BidApply
-    from ._date_transformation_pairs import DateTransformationPairApply
-    from ._value_transformations import ValueTransformationApply
+    from ._bid import BidApply
+    from ._date_transformation_pair import DateTransformationPairApply
+    from ._value_transformation import ValueTransformationApply
 
-__all__ = ["CogProces", "CogProcesApply", "CogProcesList"]
+__all__ = ["CogProcess", "CogProcessApply", "CogProcessList"]
 
 
-class CogProces(DomainModel):
+class CogProcess(DomainModel):
     space: ClassVar[str] = "market"
     bid: Optional[str] = None
     date_transformations: Optional[str] = None
@@ -23,7 +23,7 @@ class CogProces(DomainModel):
     transformation: Optional[str] = None
 
 
-class CogProcesApply(DomainModelApply):
+class CogProcessApply(DomainModelApply):
     space: ClassVar[str] = "market"
     bid: Union[BidApply, str, None] = Field(None, repr=False)
     date_transformations: Union[DateTransformationPairApply, str, None] = Field(None, repr=False)
@@ -102,5 +102,5 @@ class CogProcesApply(DomainModelApply):
         return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
 
 
-class CogProcesList(TypeList[CogProces]):
-    _NODE = CogProces
+class CogProcessList(TypeList[CogProcess]):
+    _NODE = CogProcess

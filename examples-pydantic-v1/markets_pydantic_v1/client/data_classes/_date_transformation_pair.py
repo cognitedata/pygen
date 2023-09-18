@@ -8,7 +8,7 @@ from pydantic import Field
 from ._core import DomainModel, DomainModelApply, TypeList
 
 if TYPE_CHECKING:
-    from ._date_transformations import DateTransformationApply
+    from ._date_transformation import DateTransformationApply
 
 __all__ = ["DateTransformationPair", "DateTransformationPairApply", "DateTransformationPairList"]
 

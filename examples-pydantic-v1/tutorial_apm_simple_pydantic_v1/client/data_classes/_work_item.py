@@ -8,8 +8,8 @@ from pydantic import Field
 from ._core import DomainModel, DomainModelApply, TypeList
 
 if TYPE_CHECKING:
-    from ._assets import AssetApply
-    from ._work_orders import WorkOrderApply
+    from ._asset import AssetApply
+    from ._work_order import WorkOrderApply
 
 __all__ = ["WorkItem", "WorkItemApply", "WorkItemList"]
 

@@ -45,7 +45,7 @@ class WorkItemLinkedassetsAPI:
         return self._client.data_modeling.instances.list("edge", limit=limit, filter=is_edge_type)
 
 
-class WorksAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
+class WorkItemsAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
     def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,

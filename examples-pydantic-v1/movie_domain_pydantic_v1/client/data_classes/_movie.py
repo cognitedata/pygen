@@ -8,9 +8,9 @@ from pydantic import Field
 from ._core import DomainModel, DomainModelApply, TypeList
 
 if TYPE_CHECKING:
-    from ._actors import ActorApply
-    from ._directors import DirectorApply
-    from ._ratings import RatingApply
+    from ._actor import ActorApply
+    from ._director import DirectorApply
+    from ._rating import RatingApply
 
 __all__ = ["Movie", "MovieApply", "MovieList"]
 

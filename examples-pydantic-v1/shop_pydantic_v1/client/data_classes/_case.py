@@ -9,7 +9,7 @@ from pydantic import Field
 from ._core import DomainModel, DomainModelApply, TypeList
 
 if TYPE_CHECKING:
-    from ._command_configs import CommandConfigApply
+    from ._command_config import CommandConfigApply
 
 __all__ = ["Case", "CaseApply", "CaseList"]
 
