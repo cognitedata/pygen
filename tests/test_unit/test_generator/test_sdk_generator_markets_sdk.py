@@ -63,10 +63,6 @@ def test_generate_date_transformation_pairs_data_class(
     assert actual == expected
 
 
-@pytest.mark.skip(
-    reason="There are two views for data transformation pairs, and the generator only picks one. "
-    "The view needs to be set on initialization of API"
-)
 def test_generate_date_transformation_pairs_data_api(
     date_transformation_generator: APIGenerator, top_level_package: str, code_formatter: CodeFormatter
 ):

@@ -4,7 +4,7 @@ from pathlib import Path
 
 from cognite.client import ClientConfig, CogniteClient
 from cognite.client.credentials import OAuthClientCredentials
-
+from cognite.client import data_modeling as dm
 from ._api.bid import BidAPI
 from ._api.cog_bid import CogBidAPI
 from ._api.cog_pool import CogPoolAPI
@@ -36,7 +36,9 @@ class CogPoolAPIs:
         self.cog_pool = CogPoolAPI(client)
         self.cog_process = CogProcessAPI(client)
         self.date_transformation = DateTransformationAPI(client)
-        self.date_transformation_pair = DateTransformationPairAPI(client)
+        self.date_transformation_pair = DateTransformationPairAPI(
+            client, dm.ViewId("market", "DateTransformationPair", "bde9fd4428c26e")
+        )
         self.market = MarketAPI(client)
         self.process = ProcessAPI(client)
         self.value_transformation = ValueTransformationAPI(client)
@@ -56,7 +58,9 @@ class PygenPoolAPIs:
     def __init__(self, client: CogniteClient):
         self.bid = BidAPI(client)
         self.date_transformation = DateTransformationAPI(client)
-        self.date_transformation_pair = DateTransformationPairAPI(client)
+        self.date_transformation_pair = DateTransformationPairAPI(
+            client, dm.ViewId("market", "DateTransformationPair", "310f933a9aca9b")
+        )
         self.market = MarketAPI(client)
         self.process = ProcessAPI(client)
         self.pygen_bid = PygenBidAPI(client)
