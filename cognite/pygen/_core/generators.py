@@ -9,11 +9,13 @@ from cognite.client._version import __version__ as cognite_sdk_version
 from jinja2 import Environment, PackageLoader, select_autoescape
 from pydantic.version import VERSION as PYDANTIC_VERSION
 
-from cognite.pygen._core.data_classes import APIClass, DataClass, MultiAPIClass
-from cognite.pygen._core.logic import get_unique_views
 from cognite.pygen._version import __version__
 from cognite.pygen.config import PygenConfig
 from cognite.pygen.utils.helper import get_pydantic_version
+
+from . import validation
+from .data_classes import APIClass, DataClass, MultiAPIClass
+from .logic import get_unique_views
 
 
 class SDKGenerator:
@@ -61,6 +63,7 @@ class SDKGenerator:
                 (MultiAPIClass.from_data_model(model, api_by_view_id, config) for model in data_model),
                 key=lambda a: a.name,
             )
+            validation.validate_multi_api_classes(self._multi_api_classes)
         else:
             raise ValueError("data_model must be a DataModel or a sequence of DataModels")
 
@@ -123,10 +126,9 @@ class MultiAPIGenerator:
         for api in self.sub_apis:
             api.data_class.update_fields(api.view.properties, data_class_by_view_id, config)
 
-        # Validation
-        # 1. Unique variable names for API and data classes.
-        # 2. Unique file names for data classes.
-        # 3. Unique file names for API classes.
+        validation.validate_data_classes([api.data_class for api in self.sub_apis])
+        validation.validate_api_classes([api.api_class for api in self.sub_apis])
+
         self._static_dir = Path(__file__).parent / "static"
 
     @property
