@@ -1,0 +1,72 @@
+- created_time: 1694968715176
+  description: Constructed case for causing issues for pygen
+  external_id: Pumps
+  is_global: false
+  last_updated_time: 1694968753532
+  name: Pumps
+  space: IntegrationTestsImmutable
+  version: '1'
+  views:
+  - created_time: 1694968752489
+    external_id: Pumps
+    is_global: false
+    last_updated_time: 1694968752489
+    name: Pumps
+    properties:
+      contains:
+        description: null
+        direction: outwards
+        edge_source: null
+        name: contains
+        source:
+          external_id: Pump
+          space: IntegrationTestsImmutable
+          type: view
+          version: ed1171a2f52bc5
+        type:
+          external_id: Pumps.contains
+          space: IntegrationTestsImmutable
+      name:
+        auto_increment: false
+        container:
+          external_id: Pumps
+          space: IntegrationTestsImmutable
+        container_property_identifier: name
+        default_value: null
+        description: null
+        name: name
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+    space: IntegrationTestsImmutable
+    used_for: node
+    version: b11435aac1b0a4
+    writable: true
+  - created_time: 1694968752489
+    external_id: Pump
+    is_global: false
+    last_updated_time: 1694968752489
+    name: Pump
+    properties:
+      name:
+        auto_increment: false
+        container:
+          external_id: Pump
+          space: IntegrationTestsImmutable
+        container_property_identifier: name
+        default_value: null
+        description: null
+        name: name
+        nullable: false
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+    space: IntegrationTestsImmutable
+    used_for: node
+    version: ed1171a2f52bc5
+    writable: true

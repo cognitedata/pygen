@@ -1,7 +1,7 @@
 import pytest
 from cognite.client import data_modeling as dm
 
-from tests.constants import APM_SDK, MARKET_SDK, MOVIE_SDK, SHOP_SDK
+from tests.constants import APM_SDK, MARKET_SDK, MOVIE_SDK, PUMP_SDK, SHOP_SDK
 
 
 @pytest.fixture(scope="session")
@@ -72,3 +72,8 @@ def market_view(pygen_pool_model) -> dm.View:
 @pytest.fixture(scope="session")
 def apm_data_model() -> dm.DataModel[dm.View]:
     return APM_SDK.load_data_model()
+
+
+@pytest.fixture(scope="session")
+def pump_model() -> dm.DataModel[dm.View]:
+    return PUMP_SDK.load_data_model()

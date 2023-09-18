@@ -27,6 +27,8 @@ app = typer.Typer(
 @app.command("generate-sdks", help=f"Generate all example SDKs in directory '{EXAMPLES_DIR.relative_to(REPO_ROOT)}/'")
 def generate_sdks(overwrite_manual_files: bool = typer.Option(False, help="Overwrite manual files in examples")):
     for example_sdk in EXAMPLE_SDKS:
+        if example_sdk.download_only:
+            continue
         data_models = [DataModel.load(safe_load(dms_file.read_text())[0]) for dms_file in example_sdk.dms_files]
         if len(data_models) == 1:
             data_models = data_models[0]
@@ -61,6 +63,8 @@ def download():
     for example_sdk in EXAMPLE_SDKS:
         for datamodel_id, dms_file in zip(example_sdk.data_models, example_sdk.dms_files):
             dms_model = client.data_modeling.data_models.retrieve(datamodel_id, inline_views=True)
+            if not dms_model:
+                raise ValueError(f"Failed to retrieve {datamodel_id}")
             dms_file.write_text(safe_dump(dms_model.dump(), sort_keys=True))
             typer.echo(f"Downloaded {dms_file.relative_to(REPO_ROOT)}")
 
@@ -68,6 +72,8 @@ def download():
 @app.command("list", help="List all example files which are expected to be changed manually")
 def list_manual_files():
     for example_sdk in EXAMPLE_SDKS:
+        if example_sdk.download_only:
+            continue
         typer.echo(f"{example_sdk.client_name} SDK:")
         for manual_file in example_sdk.manual_files:
             typer.echo(f" - {manual_file.relative_to(EXAMPLES_DIR)}")

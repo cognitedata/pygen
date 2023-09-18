@@ -26,6 +26,7 @@ class ExampleSDK:
     data_models: list[DataModelId]
     client_name: str
     _top_level_package: str
+    download_only: bool = False  # Used to example SDK that only trigger validation error.
     manual_files: list[Path] = field(default_factory=list, init=False)
 
     @property
@@ -88,6 +89,12 @@ APM_SDK = ExampleSDK(
     client_name="ApmSimpleClient",
 )
 
+PUMP_SDK = ExampleSDK(
+    data_models=[DataModelId("IntegrationTestsImmutable", "Pumps", "1")],
+    _top_level_package="pump.client",
+    client_name="PumpClient",
+    download_only=True,
+)
 
 # The following files are manually controlled and should not be overwritten by the generator.
 
@@ -135,4 +142,4 @@ class MovieSDKFiles:
 MOVIE_SDK.append_manual_files(MovieSDKFiles)
 
 
-EXAMPLE_SDKS = [MARKET_SDK, SHOP_SDK, MOVIE_SDK, APM_SDK]
+EXAMPLE_SDKS = [MARKET_SDK, SHOP_SDK, MOVIE_SDK, APM_SDK, PUMP_SDK]
