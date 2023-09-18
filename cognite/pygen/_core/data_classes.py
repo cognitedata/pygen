@@ -380,6 +380,8 @@ class APIClass:
     def from_view(cls, view: dm.View, config: PygenConfig) -> APIClass:
         raw_name = view.name or view.external_id
 
+        raw_name = raw_name.replace(" ", "_")
+
         return cls(
             variable=create_name(raw_name, config.naming.api_class.variable),
             variable_list=create_name(raw_name, config.naming.api_class.variable_list),

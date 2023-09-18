@@ -102,8 +102,8 @@ PUMP_SDK = ExampleSDK(
 class MarketSDKFiles:
     client_dir = MARKET_SDK.client_dir
     client = client_dir / "_api_client.py"
-    date_transformation_pair_data = client_dir / "data_classes" / "_date_transformation_pairs.py"
-    date_transformation_pair_api = client_dir / "_api" / "date_transformation_pairs.py"
+    date_transformation_pair_data = client_dir / "data_classes" / "_date_transformation_pair.py"
+    date_transformation_pair_api = client_dir / "_api" / "date_transformation_pair.py"
 
 
 MARKET_SDK.append_manual_files(MarketSDKFiles)
@@ -113,10 +113,10 @@ class ShopSDKFiles:
     client_dir = SHOP_SDK.client_dir
     data_classes = client_dir / "data_classes"
     api = client_dir / "_api"
-    cases_data = data_classes / "_cases.py"
-    command_configs_data = data_classes / "_command_configs.py"
+    cases_data = data_classes / "_case.py"
+    command_configs_data = data_classes / "_command_config.py"
     data_init = data_classes / "__init__.py"
-    command_configs_api = api / "command_configs.py"
+    command_configs_api = api / "command_config.py"
 
 
 SHOP_SDK.append_manual_files(ShopSDKFiles)
@@ -126,12 +126,12 @@ class MovieSDKFiles:
     client_dir = MOVIE_SDK.client_dir
 
     data_classes = client_dir / "data_classes"
-    persons_data = data_classes / "_persons.py"
-    actors_data = data_classes / "_actors.py"
+    persons_data = data_classes / "_person.py"
+    actors_data = data_classes / "_actor.py"
 
     api = client_dir / "_api"
-    persons_api = api / "persons.py"
-    actors_api = api / "actors.py"
+    persons_api = api / "person.py"
+    actors_api = api / "actor.py"
 
     client = client_dir / "_api_client.py"
     client_init = client_dir / "__init__.py"
