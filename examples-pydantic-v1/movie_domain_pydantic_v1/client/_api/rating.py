@@ -10,10 +10,10 @@ from movie_domain_pydantic_v1.client.data_classes import Rating, RatingApply, Ra
 
 
 class RatingAPI(TypeAPI[Rating, RatingApply, RatingList]):
-    def __init__(self, client: CogniteClient):
+    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
         super().__init__(
             client=client,
-            sources=dm.ViewId("IntegrationTestsImmutable", "Rating", "2"),
+            sources=view_id,
             class_type=Rating,
             class_apply_type=RatingApply,
             class_list=RatingList,

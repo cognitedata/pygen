@@ -77,10 +77,10 @@ class MovieDirectorsAPI:
 
 
 class MovieAPI(TypeAPI[Movie, MovieApply, MovieList]):
-    def __init__(self, client: CogniteClient):
+    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
         super().__init__(
             client=client,
-            sources=dm.ViewId("IntegrationTestsImmutable", "Movie", "2"),
+            sources=view_id,
             class_type=Movie,
             class_apply_type=MovieApply,
             class_list=MovieList,

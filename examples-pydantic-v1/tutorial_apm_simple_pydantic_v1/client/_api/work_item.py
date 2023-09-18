@@ -46,10 +46,10 @@ class WorkItemLinkedassetsAPI:
 
 
 class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
-    def __init__(self, client: CogniteClient):
+    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
         super().__init__(
             client=client,
-            sources=dm.ViewId("tutorial_apm_simple", "WorkItem", "18ac48abbe96aa"),
+            sources=view_id,
             class_type=WorkItem,
             class_apply_type=WorkItemApply,
             class_list=WorkItemList,

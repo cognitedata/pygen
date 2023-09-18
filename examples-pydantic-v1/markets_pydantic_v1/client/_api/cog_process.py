@@ -10,10 +10,10 @@ from markets_pydantic_v1.client.data_classes import CogProcess, CogProcessApply,
 
 
 class CogProcessAPI(TypeAPI[CogProcess, CogProcessApply, CogProcessList]):
-    def __init__(self, client: CogniteClient):
+    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
         super().__init__(
             client=client,
-            sources=dm.ViewId("market", "CogProcess", "b5df5d19e08fd0"),
+            sources=view_id,
             class_type=CogProcess,
             class_apply_type=CogProcessApply,
             class_list=CogProcessList,

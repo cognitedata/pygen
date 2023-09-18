@@ -10,10 +10,10 @@ from movie_domain_pydantic_v1.client.data_classes import Nomination, NominationA
 
 
 class NominationAPI(TypeAPI[Nomination, NominationApply, NominationList]):
-    def __init__(self, client: CogniteClient):
+    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
         super().__init__(
             client=client,
-            sources=dm.ViewId("IntegrationTestsImmutable", "Nomination", "2"),
+            sources=view_id,
             class_type=Nomination,
             class_apply_type=NominationApply,
             class_list=NominationList,

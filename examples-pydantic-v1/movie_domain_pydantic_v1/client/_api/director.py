@@ -77,10 +77,10 @@ class DirectorNominationAPI:
 
 
 class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
-    def __init__(self, client: CogniteClient):
+    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
         super().__init__(
             client=client,
-            sources=dm.ViewId("IntegrationTestsImmutable", "Director", "2"),
+            sources=view_id,
             class_type=Director,
             class_apply_type=DirectorApply,
             class_list=DirectorList,

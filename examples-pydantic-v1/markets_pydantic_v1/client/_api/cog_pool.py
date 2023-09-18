@@ -10,10 +10,10 @@ from markets_pydantic_v1.client.data_classes import CogPool, CogPoolApply, CogPo
 
 
 class CogPoolAPI(TypeAPI[CogPool, CogPoolApply, CogPoolList]):
-    def __init__(self, client: CogniteClient):
+    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
         super().__init__(
             client=client,
-            sources=dm.ViewId("market", "CogPool", "28af312f1d7093"),
+            sources=view_id,
             class_type=CogPool,
             class_apply_type=CogPoolApply,
             class_list=CogPoolList,

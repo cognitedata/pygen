@@ -16,10 +16,10 @@ from tutorial_apm_simple_pydantic_v1.client.data_classes import (
 class CdfConnectionPropertiesAPI(
     TypeAPI[CdfConnectionProperties, CdfConnectionPropertiesApply, CdfConnectionPropertiesList]
 ):
-    def __init__(self, client: CogniteClient):
+    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
         super().__init__(
             client=client,
-            sources=dm.ViewId("cdf_3d_schema", "Cdf3dConnectionProperties", "1"),
+            sources=view_id,
             class_type=CdfConnectionProperties,
             class_apply_type=CdfConnectionPropertiesApply,
             class_list=CdfConnectionPropertiesList,

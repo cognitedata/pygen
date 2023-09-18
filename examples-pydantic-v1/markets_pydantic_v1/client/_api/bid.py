@@ -10,10 +10,10 @@ from markets_pydantic_v1.client.data_classes import Bid, BidApply, BidList
 
 
 class BidAPI(TypeAPI[Bid, BidApply, BidList]):
-    def __init__(self, client: CogniteClient):
+    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
         super().__init__(
             client=client,
-            sources=dm.ViewId("market", "Bid", "1add47c48cf88b"),
+            sources=view_id,
             class_type=Bid,
             class_apply_type=BidApply,
             class_list=BidList,
