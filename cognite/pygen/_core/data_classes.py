@@ -373,6 +373,7 @@ class APIClass:
     client_attribute: str
     name: str
     file_name: str
+    view_id: dm.ViewId
 
     @classmethod
     def from_view(cls, view: dm.View, config: PygenConfig) -> APIClass:
@@ -384,6 +385,7 @@ class APIClass:
             client_attribute=create_name(raw_name, config.naming.api_class.client_attribute),
             name=f"{create_name(raw_name, config.naming.api_class.name)}API",
             file_name=create_name(raw_name, config.naming.api_class.file_name),
+            view_id=view.as_id(),
         )
 
 
@@ -398,7 +400,7 @@ class MultiAPIClass:
     sub_apis: list[APIClass]
     client_attribute: str
     name: str
-    model: dm.DataModelId
+    model_id: dm.DataModelId
 
     @classmethod
     def from_data_model(
@@ -415,7 +417,7 @@ class MultiAPIClass:
             sub_apis=sub_apis,
             client_attribute=create_name(data_model_name, config.naming.apis_class.client_attribute),
             name=f"{create_name(data_model_name, config.naming.apis_class.name)}APIs",
-            model=data_model.as_id(),
+            model_id=data_model.as_id(),
         )
 
 

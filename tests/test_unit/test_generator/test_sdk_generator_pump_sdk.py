@@ -5,15 +5,10 @@ from cognite.pygen import SDKGenerator
 from cognite.pygen.exceptions import NameConflict
 
 
-@pytest.fixture(scope="session")
-def sdk_generator(pump_model: dm.DataModel[dm.View]) -> SDKGenerator:
-    return SDKGenerator("cognite", "pump", pump_model)
-
-
-def test_generate_sdk_raises_name_conflict(sdk_generator: SDKGenerator) -> None:
+def test_generate_sdk_raises_name_conflict(pump_model: dm.DataModel[dm.View]) -> None:
     # Act
     with pytest.raises(NameConflict) as e:
-        sdk_generator.generate_sdk()
+        SDKGenerator("cognite", "pump", pump_model)
 
     # Assert
-    assert "Name conflict detected. The following names are used multiple times: ['PumpClient']" in str(e.value)
+    assert "Name conflict detected." in str(e.value)

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 
+from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling import DataModelId
 
 
@@ -30,8 +31,11 @@ class NameConflict(PygenException):
     Raised when a name conflict is detected.
     """
 
-    def __init__(self, conflicting_names: Sequence[str]):
+    def __init__(self, conflicting_names: list[tuple[str, list[dm.VersionedDataModelingId]]]) -> None:
         self.conflicting_names = conflicting_names
 
     def __str__(self) -> str:
-        return f"Name conflict detected. The following names are used multiple times: {self.conflicting_names}"
+        return (
+            "Name conflict detected. The following names are used by multiple views/data models: "
+            f"{self.conflicting_names}"
+        )
