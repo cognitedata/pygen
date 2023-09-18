@@ -10,7 +10,7 @@ from typing import Any, ClassVar, Generic, Optional, TypeVar, Union
 import pandas as pd
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Properties, PropertyValue
-from pydantic import BaseModel, ConfigDict, Extra, Field
+from pydantic import BaseModel, Extra, Field
 
 
 class DomainModelCore(BaseModel):
@@ -30,14 +30,15 @@ class DomainModel(DomainModelCore):
     @classmethod
     def from_node(cls: type[T_TypeNode], node: dm.Node) -> T_TypeNode:
         data = node.dump(camel_case=False)
-
-        return cls(**data, **unpack_properties(node.properties))  # type: ignore[arg-type]
+        # Extra unpacking to avoid crashing between core and property fields
+        # can happen in there is a field named 'version' in the DominModel.
+        return cls(**{**data, **unpack_properties(node.properties)})  # type: ignore[arg-type]
 
     @classmethod
     def one_to_many_fields(cls) -> list[str]:
         return [
             field_name
-            for field_name, field in cls.model_fields.items()
+            for field_name, field in cls.{% if is_pydantic_v2 %}model_fields{% else %}__fields__{% endif %}.items()
             if isinstance(field.annotation, types.GenericAlias)
         ]
 
@@ -45,9 +46,11 @@ class DomainModel(DomainModelCore):
 T_TypeNode = TypeVar("T_TypeNode", bound=DomainModel)
 
 
-class DomainModelApply(DomainModelCore):
-    model_config: ClassVar[ConfigDict] = ConfigDict(extra=Extra.forbid)
-    existing_version: Optional[int] = None
+class DomainModelApply(DomainModelCore{% if is_pydantic_v2 %}, extra=Extra.forbid{% endif %}):
+    existing_version: Optional[int] = None{% if not is_pydantic_v2 %}
+
+    class Config:
+        extra = Extra.forbid{% endif %}
 
     def to_instances_apply(self) -> dm.InstancesApply:
         return self._to_instances_apply(set())
@@ -97,19 +100,18 @@ class TypeList(UserList, Generic[T_TypeNode]):
         super().__init__(nodes)
 
     def dump(self) -> list[dict[str, Any]]:
-        return [node.model_dump() for node in self.data]
+        return [node.{% if is_pydantic_v2 %}model_dump{% else %}dict{% endif %}() for node in self.data]
 
     def to_pandas(self) -> pd.DataFrame:
         df = pd.DataFrame(self.dump())
         if df.empty:
-            df = pd.DataFrame(columns=self._NODE.model_fields)
-
+            df = pd.DataFrame(columns=self._NODE.{% if is_pydantic_v2 %}model_fields{% else %}__fields__{% endif %})
         # Reorder columns to have the custom columns first
-        fixed_columns = set(DomainModel.model_fields)
+        fixed_columns = set(DomainModel.{% if is_pydantic_v2 %}model_fields{% else %}__fields__{% endif %})
         columns = (
             ["external_id"]
             + [col for col in df if col not in fixed_columns]
-            + [col for col in DomainModel.model_fields if col != "external_id"]
+            + [col for col in DomainModel.{% if is_pydantic_v2 %}model_fields{% else %}__fields__{% endif %} if col != "external_id"]
         )
         return df[columns]
 

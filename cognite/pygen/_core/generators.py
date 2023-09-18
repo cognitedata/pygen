@@ -129,8 +129,6 @@ class MultiAPIGenerator:
         validation.validate_data_classes([api.data_class for api in self.sub_apis])
         validation.validate_api_classes([api.api_class for api in self.sub_apis])
 
-        self._static_dir = Path(__file__).parent / "static"
-
     @property
     def pydantic_version(self) -> Literal["v1", "v2"]:
         if self._pydantic_version == "infer":
@@ -153,16 +151,18 @@ class MultiAPIGenerator:
         sdk[client_dir / "__init__.py"] = self.generate_client_init_file()
         sdk[data_classes_dir / "__init__.py"] = self.generate_data_classes_init_file()
         sdk[api_dir / "_core.py"] = self.generate_api_core_file()
-        if self.pydantic_version == "v2":
-            core_data_classes = "_core_data_classes.py"
-        else:
-            core_data_classes = "_core_data_classes_pydantic_v1.py"
-        sdk[data_classes_dir / "_core.py"] = (self._static_dir / core_data_classes).read_text()
+
+        sdk[data_classes_dir / "_core.py"] = self.generate_data_class_core_file()
+        # if self.pydantic_version == "v2":
         return sdk
 
     def generate_api_core_file(self) -> str:
         api_core = self.env.get_template("_core_api.py.jinja")
         return api_core.render(top_level_package=self.top_level_package) + "\n"
+
+    def generate_data_class_core_file(self) -> str:
+        data_class_core = self.env.get_template("_core_data_classes.py.jinja")
+        return data_class_core.render(is_pydantic_v2=self.pydantic_version == "v2") + "\n"
 
     def generate_client_init_file(self) -> str:
         client_init = self.env.get_template("_client_init.py.jinja")

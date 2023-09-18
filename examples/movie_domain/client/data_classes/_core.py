@@ -10,7 +10,7 @@ from typing import Any, ClassVar, Generic, Optional, TypeVar, Union
 import pandas as pd
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Properties, PropertyValue
-from pydantic import BaseModel, ConfigDict, Extra, Field
+from pydantic import BaseModel, Extra, Field
 
 
 class DomainModelCore(BaseModel):
@@ -45,8 +45,7 @@ class DomainModel(DomainModelCore):
 T_TypeNode = TypeVar("T_TypeNode", bound=DomainModel)
 
 
-class DomainModelApply(DomainModelCore):
-    model_config: ClassVar[ConfigDict] = ConfigDict(extra=Extra.forbid)
+class DomainModelApply(DomainModelCore, extra=Extra.forbid):
     existing_version: Optional[int] = None
 
     def to_instances_apply(self) -> dm.InstancesApply:

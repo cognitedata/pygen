@@ -13,6 +13,11 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.18.2] - 20-09-18
+### Fixed
+* When generating a SDK for multiple data models, and two of the viwes in the different models are of different
+  version. Only one of them would be used in retrieve. This is now fixed.
+
 ## [0.18.1] - 20-09-18
 ### Fixed
 * Default naming convention for API class name set to unchanged plurality.
