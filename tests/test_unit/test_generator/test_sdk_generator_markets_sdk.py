@@ -38,12 +38,13 @@ def date_transformation_generator(
     return api_generator
 
 
-def test_generate_api_client(sdk_generator: SDKGenerator):
+def test_generate_api_client(sdk_generator: SDKGenerator, code_formatter: CodeFormatter):
     # Arrange
     expected = MarketSDKFiles.client.read_text()
 
     # Act
     actual = sdk_generator._generate_api_client_file()
+    actual = code_formatter.format_code(actual)
 
     # Assert
     assert actual == expected

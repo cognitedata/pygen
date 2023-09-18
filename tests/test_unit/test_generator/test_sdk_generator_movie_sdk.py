@@ -313,12 +313,13 @@ def test_generate_data_class_init_file(apis_generator: MultiAPIGenerator, code_f
     assert actual == expected
 
 
-def test_create_api_client(sdk_generator: SDKGenerator):
+def test_create_api_client(sdk_generator: SDKGenerator, code_formatter: CodeFormatter):
     # Arrange
     expected = MovieSDKFiles.client.read_text()
 
     # Act
     actual = sdk_generator._generate_api_client_file()
+    actual = code_formatter.format_code(actual)
 
     # Assert
     assert actual == expected
