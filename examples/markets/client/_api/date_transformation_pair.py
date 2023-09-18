@@ -10,7 +10,7 @@ from ._core import DEFAULT_LIMIT_READ, TypeAPI
 from markets.client.data_classes import DateTransformationPair, DateTransformationPairApply, DateTransformationPairList
 
 
-class DateTransformationPairEndsAPI:
+class DateTransformationPairEndAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
@@ -47,7 +47,7 @@ class DateTransformationPairEndsAPI:
         return self._client.data_modeling.instances.list("edge", limit=limit, filter=is_edge_type)
 
 
-class DateTransformationPairStartsAPI:
+class DateTransformationPairStartAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
@@ -90,13 +90,13 @@ class DateTransformationPairsAPI(
     def __init__(self, client: CogniteClient):
         super().__init__(
             client=client,
-            sources=dm.ViewId("market", "DateTransformationPair", "310f933a9aca9b"),
+            sources=dm.ViewId("market", "DateTransformationPair", "bde9fd4428c26e"),
             class_type=DateTransformationPair,
             class_apply_type=DateTransformationPairApply,
             class_list=DateTransformationPairList,
         )
-        self.ends = DateTransformationPairEndsAPI(client)
-        self.starts = DateTransformationPairStartsAPI(client)
+        self.end = DateTransformationPairEndAPI(client)
+        self.start = DateTransformationPairStartAPI(client)
 
     def apply(
         self, date_transformation_pair: DateTransformationPairApply, replace: bool = False
@@ -130,18 +130,18 @@ class DateTransformationPairsAPI(
         if isinstance(external_id, str):
             date_transformation_pair = self._retrieve((self.sources.space, external_id))
 
-            end_edges = self.ends.retrieve(external_id)
+            end_edges = self.end.retrieve(external_id)
             date_transformation_pair.end = [edge.end_node.external_id for edge in end_edges]
-            start_edges = self.starts.retrieve(external_id)
+            start_edges = self.start.retrieve(external_id)
             date_transformation_pair.start = [edge.end_node.external_id for edge in start_edges]
 
             return date_transformation_pair
         else:
             date_transformation_pairs = self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
 
-            end_edges = self.ends.retrieve(external_id)
+            end_edges = self.end.retrieve(external_id)
             self._set_end(date_transformation_pairs, end_edges)
-            start_edges = self.starts.retrieve(external_id)
+            start_edges = self.start.retrieve(external_id)
             self._set_start(date_transformation_pairs, start_edges)
 
             return date_transformation_pairs
@@ -149,9 +149,9 @@ class DateTransformationPairsAPI(
     def list(self, limit: int = DEFAULT_LIMIT_READ) -> DateTransformationPairList:
         date_transformation_pairs = self._list(limit=limit)
 
-        end_edges = self.ends.list(limit=-1)
+        end_edges = self.end.list(limit=-1)
         self._set_end(date_transformation_pairs, end_edges)
-        start_edges = self.starts.list(limit=-1)
+        start_edges = self.start.list(limit=-1)
         self._set_start(date_transformation_pairs, start_edges)
 
         return date_transformation_pairs

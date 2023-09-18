@@ -9,23 +9,29 @@ from pydantic import Field
 from ._core import DomainModel, DomainModelApply, TypeList
 
 if TYPE_CHECKING:
-    from ._markets import MarketApply
+    from ._market import MarketApply
 
-__all__ = ["Bid", "BidApply", "BidList"]
+__all__ = ["PygenBid", "PygenBidApply", "PygenBidList"]
 
 
-class Bid(DomainModel):
+class PygenBid(DomainModel):
     space: ClassVar[str] = "market"
     date: Optional[datetime.date] = None
+    is_block: Optional[bool] = Field(None, alias="isBlock")
     market: Optional[str] = None
+    minimum_price: Optional[float] = Field(None, alias="minimumPrice")
     name: Optional[str] = None
+    price_premium: Optional[float] = Field(None, alias="pricePremium")
 
 
-class BidApply(DomainModelApply):
+class PygenBidApply(DomainModelApply):
     space: ClassVar[str] = "market"
     date: Optional[datetime.date] = None
+    is_block: Optional[bool] = None
     market: Union[MarketApply, str, None] = Field(None, repr=False)
+    minimum_price: Optional[float] = None
     name: Optional[str] = None
+    price_premium: Optional[float] = None
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:
@@ -45,6 +51,19 @@ class BidApply(DomainModelApply):
         if properties:
             source = dm.NodeOrEdgeData(
                 source=dm.ContainerId("market", "Bid"),
+                properties=properties,
+            )
+            sources.append(source)
+        properties = {}
+        if self.is_block is not None:
+            properties["isBlock"] = self.is_block
+        if self.minimum_price is not None:
+            properties["minimumPrice"] = self.minimum_price
+        if self.price_premium is not None:
+            properties["pricePremium"] = self.price_premium
+        if properties:
+            source = dm.NodeOrEdgeData(
+                source=dm.ContainerId("market", "PygenBid"),
                 properties=properties,
             )
             sources.append(source)
@@ -70,5 +89,5 @@ class BidApply(DomainModelApply):
         return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
 
 
-class BidList(TypeList[Bid]):
-    _NODE = Bid
+class PygenBidList(TypeList[PygenBid]):
+    _NODE = PygenBid

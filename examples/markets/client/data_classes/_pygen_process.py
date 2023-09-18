@@ -8,14 +8,14 @@ from pydantic import Field
 from ._core import DomainModel, DomainModelApply, TypeList
 
 if TYPE_CHECKING:
-    from ._bids import BidApply
-    from ._date_transformation_pairs import DateTransformationPairApply
-    from ._value_transformations import ValueTransformationApply
+    from ._bid import BidApply
+    from ._date_transformation_pair import DateTransformationPairApply
+    from ._value_transformation import ValueTransformationApply
 
-__all__ = ["PygenProces", "PygenProcesApply", "PygenProcesList"]
+__all__ = ["PygenProcess", "PygenProcessApply", "PygenProcessList"]
 
 
-class PygenProces(DomainModel):
+class PygenProcess(DomainModel):
     space: ClassVar[str] = "market"
     bid: Optional[str] = None
     date_transformations: Optional[str] = None
@@ -23,7 +23,7 @@ class PygenProces(DomainModel):
     transformation: Optional[str] = None
 
 
-class PygenProcesApply(DomainModelApply):
+class PygenProcessApply(DomainModelApply):
     space: ClassVar[str] = "market"
     bid: Union[BidApply, str, None] = Field(None, repr=False)
     date_transformations: Union[DateTransformationPairApply, str, None] = Field(None, repr=False)
@@ -102,5 +102,5 @@ class PygenProcesApply(DomainModelApply):
         return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
 
 
-class PygenProcesList(TypeList[PygenProces]):
-    _NODE = PygenProces
+class PygenProcessList(TypeList[PygenProcess]):
+    _NODE = PygenProcess

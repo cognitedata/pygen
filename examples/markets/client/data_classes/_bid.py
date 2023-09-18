@@ -9,29 +9,23 @@ from pydantic import Field
 from ._core import DomainModel, DomainModelApply, TypeList
 
 if TYPE_CHECKING:
-    from ._markets import MarketApply
+    from ._market import MarketApply
 
-__all__ = ["CogBid", "CogBidApply", "CogBidList"]
+__all__ = ["Bid", "BidApply", "BidList"]
 
 
-class CogBid(DomainModel):
+class Bid(DomainModel):
     space: ClassVar[str] = "market"
     date: Optional[datetime.date] = None
     market: Optional[str] = None
     name: Optional[str] = None
-    price: Optional[float] = None
-    price_area: Optional[str] = Field(None, alias="priceArea")
-    quantity: Optional[int] = None
 
 
-class CogBidApply(DomainModelApply):
+class BidApply(DomainModelApply):
     space: ClassVar[str] = "market"
     date: Optional[datetime.date] = None
     market: Union[MarketApply, str, None] = Field(None, repr=False)
     name: Optional[str] = None
-    price: Optional[float] = None
-    price_area: Optional[str] = None
-    quantity: Optional[int] = None
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:
@@ -51,19 +45,6 @@ class CogBidApply(DomainModelApply):
         if properties:
             source = dm.NodeOrEdgeData(
                 source=dm.ContainerId("market", "Bid"),
-                properties=properties,
-            )
-            sources.append(source)
-        properties = {}
-        if self.price is not None:
-            properties["price"] = self.price
-        if self.price_area is not None:
-            properties["priceArea"] = self.price_area
-        if self.quantity is not None:
-            properties["quantity"] = self.quantity
-        if properties:
-            source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("market", "CogBid"),
                 properties=properties,
             )
             sources.append(source)
@@ -89,5 +70,5 @@ class CogBidApply(DomainModelApply):
         return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
 
 
-class CogBidList(TypeList[CogBid]):
-    _NODE = CogBid
+class BidList(TypeList[Bid]):
+    _NODE = Bid

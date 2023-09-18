@@ -1,5 +1,5 @@
-from ._cases import Case, CaseApply, CaseList
-from ._command_configs import CommandConfig, CommandConfigApply, CommandConfigList
+from ._case import Case, CaseApply, CaseList
+from ._command_config import CommandConfig, CommandConfigApply, CommandConfigList
 
 CaseApply.model_rebuild()
 

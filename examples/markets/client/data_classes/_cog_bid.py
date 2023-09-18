@@ -9,29 +9,29 @@ from pydantic import Field
 from ._core import DomainModel, DomainModelApply, TypeList
 
 if TYPE_CHECKING:
-    from ._markets import MarketApply
+    from ._market import MarketApply
 
-__all__ = ["PygenBid", "PygenBidApply", "PygenBidList"]
+__all__ = ["CogBid", "CogBidApply", "CogBidList"]
 
 
-class PygenBid(DomainModel):
+class CogBid(DomainModel):
     space: ClassVar[str] = "market"
     date: Optional[datetime.date] = None
-    is_block: Optional[bool] = Field(None, alias="isBlock")
     market: Optional[str] = None
-    minimum_price: Optional[float] = Field(None, alias="minimumPrice")
     name: Optional[str] = None
-    price_premium: Optional[float] = Field(None, alias="pricePremium")
+    price: Optional[float] = None
+    price_area: Optional[str] = Field(None, alias="priceArea")
+    quantity: Optional[int] = None
 
 
-class PygenBidApply(DomainModelApply):
+class CogBidApply(DomainModelApply):
     space: ClassVar[str] = "market"
     date: Optional[datetime.date] = None
-    is_block: Optional[bool] = None
     market: Union[MarketApply, str, None] = Field(None, repr=False)
-    minimum_price: Optional[float] = None
     name: Optional[str] = None
-    price_premium: Optional[float] = None
+    price: Optional[float] = None
+    price_area: Optional[str] = None
+    quantity: Optional[int] = None
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:
@@ -55,15 +55,15 @@ class PygenBidApply(DomainModelApply):
             )
             sources.append(source)
         properties = {}
-        if self.is_block is not None:
-            properties["isBlock"] = self.is_block
-        if self.minimum_price is not None:
-            properties["minimumPrice"] = self.minimum_price
-        if self.price_premium is not None:
-            properties["pricePremium"] = self.price_premium
+        if self.price is not None:
+            properties["price"] = self.price
+        if self.price_area is not None:
+            properties["priceArea"] = self.price_area
+        if self.quantity is not None:
+            properties["quantity"] = self.quantity
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("market", "PygenBid"),
+                source=dm.ContainerId("market", "CogBid"),
                 properties=properties,
             )
             sources.append(source)
@@ -89,5 +89,5 @@ class PygenBidApply(DomainModelApply):
         return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
 
 
-class PygenBidList(TypeList[PygenBid]):
-    _NODE = PygenBid
+class CogBidList(TypeList[CogBid]):
+    _NODE = CogBid

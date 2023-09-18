@@ -5,16 +5,16 @@ from pathlib import Path
 from cognite.client import ClientConfig, CogniteClient
 from cognite.client.credentials import OAuthClientCredentials
 
-from ._api.actors import ActorsAPI
-from ._api.best_directors import BestDirectorsAPI
-from ._api.best_leading_actors import BestLeadingActorsAPI
-from ._api.best_leading_actresses import BestLeadingActressesAPI
-from ._api.directors import DirectorsAPI
-from ._api.movies import MoviesAPI
-from ._api.nominations import NominationsAPI
-from ._api.persons import PersonsAPI
-from ._api.ratings import RatingsAPI
-from ._api.roles import RolesAPI
+from ._api.actor import ActorsAPI
+from ._api.best_director import BestDirectorsAPI
+from ._api.best_leading_actor import BestLeadingActorsAPI
+from ._api.best_leading_actress import BestLeadingActressesAPI
+from ._api.director import DirectorsAPI
+from ._api.movie import MoviesAPI
+from ._api.nomination import NominationsAPI
+from ._api.person import PersonsAPI
+from ._api.rating import RatingsAPI
+from ._api.role import RolesAPI
 
 
 class MovieClient:
@@ -39,16 +39,16 @@ class MovieClient:
             client = CogniteClient(config_or_client)
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
-        self.actors = ActorsAPI(client)
-        self.best_directors = BestDirectorsAPI(client)
-        self.best_leading_actors = BestLeadingActorsAPI(client)
-        self.best_leading_actresses = BestLeadingActressesAPI(client)
-        self.directors = DirectorsAPI(client)
-        self.movies = MoviesAPI(client)
-        self.nominations = NominationsAPI(client)
-        self.persons = PersonsAPI(client)
-        self.ratings = RatingsAPI(client)
-        self.roles = RolesAPI(client)
+        self.actor = ActorsAPI(client)
+        self.best_director = BestDirectorsAPI(client)
+        self.best_leading_actor = BestLeadingActorsAPI(client)
+        self.best_leading_actress = BestLeadingActressesAPI(client)
+        self.director = DirectorsAPI(client)
+        self.movie = MoviesAPI(client)
+        self.nomination = NominationsAPI(client)
+        self.person = PersonsAPI(client)
+        self.rating = RatingsAPI(client)
+        self.role = RolesAPI(client)
 
     @classmethod
     def azure_project(

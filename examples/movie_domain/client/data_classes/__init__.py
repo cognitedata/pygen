@@ -1,13 +1,13 @@
-from ._actors import Actor, ActorApply, ActorList
-from ._best_directors import BestDirector, BestDirectorApply, BestDirectorList
-from ._best_leading_actors import BestLeadingActor, BestLeadingActorApply, BestLeadingActorList
-from ._best_leading_actresses import BestLeadingActress, BestLeadingActressApply, BestLeadingActressList
-from ._directors import Director, DirectorApply, DirectorList
-from ._movies import Movie, MovieApply, MovieList
-from ._nominations import Nomination, NominationApply, NominationList
-from ._persons import Person, PersonApply, PersonList
-from ._ratings import Rating, RatingApply, RatingList
-from ._roles import Role, RoleApply, RoleList
+from ._actor import Actor, ActorApply, ActorList
+from ._best_director import BestDirector, BestDirectorApply, BestDirectorList
+from ._best_leading_actor import BestLeadingActor, BestLeadingActorApply, BestLeadingActorList
+from ._best_leading_actress import BestLeadingActress, BestLeadingActressApply, BestLeadingActressList
+from ._director import Director, DirectorApply, DirectorList
+from ._movie import Movie, MovieApply, MovieList
+from ._nomination import Nomination, NominationApply, NominationList
+from ._person import Person, PersonApply, PersonList
+from ._rating import Rating, RatingApply, RatingList
+from ._role import Role, RoleApply, RoleList
 
 ActorApply.model_rebuild()
 DirectorApply.model_rebuild()

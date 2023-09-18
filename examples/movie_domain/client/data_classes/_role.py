@@ -8,14 +8,14 @@ from pydantic import Field
 from ._core import DomainModel, DomainModelApply, TypeList
 
 if TYPE_CHECKING:
-    from ._movies import MovieApply
-    from ._nominations import NominationApply
-    from ._persons import PersonApply
+    from ._movie import MovieApply
+    from ._nomination import NominationApply
+    from ._person import PersonApply
 
-__all__ = ["Actor", "ActorApply", "ActorList"]
+__all__ = ["Role", "RoleApply", "RoleList"]
 
 
-class Actor(DomainModel):
+class Role(DomainModel):
     space: ClassVar[str] = "IntegrationTestsImmutable"
     movies: list[str] = []
     nomination: list[str] = []
@@ -23,7 +23,7 @@ class Actor(DomainModel):
     won_oscar: Optional[bool] = Field(None, alias="wonOscar")
 
 
-class ActorApply(DomainModelApply):
+class RoleApply(DomainModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
     movies: Union[list[MovieApply], list[str]] = Field(default_factory=list, repr=False)
     nomination: Union[list[NominationApply], list[str]] = Field(default_factory=list, repr=False)
@@ -125,5 +125,5 @@ class ActorApply(DomainModelApply):
         )
 
 
-class ActorList(TypeList[Actor]):
-    _NODE = Actor
+class RoleList(TypeList[Role]):
+    _NODE = Role
