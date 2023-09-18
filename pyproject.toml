@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cognite-pygen"
-version = "0.17.7"
+version = "0.18.0"
 description = "Cognite Python SDK Generator"
 readme = "README.md"
 authors = ["Cognite <support@cognite.com>"]
@@ -28,6 +28,9 @@ ignore = [
     "UP007", # Use X | Y for type annotations
     # Typer do function calls when setting up the CLI.
     "B008", # Do not perform function call {name} in argument defaults
+    # This is done when setting the pygen configs, and useful for getting pretty docs.
+    # In that case this is also safe as the function call produced immutable data.
+    "RUF009", #Do not perform function call in defaults
 ]
 
 [tool.ruff.isort]

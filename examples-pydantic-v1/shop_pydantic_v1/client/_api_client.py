@@ -5,8 +5,8 @@ from pathlib import Path
 from cognite.client import ClientConfig, CogniteClient
 from cognite.client.credentials import OAuthClientCredentials
 
-from shop_pydantic_v1.client._api.cases import CasesAPI
-from shop_pydantic_v1.client._api.command_configs import CommandConfigsAPI
+from ._api.case import CasesAPI
+from ._api.command_config import CommandConfigsAPI
 
 
 class ShopClient:
@@ -14,7 +14,7 @@ class ShopClient:
     ShopClient
 
     Generated with:
-        pygen = 0.17.7
+        pygen = 0.18.0
         cognite-sdk = 6.25.1
         pydantic = 1.10.7
 
@@ -31,8 +31,8 @@ class ShopClient:
             client = CogniteClient(config_or_client)
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
-        self.cases = CasesAPI(client)
-        self.command_configs = CommandConfigsAPI(client)
+        self.case = CasesAPI(client)
+        self.command_config = CommandConfigsAPI(client)
 
     @classmethod
     def azure_project(

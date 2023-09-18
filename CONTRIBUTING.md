@@ -62,11 +62,11 @@ There are two set categories of tests in `pygen`, the `tests` folder structure r
 📦tests
  ┣ 📂dms_data_models - The Domain Model Storage representation of the data models used in the examples.
  ┣ 📂test_integration - Tests that requires CDF.
- ┃ ┣ 📂generation - Test that check that pygen generates SDK(s) as expected.
- ┃ ┗ 📂sdks - Test that checks the that the generated SDK work as expected.
+ ┃ ┣ 📂test_generator - Test that check that pygen generates SDK(s) as expected.
+ ┃ ┗ 📂test_sdks - Test that checks the that the generated SDK work as expected.
  ┣ 📂test_unit - Tests that can be run locally without any external connection.
- ┃ ┣ 📂generation
- ┃ ┗ 📂sdks
+ ┃ ┣ 📂test_generator
+ ┃ ┗ 📂test_sdks
  ┗ 📜constants.py - Defines the Example SDKs and which files are manually maintained.
 ```
 

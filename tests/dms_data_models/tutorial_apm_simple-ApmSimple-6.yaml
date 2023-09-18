@@ -1,0 +1,857 @@
+- created_time: 1694865893740
+  description: Bug from Lars
+  external_id: ApmSimple
+  is_global: false
+  last_updated_time: 1694865893740
+  name: ApmSimple
+  space: tutorial_apm_simple
+  version: '6'
+  views:
+  - created_time: 1690467703871
+    external_id: Cdf3dModel
+    is_global: true
+    last_updated_time: 1694416370245
+    properties:
+      entities:
+        description: Collection of Cdf3dEntity that are part of this Cdf3dModel
+        direction: inwards
+        edge_source:
+          external_id: Cdf3dConnectionProperties
+          space: cdf_3d_schema
+          type: view
+          version: '1'
+        name: null
+        source:
+          external_id: Cdf3dEntity
+          space: cdf_3d_schema
+          type: view
+          version: '1'
+        type:
+          external_id: cdf3dEntityConnection
+          space: cdf_3d_schema
+      name:
+        auto_increment: false
+        container:
+          external_id: Cdf3dModel
+          space: cdf_3d_schema
+        container_property_identifier: name
+        default_value: null
+        description: null
+        name: null
+        nullable: false
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+    space: cdf_3d_schema
+    used_for: node
+    version: '1'
+    writable: true
+  - created_time: 1690467703871
+    external_id: Cdf3dEntity
+    is_global: true
+    last_updated_time: 1694416370245
+    properties:
+      inModel3d:
+        description: Cdf3dModel the Cdf3dEntity is part of
+        direction: outwards
+        edge_source:
+          external_id: Cdf3dConnectionProperties
+          space: cdf_3d_schema
+          type: view
+          version: '1'
+        name: null
+        source:
+          external_id: Cdf3dModel
+          space: cdf_3d_schema
+          type: view
+          version: '1'
+        type:
+          external_id: cdf3dEntityConnection
+          space: cdf_3d_schema
+    space: cdf_3d_schema
+    used_for: node
+    version: '1'
+    writable: false
+  - created_time: 1690467703871
+    external_id: Cdf3dConnectionProperties
+    is_global: true
+    last_updated_time: 1694416370245
+    properties:
+      revisionId:
+        auto_increment: false
+        container:
+          external_id: Cdf3dConnectionProperties
+          space: cdf_3d_schema
+        container_property_identifier: revisionId
+        default_value: null
+        description: null
+        name: null
+        nullable: false
+        source: null
+        type:
+          list: false
+          type: int64
+      revisionNodeId:
+        auto_increment: false
+        container:
+          external_id: Cdf3dConnectionProperties
+          space: cdf_3d_schema
+        container_property_identifier: revisionNodeId
+        default_value: null
+        description: null
+        name: null
+        nullable: false
+        source: null
+        type:
+          list: false
+          type: int64
+    space: cdf_3d_schema
+    used_for: edge
+    version: '1'
+    writable: true
+  - created_time: 1694865892001
+    external_id: Asset
+    implements:
+    - external_id: Cdf3dEntity
+      space: cdf_3d_schema
+      type: view
+      version: '1'
+    is_global: false
+    last_updated_time: 1694865892001
+    name: Asset
+    properties:
+      areaId:
+        auto_increment: false
+        container:
+          external_id: Asset
+          space: tutorial_apm_simple
+        container_property_identifier: areaId
+        default_value: null
+        description: '@name area identification'
+        name: area identification
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: int32
+      categoryId:
+        auto_increment: false
+        container:
+          external_id: Asset
+          space: tutorial_apm_simple
+        container_property_identifier: categoryId
+        default_value: null
+        description: '@name category identification'
+        name: category identification
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: int32
+      children:
+        description: null
+        direction: outwards
+        edge_source: null
+        name: children
+        source:
+          external_id: Asset
+          space: tutorial_apm_simple
+          type: view
+          version: beb2bebdcbb4ad
+        type:
+          external_id: Asset.children
+          space: tutorial_apm_simple
+      createdDate:
+        auto_increment: false
+        container:
+          external_id: Asset
+          space: tutorial_apm_simple
+        container_property_identifier: createdDate
+        default_value: null
+        description: '@name created date'
+        name: created date
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: timestamp
+      description:
+        auto_increment: false
+        container:
+          external_id: Asset
+          space: tutorial_apm_simple
+        container_property_identifier: description
+        default_value: null
+        description: null
+        name: description
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      documents:
+        auto_increment: false
+        container:
+          external_id: Asset
+          space: tutorial_apm_simple
+        container_property_identifier: documents
+        default_value: null
+        description: null
+        name: documents
+        nullable: true
+        source: null
+        type:
+          list: true
+          type: file
+      inModel3d:
+        description: Cdf3dModel the Cdf3dEntity is part of
+        direction: outwards
+        edge_source:
+          external_id: Cdf3dConnectionProperties
+          space: cdf_3d_schema
+          type: view
+          version: '1'
+        name: null
+        source:
+          external_id: Cdf3dModel
+          space: cdf_3d_schema
+          type: view
+          version: '1'
+        type:
+          external_id: cdf3dEntityConnection
+          space: cdf_3d_schema
+      isActive:
+        auto_increment: false
+        container:
+          external_id: Asset
+          space: tutorial_apm_simple
+        container_property_identifier: isActive
+        default_value: null
+        description: '@name active'
+        name: active
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: boolean
+      isCriticalLine:
+        auto_increment: false
+        container:
+          external_id: Asset
+          space: tutorial_apm_simple
+        container_property_identifier: isCriticalLine
+        default_value: null
+        description: '@name critical line'
+        name: critical line
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: boolean
+      measurements:
+        auto_increment: false
+        container:
+          external_id: Asset
+          space: tutorial_apm_simple
+        container_property_identifier: measurements
+        default_value: null
+        description: null
+        name: measurements
+        nullable: true
+        source: null
+        type:
+          list: true
+          type: sequence
+      metrics:
+        auto_increment: false
+        container:
+          external_id: Asset
+          space: tutorial_apm_simple
+        container_property_identifier: metrics
+        default_value: null
+        description: null
+        name: metrics
+        nullable: true
+        source: null
+        type:
+          list: true
+          type: timeseries
+      parent:
+        auto_increment: false
+        container:
+          external_id: Asset
+          space: tutorial_apm_simple
+        container_property_identifier: parent
+        default_value: null
+        description: null
+        name: parent
+        nullable: true
+        type:
+          container: null
+          source:
+            external_id: Asset
+            space: tutorial_apm_simple
+            version: beb2bebdcbb4ad
+          type: direct
+      pressure:
+        auto_increment: false
+        container:
+          external_id: Asset
+          space: tutorial_apm_simple
+        container_property_identifier: pressure
+        default_value: null
+        description: null
+        name: pressure
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: timeseries
+      sourceDb:
+        auto_increment: false
+        container:
+          external_id: Asset
+          space: tutorial_apm_simple
+        container_property_identifier: sourceDb
+        default_value: null
+        description: '@name source data'
+        name: source data
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      specification:
+        auto_increment: false
+        container:
+          external_id: Asset
+          space: tutorial_apm_simple
+        container_property_identifier: specification
+        default_value: null
+        description: null
+        name: specification
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: file
+      tag:
+        auto_increment: false
+        container:
+          external_id: Asset
+          space: tutorial_apm_simple
+        container_property_identifier: tag
+        default_value: null
+        description: null
+        name: tag
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      trajectory:
+        auto_increment: false
+        container:
+          external_id: Asset
+          space: tutorial_apm_simple
+        container_property_identifier: trajectory
+        default_value: null
+        description: null
+        name: trajectory
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: sequence
+      updatedDate:
+        auto_increment: false
+        container:
+          external_id: Asset
+          space: tutorial_apm_simple
+        container_property_identifier: updatedDate
+        default_value: null
+        description: '@name updated date'
+        name: updated date
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: timestamp
+    space: tutorial_apm_simple
+    used_for: node
+    version: beb2bebdcbb4ad
+    writable: true
+  - created_time: 1694865892001
+    description: '@name Work order'
+    external_id: WorkOrder
+    is_global: false
+    last_updated_time: 1694865892001
+    name: Work order
+    properties:
+      actualHours:
+        auto_increment: false
+        container:
+          external_id: WorkOrder
+          space: tutorial_apm_simple
+        container_property_identifier: actualHours
+        default_value: null
+        description: '@name actual (hours)'
+        name: actual (hours)
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: int32
+      createdDate:
+        auto_increment: false
+        container:
+          external_id: WorkOrder
+          space: tutorial_apm_simple
+        container_property_identifier: createdDate
+        default_value: null
+        description: '@name created date'
+        name: created date
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: timestamp
+      description:
+        auto_increment: false
+        container:
+          external_id: WorkOrder
+          space: tutorial_apm_simple
+        container_property_identifier: description
+        default_value: null
+        description: null
+        name: description
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      dueDate:
+        auto_increment: false
+        container:
+          external_id: WorkOrder
+          space: tutorial_apm_simple
+        container_property_identifier: dueDate
+        default_value: null
+        description: '@name due date'
+        name: due date
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: timestamp
+      durationHours:
+        auto_increment: false
+        container:
+          external_id: WorkOrder
+          space: tutorial_apm_simple
+        container_property_identifier: durationHours
+        default_value: null
+        description: '@name duration (hours)'
+        name: duration (hours)
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: int32
+      endTime:
+        auto_increment: false
+        container:
+          external_id: WorkOrder
+          space: tutorial_apm_simple
+        container_property_identifier: endTime
+        default_value: null
+        description: '@name end time'
+        name: end time
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: timestamp
+      isActive:
+        auto_increment: false
+        container:
+          external_id: WorkOrder
+          space: tutorial_apm_simple
+        container_property_identifier: isActive
+        default_value: null
+        description: '@name active'
+        name: active
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: boolean
+      isCancelled:
+        auto_increment: false
+        container:
+          external_id: WorkOrder
+          space: tutorial_apm_simple
+        container_property_identifier: isCancelled
+        default_value: null
+        description: '@name cancelled'
+        name: cancelled
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: boolean
+      isCompleted:
+        auto_increment: false
+        container:
+          external_id: WorkOrder
+          space: tutorial_apm_simple
+        container_property_identifier: isCompleted
+        default_value: null
+        description: '@name completed'
+        name: completed
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: boolean
+      isSafetyCritical:
+        auto_increment: false
+        container:
+          external_id: WorkOrder
+          space: tutorial_apm_simple
+        container_property_identifier: isSafetyCritical
+        default_value: null
+        description: '@name safety critical'
+        name: safety critical
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: boolean
+      linkedAssets:
+        description: null
+        direction: outwards
+        edge_source: null
+        name: linkedAssets
+        source:
+          external_id: Asset
+          space: tutorial_apm_simple
+          type: view
+          version: beb2bebdcbb4ad
+        type:
+          external_id: WorkOrder.linkedAssets
+          space: tutorial_apm_simple
+      percentageProgress:
+        auto_increment: false
+        container:
+          external_id: WorkOrder
+          space: tutorial_apm_simple
+        container_property_identifier: percentageProgress
+        default_value: null
+        description: '@name percentage progress'
+        name: percentage progress
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: int32
+      plannedStart:
+        auto_increment: false
+        container:
+          external_id: WorkOrder
+          space: tutorial_apm_simple
+        container_property_identifier: plannedStart
+        default_value: null
+        description: '@name planned start'
+        name: planned start
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: timestamp
+      priorityDescription:
+        auto_increment: false
+        container:
+          external_id: WorkOrder
+          space: tutorial_apm_simple
+        container_property_identifier: priorityDescription
+        default_value: null
+        description: '@name priority description'
+        name: priority description
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      programNumber:
+        auto_increment: false
+        container:
+          external_id: WorkOrder
+          space: tutorial_apm_simple
+        container_property_identifier: programNumber
+        default_value: null
+        description: '@name program number'
+        name: program number
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      startTime:
+        auto_increment: false
+        container:
+          external_id: WorkOrder
+          space: tutorial_apm_simple
+        container_property_identifier: startTime
+        default_value: null
+        description: '@name start time'
+        name: start time
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: timestamp
+      status:
+        auto_increment: false
+        container:
+          external_id: WorkOrder
+          space: tutorial_apm_simple
+        container_property_identifier: status
+        default_value: null
+        description: null
+        name: status
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      title:
+        auto_increment: false
+        container:
+          external_id: WorkOrder
+          space: tutorial_apm_simple
+        container_property_identifier: title
+        default_value: null
+        description: null
+        name: title
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      workItems:
+        description: null
+        direction: outwards
+        edge_source: null
+        name: workItems
+        source:
+          external_id: WorkItem
+          space: tutorial_apm_simple
+          type: view
+          version: 18ac48abbe96aa
+        type:
+          external_id: WorkOrder.workItems
+          space: tutorial_apm_simple
+      workOrderNumber:
+        auto_increment: false
+        container:
+          external_id: WorkOrder
+          space: tutorial_apm_simple
+        container_property_identifier: workOrderNumber
+        default_value: null
+        description: '@name work order number'
+        name: work order number
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      workPackageNumber:
+        auto_increment: false
+        container:
+          external_id: WorkOrder
+          space: tutorial_apm_simple
+        container_property_identifier: workPackageNumber
+        default_value: null
+        description: '@name work package number'
+        name: work package number
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+    space: tutorial_apm_simple
+    used_for: node
+    version: 6f36e59c3c4896
+    writable: true
+  - created_time: 1694865892001
+    description: '@name Work item'
+    external_id: WorkItem
+    is_global: false
+    last_updated_time: 1694865892001
+    name: Work item
+    properties:
+      criticality:
+        auto_increment: false
+        container:
+          external_id: WorkItem
+          space: tutorial_apm_simple
+        container_property_identifier: criticality
+        default_value: null
+        description: null
+        name: criticality
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      description:
+        auto_increment: false
+        container:
+          external_id: WorkItem
+          space: tutorial_apm_simple
+        container_property_identifier: description
+        default_value: null
+        description: null
+        name: description
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      isCompleted:
+        auto_increment: false
+        container:
+          external_id: WorkItem
+          space: tutorial_apm_simple
+        container_property_identifier: isCompleted
+        default_value: null
+        description: '@name completed'
+        name: completed
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: boolean
+      itemInfo:
+        auto_increment: false
+        container:
+          external_id: WorkItem
+          space: tutorial_apm_simple
+        container_property_identifier: itemInfo
+        default_value: null
+        description: '@name item information'
+        name: item information
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      itemName:
+        auto_increment: false
+        container:
+          external_id: WorkItem
+          space: tutorial_apm_simple
+        container_property_identifier: itemName
+        default_value: null
+        description: '@name item name'
+        name: item name
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      linkedAssets:
+        description: null
+        direction: outwards
+        edge_source: null
+        name: linkedAssets
+        source:
+          external_id: Asset
+          space: tutorial_apm_simple
+          type: view
+          version: beb2bebdcbb4ad
+        type:
+          external_id: WorkItem.linkedAssets
+          space: tutorial_apm_simple
+      method:
+        auto_increment: false
+        container:
+          external_id: WorkItem
+          space: tutorial_apm_simple
+        container_property_identifier: method
+        default_value: null
+        description: null
+        name: method
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      title:
+        auto_increment: false
+        container:
+          external_id: WorkItem
+          space: tutorial_apm_simple
+        container_property_identifier: title
+        default_value: null
+        description: null
+        name: title
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      toBeDone:
+        auto_increment: false
+        container:
+          external_id: WorkItem
+          space: tutorial_apm_simple
+        container_property_identifier: toBeDone
+        default_value: null
+        description: '@name to be done'
+        name: to be done
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: boolean
+      workOrder:
+        auto_increment: false
+        container:
+          external_id: WorkItem
+          space: tutorial_apm_simple
+        container_property_identifier: workOrder
+        default_value: null
+        description: null
+        name: workOrder
+        nullable: true
+        type:
+          container: null
+          source:
+            external_id: WorkOrder
+            space: tutorial_apm_simple
+            version: 6f36e59c3c4896
+          type: direct
+    space: tutorial_apm_simple
+    used_for: node
+    version: 18ac48abbe96aa
+    writable: true

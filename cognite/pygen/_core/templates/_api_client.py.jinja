@@ -4,23 +4,23 @@ from pathlib import Path
 
 from cognite.client import ClientConfig, CogniteClient
 from cognite.client.credentials import OAuthClientCredentials
-{% for class_ in classes %}
-from {{ top_level_package }}._api.{{ class_.file_name }} import {{ class_.api_class }}API{% endfor %}
+{% for class_ in api_classes %}
+from ._api.{{ class_.file_name }} import {{ class_.name }}{% endfor %}
 
-{% if not is_single_model %}{% for api_class in api_classes %}
-class {{ api_class.name }}:
+{% if not is_single_model %}{% for multi_api_class in multi_api_classes %}
+class {{ multi_api_class.name }}:
     """
-    {{ api_class.name }}
+    {{ multi_api_class.name }}
 
     Data Model:
-        space: {{ api_class.model.space }}
-        externalId: {{ api_class.model.external_id }}
-        version: {{ api_class.model.version }}
+        space: {{ multi_api_class.model_id.space }}
+        externalId: {{ multi_api_class.model_id.external_id }}
+        version: {{ multi_api_class.model_id.version }}
 
     """
 
-    def __init__(self, client: CogniteClient):{% for class_ in api_class.sub_apis %}
-        self.{{ class_.client_attribute }} = {{ class_.api_class }}API(client){% endfor %}
+    def __init__(self, client: CogniteClient):{% for sub in multi_api_class.sub_apis %}
+        self.{{ sub.client_attribute }} = {{ sub.name }}(client){% endfor %}
 
 {% endfor %}{% endif %}
 class {{ client_name }}:
@@ -44,9 +44,9 @@ class {{ client_name }}:
         elif isinstance(config_or_client, ClientConfig):
             client = CogniteClient(config_or_client)
         else:
-            raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}"){% if is_single_model %}{% for class_ in classes %}
-        self.{{ class_.client_attribute }} = {{ class_.api_class }}API(client){% endfor %}{% else %}{% for api_class in api_classes %}
-        self.{{ api_class.variable }} = {{ api_class.name }}(client){% endfor %}{% endif %}
+            raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}"){% if is_single_model %}{% for api_class in api_classes %}
+        self.{{ api_class.client_attribute }} = {{ api_class.name }}(client){% endfor %}{% else %}{% for multi_api_class in multi_api_classes %}
+        self.{{ multi_api_class.client_attribute }} = {{ multi_api_class.name }}(client){% endfor %}{% endif %}
 
     @classmethod
     def azure_project(

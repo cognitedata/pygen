@@ -1,0 +1,93 @@
+from __future__ import annotations
+{% if data_class.has_time_field %}
+import datetime{% endif %}
+{% if data_class.has_edges %}from typing import TYPE_CHECKING, ClassVar, Optional, Union{% else %}from typing import ClassVar, Optional{% endif %}{% if not data_class.use_optional_type %}  # noqa: F401{% endif %}
+
+from cognite.client import data_modeling as dm{% if data_class.use_pydantic_field %}
+{{ data_class.import_pydantic_field }}{% endif %}
+
+from ._core import DomainModel, DomainModelApply, TypeList
+{% if data_class.has_edges %}
+if TYPE_CHECKING:{% for dependency_class in data_class.dependencies %}
+    from .{{ dependency_class.file_name }} import {{ dependency_class.write_name }}{% endfor %}
+{% endif %}
+__all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data_class.read_list_name }}"]
+
+
+class {{ data_class.read_name }}(DomainModel):
+    space: ClassVar[str] = "{{ view.space }}"{% for field in data_class %}
+    {{ field.name }}: {{ field.as_read_type_hint() }}{% endfor %}
+
+
+class {{ data_class.write_name }}(DomainModelApply):
+    space: ClassVar[str] = "{{ view.space }}"{% for field in data_class %}
+    {{ field.name }}: {{ field.as_write_type_hint() }}{% endfor %}
+
+    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+        if self.external_id in cache:
+            return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
+
+        {% if not data_class.has_only_one_to_many_edges %}sources = []{% for container, container_fields in data_class.fields_by_container.items() %}
+        properties = {}{% for field in container_fields %}
+        if self.{{ field.name }} is not None:
+            properties["{{ field.prop_name }}"] = {% if field.is_edge %}{
+                "space": "{{ field.prop.source.space }}",
+                "externalId": self.{{ field.name }} if isinstance(self.{{ field.name }}, str) else self.{{ field.name }}.external_id,
+            }{% else %}self.{{ field.name }}{% if field.is_time_field %}.isoformat(){% endif %}{% endif %}{% endfor %}
+        if properties:
+            source = dm.NodeOrEdgeData(
+                source=dm.ContainerId("{{ container.space }}", "{{ container.external_id }}"),
+                properties=properties,
+            )
+            sources.append(source){% endfor %}
+        if sources:
+            this_node = dm.NodeApply(
+                space=self.space,
+                external_id=self.external_id,
+                existing_version=self.existing_version,
+                sources=sources,
+            )
+            nodes = [this_node]
+        else:
+            nodes = []{% else %}nodes = []{% endif %}
+
+        edges = []
+        cache.add(self.external_id)
+{%  for field in data_class.one_to_many_edges %}
+        for {{ field.variable }} in self.{{ field.name }}:
+            edge = self._create_{{field.variable}}_edge({{ field.variable }})
+            if edge.external_id not in cache:
+                edges.append(edge)
+                cache.add(edge.external_id)
+
+            if isinstance({{ field.variable }}, DomainModelApply):
+                instances = {{ field.variable }}._to_instances_apply(cache)
+                nodes.extend(instances.nodes)
+                edges.extend(instances.edges)
+{% endfor %}{% for field in data_class.one_to_one_edges %}
+        if isinstance(self.{{ field.name }}, DomainModelApply):
+            instances = self.{{ field.name }}._to_instances_apply(cache)
+            nodes.extend(instances.nodes)
+            edges.extend(instances.edges)
+{% endfor %}
+        return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
+{%  for field in data_class.one_to_many_edges %}
+    def _create_{{ field.variable }}_edge(self, {{ field.variable }}: Union[str, {{ field.data_class.write_name }}]) -> dm.EdgeApply:
+        if isinstance({{ field.variable }}, str):
+            end_node_ext_id = {{ field.variable }}
+        elif isinstance({{ field.variable }}, DomainModelApply):
+            end_node_ext_id = {{ field.variable }}.external_id
+        else:
+            raise TypeError(f"Expected str or {{ field.data_class.write_name }}, got {type({{ field.variable }})}")
+
+        return dm.EdgeApply(
+            space="{{ view.space }}",
+            external_id=f"{self.external_id}:{end_node_ext_id}",
+            type=dm.DirectRelationReference("{{ field.prop.type.space }}", "{{ field.prop.type.external_id }}"),
+            start_node=dm.DirectRelationReference(self.space, self.external_id),
+            end_node=dm.DirectRelationReference("{{ field.prop.source.space }}", end_node_ext_id),
+        )
+{% endfor %}
+
+class {{ data_class.read_list_name }}(TypeList[{{ data_class.read_name }}]):
+    _NODE = {{ data_class.read_name }}

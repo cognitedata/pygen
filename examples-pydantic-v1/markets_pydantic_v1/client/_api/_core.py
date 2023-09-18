@@ -5,9 +5,11 @@ from typing import Generic, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
-from cognite.client._constants import DEFAULT_LIMIT_READ
 
 from markets_pydantic_v1.client.data_classes._core import T_TypeApplyNode, T_TypeNode, T_TypeNodeList
+
+
+DEFAULT_LIMIT_READ = 25
 
 
 class TypeAPI(Generic[T_TypeNode, T_TypeApplyNode, T_TypeNodeList]):

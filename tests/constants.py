@@ -3,7 +3,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling import DataModelId
+from yaml import safe_load
 
 from cognite.pygen.utils.helper import get_pydantic_version
 
@@ -24,6 +26,7 @@ class ExampleSDK:
     data_models: list[DataModelId]
     client_name: str
     _top_level_package: str
+    download_only: bool = False  # Used to example SDK that only trigger validation error.
     manual_files: list[Path] = field(default_factory=list, init=False)
 
     @property
@@ -43,6 +46,18 @@ class ExampleSDK:
     @property
     def client_dir(self) -> Path:
         return EXAMPLES_DIR / self.top_level_package.replace(".", "/")
+
+    def load_data_models(self) -> list[dm.DataModel[dm.View]]:
+        models = []
+        for dms_file in self.dms_files:
+            models.append(dm.DataModel.load(safe_load(dms_file.read_text())[0]))
+        return models
+
+    def load_data_model(self) -> dm.DataModel[dm.View]:
+        models = self.load_data_models()
+        if len(models) == 1:
+            return models[0]
+        raise ValueError(f"Expected exactly one data model, got {len(models)}")
 
     def append_manual_files(self, manual_files_cls: type):
         for var in vars(manual_files_cls).values():
@@ -68,13 +83,18 @@ MOVIE_SDK = ExampleSDK(
     client_name="MovieClient",
 )
 
+APM_SDK = ExampleSDK(
+    data_models=[DataModelId("tutorial_apm_simple", "ApmSimple", "6")],
+    _top_level_package="tutorial_apm_simple.client",
+    client_name="ApmSimpleClient",
+)
 
-class DMSModels:
-    movie_model = MOVIE_SDK.dms_files[0]
-    shop_model = SHOP_SDK.dms_files[0]
-    cog_pool = MARKET_SDK.dms_files[0]
-    pygen_pool = MARKET_SDK.dms_files[1]
-
+PUMP_SDK = ExampleSDK(
+    data_models=[DataModelId("IntegrationTestsImmutable", "Pumps", "1")],
+    _top_level_package="pump.client",
+    client_name="PumpClient",
+    download_only=True,
+)
 
 # The following files are manually controlled and should not be overwritten by the generator.
 
@@ -82,8 +102,8 @@ class DMSModels:
 class MarketSDKFiles:
     client_dir = MARKET_SDK.client_dir
     client = client_dir / "_api_client.py"
-    date_transformation_pair_data = client_dir / "data_classes" / "_date_transformation_pairs.py"
-    date_transformation_pair_api = client_dir / "_api" / "date_transformation_pairs.py"
+    date_transformation_pair_data = client_dir / "data_classes" / "_date_transformation_pair.py"
+    date_transformation_pair_api = client_dir / "_api" / "date_transformation_pair.py"
 
 
 MARKET_SDK.append_manual_files(MarketSDKFiles)
@@ -93,10 +113,10 @@ class ShopSDKFiles:
     client_dir = SHOP_SDK.client_dir
     data_classes = client_dir / "data_classes"
     api = client_dir / "_api"
-    cases_data = data_classes / "_cases.py"
-    command_configs_data = data_classes / "_command_configs.py"
+    cases_data = data_classes / "_case.py"
+    command_configs_data = data_classes / "_command_config.py"
     data_init = data_classes / "__init__.py"
-    command_configs_api = api / "command_configs.py"
+    command_configs_api = api / "command_config.py"
 
 
 SHOP_SDK.append_manual_files(ShopSDKFiles)
@@ -106,12 +126,12 @@ class MovieSDKFiles:
     client_dir = MOVIE_SDK.client_dir
 
     data_classes = client_dir / "data_classes"
-    persons_data = data_classes / "_persons.py"
-    actors_data = data_classes / "_actors.py"
+    persons_data = data_classes / "_person.py"
+    actors_data = data_classes / "_actor.py"
 
     api = client_dir / "_api"
-    persons_api = api / "persons.py"
-    actors_api = api / "actors.py"
+    persons_api = api / "person.py"
+    actors_api = api / "actor.py"
 
     client = client_dir / "_api_client.py"
     client_init = client_dir / "__init__.py"
@@ -122,4 +142,4 @@ class MovieSDKFiles:
 MOVIE_SDK.append_manual_files(MovieSDKFiles)
 
 
-EXAMPLE_SDKS = [MARKET_SDK, SHOP_SDK, MOVIE_SDK]
+EXAMPLE_SDKS = [MARKET_SDK, SHOP_SDK, MOVIE_SDK, APM_SDK, PUMP_SDK]

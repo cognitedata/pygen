@@ -3,7 +3,6 @@ This is a small CLI used for development of Pygen.
 
 """
 import re
-
 import typer
 
 from cognite.pygen import SDKGenerator, write_sdk_to_disk
@@ -15,13 +14,21 @@ import toml
 from cognite.client._version import __version__ as cognite_sdk_version
 from pydantic.version import VERSION as PYDANTIC_VERSION
 
-app = typer.Typer(add_completion=False, help=__doc__)
+app = typer.Typer(
+    add_completion=False,
+    help=__doc__,
+    pretty_exceptions_short=False,
+    pretty_exceptions_show_locals=False,
+    pretty_exceptions_enable=False,
+)
 
 
 @app.command("generate-sdks", help=f"Generate all example SDKs in directory '{EXAMPLES_DIR.relative_to(REPO_ROOT)}/'")
 def generate_sdks(overwrite_manual_files: bool = typer.Option(False, help="Overwrite manual files in examples")):
     for example_sdk in EXAMPLE_SDKS:
-        data_models = [DataModel.load(safe_load(dms_file.read_text())) for dms_file in example_sdk.dms_files]
+        if example_sdk.download_only:
+            continue
+        data_models = [DataModel.load(safe_load(dms_file.read_text())[0]) for dms_file in example_sdk.dms_files]
         if len(data_models) == 1:
             data_models = data_models[0]
         sdk_generator = SDKGenerator(
@@ -30,20 +37,22 @@ def generate_sdks(overwrite_manual_files: bool = typer.Option(False, help="Overw
 
         sdk = sdk_generator.generate_sdk()
         manual_files = []
-        if overwrite_manual_files is True:
+        if overwrite_manual_files is not True:
             for manual_file in example_sdk.manual_files:
                 manual_path = manual_file.relative_to(EXAMPLES_DIR)
                 popped = sdk.pop(manual_path, None)
                 if popped is None:
                     typer.echo(f"Could not find {manual_path} in generated SDK", err=True, color=True)
                 else:
-                    manual_files.append(popped)
+                    manual_files.append(manual_path)
         write_sdk_to_disk(sdk, EXAMPLES_DIR, overwrite=True, format_code=True)
         typer.echo(f"{example_sdk.client_name} SDK Created in {example_sdk.client_dir}")
         if manual_files:
             typer.echo(
                 f"The following files were not updated, as they are expected to be changed manually: {manual_files}"
             )
+        else:
+            typer.echo("All files updated! Including files assumed to be manually maintained.")
     typer.echo("All SDKs Created!")
 
 
@@ -52,14 +61,18 @@ def download():
     client = load_cognite_client_from_toml("config.toml")
     for example_sdk in EXAMPLE_SDKS:
         for datamodel_id, dms_file in zip(example_sdk.data_models, example_sdk.dms_files):
-            dms_model = client.data_modeling.data_models.retrieve(model_id=datamodel_id, inline_views=True)
-            dms_file.write_text(safe_dump(dms_model.dump(), sort_keys=False))
+            dms_model = client.data_modeling.data_models.retrieve(datamodel_id, inline_views=True)
+            if not dms_model:
+                raise ValueError(f"Failed to retrieve {datamodel_id}")
+            dms_file.write_text(safe_dump(dms_model.dump(), sort_keys=True))
             typer.echo(f"Downloaded {dms_file.relative_to(REPO_ROOT)}")
 
 
 @app.command("list", help="List all example files which are expected to be changed manually")
 def list_manual_files():
     for example_sdk in EXAMPLE_SDKS:
+        if example_sdk.download_only:
+            continue
         typer.echo(f"{example_sdk.client_name} SDK:")
         for manual_file in example_sdk.manual_files:
             typer.echo(f" - {manual_file.relative_to(EXAMPLES_DIR)}")

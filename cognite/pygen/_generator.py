@@ -13,7 +13,7 @@ from cognite.client.data_classes.data_modeling import DataModelIdentifier
 from cognite.client.data_classes.data_modeling.ids import DataModelId
 from cognite.client.exceptions import CogniteAPIError
 
-from cognite.pygen._core.dms_to_python import SDKGenerator
+from cognite.pygen._core.generators import SDKGenerator
 
 from ._settings import _load_pyproject_toml
 from .exceptions import DataModelNotFound
