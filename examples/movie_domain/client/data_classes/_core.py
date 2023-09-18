@@ -30,8 +30,9 @@ class DomainModel(DomainModelCore):
     @classmethod
     def from_node(cls: type[T_TypeNode], node: dm.Node) -> T_TypeNode:
         data = node.dump(camel_case=False)
-
-        return cls(**data, **unpack_properties(node.properties))  # type: ignore[arg-type]
+        # Extra unpacking to avoid crashing between core and property fields
+        # can happen in there is a field named 'version' in the DominModel.
+        return cls(**{**data, **unpack_properties(node.properties)})  # type: ignore[arg-type]
 
     @classmethod
     def one_to_many_fields(cls) -> list[str]:
@@ -102,7 +103,6 @@ class TypeList(UserList, Generic[T_TypeNode]):
         df = pd.DataFrame(self.dump())
         if df.empty:
             df = pd.DataFrame(columns=self._NODE.model_fields)
-
         # Reorder columns to have the custom columns first
         fixed_columns = set(DomainModel.model_fields)
         columns = (

@@ -30,14 +30,15 @@ class DomainModel(DomainModelCore):
     @classmethod
     def from_node(cls: type[T_TypeNode], node: dm.Node) -> T_TypeNode:
         data = node.dump(camel_case=False)
-
-        return cls(**data, **unpack_properties(node.properties))  # type: ignore[arg-type]
+        # Extra unpacking to avoid crashing between core and property fields
+        # can happen in there is a field named 'version' in the DominModel.
+        return cls(**{**data, **unpack_properties(node.properties)})  # type: ignore[arg-type]
 
     @classmethod
     def one_to_many_fields(cls) -> list[str]:
         return [
             field_name
-            for field_name, field in cls.__fields__.items()  # type: ignore[attr-defined]
+            for field_name, field in cls.__fields__.items()
             if isinstance(field.annotation, types.GenericAlias)
         ]
 
@@ -104,13 +105,13 @@ class TypeList(UserList, Generic[T_TypeNode]):
     def to_pandas(self) -> pd.DataFrame:
         df = pd.DataFrame(self.dump())
         if df.empty:
-            df = pd.DataFrame(columns=self._NODE.__fields__.keys())  # type: ignore[attr-defined]
+            df = pd.DataFrame(columns=self._NODE.__fields__)
         # Reorder columns to have the custom columns first
-        fixed_columns = set(DomainModel.__fields__.keys())  # type: ignore[attr-defined]
+        fixed_columns = set(DomainModel.__fields__)
         columns = (
             ["external_id"]
             + [col for col in df if col not in fixed_columns]
-            + [col for col in DomainModel.__fields__.keys() if col != "external_id"]  # type: ignore[attr-defined]
+            + [col for col in DomainModel.__fields__ if col != "external_id"]
         )
         return df[columns]
 
