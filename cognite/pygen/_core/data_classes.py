@@ -368,9 +368,6 @@ class DataClass:
 
 @dataclass(frozen=True)
 class APIClass:
-    # Todo: Check is variable and variable_list are needed
-    variable: str
-    variable_list: str
     client_attribute: str
     name: str
     file_name: str
@@ -383,8 +380,6 @@ class APIClass:
         raw_name = raw_name.replace(" ", "_")
 
         return cls(
-            variable=create_name(raw_name, config.naming.api_class.variable),
-            variable_list=create_name(raw_name, config.naming.api_class.variable_list),
             client_attribute=create_name(raw_name, config.naming.api_class.client_attribute),
             name=f"{create_name(raw_name, config.naming.api_class.name)}API",
             file_name=create_name(raw_name, config.naming.api_class.file_name),
