@@ -18,6 +18,10 @@ Changes are grouped as follows
 * Support for configuring naming convention used for the generated SDK.
 * Validation of the naming used in the generated SDK. This is to avoid name collisions between data and API classes.
 
+### Changed
+* `pygen` no longer pluralize/singularize data and api class names and attributes. You can turn this using the
+  configuration.
+
 ### Fixed
 * Data models containing views with properties without specified `name` caused a `KeyError`. This is now fixed.
 * Data models containing views with named `Field` caused namespace collision with `pydantic.Field` in
