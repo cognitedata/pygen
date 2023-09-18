@@ -13,8 +13,9 @@ from cognite.pygen._core.data_classes import (
     Field,
     PrimitiveField,
     PrimitiveListField,
+    ViewSpaceExternalId,
 )
-from cognite.pygen._core.generators import MultiAPIGenerator, SDKGenerator
+from cognite.pygen._core.generators import APIGenerator, MultiAPIGenerator, SDKGenerator
 from cognite.pygen._generator import CodeFormatter
 from cognite.pygen.config import PygenConfig
 from tests.constants import IS_PYDANTIC_V1, MovieSDKFiles
@@ -87,11 +88,11 @@ def create_fields_test_cases():
         variable="role",
         variable_list="roles",
         file_name="_roles",
-        view_id=dm.ViewId("IntegrationTestsImmutable", "Role", "2"),
+        view_id=ViewSpaceExternalId("IntegrationTestsImmutable", "Role"),
         view_name="Role",
     )
 
-    data_class_by_view_id = {("IntegrationTestsImmutable", "Role"): data_class}
+    data_class_by_view_id = {ViewSpaceExternalId("IntegrationTestsImmutable", "Role"): data_class}
     yield pytest.param(
         "roles",
         prop,
@@ -162,11 +163,11 @@ def create_fields_test_cases():
         write_list_name="PersonListApply",
         variable="person",
         file_name="_persons",
-        view_id=dm.ViewId("IntegrationTestsImmutable", "Person", "2"),
+        view_id=ViewSpaceExternalId("IntegrationTestsImmutable", "Person"),
         variable_list="persons",
         view_name="Person",
     )
-    data_class_by_view_id = {("IntegrationTestsImmutable", "Person"): data_class}
+    data_class_by_view_id = {ViewSpaceExternalId("IntegrationTestsImmutable", "Person"): data_class}
 
     prop = ViewProperty.load(prop)
     yield pytest.param(
@@ -227,7 +228,7 @@ def create_fields_test_cases():
 def test_fields_from_property(
     prop_name: str,
     property_: dm.MappedProperty | dm.ConnectionDefinition,
-    data_class_by_view_id: dict[tuple[str, str], DataClass],
+    data_class_by_view_id: dict[ViewSpaceExternalId, DataClass],
     view_name: str,
     expected: Field,
     expected_read_type_hint: str,
@@ -243,59 +244,63 @@ def test_fields_from_property(
     assert actual.as_write_type_hint() == expected_write_type_hint
 
 
-def test_generate_data_class_file_persons(
-    apis_generator: MultiAPIGenerator, person_view: dm.View, pygen_config: PygenConfig
-):
+@pytest.fixture()
+def person_api_generator(apis_generator: MultiAPIGenerator, person_view: dm.View) -> APIGenerator:
+    api_generator = next(
+        (api for api in apis_generator.sub_apis if api.view_identifier == ViewSpaceExternalId.from_(person_view)), None
+    )
+    assert api_generator is not None, "Could not find API generator for actor view"
+    return api_generator
+
+
+@pytest.fixture()
+def actor_api_generator(apis_generator: MultiAPIGenerator, actor_view: dm.View) -> APIGenerator:
+    api_generator = next(
+        (api for api in apis_generator.sub_apis if api.view_identifier == ViewSpaceExternalId.from_(actor_view)), None
+    )
+    assert api_generator is not None, "Could not find API generator for actor view"
+    return api_generator
+
+
+def test_generate_data_class_file_persons(person_api_generator: APIGenerator, pygen_config: PygenConfig):
     # Arrange
     expected = MovieSDKFiles.persons_data.read_text()
-    api_generator = next((api for api in apis_generator.sub_apis if api.view.as_id() == person_view.as_id()), None)
-    assert api_generator is not None, "Could not find API generator for actor view"
 
     # Act
-    actual = api_generator.generate_data_class_file()
+    actual = person_api_generator.generate_data_class_file()
 
     # Assert
     assert actual == expected
 
 
-def test_create_view_data_class_actors(
-    apis_generator: MultiAPIGenerator, actor_view: dm.View, pygen_config: PygenConfig
-):
+def test_create_view_data_class_actors(actor_api_generator: APIGenerator, pygen_config: PygenConfig):
     # Arrange
     expected = MovieSDKFiles.actors_data.read_text()
-    api_generator = next((api for api in apis_generator.sub_apis if api.view.as_id() == actor_view.as_id()), None)
-    assert api_generator is not None, "Could not find API generator for actor view"
 
     # Act
-    actual = api_generator.generate_data_class_file()
+    actual = actor_api_generator.generate_data_class_file()
 
     # Assert
     assert actual == expected
 
 
-def test_create_view_api_classes_actors(apis_generator: MultiAPIGenerator, actor_view: dm.View, top_level_package: str):
+def test_create_view_api_classes_actors(actor_api_generator: APIGenerator, top_level_package: str):
     # Arrange
     expected = MovieSDKFiles.actors_api.read_text()
-    api_generator = next((api for api in apis_generator.sub_apis if api.view.as_id() == actor_view.as_id()), None)
-    assert api_generator is not None, "Could not find API generator for actor view"
 
     # Act
-    actual = api_generator.generate_api_file(top_level_package)
+    actual = actor_api_generator.generate_api_file(top_level_package)
 
     # Assert
     assert actual == expected
 
 
-def test_create_view_api_classes_persons(
-    apis_generator: MultiAPIGenerator, person_view: dm.View, top_level_package: str
-):
+def test_create_view_api_classes_persons(person_api_generator: APIGenerator, top_level_package: str):
     # Arrange
     expected = MovieSDKFiles.persons_api.read_text()
-    api_generator = next((api for api in apis_generator.sub_apis if api.view.as_id() == person_view.as_id()), None)
-    assert api_generator is not None, "Could not find API generator for actor view"
 
     # Act
-    actual = api_generator.generate_api_file(top_level_package)
+    actual = person_api_generator.generate_api_file(top_level_package)
 
     # Assert
     assert actual == expected
@@ -313,12 +318,13 @@ def test_generate_data_class_init_file(apis_generator: MultiAPIGenerator, code_f
     assert actual == expected
 
 
-def test_create_api_client(sdk_generator: SDKGenerator):
+def test_create_api_client(sdk_generator: SDKGenerator, code_formatter: CodeFormatter):
     # Arrange
     expected = MovieSDKFiles.client.read_text()
 
     # Act
     actual = sdk_generator._generate_api_client_file()
+    actual = code_formatter.format_code(actual)
 
     # Assert
     assert actual == expected

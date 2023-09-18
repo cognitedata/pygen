@@ -10,10 +10,10 @@ from markets.client.data_classes import PygenPool, PygenPoolApply, PygenPoolList
 
 
 class PygenPoolAPI(TypeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
-    def __init__(self, client: CogniteClient):
+    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
         super().__init__(
             client=client,
-            sources=dm.ViewId("market", "PygenPool", "23c71ba66bad9d"),
+            sources=view_id,
             class_type=PygenPool,
             class_apply_type=PygenPoolApply,
             class_list=PygenPoolList,

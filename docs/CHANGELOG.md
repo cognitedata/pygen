@@ -13,6 +13,14 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.18.2] - 20-09-18
+### Fixed
+* When generating an SDK for multiple data models, and two of the views in the different models are of different
+   versions. Only one of them would be used to retrieve. This is now fixed.
+* Views with a property named `version` will raise an error in the generated SDK. This is now allowed, but
+  will overwrite the `node.version` parameter. A warning is issued to the used upon the generation of the SDK.
+* Views named `core` will now raise a `ReservedWordConflict`, instead of silently removing the view.
+
 ## [0.18.1] - 20-09-18
 ### Fixed
 * Default naming convention for API class name set to unchanged plurality.

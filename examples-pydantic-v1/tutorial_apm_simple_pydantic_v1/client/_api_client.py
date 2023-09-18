@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from cognite.client import ClientConfig, CogniteClient
+from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
 from cognite.client.credentials import OAuthClientCredentials
 
 from ._api.asset import AssetAPI
@@ -35,12 +35,14 @@ class ApmSimpleClient:
             client = CogniteClient(config_or_client)
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
-        self.asset = AssetAPI(client)
-        self.cdf_3_d_connection_properties = CdfConnectionPropertiesAPI(client)
-        self.cdf_3_d_entity = CdfEntityAPI(client)
-        self.cdf_3_d_model = CdfModelAPI(client)
-        self.work_item = WorkItemAPI(client)
-        self.work_order = WorkOrderAPI(client)
+        self.asset = AssetAPI(client, dm.ViewId("tutorial_apm_simple", "Asset", "beb2bebdcbb4ad"))
+        self.cdf_3_d_connection_properties = CdfConnectionPropertiesAPI(
+            client, dm.ViewId("cdf_3d_schema", "Cdf3dConnectionProperties", "1")
+        )
+        self.cdf_3_d_entity = CdfEntityAPI(client, dm.ViewId("cdf_3d_schema", "Cdf3dEntity", "1"))
+        self.cdf_3_d_model = CdfModelAPI(client, dm.ViewId("cdf_3d_schema", "Cdf3dModel", "1"))
+        self.work_item = WorkItemAPI(client, dm.ViewId("tutorial_apm_simple", "WorkItem", "18ac48abbe96aa"))
+        self.work_order = WorkOrderAPI(client, dm.ViewId("tutorial_apm_simple", "WorkOrder", "6f36e59c3c4896"))
 
     @classmethod
     def azure_project(

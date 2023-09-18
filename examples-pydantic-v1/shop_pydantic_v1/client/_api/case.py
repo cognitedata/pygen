@@ -10,10 +10,10 @@ from shop_pydantic_v1.client.data_classes import Case, CaseApply, CaseList
 
 
 class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
-    def __init__(self, client: CogniteClient):
+    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
         super().__init__(
             client=client,
-            sources=dm.ViewId("IntegrationTestsImmutable", "Case", "366b75cc4e699f"),
+            sources=view_id,
             class_type=Case,
             class_apply_type=CaseApply,
             class_list=CaseList,

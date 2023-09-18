@@ -145,8 +145,6 @@ class APIClassNaming:
     """
 
     name: Naming = Naming(Case.pascal, Number.unchanged)
-    variable = Naming(Case.snake, Number.singular)
-    variable_list = Naming(Case.snake, Number.plural)
     file_name: Naming = Naming(Case.snake, Number.unchanged)
     client_attribute: Naming = Naming(Case.snake, Number.unchanged)
 

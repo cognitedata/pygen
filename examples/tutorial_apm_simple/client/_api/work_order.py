@@ -85,10 +85,10 @@ class WorkOrderWorkitemsAPI:
 
 
 class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
-    def __init__(self, client: CogniteClient):
+    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
         super().__init__(
             client=client,
-            sources=dm.ViewId("tutorial_apm_simple", "WorkOrder", "6f36e59c3c4896"),
+            sources=view_id,
             class_type=WorkOrder,
             class_apply_type=WorkOrderApply,
             class_list=WorkOrderList,

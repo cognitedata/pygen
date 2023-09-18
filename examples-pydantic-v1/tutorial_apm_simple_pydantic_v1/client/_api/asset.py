@@ -77,10 +77,10 @@ class AssetInmodel3dAPI:
 
 
 class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
-    def __init__(self, client: CogniteClient):
+    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
         super().__init__(
             client=client,
-            sources=dm.ViewId("tutorial_apm_simple", "Asset", "beb2bebdcbb4ad"),
+            sources=view_id,
             class_type=Asset,
             class_apply_type=AssetApply,
             class_list=AssetList,

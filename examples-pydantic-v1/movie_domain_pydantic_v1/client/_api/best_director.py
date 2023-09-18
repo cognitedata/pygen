@@ -10,10 +10,10 @@ from movie_domain_pydantic_v1.client.data_classes import BestDirector, BestDirec
 
 
 class BestDirectorAPI(TypeAPI[BestDirector, BestDirectorApply, BestDirectorList]):
-    def __init__(self, client: CogniteClient):
+    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
         super().__init__(
             client=client,
-            sources=dm.ViewId("IntegrationTestsImmutable", "BestDirector", "2"),
+            sources=view_id,
             class_type=BestDirector,
             class_apply_type=BestDirectorApply,
             class_list=BestDirectorList,

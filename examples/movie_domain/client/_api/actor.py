@@ -77,10 +77,10 @@ class ActorNominationAPI:
 
 
 class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
-    def __init__(self, client: CogniteClient):
+    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
         super().__init__(
             client=client,
-            sources=dm.ViewId("IntegrationTestsImmutable", "Actor", "2"),
+            sources=view_id,
             class_type=Actor,
             class_apply_type=ActorApply,
             class_list=ActorList,

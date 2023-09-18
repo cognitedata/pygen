@@ -28,9 +28,7 @@ def multi_api_generator(shop_model, top_level_package) -> MultiAPIGenerator:
 
 @pytest.fixture
 def command_api_generator(multi_api_generator: MultiAPIGenerator, command_config_view: dm.View) -> APIGenerator:
-    api_generator = next(
-        (api for api in multi_api_generator.sub_apis if api.view.as_id() == command_config_view.as_id()), None
-    )
+    api_generator = multi_api_generator[command_config_view]
     assert api_generator is not None, "Could not find API generator for command config view"
     return api_generator
 
@@ -40,7 +38,7 @@ def test_create_view_data_classes_case(
 ):
     # Arrange
     expected = ShopSDKFiles.cases_data.read_text()
-    api_generator = next((api for api in multi_api_generator.sub_apis if api.view.as_id() == case_view.as_id()), None)
+    api_generator = multi_api_generator[case_view]
     assert api_generator is not None, "Could not find API generator for case view"
 
     # Act

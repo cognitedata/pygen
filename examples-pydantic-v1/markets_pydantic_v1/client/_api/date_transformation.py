@@ -10,10 +10,10 @@ from markets_pydantic_v1.client.data_classes import DateTransformation, DateTran
 
 
 class DateTransformationAPI(TypeAPI[DateTransformation, DateTransformationApply, DateTransformationList]):
-    def __init__(self, client: CogniteClient):
+    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
         super().__init__(
             client=client,
-            sources=dm.ViewId("market", "DateTransformation", "482866112eb911"),
+            sources=view_id,
             class_type=DateTransformation,
             class_apply_type=DateTransformationApply,
             class_list=DateTransformationList,

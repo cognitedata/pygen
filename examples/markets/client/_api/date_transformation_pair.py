@@ -87,10 +87,10 @@ class DateTransformationPairStartAPI:
 class DateTransformationPairAPI(
     TypeAPI[DateTransformationPair, DateTransformationPairApply, DateTransformationPairList]
 ):
-    def __init__(self, client: CogniteClient):
+    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
         super().__init__(
             client=client,
-            sources=dm.ViewId("market", "DateTransformationPair", "bde9fd4428c26e"),
+            sources=view_id,
             class_type=DateTransformationPair,
             class_apply_type=DateTransformationPairApply,
             class_list=DateTransformationPairList,

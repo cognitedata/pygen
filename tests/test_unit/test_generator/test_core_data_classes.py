@@ -5,7 +5,12 @@ from typing import ClassVar, Optional
 
 from pydantic import Field
 
-from cognite.pygen._core.static._core_data_classes import DomainModel
+from tests.constants import IS_PYDANTIC_V1
+
+if IS_PYDANTIC_V1:
+    from movie_domain_pydantic_v1.client.data_classes._core import DomainModel
+else:
+    from movie_domain.client.data_classes._core import DomainModel
 
 
 class TestDomainModel:

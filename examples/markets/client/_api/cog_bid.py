@@ -10,10 +10,10 @@ from markets.client.data_classes import CogBid, CogBidApply, CogBidList
 
 
 class CogBidAPI(TypeAPI[CogBid, CogBidApply, CogBidList]):
-    def __init__(self, client: CogniteClient):
+    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
         super().__init__(
             client=client,
-            sources=dm.ViewId("market", "CogBid", "3c04fa081c45d5"),
+            sources=view_id,
             class_type=CogBid,
             class_apply_type=CogBidApply,
             class_list=CogBidList,

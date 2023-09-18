@@ -10,7 +10,7 @@ from typing import Any, ClassVar, Generic, Optional, TypeVar, Union
 import pandas as pd
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Properties, PropertyValue
-from pydantic import BaseModel, ConfigDict, Extra, Field
+from pydantic import BaseModel, Extra, Field
 
 
 class DomainModelCore(BaseModel):
@@ -30,8 +30,9 @@ class DomainModel(DomainModelCore):
     @classmethod
     def from_node(cls: type[T_TypeNode], node: dm.Node) -> T_TypeNode:
         data = node.dump(camel_case=False)
-
-        return cls(**data, **unpack_properties(node.properties))  # type: ignore[arg-type]
+        # Extra unpacking to avoid crashing between core and property fields
+        # can happen in there is a field named 'version' in the DominModel.
+        return cls(**{**data, **unpack_properties(node.properties)})  # type: ignore[arg-type]
 
     @classmethod
     def one_to_many_fields(cls) -> list[str]:
@@ -45,8 +46,7 @@ class DomainModel(DomainModelCore):
 T_TypeNode = TypeVar("T_TypeNode", bound=DomainModel)
 
 
-class DomainModelApply(DomainModelCore):
-    model_config: ClassVar[ConfigDict] = ConfigDict(extra=Extra.forbid)
+class DomainModelApply(DomainModelCore, extra=Extra.forbid):
     existing_version: Optional[int] = None
 
     def to_instances_apply(self) -> dm.InstancesApply:
@@ -103,7 +103,6 @@ class TypeList(UserList, Generic[T_TypeNode]):
         df = pd.DataFrame(self.dump())
         if df.empty:
             df = pd.DataFrame(columns=self._NODE.model_fields)
-
         # Reorder columns to have the custom columns first
         fixed_columns = set(DomainModel.model_fields)
         columns = (

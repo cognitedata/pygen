@@ -77,10 +77,10 @@ class RoleNominationAPI:
 
 
 class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
-    def __init__(self, client: CogniteClient):
+    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
         super().__init__(
             client=client,
-            sources=dm.ViewId("IntegrationTestsImmutable", "Role", "2"),
+            sources=view_id,
             class_type=Role,
             class_apply_type=RoleApply,
             class_list=RoleList,

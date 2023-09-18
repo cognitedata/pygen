@@ -10,10 +10,10 @@ from markets.client.data_classes import Process, ProcessApply, ProcessList
 
 
 class ProcessAPI(TypeAPI[Process, ProcessApply, ProcessList]):
-    def __init__(self, client: CogniteClient):
+    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
         super().__init__(
             client=client,
-            sources=dm.ViewId("market", "Process", "98a2becd0f63ee"),
+            sources=view_id,
             class_type=Process,
             class_apply_type=ProcessApply,
             class_list=ProcessList,

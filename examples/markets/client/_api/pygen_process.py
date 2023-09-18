@@ -10,10 +10,10 @@ from markets.client.data_classes import PygenProcess, PygenProcessApply, PygenPr
 
 
 class PygenProcessAPI(TypeAPI[PygenProcess, PygenProcessApply, PygenProcessList]):
-    def __init__(self, client: CogniteClient):
+    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
         super().__init__(
             client=client,
-            sources=dm.ViewId("market", "PygenProcess", "477b68a858c7a8"),
+            sources=view_id,
             class_type=PygenProcess,
             class_apply_type=PygenProcessApply,
             class_list=PygenProcessList,

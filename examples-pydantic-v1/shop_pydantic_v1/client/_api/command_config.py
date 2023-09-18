@@ -10,10 +10,10 @@ from shop_pydantic_v1.client.data_classes import CommandConfig, CommandConfigApp
 
 
 class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigList]):
-    def __init__(self, client: CogniteClient):
+    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
         super().__init__(
             client=client,
-            sources=dm.ViewId("IntegrationTestsImmutable", "Command_Config", "4727b5ad34b608"),
+            sources=view_id,
             class_type=CommandConfig,
             class_apply_type=CommandConfigApply,
             class_list=CommandConfigList,

@@ -44,10 +44,10 @@ class PersonRolesAPI:
 
 
 class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
-    def __init__(self, client: CogniteClient):
+    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
         super().__init__(
             client=client,
-            sources=dm.ViewId("IntegrationTestsImmutable", "Person", "2"),
+            sources=view_id,
             class_type=Person,
             class_apply_type=PersonApply,
             class_list=PersonList,
