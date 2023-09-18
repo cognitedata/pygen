@@ -48,13 +48,13 @@ class Field(ABC):
         view_name: str,
         pydantic_field: str = "Field",
     ) -> Field:
-        name = create_name(prop_name, config.naming.field_.name)
+        name = create_name(prop_name, config.naming.field.name)
         if isinstance(prop, dm.SingleHopConnectionDefinition):
-            variable = create_name(prop_name, config.naming.field_.variable)
+            variable = create_name(prop_name, config.naming.field.variable)
 
             edge_api_class_input = f"{view_name}_{prop_name}"
-            edge_api_class = f"{create_name(edge_api_class_input, config.naming.field_.edge_api_class)}API"
-            edge_api_attribute = create_name(prop_name, config.naming.field_.edge_api_attribute)
+            edge_api_class = f"{create_name(edge_api_class_input, config.naming.field.edge_api_class)}API"
+            edge_api_attribute = create_name(prop_name, config.naming.field.api_class_attribute)
             return EdgeOneToMany(
                 name=name,
                 prop_name=prop_name,
@@ -368,6 +368,7 @@ class DataClass:
 
 @dataclass(frozen=True)
 class APIClass:
+    # Todo: Check is variable and variable_list are needed
     variable: str
     variable_list: str
     client_attribute: str
@@ -415,8 +416,8 @@ class MultiAPIClass:
 
         return cls(
             sub_apis=sub_apis,
-            client_attribute=create_name(data_model_name, config.naming.apis_class.client_attribute),
-            name=f"{create_name(data_model_name, config.naming.apis_class.name)}APIs",
+            client_attribute=create_name(data_model_name, config.naming.multi_api_class.client_attribute),
+            name=f"{create_name(data_model_name, config.naming.multi_api_class.name)}APIs",
             model_id=data_model.as_id(),
         )
 
