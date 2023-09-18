@@ -13,7 +13,7 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## [0.18.0] - 20-09-17
+## [0.18.0] - 20-09-18
 ### Added
 * Support for configuring naming convention used for the generated SDK.
 * Validation of the naming used in the generated SDK. This is to avoid name collisions between data and API classes.
