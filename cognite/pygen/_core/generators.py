@@ -213,5 +213,5 @@ class APIGenerator:
         type_api = self._env.get_template("api_class.py.jinja")
 
         return type_api.render(
-            top_level_package=top_level_package, api_class=self.api_class, data_class=self.data_class, view=self.view
+            top_level_package=top_level_package, api_class=self.api_class, data_class=self.data_class
         )
