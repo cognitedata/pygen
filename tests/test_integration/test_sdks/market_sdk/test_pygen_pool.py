@@ -18,4 +18,7 @@ def test_list_empty_to_pandas(market_client: MarketClient, cognite_client: Cogni
 
     # Assert
     assert market_df.empty
-    assert sorted(market_df.columns) == sorted(PygenPool.model_fields)
+    if IS_PYDANTIC_V1:
+        assert sorted(market_df.columns) == sorted(PygenPool.__fields__)
+    else:
+        assert sorted(market_df.columns) == sorted(PygenPool.model_fields)
