@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Union
 
 try:
     from pydantic import BaseModel, Field, FieldValidationInfo, field_validator
@@ -14,7 +14,7 @@ except ImportError:
 
 
 class Argument(BaseModel):
-    default: Optional[str] = None
+    default: Union[str, bool, None] = None
     help: str
 
 
@@ -37,6 +37,10 @@ class PygenSettings(BaseModel):
     output_dir: Argument = Argument(default=None, help="Output directory for generated SDK")
     top_level_package: Argument = Argument(default="my_domain.client", help="Package name for the generated client.")
     client_name: Argument = Argument(default="MyClient", help="Client name for the generated client.")
+    overwrite: Argument = Argument(
+        default=False, help="Whether to overwrite existing files in output directory with the new SDK."
+    )
+    skip_formatting: Argument = Argument(default=False, help="Whether to skip formatting the generated SDK with black.")
     data_models: list[tuple[str, str, str]] = Field(default_factory=list, help="Data models to generate SDK for.")
 
     if is_pydantic_v2:
