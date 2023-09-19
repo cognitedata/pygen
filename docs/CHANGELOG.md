@@ -13,6 +13,12 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.19.0] - 20-09-19
+### Added
+* Added helper methods `as_external_ids` and `as_node_ids` to generated data class lists. Example, if I have a view
+  `WorkOrder`, and a do a list call `work_orders = apm_client.work_order.list()`. I can now do
+  `work_orders.as_external_ids()`
+
 ## [0.18.3] - 20-09-19
 ### Fixed
 * Addded missing arguments `overwrite` and `skip-formatting` to `pygen` CLI.
