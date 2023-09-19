@@ -16,8 +16,9 @@ Changes are grouped as follows
 ## [0.19.0] - 20-09-19
 ### Added
 * Added helper methods `as_external_ids` and `as_node_ids` to generated data class lists. Example, if I have a view
-  `WorkOrder`, and a do a list call `work_orders = apm_client.work_order.list()`. I can now do
-  `work_orders.as_external_ids()`
+  `WorkOrder`, and then do a list call `work_orders = apm_client.work_order.list()`. You can now do
+  `work_orders.as_external_ids()` or `work_orders.as_node_ids()` to get a list of the external ids or node ids.
+* Option for filtering edges by source id in the generated SDK.
 
 ## [0.18.3] - 20-09-19
 ### Fixed
