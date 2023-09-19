@@ -122,11 +122,11 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
                 )
             )
         if name:
-            filters.append(dm.filters.In(self.view_id.as_property_ref("name"), name))
+            filters.append(dm.filters.In(self.view_id.as_property_ref("name"), values=name))
         if name_prefix:
-            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("name"), name_prefix))
+            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("name"), value=name_prefix))
         if external_id_prefix:
-            filters.append(dm.filters.Prefix(["node", "externalId"], external_id_prefix))
+            filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
         if filter:
             filters.append(filter)
 

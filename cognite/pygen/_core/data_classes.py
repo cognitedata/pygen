@@ -448,12 +448,34 @@ class MultiAPIClass:
 
 @dataclass(frozen=True)
 class ListParameter:
-    ...
+    name: str
+    type_: str
+    default: None = None
+
+
+@dataclass(frozen=True)
+class ListFilter:
+    filter: type[dm.Filter]
+    prop_name: str
+    keyword_arguments: dict[str, ListParameter]
+
+    @property
+    def condition(self) -> str:
+        return " or ".join(arg.name for arg in self.keyword_arguments.values())
+
+    @property
+    def arguments(self) -> str:
+        return ", ".join((f"{keyword}={arg}" for keyword, arg in self.keyword_arguments.items()))
+
+    @property
+    def filter_call(self) -> str:
+        return f"dm.filters.{self.filter.__name__}"
 
 
 @dataclass(frozen=True)
 class ListMethod:
-    ...
+    parameters: list[ListParameter]
+    filters: list[ListFilter]
 
 
 def _to_python_type(type_: dm.DirectRelationReference | dm.PropertyType) -> str:
