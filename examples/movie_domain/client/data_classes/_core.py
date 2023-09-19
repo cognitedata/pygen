@@ -99,6 +99,12 @@ class TypeList(UserList, Generic[T_TypeNode]):
     def dump(self) -> list[dict[str, Any]]:
         return [node.model_dump() for node in self.data]
 
+    def as_external_ids(self) -> list[str]:
+        return [node.external_id for node in self.data]
+
+    def as_ids(self) -> list[dm.NodeId]:
+        return [dm.NodeId(space=node.space, external_id=node.external_id) for node in self.data]
+
     def to_pandas(self) -> pd.DataFrame:
         df = pd.DataFrame(self.dump())
         if df.empty:
