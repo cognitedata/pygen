@@ -35,7 +35,7 @@ def sdk_generator(movie_model, top_level_package) -> SDKGenerator:
 
 
 @pytest.fixture
-def apis_generator(movie_model, top_level_package, pygen_config: PygenConfig) -> MultiAPIGenerator:
+def multi_api_generator(movie_model, top_level_package, pygen_config: PygenConfig) -> MultiAPIGenerator:
     return MultiAPIGenerator(top_level_package, "MovieClient", movie_model.views, config=pygen_config)
 
 
@@ -245,18 +245,20 @@ def test_fields_from_property(
 
 
 @pytest.fixture()
-def person_api_generator(apis_generator: MultiAPIGenerator, person_view: dm.View) -> APIGenerator:
+def person_api_generator(multi_api_generator: MultiAPIGenerator, person_view: dm.View) -> APIGenerator:
     api_generator = next(
-        (api for api in apis_generator.sub_apis if api.view_identifier == ViewSpaceExternalId.from_(person_view)), None
+        (api for api in multi_api_generator.sub_apis if api.view_identifier == ViewSpaceExternalId.from_(person_view)),
+        None,
     )
     assert api_generator is not None, "Could not find API generator for actor view"
     return api_generator
 
 
 @pytest.fixture()
-def actor_api_generator(apis_generator: MultiAPIGenerator, actor_view: dm.View) -> APIGenerator:
+def actor_api_generator(multi_api_generator: MultiAPIGenerator, actor_view: dm.View) -> APIGenerator:
     api_generator = next(
-        (api for api in apis_generator.sub_apis if api.view_identifier == ViewSpaceExternalId.from_(actor_view)), None
+        (api for api in multi_api_generator.sub_apis if api.view_identifier == ViewSpaceExternalId.from_(actor_view)),
+        None,
     )
     assert api_generator is not None, "Could not find API generator for actor view"
     return api_generator
@@ -306,12 +308,12 @@ def test_create_view_api_classes_persons(person_api_generator: APIGenerator, top
     assert actual == expected
 
 
-def test_generate_data_class_init_file(apis_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
+def test_generate_data_class_init_file(multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
     # Arrange
     expected = MovieSDKFiles.data_init.read_text()
 
     # Act
-    actual = apis_generator.generate_data_classes_init_file()
+    actual = multi_api_generator.generate_data_classes_init_file()
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -325,6 +327,28 @@ def test_create_api_client(sdk_generator: SDKGenerator, code_formatter: CodeForm
     # Act
     actual = sdk_generator._generate_api_client_file()
     actual = code_formatter.format_code(actual)
+
+    # Assert
+    assert actual == expected
+
+
+def test_generate_api_core_file(multi_api_generator: MultiAPIGenerator) -> None:
+    # Arrange
+    expected = MovieSDKFiles.core_api.read_text()
+
+    # Act
+    actual = multi_api_generator.generate_api_core_file()
+
+    # Assert
+    assert actual == expected
+
+
+def test_generate_data_class_core_file(multi_api_generator: MultiAPIGenerator) -> None:
+    # Arrange
+    expected = MovieSDKFiles.core_data.read_text()
+
+    # Act
+    actual = multi_api_generator.generate_data_class_core_file()
 
     # Assert
     assert actual == expected
