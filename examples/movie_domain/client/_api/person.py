@@ -125,10 +125,10 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
             filters.append(dm.filters.In(self.view_id.as_property_ref("name"), name))
         if name_prefix:
             filters.append(dm.filters.Prefix(self.view_id.as_property_ref("name"), name_prefix))
-        if filter:
-            filters.append(filter)
         if external_id_prefix:
             filters.append(dm.filters.Prefix(["node", "externalId"], external_id_prefix))
+        if filter:
+            filters.append(filter)
 
         persons = self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)
 

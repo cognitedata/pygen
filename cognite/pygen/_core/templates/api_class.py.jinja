@@ -107,13 +107,21 @@ class {{ api_class.name }}(TypeAPI[{{ data_class.read_name }}, {{ data_class.wri
 
             return {{ data_class.variable_list }}{% else %}return self._retrieve([(self.sources.space, ext_id) for ext_id in external_id]){% endif %}
 
-    def list(self, limit: int = DEFAULT_LIMIT_READ) -> {{ data_class.read_list_name }}:
-        {% if data_class.has_one_to_many_edges %}{{ data_class.variable_list }} = self._list(limit=limit)
-{% for field in data_class.one_to_many_edges %}
-        {{ field.variable }}_edges = self.{{ field.edge_api_attribute }}.list(limit=-1)
-        self._set_{{ field.name }}({{ data_class.variable_list }}, {{ field.variable }}_edges){% endfor %}
+    def list(
+        self,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+        {% if data_class.has_one_to_many_edges %}retrieve_edges: bool = True,{% endif %}
+    ) -> {{ data_class.read_list_name }}:
+        filters = []
+        if filter:
+            filters.append(filter)
+        {% if data_class.has_one_to_many_edges %}{{ data_class.variable_list }} = self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)
+        if retrieve_edges:{% for field in data_class.one_to_many_edges %}
+            {{ field.variable }}_edges = self.{{ field.edge_api_attribute }}.list({{ data_class.variable_list }}.as_external_ids(), limit=-1)
+            self._set_{{ field.name }}({{ data_class.variable_list }}, {{ field.variable }}_edges){% endfor %}
 
-        return {{ data_class.variable_list }}{% else %}return self._list(limit=limit){% endif %}
+        return {{ data_class.variable_list }}{% else %}return self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None){% endif %}
 {% for field in data_class.one_to_many_edges %}
     @staticmethod
     def _set_{{ field.name }}({{ data_class.variable_list }}: Sequence[{{ data_class.read_name }}], {{ field.variable }}_edges: Sequence[dm.Edge]):

@@ -446,6 +446,16 @@ class MultiAPIClass:
         )
 
 
+@dataclass(frozen=True)
+class ListParameter:
+    ...
+
+
+@dataclass(frozen=True)
+class ListMethod:
+    ...
+
+
 def _to_python_type(type_: dm.DirectRelationReference | dm.PropertyType) -> str:
     if isinstance(type_, (dm.Int32, dm.Int64)):
         out_type = "int"
