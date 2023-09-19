@@ -68,6 +68,10 @@ if _has_typer:
                 loaded_settings.top_level_package.default, help=loaded_settings.top_level_package.help
             ),
             client_name: str = typer.Option(loaded_settings.client_name.default, help=loaded_settings.client_name.help),
+            overwrite: bool = typer.Option(loaded_settings.overwrite.default, help=loaded_settings.overwrite.help),
+            skip_formatting: bool = typer.Option(
+                loaded_settings.skip_formatting.default, help=loaded_settings.skip_formatting.help
+            ),
         ):
             client = CogniteClient.default_oauth_client_credentials(
                 cdf_project, cdf_cluster, tenant_id, client_id, client_secret
@@ -85,7 +89,16 @@ if _has_typer:
                     "or 'data_models' in the 'pyproject.toml' file."
                 )
             try:
-                generate_sdk(client, data_models, top_level_package, client_name, output_dir, typer.echo)
+                generate_sdk(
+                    client,
+                    data_models,
+                    top_level_package,
+                    client_name,
+                    output_dir,
+                    typer.echo,
+                    overwrite=overwrite,
+                    format_code=not skip_formatting,
+                )
             except (CogniteAPIError, IndexError) as e:
                 raise typer.Exit(code=1) from e
 
@@ -109,13 +122,24 @@ if _has_typer:
             client_name: str = typer.Option(
                 default_settings.client_name.default, help=default_settings.client_name.help
             ),
+            overwrite: bool = typer.Option(default_settings.overwrite.default, help=default_settings.overwrite.help),
+            skip_formatting: bool = typer.Option(
+                default_settings.skip_formatting.default, help=default_settings.skip_formatting.help
+            ),
         ):
             client = CogniteClient.default_oauth_client_credentials(
                 cdf_project, cdf_cluster, tenant_id, client_id, client_secret
             )
             try:
                 generate_sdk(
-                    client, (space, external_id, version), top_level_package, client_name, output_dir, typer.echo
+                    client,
+                    (space, external_id, version),
+                    top_level_package,
+                    client_name,
+                    output_dir,
+                    typer.echo,
+                    overwrite=overwrite,
+                    format_code=not skip_formatting,
                 )
             except (CogniteAPIError, IndexError) as e:
                 raise typer.Exit(code=1) from e
