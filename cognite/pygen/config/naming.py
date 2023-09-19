@@ -197,15 +197,3 @@ class NamingConfig:
     data_class: DataClassNaming = dataclass_field(default_factory=DataClassNaming)
     api_class: APIClassNaming = dataclass_field(default_factory=APIClassNaming)
     multi_api_class: MultiAPIClassNaming = dataclass_field(default_factory=MultiAPIClassNaming)
-
-
-@dataclass
-class PygenConfig:
-    """
-    Configuration for how pygen should generate the SDK.
-
-    Args:
-        naming: The naming convention used by pygen.
-    """
-
-    naming: NamingConfig = dataclass_field(default_factory=NamingConfig)

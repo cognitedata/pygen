@@ -5,7 +5,7 @@ from cognite.client import CogniteClient
 from cognite.client.exceptions import CogniteAPIError
 
 from cognite import pygen
-from cognite.pygen._generator import generate_sdk
+from cognite.pygen import generate_sdk
 from cognite.pygen._settings import PygenSettings, load_settings
 
 try:

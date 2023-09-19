@@ -121,8 +121,10 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
                     lte=max_birth_year,
                 )
             )
-        if name:
+        if name and isinstance(name, list):
             filters.append(dm.filters.In(self.view_id.as_property_ref("name"), values=name))
+        if name and isinstance(name, str):
+            filters.append(dm.filters.Equals(self.view_id.as_property_ref("name"), value=name))
         if name_prefix:
             filters.append(dm.filters.Prefix(self.view_id.as_property_ref("name"), value=name_prefix))
         if external_id_prefix:
