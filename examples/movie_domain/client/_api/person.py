@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import Dict, List, Sequence, Tuple, overload, Literal
+from typing import Dict, List, Sequence, Tuple, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -43,7 +43,7 @@ class PersonRolesAPI:
         )
         filters.append(is_edge_type)
         if person_id:
-            person_ids = person_id if isinstance(person_id, list) else [person_id]
+            person_ids = [person_id] if isinstance(person_id, str) else person_id
             is_persons = f.In(
                 ["edge", "startNode"],
                 [{"space": "IntegrationTestsImmutable", "externalId": ext_id} for ext_id in person_ids],
