@@ -477,6 +477,10 @@ class ListMethod:
     parameters: list[ListParameter]
     filters: list[ListFilter]
 
+    @classmethod
+    def from_fields(cls, fields: Iterable[Field]) -> Self:
+        raise NotImplementedError()
+
 
 def _to_python_type(type_: dm.DirectRelationReference | dm.PropertyType) -> str:
     if isinstance(type_, (dm.Int32, dm.Int64)):

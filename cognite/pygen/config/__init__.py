@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from dataclasses import field as dataclass_field
 
+from .list_method import TypeFilters
 from .naming import (
     APIClassNaming,
     Case,
@@ -22,6 +23,7 @@ __all__ = [
     "Naming",
     "Number",
     "Case",
+    "TypeFilters",
 ]
 
 
@@ -35,3 +37,4 @@ class PygenConfig:
     """
 
     naming: NamingConfig = dataclass_field(default_factory=NamingConfig)
+    list_method: TypeFilters = dataclass_field(default_factory=TypeFilters)
