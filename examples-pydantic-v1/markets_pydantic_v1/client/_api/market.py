@@ -18,6 +18,7 @@ class MarketAPI(TypeAPI[Market, MarketApply, MarketList]):
             class_apply_type=MarketApply,
             class_list=MarketList,
         )
+        self.view_id = view_id
 
     def apply(self, market: MarketApply, replace: bool = False) -> dm.InstancesApplyResult:
         instances = market.to_instances_apply()
@@ -45,5 +46,32 @@ class MarketAPI(TypeAPI[Market, MarketApply, MarketList]):
         else:
             return self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
 
-    def list(self, limit: int = DEFAULT_LIMIT_READ) -> MarketList:
-        return self._list(limit=limit)
+    def list(
+        self,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        timezone: str | list[str] | None = None,
+        timezone_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> MarketList:
+        filters = []
+        if name and isinstance(name, str):
+            filters.append(dm.filters.Equals(self.view_id.as_property_ref("name"), value=name))
+        if name and isinstance(name, list):
+            filters.append(dm.filters.In(self.view_id.as_property_ref("name"), values=name))
+        if name_prefix:
+            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("name"), value=name_prefix))
+        if timezone and isinstance(timezone, str):
+            filters.append(dm.filters.Equals(self.view_id.as_property_ref("timezone"), value=timezone))
+        if timezone and isinstance(timezone, list):
+            filters.append(dm.filters.In(self.view_id.as_property_ref("timezone"), values=timezone))
+        if timezone_prefix:
+            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("timezone"), value=timezone_prefix))
+        if external_id_prefix:
+            filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+        if filter:
+            filters.append(filter)
+
+        return self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)

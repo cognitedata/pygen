@@ -18,6 +18,7 @@ class BestDirectorAPI(TypeAPI[BestDirector, BestDirectorApply, BestDirectorList]
             class_apply_type=BestDirectorApply,
             class_list=BestDirectorList,
         )
+        self.view_id = view_id
 
     def apply(self, best_director: BestDirectorApply, replace: bool = False) -> dm.InstancesApplyResult:
         instances = best_director.to_instances_apply()
@@ -45,5 +46,28 @@ class BestDirectorAPI(TypeAPI[BestDirector, BestDirectorApply, BestDirectorList]
         else:
             return self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
 
-    def list(self, limit: int = DEFAULT_LIMIT_READ) -> BestDirectorList:
-        return self._list(limit=limit)
+    def list(
+        self,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        min_year: int | None = None,
+        max_year: int | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> BestDirectorList:
+        filters = []
+        if name and isinstance(name, str):
+            filters.append(dm.filters.Equals(self.view_id.as_property_ref("name"), value=name))
+        if name and isinstance(name, list):
+            filters.append(dm.filters.In(self.view_id.as_property_ref("name"), values=name))
+        if name_prefix:
+            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("name"), value=name_prefix))
+        if min_year or max_year:
+            filters.append(dm.filters.Range(self.view_id.as_property_ref("year"), gte=min_year, lte=max_year))
+        if external_id_prefix:
+            filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+        if filter:
+            filters.append(filter)
+
+        return self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)

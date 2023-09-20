@@ -42,13 +42,27 @@ class DateTransformationPairEndAPI:
                 "edge", limit=-1, filter=f.And(is_edge_type, is_date_transformation_pairs)
             )
 
-    def list(self, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
+    def list(self, date_transformation_pair_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
         f = dm.filters
+        filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
             {"space": "market", "externalId": "DateTransformationPair.end"},
         )
-        return self._client.data_modeling.instances.list("edge", limit=limit, filter=is_edge_type)
+        filters.append(is_edge_type)
+        if date_transformation_pair_id:
+            date_transformation_pair_ids = (
+                [date_transformation_pair_id]
+                if isinstance(date_transformation_pair_id, str)
+                else date_transformation_pair_id
+            )
+            is_date_transformation_pairs = f.In(
+                ["edge", "startNode"],
+                [{"space": "market", "externalId": ext_id} for ext_id in date_transformation_pair_ids],
+            )
+            filters.append(is_date_transformation_pairs)
+
+        return self._client.data_modeling.instances.list("edge", limit=limit, filter=f.And(*filters))
 
 
 class DateTransformationPairStartAPI:
@@ -79,13 +93,27 @@ class DateTransformationPairStartAPI:
                 "edge", limit=-1, filter=f.And(is_edge_type, is_date_transformation_pairs)
             )
 
-    def list(self, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
+    def list(self, date_transformation_pair_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
         f = dm.filters
+        filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
             {"space": "market", "externalId": "DateTransformationPair.start"},
         )
-        return self._client.data_modeling.instances.list("edge", limit=limit, filter=is_edge_type)
+        filters.append(is_edge_type)
+        if date_transformation_pair_id:
+            date_transformation_pair_ids = (
+                [date_transformation_pair_id]
+                if isinstance(date_transformation_pair_id, str)
+                else date_transformation_pair_id
+            )
+            is_date_transformation_pairs = f.In(
+                ["edge", "startNode"],
+                [{"space": "market", "externalId": ext_id} for ext_id in date_transformation_pair_ids],
+            )
+            filters.append(is_date_transformation_pairs)
+
+        return self._client.data_modeling.instances.list("edge", limit=limit, filter=f.And(*filters))
 
 
 class DateTransformationPairAPI(
@@ -99,6 +127,7 @@ class DateTransformationPairAPI(
             class_apply_type=DateTransformationPairApply,
             class_list=DateTransformationPairList,
         )
+        self.view_id = view_id
         self.end = DateTransformationPairEndAPI(client)
         self.start = DateTransformationPairStartAPI(client)
 
@@ -150,13 +179,26 @@ class DateTransformationPairAPI(
 
             return date_transformation_pairs
 
-    def list(self, limit: int = DEFAULT_LIMIT_READ) -> DateTransformationPairList:
-        date_transformation_pairs = self._list(limit=limit)
+    def list(
+        self,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+        retrieve_edges: bool = True,
+    ) -> DateTransformationPairList:
+        filters = []
+        if external_id_prefix:
+            filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+        if filter:
+            filters.append(filter)
 
-        end_edges = self.end.list(limit=-1)
-        self._set_end(date_transformation_pairs, end_edges)
-        start_edges = self.start.list(limit=-1)
-        self._set_start(date_transformation_pairs, start_edges)
+        date_transformation_pairs = self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)
+
+        if retrieve_edges:
+            end_edges = self.end.list(date_transformation_pairs.as_external_ids(), limit=-1)
+            self._set_end(date_transformation_pairs, end_edges)
+            start_edges = self.start.list(date_transformation_pairs.as_external_ids(), limit=-1)
+            self._set_start(date_transformation_pairs, start_edges)
 
         return date_transformation_pairs
 

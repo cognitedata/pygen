@@ -18,6 +18,7 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
             class_apply_type=CaseApply,
             class_list=CaseList,
         )
+        self.view_id = view_id
 
     def apply(self, case: CaseApply, replace: bool = False) -> dm.InstancesApplyResult:
         instances = case.to_instances_apply()
@@ -45,5 +46,60 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
         else:
             return self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
 
-    def list(self, limit: int = DEFAULT_LIMIT_READ) -> CaseList:
-        return self._list(limit=limit)
+    def list(
+        self,
+        arguments: str | list[str] | None = None,
+        arguments_prefix: str | None = None,
+        min_end_time: datetime.datetime | None = None,
+        max_end_time: datetime.datetime | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        run_status: str | list[str] | None = None,
+        run_status_prefix: str | None = None,
+        scenario: str | list[str] | None = None,
+        scenario_prefix: str | None = None,
+        min_start_time: datetime.datetime | None = None,
+        max_start_time: datetime.datetime | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> CaseList:
+        filters = []
+        if arguments and isinstance(arguments, str):
+            filters.append(dm.filters.Equals(self.view_id.as_property_ref("arguments"), value=arguments))
+        if arguments and isinstance(arguments, list):
+            filters.append(dm.filters.In(self.view_id.as_property_ref("arguments"), values=arguments))
+        if arguments_prefix:
+            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("arguments"), value=arguments_prefix))
+        if min_end_time or max_end_time:
+            filters.append(
+                dm.filters.Range(self.view_id.as_property_ref("end_time"), gte=min_end_time, lte=max_end_time)
+            )
+        if name and isinstance(name, str):
+            filters.append(dm.filters.Equals(self.view_id.as_property_ref("name"), value=name))
+        if name and isinstance(name, list):
+            filters.append(dm.filters.In(self.view_id.as_property_ref("name"), values=name))
+        if name_prefix:
+            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("name"), value=name_prefix))
+        if run_status and isinstance(run_status, str):
+            filters.append(dm.filters.Equals(self.view_id.as_property_ref("runStatus"), value=run_status))
+        if run_status and isinstance(run_status, list):
+            filters.append(dm.filters.In(self.view_id.as_property_ref("runStatus"), values=run_status))
+        if run_status_prefix:
+            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("runStatus"), value=run_status_prefix))
+        if scenario and isinstance(scenario, str):
+            filters.append(dm.filters.Equals(self.view_id.as_property_ref("scenario"), value=scenario))
+        if scenario and isinstance(scenario, list):
+            filters.append(dm.filters.In(self.view_id.as_property_ref("scenario"), values=scenario))
+        if scenario_prefix:
+            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("scenario"), value=scenario_prefix))
+        if min_start_time or max_start_time:
+            filters.append(
+                dm.filters.Range(self.view_id.as_property_ref("start_time"), gte=min_start_time, lte=max_start_time)
+            )
+        if external_id_prefix:
+            filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+        if filter:
+            filters.append(filter)
+
+        return self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)
