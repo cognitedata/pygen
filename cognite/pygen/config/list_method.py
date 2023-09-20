@@ -35,4 +35,5 @@ class TypeFilters:
         elif isinstance(type_, dm.Text):
             return self.string
         else:
-            raise ValueError(f"Filter type {type_} is not currently not supported.")
+            # Skip unsupported types
+            return tuple([])

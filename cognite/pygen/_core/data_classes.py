@@ -577,7 +577,8 @@ class ListMethod:
                         )
                     )
                 else:
-                    raise NotImplementedError(f"Filter {selected_filter} is not supported")
+                    # This is a filter which is not supported by the list method.
+                    continue
         return cls(
             parameters=list(parameters_by_name.values()),
             filters=list_filters,

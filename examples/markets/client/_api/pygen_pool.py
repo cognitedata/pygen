@@ -18,6 +18,7 @@ class PygenPoolAPI(TypeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
             class_apply_type=PygenPoolApply,
             class_list=PygenPoolList,
         )
+        self.view_id = view_id
 
     def apply(self, pygen_pool: PygenPoolApply, replace: bool = False) -> dm.InstancesApplyResult:
         instances = pygen_pool.to_instances_apply()
@@ -45,5 +46,38 @@ class PygenPoolAPI(TypeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
         else:
             return self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
 
-    def list(self, limit: int = DEFAULT_LIMIT_READ) -> PygenPoolList:
-        return self._list(limit=limit)
+    def list(
+        self,
+        min_day_of_week: int | None = None,
+        max_day_of_week: int | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        timezone: str | list[str] | None = None,
+        timezone_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> PygenPoolList:
+        filters = []
+        if min_day_of_week or max_day_of_week:
+            filters.append(
+                dm.filters.Range(self.view_id.as_property_ref("dayOfWeek"), gte=min_day_of_week, lte=max_day_of_week)
+            )
+        if name and isinstance(name, str):
+            filters.append(dm.filters.Equals(self.view_id.as_property_ref("name"), value=name))
+        if name and isinstance(name, list):
+            filters.append(dm.filters.In(self.view_id.as_property_ref("name"), values=name))
+        if name_prefix:
+            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("name"), value=name_prefix))
+        if timezone and isinstance(timezone, str):
+            filters.append(dm.filters.Equals(self.view_id.as_property_ref("timezone"), value=timezone))
+        if timezone and isinstance(timezone, list):
+            filters.append(dm.filters.In(self.view_id.as_property_ref("timezone"), values=timezone))
+        if timezone_prefix:
+            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("timezone"), value=timezone_prefix))
+        if external_id_prefix:
+            filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+        if filter:
+            filters.append(filter)
+
+        return self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)

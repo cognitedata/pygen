@@ -34,13 +34,23 @@ class AssetChildrenAPI:
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_assets))
 
-    def list(self, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
+    def list(self, asset_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
         f = dm.filters
+        filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
             {"space": "tutorial_apm_simple", "externalId": "Asset.children"},
         )
-        return self._client.data_modeling.instances.list("edge", limit=limit, filter=is_edge_type)
+        filters.append(is_edge_type)
+        if asset_id:
+            asset_ids = [asset_id] if isinstance(asset_id, str) else asset_id
+            is_assets = f.In(
+                ["edge", "startNode"],
+                [{"space": "tutorial_apm_simple", "externalId": ext_id} for ext_id in asset_ids],
+            )
+            filters.append(is_assets)
+
+        return self._client.data_modeling.instances.list("edge", limit=limit, filter=f.And(*filters))
 
 
 class AssetInmodel3dAPI:
@@ -67,13 +77,23 @@ class AssetInmodel3dAPI:
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_assets))
 
-    def list(self, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
+    def list(self, asset_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
         f = dm.filters
+        filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
             {"space": "cdf_3d_schema", "externalId": "cdf3dEntityConnection"},
         )
-        return self._client.data_modeling.instances.list("edge", limit=limit, filter=is_edge_type)
+        filters.append(is_edge_type)
+        if asset_id:
+            asset_ids = [asset_id] if isinstance(asset_id, str) else asset_id
+            is_assets = f.In(
+                ["edge", "startNode"],
+                [{"space": "cdf_3d_schema", "externalId": ext_id} for ext_id in asset_ids],
+            )
+            filters.append(is_assets)
+
+        return self._client.data_modeling.instances.list("edge", limit=limit, filter=f.And(*filters))
 
 
 class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
@@ -85,6 +105,7 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
             class_apply_type=AssetApply,
             class_list=AssetList,
         )
+        self.view_id = view_id
         self.children = AssetChildrenAPI(client)
         self.in_model_3_d = AssetInmodel3dAPI(client)
 
@@ -128,13 +149,82 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
 
             return assets
 
-    def list(self, limit: int = DEFAULT_LIMIT_READ) -> AssetList:
-        assets = self._list(limit=limit)
+    def list(
+        self,
+        min_area_id: int | None = None,
+        max_area_id: int | None = None,
+        min_category_id: int | None = None,
+        max_category_id: int | None = None,
+        min_created_date: datetime.datetime | None = None,
+        max_created_date: datetime.datetime | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        is_active: bool | None = None,
+        is_critical_line: bool | None = None,
+        source_db: str | list[str] | None = None,
+        source_db_prefix: str | None = None,
+        tag: str | list[str] | None = None,
+        tag_prefix: str | None = None,
+        min_updated_date: datetime.datetime | None = None,
+        max_updated_date: datetime.datetime | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+        retrieve_edges: bool = True,
+    ) -> AssetList:
+        filters = []
+        if min_area_id or max_area_id:
+            filters.append(dm.filters.Range(self.view_id.as_property_ref("areaId"), gte=min_area_id, lte=max_area_id))
+        if min_category_id or max_category_id:
+            filters.append(
+                dm.filters.Range(self.view_id.as_property_ref("categoryId"), gte=min_category_id, lte=max_category_id)
+            )
+        if min_created_date or max_created_date:
+            filters.append(
+                dm.filters.Range(
+                    self.view_id.as_property_ref("createdDate"), gte=min_created_date, lte=max_created_date
+                )
+            )
+        if description and isinstance(description, str):
+            filters.append(dm.filters.Equals(self.view_id.as_property_ref("description"), value=description))
+        if description and isinstance(description, list):
+            filters.append(dm.filters.In(self.view_id.as_property_ref("description"), values=description))
+        if description_prefix:
+            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("description"), value=description_prefix))
+        if is_active and isinstance(is_active, str):
+            filters.append(dm.filters.Equals(self.view_id.as_property_ref("isActive"), value=is_active))
+        if is_critical_line and isinstance(is_critical_line, str):
+            filters.append(dm.filters.Equals(self.view_id.as_property_ref("isCriticalLine"), value=is_critical_line))
+        if source_db and isinstance(source_db, str):
+            filters.append(dm.filters.Equals(self.view_id.as_property_ref("sourceDb"), value=source_db))
+        if source_db and isinstance(source_db, list):
+            filters.append(dm.filters.In(self.view_id.as_property_ref("sourceDb"), values=source_db))
+        if source_db_prefix:
+            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("sourceDb"), value=source_db_prefix))
+        if tag and isinstance(tag, str):
+            filters.append(dm.filters.Equals(self.view_id.as_property_ref("tag"), value=tag))
+        if tag and isinstance(tag, list):
+            filters.append(dm.filters.In(self.view_id.as_property_ref("tag"), values=tag))
+        if tag_prefix:
+            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("tag"), value=tag_prefix))
+        if min_updated_date or max_updated_date:
+            filters.append(
+                dm.filters.Range(
+                    self.view_id.as_property_ref("updatedDate"), gte=min_updated_date, lte=max_updated_date
+                )
+            )
+        if external_id_prefix:
+            filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+        if filter:
+            filters.append(filter)
 
-        child_edges = self.children.list(limit=-1)
-        self._set_children(assets, child_edges)
-        in_model_3_d_edges = self.in_model_3_d.list(limit=-1)
-        self._set_in_model_3_d(assets, in_model_3_d_edges)
+        assets = self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)
+
+        if retrieve_edges:
+            child_edges = self.children.list(assets.as_external_ids(), limit=-1)
+            self._set_children(assets, child_edges)
+            in_model_3_d_edges = self.in_model_3_d.list(assets.as_external_ids(), limit=-1)
+            self._set_in_model_3_d(assets, in_model_3_d_edges)
 
         return assets
 

@@ -24,6 +24,7 @@ class CdfConnectionPropertiesAPI(
             class_apply_type=CdfConnectionPropertiesApply,
             class_list=CdfConnectionPropertiesList,
         )
+        self.view_id = view_id
 
     def apply(
         self, cdf_3_d_connection_property: CdfConnectionPropertiesApply, replace: bool = False
@@ -53,5 +54,30 @@ class CdfConnectionPropertiesAPI(
         else:
             return self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
 
-    def list(self, limit: int = DEFAULT_LIMIT_READ) -> CdfConnectionPropertiesList:
-        return self._list(limit=limit)
+    def list(
+        self,
+        min_revision_id: int | None = None,
+        max_revision_id: int | None = None,
+        min_revision_node_id: int | None = None,
+        max_revision_node_id: int | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> CdfConnectionPropertiesList:
+        filters = []
+        if min_revision_id or max_revision_id:
+            filters.append(
+                dm.filters.Range(self.view_id.as_property_ref("revisionId"), gte=min_revision_id, lte=max_revision_id)
+            )
+        if min_revision_node_id or max_revision_node_id:
+            filters.append(
+                dm.filters.Range(
+                    self.view_id.as_property_ref("revisionNodeId"), gte=min_revision_node_id, lte=max_revision_node_id
+                )
+            )
+        if external_id_prefix:
+            filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+        if filter:
+            filters.append(filter)
+
+        return self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)
