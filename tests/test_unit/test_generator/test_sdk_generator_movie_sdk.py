@@ -301,12 +301,15 @@ def test_create_view_api_classes_actors(actor_api_generator: APIGenerator, top_l
     assert actual == expected
 
 
-def test_create_view_api_classes_persons(person_api_generator: APIGenerator, top_level_package: str):
+def test_create_view_api_classes_persons(
+    person_api_generator: APIGenerator, top_level_package: str, code_formatter: CodeFormatter
+):
     # Arrange
     expected = MovieSDKFiles.persons_api.read_text()
 
     # Act
     actual = person_api_generator.generate_api_file(top_level_package)
+    actual = code_formatter.format_code(actual)
 
     # Assert
     assert actual == expected

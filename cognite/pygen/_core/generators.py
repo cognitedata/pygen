@@ -242,7 +242,9 @@ class APIGenerator:
         self.view_identifier = ViewSpaceExternalId.from_(view)
         self.data_class = DataClass.from_view(view, config.naming.data_class)
         self.api_class = APIClass.from_view(view, config.naming.api_class)
-        self.list_method = ListMethod.from_fields(self.data_class.fields, config.list_method)
+
+        # List method cannot be generated here, as we need all data class fields to bo updated first.
+        self._config = config
 
     def generate_data_class_file(self) -> str:
         type_data = self._env.get_template("data_class.py.jinja")
@@ -253,5 +255,8 @@ class APIGenerator:
         type_api = self._env.get_template("api_class.py.jinja")
 
         return type_api.render(
-            top_level_package=top_level_package, api_class=self.api_class, data_class=self.data_class
+            top_level_package=top_level_package,
+            api_class=self.api_class,
+            data_class=self.data_class,
+            list_method=ListMethod.from_fields(self.data_class.fields, self._config.list_method),
         )

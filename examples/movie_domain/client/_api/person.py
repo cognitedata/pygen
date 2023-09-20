@@ -115,16 +115,12 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
         filters = []
         if min_birth_year or max_birth_year:
             filters.append(
-                dm.filters.Range(
-                    self.view_id.as_property_ref("birthYear"),
-                    gte=min_birth_year,
-                    lte=max_birth_year,
-                )
+                dm.filters.Range(self.view_id.as_property_ref("birthYear"), gte=min_birth_year, lte=max_birth_year)
             )
-        if name and isinstance(name, list):
-            filters.append(dm.filters.In(self.view_id.as_property_ref("name"), values=name))
         if name and isinstance(name, str):
             filters.append(dm.filters.Equals(self.view_id.as_property_ref("name"), value=name))
+        if name and isinstance(name, list):
+            filters.append(dm.filters.In(self.view_id.as_property_ref("name"), values=name))
         if name_prefix:
             filters.append(dm.filters.Prefix(self.view_id.as_property_ref("name"), value=name_prefix))
         if external_id_prefix:

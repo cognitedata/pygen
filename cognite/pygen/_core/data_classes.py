@@ -453,6 +453,10 @@ class ListParameter:
     type_: str
     default: None = None
 
+    @property
+    def annotation(self) -> str:
+        return f"{self.type_} | None"
+
 
 @dataclass
 class ListFilter:
@@ -462,11 +466,24 @@ class ListFilter:
 
     @property
     def condition(self) -> str:
+        if self.filter is dm.filters.In:
+            parameter = next(iter(self.keyword_arguments.values())).name
+            return f"{parameter} and isinstance({parameter}, list)"
+        elif self.filter is dm.filters.Equals:
+            parameter = next(iter(self.keyword_arguments.values())).name
+            return f"{parameter} and isinstance({parameter}, str)"
+
         return " or ".join(arg.name for arg in self.keyword_arguments.values())
 
     @property
     def arguments(self) -> str:
-        return ", ".join((f"{keyword}={arg}" for keyword, arg in self.keyword_arguments.items()))
+        if self.prop_name == "externalId":
+            property_ref = '["node", "externalId"], '
+        else:
+            property_ref = f'self.view_id.as_property_ref("{self.prop_name}"), '
+
+        filter_args = ", ".join((f"{keyword}={arg.name}" for keyword, arg in self.keyword_arguments.items()))
+        return f"{property_ref}{filter_args}"
 
     @property
     def filter_call(self) -> str:
