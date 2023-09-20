@@ -10,7 +10,7 @@ from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.data_modeling.data_types import ListablePropertyType
 from typing_extensions import Self
 
-from cognite.pygen.config import PygenConfig
+from cognite.pygen import config as pygen_config
 from cognite.pygen.utils.text import create_name
 
 _PRIMITIVE_TYPES = (dm.Text, dm.Boolean, dm.Float32, dm.Float64, dm.Int32, dm.Int64, dm.Timestamp, dm.Date, dm.Json)
@@ -65,17 +65,17 @@ class Field(ABC):
         prop_name: str,
         prop: dm.MappedProperty | dm.ConnectionDefinition,
         data_class_by_view_id: dict[ViewSpaceExternalId, DataClass],
-        config: PygenConfig,
+        field_naming: pygen_config.FieldNaming,
         view_name: str,
         pydantic_field: str = "Field",
     ) -> Field:
-        name = create_name(prop_name, config.naming.field.name)
+        name = create_name(prop_name, field_naming.name)
         if isinstance(prop, dm.SingleHopConnectionDefinition):
-            variable = create_name(prop_name, config.naming.field.variable)
+            variable = create_name(prop_name, field_naming.variable)
 
             edge_api_class_input = f"{view_name}_{prop_name}"
-            edge_api_class = f"{create_name(edge_api_class_input, config.naming.field.edge_api_class)}API"
-            edge_api_attribute = create_name(prop_name, config.naming.field.api_class_attribute)
+            edge_api_class = f"{create_name(edge_api_class_input, field_naming.edge_api_class)}API"
+            edge_api_attribute = create_name(prop_name, field_naming.api_class_attribute)
             return EdgeOneToMany(
                 name=name,
                 prop_name=prop_name,
@@ -276,12 +276,12 @@ class DataClass:
     fields: list[Field] = field(default_factory=list)
 
     @classmethod
-    def from_view(cls, view: dm.View, config: PygenConfig) -> Self:
+    def from_view(cls, view: dm.View, data_class: pygen_config.DataClassNaming) -> Self:
         view_name = (view.name or view.external_id).replace(" ", "_")
-        class_name = create_name(view_name, config.naming.data_class.name)
-        variable_name = create_name(view_name, config.naming.data_class.variable)
-        variable_list = create_name(view_name, config.naming.data_class.variable_list)
-        file_name = f"_{create_name(view_name, config.naming.data_class.file)}"
+        class_name = create_name(view_name, data_class.name)
+        variable_name = create_name(view_name, data_class.variable)
+        variable_list = create_name(view_name, data_class.variable_list)
+        file_name = f"_{create_name(view_name, data_class.file)}"
         return cls(
             view_name=view_name,
             read_name=class_name,
@@ -298,12 +298,12 @@ class DataClass:
         self,
         properties: dict[str, dm.MappedProperty | dm.ConnectionDefinition],
         data_class_by_view_id: dict[ViewSpaceExternalId, DataClass],
-        config: PygenConfig,
+        field_naming: pygen_config.FieldNaming,
     ) -> None:
         pydantic_field = self.pydantic_field
         for prop_name, prop in properties.items():
             field_ = Field.from_property(
-                prop_name, prop, data_class_by_view_id, config, self.view_name, pydantic_field=pydantic_field
+                prop_name, prop, data_class_by_view_id, field_naming, self.view_name, pydantic_field=pydantic_field
             )
             self.fields.append(field_)
 
@@ -394,15 +394,15 @@ class APIClass:
     view_id: ViewSpaceExternalId
 
     @classmethod
-    def from_view(cls, view: dm.View, config: PygenConfig) -> APIClass:
+    def from_view(cls, view: dm.View, api_class: pygen_config.APIClassNaming) -> APIClass:
         raw_name = view.name or view.external_id
 
         raw_name = raw_name.replace(" ", "_")
 
         return cls(
-            client_attribute=create_name(raw_name, config.naming.api_class.client_attribute),
-            name=f"{create_name(raw_name, config.naming.api_class.name)}API",
-            file_name=create_name(raw_name, config.naming.api_class.file_name),
+            client_attribute=create_name(raw_name, api_class.client_attribute),
+            name=f"{create_name(raw_name, api_class.name)}API",
+            file_name=create_name(raw_name, api_class.file_name),
             view_id=ViewSpaceExternalId.from_(view),
         )
 
@@ -429,7 +429,7 @@ class MultiAPIClass:
         cls,
         data_model: dm.DataModel[dm.View],
         api_class_by_view_id: dict[ViewSpaceExternalId, APIClass],
-        config: PygenConfig,
+        multi_api_class: pygen_config.MultiAPIClassNaming,
     ) -> MultiAPIClass:
         sub_apis = sorted(
             [api_class_by_view_id[ViewSpaceExternalId.from_(view)] for view in data_model.views],
@@ -440,8 +440,8 @@ class MultiAPIClass:
 
         return cls(
             sub_apis=sub_apis,
-            client_attribute=create_name(data_model_name, config.naming.multi_api_class.client_attribute),
-            name=f"{create_name(data_model_name, config.naming.multi_api_class.name)}APIs",
+            client_attribute=create_name(data_model_name, multi_api_class.client_attribute),
+            name=f"{create_name(data_model_name, multi_api_class.name)}APIs",
             model=data_model,
         )
 
@@ -478,7 +478,7 @@ class ListMethod:
     filters: list[ListFilter]
 
     @classmethod
-    def from_fields(cls, fields: Iterable[Field]) -> Self:
+    def from_fields(cls, fields: Iterable[Field], config: pygen_config.TypeFilters) -> Self:
         raise NotImplementedError()
 
 
