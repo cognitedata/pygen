@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import cast
+from unittest.mock import MagicMock
 
 import pytest
 from cognite.client import data_modeling as dm
@@ -360,6 +361,12 @@ def test_generate_data_class_core_file(multi_api_generator: MultiAPIGenerator) -
 def test_create_list_method(person_view: dm.View, pygen_config: PygenConfig) -> None:
     # Arrange
     data_class = DataClass.from_view(person_view, pygen_config.naming.data_class)
+
+    data_class.update_fields(
+        person_view.properties,
+        {ViewSpaceExternalId(space="IntegrationTestsImmutable", external_id="Role"): MagicMock(spec=DataClass)},
+        field_naming=pygen_config.naming.field,
+    )
     parameters = [
         ListParameter("min_birth_year", "int"),
         ListParameter("max_birth_year", "int"),
@@ -371,8 +378,8 @@ def test_create_list_method(person_view: dm.View, pygen_config: PygenConfig) -> 
         parameters=parameters,
         filters=[
             ListFilter(dm.filters.Range, "birthYear", dict(gte=parameters[0], lte=parameters[1])),
-            ListFilter(dm.filters.In, "name", dict(values=parameters[2])),
             ListFilter(dm.filters.Equals, "name", dict(value=parameters[2])),
+            ListFilter(dm.filters.In, "name", dict(values=parameters[2])),
             ListFilter(dm.filters.Prefix, "name", dict(value=parameters[3])),
             ListFilter(dm.filters.Prefix, "externalId", dict(value=parameters[4])),
         ],
@@ -382,4 +389,10 @@ def test_create_list_method(person_view: dm.View, pygen_config: PygenConfig) -> 
     actual = ListMethod.from_fields(data_class.fields, pygen_config.list_method)
 
     # Assert
+    assert actual.parameters == expected.parameters
+    for a, e in zip(actual.filters, expected.filters):
+        assert a.filter == e.filter
+        assert a.prop_name == e.prop_name
+        assert a.keyword_arguments == e.keyword_arguments
+        assert a == e
     assert actual == expected

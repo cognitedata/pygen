@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import itertools
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from collections.abc import Iterable, Iterator
@@ -446,14 +447,14 @@ class MultiAPIClass:
         )
 
 
-@dataclass(frozen=True)
+@dataclass
 class ListParameter:
     name: str
     type_: str
     default: None = None
 
 
-@dataclass(frozen=True)
+@dataclass
 class ListFilter:
     filter: type[dm.Filter]
     prop_name: str
@@ -472,7 +473,25 @@ class ListFilter:
         return f"dm.filters.{self.filter.__name__}"
 
 
-@dataclass(frozen=True)
+# This field is used when creating the list method.
+_EXTERNAL_ID_FIELD = PrimitiveField(
+    name="external_id",
+    prop_name="externalId",
+    type_="str",
+    is_nullable=False,
+    default=None,
+    prop=dm.MappedProperty(
+        container_property_identifier="externalId",
+        type=dm.Text(),
+        nullable=False,
+        auto_increment=False,
+        container=dm.ContainerId("dummy", "dummy"),
+    ),
+    pydantic_field="Field",
+)
+
+
+@dataclass
 class ListMethod:
     parameters: list[ListParameter]
     filters: list[ListFilter]
@@ -481,41 +500,67 @@ class ListMethod:
     def from_fields(cls, fields: Iterable[Field], config: pygen_config.TypeFilters) -> Self:
         parameters_by_name: dict[str, ListParameter] = {}
         list_filters: list[ListFilter] = []
-        for field_ in fields:
+
+        for field_ in itertools.chain(fields, (_EXTERNAL_ID_FIELD,)):
             if not isinstance(field_, PrimitiveField):
                 # Only primitive fields supported for now
                 continue
-            for selected_filter in config.get(field_.prop.type):
+
+            for selected_filter in config.get(field_.prop.type, field_.prop_name):
                 if selected_filter is dm.filters.Equals:
                     if field_.name not in parameters_by_name:
                         parameter = ListParameter(name=field_.name, type_=field_.type_)
+                        parameters_by_name[parameter.name] = parameter
                     else:
-                        # Equals and In filter share parameter, you have to extend the typ hint.
+                        # Equals and In filter share parameter, you have to extend the type hint.
                         parameter = parameters_by_name[field_.name]
-                        parameter = ListParameter(name=field_.name, type_=f"{field_.type_} | {parameter.type_}")
-                    parameters_by_name[field_.name] = parameter
-                    list_filter = ListFilter(
-                        filter=selected_filter,
-                        prop_name=field_.prop_name,
-                        keyword_arguments=dict(value=parameter),
+                        parameter.type_ = f"{field_.type_} | {parameter.type_}"
+                    list_filters.append(
+                        ListFilter(
+                            filter=selected_filter,
+                            prop_name=field_.prop_name,
+                            keyword_arguments=dict(value=parameter),
+                        )
                     )
-                    list_filters.append(list_filter)
                 elif selected_filter is dm.filters.In:
                     if field_.name not in parameters_by_name:
                         parameter = ListParameter(field_.name, type_=f"list[{field_.type_}]")
+                        parameters_by_name[parameter.name] = parameter
                     else:
                         # Equals and In filter share parameter, you have to extend the typ hint.
                         parameter = parameters_by_name[field_.name]
-                        parameter = ListParameter(name=field_.name, type_=f"{parameter.type_} | list[{field_.type_}]")
-                    list_filter = ListFilter(
-                        filter=selected_filter,
-                        prop_name=field_.prop_name,
-                        keyword_arguments=dict(values=parameter),
+                        parameter.type_ = f"{parameter.type_} | list[{field_.type_}]"
+                    list_filters.append(
+                        ListFilter(
+                            filter=selected_filter,
+                            prop_name=field_.prop_name,
+                            keyword_arguments=dict(values=parameter),
+                        )
+                    )
+                elif selected_filter is dm.filters.Prefix:
+                    parameter = ListParameter(name=f"{field_.name}_prefix", type_=field_.type_)
+                    parameters_by_name[parameter.name] = parameter
+                    list_filters.append(
+                        ListFilter(
+                            filter=selected_filter,
+                            prop_name=field_.prop_name,
+                            keyword_arguments=dict(value=parameter),
+                        )
+                    )
+                elif selected_filter is dm.filters.Range:
+                    min_parameter = ListParameter(name=f"min_{field_.name}", type_=field_.type_)
+                    max_parameter = ListParameter(name=f"max_{field_.name}", type_=field_.type_)
+                    parameters_by_name[min_parameter.name] = min_parameter
+                    parameters_by_name[max_parameter.name] = max_parameter
+                    list_filters.append(
+                        ListFilter(
+                            filter=selected_filter,
+                            prop_name=field_.prop_name,
+                            keyword_arguments=dict(gte=min_parameter, lte=max_parameter),
+                        )
                     )
                 else:
                     raise NotImplementedError(f"Filter {selected_filter} is not supported")
-                parameters_by_name[field_.name] = parameter
-                list_filters.append(list_filter)
         return cls(
             parameters=list(parameters_by_name.values()),
             filters=list_filters,
