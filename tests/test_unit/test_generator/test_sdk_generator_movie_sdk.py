@@ -11,6 +11,9 @@ from cognite.pygen._core.data_classes import (
     EdgeOneToMany,
     EdgeOneToOne,
     Field,
+    ListFilter,
+    ListMethod,
+    ListParameter,
     PrimitiveField,
     PrimitiveListField,
     ViewSpaceExternalId,
@@ -349,6 +352,34 @@ def test_generate_data_class_core_file(multi_api_generator: MultiAPIGenerator) -
 
     # Act
     actual = multi_api_generator.generate_data_class_core_file()
+
+    # Assert
+    assert actual == expected
+
+
+def test_create_list_method(person_view: dm.View, pygen_config: PygenConfig) -> None:
+    # Arrange
+    data_class = DataClass.from_view(person_view, pygen_config.naming.data_class)
+    parameters = [
+        ListParameter("min_birth_year", "int"),
+        ListParameter("max_birth_year", "int"),
+        ListParameter("name", "str | list[str]"),
+        ListParameter("name_prefix", "str"),
+        ListParameter("external_id_prefix", "str"),
+    ]
+    expected = ListMethod(
+        parameters=parameters,
+        filters=[
+            ListFilter(dm.filters.Range, "birthYear", dict(gte=parameters[0], lte=parameters[1])),
+            ListFilter(dm.filters.In, "name", dict(values=parameters[2])),
+            ListFilter(dm.filters.Equals, "name", dict(value=parameters[2])),
+            ListFilter(dm.filters.Prefix, "name", dict(value=parameters[3])),
+            ListFilter(dm.filters.Prefix, "externalId", dict(value=parameters[4])),
+        ],
+    )
+
+    # Act
+    actual = ListMethod.from_fields(data_class.fields, pygen_config.list_method)
 
     # Assert
     assert actual == expected
