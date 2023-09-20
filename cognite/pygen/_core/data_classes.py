@@ -479,7 +479,47 @@ class ListMethod:
 
     @classmethod
     def from_fields(cls, fields: Iterable[Field], config: pygen_config.TypeFilters) -> Self:
-        raise NotImplementedError()
+        parameters_by_name: dict[str, ListParameter] = {}
+        list_filters: list[ListFilter] = []
+        for field_ in fields:
+            if not isinstance(field_, PrimitiveField):
+                # Only primitive fields supported for now
+                continue
+            for selected_filter in config.get(field_.prop.type):
+                if selected_filter is dm.filters.Equals:
+                    if field_.name not in parameters_by_name:
+                        parameter = ListParameter(name=field_.name, type_=field_.type_)
+                    else:
+                        # Equals and In filter share parameter, you have to extend the typ hint.
+                        parameter = parameters_by_name[field_.name]
+                        parameter = ListParameter(name=field_.name, type_=f"{field_.type_} | {parameter.type_}")
+                    parameters_by_name[field_.name] = parameter
+                    list_filter = ListFilter(
+                        filter=selected_filter,
+                        prop_name=field_.prop_name,
+                        keyword_arguments=dict(value=parameter),
+                    )
+                    list_filters.append(list_filter)
+                elif selected_filter is dm.filters.In:
+                    if field_.name not in parameters_by_name:
+                        parameter = ListParameter(field_.name, type_=f"list[{field_.type_}]")
+                    else:
+                        # Equals and In filter share parameter, you have to extend the typ hint.
+                        parameter = parameters_by_name[field_.name]
+                        parameter = ListParameter(name=field_.name, type_=f"{parameter.type_} | list[{field_.type_}]")
+                    list_filter = ListFilter(
+                        filter=selected_filter,
+                        prop_name=field_.prop_name,
+                        keyword_arguments=dict(values=parameter),
+                    )
+                else:
+                    raise NotImplementedError(f"Filter {selected_filter} is not supported")
+                parameters_by_name[field_.name] = parameter
+                list_filters.append(list_filter)
+        return cls(
+            parameters=list(parameters_by_name.values()),
+            filters=list_filters,
+        )
 
 
 def _to_python_type(type_: dm.DirectRelationReference | dm.PropertyType) -> str:

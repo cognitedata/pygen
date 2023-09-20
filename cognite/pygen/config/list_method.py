@@ -11,3 +11,19 @@ class TypeFilters:
     date: tuple[type[dm.Filter], ...] = (dm.filters.Range,)
     datetime: tuple[type[dm.Filter], ...] = (dm.filters.Range,)
     string: tuple[type[dm.Filter], ...] = (dm.filters.Equals, dm.filters.In, dm.filters.Prefix)
+
+    def get(self, type_: dm.PropertyType) -> tuple[type[dm.Filter], ...]:
+        if isinstance(type_, (dm.Int32, dm.Int64)):
+            return self.integer
+        elif isinstance(type_, dm.Boolean):
+            return self.boolean
+        elif isinstance(type_, (dm.Float32, dm.Float64)):
+            return self.float
+        elif isinstance(type_, dm.Date):
+            return self.date
+        elif isinstance(type_, dm.Timestamp):
+            return self.datetime
+        elif isinstance(type_, dm.Text):
+            return self.string
+        else:
+            raise ValueError(f"Filter type {type_} is not currently not supported.")
