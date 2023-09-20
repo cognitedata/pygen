@@ -34,13 +34,23 @@ class ActorMoviesAPI:
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_actors))
 
-    def list(self, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
+    def list(self, actor_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
         f = dm.filters
+        filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
             {"space": "IntegrationTestsImmutable", "externalId": "Role.movies"},
         )
-        return self._client.data_modeling.instances.list("edge", limit=limit, filter=is_edge_type)
+        filters.append(is_edge_type)
+        if actor_id:
+            actor_ids = [actor_id] if isinstance(actor_id, str) else actor_id
+            is_actors = f.In(
+                ["edge", "startNode"],
+                [{"space": "IntegrationTestsImmutable", "externalId": ext_id} for ext_id in actor_ids],
+            )
+            filters.append(is_actors)
+
+        return self._client.data_modeling.instances.list("edge", limit=limit, filter=f.And(*filters))
 
 
 class ActorNominationAPI:
@@ -67,13 +77,23 @@ class ActorNominationAPI:
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_actors))
 
-    def list(self, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
+    def list(self, actor_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
         f = dm.filters
+        filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
             {"space": "IntegrationTestsImmutable", "externalId": "Role.nomination"},
         )
-        return self._client.data_modeling.instances.list("edge", limit=limit, filter=is_edge_type)
+        filters.append(is_edge_type)
+        if actor_id:
+            actor_ids = [actor_id] if isinstance(actor_id, str) else actor_id
+            is_actors = f.In(
+                ["edge", "startNode"],
+                [{"space": "IntegrationTestsImmutable", "externalId": ext_id} for ext_id in actor_ids],
+            )
+            filters.append(is_actors)
+
+        return self._client.data_modeling.instances.list("edge", limit=limit, filter=f.And(*filters))
 
 
 class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
@@ -85,6 +105,7 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
             class_apply_type=ActorApply,
             class_list=ActorList,
         )
+        self.view_id = view_id
         self.movies = ActorMoviesAPI(client)
         self.nomination = ActorNominationAPI(client)
 
@@ -128,13 +149,29 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
 
             return actors
 
-    def list(self, limit: int = DEFAULT_LIMIT_READ) -> ActorList:
-        actors = self._list(limit=limit)
+    def list(
+        self,
+        won_oscar: bool | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+        retrieve_edges: bool = True,
+    ) -> ActorList:
+        filters = []
+        if won_oscar and isinstance(won_oscar, str):
+            filters.append(dm.filters.Equals(self.view_id.as_property_ref("wonOscar"), value=won_oscar))
+        if external_id_prefix:
+            filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+        if filter:
+            filters.append(filter)
 
-        movie_edges = self.movies.list(limit=-1)
-        self._set_movies(actors, movie_edges)
-        nomination_edges = self.nomination.list(limit=-1)
-        self._set_nomination(actors, nomination_edges)
+        actors = self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)
+
+        if retrieve_edges:
+            movie_edges = self.movies.list(actors.as_external_ids(), limit=-1)
+            self._set_movies(actors, movie_edges)
+            nomination_edges = self.nomination.list(actors.as_external_ids(), limit=-1)
+            self._set_nomination(actors, nomination_edges)
 
         return actors
 
