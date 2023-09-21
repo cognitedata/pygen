@@ -514,7 +514,7 @@ class ListMethod:
     filters: list[ListFilter]
 
     @classmethod
-    def from_fields(cls, fields: Iterable[Field], config: pygen_config.TypeFilters) -> Self:
+    def from_fields(cls, fields: Iterable[Field], config: pygen_config.ListMethodFilters) -> Self:
         parameters_by_name: dict[str, ListParameter] = {}
         list_filters: list[ListFilter] = []
 

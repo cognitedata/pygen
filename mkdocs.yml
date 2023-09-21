@@ -19,6 +19,7 @@ nav:
     - Pygen Config:
         - Home: config/index.md
         - Naming: config/naming.md
+        - ListMethod: config/list_method.md
     - API:
         - Pygen: api/api.md
         - Demo: api/demo.md

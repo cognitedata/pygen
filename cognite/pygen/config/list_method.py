@@ -7,7 +7,43 @@ from cognite.client import data_modeling as dm
 
 
 @dataclass
-class TypeFilters:
+class ListMethodFilters:
+    """The type of filters to use for each property type.
+
+    When pygen generates a list method, it uses the type of the property to determine which filters to
+    implement. For example, if you have two properties, `year` of type Int32 and `name` of type Text,
+    and you generate a list method with the default options, you will get the following filters:
+
+    ```python
+    class MyAPIClass:
+        ...
+        def list(self,
+            min_year: int | None = None,
+            max_year: int | None = None,
+            name: str | list[str] | None = None,
+            name_prefix: str | None = None,
+            external_id_prefix: str | None = None,
+        ):
+            ...
+
+    ```
+
+    !!! warning "Not supported properties"
+        Currently only primitive type properties are supported. If you have a list of primitive types, e.g., list of
+        strings, it will not be used to generate filters. One-to-one and one-to-many edges will also not be used to
+        create filters in the `.list(...)` method.
+
+    Args:
+        integer: Filters to use for integer properties.
+        boolean: Filters to use for boolean properties.
+        float: Filters to use for float properties.
+        date: Filters to use for date properties.
+        datetime: Filters to use for datetime properties.
+        string: Filters to use for string properties.
+        by_name: Filters to use for properties with a specific name. This
+            overwrites the default filters for the property with the given name.
+    """
+
     integer: tuple[type[dm.Filter], ...] = (dm.filters.Range,)
     boolean: tuple[type[dm.Filter], ...] = (dm.filters.Equals,)
     float: tuple[type[dm.Filter], ...] = (dm.filters.Range,)
