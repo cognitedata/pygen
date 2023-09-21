@@ -577,7 +577,7 @@ class ListMethod:
                         )
                     )
                 else:
-                    # This is a filter which is not supported by the list method.
+                    # This is a filter that is not supported by the list method.
                     continue
         return cls(
             parameters=list(parameters_by_name.values()),

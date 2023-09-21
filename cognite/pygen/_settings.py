@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any, Union
 
 try:
-    from pydantic import BaseModel, Field, FieldValidationInfo, field_validator
+    from pydantic import BaseModel, Field, FieldValidationInfo, field_validator  # type: ignore[attr-defined]
 
     is_pydantic_v2 = True
 except ImportError:
@@ -49,7 +49,7 @@ class PygenSettings(BaseModel):
         def parse_string(cls, value, info: FieldValidationInfo) -> Argument:
             if info.field_name == "data_models":
                 return value
-            field = cls.model_fields[info.field_name]
+            field = cls.model_fields[info.field_name]  # type: ignore[attr-defined]
             return _parse_string(value, field)
 
     else:

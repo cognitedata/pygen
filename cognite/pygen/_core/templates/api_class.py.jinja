@@ -111,8 +111,8 @@ class {{ api_class.name }}(TypeAPI[{{ data_class.read_name }}, {{ data_class.wri
         self,{% for parm in list_method.parameters %}
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
         limit: int = DEFAULT_LIMIT_READ,
-        filter: dm.Filter | None = None,
-        {% if data_class.has_one_to_many_edges %}retrieve_edges: bool = True,{% endif %}
+        filter: dm.Filter | None = None,{% if data_class.has_one_to_many_edges %}
+        retrieve_edges: bool = True,{% endif %}
     ) -> {{ data_class.read_list_name }}:
         filters = []{% for filter in list_method.filters %}
         if {{ filter.condition }}:
