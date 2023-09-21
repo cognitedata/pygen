@@ -14,7 +14,7 @@ from cognite.pygen.config import PygenConfig
 from cognite.pygen.utils.helper import get_pydantic_version
 
 from . import validation
-from .data_classes import APIClass, DataClass, MultiAPIClass, ViewSpaceExternalId
+from .data_classes import APIClass, DataClass, ListMethod, MultiAPIClass, ViewSpaceExternalId
 from .logic import get_unique_views
 
 
@@ -58,7 +58,10 @@ class SDKGenerator:
             api_by_view_identifier = {api.view_identifier: api.api_class for api in self._multi_api_generator.sub_apis}
 
             self._multi_api_classes = sorted(
-                (MultiAPIClass.from_data_model(model, api_by_view_identifier, config) for model in data_model),
+                (
+                    MultiAPIClass.from_data_model(model, api_by_view_identifier, config.naming.multi_api_class)
+                    for model in data_model
+                ),
                 key=lambda a: a.name,
             )
             validation.validate_multi_api_classes(self._multi_api_classes)
@@ -156,7 +159,7 @@ class MultiAPIGenerator:
             api.view_identifier: api.data_class for api in self.sub_apis
         }
         for api, view in zip(self.sub_apis, views):
-            api.data_class.update_fields(view.properties, data_class_by_view_id, config)
+            api.data_class.update_fields(view.properties, data_class_by_view_id, config.naming.field)
 
         validation.validate_data_classes([api.data_class for api in self.sub_apis])
         validation.validate_api_classes([api.api_class for api in self.sub_apis])
@@ -237,8 +240,11 @@ class APIGenerator:
             loader=PackageLoader("cognite.pygen._core", "templates"), autoescape=select_autoescape()
         )
         self.view_identifier = ViewSpaceExternalId.from_(view)
-        self.data_class = DataClass.from_view(view, config)
-        self.api_class = APIClass.from_view(view, config)
+        self.data_class = DataClass.from_view(view, config.naming.data_class)
+        self.api_class = APIClass.from_view(view, config.naming.api_class)
+
+        # List method cannot be generated here, as we need all data class fields to bo updated first.
+        self._config = config
 
     def generate_data_class_file(self) -> str:
         type_data = self._env.get_template("data_class.py.jinja")
@@ -249,5 +255,8 @@ class APIGenerator:
         type_api = self._env.get_template("api_class.py.jinja")
 
         return type_api.render(
-            top_level_package=top_level_package, api_class=self.api_class, data_class=self.data_class
+            top_level_package=top_level_package,
+            api_class=self.api_class,
+            data_class=self.data_class,
+            list_method=ListMethod.from_fields(self.data_class.fields, self._config.list_method),
         )

@@ -34,13 +34,23 @@ class RoleMoviesAPI:
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_roles))
 
-    def list(self, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
+    def list(self, role_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
         f = dm.filters
+        filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
             {"space": "IntegrationTestsImmutable", "externalId": "Role.movies"},
         )
-        return self._client.data_modeling.instances.list("edge", limit=limit, filter=is_edge_type)
+        filters.append(is_edge_type)
+        if role_id:
+            role_ids = [role_id] if isinstance(role_id, str) else role_id
+            is_roles = f.In(
+                ["edge", "startNode"],
+                [{"space": "IntegrationTestsImmutable", "externalId": ext_id} for ext_id in role_ids],
+            )
+            filters.append(is_roles)
+
+        return self._client.data_modeling.instances.list("edge", limit=limit, filter=f.And(*filters))
 
 
 class RoleNominationAPI:
@@ -67,13 +77,23 @@ class RoleNominationAPI:
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_roles))
 
-    def list(self, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
+    def list(self, role_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
         f = dm.filters
+        filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
             {"space": "IntegrationTestsImmutable", "externalId": "Role.nomination"},
         )
-        return self._client.data_modeling.instances.list("edge", limit=limit, filter=is_edge_type)
+        filters.append(is_edge_type)
+        if role_id:
+            role_ids = [role_id] if isinstance(role_id, str) else role_id
+            is_roles = f.In(
+                ["edge", "startNode"],
+                [{"space": "IntegrationTestsImmutable", "externalId": ext_id} for ext_id in role_ids],
+            )
+            filters.append(is_roles)
+
+        return self._client.data_modeling.instances.list("edge", limit=limit, filter=f.And(*filters))
 
 
 class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
@@ -85,6 +105,7 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
             class_apply_type=RoleApply,
             class_list=RoleList,
         )
+        self.view_id = view_id
         self.movies = RoleMoviesAPI(client)
         self.nomination = RoleNominationAPI(client)
 
@@ -128,13 +149,29 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
 
             return roles
 
-    def list(self, limit: int = DEFAULT_LIMIT_READ) -> RoleList:
-        roles = self._list(limit=limit)
+    def list(
+        self,
+        won_oscar: bool | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+        retrieve_edges: bool = True,
+    ) -> RoleList:
+        filters = []
+        if won_oscar and isinstance(won_oscar, str):
+            filters.append(dm.filters.Equals(self.view_id.as_property_ref("wonOscar"), value=won_oscar))
+        if external_id_prefix:
+            filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+        if filter:
+            filters.append(filter)
 
-        movie_edges = self.movies.list(limit=-1)
-        self._set_movies(roles, movie_edges)
-        nomination_edges = self.nomination.list(limit=-1)
-        self._set_nomination(roles, nomination_edges)
+        roles = self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)
+
+        if retrieve_edges:
+            movie_edges = self.movies.list(roles.as_external_ids(), limit=-1)
+            self._set_movies(roles, movie_edges)
+            nomination_edges = self.nomination.list(roles.as_external_ids(), limit=-1)
+            self._set_nomination(roles, nomination_edges)
 
         return roles
 

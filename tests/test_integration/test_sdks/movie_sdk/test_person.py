@@ -40,3 +40,11 @@ def test_person_apply_and_delete(movie_client: MovieClient):
         assert len(result.nodes) == 1
     finally:
         movie_client.person.delete(person.external_id)
+
+
+def test_person_list_born_before_1960(movie_client: MovieClient) -> None:
+    persons = movie_client.person.list(max_birth_year=1960, limit=-1)
+
+    assert len(persons) > 0
+    people_born_after_1960 = [person for person in persons if person.birth_year > 1960]
+    assert not people_born_after_1960, "Found people born after 1960"

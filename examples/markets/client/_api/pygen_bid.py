@@ -18,6 +18,7 @@ class PygenBidAPI(TypeAPI[PygenBid, PygenBidApply, PygenBidList]):
             class_apply_type=PygenBidApply,
             class_list=PygenBidList,
         )
+        self.view_id = view_id
 
     def apply(self, pygen_bid: PygenBidApply, replace: bool = False) -> dm.InstancesApplyResult:
         instances = pygen_bid.to_instances_apply()
@@ -45,5 +46,47 @@ class PygenBidAPI(TypeAPI[PygenBid, PygenBidApply, PygenBidList]):
         else:
             return self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
 
-    def list(self, limit: int = DEFAULT_LIMIT_READ) -> PygenBidList:
-        return self._list(limit=limit)
+    def list(
+        self,
+        min_date: datetime.date | None = None,
+        max_date: datetime.date | None = None,
+        is_block: bool | None = None,
+        min_minimum_price: float | None = None,
+        max_minimum_price: float | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        min_price_premium: float | None = None,
+        max_price_premium: float | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> PygenBidList:
+        filters = []
+        if min_date or max_date:
+            filters.append(dm.filters.Range(self.view_id.as_property_ref("date"), gte=min_date, lte=max_date))
+        if is_block and isinstance(is_block, str):
+            filters.append(dm.filters.Equals(self.view_id.as_property_ref("isBlock"), value=is_block))
+        if min_minimum_price or max_minimum_price:
+            filters.append(
+                dm.filters.Range(
+                    self.view_id.as_property_ref("minimumPrice"), gte=min_minimum_price, lte=max_minimum_price
+                )
+            )
+        if name and isinstance(name, str):
+            filters.append(dm.filters.Equals(self.view_id.as_property_ref("name"), value=name))
+        if name and isinstance(name, list):
+            filters.append(dm.filters.In(self.view_id.as_property_ref("name"), values=name))
+        if name_prefix:
+            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("name"), value=name_prefix))
+        if min_price_premium or max_price_premium:
+            filters.append(
+                dm.filters.Range(
+                    self.view_id.as_property_ref("pricePremium"), gte=min_price_premium, lte=max_price_premium
+                )
+            )
+        if external_id_prefix:
+            filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+        if filter:
+            filters.append(filter)
+
+        return self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)

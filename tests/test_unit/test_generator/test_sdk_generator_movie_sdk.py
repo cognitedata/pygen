@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import cast
+from unittest.mock import MagicMock
 
 import pytest
 from cognite.client import data_modeling as dm
@@ -11,6 +12,9 @@ from cognite.pygen._core.data_classes import (
     EdgeOneToMany,
     EdgeOneToOne,
     Field,
+    ListFilter,
+    ListMethod,
+    ListParameter,
     PrimitiveField,
     PrimitiveListField,
     ViewSpaceExternalId,
@@ -35,7 +39,7 @@ def sdk_generator(movie_model, top_level_package) -> SDKGenerator:
 
 
 @pytest.fixture
-def apis_generator(movie_model, top_level_package, pygen_config: PygenConfig) -> MultiAPIGenerator:
+def multi_api_generator(movie_model, top_level_package, pygen_config: PygenConfig) -> MultiAPIGenerator:
     return MultiAPIGenerator(top_level_package, "MovieClient", movie_model.views, config=pygen_config)
 
 
@@ -236,7 +240,7 @@ def test_fields_from_property(
     pygen_config: PygenConfig,
 ):
     # Act
-    actual = Field.from_property(prop_name, property_, data_class_by_view_id, pygen_config, view_name)
+    actual = Field.from_property(prop_name, property_, data_class_by_view_id, pygen_config.naming.field, view_name)
 
     # Assert
     assert actual == expected
@@ -245,18 +249,20 @@ def test_fields_from_property(
 
 
 @pytest.fixture()
-def person_api_generator(apis_generator: MultiAPIGenerator, person_view: dm.View) -> APIGenerator:
+def person_api_generator(multi_api_generator: MultiAPIGenerator, person_view: dm.View) -> APIGenerator:
     api_generator = next(
-        (api for api in apis_generator.sub_apis if api.view_identifier == ViewSpaceExternalId.from_(person_view)), None
+        (api for api in multi_api_generator.sub_apis if api.view_identifier == ViewSpaceExternalId.from_(person_view)),
+        None,
     )
     assert api_generator is not None, "Could not find API generator for actor view"
     return api_generator
 
 
 @pytest.fixture()
-def actor_api_generator(apis_generator: MultiAPIGenerator, actor_view: dm.View) -> APIGenerator:
+def actor_api_generator(multi_api_generator: MultiAPIGenerator, actor_view: dm.View) -> APIGenerator:
     api_generator = next(
-        (api for api in apis_generator.sub_apis if api.view_identifier == ViewSpaceExternalId.from_(actor_view)), None
+        (api for api in multi_api_generator.sub_apis if api.view_identifier == ViewSpaceExternalId.from_(actor_view)),
+        None,
     )
     assert api_generator is not None, "Could not find API generator for actor view"
     return api_generator
@@ -295,23 +301,26 @@ def test_create_view_api_classes_actors(actor_api_generator: APIGenerator, top_l
     assert actual == expected
 
 
-def test_create_view_api_classes_persons(person_api_generator: APIGenerator, top_level_package: str):
+def test_create_view_api_classes_persons(
+    person_api_generator: APIGenerator, top_level_package: str, code_formatter: CodeFormatter
+):
     # Arrange
     expected = MovieSDKFiles.persons_api.read_text()
 
     # Act
     actual = person_api_generator.generate_api_file(top_level_package)
+    actual = code_formatter.format_code(actual)
 
     # Assert
     assert actual == expected
 
 
-def test_generate_data_class_init_file(apis_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
+def test_generate_data_class_init_file(multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
     # Arrange
     expected = MovieSDKFiles.data_init.read_text()
 
     # Act
-    actual = apis_generator.generate_data_classes_init_file()
+    actual = multi_api_generator.generate_data_classes_init_file()
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -327,4 +336,66 @@ def test_create_api_client(sdk_generator: SDKGenerator, code_formatter: CodeForm
     actual = code_formatter.format_code(actual)
 
     # Assert
+    assert actual == expected
+
+
+def test_generate_api_core_file(multi_api_generator: MultiAPIGenerator) -> None:
+    # Arrange
+    expected = MovieSDKFiles.core_api.read_text()
+
+    # Act
+    actual = multi_api_generator.generate_api_core_file()
+
+    # Assert
+    assert actual == expected
+
+
+def test_generate_data_class_core_file(multi_api_generator: MultiAPIGenerator) -> None:
+    # Arrange
+    expected = MovieSDKFiles.core_data.read_text()
+
+    # Act
+    actual = multi_api_generator.generate_data_class_core_file()
+
+    # Assert
+    assert actual == expected
+
+
+def test_create_list_method(person_view: dm.View, pygen_config: PygenConfig) -> None:
+    # Arrange
+    data_class = DataClass.from_view(person_view, pygen_config.naming.data_class)
+
+    data_class.update_fields(
+        person_view.properties,
+        {ViewSpaceExternalId(space="IntegrationTestsImmutable", external_id="Role"): MagicMock(spec=DataClass)},
+        field_naming=pygen_config.naming.field,
+    )
+    parameters = [
+        ListParameter("min_birth_year", "int"),
+        ListParameter("max_birth_year", "int"),
+        ListParameter("name", "str | list[str]"),
+        ListParameter("name_prefix", "str"),
+        ListParameter("external_id_prefix", "str"),
+    ]
+    expected = ListMethod(
+        parameters=parameters,
+        filters=[
+            ListFilter(dm.filters.Range, "birthYear", dict(gte=parameters[0], lte=parameters[1])),
+            ListFilter(dm.filters.Equals, "name", dict(value=parameters[2])),
+            ListFilter(dm.filters.In, "name", dict(values=parameters[2])),
+            ListFilter(dm.filters.Prefix, "name", dict(value=parameters[3])),
+            ListFilter(dm.filters.Prefix, "externalId", dict(value=parameters[4])),
+        ],
+    )
+
+    # Act
+    actual = ListMethod.from_fields(data_class.fields, pygen_config.list_method)
+
+    # Assert
+    assert actual.parameters == expected.parameters
+    for a, e in zip(actual.filters, expected.filters):
+        assert a.filter == e.filter
+        assert a.prop_name == e.prop_name
+        assert a.keyword_arguments == e.keyword_arguments
+        assert a == e
     assert actual == expected

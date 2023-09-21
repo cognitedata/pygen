@@ -34,13 +34,23 @@ class {{ field.edge_api_class }}:
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_{{ data_class.variable_list }}))
 
-    def list(self, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
+    def list(self, {{ data_class.variable }}_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
         f = dm.filters
+        filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
             {"space": "{{ field.prop.type.space }}", "externalId": "{{ field.prop.type.external_id }}"},
         )
-        return self._client.data_modeling.instances.list("edge", limit=limit, filter=is_edge_type)
+        filters.append(is_edge_type)
+        if {{ data_class.variable }}_id:
+            {{ data_class.variable }}_ids = [{{ data_class.variable }}_id] if isinstance({{ data_class.variable }}_id, str) else {{ data_class.variable }}_id
+            is_{{ data_class.variable_list }} = f.In(
+                ["edge", "startNode"],
+                [{"space": "{{ field.prop.source.space }}", "externalId": ext_id} for ext_id in {{ data_class.variable }}_ids],
+            )
+            filters.append(is_{{ data_class.variable_list }})
+
+        return self._client.data_modeling.instances.list("edge", limit=limit, filter=f.And(*filters))
 
 {% endfor %}
 class {{ api_class.name }}(TypeAPI[{{ data_class.read_name }}, {{ data_class.write_name }}, {{ data_class.read_list_name }}]):
@@ -51,7 +61,8 @@ class {{ api_class.name }}(TypeAPI[{{ data_class.read_name }}, {{ data_class.wri
             class_type={{ data_class.read_name }},
             class_apply_type={{ data_class.write_name }},
             class_list={{ data_class.read_list_name }},
-        ){% for field in data_class.one_to_many_edges %}
+        )
+        self.view_id = view_id{% for field in data_class.one_to_many_edges %}
         self.{{ field.edge_api_attribute }} = {{ field.edge_api_class }}(client){% endfor %}
 
     def apply(self, {{ data_class.variable }}: {{ data_class.write_name }}, replace: bool = False) -> dm.InstancesApplyResult:
@@ -96,13 +107,26 @@ class {{ api_class.name }}(TypeAPI[{{ data_class.read_name }}, {{ data_class.wri
 
             return {{ data_class.variable_list }}{% else %}return self._retrieve([(self.sources.space, ext_id) for ext_id in external_id]){% endif %}
 
-    def list(self, limit: int = DEFAULT_LIMIT_READ) -> {{ data_class.read_list_name }}:
-        {% if data_class.has_one_to_many_edges %}{{ data_class.variable_list }} = self._list(limit=limit)
-{% for field in data_class.one_to_many_edges %}
-        {{ field.variable }}_edges = self.{{ field.edge_api_attribute }}.list(limit=-1)
-        self._set_{{ field.name }}({{ data_class.variable_list }}, {{ field.variable }}_edges){% endfor %}
+    def list(
+        self,{% for parm in list_method.parameters %}
+        {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,{% if data_class.has_one_to_many_edges %}
+        retrieve_edges: bool = True,{% endif %}
+    ) -> {{ data_class.read_list_name }}:
+        filters = []{% for filter in list_method.filters %}
+        if {{ filter.condition }}:
+            filters.append({{ filter.filter_call }}({{ filter.arguments }})){% endfor %}
+        if filter:
+            filters.append(filter)
 
-        return {{ data_class.variable_list }}{% else %}return self._list(limit=limit){% endif %}
+        {% if data_class.has_one_to_many_edges %}{{ data_class.variable_list }} = self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)
+
+        if retrieve_edges:{% for field in data_class.one_to_many_edges %}
+            {{ field.variable }}_edges = self.{{ field.edge_api_attribute }}.list({{ data_class.variable_list }}.as_external_ids(), limit=-1)
+            self._set_{{ field.name }}({{ data_class.variable_list }}, {{ field.variable }}_edges){% endfor %}
+
+        return {{ data_class.variable_list }}{% else %}return self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None){% endif %}
 {% for field in data_class.one_to_many_edges %}
     @staticmethod
     def _set_{{ field.name }}({{ data_class.variable_list }}: Sequence[{{ data_class.read_name }}], {{ field.variable }}_edges: Sequence[dm.Edge]):

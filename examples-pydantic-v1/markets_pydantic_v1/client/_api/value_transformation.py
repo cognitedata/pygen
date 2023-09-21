@@ -22,6 +22,7 @@ class ValueTransformationAPI(TypeAPI[ValueTransformation, ValueTransformationApp
             class_apply_type=ValueTransformationApply,
             class_list=ValueTransformationList,
         )
+        self.view_id = view_id
 
     def apply(self, value_transformation: ValueTransformationApply, replace: bool = False) -> dm.InstancesApplyResult:
         instances = value_transformation.to_instances_apply()
@@ -49,5 +50,24 @@ class ValueTransformationAPI(TypeAPI[ValueTransformation, ValueTransformationApp
         else:
             return self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
 
-    def list(self, limit: int = DEFAULT_LIMIT_READ) -> ValueTransformationList:
-        return self._list(limit=limit)
+    def list(
+        self,
+        method: str | list[str] | None = None,
+        method_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> ValueTransformationList:
+        filters = []
+        if method and isinstance(method, str):
+            filters.append(dm.filters.Equals(self.view_id.as_property_ref("method"), value=method))
+        if method and isinstance(method, list):
+            filters.append(dm.filters.In(self.view_id.as_property_ref("method"), values=method))
+        if method_prefix:
+            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("method"), value=method_prefix))
+        if external_id_prefix:
+            filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+        if filter:
+            filters.append(filter)
+
+        return self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)

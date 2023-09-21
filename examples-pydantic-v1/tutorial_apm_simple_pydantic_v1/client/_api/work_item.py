@@ -36,13 +36,23 @@ class WorkItemLinkedassetsAPI:
                 "edge", limit=-1, filter=f.And(is_edge_type, is_work_items)
             )
 
-    def list(self, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
+    def list(self, work_item_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
         f = dm.filters
+        filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
             {"space": "tutorial_apm_simple", "externalId": "WorkItem.linkedAssets"},
         )
-        return self._client.data_modeling.instances.list("edge", limit=limit, filter=is_edge_type)
+        filters.append(is_edge_type)
+        if work_item_id:
+            work_item_ids = [work_item_id] if isinstance(work_item_id, str) else work_item_id
+            is_work_items = f.In(
+                ["edge", "startNode"],
+                [{"space": "tutorial_apm_simple", "externalId": ext_id} for ext_id in work_item_ids],
+            )
+            filters.append(is_work_items)
+
+        return self._client.data_modeling.instances.list("edge", limit=limit, filter=f.And(*filters))
 
 
 class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
@@ -54,6 +64,7 @@ class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
             class_apply_type=WorkItemApply,
             class_list=WorkItemList,
         )
+        self.view_id = view_id
         self.linked_assets = WorkItemLinkedassetsAPI(client)
 
     def apply(self, work_item: WorkItemApply, replace: bool = False) -> dm.InstancesApplyResult:
@@ -92,11 +103,78 @@ class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
 
             return work_items
 
-    def list(self, limit: int = DEFAULT_LIMIT_READ) -> WorkItemList:
-        work_items = self._list(limit=limit)
+    def list(
+        self,
+        criticality: str | list[str] | None = None,
+        criticality_prefix: str | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        is_completed: bool | None = None,
+        item_info: str | list[str] | None = None,
+        item_info_prefix: str | None = None,
+        item_name: str | list[str] | None = None,
+        item_name_prefix: str | None = None,
+        method: str | list[str] | None = None,
+        method_prefix: str | None = None,
+        title: str | list[str] | None = None,
+        title_prefix: str | None = None,
+        to_be_done: bool | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+        retrieve_edges: bool = True,
+    ) -> WorkItemList:
+        filters = []
+        if criticality and isinstance(criticality, str):
+            filters.append(dm.filters.Equals(self.view_id.as_property_ref("criticality"), value=criticality))
+        if criticality and isinstance(criticality, list):
+            filters.append(dm.filters.In(self.view_id.as_property_ref("criticality"), values=criticality))
+        if criticality_prefix:
+            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("criticality"), value=criticality_prefix))
+        if description and isinstance(description, str):
+            filters.append(dm.filters.Equals(self.view_id.as_property_ref("description"), value=description))
+        if description and isinstance(description, list):
+            filters.append(dm.filters.In(self.view_id.as_property_ref("description"), values=description))
+        if description_prefix:
+            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("description"), value=description_prefix))
+        if is_completed and isinstance(is_completed, str):
+            filters.append(dm.filters.Equals(self.view_id.as_property_ref("isCompleted"), value=is_completed))
+        if item_info and isinstance(item_info, str):
+            filters.append(dm.filters.Equals(self.view_id.as_property_ref("itemInfo"), value=item_info))
+        if item_info and isinstance(item_info, list):
+            filters.append(dm.filters.In(self.view_id.as_property_ref("itemInfo"), values=item_info))
+        if item_info_prefix:
+            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("itemInfo"), value=item_info_prefix))
+        if item_name and isinstance(item_name, str):
+            filters.append(dm.filters.Equals(self.view_id.as_property_ref("itemName"), value=item_name))
+        if item_name and isinstance(item_name, list):
+            filters.append(dm.filters.In(self.view_id.as_property_ref("itemName"), values=item_name))
+        if item_name_prefix:
+            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("itemName"), value=item_name_prefix))
+        if method and isinstance(method, str):
+            filters.append(dm.filters.Equals(self.view_id.as_property_ref("method"), value=method))
+        if method and isinstance(method, list):
+            filters.append(dm.filters.In(self.view_id.as_property_ref("method"), values=method))
+        if method_prefix:
+            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("method"), value=method_prefix))
+        if title and isinstance(title, str):
+            filters.append(dm.filters.Equals(self.view_id.as_property_ref("title"), value=title))
+        if title and isinstance(title, list):
+            filters.append(dm.filters.In(self.view_id.as_property_ref("title"), values=title))
+        if title_prefix:
+            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("title"), value=title_prefix))
+        if to_be_done and isinstance(to_be_done, str):
+            filters.append(dm.filters.Equals(self.view_id.as_property_ref("toBeDone"), value=to_be_done))
+        if external_id_prefix:
+            filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+        if filter:
+            filters.append(filter)
 
-        linked_asset_edges = self.linked_assets.list(limit=-1)
-        self._set_linked_assets(work_items, linked_asset_edges)
+        work_items = self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)
+
+        if retrieve_edges:
+            linked_asset_edges = self.linked_assets.list(work_items.as_external_ids(), limit=-1)
+            self._set_linked_assets(work_items, linked_asset_edges)
 
         return work_items
 

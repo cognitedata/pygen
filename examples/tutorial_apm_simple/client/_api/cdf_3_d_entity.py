@@ -38,13 +38,23 @@ class Cdf3dEntityInmodel3dAPI:
                 "edge", limit=-1, filter=f.And(is_edge_type, is_cdf_3_d_entities)
             )
 
-    def list(self, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
+    def list(self, cdf_3_d_entity_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
         f = dm.filters
+        filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
             {"space": "cdf_3d_schema", "externalId": "cdf3dEntityConnection"},
         )
-        return self._client.data_modeling.instances.list("edge", limit=limit, filter=is_edge_type)
+        filters.append(is_edge_type)
+        if cdf_3_d_entity_id:
+            cdf_3_d_entity_ids = [cdf_3_d_entity_id] if isinstance(cdf_3_d_entity_id, str) else cdf_3_d_entity_id
+            is_cdf_3_d_entities = f.In(
+                ["edge", "startNode"],
+                [{"space": "cdf_3d_schema", "externalId": ext_id} for ext_id in cdf_3_d_entity_ids],
+            )
+            filters.append(is_cdf_3_d_entities)
+
+        return self._client.data_modeling.instances.list("edge", limit=limit, filter=f.And(*filters))
 
 
 class CdfEntityAPI(TypeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
@@ -56,6 +66,7 @@ class CdfEntityAPI(TypeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
             class_apply_type=CdfEntityApply,
             class_list=CdfEntityList,
         )
+        self.view_id = view_id
         self.in_model_3_d = Cdf3dEntityInmodel3dAPI(client)
 
     def apply(self, cdf_3_d_entity: CdfEntityApply, replace: bool = False) -> dm.InstancesApplyResult:
@@ -100,11 +111,24 @@ class CdfEntityAPI(TypeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
 
             return cdf_3_d_entities
 
-    def list(self, limit: int = DEFAULT_LIMIT_READ) -> CdfEntityList:
-        cdf_3_d_entities = self._list(limit=limit)
+    def list(
+        self,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+        retrieve_edges: bool = True,
+    ) -> CdfEntityList:
+        filters = []
+        if external_id_prefix:
+            filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+        if filter:
+            filters.append(filter)
 
-        in_model_3_d_edges = self.in_model_3_d.list(limit=-1)
-        self._set_in_model_3_d(cdf_3_d_entities, in_model_3_d_edges)
+        cdf_3_d_entities = self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)
+
+        if retrieve_edges:
+            in_model_3_d_edges = self.in_model_3_d.list(cdf_3_d_entities.as_external_ids(), limit=-1)
+            self._set_in_model_3_d(cdf_3_d_entities, in_model_3_d_edges)
 
         return cdf_3_d_entities
 

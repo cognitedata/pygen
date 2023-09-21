@@ -62,3 +62,4 @@ examples/playground.ipynb
 playground.py
 .dmypy.json
 .secret.toml
+docs/examples/movie_domain

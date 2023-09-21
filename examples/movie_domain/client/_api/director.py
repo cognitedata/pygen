@@ -34,13 +34,23 @@ class DirectorMoviesAPI:
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_directors))
 
-    def list(self, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
+    def list(self, director_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
         f = dm.filters
+        filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
             {"space": "IntegrationTestsImmutable", "externalId": "Role.movies"},
         )
-        return self._client.data_modeling.instances.list("edge", limit=limit, filter=is_edge_type)
+        filters.append(is_edge_type)
+        if director_id:
+            director_ids = [director_id] if isinstance(director_id, str) else director_id
+            is_directors = f.In(
+                ["edge", "startNode"],
+                [{"space": "IntegrationTestsImmutable", "externalId": ext_id} for ext_id in director_ids],
+            )
+            filters.append(is_directors)
+
+        return self._client.data_modeling.instances.list("edge", limit=limit, filter=f.And(*filters))
 
 
 class DirectorNominationAPI:
@@ -67,13 +77,23 @@ class DirectorNominationAPI:
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_directors))
 
-    def list(self, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
+    def list(self, director_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
         f = dm.filters
+        filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
             {"space": "IntegrationTestsImmutable", "externalId": "Role.nomination"},
         )
-        return self._client.data_modeling.instances.list("edge", limit=limit, filter=is_edge_type)
+        filters.append(is_edge_type)
+        if director_id:
+            director_ids = [director_id] if isinstance(director_id, str) else director_id
+            is_directors = f.In(
+                ["edge", "startNode"],
+                [{"space": "IntegrationTestsImmutable", "externalId": ext_id} for ext_id in director_ids],
+            )
+            filters.append(is_directors)
+
+        return self._client.data_modeling.instances.list("edge", limit=limit, filter=f.And(*filters))
 
 
 class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
@@ -85,6 +105,7 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
             class_apply_type=DirectorApply,
             class_list=DirectorList,
         )
+        self.view_id = view_id
         self.movies = DirectorMoviesAPI(client)
         self.nomination = DirectorNominationAPI(client)
 
@@ -128,13 +149,29 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
 
             return directors
 
-    def list(self, limit: int = DEFAULT_LIMIT_READ) -> DirectorList:
-        directors = self._list(limit=limit)
+    def list(
+        self,
+        won_oscar: bool | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+        retrieve_edges: bool = True,
+    ) -> DirectorList:
+        filters = []
+        if won_oscar and isinstance(won_oscar, str):
+            filters.append(dm.filters.Equals(self.view_id.as_property_ref("wonOscar"), value=won_oscar))
+        if external_id_prefix:
+            filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+        if filter:
+            filters.append(filter)
 
-        movie_edges = self.movies.list(limit=-1)
-        self._set_movies(directors, movie_edges)
-        nomination_edges = self.nomination.list(limit=-1)
-        self._set_nomination(directors, nomination_edges)
+        directors = self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)
+
+        if retrieve_edges:
+            movie_edges = self.movies.list(directors.as_external_ids(), limit=-1)
+            self._set_movies(directors, movie_edges)
+            nomination_edges = self.nomination.list(directors.as_external_ids(), limit=-1)
+            self._set_nomination(directors, nomination_edges)
 
         return directors
 

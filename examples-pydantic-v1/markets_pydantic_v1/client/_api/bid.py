@@ -18,6 +18,7 @@ class BidAPI(TypeAPI[Bid, BidApply, BidList]):
             class_apply_type=BidApply,
             class_list=BidList,
         )
+        self.view_id = view_id
 
     def apply(self, bid: BidApply, replace: bool = False) -> dm.InstancesApplyResult:
         instances = bid.to_instances_apply()
@@ -45,5 +46,28 @@ class BidAPI(TypeAPI[Bid, BidApply, BidList]):
         else:
             return self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
 
-    def list(self, limit: int = DEFAULT_LIMIT_READ) -> BidList:
-        return self._list(limit=limit)
+    def list(
+        self,
+        min_date: datetime.date | None = None,
+        max_date: datetime.date | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> BidList:
+        filters = []
+        if min_date or max_date:
+            filters.append(dm.filters.Range(self.view_id.as_property_ref("date"), gte=min_date, lte=max_date))
+        if name and isinstance(name, str):
+            filters.append(dm.filters.Equals(self.view_id.as_property_ref("name"), value=name))
+        if name and isinstance(name, list):
+            filters.append(dm.filters.In(self.view_id.as_property_ref("name"), values=name))
+        if name_prefix:
+            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("name"), value=name_prefix))
+        if external_id_prefix:
+            filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+        if filter:
+            filters.append(filter)
+
+        return self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)

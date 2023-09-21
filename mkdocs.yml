@@ -19,6 +19,7 @@ nav:
     - Pygen Config:
         - Home: config/index.md
         - Naming: config/naming.md
+        - ListMethod: config/list_method.md
     - API:
         - Pygen: api/api.md
         - Demo: api/demo.md
@@ -60,3 +61,7 @@ plugins:
           options:
             show_root_heading: true
             show_source: true
+
+exclude_docs: |
+  .*
+  examples/movie_domain/.*

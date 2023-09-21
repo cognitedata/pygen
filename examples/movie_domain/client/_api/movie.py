@@ -34,13 +34,23 @@ class MovieActorsAPI:
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_movies))
 
-    def list(self, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
+    def list(self, movie_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
         f = dm.filters
+        filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
             {"space": "IntegrationTestsImmutable", "externalId": "Movie.actors"},
         )
-        return self._client.data_modeling.instances.list("edge", limit=limit, filter=is_edge_type)
+        filters.append(is_edge_type)
+        if movie_id:
+            movie_ids = [movie_id] if isinstance(movie_id, str) else movie_id
+            is_movies = f.In(
+                ["edge", "startNode"],
+                [{"space": "IntegrationTestsImmutable", "externalId": ext_id} for ext_id in movie_ids],
+            )
+            filters.append(is_movies)
+
+        return self._client.data_modeling.instances.list("edge", limit=limit, filter=f.And(*filters))
 
 
 class MovieDirectorsAPI:
@@ -67,13 +77,23 @@ class MovieDirectorsAPI:
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_movies))
 
-    def list(self, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
+    def list(self, movie_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
         f = dm.filters
+        filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
             {"space": "IntegrationTestsImmutable", "externalId": "Movie.directors"},
         )
-        return self._client.data_modeling.instances.list("edge", limit=limit, filter=is_edge_type)
+        filters.append(is_edge_type)
+        if movie_id:
+            movie_ids = [movie_id] if isinstance(movie_id, str) else movie_id
+            is_movies = f.In(
+                ["edge", "startNode"],
+                [{"space": "IntegrationTestsImmutable", "externalId": ext_id} for ext_id in movie_ids],
+            )
+            filters.append(is_movies)
+
+        return self._client.data_modeling.instances.list("edge", limit=limit, filter=f.And(*filters))
 
 
 class MovieAPI(TypeAPI[Movie, MovieApply, MovieList]):
@@ -85,6 +105,7 @@ class MovieAPI(TypeAPI[Movie, MovieApply, MovieList]):
             class_apply_type=MovieApply,
             class_list=MovieList,
         )
+        self.view_id = view_id
         self.actors = MovieActorsAPI(client)
         self.directors = MovieDirectorsAPI(client)
 
@@ -128,13 +149,50 @@ class MovieAPI(TypeAPI[Movie, MovieApply, MovieList]):
 
             return movies
 
-    def list(self, limit: int = DEFAULT_LIMIT_READ) -> MovieList:
-        movies = self._list(limit=limit)
+    def list(
+        self,
+        min_release_year: int | None = None,
+        max_release_year: int | None = None,
+        min_run_time_minutes: float | None = None,
+        max_run_time_minutes: float | None = None,
+        title: str | list[str] | None = None,
+        title_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+        retrieve_edges: bool = True,
+    ) -> MovieList:
+        filters = []
+        if min_release_year or max_release_year:
+            filters.append(
+                dm.filters.Range(
+                    self.view_id.as_property_ref("releaseYear"), gte=min_release_year, lte=max_release_year
+                )
+            )
+        if min_run_time_minutes or max_run_time_minutes:
+            filters.append(
+                dm.filters.Range(
+                    self.view_id.as_property_ref("runTimeMinutes"), gte=min_run_time_minutes, lte=max_run_time_minutes
+                )
+            )
+        if title and isinstance(title, str):
+            filters.append(dm.filters.Equals(self.view_id.as_property_ref("title"), value=title))
+        if title and isinstance(title, list):
+            filters.append(dm.filters.In(self.view_id.as_property_ref("title"), values=title))
+        if title_prefix:
+            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("title"), value=title_prefix))
+        if external_id_prefix:
+            filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+        if filter:
+            filters.append(filter)
 
-        actor_edges = self.actors.list(limit=-1)
-        self._set_actors(movies, actor_edges)
-        director_edges = self.directors.list(limit=-1)
-        self._set_directors(movies, director_edges)
+        movies = self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)
+
+        if retrieve_edges:
+            actor_edges = self.actors.list(movies.as_external_ids(), limit=-1)
+            self._set_actors(movies, actor_edges)
+            director_edges = self.directors.list(movies.as_external_ids(), limit=-1)
+            self._set_directors(movies, director_edges)
 
         return movies
 

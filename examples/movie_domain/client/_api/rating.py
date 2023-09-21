@@ -18,6 +18,7 @@ class RatingAPI(TypeAPI[Rating, RatingApply, RatingList]):
             class_apply_type=RatingApply,
             class_list=RatingList,
         )
+        self.view_id = view_id
 
     def apply(self, rating: RatingApply, replace: bool = False) -> dm.InstancesApplyResult:
         instances = rating.to_instances_apply()
@@ -45,5 +46,16 @@ class RatingAPI(TypeAPI[Rating, RatingApply, RatingList]):
         else:
             return self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
 
-    def list(self, limit: int = DEFAULT_LIMIT_READ) -> RatingList:
-        return self._list(limit=limit)
+    def list(
+        self,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> RatingList:
+        filters = []
+        if external_id_prefix:
+            filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+        if filter:
+            filters.append(filter)
+
+        return self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)

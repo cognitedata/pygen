@@ -18,6 +18,7 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
             class_apply_type=CommandConfigApply,
             class_list=CommandConfigList,
         )
+        self.view_id = view_id
 
     def apply(self, command_config: CommandConfigApply, replace: bool = False) -> dm.InstancesApplyResult:
         instances = command_config.to_instances_apply()
@@ -45,5 +46,16 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
         else:
             return self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
 
-    def list(self, limit: int = DEFAULT_LIMIT_READ) -> CommandConfigList:
-        return self._list(limit=limit)
+    def list(
+        self,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> CommandConfigList:
+        filters = []
+        if external_id_prefix:
+            filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+        if filter:
+            filters.append(filter)
+
+        return self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)

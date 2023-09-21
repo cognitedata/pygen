@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import itertools
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from collections.abc import Iterable, Iterator
@@ -10,7 +11,7 @@ from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.data_modeling.data_types import ListablePropertyType
 from typing_extensions import Self
 
-from cognite.pygen.config import PygenConfig
+from cognite.pygen import config as pygen_config
 from cognite.pygen.utils.text import create_name
 
 _PRIMITIVE_TYPES = (dm.Text, dm.Boolean, dm.Float32, dm.Float64, dm.Int32, dm.Int64, dm.Timestamp, dm.Date, dm.Json)
@@ -65,17 +66,17 @@ class Field(ABC):
         prop_name: str,
         prop: dm.MappedProperty | dm.ConnectionDefinition,
         data_class_by_view_id: dict[ViewSpaceExternalId, DataClass],
-        config: PygenConfig,
+        field_naming: pygen_config.FieldNaming,
         view_name: str,
         pydantic_field: str = "Field",
     ) -> Field:
-        name = create_name(prop_name, config.naming.field.name)
+        name = create_name(prop_name, field_naming.name)
         if isinstance(prop, dm.SingleHopConnectionDefinition):
-            variable = create_name(prop_name, config.naming.field.variable)
+            variable = create_name(prop_name, field_naming.variable)
 
             edge_api_class_input = f"{view_name}_{prop_name}"
-            edge_api_class = f"{create_name(edge_api_class_input, config.naming.field.edge_api_class)}API"
-            edge_api_attribute = create_name(prop_name, config.naming.field.api_class_attribute)
+            edge_api_class = f"{create_name(edge_api_class_input, field_naming.edge_api_class)}API"
+            edge_api_attribute = create_name(prop_name, field_naming.api_class_attribute)
             return EdgeOneToMany(
                 name=name,
                 prop_name=prop_name,
@@ -276,12 +277,12 @@ class DataClass:
     fields: list[Field] = field(default_factory=list)
 
     @classmethod
-    def from_view(cls, view: dm.View, config: PygenConfig) -> Self:
+    def from_view(cls, view: dm.View, data_class: pygen_config.DataClassNaming) -> Self:
         view_name = (view.name or view.external_id).replace(" ", "_")
-        class_name = create_name(view_name, config.naming.data_class.name)
-        variable_name = create_name(view_name, config.naming.data_class.variable)
-        variable_list = create_name(view_name, config.naming.data_class.variable_list)
-        file_name = f"_{create_name(view_name, config.naming.data_class.file)}"
+        class_name = create_name(view_name, data_class.name)
+        variable_name = create_name(view_name, data_class.variable)
+        variable_list = create_name(view_name, data_class.variable_list)
+        file_name = f"_{create_name(view_name, data_class.file)}"
         return cls(
             view_name=view_name,
             read_name=class_name,
@@ -298,12 +299,12 @@ class DataClass:
         self,
         properties: dict[str, dm.MappedProperty | dm.ConnectionDefinition],
         data_class_by_view_id: dict[ViewSpaceExternalId, DataClass],
-        config: PygenConfig,
+        field_naming: pygen_config.FieldNaming,
     ) -> None:
         pydantic_field = self.pydantic_field
         for prop_name, prop in properties.items():
             field_ = Field.from_property(
-                prop_name, prop, data_class_by_view_id, config, self.view_name, pydantic_field=pydantic_field
+                prop_name, prop, data_class_by_view_id, field_naming, self.view_name, pydantic_field=pydantic_field
             )
             self.fields.append(field_)
 
@@ -394,15 +395,15 @@ class APIClass:
     view_id: ViewSpaceExternalId
 
     @classmethod
-    def from_view(cls, view: dm.View, config: PygenConfig) -> APIClass:
+    def from_view(cls, view: dm.View, api_class: pygen_config.APIClassNaming) -> APIClass:
         raw_name = view.name or view.external_id
 
         raw_name = raw_name.replace(" ", "_")
 
         return cls(
-            client_attribute=create_name(raw_name, config.naming.api_class.client_attribute),
-            name=f"{create_name(raw_name, config.naming.api_class.name)}API",
-            file_name=create_name(raw_name, config.naming.api_class.file_name),
+            client_attribute=create_name(raw_name, api_class.client_attribute),
+            name=f"{create_name(raw_name, api_class.name)}API",
+            file_name=create_name(raw_name, api_class.file_name),
             view_id=ViewSpaceExternalId.from_(view),
         )
 
@@ -429,7 +430,7 @@ class MultiAPIClass:
         cls,
         data_model: dm.DataModel[dm.View],
         api_class_by_view_id: dict[ViewSpaceExternalId, APIClass],
-        config: PygenConfig,
+        multi_api_class: pygen_config.MultiAPIClassNaming,
     ) -> MultiAPIClass:
         sub_apis = sorted(
             [api_class_by_view_id[ViewSpaceExternalId.from_(view)] for view in data_model.views],
@@ -440,9 +441,147 @@ class MultiAPIClass:
 
         return cls(
             sub_apis=sub_apis,
-            client_attribute=create_name(data_model_name, config.naming.multi_api_class.client_attribute),
-            name=f"{create_name(data_model_name, config.naming.multi_api_class.name)}APIs",
+            client_attribute=create_name(data_model_name, multi_api_class.client_attribute),
+            name=f"{create_name(data_model_name, multi_api_class.name)}APIs",
             model=data_model,
+        )
+
+
+@dataclass
+class ListParameter:
+    name: str
+    type_: str
+    default: None = None
+
+    @property
+    def annotation(self) -> str:
+        return f"{self.type_} | None"
+
+
+@dataclass
+class ListFilter:
+    filter: type[dm.Filter]
+    prop_name: str
+    keyword_arguments: dict[str, ListParameter]
+
+    @property
+    def condition(self) -> str:
+        if self.filter is dm.filters.In:
+            parameter = next(iter(self.keyword_arguments.values())).name
+            return f"{parameter} and isinstance({parameter}, list)"
+        elif self.filter is dm.filters.Equals:
+            parameter = next(iter(self.keyword_arguments.values())).name
+            return f"{parameter} and isinstance({parameter}, str)"
+
+        return " or ".join(arg.name for arg in self.keyword_arguments.values())
+
+    @property
+    def arguments(self) -> str:
+        if self.prop_name == "externalId":
+            property_ref = '["node", "externalId"], '
+        else:
+            property_ref = f'self.view_id.as_property_ref("{self.prop_name}"), '
+
+        filter_args = ", ".join((f"{keyword}={arg.name}" for keyword, arg in self.keyword_arguments.items()))
+        return f"{property_ref}{filter_args}"
+
+    @property
+    def filter_call(self) -> str:
+        return f"dm.filters.{self.filter.__name__}"
+
+
+# This field is used when creating the list method.
+_EXTERNAL_ID_FIELD = PrimitiveField(
+    name="external_id",
+    prop_name="externalId",
+    type_="str",
+    is_nullable=False,
+    default=None,
+    prop=dm.MappedProperty(
+        container_property_identifier="externalId",
+        type=dm.Text(),
+        nullable=False,
+        auto_increment=False,
+        container=dm.ContainerId("dummy", "dummy"),
+    ),
+    pydantic_field="Field",
+)
+
+
+@dataclass
+class ListMethod:
+    parameters: list[ListParameter]
+    filters: list[ListFilter]
+
+    @classmethod
+    def from_fields(cls, fields: Iterable[Field], config: pygen_config.ListMethodFilters) -> Self:
+        parameters_by_name: dict[str, ListParameter] = {}
+        list_filters: list[ListFilter] = []
+
+        for field_ in itertools.chain(fields, (_EXTERNAL_ID_FIELD,)):
+            if not isinstance(field_, PrimitiveField):
+                # Only primitive fields supported for now
+                continue
+
+            for selected_filter in config.get(field_.prop.type, field_.prop_name):
+                if selected_filter is dm.filters.Equals:
+                    if field_.name not in parameters_by_name:
+                        parameter = ListParameter(name=field_.name, type_=field_.type_)
+                        parameters_by_name[parameter.name] = parameter
+                    else:
+                        # Equals and In filter share parameter, you have to extend the type hint.
+                        parameter = parameters_by_name[field_.name]
+                        parameter.type_ = f"{field_.type_} | {parameter.type_}"
+                    list_filters.append(
+                        ListFilter(
+                            filter=selected_filter,
+                            prop_name=field_.prop_name,
+                            keyword_arguments=dict(value=parameter),
+                        )
+                    )
+                elif selected_filter is dm.filters.In:
+                    if field_.name not in parameters_by_name:
+                        parameter = ListParameter(field_.name, type_=f"list[{field_.type_}]")
+                        parameters_by_name[parameter.name] = parameter
+                    else:
+                        # Equals and In filter share parameter, you have to extend the typ hint.
+                        parameter = parameters_by_name[field_.name]
+                        parameter.type_ = f"{parameter.type_} | list[{field_.type_}]"
+                    list_filters.append(
+                        ListFilter(
+                            filter=selected_filter,
+                            prop_name=field_.prop_name,
+                            keyword_arguments=dict(values=parameter),
+                        )
+                    )
+                elif selected_filter is dm.filters.Prefix:
+                    parameter = ListParameter(name=f"{field_.name}_prefix", type_=field_.type_)
+                    parameters_by_name[parameter.name] = parameter
+                    list_filters.append(
+                        ListFilter(
+                            filter=selected_filter,
+                            prop_name=field_.prop_name,
+                            keyword_arguments=dict(value=parameter),
+                        )
+                    )
+                elif selected_filter is dm.filters.Range:
+                    min_parameter = ListParameter(name=f"min_{field_.name}", type_=field_.type_)
+                    max_parameter = ListParameter(name=f"max_{field_.name}", type_=field_.type_)
+                    parameters_by_name[min_parameter.name] = min_parameter
+                    parameters_by_name[max_parameter.name] = max_parameter
+                    list_filters.append(
+                        ListFilter(
+                            filter=selected_filter,
+                            prop_name=field_.prop_name,
+                            keyword_arguments=dict(gte=min_parameter, lte=max_parameter),
+                        )
+                    )
+                else:
+                    # This is a filter that is not supported by the list method.
+                    continue
+        return cls(
+            parameters=list(parameters_by_name.values()),
+            filters=list_filters,
         )
 
 

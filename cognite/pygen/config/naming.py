@@ -101,13 +101,13 @@ class DataClassNaming:
 
     Examples:
 
-        If we have a data model with two views, with name "My view" and "My other view",
-        we will generate two API classes, with name as singular pascal case. The generated data classes
-        will be available:
+    If we have a data model with two views, with name "My view" and "My other view",
+    we will generate two API classes, with name as singular pascal case. The generated data classes
+    will be available:
 
-        ```python
-        from cognite.my_client.data_class emport MyViewApply, MyOtherViewApply
-        ```
+    ```python
+    from cognite.my_client.data_class emport MyViewApply, MyOtherViewApply
+    ```
     """
 
     name: Naming = Naming(Case.pascal, Number.unchanged)
@@ -128,19 +128,19 @@ class APIClassNaming:
 
     Examples:
 
-        If we have a data model with two views, "MyView" and "MyOtherView", we will generate two API classes,
-        with client attribute as plural snake case, and name as pascal case plural. The generated client
-        will then get the following attributes:
+    If we have a data model with two views, "MyView" and "MyOtherView", we will generate two API classes,
+    with client attribute as plural snake case, and name as pascal case plural. The generated client
+    will then get the following attributes:
 
-        ```python
-        from cognite import pygen
-        my_client = pygen.generate_sdk_notebook(...)
-        # my_client.[client_attribute].list()/.retrieve()/.apply/.delete()
-        my_client.my_views.list()
+    ```python
+    from cognite import pygen
+    my_client = pygen.generate_sdk_notebook(...)
+    # my_client.[client_attribute].list()/.retrieve()/.apply/.delete()
+    my_client.my_views.list()
 
-        # and
-        my_client.my_other_views.list()
-        ```
+    # and
+    my_client.my_other_views.list()
+    ```
 
     """
 
@@ -160,19 +160,19 @@ class MultiAPIClassNaming:
 
     Examples:
 
-        If we have a data model with two views, "MyView" and "MyOtherView", we will generate two API classes,
-        with client attribute as plural snake case, and name as pascal case plural. The generated client
-        will then get the following attributes:
+    If we have a data model with two views, "MyView" and "MyOtherView", we will generate two API classes,
+    with client attribute as plural snake case, and name as pascal case plural. The generated client
+    will then get the following attributes:
 
-        ```python
-        from cognite import pygen
-        my_client = pygen.generate_sdk_notebook(...)
-        # my_client.[client_attribute].list()/.retrieve()/.apply/.delete()
-        my_client.my_views.list()
+    ```python
+    from cognite import pygen
+    my_client = pygen.generate_sdk_notebook(...)
+    # my_client.[client_attribute].list()/.retrieve()/.apply/.delete()
+    my_client.my_views.list()
 
-        # and
-        my_client.my_other_views.list()
-        ```
+    # and
+    my_client.my_other_views.list()
+    ```
 
     """
 
@@ -197,15 +197,3 @@ class NamingConfig:
     data_class: DataClassNaming = dataclass_field(default_factory=DataClassNaming)
     api_class: APIClassNaming = dataclass_field(default_factory=APIClassNaming)
     multi_api_class: MultiAPIClassNaming = dataclass_field(default_factory=MultiAPIClassNaming)
-
-
-@dataclass
-class PygenConfig:
-    """
-    Configuration for how pygen should generate the SDK.
-
-    Args:
-        naming: The naming convention used by pygen.
-    """
-
-    naming: NamingConfig = dataclass_field(default_factory=NamingConfig)
