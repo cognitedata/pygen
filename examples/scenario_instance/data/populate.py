@@ -18,7 +18,7 @@ from scenario_instance.client import ScenarioInstanceClient
 DATE_FORMAT = "%Y-%m-%d"
 
 
-def create_timeseries(
+def populate_data(
     client: CogniteClient,
     scenario_names: list[str],
     countries_by_price_area: dict[str, str],
@@ -39,7 +39,7 @@ def create_timeseries(
         * len(markets)
     )
     count = 0
-    for (price_area, country), start_time in product(countries_by_price_area.values(), instance_by_start_time):
+    for (price_area, country), start_time in product(countries_by_price_area.items(), instance_by_start_time):
         for market in markets:
             for instance in instance_by_start_time[start_time]:
                 prefix_external_id = f"scenario_instance:{price_area}:{market}:{start_time.strftime(DATE_FORMAT)}:{instance.strftime(DATE_FORMAT)}:"
@@ -57,7 +57,7 @@ def create_timeseries(
                     )
                     scenario_instances.append(ins)
                     ts = TimeSeries(
-                        external_id=ins.priceForecast,
+                        external_id=ins.price_forecast,
                         name=f"Start={ins.start.strftime(DATE_FORMAT)}, Scenario={scenario_name} Instance={ins.instance.strftime(DATE_FORMAT)}",
                         data_set_id=dataset_id,
                         is_string=False,
@@ -66,7 +66,7 @@ def create_timeseries(
                     start = ins.start.replace(tzinfo=None)
                     index = pd.date_range(start, end=start + timedelta(days=14), freq="1H", tz="Europe/Oslo")
                     data = pd.Series(
-                        index=index, data=[random.random() * 100 for _ in range(len(index))], name=ins.forecast
+                        index=index, data=[random.random() * 100 for _ in range(len(index))], name=ins.price_forecast
                     )
                     datapoints.append(data)
                     timeseries.append(ts)
@@ -91,28 +91,28 @@ def create_timeseries(
                     )
                     scenario_instances.append(ins)
                     ts = TimeSeries(
-                        external_id=ins.priceForecast,
+                        external_id=ins.price_forecast,
                         name=f"Start={ins.start.strftime(DATE_FORMAT)}, Aggregation={agg_name} Instance={ins.instance.strftime(DATE_FORMAT)}",
                         data_set_id=dataset_id,
                         is_string=False,
                         metadata=json.loads(ins.model_dump_json(exclude_none=True)),
                     )
-                    agg.name = ins.forecast
+                    agg.name = ins.price_forecast
                     timeseries.append(ts)
                     datapoints.append(agg)
 
                 scenario_data.clear()
                 if len(timeseries) > batch_size:
-                    client.time_series.create(time_series=timeseries)
+                    print(f"Inserting {len(timeseries)} timeseries, datapoints, and ScenarioInstance nodes.")
+                    client.time_series.upsert(timeseries, mode="replace")
                     count += len(timeseries)
                     print(f"Inserted {len(timeseries)} timeseries, accumulated {count:,}/{total:,}")
 
                     df = pd.concat(datapoints, axis=1)
-                    client.time_series.forecast.insert_dataframe(df, external_id_headers=True)
+                    client.time_series.data.insert_dataframe(df, external_id_headers=True)
                     print(f"Inserted dataframe of {'x'.join(map(str, df.shape))}.")
 
                     instance_client.scenario_instance.apply(scenario_instances)
-
                     timeseries.clear()
                     datapoints.clear()
                     scenario_instances.clear()
@@ -143,7 +143,7 @@ def main():
         price_areas = [f"NO{no}" for no in "12345"] + [f"SE{no}" for no in "1234"] + [f"DK{no}" for no in "12"] + ["FI"]
         countries_by_price_area = {price_area: countries_by_code[price_area[:2]] for price_area in price_areas}
 
-        create_timeseries(
+        populate_data(
             client, scenario_names, countries_by_price_area, markets, instance_by_start_time, dataset_id, batch_size=500
         )
 
