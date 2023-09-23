@@ -22,10 +22,15 @@ class ScenarioInstancePriceForecastQuery:
     def __init__(
         self,
         client: CogniteClient,
+        view_id: dm.ViewId,
+        timeseries_limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ):
         self._client = client
+        self._view_id = view_id
+        self._timeseries_limit = timeseries_limit
         self._filter = filter
+        self._timeseries_external_ids: list[str] | None = None
 
     def retrieve(
         self,
@@ -36,9 +41,20 @@ class ScenarioInstancePriceForecastQuery:
         granularity: str | None = None,
         limit: int | None = None,
         include_outside_points: bool = False,
-        ignore_unknown_ids: bool = False,
-    ) -> Datapoints | DatapointsList | None:
-        raise NotImplementedError()
+    ) -> DatapointsList:
+        external_ids = self._retrieve_timeseries_external_ids()
+        if external_ids:
+            return self._client.time_series.data.retrieve(
+                external_id=external_ids,
+                start=start,
+                end=end,
+                aggregates=aggregates,
+                granularity=granularity,
+                limit=limit,
+                include_outside_points=include_outside_points,
+            )
+        else:
+            return DatapointsList([])
 
     def retrieve_arrays(
         self,
@@ -49,8 +65,20 @@ class ScenarioInstancePriceForecastQuery:
         granularity: str | None = None,
         limit: int | None = None,
         include_outside_points: bool = False,
-    ) -> DatapointsArray | DatapointsArrayList | None:
-        raise NotImplementedError()
+    ) -> DatapointsArrayList:
+        external_ids = self._retrieve_timeseries_external_ids()
+        if external_ids:
+            return self._client.time_series.data.retrieve_arrays(
+                external_id=external_ids,
+                start=start,
+                end=end,
+                aggregates=aggregates,
+                granularity=granularity,
+                limit=limit,
+                include_outside_points=include_outside_points,
+            )
+        else:
+            return DatapointsArrayList([])
 
     def retrieve_dataframe(
         self,
@@ -65,7 +93,22 @@ class ScenarioInstancePriceForecastQuery:
         include_aggregate_name: bool = True,
         include_granularity_name: bool = False,
     ) -> pd.DataFrame:
-        raise NotImplementedError()
+        external_ids = self._retrieve_timeseries_external_ids()
+        if external_ids:
+            return self._client.time_series.data.retrieve_dataframe(
+                external_id=external_ids,
+                start=start,
+                end=end,
+                aggregates=aggregates,
+                granularity=granularity,
+                limit=limit,
+                include_outside_points=include_outside_points,
+                uniform_index=uniform_index,
+                include_aggregate_name=include_aggregate_name,
+                include_granularity_name=include_granularity_name,
+            )
+        else:
+            return pd.DataFrame()
 
     def retrieve_dataframe_in_tz(
         self,
@@ -78,21 +121,33 @@ class ScenarioInstancePriceForecastQuery:
         include_aggregate_name: bool = True,
         include_granularity_name: bool = False,
     ) -> pd.DataFrame:
-        return self._client.time_series.data.retrieve_dataframe_in_tz(
-            start=start,
-            end=end,
-            aggregates=aggregates,
-            granularity=granularity,
-            uniform_index=uniform_index,
-            include_aggregate_name=include_aggregate_name,
-            include_granularity_name=include_granularity_name,
-        )
+        external_ids = self._retrieve_timeseries_external_ids()
+        if external_ids:
+            return self._client.time_series.data.retrieve_dataframe_in_tz(
+                external_id=external_ids,
+                start=start,
+                end=end,
+                aggregates=aggregates,
+                granularity=granularity,
+                uniform_index=uniform_index,
+                include_aggregate_name=include_aggregate_name,
+                include_granularity_name=include_granularity_name,
+            )
+        else:
+            return pd.DataFrame()
 
     def retrieve_latest(
         self,
         before: None | int | str | datetime = None,
     ) -> Datapoints | DatapointsList | None:
-        raise NotImplementedError()
+        external_ids = self._retrieve_timeseries_external_ids()
+        if external_ids:
+            return self._client.time_series.data.retrieve_latest(
+                external_id=external_ids,
+                before=before,
+            )
+        else:
+            return None
 
     def plot(
         self,
@@ -107,6 +162,16 @@ class ScenarioInstancePriceForecastQuery:
         include_granularity_name: bool = False,
     ) -> None:
         raise NotImplementedError()
+
+    def _retrieve_timeseries_external_ids(self) -> list[str]:
+        if self._timeseries_external_ids is None:
+            self._timeseries_external_ids = _retrieve_timeseries_external_ids(
+                self._client,
+                self._view_id,
+                self._filter,
+                self._timeseries_limit,
+            )
+        return self._timeseries_external_ids
 
 
 class ScenarioInstancePriceForecastAPI:
@@ -156,6 +221,8 @@ class ScenarioInstancePriceForecastAPI:
 
         return ScenarioInstancePriceForecastQuery(
             client=self._client,
+            view_id=self._view_id,
+            timeseries_limit=limit,
             filter=filter_,
         )
 
@@ -198,27 +265,33 @@ class ScenarioInstancePriceForecastAPI:
             external_id_prefix,
             filter,
         )
-        has_data = dm.filters.HasData(
-            [dm.ContainerId("IntegrationTestsImmutable", "ScenarioInstance")], [self._view_id]
-        )
-        filter_ = dm.filters.And(filter_, has_data) if filter_ else has_data
-        selected_nodes = dm.query.NodeResultSetExpression(filter=filter_, limit=limit)
-        query = dm.query.Query(
-            with_={
-                "nodes": selected_nodes,
-            },
-            select={
-                "nodes": dm.query.Select(
-                    [dm.query.SourceSelector(self._view_id, ["priceForecast"])],
-                )
-            },
-        )
-        result = self._client.data_modeling.instances.query(query)
-        external_ids = [node.properties[self._view_id]["priceForecast"] for node in result.data["nodes"].data]
+        external_ids = _retrieve_timeseries_external_ids(self._client, self._view_id, filter_, limit)
         if external_ids:
             return self._client.time_series.retrieve_multiple(external_ids=external_ids)
         else:
             return TimeSeriesList([])
+
+
+def _retrieve_timeseries_external_ids(
+    client: CogniteClient, view_id: dm.ViewId, filter_: dm.Filter | None, limit: int
+) -> list[str]:
+    has_data = dm.filters.HasData([dm.ContainerId("IntegrationTestsImmutable", "ScenarioInstance")], [view_id])
+    filter_ = dm.filters.And(filter_, has_data) if filter_ else has_data
+    selected_nodes = dm.query.NodeResultSetExpression(filter=filter_, limit=limit)
+    query = dm.query.Query(
+        with_={
+            "nodes": selected_nodes,
+        },
+        select={
+            "nodes": dm.query.Select(
+                [dm.query.SourceSelector(view_id, ["priceForecast"])],
+            )
+        },
+    )
+    # Todo implement paging
+    result = client.data_modeling.instances.query(query)
+    external_ids = [node.properties[view_id]["priceForecast"] for node in result.data["nodes"].data]
+    return external_ids
 
 
 class ScenarioInstanceAPI(TypeAPI[ScenarioInstance, ScenarioInstanceApply, ScenarioInstanceList]):
@@ -340,7 +413,13 @@ def _create_filter(
     if country_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("country"), value=country_prefix))
     if min_instance or max_instance:
-        filters.append(dm.filters.Range(view_id.as_property_ref("instance"), gte=min_instance, lte=max_instance))
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("instance"),
+                gte=min_instance.isoformat() if min_instance else None,
+                lte=max_instance.isoformat() if max_instance else None,
+            )
+        )
     if market and isinstance(market, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("market"), value=market))
     if market and isinstance(market, list):
@@ -360,7 +439,13 @@ def _create_filter(
     if scenario_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("scenario"), value=scenario_prefix))
     if min_start or max_start:
-        filters.append(dm.filters.Range(view_id.as_property_ref("start"), gte=min_start, lte=max_start))
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("start"),
+                gte=min_start.isoformat() if min_start else None,
+                lte=max_start.isoformat() if max_start else None,
+            )
+        )
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if filter:
