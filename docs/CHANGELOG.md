@@ -13,6 +13,12 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.20.0] - 20-09-19
+### Fixed
+* Generated SDKs failed to import `datedime` in the generated APIclass for views with `Timestamp` or `Date` fields.
+  This is now fixed.
+
+
 ## [0.19.0] - 20-09-19
 ### Added
 * Added support for generating filtering options in the generated SDK `.list` methods.
