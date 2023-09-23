@@ -21,6 +21,9 @@ class DomainModelCore(BaseModel):
         return self.space, self.external_id
 
 
+T_TypeNodeCore = TypeVar("T_TypeNodeCore", bound=DomainModelCore)
+
+
 class DomainModel(DomainModelCore):
     version: int
     last_updated_time: datetime.datetime
@@ -93,28 +96,31 @@ class TimeSeries(DomainModelCore):
     data_points: Union[list[NumericDataPoint], list[StringDataPoint]]
 
 
-class TypeList(UserList, Generic[T_TypeNode]):
-    _NODE: type[T_TypeNode]
+class TypeList(UserList, Generic[T_TypeNodeCore]):
+    _NODE: type[T_TypeNodeCore]
 
-    def __init__(self, nodes: Collection[type[DomainModelCore]]):
+    def __init__(self, nodes: Collection[T_TypeNodeCore]):
         super().__init__(nodes)
 
     # The dunder implementations are to get proper type hints
-    @overload
-    def __getitem__(self, item: int) -> T_TypeNode:
-        ...
-
-    @overload
-    def __getitem__(self, item: slice) -> T_TypeNodeList:
-        ...
-
-    def __getitem__(self, item: int | slice) -> T_TypeNode | T_TypeNodeList:
-        if isinstance(item, slice):
-            return type(self)(self.data[item])
-        return self.data[item]
-
-    def __iter__(self) -> Iterator[T_TypeNode]:
+    def __iter__(self) -> Iterator[T_TypeNodeCore]:
         return super().__iter__()
+
+    @overload
+    def __getitem__(self, item: int) -> T_TypeNodeCore:
+        ...
+
+    @overload
+    def __getitem__(self: type[T_TypeNodeList], item: slice) -> T_TypeNodeList:
+        ...
+
+    def __getitem__(self, item: int | slice) -> T_TypeNodeCore | T_TypeNodeList:
+        if isinstance(item, slice):
+            return self.__class__(self.data[item])
+        elif isinstance(item, int):
+            return self.data[item]
+        else:
+            raise TypeError(f"Expected int or slice, got {type(item)}")
 
     def dump(self) -> list[dict[str, Any]]:
         return [node.model_dump() for node in self.data]
@@ -143,12 +149,12 @@ class TypeList(UserList, Generic[T_TypeNode]):
 
 
 T_TypeApplyNode = TypeVar("T_TypeApplyNode", bound=DomainModelApply)
-T_TypeNodeList = TypeVar("T_TypeNodeList", bound=TypeList)
+T_TypeNodeList = TypeVar("T_TypeNodeList", bound=TypeList, covariant=True)
 
 
 class TypeApplyList(TypeList[T_TypeApplyNode]):
     def to_instances_apply(self) -> dm.InstancesApply:
-        cache = set()
+        cache: set[str] = set()
         nodes: list[dm.NodeApply] = []
         edges: list[dm.EdgeApply] = []
         for node in self.data:
