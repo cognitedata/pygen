@@ -22,26 +22,10 @@ class ScenarioInstancePriceForecastQuery:
     def __init__(
         self,
         client: CogniteClient,
-        aggregation: str | list[str] | None = None,
-        aggregation_prefix: str | None = None,
-        country: str | list[str] | None = None,
-        country_prefix: str | None = None,
-        min_instance: datetime.datetime | None = None,
-        max_instance: datetime.datetime | None = None,
-        market: str | list[str] | None = None,
-        market_prefix: str | None = None,
-        price_area: str | list[str] | None = None,
-        price_area_prefix: str | None = None,
-        scenario: str | list[str] | None = None,
-        scenario_prefix: str | None = None,
-        min_start: datetime.datetime | None = None,
-        max_start: datetime.datetime | None = None,
-        external_id_prefix: str | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ):
         self._client = client
-        raise NotImplementedError()
+        self._filter = filter
 
     def retrieve(
         self,
@@ -126,8 +110,9 @@ class ScenarioInstancePriceForecastQuery:
 
 
 class ScenarioInstancePriceForecastAPI:
-    def __init__(self, client: CogniteClient):
+    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
         self._client = client
+        self._view_id = view_id
 
     def __call__(
         self,
@@ -149,7 +134,30 @@ class ScenarioInstancePriceForecastAPI:
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> ScenarioInstancePriceForecastQuery:
-        raise NotImplementedError()
+        filter_ = _create_filter(
+            self._view_id,
+            aggregation,
+            aggregation_prefix,
+            country,
+            country_prefix,
+            min_instance,
+            max_instance,
+            market,
+            market_prefix,
+            price_area,
+            price_area_prefix,
+            scenario,
+            scenario_prefix,
+            min_start,
+            max_start,
+            external_id_prefix,
+            filter,
+        )
+
+        return ScenarioInstancePriceForecastQuery(
+            client=self._client,
+            filter=filter_,
+        )
 
     def list(
         self,
@@ -171,7 +179,40 @@ class ScenarioInstancePriceForecastAPI:
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> TimeSeriesList:
-        raise NotImplementedError()
+        filter_ = _create_filter(
+            self._view_id,
+            aggregation,
+            aggregation_prefix,
+            country,
+            country_prefix,
+            min_instance,
+            max_instance,
+            market,
+            market_prefix,
+            price_area,
+            price_area_prefix,
+            scenario,
+            scenario_prefix,
+            min_start,
+            max_start,
+            external_id_prefix,
+            filter,
+        )
+        selected_nodes = dm.query.NodeResultSetExpression(filter=filter_)
+        query = dm.query.Query(
+            with_={
+                "nodes": selected_nodes,
+            },
+            select={
+                "nodes": dm.query.Select(
+                    [dm.query.SourceSelector(self._view_id, ["priceForecast"])],
+                    limit=limit,
+                )
+            },
+        )
+        result = self._client.data_modeling.instances.query(query)
+        external_ids = [node.properties[self._view_id]["priceForecast"] for node in result.data["nodes"].data]
+        return self._client.time_series.retrieve_multiple(external_ids=external_ids)
 
 
 class ScenarioInstanceAPI(TypeAPI[ScenarioInstance, ScenarioInstanceApply, ScenarioInstanceList]):
@@ -184,7 +225,7 @@ class ScenarioInstanceAPI(TypeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
             class_list=ScenarioInstanceList,
         )
         self.view_id = view_id
-        self.price_forecast = ScenarioInstancePriceForecastAPI(client)
+        self.price_forecast = ScenarioInstancePriceForecastAPI(client, view_id)
 
     def apply(
         self, scenario_instance: ScenarioInstanceApply | Sequence[ScenarioInstanceApply], replace: bool = False
@@ -237,46 +278,85 @@ class ScenarioInstanceAPI(TypeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> ScenarioInstanceList:
-        filters = []
-        if aggregation and isinstance(aggregation, str):
-            filters.append(dm.filters.Equals(self.view_id.as_property_ref("aggregation"), value=aggregation))
-        if aggregation and isinstance(aggregation, list):
-            filters.append(dm.filters.In(self.view_id.as_property_ref("aggregation"), values=aggregation))
-        if aggregation_prefix:
-            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("aggregation"), value=aggregation_prefix))
-        if country and isinstance(country, str):
-            filters.append(dm.filters.Equals(self.view_id.as_property_ref("country"), value=country))
-        if country and isinstance(country, list):
-            filters.append(dm.filters.In(self.view_id.as_property_ref("country"), values=country))
-        if country_prefix:
-            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("country"), value=country_prefix))
-        if min_instance or max_instance:
-            filters.append(
-                dm.filters.Range(self.view_id.as_property_ref("instance"), gte=min_instance, lte=max_instance)
-            )
-        if market and isinstance(market, str):
-            filters.append(dm.filters.Equals(self.view_id.as_property_ref("market"), value=market))
-        if market and isinstance(market, list):
-            filters.append(dm.filters.In(self.view_id.as_property_ref("market"), values=market))
-        if market_prefix:
-            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("market"), value=market_prefix))
-        if price_area and isinstance(price_area, str):
-            filters.append(dm.filters.Equals(self.view_id.as_property_ref("priceArea"), value=price_area))
-        if price_area and isinstance(price_area, list):
-            filters.append(dm.filters.In(self.view_id.as_property_ref("priceArea"), values=price_area))
-        if price_area_prefix:
-            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("priceArea"), value=price_area_prefix))
-        if scenario and isinstance(scenario, str):
-            filters.append(dm.filters.Equals(self.view_id.as_property_ref("scenario"), value=scenario))
-        if scenario and isinstance(scenario, list):
-            filters.append(dm.filters.In(self.view_id.as_property_ref("scenario"), values=scenario))
-        if scenario_prefix:
-            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("scenario"), value=scenario_prefix))
-        if min_start or max_start:
-            filters.append(dm.filters.Range(self.view_id.as_property_ref("start"), gte=min_start, lte=max_start))
-        if external_id_prefix:
-            filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-        if filter:
-            filters.append(filter)
+        filter_ = _create_filter(
+            self.view_id,
+            aggregation,
+            aggregation_prefix,
+            country,
+            country_prefix,
+            min_instance,
+            max_instance,
+            market,
+            market_prefix,
+            price_area,
+            price_area_prefix,
+            scenario,
+            scenario_prefix,
+            min_start,
+            max_start,
+            external_id_prefix,
+            filter,
+        )
 
-        return self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)
+        return self._list(limit=limit, filter=filter_)
+
+
+def _create_filter(
+    view_id: dm.ViewId,
+    aggregation: str | list[str] | None = None,
+    aggregation_prefix: str | None = None,
+    country: str | list[str] | None = None,
+    country_prefix: str | None = None,
+    min_instance: datetime.datetime | None = None,
+    max_instance: datetime.datetime | None = None,
+    market: str | list[str] | None = None,
+    market_prefix: str | None = None,
+    price_area: str | list[str] | None = None,
+    price_area_prefix: str | None = None,
+    scenario: str | list[str] | None = None,
+    scenario_prefix: str | None = None,
+    min_start: datetime.datetime | None = None,
+    max_start: datetime.datetime | None = None,
+    external_id_prefix: str | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if aggregation and isinstance(aggregation, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("aggregation"), value=aggregation))
+    if aggregation and isinstance(aggregation, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("aggregation"), values=aggregation))
+    if aggregation_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("aggregation"), value=aggregation_prefix))
+    if country and isinstance(country, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("country"), value=country))
+    if country and isinstance(country, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("country"), values=country))
+    if country_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("country"), value=country_prefix))
+    if min_instance or max_instance:
+        filters.append(dm.filters.Range(view_id.as_property_ref("instance"), gte=min_instance, lte=max_instance))
+    if market and isinstance(market, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("market"), value=market))
+    if market and isinstance(market, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("market"), values=market))
+    if market_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("market"), value=market_prefix))
+    if price_area and isinstance(price_area, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("priceArea"), value=price_area))
+    if price_area and isinstance(price_area, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("priceArea"), values=price_area))
+    if price_area_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("priceArea"), value=price_area_prefix))
+    if scenario and isinstance(scenario, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("scenario"), value=scenario))
+    if scenario and isinstance(scenario, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("scenario"), values=scenario))
+    if scenario_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("scenario"), value=scenario_prefix))
+    if min_start or max_start:
+        filters.append(dm.filters.Range(view_id.as_property_ref("start"), gte=min_start, lte=max_start))
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None
