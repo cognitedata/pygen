@@ -3,7 +3,10 @@ from __future__ import annotations
 import datetime
 from typing import Sequence, overload
 
+import pandas as pd
 from cognite.client import CogniteClient
+from cognite.client.data_classes import TimeSeriesList, DatapointsList, Datapoints, DatapointsArray, DatapointsArrayList
+from cognite.client.data_classes.datapoints import Aggregate
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI
@@ -13,6 +16,154 @@ from scenario_instance.client.data_classes import (
     ScenarioInstanceList,
     ScenarioInstanceApplyList,
 )
+
+
+class ScenarioInstancePriceForecastQuery:
+    def __init__(
+        self,
+        client: CogniteClient,
+        aggregation: str | list[str] | None = None,
+        aggregation_prefix: str | None = None,
+        country: str | list[str] | None = None,
+        country_prefix: str | None = None,
+        min_instance: datetime.datetime | None = None,
+        max_instance: datetime.datetime | None = None,
+        market: str | list[str] | None = None,
+        market_prefix: str | None = None,
+        price_area: str | list[str] | None = None,
+        price_area_prefix: str | None = None,
+        scenario: str | list[str] | None = None,
+        scenario_prefix: str | None = None,
+        min_start: datetime.datetime | None = None,
+        max_start: datetime.datetime | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ):
+        self._client = client
+        raise NotImplementedError()
+
+    def retrieve(
+        self,
+        *,
+        start: int | str | datetime | None = None,
+        end: int | str | datetime | None = None,
+        aggregates: Aggregate | list[Aggregate] | None = None,
+        granularity: str | None = None,
+        limit: int | None = None,
+        include_outside_points: bool = False,
+        ignore_unknown_ids: bool = False,
+    ) -> Datapoints | DatapointsList | None:
+        raise NotImplementedError()
+
+    def retrieve_arrays(
+        self,
+        *,
+        start: int | str | datetime | None = None,
+        end: int | str | datetime | None = None,
+        aggregates: Aggregate | list[Aggregate] | None = None,
+        granularity: str | None = None,
+        limit: int | None = None,
+        include_outside_points: bool = False,
+        ignore_unknown_ids: bool = False,
+    ) -> DatapointsArray | DatapointsArrayList | None:
+        raise NotImplementedError()
+
+    def retrieve_dataframe(
+        self,
+        *,
+        start: int | str | datetime | None = None,
+        end: int | str | datetime | None = None,
+        aggregates: Aggregate | list[Aggregate] | None = None,
+        granularity: str | None = None,
+        limit: int | None = None,
+        include_outside_points: bool = False,
+        uniform_index: bool = False,
+        include_aggregate_name: bool = True,
+        include_granularity_name: bool = False,
+    ) -> pd.DataFrame:
+        raise NotImplementedError()
+
+    def retrieve_dataframe_in_tz(
+        self,
+        *,
+        start: datetime,
+        end: datetime,
+        aggregates: Aggregate | Sequence[Aggregate] | None = None,
+        granularity: str | None = None,
+        uniform_index: bool = False,
+        include_aggregate_name: bool = True,
+        include_granularity_name: bool = False,
+    ) -> pd.DataFrame:
+        raise NotImplementedError()
+
+    def retrieve_latest(
+        self,
+        before: None | int | str | datetime = None,
+    ) -> Datapoints | DatapointsList | None:
+        raise NotImplementedError()
+
+    def plot(
+        self,
+        start: int | str | datetime | None = None,
+        end: int | str | datetime | None = None,
+        aggregates: Aggregate | Sequence[Aggregate] | None = None,
+        granularity: str | None = None,
+        ignore_unknown_ids: bool = False,
+        uniform_index: bool = False,
+        include_aggregate_name: bool = True,
+        include_granularity_name: bool = False,
+    ) -> None:
+        raise NotImplementedError()
+
+
+class ScenarioInstancePriceForecastAPI:
+    def __init__(self, client: CogniteClient):
+        self._client = client
+
+    def __call__(
+        self,
+        aggregation: str | list[str] | None = None,
+        aggregation_prefix: str | None = None,
+        country: str | list[str] | None = None,
+        country_prefix: str | None = None,
+        min_instance: datetime.datetime | None = None,
+        max_instance: datetime.datetime | None = None,
+        market: str | list[str] | None = None,
+        market_prefix: str | None = None,
+        price_area: str | list[str] | None = None,
+        price_area_prefix: str | None = None,
+        scenario: str | list[str] | None = None,
+        scenario_prefix: str | None = None,
+        min_start: datetime.datetime | None = None,
+        max_start: datetime.datetime | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> ScenarioInstancePriceForecastQuery:
+        raise NotImplementedError()
+
+    def list(
+        self,
+        aggregation: str | list[str] | None = None,
+        aggregation_prefix: str | None = None,
+        country: str | list[str] | None = None,
+        country_prefix: str | None = None,
+        min_instance: datetime.datetime | None = None,
+        max_instance: datetime.datetime | None = None,
+        market: str | list[str] | None = None,
+        market_prefix: str | None = None,
+        price_area: str | list[str] | None = None,
+        price_area_prefix: str | None = None,
+        scenario: str | list[str] | None = None,
+        scenario_prefix: str | None = None,
+        min_start: datetime.datetime | None = None,
+        max_start: datetime.datetime | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> TimeSeriesList:
+        raise NotImplementedError()
 
 
 class ScenarioInstanceAPI(TypeAPI[ScenarioInstance, ScenarioInstanceApply, ScenarioInstanceList]):
@@ -25,6 +176,7 @@ class ScenarioInstanceAPI(TypeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
             class_list=ScenarioInstanceList,
         )
         self.view_id = view_id
+        self.price_forecast = ScenarioInstancePriceForecastAPI(client)
 
     def apply(
         self, scenario_instance: ScenarioInstanceApply | Sequence[ScenarioInstanceApply], replace: bool = False
