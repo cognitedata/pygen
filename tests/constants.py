@@ -96,6 +96,12 @@ PUMP_SDK = ExampleSDK(
     download_only=True,
 )
 
+SCENARIO_INSTANCE_SDK = ExampleSDK(
+    data_models=[DataModelId("IntegrationTestsImmutable", "ScenarioInstance", "1")],
+    _top_level_package="scenario_instance.client",
+    client_name="ScenarioInstanceClient",
+)
+
 # The following files are manually controlled and should not be overwritten by the generator.
 
 
@@ -144,4 +150,4 @@ class MovieSDKFiles:
 MOVIE_SDK.append_manual_files(MovieSDKFiles)
 
 
-EXAMPLE_SDKS = [MARKET_SDK, SHOP_SDK, MOVIE_SDK, APM_SDK, PUMP_SDK]
+EXAMPLE_SDKS = [MARKET_SDK, SHOP_SDK, MOVIE_SDK, APM_SDK, PUMP_SDK, SCENARIO_INSTANCE_SDK]

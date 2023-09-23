@@ -1,0 +1,10 @@
+type ScenarioInstance {
+    start: Timestamp
+    instance: Timestamp
+    scenario: String
+    priceArea: String
+    market: String
+    priceForecast: TimeSeries
+    country: String
+    aggregation: String
+}
