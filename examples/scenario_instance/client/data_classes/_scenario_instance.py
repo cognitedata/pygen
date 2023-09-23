@@ -6,9 +6,9 @@ from typing import ClassVar, Optional
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import DomainModel, DomainModelApply, TypeList
+from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 
-__all__ = ["ScenarioInstance", "ScenarioInstanceApply", "ScenarioInstanceList"]
+__all__ = ["ScenarioInstance", "ScenarioInstanceApply", "ScenarioInstanceList", "ScenarioInstanceApplyList"]
 
 
 class ScenarioInstance(DomainModel):
@@ -81,3 +81,7 @@ class ScenarioInstanceApply(DomainModelApply):
 
 class ScenarioInstanceList(TypeList[ScenarioInstance]):
     _NODE = ScenarioInstance
+
+
+class ScenarioInstanceApplyList(TypeApplyList[ScenarioInstanceApply]):
+    _NODE = ScenarioInstanceApply

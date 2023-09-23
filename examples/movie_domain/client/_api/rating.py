@@ -6,7 +6,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI
-from movie_domain.client.data_classes import Rating, RatingApply, RatingList
+from movie_domain.client.data_classes import Rating, RatingApply, RatingList, RatingApplyList
 
 
 class RatingAPI(TypeAPI[Rating, RatingApply, RatingList]):
@@ -20,8 +20,11 @@ class RatingAPI(TypeAPI[Rating, RatingApply, RatingList]):
         )
         self.view_id = view_id
 
-    def apply(self, rating: RatingApply, replace: bool = False) -> dm.InstancesApplyResult:
-        instances = rating.to_instances_apply()
+    def apply(self, rating: RatingApply | Sequence[RatingApply], replace: bool = False) -> dm.InstancesApplyResult:
+        if isinstance(rating, RatingApply):
+            instances = rating.to_instances_apply()
+        else:
+            instances = RatingApplyList(rating).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
     def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:

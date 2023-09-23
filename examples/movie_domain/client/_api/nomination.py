@@ -6,7 +6,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI
-from movie_domain.client.data_classes import Nomination, NominationApply, NominationList
+from movie_domain.client.data_classes import Nomination, NominationApply, NominationList, NominationApplyList
 
 
 class NominationAPI(TypeAPI[Nomination, NominationApply, NominationList]):
@@ -20,8 +20,13 @@ class NominationAPI(TypeAPI[Nomination, NominationApply, NominationList]):
         )
         self.view_id = view_id
 
-    def apply(self, nomination: NominationApply, replace: bool = False) -> dm.InstancesApplyResult:
-        instances = nomination.to_instances_apply()
+    def apply(
+        self, nomination: NominationApply | Sequence[NominationApply], replace: bool = False
+    ) -> dm.InstancesApplyResult:
+        if isinstance(nomination, NominationApply):
+            instances = nomination.to_instances_apply()
+        else:
+            instances = NominationApplyList(nomination).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
     def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:

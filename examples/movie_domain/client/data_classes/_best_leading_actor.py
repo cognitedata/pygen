@@ -4,9 +4,9 @@ from typing import ClassVar, Optional
 
 from cognite.client import data_modeling as dm
 
-from ._core import DomainModel, DomainModelApply, TypeList
+from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 
-__all__ = ["BestLeadingActor", "BestLeadingActorApply", "BestLeadingActorList"]
+__all__ = ["BestLeadingActor", "BestLeadingActorApply", "BestLeadingActorList", "BestLeadingActorApplyList"]
 
 
 class BestLeadingActor(DomainModel):
@@ -55,3 +55,7 @@ class BestLeadingActorApply(DomainModelApply):
 
 class BestLeadingActorList(TypeList[BestLeadingActor]):
     _NODE = BestLeadingActor
+
+
+class BestLeadingActorApplyList(TypeApplyList[BestLeadingActorApply]):
+    _NODE = BestLeadingActorApply

@@ -7,7 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI
-from movie_domain.client.data_classes import Director, DirectorApply, DirectorList
+from movie_domain.client.data_classes import Director, DirectorApply, DirectorList, DirectorApplyList
 
 
 class DirectorMoviesAPI:
@@ -109,8 +109,13 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
         self.movies = DirectorMoviesAPI(client)
         self.nomination = DirectorNominationAPI(client)
 
-    def apply(self, director: DirectorApply, replace: bool = False) -> dm.InstancesApplyResult:
-        instances = director.to_instances_apply()
+    def apply(
+        self, director: DirectorApply | Sequence[DirectorApply], replace: bool = False
+    ) -> dm.InstancesApplyResult:
+        if isinstance(director, DirectorApply):
+            instances = director.to_instances_apply()
+        else:
+            instances = DirectorApplyList(director).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
     def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:

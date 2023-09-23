@@ -7,7 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI
-from markets.client.data_classes import Bid, BidApply, BidList
+from markets.client.data_classes import Bid, BidApply, BidList, BidApplyList
 
 
 class BidAPI(TypeAPI[Bid, BidApply, BidList]):
@@ -21,8 +21,11 @@ class BidAPI(TypeAPI[Bid, BidApply, BidList]):
         )
         self.view_id = view_id
 
-    def apply(self, bid: BidApply, replace: bool = False) -> dm.InstancesApplyResult:
-        instances = bid.to_instances_apply()
+    def apply(self, bid: BidApply | Sequence[BidApply], replace: bool = False) -> dm.InstancesApplyResult:
+        if isinstance(bid, BidApply):
+            instances = bid.to_instances_apply()
+        else:
+            instances = BidApplyList(bid).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
     def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:

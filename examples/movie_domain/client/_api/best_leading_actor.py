@@ -6,7 +6,12 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI
-from movie_domain.client.data_classes import BestLeadingActor, BestLeadingActorApply, BestLeadingActorList
+from movie_domain.client.data_classes import (
+    BestLeadingActor,
+    BestLeadingActorApply,
+    BestLeadingActorList,
+    BestLeadingActorApplyList,
+)
 
 
 class BestLeadingActorAPI(TypeAPI[BestLeadingActor, BestLeadingActorApply, BestLeadingActorList]):
@@ -20,8 +25,13 @@ class BestLeadingActorAPI(TypeAPI[BestLeadingActor, BestLeadingActorApply, BestL
         )
         self.view_id = view_id
 
-    def apply(self, best_leading_actor: BestLeadingActorApply, replace: bool = False) -> dm.InstancesApplyResult:
-        instances = best_leading_actor.to_instances_apply()
+    def apply(
+        self, best_leading_actor: BestLeadingActorApply | Sequence[BestLeadingActorApply], replace: bool = False
+    ) -> dm.InstancesApplyResult:
+        if isinstance(best_leading_actor, BestLeadingActorApply):
+            instances = best_leading_actor.to_instances_apply()
+        else:
+            instances = BestLeadingActorApplyList(best_leading_actor).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
     def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:

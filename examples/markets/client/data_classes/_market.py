@@ -4,9 +4,9 @@ from typing import ClassVar, Optional
 
 from cognite.client import data_modeling as dm
 
-from ._core import DomainModel, DomainModelApply, TypeList
+from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 
-__all__ = ["Market", "MarketApply", "MarketList"]
+__all__ = ["Market", "MarketApply", "MarketList", "MarketApplyList"]
 
 
 class Market(DomainModel):
@@ -55,3 +55,7 @@ class MarketApply(DomainModelApply):
 
 class MarketList(TypeList[Market]):
     _NODE = Market
+
+
+class MarketApplyList(TypeApplyList[MarketApply]):
+    _NODE = MarketApply

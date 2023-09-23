@@ -7,7 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI
-from movie_domain.client.data_classes import Actor, ActorApply, ActorList
+from movie_domain.client.data_classes import Actor, ActorApply, ActorList, ActorApplyList
 
 
 class ActorMoviesAPI:
@@ -109,8 +109,11 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
         self.movies = ActorMoviesAPI(client)
         self.nomination = ActorNominationAPI(client)
 
-    def apply(self, actor: ActorApply, replace: bool = False) -> dm.InstancesApplyResult:
-        instances = actor.to_instances_apply()
+    def apply(self, actor: ActorApply | Sequence[ActorApply], replace: bool = False) -> dm.InstancesApplyResult:
+        if isinstance(actor, ActorApply):
+            instances = actor.to_instances_apply()
+        else:
+            instances = ActorApplyList(actor).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
     def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:

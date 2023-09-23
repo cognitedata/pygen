@@ -8,7 +8,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI
-from tutorial_apm_simple.client.data_classes import WorkOrder, WorkOrderApply, WorkOrderList
+from tutorial_apm_simple.client.data_classes import WorkOrder, WorkOrderApply, WorkOrderList, WorkOrderApplyList
 
 
 class WorkOrderLinkedassetsAPI:
@@ -118,8 +118,13 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         self.linked_assets = WorkOrderLinkedassetsAPI(client)
         self.work_items = WorkOrderWorkitemsAPI(client)
 
-    def apply(self, work_order: WorkOrderApply, replace: bool = False) -> dm.InstancesApplyResult:
-        instances = work_order.to_instances_apply()
+    def apply(
+        self, work_order: WorkOrderApply | Sequence[WorkOrderApply], replace: bool = False
+    ) -> dm.InstancesApplyResult:
+        if isinstance(work_order, WorkOrderApply):
+            instances = work_order.to_instances_apply()
+        else:
+            instances = WorkOrderApplyList(work_order).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
     def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:

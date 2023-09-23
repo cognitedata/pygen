@@ -5,14 +5,14 @@ from typing import TYPE_CHECKING, ClassVar, Optional, Union
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import DomainModel, DomainModelApply, TypeList
+from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 
 if TYPE_CHECKING:
     from ._movie import MovieApply
     from ._nomination import NominationApply
     from ._person import PersonApply
 
-__all__ = ["Role", "RoleApply", "RoleList"]
+__all__ = ["Role", "RoleApply", "RoleList", "RoleApplyList"]
 
 
 class Role(DomainModel):
@@ -127,3 +127,7 @@ class RoleApply(DomainModelApply):
 
 class RoleList(TypeList[Role]):
     _NODE = Role
+
+
+class RoleApplyList(TypeApplyList[RoleApply]):
+    _NODE = RoleApply

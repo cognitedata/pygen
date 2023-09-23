@@ -6,7 +6,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI
-from markets.client.data_classes import PygenPool, PygenPoolApply, PygenPoolList
+from markets.client.data_classes import PygenPool, PygenPoolApply, PygenPoolList, PygenPoolApplyList
 
 
 class PygenPoolAPI(TypeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
@@ -20,8 +20,13 @@ class PygenPoolAPI(TypeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
         )
         self.view_id = view_id
 
-    def apply(self, pygen_pool: PygenPoolApply, replace: bool = False) -> dm.InstancesApplyResult:
-        instances = pygen_pool.to_instances_apply()
+    def apply(
+        self, pygen_pool: PygenPoolApply | Sequence[PygenPoolApply], replace: bool = False
+    ) -> dm.InstancesApplyResult:
+        if isinstance(pygen_pool, PygenPoolApply):
+            instances = pygen_pool.to_instances_apply()
+        else:
+            instances = PygenPoolApplyList(pygen_pool).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
     def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:

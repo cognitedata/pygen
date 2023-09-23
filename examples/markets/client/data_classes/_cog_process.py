@@ -5,14 +5,14 @@ from typing import TYPE_CHECKING, ClassVar, Optional, Union
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import DomainModel, DomainModelApply, TypeList
+from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 
 if TYPE_CHECKING:
     from ._bid import BidApply
     from ._date_transformation_pair import DateTransformationPairApply
     from ._value_transformation import ValueTransformationApply
 
-__all__ = ["CogProcess", "CogProcessApply", "CogProcessList"]
+__all__ = ["CogProcess", "CogProcessApply", "CogProcessList", "CogProcessApplyList"]
 
 
 class CogProcess(DomainModel):
@@ -104,3 +104,7 @@ class CogProcessApply(DomainModelApply):
 
 class CogProcessList(TypeList[CogProcess]):
     _NODE = CogProcess
+
+
+class CogProcessApplyList(TypeApplyList[CogProcessApply]):
+    _NODE = CogProcessApply

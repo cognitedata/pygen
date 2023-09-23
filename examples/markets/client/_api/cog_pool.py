@@ -6,7 +6,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI
-from markets.client.data_classes import CogPool, CogPoolApply, CogPoolList
+from markets.client.data_classes import CogPool, CogPoolApply, CogPoolList, CogPoolApplyList
 
 
 class CogPoolAPI(TypeAPI[CogPool, CogPoolApply, CogPoolList]):
@@ -20,8 +20,11 @@ class CogPoolAPI(TypeAPI[CogPool, CogPoolApply, CogPoolList]):
         )
         self.view_id = view_id
 
-    def apply(self, cog_pool: CogPoolApply, replace: bool = False) -> dm.InstancesApplyResult:
-        instances = cog_pool.to_instances_apply()
+    def apply(self, cog_pool: CogPoolApply | Sequence[CogPoolApply], replace: bool = False) -> dm.InstancesApplyResult:
+        if isinstance(cog_pool, CogPoolApply):
+            instances = cog_pool.to_instances_apply()
+        else:
+            instances = CogPoolApplyList(cog_pool).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
     def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:

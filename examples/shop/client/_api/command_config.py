@@ -6,7 +6,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI
-from shop.client.data_classes import CommandConfig, CommandConfigApply, CommandConfigList
+from shop.client.data_classes import CommandConfig, CommandConfigApply, CommandConfigList, CommandConfigApplyList
 
 
 class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigList]):
@@ -20,8 +20,13 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
         )
         self.view_id = view_id
 
-    def apply(self, command_config: CommandConfigApply, replace: bool = False) -> dm.InstancesApplyResult:
-        instances = command_config.to_instances_apply()
+    def apply(
+        self, command_config: CommandConfigApply | Sequence[CommandConfigApply], replace: bool = False
+    ) -> dm.InstancesApplyResult:
+        if isinstance(command_config, CommandConfigApply):
+            instances = command_config.to_instances_apply()
+        else:
+            instances = CommandConfigApplyList(command_config).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
     def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:

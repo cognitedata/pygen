@@ -6,7 +6,12 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI
-from markets.client.data_classes import DateTransformation, DateTransformationApply, DateTransformationList
+from markets.client.data_classes import (
+    DateTransformation,
+    DateTransformationApply,
+    DateTransformationList,
+    DateTransformationApplyList,
+)
 
 
 class DateTransformationAPI(TypeAPI[DateTransformation, DateTransformationApply, DateTransformationList]):
@@ -20,8 +25,13 @@ class DateTransformationAPI(TypeAPI[DateTransformation, DateTransformationApply,
         )
         self.view_id = view_id
 
-    def apply(self, date_transformation: DateTransformationApply, replace: bool = False) -> dm.InstancesApplyResult:
-        instances = date_transformation.to_instances_apply()
+    def apply(
+        self, date_transformation: DateTransformationApply | Sequence[DateTransformationApply], replace: bool = False
+    ) -> dm.InstancesApplyResult:
+        if isinstance(date_transformation, DateTransformationApply):
+            instances = date_transformation.to_instances_apply()
+        else:
+            instances = DateTransformationApplyList(date_transformation).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
     def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:

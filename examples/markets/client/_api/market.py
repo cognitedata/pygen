@@ -6,7 +6,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI
-from markets.client.data_classes import Market, MarketApply, MarketList
+from markets.client.data_classes import Market, MarketApply, MarketList, MarketApplyList
 
 
 class MarketAPI(TypeAPI[Market, MarketApply, MarketList]):
@@ -20,8 +20,11 @@ class MarketAPI(TypeAPI[Market, MarketApply, MarketList]):
         )
         self.view_id = view_id
 
-    def apply(self, market: MarketApply, replace: bool = False) -> dm.InstancesApplyResult:
-        instances = market.to_instances_apply()
+    def apply(self, market: MarketApply | Sequence[MarketApply], replace: bool = False) -> dm.InstancesApplyResult:
+        if isinstance(market, MarketApply):
+            instances = market.to_instances_apply()
+        else:
+            instances = MarketApplyList(market).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
     def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:

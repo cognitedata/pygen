@@ -7,7 +7,12 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI
-from scenario_instance.client.data_classes import ScenarioInstance, ScenarioInstanceApply, ScenarioInstanceList
+from scenario_instance.client.data_classes import (
+    ScenarioInstance,
+    ScenarioInstanceApply,
+    ScenarioInstanceList,
+    ScenarioInstanceApplyList,
+)
 
 
 class ScenarioInstanceAPI(TypeAPI[ScenarioInstance, ScenarioInstanceApply, ScenarioInstanceList]):
@@ -21,8 +26,13 @@ class ScenarioInstanceAPI(TypeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
         )
         self.view_id = view_id
 
-    def apply(self, scenario_instance: ScenarioInstanceApply, replace: bool = False) -> dm.InstancesApplyResult:
-        instances = scenario_instance.to_instances_apply()
+    def apply(
+        self, scenario_instance: ScenarioInstanceApply | Sequence[ScenarioInstanceApply], replace: bool = False
+    ) -> dm.InstancesApplyResult:
+        if isinstance(scenario_instance, ScenarioInstanceApply):
+            instances = scenario_instance.to_instances_apply()
+        else:
+            instances = ScenarioInstanceApplyList(scenario_instance).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
     def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:

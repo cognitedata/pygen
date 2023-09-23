@@ -5,12 +5,17 @@ from typing import TYPE_CHECKING, ClassVar, Optional, Union  # noqa: F401
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import DomainModel, DomainModelApply, TypeList
+from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 
 if TYPE_CHECKING:
     from ._date_transformation import DateTransformationApply
 
-__all__ = ["DateTransformationPair", "DateTransformationPairApply", "DateTransformationPairList"]
+__all__ = [
+    "DateTransformationPair",
+    "DateTransformationPairApply",
+    "DateTransformationPairList",
+    "DateTransformationPairApplyList",
+]
 
 
 class DateTransformationPair(DomainModel):
@@ -92,3 +97,7 @@ class DateTransformationPairApply(DomainModelApply):
 
 class DateTransformationPairList(TypeList[DateTransformationPair]):
     _NODE = DateTransformationPair
+
+
+class DateTransformationPairApplyList(TypeApplyList[DateTransformationPairApply]):
+    _NODE = DateTransformationPairApply

@@ -7,7 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI
-from shop.client.data_classes import Case, CaseApply, CaseList
+from shop.client.data_classes import Case, CaseApply, CaseList, CaseApplyList
 
 
 class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
@@ -21,8 +21,11 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
         )
         self.view_id = view_id
 
-    def apply(self, case: CaseApply, replace: bool = False) -> dm.InstancesApplyResult:
-        instances = case.to_instances_apply()
+    def apply(self, case: CaseApply | Sequence[CaseApply], replace: bool = False) -> dm.InstancesApplyResult:
+        if isinstance(case, CaseApply):
+            instances = case.to_instances_apply()
+        else:
+            instances = CaseApplyList(case).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
     def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:

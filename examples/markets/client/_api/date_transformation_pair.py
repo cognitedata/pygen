@@ -7,7 +7,12 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI
-from markets.client.data_classes import DateTransformationPair, DateTransformationPairApply, DateTransformationPairList
+from markets.client.data_classes import (
+    DateTransformationPair,
+    DateTransformationPairApply,
+    DateTransformationPairList,
+    DateTransformationPairApplyList,
+)
 
 
 class DateTransformationPairEndAPI:
@@ -128,9 +133,14 @@ class DateTransformationPairAPI(
         self.start = DateTransformationPairStartAPI(client)
 
     def apply(
-        self, date_transformation_pair: DateTransformationPairApply, replace: bool = False
+        self,
+        date_transformation_pair: DateTransformationPairApply | Sequence[DateTransformationPairApply],
+        replace: bool = False,
     ) -> dm.InstancesApplyResult:
-        instances = date_transformation_pair.to_instances_apply()
+        if isinstance(date_transformation_pair, DateTransformationPairApply):
+            instances = date_transformation_pair.to_instances_apply()
+        else:
+            instances = DateTransformationPairApplyList(date_transformation_pair).to_instances_apply()
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

@@ -7,7 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI
-from tutorial_apm_simple.client.data_classes import CdfModel, CdfModelApply, CdfModelList
+from tutorial_apm_simple.client.data_classes import CdfModel, CdfModelApply, CdfModelList, CdfModelApplyList
 
 
 class Cdf3dModelEntitiesAPI:
@@ -69,8 +69,13 @@ class CdfModelAPI(TypeAPI[CdfModel, CdfModelApply, CdfModelList]):
         self.view_id = view_id
         self.entities = Cdf3dModelEntitiesAPI(client)
 
-    def apply(self, cdf_3_d_model: CdfModelApply, replace: bool = False) -> dm.InstancesApplyResult:
-        instances = cdf_3_d_model.to_instances_apply()
+    def apply(
+        self, cdf_3_d_model: CdfModelApply | Sequence[CdfModelApply], replace: bool = False
+    ) -> dm.InstancesApplyResult:
+        if isinstance(cdf_3_d_model, CdfModelApply):
+            instances = cdf_3_d_model.to_instances_apply()
+        else:
+            instances = CdfModelApplyList(cdf_3_d_model).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
     def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
