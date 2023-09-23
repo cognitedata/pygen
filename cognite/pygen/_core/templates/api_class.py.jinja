@@ -1,5 +1,6 @@
 from __future__ import annotations
-
+{% if data_class.has_time_field %}
+import datetime{% endif %}
 {% if data_class.has_one_to_many_edges %}from collections import defaultdict
 from typing import Dict, List, Sequence, Tuple, overload{% else %}from typing import Sequence, overload{% endif %}
 
