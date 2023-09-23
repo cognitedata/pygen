@@ -45,9 +45,9 @@ class ScenarioInstancePriceForecastQuery:
 
     def retrieve(
         self,
-        *,
         start: int | str | datetime | None = None,
         end: int | str | datetime | None = None,
+        *,
         aggregates: Aggregate | list[Aggregate] | None = None,
         granularity: str | None = None,
         limit: int | None = None,
@@ -58,22 +58,21 @@ class ScenarioInstancePriceForecastQuery:
 
     def retrieve_arrays(
         self,
-        *,
         start: int | str | datetime | None = None,
         end: int | str | datetime | None = None,
+        *,
         aggregates: Aggregate | list[Aggregate] | None = None,
         granularity: str | None = None,
         limit: int | None = None,
         include_outside_points: bool = False,
-        ignore_unknown_ids: bool = False,
     ) -> DatapointsArray | DatapointsArrayList | None:
         raise NotImplementedError()
 
     def retrieve_dataframe(
         self,
-        *,
         start: int | str | datetime | None = None,
         end: int | str | datetime | None = None,
+        *,
         aggregates: Aggregate | list[Aggregate] | None = None,
         granularity: str | None = None,
         limit: int | None = None,
@@ -86,16 +85,24 @@ class ScenarioInstancePriceForecastQuery:
 
     def retrieve_dataframe_in_tz(
         self,
-        *,
         start: datetime,
         end: datetime,
+        *,
         aggregates: Aggregate | Sequence[Aggregate] | None = None,
         granularity: str | None = None,
         uniform_index: bool = False,
         include_aggregate_name: bool = True,
         include_granularity_name: bool = False,
     ) -> pd.DataFrame:
-        raise NotImplementedError()
+        return self._client.time_series.data.retrieve_dataframe_in_tz(
+            start=start,
+            end=end,
+            aggregates=aggregates,
+            granularity=granularity,
+            uniform_index=uniform_index,
+            include_aggregate_name=include_aggregate_name,
+            include_granularity_name=include_granularity_name,
+        )
 
     def retrieve_latest(
         self,
@@ -107,6 +114,7 @@ class ScenarioInstancePriceForecastQuery:
         self,
         start: int | str | datetime | None = None,
         end: int | str | datetime | None = None,
+        *,
         aggregates: Aggregate | Sequence[Aggregate] | None = None,
         granularity: str | None = None,
         ignore_unknown_ids: bool = False,
