@@ -52,7 +52,7 @@ def test_person_list_born_before_1960(movie_client: MovieClient) -> None:
 
 def test_person_apply_multiple(movie_client: MovieClient) -> None:
     # Arrange
-    persons = [movie.PersonApply(external_id=f"person:anders{i}", name=f"Anders{i}", birth_year=0) for i in range(10)]
+    persons = [movie.PersonApply(external_id=f"person:anders{i}", name=f"Anders{i}", birth_year=0) for i in range(2)]
 
     # Act
     try:

@@ -4,8 +4,8 @@ import datetime
 import types
 from abc import abstractmethod
 from collections import UserList
-from collections.abc import Collection, Mapping
-from typing import Any, ClassVar, Generic, Optional, TypeVar, Union
+from collections.abc import Collection, Mapping, Iterator
+from typing import Any, ClassVar, Generic, Optional, TypeVar, Union, overload
 
 import pandas as pd
 from cognite.client import data_modeling as dm
@@ -57,6 +57,9 @@ class DomainModelApply(DomainModelCore, extra=Extra.forbid):
         raise NotImplementedError()
 
 
+T_TypeNodeApply = TypeVar("T_TypeNodeApply", bound=DomainModelApply)
+
+
 class DomainModelApplyResult(DomainModelCore):
     version: int
     was_modified: bool
@@ -96,6 +99,23 @@ class TypeList(UserList, Generic[T_TypeNode]):
     def __init__(self, nodes: Collection[type[DomainModelCore]]):
         super().__init__(nodes)
 
+    # The dunder implementations are to get proper type hints
+    @overload
+    def __getitem__(self, item: int) -> T_TypeNode:
+        ...
+
+    @overload
+    def __getitem__(self, item: slice) -> T_TypeNodeList:
+        ...
+
+    def __getitem__(self, item: int | slice) -> T_TypeNode | T_TypeNodeList:
+        if isinstance(item, slice):
+            return type(self)(self.data[item])
+        return self.data[item]
+
+    def __iter__(self) -> Iterator[T_TypeNode]:
+        return super().__iter__()
+
     def dump(self) -> list[dict[str, Any]]:
         return [node.model_dump() for node in self.data]
 
@@ -124,6 +144,18 @@ class TypeList(UserList, Generic[T_TypeNode]):
 
 T_TypeApplyNode = TypeVar("T_TypeApplyNode", bound=DomainModelApply)
 T_TypeNodeList = TypeVar("T_TypeNodeList", bound=TypeList)
+
+
+class TypeApplyList(TypeList[T_TypeApplyNode]):
+    def to_instances_apply(self) -> dm.InstancesApply:
+        cache = set()
+        nodes: list[dm.NodeApply] = []
+        edges: list[dm.EdgeApply] = []
+        for node in self.data:
+            result = node._to_instances_apply(cache)
+            nodes.extend(result.nodes)
+            edges.extend(result.edges)
+        return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
 
 
 def unpack_properties(properties: Properties) -> Mapping[str, PropertyValue]:

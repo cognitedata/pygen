@@ -5,7 +5,7 @@ from ._best_leading_actress import BestLeadingActress, BestLeadingActressApply, 
 from ._director import Director, DirectorApply, DirectorList
 from ._movie import Movie, MovieApply, MovieList
 from ._nomination import Nomination, NominationApply, NominationList
-from ._person import Person, PersonApply, PersonList
+from ._person import Person, PersonApply, PersonList, PersonApplyList
 from ._rating import Rating, RatingApply, RatingList
 from ._role import Role, RoleApply, RoleList
 
@@ -40,6 +40,7 @@ __all__ = [
     "Person",
     "PersonApply",
     "PersonList",
+    "PersonApplyList",
     "Rating",
     "RatingApply",
     "RatingList",
