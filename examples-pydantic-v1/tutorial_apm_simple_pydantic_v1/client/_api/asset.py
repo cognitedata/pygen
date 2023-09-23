@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from collections import defaultdict
 from typing import Dict, List, Sequence, Tuple, overload
 
@@ -7,7 +8,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI
-from tutorial_apm_simple_pydantic_v1.client.data_classes import Asset, AssetApply, AssetList
+from tutorial_apm_simple_pydantic_v1.client.data_classes import Asset, AssetApply, AssetList, AssetApplyList
 
 
 class AssetChildrenAPI:
@@ -109,8 +110,11 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
         self.children = AssetChildrenAPI(client)
         self.in_model_3_d = AssetInmodel3dAPI(client)
 
-    def apply(self, asset: AssetApply, replace: bool = False) -> dm.InstancesApplyResult:
-        instances = asset.to_instances_apply()
+    def apply(self, asset: AssetApply | Sequence[AssetApply], replace: bool = False) -> dm.InstancesApplyResult:
+        if isinstance(asset, AssetApply):
+            instances = asset.to_instances_apply()
+        else:
+            instances = AssetApplyList(asset).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
     def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:

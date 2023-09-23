@@ -10,6 +10,7 @@ from movie_domain_pydantic_v1.client.data_classes import (
     BestLeadingActress,
     BestLeadingActressApply,
     BestLeadingActressList,
+    BestLeadingActressApplyList,
 )
 
 
@@ -24,8 +25,13 @@ class BestLeadingActressAPI(TypeAPI[BestLeadingActress, BestLeadingActressApply,
         )
         self.view_id = view_id
 
-    def apply(self, best_leading_actress: BestLeadingActressApply, replace: bool = False) -> dm.InstancesApplyResult:
-        instances = best_leading_actress.to_instances_apply()
+    def apply(
+        self, best_leading_actress: BestLeadingActressApply | Sequence[BestLeadingActressApply], replace: bool = False
+    ) -> dm.InstancesApplyResult:
+        if isinstance(best_leading_actress, BestLeadingActressApply):
+            instances = best_leading_actress.to_instances_apply()
+        else:
+            instances = BestLeadingActressApplyList(best_leading_actress).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
     def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:

@@ -7,7 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI
-from movie_domain_pydantic_v1.client.data_classes import Person, PersonApply, PersonList
+from movie_domain_pydantic_v1.client.data_classes import Person, PersonApply, PersonList, PersonApplyList
 
 
 class PersonRolesAPI:
@@ -65,8 +65,11 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
         self.view_id = view_id
         self.roles = PersonRolesAPI(client)
 
-    def apply(self, person: PersonApply, replace: bool = False) -> dm.InstancesApplyResult:
-        instances = person.to_instances_apply()
+    def apply(self, person: PersonApply | Sequence[PersonApply], replace: bool = False) -> dm.InstancesApplyResult:
+        if isinstance(person, PersonApply):
+            instances = person.to_instances_apply()
+        else:
+            instances = PersonApplyList(person).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
     def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:

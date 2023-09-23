@@ -10,6 +10,7 @@ from tutorial_apm_simple_pydantic_v1.client.data_classes import (
     CdfConnectionProperties,
     CdfConnectionPropertiesApply,
     CdfConnectionPropertiesList,
+    CdfConnectionPropertiesApplyList,
 )
 
 
@@ -27,9 +28,14 @@ class CdfConnectionPropertiesAPI(
         self.view_id = view_id
 
     def apply(
-        self, cdf_3_d_connection_property: CdfConnectionPropertiesApply, replace: bool = False
+        self,
+        cdf_3_d_connection_property: CdfConnectionPropertiesApply | Sequence[CdfConnectionPropertiesApply],
+        replace: bool = False,
     ) -> dm.InstancesApplyResult:
-        instances = cdf_3_d_connection_property.to_instances_apply()
+        if isinstance(cdf_3_d_connection_property, CdfConnectionPropertiesApply):
+            instances = cdf_3_d_connection_property.to_instances_apply()
+        else:
+            instances = CdfConnectionPropertiesApplyList(cdf_3_d_connection_property).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
     def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:

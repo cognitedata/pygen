@@ -7,7 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI
-from tutorial_apm_simple_pydantic_v1.client.data_classes import WorkItem, WorkItemApply, WorkItemList
+from tutorial_apm_simple_pydantic_v1.client.data_classes import WorkItem, WorkItemApply, WorkItemList, WorkItemApplyList
 
 
 class WorkItemLinkedassetsAPI:
@@ -67,8 +67,13 @@ class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
         self.view_id = view_id
         self.linked_assets = WorkItemLinkedassetsAPI(client)
 
-    def apply(self, work_item: WorkItemApply, replace: bool = False) -> dm.InstancesApplyResult:
-        instances = work_item.to_instances_apply()
+    def apply(
+        self, work_item: WorkItemApply | Sequence[WorkItemApply], replace: bool = False
+    ) -> dm.InstancesApplyResult:
+        if isinstance(work_item, WorkItemApply):
+            instances = work_item.to_instances_apply()
+        else:
+            instances = WorkItemApplyList(work_item).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
     def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:

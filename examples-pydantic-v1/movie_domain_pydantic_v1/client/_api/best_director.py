@@ -6,7 +6,12 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI
-from movie_domain_pydantic_v1.client.data_classes import BestDirector, BestDirectorApply, BestDirectorList
+from movie_domain_pydantic_v1.client.data_classes import (
+    BestDirector,
+    BestDirectorApply,
+    BestDirectorList,
+    BestDirectorApplyList,
+)
 
 
 class BestDirectorAPI(TypeAPI[BestDirector, BestDirectorApply, BestDirectorList]):
@@ -20,8 +25,13 @@ class BestDirectorAPI(TypeAPI[BestDirector, BestDirectorApply, BestDirectorList]
         )
         self.view_id = view_id
 
-    def apply(self, best_director: BestDirectorApply, replace: bool = False) -> dm.InstancesApplyResult:
-        instances = best_director.to_instances_apply()
+    def apply(
+        self, best_director: BestDirectorApply | Sequence[BestDirectorApply], replace: bool = False
+    ) -> dm.InstancesApplyResult:
+        if isinstance(best_director, BestDirectorApply):
+            instances = best_director.to_instances_apply()
+        else:
+            instances = BestDirectorApplyList(best_director).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
     def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:

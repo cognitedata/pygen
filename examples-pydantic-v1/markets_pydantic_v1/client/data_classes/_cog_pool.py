@@ -5,9 +5,9 @@ from typing import ClassVar, Optional
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import DomainModel, DomainModelApply, TypeList
+from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 
-__all__ = ["CogPool", "CogPoolApply", "CogPoolList"]
+__all__ = ["CogPool", "CogPoolApply", "CogPoolList", "CogPoolApplyList"]
 
 
 class CogPool(DomainModel):
@@ -75,3 +75,7 @@ class CogPoolApply(DomainModelApply):
 
 class CogPoolList(TypeList[CogPool]):
     _NODE = CogPool
+
+
+class CogPoolApplyList(TypeApplyList[CogPoolApply]):
+    _NODE = CogPoolApply

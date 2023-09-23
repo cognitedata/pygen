@@ -4,9 +4,9 @@ from typing import ClassVar, Optional
 
 from cognite.client import data_modeling as dm
 
-from ._core import DomainModel, DomainModelApply, TypeList
+from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 
-__all__ = ["Nomination", "NominationApply", "NominationList"]
+__all__ = ["Nomination", "NominationApply", "NominationList", "NominationApplyList"]
 
 
 class Nomination(DomainModel):
@@ -55,3 +55,7 @@ class NominationApply(DomainModelApply):
 
 class NominationList(TypeList[Nomination]):
     _NODE = Nomination
+
+
+class NominationApplyList(TypeApplyList[NominationApply]):
+    _NODE = NominationApply

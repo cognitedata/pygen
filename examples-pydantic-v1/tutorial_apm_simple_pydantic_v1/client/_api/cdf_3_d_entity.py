@@ -7,7 +7,12 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI
-from tutorial_apm_simple_pydantic_v1.client.data_classes import CdfEntity, CdfEntityApply, CdfEntityList
+from tutorial_apm_simple_pydantic_v1.client.data_classes import (
+    CdfEntity,
+    CdfEntityApply,
+    CdfEntityList,
+    CdfEntityApplyList,
+)
 
 
 class Cdf3dEntityInmodel3dAPI:
@@ -69,8 +74,13 @@ class CdfEntityAPI(TypeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
         self.view_id = view_id
         self.in_model_3_d = Cdf3dEntityInmodel3dAPI(client)
 
-    def apply(self, cdf_3_d_entity: CdfEntityApply, replace: bool = False) -> dm.InstancesApplyResult:
-        instances = cdf_3_d_entity.to_instances_apply()
+    def apply(
+        self, cdf_3_d_entity: CdfEntityApply | Sequence[CdfEntityApply], replace: bool = False
+    ) -> dm.InstancesApplyResult:
+        if isinstance(cdf_3_d_entity, CdfEntityApply):
+            instances = cdf_3_d_entity.to_instances_apply()
+        else:
+            instances = CdfEntityApplyList(cdf_3_d_entity).to_instances_apply()
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

@@ -10,6 +10,7 @@ from markets_pydantic_v1.client.data_classes import (
     ValueTransformation,
     ValueTransformationApply,
     ValueTransformationList,
+    ValueTransformationApplyList,
 )
 
 
@@ -24,8 +25,13 @@ class ValueTransformationAPI(TypeAPI[ValueTransformation, ValueTransformationApp
         )
         self.view_id = view_id
 
-    def apply(self, value_transformation: ValueTransformationApply, replace: bool = False) -> dm.InstancesApplyResult:
-        instances = value_transformation.to_instances_apply()
+    def apply(
+        self, value_transformation: ValueTransformationApply | Sequence[ValueTransformationApply], replace: bool = False
+    ) -> dm.InstancesApplyResult:
+        if isinstance(value_transformation, ValueTransformationApply):
+            instances = value_transformation.to_instances_apply()
+        else:
+            instances = ValueTransformationApplyList(value_transformation).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
     def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
