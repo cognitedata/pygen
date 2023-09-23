@@ -10,7 +10,7 @@ from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 if TYPE_CHECKING:
     from ._role import RoleApply
 
-__all__ = ["Person", "PersonApply", "PersonList"]
+__all__ = ["Person", "PersonApply", "PersonList", "PersonApplyList"]
 
 
 class Person(DomainModel):

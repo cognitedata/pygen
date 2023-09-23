@@ -319,7 +319,10 @@ class DataClass:
 
     @property
     def init_import(self) -> str:
-        return f"from .{self.file_name} " f"import {self.read_name}, {self.write_name}, {self.read_list_name}"
+        return (
+            f"from .{self.file_name} "
+            f"import {self.read_name}, {self.write_name}, {self.read_list_name}, {self.write_list_name}"
+        )
 
     def __iter__(self) -> Iterator[Field]:
         return iter(self.fields)

@@ -4,8 +4,8 @@ import datetime
 import types
 from abc import abstractmethod
 from collections import UserList
-from collections.abc import Collection, Mapping
-from typing import Any, ClassVar, Generic, Optional, TypeVar, Union
+from collections.abc import Collection, Mapping, Iterator
+from typing import Any, ClassVar, Generic, Optional, TypeVar, Union, overload
 
 import pandas as pd
 from cognite.client import data_modeling as dm
@@ -19,6 +19,9 @@ class DomainModelCore(BaseModel):
 
     def id_tuple(self) -> tuple[str, str]:
         return self.space, self.external_id
+
+
+T_TypeNodeCore = TypeVar("T_TypeNodeCore", bound=DomainModelCore)
 
 
 class DomainModel(DomainModelCore):
@@ -60,6 +63,9 @@ class DomainModelApply(DomainModelCore{% if is_pydantic_v2 %}, extra=Extra.forbi
         raise NotImplementedError()
 
 
+T_TypeNodeApply = TypeVar("T_TypeNodeApply", bound=DomainModelApply)
+
+
 class DomainModelApplyResult(DomainModelCore):
     version: int
     was_modified: bool
@@ -93,11 +99,31 @@ class TimeSeries(DomainModelCore):
     data_points: Union[list[NumericDataPoint], list[StringDataPoint]]
 
 
-class TypeList(UserList, Generic[T_TypeNode]):
-    _NODE: type[T_TypeNode]
+class TypeList(UserList, Generic[T_TypeNodeCore]):
+    _NODE: type[T_TypeNodeCore]
 
-    def __init__(self, nodes: Collection[type[DomainModelCore]]):
+    def __init__(self, nodes: Collection[T_TypeNodeCore]):
         super().__init__(nodes)
+
+    # The dunder implementations are to get proper type hints
+    def __iter__(self) -> Iterator[T_TypeNodeCore]:
+        return super().__iter__()
+
+    @overload
+    def __getitem__(self, item: int) -> T_TypeNodeCore:
+        ...
+
+    @overload
+    def __getitem__(self: type[T_TypeNodeList], item: slice) -> T_TypeNodeList:
+        ...
+
+    def __getitem__(self, item: int | slice) -> T_TypeNodeCore | T_TypeNodeList:
+        if isinstance(item, slice):
+            return self.__class__(self.data[item])
+        elif isinstance(item, int):
+            return self.data[item]
+        else:
+            raise TypeError(f"Expected int or slice, got {type(item)}")
 
     def dump(self) -> list[dict[str, Any]]:
         return [node.{% if is_pydantic_v2 %}model_dump{% else %}dict{% endif %}() for node in self.data]
@@ -126,7 +152,19 @@ class TypeList(UserList, Generic[T_TypeNode]):
 
 
 T_TypeApplyNode = TypeVar("T_TypeApplyNode", bound=DomainModelApply)
-T_TypeNodeList = TypeVar("T_TypeNodeList", bound=TypeList)
+T_TypeNodeList = TypeVar("T_TypeNodeList", bound=TypeList, covariant=True)
+
+
+class TypeApplyList(TypeList[T_TypeApplyNode]):
+    def to_instances_apply(self) -> dm.InstancesApply:
+        cache: set[str] = set()
+        nodes: list[dm.NodeApply] = []
+        edges: list[dm.EdgeApply] = []
+        for node in self.data:
+            result = node._to_instances_apply(cache)
+            nodes.extend(result.nodes)
+            edges.extend(result.edges)
+        return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
 
 
 def unpack_properties(properties: Properties) -> Mapping[str, PropertyValue]:
