@@ -11,7 +11,7 @@ else:
 
 def test_scenario_instance_list_timeseries(client: ScenarioInstanceClient) -> None:
     # Act
-    timeseries = client.scenario_instance.price_forecast.list(country="Norway", limit=5)
+    timeseries = client.scenario_instance.price_forecast.list(country="Norway", market="Day-ahead", limit=5)
 
     # Assert
     assert len(timeseries) == 5

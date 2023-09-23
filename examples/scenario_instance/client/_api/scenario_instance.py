@@ -198,7 +198,11 @@ class ScenarioInstancePriceForecastAPI:
             external_id_prefix,
             filter,
         )
-        selected_nodes = dm.query.NodeResultSetExpression(filter=filter_)
+        has_data = dm.filters.HasData(
+            [dm.ContainerId("IntegrationTestsImmutable", "ScenarioInstance")], [self._view_id]
+        )
+        filter_ = dm.filters.And(filter_, has_data) if filter_ else has_data
+        selected_nodes = dm.query.NodeResultSetExpression(filter=filter_, limit=limit)
         query = dm.query.Query(
             with_={
                 "nodes": selected_nodes,
@@ -206,13 +210,15 @@ class ScenarioInstancePriceForecastAPI:
             select={
                 "nodes": dm.query.Select(
                     [dm.query.SourceSelector(self._view_id, ["priceForecast"])],
-                    limit=limit,
                 )
             },
         )
         result = self._client.data_modeling.instances.query(query)
         external_ids = [node.properties[self._view_id]["priceForecast"] for node in result.data["nodes"].data]
-        return self._client.time_series.retrieve_multiple(external_ids=external_ids)
+        if external_ids:
+            return self._client.time_series.retrieve_multiple(external_ids=external_ids)
+        else:
+            return TimeSeriesList([])
 
 
 class ScenarioInstanceAPI(TypeAPI[ScenarioInstance, ScenarioInstanceApply, ScenarioInstanceList]):
