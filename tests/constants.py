@@ -150,4 +150,11 @@ class MovieSDKFiles:
 MOVIE_SDK.append_manual_files(MovieSDKFiles)
 
 
+class ScenarioInstanceFiles:
+    client_dir = SCENARIO_INSTANCE_SDK.client_dir
+
+    api = client_dir / "_api"
+    scenario_instance_api = api / "scenario_instance.py"
+
+
 EXAMPLE_SDKS = [MARKET_SDK, SHOP_SDK, MOVIE_SDK, APM_SDK, PUMP_SDK, SCENARIO_INSTANCE_SDK]
