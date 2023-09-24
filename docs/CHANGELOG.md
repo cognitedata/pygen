@@ -35,6 +35,9 @@ Changes are grouped as follows
 * `to_pascal` and `to_camel` in `cognite.pygen.utils.text` failed for strings with a combination of snake and pascal/camel
   case. This is now fixed.
 
+### Removed
+* Unused classes from generated SDK `data_classes/_core.py` `DataPoint`, `NumericDataPoint`, `StringDataPoint`,
+  `TimeSeries`.
 
 ## [0.19.0] - 19-09-23
 ### Added
