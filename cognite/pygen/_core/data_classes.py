@@ -101,6 +101,10 @@ class Field(ABC):
                     pydantic_field=pydantic_field,
                 )
 
+            # Used for timeseries. Consider moving external CDF resources to a separate class.
+            edge_api_class_input = f"{view_name}_{prop_name}"
+            edge_api_class = f"{create_name(edge_api_class_input, field_naming.edge_api_class)}"
+            edge_api_attribute = create_name(prop_name, field_naming.api_class_attribute)
             return PrimitiveField(
                 name=name,
                 prop_name=prop_name,
@@ -109,6 +113,8 @@ class Field(ABC):
                 default=prop.default_value,
                 prop=prop,
                 pydantic_field=pydantic_field,
+                edge_api_class=edge_api_class,
+                edge_api_attribute=edge_api_attribute,
             )
         elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation):
             # For direct relation the source is required.
@@ -165,6 +171,8 @@ class PrimitiveField(PrimitiveFieldCore):
     This represents a basic type such as str, int, float, bool, datetime.datetime, datetime.date.
     """
 
+    edge_api_class: str
+    edge_api_attribute: str
     default: str | int | dict | None = None
 
     def as_read_type_hint(self) -> str:
@@ -336,6 +344,14 @@ class DataClass:
         return (field_ for field_ in self.fields if isinstance(field_, EdgeOneToMany))
 
     @property
+    def primitive_fields(self) -> Iterable[PrimitiveField]:
+        return (field_ for field_ in self.fields if isinstance(field_, PrimitiveField))
+
+    @property
+    def single_timeseries_fields(self) -> Iterable[PrimitiveField]:
+        return (field_ for field_ in self.primitive_fields if isinstance(field_.prop.type, dm.TimeSeriesReference))
+
+    @property
     def has_one_to_many_edges(self) -> bool:
         return any(isinstance(field_, EdgeOneToMany) for field_ in self.fields)
 
@@ -388,6 +404,17 @@ class DataClass:
                 # however, this is not a problem as all data classes are uniquely identified by their view id
                 unique[field_.data_class.view_id] = field_.data_class
         return sorted(unique.values(), key=lambda x: x.write_name)
+
+    @property
+    def has_single_timeseries_fields(self) -> bool:
+        return any(
+            isinstance(field_.prop.type, dm.TimeSeriesReference) and not isinstance(field_, PrimitiveListField)
+            for field_ in self.single_timeseries_fields
+        )
+
+    @property
+    def primitive_fields_literal(self) -> str:
+        return ", ".join(f'"{field_.prop_name}"' for field_ in self.primitive_fields)
 
 
 @dataclass(frozen=True)
@@ -517,6 +544,8 @@ _EXTERNAL_ID_FIELD = PrimitiveField(
         container=dm.ContainerId("dummy", "dummy"),
     ),
     pydantic_field="Field",
+    edge_api_class="",
+    edge_api_attribute="",
 )
 
 

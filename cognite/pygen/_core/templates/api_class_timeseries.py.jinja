@@ -1,7 +1,8 @@
-ColumnNames = Literal[]
 
+ColumnNames = Literal[{{ data_class.primitive_fields_literal }}]
 
-class ScenarioInstancePriceForecastQuery:
+{% for timeseries in data_class.single_timeseries_fields %}
+class {{ timeseries.edge_api_class}}Query:
     def __init__(
         self,
         client: CogniteClient,
@@ -74,7 +75,7 @@ class ScenarioInstancePriceForecastQuery:
         uniform_index: bool = False,
         include_aggregate_name: bool = True,
         include_granularity_name: bool = False,
-        column_names: ColumnNames | list[ColumnNames] = "",
+        column_names: ColumnNames | list[ColumnNames] = "{{ timeseries.prop_name }}",
     ) -> pd.DataFrame:
         external_ids = self._retrieve_timeseries_external_ids_with_extra(column_names)
         if external_ids:
@@ -110,7 +111,7 @@ class ScenarioInstancePriceForecastQuery:
         uniform_index: bool = False,
         include_aggregate_name: bool = True,
         include_granularity_name: bool = False,
-        column_names: ColumnNames | list[ColumnNames] = "",
+        column_names: ColumnNames | list[ColumnNames] = "{{ timeseries.prop_name }}",
     ) -> pd.DataFrame:
         external_ids = self._retrieve_timeseries_external_ids_with_extra(column_names)
         if external_ids:
@@ -157,7 +158,7 @@ class ScenarioInstancePriceForecastQuery:
         uniform_index: bool = False,
         include_aggregate_name: bool = True,
         include_granularity_name: bool = False,
-        column_names: ColumnNames | list[ColumnNames] = "",
+        column_names: ColumnNames | list[ColumnNames] = "{{ timeseries.prop_name }}",
         warning: bool = True,
         **kwargs,
     ) -> None:
@@ -190,9 +191,9 @@ class ScenarioInstancePriceForecastQuery:
         df.plot(**kwargs)
 
     def _retrieve_timeseries_external_ids_with_extra(
-        self, extra_properties: ColumnNames | list[ColumnNames] = ""
+        self, extra_properties: ColumnNames | list[ColumnNames] = "{{ timeseries.prop_name }}"
     ) -> dict[str, list[str]]:
-        return _retrieve_timeseries_external_ids_with_extra(
+        return _retrieve_timeseries_external_ids_with_extra_{{ timeseries.name }}(
             self._client,
             self._view_id,
             self._filter,
@@ -208,7 +209,7 @@ class ScenarioInstancePriceForecastQuery:
         include_aggregate_name: bool,
         include_granularity_name: bool,
     ) -> pd.DataFrame:
-        if isinstance(column_names, str) and column_names == "":
+        if isinstance(column_names, str) and column_names == "{{ timeseries.prop_name }}":
             return df
         splits = sum(included for included in [include_aggregate_name, include_granularity_name])
         if splits == 0:
@@ -221,22 +222,24 @@ class ScenarioInstancePriceForecastQuery:
         return df
 
 
-class ScenarioInstancePriceForecastAPI:
+class {{ timeseries.edge_api_class}}API:
     def __init__(self, client: CogniteClient, view_id: dm.ViewId):
         self._client = client
         self._view_id = view_id
 
     def __call__(
-        self,
+        self,{% for parm in list_method.parameters %}
+        {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> ScenarioInstancePriceForecastQuery:
+    ) -> {{ timeseries.edge_api_class}}Query:
         filter_ = _create_filter(
-            self._view_id,
+            self._view_id,{% for parm in list_method.parameters %}
+            {{ parm.name }},{% endfor %}
             filter,
         )
 
-        return ScenarioInstancePriceForecastQuery(
+        return {{ timeseries.edge_api_class }}Query(
             client=self._client,
             view_id=self._view_id,
             timeseries_limit=limit,
@@ -244,35 +247,37 @@ class ScenarioInstancePriceForecastAPI:
         )
 
     def list(
-        self,
+        self,{% for parm in list_method.parameters %}
+        {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> TimeSeriesList:
         filter_ = _create_filter(
-            self._view_id,
+            self._view_id,{% for parm in list_method.parameters %}
+            {{ parm.name }},{% endfor %}
             filter,
         )
-        external_ids = _retrieve_timeseries_external_ids_with_extra(self._client, self._view_id, filter_, limit)
+        external_ids = _retrieve_timeseries_external_ids_with_extra_{{ timeseries.name }}(self._client, self._view_id, filter_, limit)
         if external_ids:
             return self._client.time_series.retrieve_multiple(external_ids=list(external_ids))
         else:
             return TimeSeriesList([])
 
 
-def _retrieve_timeseries_external_ids_with_extra(
+def _retrieve_timeseries_external_ids_with_extra_{{ timeseries.name }}(
     client: CogniteClient,
     view_id: dm.ViewId,
     filter_: dm.Filter | None,
     limit: int,
-    extra_properties: ColumnNames | list[ColumnNames] = "",
+    extra_properties: ColumnNames | list[ColumnNames] = "{{ timeseries.prop_name }}",
 ) -> dict[str, list[str]]:
-    properties = [""]
-    if extra_properties == "":
+    properties = ["{{ timeseries.prop_name }}"]
+    if extra_properties == "{{ timeseries.prop_name }}":
         ...
-    elif isinstance(extra_properties, str) and extra_properties != "":
+    elif isinstance(extra_properties, str) and extra_properties != "{{ timeseries.prop_name }}":
         properties.append(extra_properties)
     elif isinstance(extra_properties, list):
-        properties.extend([prop for prop in extra_properties if prop != ""])
+        properties.extend([prop for prop in extra_properties if prop != "{{ timeseries.prop_name }}"])
     else:
         raise ValueError(f"Invalid value for extra_properties: {extra_properties}")
 
@@ -280,7 +285,7 @@ def _retrieve_timeseries_external_ids_with_extra(
         extra_list = [extra_properties]
     else:
         extra_list = extra_properties
-    has_data = dm.filters.HasData([dm.ContainerId("", "")], [view_id])
+    has_data = dm.filters.HasData([dm.ContainerId("{{ timeseries.prop.container.space }}", "{{ timeseries.prop.container.external_id }}")], [view_id])
     filter_ = dm.filters.And(filter_, has_data) if filter_ else has_data
 
     cursor = None
@@ -302,7 +307,7 @@ def _retrieve_timeseries_external_ids_with_extra(
         )
         result = client.data_modeling.instances.query(query)
         batch_external_ids = {
-            node.properties[view_id][""]: [node.properties[view_id][prop] for prop in extra_list]
+            node.properties[view_id]["{{ timeseries.prop_name }}"]: [node.properties[view_id][prop] for prop in extra_list]
             for node in result.data["nodes"].data
         }
         total_retrieved += len(batch_external_ids)
@@ -311,3 +316,4 @@ def _retrieve_timeseries_external_ids_with_extra(
         if total_retrieved >= limit or cursor is None:
             break
     return external_ids
+{% endfor %}

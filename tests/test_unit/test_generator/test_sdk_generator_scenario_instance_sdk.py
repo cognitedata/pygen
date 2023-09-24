@@ -34,6 +34,7 @@ def test_generate_api_file_scenario_instance(
 ) -> None:
     # Arrange
     expected = ScenarioInstanceFiles.scenario_instance_api.read_text()
+    assert scenario_instance_api_generator.data_class.has_single_timeseries_fields
 
     # Act
     actual = scenario_instance_api_generator.generate_api_file(SCENARIO_INSTANCE_SDK.top_level_package)

@@ -47,17 +47,23 @@ def to_camel(string: str, pluralize: bool = False, singularize: bool = False) ->
         'camelCases'
         >>> to_camel('best_directors', singularize=True)
         'bestDirector'
+        >>> to_camel("ScenarioInstance_priceForecast")
+        'scenarioInstancePriceForecast'
     """
     if "_" in string:
-        # Is snake case
-        string_split = string.split("_")
+        # Could be a combination of snake and pascal/camel case
+        parts = string.split("_")
+        pascal_splits = [to_pascal(part) for part in parts]
     else:
         # Assume is pascal/camel case
         # Ensure pascal
         string = string[0].upper() + string[1:]
-        string_split = re.findall(r"[A-Z][a-z]*", string)
-        if not string_split:
-            string_split = [string]
+        pascal_splits = [string]
+    string_split = []
+    for part in pascal_splits:
+        string_split.extend(re.findall(r"[A-Z][a-z]*", part))
+    if not string_split:
+        string_split = [string]
     if pluralize and singularize:
         raise ValueError("Cannot pluralize and singularize at the same time")
     elif pluralize:
@@ -65,7 +71,7 @@ def to_camel(string: str, pluralize: bool = False, singularize: bool = False) ->
     elif singularize:
         string_split[-1] = as_singular(string_split[-1].casefold())
     try:
-        return string_split[0] + "".join(word.capitalize() for word in string_split[1:])
+        return string_split[0].casefold() + "".join(word.capitalize() for word in string_split[1:])
     except IndexError:
         return ""
 
@@ -93,6 +99,8 @@ def to_pascal(string: str, pluralize: bool = False, singularize: bool = False) -
         'PriceScenarios'
         >>> to_pascal("reserveScenarios", pluralize=True)
         'ReserveScenarios'
+        >>> to_pascal("ScenarioInstance_priceForecast")
+        'ScenarioInstancePriceForecast'
     """
     camel = to_camel(string, pluralize, singularize)
     return f"{camel[0].upper()}{camel[1:]}" if camel else ""
