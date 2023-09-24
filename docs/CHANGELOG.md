@@ -20,7 +20,7 @@ Changes are grouped as follows
   `movie_client.persons.apply(person: PersonApply | Sequence[PersonApply], ...)`.
 
 ### Fixed
-* Generated SDKs failed to import `datedime` in the generated APIclass for views with `Timestamp` or `Date` fields.
+* Generated SDKs failed to import `datetime` in the generated APIClass for views with `Timestamp` or `Date` fields.
   This is now fixed.
 
 
