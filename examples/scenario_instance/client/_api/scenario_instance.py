@@ -156,12 +156,25 @@ class ScenarioInstancePriceForecastQuery:
         *,
         aggregates: Aggregate | Sequence[Aggregate] | None = None,
         granularity: str | None = None,
-        ignore_unknown_ids: bool = False,
         uniform_index: bool = False,
         include_aggregate_name: bool = True,
         include_granularity_name: bool = False,
+        **kwargs,
     ) -> None:
-        raise NotImplementedError()
+        external_ids = self._retrieve_timeseries_external_ids()
+        if not external_ids:
+            return
+        df = self._client.time_series.data.retrieve_dataframe(
+            external_id=external_ids,
+            start=start,
+            end=end,
+            aggregates=aggregates,
+            granularity=granularity,
+            uniform_index=uniform_index,
+            include_aggregate_name=include_aggregate_name,
+            include_granularity_name=include_granularity_name,
+        )
+        df.plot(**kwargs)
 
     def _retrieve_timeseries_external_ids(self) -> list[str]:
         if self._timeseries_external_ids is None:

@@ -102,6 +102,7 @@ pandas-stubs = "^2"
 types-PyYAML = "^6"
 types-toml = "^0.10"
 IPython = "*"
+matplotlib = "*"
 
 [tool.pytest.ini_options]
 filterwarnings = [
