@@ -320,7 +320,9 @@ def _retrieve_timeseries_external_ids_with_extra(
     extra_properties: ColumnNames | list[ColumnNames] = "priceForecast",
 ) -> dict[str, list[str]]:
     properties = ["priceForecast"]
-    if isinstance(extra_properties, str) and extra_properties != "priceForecast":
+    if extra_properties == "priceForecast":
+        ...
+    elif isinstance(extra_properties, str) and extra_properties != "priceForecast":
         properties.append(extra_properties)
     elif isinstance(extra_properties, list):
         properties.extend([prop for prop in extra_properties if prop != "priceForecast"])
