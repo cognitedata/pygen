@@ -70,32 +70,6 @@ class DomainModelApplyResult(DomainModelCore):
     created_time: datetime.datetime
 
 
-class DataPoint(BaseModel):
-    timestamp: str
-
-
-class NumericDataPoint(DataPoint):
-    value: float
-
-
-class StringDataPoint(DataPoint):
-    value: str
-
-
-class TimeSeries(DomainModelCore):
-    id: Optional[int] = None
-    name: Optional[str] = None
-    is_string: bool = False
-    metadata: dict[str, str] = Field(default_factory=dict)
-    unit: Optional[str] = None
-    asset_id: Optional[int] = None
-    is_step: bool = False
-    description: Optional[str] = None
-    security_categories: Optional[str] = None
-    dataset_id: Optional[int] = None
-    data_points: Union[list[NumericDataPoint], list[StringDataPoint]]
-
-
 class TypeList(UserList, Generic[T_TypeNodeCore]):
     _NODE: type[T_TypeNodeCore]
 
