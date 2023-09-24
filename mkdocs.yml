@@ -15,7 +15,9 @@ nav:
         - Python Application: quickstart/project.md
     - Installation: installation.md
     - CLI: cli.md
-    - Examples: examples/movie_domain.ipynb
+    - Examples:
+        - Movie: examples/movie_domain.ipynb
+        - Working with Time Series: examples/timeseries.ipynb
     - Pygen Config:
         - Home: config/index.md
         - Naming: config/naming.md

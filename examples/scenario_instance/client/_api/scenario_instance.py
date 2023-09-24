@@ -110,12 +110,13 @@ class ScenarioInstancePriceForecastQuery:
                 include_aggregate_name=include_aggregate_name,
                 include_granularity_name=include_granularity_name,
             )
+            is_aggregate = aggregates is not None
             return self._rename_columns(
                 external_ids,
                 df,
                 column_names,
-                include_aggregate_name,
-                include_granularity_name,
+                is_aggregate and include_aggregate_name,
+                is_aggregate and include_granularity_name,
             )
         else:
             return pd.DataFrame()
@@ -144,12 +145,13 @@ class ScenarioInstancePriceForecastQuery:
                 include_aggregate_name=include_aggregate_name,
                 include_granularity_name=include_granularity_name,
             )
+            is_aggregate = aggregates is not None
             return self._rename_columns(
                 external_ids,
                 df,
                 column_names,
-                include_aggregate_name,
-                include_granularity_name,
+                is_aggregate and include_aggregate_name,
+                is_aggregate and include_granularity_name,
             )
         else:
             return pd.DataFrame()
