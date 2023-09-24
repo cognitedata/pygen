@@ -333,26 +333,36 @@ def _retrieve_timeseries_external_ids_with_extra(
         extra_list = [extra_properties]
     else:
         extra_list = extra_properties
-
     has_data = dm.filters.HasData([dm.ContainerId("IntegrationTestsImmutable", "ScenarioInstance")], [view_id])
     filter_ = dm.filters.And(filter_, has_data) if filter_ else has_data
-    selected_nodes = dm.query.NodeResultSetExpression(filter=filter_, limit=limit)
-    query = dm.query.Query(
-        with_={
-            "nodes": selected_nodes,
-        },
-        select={
-            "nodes": dm.query.Select(
-                [dm.query.SourceSelector(view_id, properties)],
-            )
-        },
-    )
-    # Todo implement paging
-    result = client.data_modeling.instances.query(query)
-    external_ids = {
-        node.properties[view_id]["priceForecast"]: [node.properties[view_id][prop] for prop in extra_list]
-        for node in result.data["nodes"].data
-    }
+
+    cursor = None
+    external_ids: dict[str, list[str]] = {}
+    total_retrieved = 0
+    while True:
+        query_limit = min(10_000, limit - total_retrieved)
+        selected_nodes = dm.query.NodeResultSetExpression(filter=filter_, limit=query_limit)
+        query = dm.query.Query(
+            with_={
+                "nodes": selected_nodes,
+            },
+            select={
+                "nodes": dm.query.Select(
+                    [dm.query.SourceSelector(view_id, properties)],
+                )
+            },
+            cursors={"nodes": cursor},
+        )
+        result = client.data_modeling.instances.query(query)
+        batch_external_ids = {
+            node.properties[view_id]["priceForecast"]: [node.properties[view_id][prop] for prop in extra_list]
+            for node in result.data["nodes"].data
+        }
+        total_retrieved += len(batch_external_ids)
+        external_ids.update(batch_external_ids)
+        cursor = result.cursors["nodes"]
+        if total_retrieved >= limit or cursor is None:
+            break
     return external_ids
 
 

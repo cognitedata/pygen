@@ -156,3 +156,12 @@ def test_retrieve(client: ScenarioInstanceClient) -> None:
 def test_plot(client: ScenarioInstanceClient) -> None:
     # Act
     client.scenario_instance.price_forecast(country_prefix="N", limit=5).plot()
+
+
+def test_paging(client: ScenarioInstanceClient) -> None:
+    # Act
+    # The query endpoint can return a maximum of 10_000 rows, so we set the limit to 10_001 to test paging
+    timeseries = client.scenario_instance.price_forecast.list(limit=10_001)
+
+    # Assert
+    assert len(timeseries) == 10_001
