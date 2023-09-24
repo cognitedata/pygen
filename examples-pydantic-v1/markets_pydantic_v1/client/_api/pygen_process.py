@@ -64,16 +64,33 @@ class PygenProcessAPI(TypeAPI[PygenProcess, PygenProcessApply, PygenProcessList]
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> PygenProcessList:
-        filters = []
-        if name and isinstance(name, str):
-            filters.append(dm.filters.Equals(self.view_id.as_property_ref("name"), value=name))
-        if name and isinstance(name, list):
-            filters.append(dm.filters.In(self.view_id.as_property_ref("name"), values=name))
-        if name_prefix:
-            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("name"), value=name_prefix))
-        if external_id_prefix:
-            filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-        if filter:
-            filters.append(filter)
+        filter_ = _create_filter(
+            self.view_id,
+            name,
+            name_prefix,
+            external_id_prefix,
+            filter,
+        )
 
-        return self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)
+        return self._list(limit=limit, filter=filter_)
+
+
+def _create_filter(
+    view_id: dm.ViewId,
+    name: str | list[str] | None = None,
+    name_prefix: str | None = None,
+    external_id_prefix: str | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if name and isinstance(name, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
+    if name and isinstance(name, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("name"), values=name))
+    if name_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

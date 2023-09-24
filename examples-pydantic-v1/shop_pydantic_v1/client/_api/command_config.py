@@ -62,10 +62,23 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> CommandConfigList:
-        filters = []
-        if external_id_prefix:
-            filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-        if filter:
-            filters.append(filter)
+        filter_ = _create_filter(
+            self.view_id,
+            external_id_prefix,
+            filter,
+        )
 
-        return self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)
+        return self._list(limit=limit, filter=filter_)
+
+
+def _create_filter(
+    view_id: dm.ViewId,
+    external_id_prefix: str | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

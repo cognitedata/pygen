@@ -66,18 +66,39 @@ class NominationAPI(TypeAPI[Nomination, NominationApply, NominationList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> NominationList:
-        filters = []
-        if name and isinstance(name, str):
-            filters.append(dm.filters.Equals(self.view_id.as_property_ref("name"), value=name))
-        if name and isinstance(name, list):
-            filters.append(dm.filters.In(self.view_id.as_property_ref("name"), values=name))
-        if name_prefix:
-            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("name"), value=name_prefix))
-        if min_year or max_year:
-            filters.append(dm.filters.Range(self.view_id.as_property_ref("year"), gte=min_year, lte=max_year))
-        if external_id_prefix:
-            filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-        if filter:
-            filters.append(filter)
+        filter_ = _create_filter(
+            self.view_id,
+            name,
+            name_prefix,
+            min_year,
+            max_year,
+            external_id_prefix,
+            filter,
+        )
 
-        return self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)
+        return self._list(limit=limit, filter=filter_)
+
+
+def _create_filter(
+    view_id: dm.ViewId,
+    name: str | list[str] | None = None,
+    name_prefix: str | None = None,
+    min_year: int | None = None,
+    max_year: int | None = None,
+    external_id_prefix: str | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if name and isinstance(name, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
+    if name and isinstance(name, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("name"), values=name))
+    if name_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
+    if min_year or max_year:
+        filters.append(dm.filters.Range(view_id.as_property_ref("year"), gte=min_year, lte=max_year))
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

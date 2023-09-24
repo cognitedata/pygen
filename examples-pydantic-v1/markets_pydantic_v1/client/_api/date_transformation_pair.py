@@ -192,13 +192,13 @@ class DateTransformationPairAPI(
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> DateTransformationPairList:
-        filters = []
-        if external_id_prefix:
-            filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-        if filter:
-            filters.append(filter)
+        filter_ = _create_filter(
+            self.view_id,
+            external_id_prefix,
+            filter,
+        )
 
-        date_transformation_pairs = self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)
+        date_transformation_pairs = self._list(limit=limit, filter=filter_)
 
         if retrieve_edges:
             end_edges = self.end.list(date_transformation_pairs.as_external_ids(), limit=-1)
@@ -229,3 +229,16 @@ class DateTransformationPairAPI(
             node_id = date_transformation_pair.id_tuple()
             if node_id in edges_by_start_node:
                 date_transformation_pair.start = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
+
+
+def _create_filter(
+    view_id: dm.ViewId,
+    external_id_prefix: str | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None
