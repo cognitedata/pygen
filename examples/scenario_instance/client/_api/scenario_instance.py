@@ -18,7 +18,9 @@ from scenario_instance.client.data_classes import (
     ScenarioInstanceApplyList,
 )
 
-ColumnNames = Literal["priceForecast", "aggregation", "country", "instance", "market", "priceArea", "scenario", "start"]
+PriceForecastColumnNames = Literal[
+    "priceForecast", "aggregation", "country", "instance", "market", "priceArea", "scenario", "start"
+]
 
 
 class ScenarioInstancePriceForecastQuery:
@@ -94,7 +96,7 @@ class ScenarioInstancePriceForecastQuery:
         uniform_index: bool = False,
         include_aggregate_name: bool = True,
         include_granularity_name: bool = False,
-        column_names: ColumnNames | list[ColumnNames] = "priceForecast",
+        column_names: PriceForecastColumnNames | list[PriceForecastColumnNames] = "priceForecast",
     ) -> pd.DataFrame:
         external_ids = self._retrieve_timeseries_external_ids_with_extra(column_names)
         if external_ids:
@@ -130,7 +132,7 @@ class ScenarioInstancePriceForecastQuery:
         uniform_index: bool = False,
         include_aggregate_name: bool = True,
         include_granularity_name: bool = False,
-        column_names: ColumnNames | list[ColumnNames] = "priceForecast",
+        column_names: PriceForecastColumnNames | list[PriceForecastColumnNames] = "priceForecast",
     ) -> pd.DataFrame:
         external_ids = self._retrieve_timeseries_external_ids_with_extra(column_names)
         if external_ids:
@@ -177,7 +179,7 @@ class ScenarioInstancePriceForecastQuery:
         uniform_index: bool = False,
         include_aggregate_name: bool = True,
         include_granularity_name: bool = False,
-        column_names: ColumnNames | list[ColumnNames] = "priceForecast",
+        column_names: PriceForecastColumnNames | list[PriceForecastColumnNames] = "priceForecast",
         warning: bool = True,
         **kwargs,
     ) -> None:
@@ -210,9 +212,9 @@ class ScenarioInstancePriceForecastQuery:
         df.plot(**kwargs)
 
     def _retrieve_timeseries_external_ids_with_extra(
-        self, extra_properties: ColumnNames | list[ColumnNames] = "priceForecast"
+        self, extra_properties: PriceForecastColumnNames | list[PriceForecastColumnNames] = "priceForecast"
     ) -> dict[str, list[str]]:
-        return _retrieve_timeseries_external_ids_with_extra(
+        return _retrieve_timeseries_external_ids_with_extra_price_forecast(
             self._client,
             self._view_id,
             self._filter,
@@ -224,7 +226,7 @@ class ScenarioInstancePriceForecastQuery:
     def _rename_columns(
         external_ids: dict[str, list[str]],
         df: pd.DataFrame,
-        column_names: ColumnNames | list[ColumnNames],
+        column_names: PriceForecastColumnNames | list[PriceForecastColumnNames],
         include_aggregate_name: bool,
         include_granularity_name: bool,
     ) -> pd.DataFrame:
@@ -332,19 +334,21 @@ class ScenarioInstancePriceForecastAPI:
             external_id_prefix,
             filter,
         )
-        external_ids = _retrieve_timeseries_external_ids_with_extra(self._client, self._view_id, filter_, limit)
+        external_ids = _retrieve_timeseries_external_ids_with_extra_price_forecast(
+            self._client, self._view_id, filter_, limit
+        )
         if external_ids:
             return self._client.time_series.retrieve_multiple(external_ids=list(external_ids))
         else:
             return TimeSeriesList([])
 
 
-def _retrieve_timeseries_external_ids_with_extra(
+def _retrieve_timeseries_external_ids_with_extra_price_forecast(
     client: CogniteClient,
     view_id: dm.ViewId,
     filter_: dm.Filter | None,
     limit: int,
-    extra_properties: ColumnNames | list[ColumnNames] = "priceForecast",
+    extra_properties: PriceForecastColumnNames | list[PriceForecastColumnNames] = "priceForecast",
 ) -> dict[str, list[str]]:
     properties = ["priceForecast"]
     if extra_properties == "priceForecast":
