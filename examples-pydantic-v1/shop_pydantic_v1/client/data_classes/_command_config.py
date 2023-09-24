@@ -4,9 +4,9 @@ from typing import ClassVar, Optional
 
 from cognite.client import data_modeling as dm
 
-from ._core import DomainModel, DomainModelApply, TypeList
+from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 
-__all__ = ["CommandConfig", "CommandConfigApply", "CommandConfigList"]
+__all__ = ["CommandConfig", "CommandConfigApply", "CommandConfigList", "CommandConfigApplyList"]
 
 
 class CommandConfig(DomainModel):
@@ -55,3 +55,7 @@ class CommandConfigApply(DomainModelApply):
 
 class CommandConfigList(TypeList[CommandConfig]):
     _NODE = CommandConfig
+
+
+class CommandConfigApplyList(TypeApplyList[CommandConfigApply]):
+    _NODE = CommandConfigApply

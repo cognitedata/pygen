@@ -7,10 +7,10 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI
-from tutorial_apm_simple.client.data_classes import CdfModel, CdfModelApply, CdfModelList
+from tutorial_apm_simple.client.data_classes import CdfModel, CdfModelApply, CdfModelList, CdfModelApplyList
 
 
-class Cdf3dModelEntitiesAPI:
+class CdfModelEntitiesAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
@@ -67,10 +67,15 @@ class CdfModelAPI(TypeAPI[CdfModel, CdfModelApply, CdfModelList]):
             class_list=CdfModelList,
         )
         self.view_id = view_id
-        self.entities = Cdf3dModelEntitiesAPI(client)
+        self.entities = CdfModelEntitiesAPI(client)
 
-    def apply(self, cdf_3_d_model: CdfModelApply, replace: bool = False) -> dm.InstancesApplyResult:
-        instances = cdf_3_d_model.to_instances_apply()
+    def apply(
+        self, cdf_3_d_model: CdfModelApply | Sequence[CdfModelApply], replace: bool = False
+    ) -> dm.InstancesApplyResult:
+        if isinstance(cdf_3_d_model, CdfModelApply):
+            instances = cdf_3_d_model.to_instances_apply()
+        else:
+            instances = CdfModelApplyList(cdf_3_d_model).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
     def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
@@ -114,19 +119,15 @@ class CdfModelAPI(TypeAPI[CdfModel, CdfModelApply, CdfModelList]):
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> CdfModelList:
-        filters = []
-        if name and isinstance(name, str):
-            filters.append(dm.filters.Equals(self.view_id.as_property_ref("name"), value=name))
-        if name and isinstance(name, list):
-            filters.append(dm.filters.In(self.view_id.as_property_ref("name"), values=name))
-        if name_prefix:
-            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("name"), value=name_prefix))
-        if external_id_prefix:
-            filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-        if filter:
-            filters.append(filter)
+        filter_ = _create_filter(
+            self.view_id,
+            name,
+            name_prefix,
+            external_id_prefix,
+            filter,
+        )
 
-        cdf_3_d_models = self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)
+        cdf_3_d_models = self._list(limit=limit, filter=filter_)
 
         if retrieve_edges:
             entity_edges = self.entities.list(cdf_3_d_models.as_external_ids(), limit=-1)
@@ -144,3 +145,24 @@ class CdfModelAPI(TypeAPI[CdfModel, CdfModelApply, CdfModelList]):
             node_id = cdf_3_d_model.id_tuple()
             if node_id in edges_by_start_node:
                 cdf_3_d_model.entities = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
+
+
+def _create_filter(
+    view_id: dm.ViewId,
+    name: str | list[str] | None = None,
+    name_prefix: str | None = None,
+    external_id_prefix: str | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if name and isinstance(name, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
+    if name and isinstance(name, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("name"), values=name))
+    if name_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

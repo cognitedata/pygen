@@ -28,6 +28,7 @@ def generate_sdks(overwrite_manual_files: bool = typer.Option(False, help="Overw
     for example_sdk in EXAMPLE_SDKS:
         if example_sdk.download_only:
             continue
+        typer.echo(f"Generating {example_sdk.client_name} SDK...")
         data_models = [DataModel.load(safe_load(dms_file.read_text())[0]) for dms_file in example_sdk.dms_files]
         if len(data_models) == 1:
             data_models = data_models[0]
@@ -53,6 +54,7 @@ def generate_sdks(overwrite_manual_files: bool = typer.Option(False, help="Overw
             )
         else:
             typer.echo("All files updated! Including files assumed to be manually maintained.")
+        typer.echo("\n")
     typer.echo("All SDKs Created!")
 
 

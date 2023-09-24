@@ -6,12 +6,12 @@ from typing import TYPE_CHECKING, ClassVar, Optional, Union
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import DomainModel, DomainModelApply, TypeList
+from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 
 if TYPE_CHECKING:
     from ._market import MarketApply
 
-__all__ = ["CogBid", "CogBidApply", "CogBidList"]
+__all__ = ["CogBid", "CogBidApply", "CogBidList", "CogBidApplyList"]
 
 
 class CogBid(DomainModel):
@@ -91,3 +91,7 @@ class CogBidApply(DomainModelApply):
 
 class CogBidList(TypeList[CogBid]):
     _NODE = CogBid
+
+
+class CogBidApplyList(TypeApplyList[CogBidApply]):
+    _NODE = CogBidApply

@@ -4,9 +4,9 @@ from typing import ClassVar, Optional
 
 from cognite.client import data_modeling as dm
 
-from ._core import DomainModel, DomainModelApply, TypeList
+from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 
-__all__ = ["ValueTransformation", "ValueTransformationApply", "ValueTransformationList"]
+__all__ = ["ValueTransformation", "ValueTransformationApply", "ValueTransformationList", "ValueTransformationApplyList"]
 
 
 class ValueTransformation(DomainModel):
@@ -55,3 +55,7 @@ class ValueTransformationApply(DomainModelApply):
 
 class ValueTransformationList(TypeList[ValueTransformation]):
     _NODE = ValueTransformation
+
+
+class ValueTransformationApplyList(TypeApplyList[ValueTransformationApply]):
+    _NODE = ValueTransformationApply

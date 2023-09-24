@@ -6,13 +6,13 @@ from typing import TYPE_CHECKING, ClassVar, Optional, Union
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import DomainModel, DomainModelApply, TypeList
+from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 
 if TYPE_CHECKING:
     from ._asset import AssetApply
     from ._work_item import WorkItemApply
 
-__all__ = ["WorkOrder", "WorkOrderApply", "WorkOrderList"]
+__all__ = ["WorkOrder", "WorkOrderApply", "WorkOrderList", "WorkOrderApplyList"]
 
 
 class WorkOrder(DomainModel):
@@ -187,3 +187,7 @@ class WorkOrderApply(DomainModelApply):
 
 class WorkOrderList(TypeList[WorkOrder]):
     _NODE = WorkOrder
+
+
+class WorkOrderApplyList(TypeApplyList[WorkOrderApply]):
+    _NODE = WorkOrderApply

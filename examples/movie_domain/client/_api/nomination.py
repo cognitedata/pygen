@@ -6,7 +6,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI
-from movie_domain.client.data_classes import Nomination, NominationApply, NominationList
+from movie_domain.client.data_classes import Nomination, NominationApply, NominationList, NominationApplyList
 
 
 class NominationAPI(TypeAPI[Nomination, NominationApply, NominationList]):
@@ -20,8 +20,13 @@ class NominationAPI(TypeAPI[Nomination, NominationApply, NominationList]):
         )
         self.view_id = view_id
 
-    def apply(self, nomination: NominationApply, replace: bool = False) -> dm.InstancesApplyResult:
-        instances = nomination.to_instances_apply()
+    def apply(
+        self, nomination: NominationApply | Sequence[NominationApply], replace: bool = False
+    ) -> dm.InstancesApplyResult:
+        if isinstance(nomination, NominationApply):
+            instances = nomination.to_instances_apply()
+        else:
+            instances = NominationApplyList(nomination).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
     def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
@@ -56,18 +61,39 @@ class NominationAPI(TypeAPI[Nomination, NominationApply, NominationList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> NominationList:
-        filters = []
-        if name and isinstance(name, str):
-            filters.append(dm.filters.Equals(self.view_id.as_property_ref("name"), value=name))
-        if name and isinstance(name, list):
-            filters.append(dm.filters.In(self.view_id.as_property_ref("name"), values=name))
-        if name_prefix:
-            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("name"), value=name_prefix))
-        if min_year or max_year:
-            filters.append(dm.filters.Range(self.view_id.as_property_ref("year"), gte=min_year, lte=max_year))
-        if external_id_prefix:
-            filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-        if filter:
-            filters.append(filter)
+        filter_ = _create_filter(
+            self.view_id,
+            name,
+            name_prefix,
+            min_year,
+            max_year,
+            external_id_prefix,
+            filter,
+        )
 
-        return self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)
+        return self._list(limit=limit, filter=filter_)
+
+
+def _create_filter(
+    view_id: dm.ViewId,
+    name: str | list[str] | None = None,
+    name_prefix: str | None = None,
+    min_year: int | None = None,
+    max_year: int | None = None,
+    external_id_prefix: str | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if name and isinstance(name, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
+    if name and isinstance(name, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("name"), values=name))
+    if name_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
+    if min_year or max_year:
+        filters.append(dm.filters.Range(view_id.as_property_ref("year"), gte=min_year, lte=max_year))
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

@@ -1,12 +1,13 @@
 from __future__ import annotations
 
+import datetime
 from typing import Sequence, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI
-from markets_pydantic_v1.client.data_classes import Bid, BidApply, BidList
+from markets_pydantic_v1.client.data_classes import Bid, BidApply, BidList, BidApplyList
 
 
 class BidAPI(TypeAPI[Bid, BidApply, BidList]):
@@ -20,8 +21,11 @@ class BidAPI(TypeAPI[Bid, BidApply, BidList]):
         )
         self.view_id = view_id
 
-    def apply(self, bid: BidApply, replace: bool = False) -> dm.InstancesApplyResult:
-        instances = bid.to_instances_apply()
+    def apply(self, bid: BidApply | Sequence[BidApply], replace: bool = False) -> dm.InstancesApplyResult:
+        if isinstance(bid, BidApply):
+            instances = bid.to_instances_apply()
+        else:
+            instances = BidApplyList(bid).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
     def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
@@ -56,18 +60,45 @@ class BidAPI(TypeAPI[Bid, BidApply, BidList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> BidList:
-        filters = []
-        if min_date or max_date:
-            filters.append(dm.filters.Range(self.view_id.as_property_ref("date"), gte=min_date, lte=max_date))
-        if name and isinstance(name, str):
-            filters.append(dm.filters.Equals(self.view_id.as_property_ref("name"), value=name))
-        if name and isinstance(name, list):
-            filters.append(dm.filters.In(self.view_id.as_property_ref("name"), values=name))
-        if name_prefix:
-            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("name"), value=name_prefix))
-        if external_id_prefix:
-            filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-        if filter:
-            filters.append(filter)
+        filter_ = _create_filter(
+            self.view_id,
+            min_date,
+            max_date,
+            name,
+            name_prefix,
+            external_id_prefix,
+            filter,
+        )
 
-        return self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)
+        return self._list(limit=limit, filter=filter_)
+
+
+def _create_filter(
+    view_id: dm.ViewId,
+    min_date: datetime.date | None = None,
+    max_date: datetime.date | None = None,
+    name: str | list[str] | None = None,
+    name_prefix: str | None = None,
+    external_id_prefix: str | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if min_date or max_date:
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("date"),
+                gte=min_date.isoformat() if min_date else None,
+                lte=max_date.isoformat() if max_date else None,
+            )
+        )
+    if name and isinstance(name, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
+    if name and isinstance(name, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("name"), values=name))
+    if name_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

@@ -6,7 +6,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI
-from shop.client.data_classes import CommandConfig, CommandConfigApply, CommandConfigList
+from shop.client.data_classes import CommandConfig, CommandConfigApply, CommandConfigList, CommandConfigApplyList
 
 
 class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigList]):
@@ -20,8 +20,13 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
         )
         self.view_id = view_id
 
-    def apply(self, command_config: CommandConfigApply, replace: bool = False) -> dm.InstancesApplyResult:
-        instances = command_config.to_instances_apply()
+    def apply(
+        self, command_config: CommandConfigApply | Sequence[CommandConfigApply], replace: bool = False
+    ) -> dm.InstancesApplyResult:
+        if isinstance(command_config, CommandConfigApply):
+            instances = command_config.to_instances_apply()
+        else:
+            instances = CommandConfigApplyList(command_config).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
     def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
@@ -52,10 +57,23 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> CommandConfigList:
-        filters = []
-        if external_id_prefix:
-            filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-        if filter:
-            filters.append(filter)
+        filter_ = _create_filter(
+            self.view_id,
+            external_id_prefix,
+            filter,
+        )
 
-        return self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)
+        return self._list(limit=limit, filter=filter_)
+
+
+def _create_filter(
+    view_id: dm.ViewId,
+    external_id_prefix: str | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

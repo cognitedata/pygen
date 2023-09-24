@@ -13,7 +13,33 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## [0.19.0] - 20-09-19
+## [0.20.0] - 23-09-23
+### Added
+* Support for reading `TimesSeries` and `DataPoints` in generated SDKs for fields of type a single `TimeSeries`.
+  For example, if you have a `Generator` with a field `production` of type `TimeSeries`, you can now do
+  `client.generator.production(... filter for generator ).retrieve_dataframe()` to retrieve the data points for
+   the filtered generator. In addition, the following methods are will be available
+  * `client.generator.production.list( )` to list all the time series for the filtered generators.
+  * `client.generator.production(...).retrieve( )` to retrieve the data points for the filtered generators.
+  * `client.generator.production(...).retrieve_array( )` to retrieve the data points as `numpy` array for the filtered generators.
+  * `client.generator.production(...).retrieve_dataframe( )` to retrieve the data points as a pandas dataframe for the filtered generators.
+  * `client.generator.production(...).retrieve_dataframe_in_tz( )` to retrieve the data points with timezone support for the filtered generators.
+
+* Support for sequences of nodes in generated `APIClass.apply(...)` methods. For example, if you have a `PersonView`
+  before you would get `movie_client.person.apply(person: PersonApply, ...)`, while now you will get
+  `movie_client.persons.apply(person: PersonApply | Sequence[PersonApply], ...)`.
+
+### Fixed
+* Generated SDKs failed to import `datetime` in the generated APIClass for views with `Timestamp` or `Date` fields.
+  This is now fixed.
+* `to_pascal` and `to_camel` in `cognite.pygen.utils.text` failed for strings with a combination of snake and pascal/camel
+  case. This is now fixed.
+
+### Removed
+* Unused classes from generated SDK `data_classes/_core.py` `DataPoint`, `NumericDataPoint`, `StringDataPoint`,
+  `TimeSeries`.
+
+## [0.19.0] - 19-09-23
 ### Added
 * Added support for generating filtering options in the generated SDK `.list` methods.
 * Added helper methods `as_external_ids` and `as_node_ids` to generated data class lists. Example, if I have a view
@@ -21,11 +47,11 @@ Changes are grouped as follows
   `work_orders.as_external_ids()` or `work_orders.as_node_ids()` to get a list of the external ids or node ids.
 * Option for filtering edges by source id in the generated SDK.
 
-## [0.18.3] - 20-09-19
+## [0.18.3] - 19-09-23
 ### Fixed
 * Addded missing arguments `overwrite` and `skip-formatting` to `pygen` CLI.
 
-## [0.18.2] - 20-09-18
+## [0.18.2] - 18-09-23
 ### Fixed
 * When generating an SDK for multiple data models, and two of the views in the different models are of different
    versions. Only one of them would be used to retrieve. This is now fixed.
@@ -33,11 +59,11 @@ Changes are grouped as follows
   will overwrite the `node.version` parameter. A warning is issued to the used upon the generation of the SDK.
 * Views named `core` will now raise a `ReservedWordConflict`, instead of silently removing the view.
 
-## [0.18.1] - 20-09-18
+## [0.18.1] - 18-09-23
 ### Fixed
 * Default naming convention for API class name set to unchanged plurality.
 
-## [0.18.0] - 20-09-18
+## [0.18.0] - 18-09-23
 ### Added
 * Support for configuring naming convention used for the generated SDK.
 * Validation of the naming used in the generated SDK. This is to avoid name collisions between data and API classes.
@@ -51,17 +77,17 @@ Changes are grouped as follows
 * Data models containing views with named `Field` caused namespace collision with `pydantic.Field` in
   the generated data class. This is now fixed.
 
-## [0.17.7] - 20-09-07
+## [0.17.7] - 07-09-23
 ### Fixed
 * Removed import of `INSTANCES_LIST_LIMIT_DEFAULT` from `cognite-sdk` which no longer exists. This is a private
   constant in the `cognite-sdk` which was removed in `v6.20.0`.
 
-## [0.17.6] - 20-08-24
+## [0.17.6] - 24-08-23
 ### Fixed
 * `cognite.pygen.generate_sdk_notebook` parameter `overwrite` from `False` to `True`.
 
 
-## [0.17.5] - 20-08-24
+## [0.17.5] - 24-08-23
 ### Fixed
 * `utils.cdf.CSVLoader` failed for data type `date`.
 

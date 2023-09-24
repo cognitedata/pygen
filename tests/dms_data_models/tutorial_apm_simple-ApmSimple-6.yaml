@@ -10,7 +10,7 @@
   - created_time: 1690467703871
     external_id: Cdf3dModel
     is_global: true
-    last_updated_time: 1694416370245
+    last_updated_time: 1695127673955
     properties:
       entities:
         description: Collection of Cdf3dEntity that are part of this Cdf3dModel
@@ -51,7 +51,7 @@
   - created_time: 1690467703871
     external_id: Cdf3dEntity
     is_global: true
-    last_updated_time: 1694416370245
+    last_updated_time: 1695127673955
     properties:
       inModel3d:
         description: Cdf3dModel the Cdf3dEntity is part of
@@ -77,7 +77,7 @@
   - created_time: 1690467703871
     external_id: Cdf3dConnectionProperties
     is_global: true
-    last_updated_time: 1694416370245
+    last_updated_time: 1695127673955
     properties:
       revisionId:
         auto_increment: false

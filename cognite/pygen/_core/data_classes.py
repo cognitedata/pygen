@@ -100,16 +100,32 @@ class Field(ABC):
                     prop=prop,
                     pydantic_field=pydantic_field,
                 )
-
-            return PrimitiveField(
-                name=name,
-                prop_name=prop_name,
-                type_=type_,
-                is_nullable=prop.nullable,
-                default=prop.default_value,
-                prop=prop,
-                pydantic_field=pydantic_field,
-            )
+            elif isinstance(prop.type, dm.CDFExternalIdReference):
+                # Note: these are only CDF External Fields that are not listable. Listable CDF External Fields
+                # are handled above.
+                edge_api_class_input = f"{view_name}_{prop_name}"
+                edge_api_class = f"{create_name(edge_api_class_input, field_naming.edge_api_class)}"
+                edge_api_attribute = create_name(prop_name, field_naming.api_class_attribute)
+                return CDFExternalField(
+                    name=name,
+                    prop_name=prop_name,
+                    type_=type_,
+                    is_nullable=prop.nullable,
+                    prop=prop,
+                    pydantic_field=pydantic_field,
+                    edge_api_class=edge_api_class,
+                    edge_api_attribute=edge_api_attribute,
+                )
+            else:
+                return PrimitiveField(
+                    name=name,
+                    prop_name=prop_name,
+                    type_=type_,
+                    is_nullable=prop.nullable,
+                    default=prop.default_value,
+                    prop=prop,
+                    pydantic_field=pydantic_field,
+                )
         elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation):
             # For direct relation the source is required.
             view_id = cast(dm.ViewId, prop.source)
@@ -204,6 +220,25 @@ class PrimitiveListField(PrimitiveFieldCore):
         if self.is_nullable:
             rhs = " = []"
         return f"list[{self.type_}]{rhs}"
+
+
+@dataclass(frozen=True)
+class CDFExternalField(PrimitiveFieldCore):
+    edge_api_class: str
+    edge_api_attribute: str
+
+    def as_read_type_hint(self) -> str:
+        rhs = "None"
+        if self.need_alias:
+            rhs = f'{self.pydantic_field}({rhs}, alias="{self.prop_name}")'
+
+        return f"Optional[{self.type_}] = {rhs}"
+
+    def as_write_type_hint(self) -> str:
+        out_type = self.type_
+        if self.is_nullable:
+            out_type = f"Optional[{out_type}] = None"
+        return out_type
 
 
 @dataclass(frozen=True)
@@ -319,7 +354,10 @@ class DataClass:
 
     @property
     def init_import(self) -> str:
-        return f"from .{self.file_name} " f"import {self.read_name}, {self.write_name}, {self.read_list_name}"
+        return (
+            f"from .{self.file_name} "
+            f"import {self.read_name}, {self.write_name}, {self.read_list_name}, {self.write_list_name}"
+        )
 
     def __iter__(self) -> Iterator[Field]:
         return iter(self.fields)
@@ -331,6 +369,18 @@ class DataClass:
     @property
     def one_to_many_edges(self) -> Iterable[EdgeOneToMany]:
         return (field_ for field_ in self.fields if isinstance(field_, EdgeOneToMany))
+
+    @property
+    def primitive_fields(self) -> Iterable[PrimitiveField]:
+        return (field_ for field_ in self.fields if isinstance(field_, PrimitiveField))
+
+    @property
+    def cdf_external_fields(self) -> Iterable[CDFExternalField]:
+        return (field_ for field_ in self.fields if isinstance(field_, CDFExternalField))
+
+    @property
+    def single_timeseries_fields(self) -> Iterable[CDFExternalField]:
+        return (field_ for field_ in self.cdf_external_fields if isinstance(field_.prop.type, dm.TimeSeriesReference))
 
     @property
     def has_one_to_many_edges(self) -> bool:
@@ -385,6 +435,19 @@ class DataClass:
                 # however, this is not a problem as all data classes are uniquely identified by their view id
                 unique[field_.data_class.view_id] = field_.data_class
         return sorted(unique.values(), key=lambda x: x.write_name)
+
+    @property
+    def has_single_timeseries_fields(self) -> bool:
+        return any(
+            isinstance(field_.prop.type, dm.TimeSeriesReference) and not isinstance(field_, PrimitiveListField)
+            for field_ in self.single_timeseries_fields
+        )
+
+    @property
+    def primitive_fields_literal(self) -> str:
+        return ", ".join(
+            f'"{field_.prop_name}"' for field_ in self if isinstance(field_, (PrimitiveField, CDFExternalField))
+        )
 
 
 @dataclass(frozen=True)
@@ -457,6 +520,10 @@ class ListParameter:
     def annotation(self) -> str:
         return f"{self.type_} | None"
 
+    @property
+    def is_time(self) -> bool:
+        return self.type_ in ("datetime.datetime", "datetime.date")
+
 
 @dataclass
 class ListFilter:
@@ -480,9 +547,14 @@ class ListFilter:
         if self.prop_name == "externalId":
             property_ref = '["node", "externalId"], '
         else:
-            property_ref = f'self.view_id.as_property_ref("{self.prop_name}"), '
+            property_ref = f'view_id.as_property_ref("{self.prop_name}"), '
 
-        filter_args = ", ".join((f"{keyword}={arg.name}" for keyword, arg in self.keyword_arguments.items()))
+        filter_args = ", ".join(
+            (
+                f"{keyword}={arg.name}.isoformat() if {arg.name} else None" if arg.is_time else f"{keyword}={arg.name}"
+                for keyword, arg in self.keyword_arguments.items()
+            )
+        )
         return f"{property_ref}{filter_args}"
 
     @property

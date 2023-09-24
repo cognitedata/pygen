@@ -7,7 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI
-from movie_domain.client.data_classes import Role, RoleApply, RoleList
+from movie_domain.client.data_classes import Role, RoleApply, RoleList, RoleApplyList
 
 
 class RoleMoviesAPI:
@@ -109,8 +109,11 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
         self.movies = RoleMoviesAPI(client)
         self.nomination = RoleNominationAPI(client)
 
-    def apply(self, role: RoleApply, replace: bool = False) -> dm.InstancesApplyResult:
-        instances = role.to_instances_apply()
+    def apply(self, role: RoleApply | Sequence[RoleApply], replace: bool = False) -> dm.InstancesApplyResult:
+        if isinstance(role, RoleApply):
+            instances = role.to_instances_apply()
+        else:
+            instances = RoleApplyList(role).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
     def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
@@ -157,15 +160,14 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> RoleList:
-        filters = []
-        if won_oscar and isinstance(won_oscar, str):
-            filters.append(dm.filters.Equals(self.view_id.as_property_ref("wonOscar"), value=won_oscar))
-        if external_id_prefix:
-            filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-        if filter:
-            filters.append(filter)
+        filter_ = _create_filter(
+            self.view_id,
+            won_oscar,
+            external_id_prefix,
+            filter,
+        )
 
-        roles = self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)
+        roles = self._list(limit=limit, filter=filter_)
 
         if retrieve_edges:
             movie_edges = self.movies.list(roles.as_external_ids(), limit=-1)
@@ -196,3 +198,19 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
             node_id = role.id_tuple()
             if node_id in edges_by_start_node:
                 role.nomination = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
+
+
+def _create_filter(
+    view_id: dm.ViewId,
+    won_oscar: bool | None = None,
+    external_id_prefix: str | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if won_oscar and isinstance(won_oscar, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("wonOscar"), value=won_oscar))
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

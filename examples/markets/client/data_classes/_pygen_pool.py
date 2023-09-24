@@ -5,9 +5,9 @@ from typing import ClassVar, Optional
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import DomainModel, DomainModelApply, TypeList
+from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 
-__all__ = ["PygenPool", "PygenPoolApply", "PygenPoolList"]
+__all__ = ["PygenPool", "PygenPoolApply", "PygenPoolList", "PygenPoolApplyList"]
 
 
 class PygenPool(DomainModel):
@@ -67,3 +67,7 @@ class PygenPoolApply(DomainModelApply):
 
 class PygenPoolList(TypeList[PygenPool]):
     _NODE = PygenPool
+
+
+class PygenPoolApplyList(TypeApplyList[PygenPoolApply]):
+    _NODE = PygenPoolApply

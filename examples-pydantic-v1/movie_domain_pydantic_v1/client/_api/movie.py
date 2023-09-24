@@ -7,7 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI
-from movie_domain_pydantic_v1.client.data_classes import Movie, MovieApply, MovieList
+from movie_domain_pydantic_v1.client.data_classes import Movie, MovieApply, MovieList, MovieApplyList
 
 
 class MovieActorsAPI:
@@ -109,8 +109,11 @@ class MovieAPI(TypeAPI[Movie, MovieApply, MovieList]):
         self.actors = MovieActorsAPI(client)
         self.directors = MovieDirectorsAPI(client)
 
-    def apply(self, movie: MovieApply, replace: bool = False) -> dm.InstancesApplyResult:
-        instances = movie.to_instances_apply()
+    def apply(self, movie: MovieApply | Sequence[MovieApply], replace: bool = False) -> dm.InstancesApplyResult:
+        if isinstance(movie, MovieApply):
+            instances = movie.to_instances_apply()
+        else:
+            instances = MovieApplyList(movie).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
     def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
@@ -162,31 +165,19 @@ class MovieAPI(TypeAPI[Movie, MovieApply, MovieList]):
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> MovieList:
-        filters = []
-        if min_release_year or max_release_year:
-            filters.append(
-                dm.filters.Range(
-                    self.view_id.as_property_ref("releaseYear"), gte=min_release_year, lte=max_release_year
-                )
-            )
-        if min_run_time_minutes or max_run_time_minutes:
-            filters.append(
-                dm.filters.Range(
-                    self.view_id.as_property_ref("runTimeMinutes"), gte=min_run_time_minutes, lte=max_run_time_minutes
-                )
-            )
-        if title and isinstance(title, str):
-            filters.append(dm.filters.Equals(self.view_id.as_property_ref("title"), value=title))
-        if title and isinstance(title, list):
-            filters.append(dm.filters.In(self.view_id.as_property_ref("title"), values=title))
-        if title_prefix:
-            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("title"), value=title_prefix))
-        if external_id_prefix:
-            filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-        if filter:
-            filters.append(filter)
+        filter_ = _create_filter(
+            self.view_id,
+            min_release_year,
+            max_release_year,
+            min_run_time_minutes,
+            max_run_time_minutes,
+            title,
+            title_prefix,
+            external_id_prefix,
+            filter,
+        )
 
-        movies = self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)
+        movies = self._list(limit=limit, filter=filter_)
 
         if retrieve_edges:
             actor_edges = self.actors.list(movies.as_external_ids(), limit=-1)
@@ -217,3 +208,38 @@ class MovieAPI(TypeAPI[Movie, MovieApply, MovieList]):
             node_id = movie.id_tuple()
             if node_id in edges_by_start_node:
                 movie.directors = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
+
+
+def _create_filter(
+    view_id: dm.ViewId,
+    min_release_year: int | None = None,
+    max_release_year: int | None = None,
+    min_run_time_minutes: float | None = None,
+    max_run_time_minutes: float | None = None,
+    title: str | list[str] | None = None,
+    title_prefix: str | None = None,
+    external_id_prefix: str | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if min_release_year or max_release_year:
+        filters.append(
+            dm.filters.Range(view_id.as_property_ref("releaseYear"), gte=min_release_year, lte=max_release_year)
+        )
+    if min_run_time_minutes or max_run_time_minutes:
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("runTimeMinutes"), gte=min_run_time_minutes, lte=max_run_time_minutes
+            )
+        )
+    if title and isinstance(title, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("title"), value=title))
+    if title and isinstance(title, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("title"), values=title))
+    if title_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("title"), value=title_prefix))
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

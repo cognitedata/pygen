@@ -5,6 +5,7 @@ from cognite.client import data_modeling as dm
 
 from cognite import pygen
 from cognite.pygen._core.generators import APIGenerator, MultiAPIGenerator, SDKGenerator
+from cognite.pygen._generator import CodeFormatter
 from tests.constants import EXAMPLES_DIR, IS_PYDANTIC_V1, ShopSDKFiles
 
 
@@ -59,12 +60,15 @@ def test_generate_data_class_file_command_configs(command_api_generator: APIGene
     assert actual == expected
 
 
-def test_create_view_api_classes_command_configs(command_api_generator: APIGenerator, top_level_package: str):
+def test_create_view_api_classes_command_configs(
+    command_api_generator: APIGenerator, top_level_package: str, code_formatter: CodeFormatter
+):
     # Arrange
     expected = ShopSDKFiles.command_configs_api.read_text()
 
     # Act
     actual = command_api_generator.generate_api_file(top_level_package)
+    actual = code_formatter.format_code(actual)
 
     assert actual == expected
 

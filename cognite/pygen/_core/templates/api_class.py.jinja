@@ -1,14 +1,19 @@
 from __future__ import annotations
-
+{% if data_class.has_time_field %}
+import datetime{% endif %}{% if data_class.has_single_timeseries_fields %}
+import warnings{% endif %}
 {% if data_class.has_one_to_many_edges %}from collections import defaultdict
-from typing import Dict, List, Sequence, Tuple, overload{% else %}from typing import Sequence, overload{% endif %}
-
-from cognite.client import CogniteClient
+from typing import Dict, List, Sequence, Tuple, overload{% else %}from typing import Sequence, overload{% endif %}{% if data_class.has_single_timeseries_fields %}, Literal{% endif %}
+{% if data_class.has_single_timeseries_fields %}
+import pandas as pd{% endif %}
+from cognite.client import CogniteClient{% if data_class.has_single_timeseries_fields %}
+from cognite.client.data_classes import TimeSeriesList, DatapointsList, Datapoints, DatapointsArrayList
+from cognite.client.data_classes.datapoints import Aggregate{% endif %}
 from cognite.client import data_modeling as dm
 
-from ._core import DEFAULT_LIMIT_READ, TypeAPI
-from {{ top_level_package }}.data_classes import {{ data_class.read_name }}, {{ data_class.write_name }}, {{ data_class.read_list_name }}
-
+from ._core import DEFAULT_LIMIT_READ, TypeAPI{% if data_class.has_single_timeseries_fields %}, INSTANCE_QUERY_LIMIT{% endif %}
+from {{ top_level_package }}.data_classes import {{ data_class.read_name }}, {{ data_class.write_name }}, {{ data_class.read_list_name }}, {{ data_class.write_list_name }}
+{% if data_class.has_single_timeseries_fields %}{% include "api_class_timeseries.py.jinja" %}{% endif %}
 {% for field in data_class.one_to_many_edges %}
 class {{ field.edge_api_class }}:
     def __init__(self, client: CogniteClient):
@@ -63,10 +68,14 @@ class {{ api_class.name }}(TypeAPI[{{ data_class.read_name }}, {{ data_class.wri
             class_list={{ data_class.read_list_name }},
         )
         self.view_id = view_id{% for field in data_class.one_to_many_edges %}
-        self.{{ field.edge_api_attribute }} = {{ field.edge_api_class }}(client){% endfor %}
+        self.{{ field.edge_api_attribute }} = {{ field.edge_api_class }}(client){% endfor %}{% for timeseries in data_class.single_timeseries_fields %}
+        self.{{ timeseries.edge_api_attribute }} = {{ timeseries.edge_api_class }}API(client, view_id){% endfor %}
 
-    def apply(self, {{ data_class.variable }}: {{ data_class.write_name }}, replace: bool = False) -> dm.InstancesApplyResult:
-        instances = {{ data_class.variable }}.to_instances_apply()
+    def apply(self, {{ data_class.variable }}: {{ data_class.write_name }} | Sequence[{{ data_class.write_name }}], replace: bool = False) -> dm.InstancesApplyResult:
+        if isinstance({{ data_class.variable }}, {{ data_class.write_name }}):
+            instances = {{ data_class.variable }}.to_instances_apply()
+        else:
+            instances = {{ data_class.write_list_name }}({{ data_class.variable }}).to_instances_apply()
         {% if data_class.has_only_one_to_many_edges %}return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
@@ -114,19 +123,19 @@ class {{ api_class.name }}(TypeAPI[{{ data_class.read_name }}, {{ data_class.wri
         filter: dm.Filter | None = None,{% if data_class.has_one_to_many_edges %}
         retrieve_edges: bool = True,{% endif %}
     ) -> {{ data_class.read_list_name }}:
-        filters = []{% for filter in list_method.filters %}
-        if {{ filter.condition }}:
-            filters.append({{ filter.filter_call }}({{ filter.arguments }})){% endfor %}
-        if filter:
-            filters.append(filter)
+        filter_ = _create_filter(
+            self.view_id,{% for parm in list_method.parameters %}
+            {{ parm.name }},{% endfor %}
+            filter,
+        )
 
-        {% if data_class.has_one_to_many_edges %}{{ data_class.variable_list }} = self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)
+        {% if data_class.has_one_to_many_edges %}{{ data_class.variable_list }} = self._list(limit=limit, filter=filter_)
 
         if retrieve_edges:{% for field in data_class.one_to_many_edges %}
             {{ field.variable }}_edges = self.{{ field.edge_api_attribute }}.list({{ data_class.variable_list }}.as_external_ids(), limit=-1)
             self._set_{{ field.name }}({{ data_class.variable_list }}, {{ field.variable }}_edges){% endfor %}
 
-        return {{ data_class.variable_list }}{% else %}return self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None){% endif %}
+        return {{ data_class.variable_list }}{% else %}return self._list(limit=limit, filter=filter_){% endif %}
 {% for field in data_class.one_to_many_edges %}
     @staticmethod
     def _set_{{ field.name }}({{ data_class.variable_list }}: Sequence[{{ data_class.read_name }}], {{ field.variable }}_edges: Sequence[dm.Edge]):
@@ -139,3 +148,15 @@ class {{ api_class.name }}(TypeAPI[{{ data_class.read_name }}, {{ data_class.wri
             if node_id in edges_by_start_node:
                 {{ data_class.variable }}.{{ field.name }} = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
 {% endfor %}
+
+def _create_filter(
+    view_id: dm.ViewId,{% for parm in list_method.parameters %}
+    {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []{% for filter in list_method.filters %}
+    if {{ filter.condition }}:
+        filters.append({{ filter.filter_call }}({{ filter.arguments }})){% endfor %}
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

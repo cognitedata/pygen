@@ -5,12 +5,12 @@ from typing import TYPE_CHECKING, ClassVar, Optional, Union  # noqa: F401
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import DomainModel, DomainModelApply, TypeList
+from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 
 if TYPE_CHECKING:
     from ._cdf_3_d_model import CdfModelApply
 
-__all__ = ["CdfEntity", "CdfEntityApply", "CdfEntityList"]
+__all__ = ["CdfEntity", "CdfEntityApply", "CdfEntityList", "CdfEntityApplyList"]
 
 
 class CdfEntity(DomainModel):
@@ -63,3 +63,7 @@ class CdfEntityApply(DomainModelApply):
 
 class CdfEntityList(TypeList[CdfEntity]):
     _NODE = CdfEntity
+
+
+class CdfEntityApplyList(TypeApplyList[CdfEntityApply]):
+    _NODE = CdfEntityApply

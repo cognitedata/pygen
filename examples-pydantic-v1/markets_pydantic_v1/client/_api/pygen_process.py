@@ -6,7 +6,12 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI
-from markets_pydantic_v1.client.data_classes import PygenProcess, PygenProcessApply, PygenProcessList
+from markets_pydantic_v1.client.data_classes import (
+    PygenProcess,
+    PygenProcessApply,
+    PygenProcessList,
+    PygenProcessApplyList,
+)
 
 
 class PygenProcessAPI(TypeAPI[PygenProcess, PygenProcessApply, PygenProcessList]):
@@ -20,8 +25,13 @@ class PygenProcessAPI(TypeAPI[PygenProcess, PygenProcessApply, PygenProcessList]
         )
         self.view_id = view_id
 
-    def apply(self, pygen_proces: PygenProcessApply, replace: bool = False) -> dm.InstancesApplyResult:
-        instances = pygen_proces.to_instances_apply()
+    def apply(
+        self, pygen_proces: PygenProcessApply | Sequence[PygenProcessApply], replace: bool = False
+    ) -> dm.InstancesApplyResult:
+        if isinstance(pygen_proces, PygenProcessApply):
+            instances = pygen_proces.to_instances_apply()
+        else:
+            instances = PygenProcessApplyList(pygen_proces).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
     def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
@@ -54,16 +64,33 @@ class PygenProcessAPI(TypeAPI[PygenProcess, PygenProcessApply, PygenProcessList]
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> PygenProcessList:
-        filters = []
-        if name and isinstance(name, str):
-            filters.append(dm.filters.Equals(self.view_id.as_property_ref("name"), value=name))
-        if name and isinstance(name, list):
-            filters.append(dm.filters.In(self.view_id.as_property_ref("name"), values=name))
-        if name_prefix:
-            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("name"), value=name_prefix))
-        if external_id_prefix:
-            filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-        if filter:
-            filters.append(filter)
+        filter_ = _create_filter(
+            self.view_id,
+            name,
+            name_prefix,
+            external_id_prefix,
+            filter,
+        )
 
-        return self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)
+        return self._list(limit=limit, filter=filter_)
+
+
+def _create_filter(
+    view_id: dm.ViewId,
+    name: str | list[str] | None = None,
+    name_prefix: str | None = None,
+    external_id_prefix: str | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if name and isinstance(name, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
+    if name and isinstance(name, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("name"), values=name))
+    if name_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

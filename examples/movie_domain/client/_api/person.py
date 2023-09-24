@@ -7,7 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI
-from movie_domain.client.data_classes import Person, PersonApply, PersonList
+from movie_domain.client.data_classes import Person, PersonApply, PersonList, PersonApplyList
 
 
 class PersonRolesAPI:
@@ -65,8 +65,11 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
         self.view_id = view_id
         self.roles = PersonRolesAPI(client)
 
-    def apply(self, person: PersonApply, replace: bool = False) -> dm.InstancesApplyResult:
-        instances = person.to_instances_apply()
+    def apply(self, person: PersonApply | Sequence[PersonApply], replace: bool = False) -> dm.InstancesApplyResult:
+        if isinstance(person, PersonApply):
+            instances = person.to_instances_apply()
+        else:
+            instances = PersonApplyList(person).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
     def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
@@ -112,23 +115,17 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> PersonList:
-        filters = []
-        if min_birth_year or max_birth_year:
-            filters.append(
-                dm.filters.Range(self.view_id.as_property_ref("birthYear"), gte=min_birth_year, lte=max_birth_year)
-            )
-        if name and isinstance(name, str):
-            filters.append(dm.filters.Equals(self.view_id.as_property_ref("name"), value=name))
-        if name and isinstance(name, list):
-            filters.append(dm.filters.In(self.view_id.as_property_ref("name"), values=name))
-        if name_prefix:
-            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("name"), value=name_prefix))
-        if external_id_prefix:
-            filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-        if filter:
-            filters.append(filter)
+        filter_ = _create_filter(
+            self.view_id,
+            min_birth_year,
+            max_birth_year,
+            name,
+            name_prefix,
+            external_id_prefix,
+            filter,
+        )
 
-        persons = self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)
+        persons = self._list(limit=limit, filter=filter_)
 
         if retrieve_edges:
             role_edges = self.roles.list(persons.as_external_ids(), limit=-1)
@@ -146,3 +143,28 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
             node_id = person.id_tuple()
             if node_id in edges_by_start_node:
                 person.roles = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
+
+
+def _create_filter(
+    view_id: dm.ViewId,
+    min_birth_year: int | None = None,
+    max_birth_year: int | None = None,
+    name: str | list[str] | None = None,
+    name_prefix: str | None = None,
+    external_id_prefix: str | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if min_birth_year or max_birth_year:
+        filters.append(dm.filters.Range(view_id.as_property_ref("birthYear"), gte=min_birth_year, lte=max_birth_year))
+    if name and isinstance(name, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
+    if name and isinstance(name, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("name"), values=name))
+    if name_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

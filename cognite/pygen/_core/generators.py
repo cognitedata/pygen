@@ -254,9 +254,12 @@ class APIGenerator:
     def generate_api_file(self, top_level_package: str) -> str:
         type_api = self._env.get_template("api_class.py.jinja")
 
-        return type_api.render(
-            top_level_package=top_level_package,
-            api_class=self.api_class,
-            data_class=self.data_class,
-            list_method=ListMethod.from_fields(self.data_class.fields, self._config.list_method),
+        return (
+            type_api.render(
+                top_level_package=top_level_package,
+                api_class=self.api_class,
+                data_class=self.data_class,
+                list_method=ListMethod.from_fields(self.data_class.fields, self._config.list_method),
+            )
+            + "\n"
         )

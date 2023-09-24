@@ -5,9 +5,14 @@ from typing import ClassVar, Optional
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import DomainModel, DomainModelApply, TypeList
+from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 
-__all__ = ["CdfConnectionProperties", "CdfConnectionPropertiesApply", "CdfConnectionPropertiesList"]
+__all__ = [
+    "CdfConnectionProperties",
+    "CdfConnectionPropertiesApply",
+    "CdfConnectionPropertiesList",
+    "CdfConnectionPropertiesApplyList",
+]
 
 
 class CdfConnectionProperties(DomainModel):
@@ -56,3 +61,7 @@ class CdfConnectionPropertiesApply(DomainModelApply):
 
 class CdfConnectionPropertiesList(TypeList[CdfConnectionProperties]):
     _NODE = CdfConnectionProperties
+
+
+class CdfConnectionPropertiesApplyList(TypeApplyList[CdfConnectionPropertiesApply]):
+    _NODE = CdfConnectionPropertiesApply

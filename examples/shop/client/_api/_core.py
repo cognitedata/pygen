@@ -11,6 +11,8 @@ from shop.client.data_classes._core import T_TypeApplyNode, T_TypeNode, T_TypeNo
 
 DEFAULT_LIMIT_READ = 25
 
+INSTANCE_QUERY_LIMIT = 10_000
+
 
 class TypeAPI(Generic[T_TypeNode, T_TypeApplyNode, T_TypeNodeList]):
     def __init__(

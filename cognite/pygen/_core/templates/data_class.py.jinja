@@ -6,12 +6,12 @@ import datetime{% endif %}
 from cognite.client import data_modeling as dm{% if data_class.use_pydantic_field %}
 {{ data_class.import_pydantic_field }}{% endif %}
 
-from ._core import DomainModel, DomainModelApply, TypeList
+from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 {% if data_class.has_edges %}
 if TYPE_CHECKING:{% for dependency_class in data_class.dependencies %}
     from .{{ dependency_class.file_name }} import {{ dependency_class.write_name }}{% endfor %}
 {% endif %}
-__all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data_class.read_list_name }}"]
+__all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data_class.read_list_name }}", "{{ data_class.write_list_name }}"]
 
 
 class {{ data_class.read_name }}(DomainModel):
@@ -91,3 +91,7 @@ class {{ data_class.write_name }}(DomainModelApply):
 
 class {{ data_class.read_list_name }}(TypeList[{{ data_class.read_name }}]):
     _NODE = {{ data_class.read_name }}
+
+
+class {{ data_class.write_list_name }}(TypeApplyList[{{ data_class.write_name }}]):
+    _NODE = {{ data_class.write_name }}

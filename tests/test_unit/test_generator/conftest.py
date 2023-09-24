@@ -1,7 +1,7 @@
 import pytest
 from cognite.client import data_modeling as dm
 
-from tests.constants import APM_SDK, MARKET_SDK, MOVIE_SDK, PUMP_SDK, SHOP_SDK
+from tests.constants import APM_SDK, MARKET_SDK, MOVIE_SDK, PUMP_SDK, SCENARIO_INSTANCE_SDK, SHOP_SDK
 
 
 @pytest.fixture(scope="session")
@@ -77,3 +77,13 @@ def apm_data_model() -> dm.DataModel[dm.View]:
 @pytest.fixture(scope="session")
 def pump_model() -> dm.DataModel[dm.View]:
     return PUMP_SDK.load_data_model()
+
+
+@pytest.fixture(scope="session")
+def scenario_instance_model() -> dm.DataModel[dm.View]:
+    return SCENARIO_INSTANCE_SDK.load_data_model()
+
+
+@pytest.fixture(scope="session")
+def scenario_instance_view(scenario_instance_model: dm.DataModel[dm.View]) -> dm.View:
+    return next(v for v in scenario_instance_model.views if v.name == "ScenarioInstance")

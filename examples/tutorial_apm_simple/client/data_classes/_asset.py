@@ -6,13 +6,13 @@ from typing import TYPE_CHECKING, ClassVar, Optional, Union
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import DomainModel, DomainModelApply, TypeList
+from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 
 if TYPE_CHECKING:
     from ._asset import AssetApply
     from ._cdf_3_d_model import CdfModelApply
 
-__all__ = ["Asset", "AssetApply", "AssetList"]
+__all__ = ["Asset", "AssetApply", "AssetList", "AssetApplyList"]
 
 
 class Asset(DomainModel):
@@ -183,3 +183,7 @@ class AssetApply(DomainModelApply):
 
 class AssetList(TypeList[Asset]):
     _NODE = Asset
+
+
+class AssetApplyList(TypeApplyList[AssetApply]):
+    _NODE = AssetApply

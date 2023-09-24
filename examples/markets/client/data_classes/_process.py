@@ -5,12 +5,12 @@ from typing import TYPE_CHECKING, ClassVar, Optional, Union
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import DomainModel, DomainModelApply, TypeList
+from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 
 if TYPE_CHECKING:
     from ._bid import BidApply
 
-__all__ = ["Process", "ProcessApply", "ProcessList"]
+__all__ = ["Process", "ProcessApply", "ProcessList", "ProcessApplyList"]
 
 
 class Process(DomainModel):
@@ -67,3 +67,7 @@ class ProcessApply(DomainModelApply):
 
 class ProcessList(TypeList[Process]):
     _NODE = Process
+
+
+class ProcessApplyList(TypeApplyList[ProcessApply]):
+    _NODE = ProcessApply
