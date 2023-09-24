@@ -15,6 +15,16 @@ Changes are grouped as follows
 
 ## [0.20.0] - 23-09-23
 ### Added
+* Support for reading `TimesSeries` and `DataPoints` in generated SDKs for fields of type a single `TimeSeries`.
+  For example, if you have a `Generator` with a field `production` of type `TimeSeries`, you can now do
+  `client.generator.production(... filter for generator ).retrieve_dataframe()` to retrieve the data points for
+   the filtered generator. In addition, the following methods are will be available
+  * `client.generator.production.list( )` to list all the time series for the filtered generators.
+  * `client.generator.production(...).retrieve( )` to retrieve the data points for the filtered generators.
+  * `client.generator.production(...).retrieve_array( )` to retrieve the data points as `numpy` array for the filtered generators.
+  * `client.generator.production(...).retrieve_dataframe( )` to retrieve the data points as a pandas dataframe for the filtered generators.
+  * `client.generator.production(...).retrieve_dataframe_in_tz( )` to retrieve the data points with timezone support for the filtered generators.
+
 * Support for sequences of nodes in generated `APIClass.apply(...)` methods. For example, if you have a `PersonView`
   before you would get `movie_client.person.apply(person: PersonApply, ...)`, while now you will get
   `movie_client.persons.apply(person: PersonApply | Sequence[PersonApply], ...)`.
@@ -22,6 +32,8 @@ Changes are grouped as follows
 ### Fixed
 * Generated SDKs failed to import `datetime` in the generated APIClass for views with `Timestamp` or `Date` fields.
   This is now fixed.
+* `to_pascal` and `to_camel` in `cognite.pygen.utils.text` failed for strings with a combination of snake and pascal/camel
+  case. This is now fixed.
 
 
 ## [0.19.0] - 19-09-23
