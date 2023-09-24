@@ -460,6 +460,10 @@ class ListParameter:
     def annotation(self) -> str:
         return f"{self.type_} | None"
 
+    @property
+    def is_time(self) -> bool:
+        return self.type_ in ("datetime.datetime", "datetime.date")
+
 
 @dataclass
 class ListFilter:
@@ -483,9 +487,14 @@ class ListFilter:
         if self.prop_name == "externalId":
             property_ref = '["node", "externalId"], '
         else:
-            property_ref = f'self.view_id.as_property_ref("{self.prop_name}"), '
+            property_ref = f'view_id.as_property_ref("{self.prop_name}"), '
 
-        filter_args = ", ".join((f"{keyword}={arg.name}" for keyword, arg in self.keyword_arguments.items()))
+        filter_args = ", ".join(
+            (
+                f"{keyword}={arg.name}.isoformat() if {arg.name} else None" if arg.is_time else f"{keyword}={arg.name}"
+                for keyword, arg in self.keyword_arguments.items()
+            )
+        )
         return f"{property_ref}{filter_args}"
 
     @property
