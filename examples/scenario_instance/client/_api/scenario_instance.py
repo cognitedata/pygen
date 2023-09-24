@@ -110,17 +110,13 @@ class ScenarioInstancePriceForecastQuery:
                 include_aggregate_name=include_aggregate_name,
                 include_granularity_name=include_granularity_name,
             )
-            if isinstance(column_names, str) and column_names == "priceForecast":
-                return df
-            splits = sum(included for included in [include_aggregate_name, include_granularity_name])
-            if splits == 0:
-                df.columns = ["-".join(external_ids[external_id]) for external_id in df.columns]
-            else:
-                column_parts = (col.rsplit("|", maxsplit=splits) for col in df.columns)
-                df.columns = [
-                    "-".join(external_ids[external_id]) + "|" + "|".join(parts) for external_id, *parts in column_parts
-                ]
-            return df
+            return self._rename_columns(
+                external_ids,
+                df,
+                column_names,
+                include_aggregate_name,
+                include_granularity_name,
+            )
         else:
             return pd.DataFrame()
 
@@ -138,7 +134,7 @@ class ScenarioInstancePriceForecastQuery:
     ) -> pd.DataFrame:
         external_ids = self._retrieve_timeseries_external_ids_with_extra(column_names)
         if external_ids:
-            return self._client.time_series.data.retrieve_dataframe_in_tz(
+            df = self._client.time_series.data.retrieve_dataframe_in_tz(
                 external_id=list(external_ids),
                 start=start,
                 end=end,
@@ -147,6 +143,13 @@ class ScenarioInstancePriceForecastQuery:
                 uniform_index=uniform_index,
                 include_aggregate_name=include_aggregate_name,
                 include_granularity_name=include_granularity_name,
+            )
+            return self._rename_columns(
+                external_ids,
+                df,
+                column_names,
+                include_aggregate_name,
+                include_granularity_name,
             )
         else:
             return pd.DataFrame()
@@ -216,6 +219,26 @@ class ScenarioInstancePriceForecastQuery:
             self._timeseries_limit,
             extra_properties,
         )
+
+    @staticmethod
+    def _rename_columns(
+        external_ids: dict[str, list[str]],
+        df: pd.DataFrame,
+        column_names: ColumnNames | list[ColumnNames],
+        include_aggregate_name: bool,
+        include_granularity_name: bool,
+    ) -> pd.DataFrame:
+        if isinstance(column_names, str) and column_names == "priceForecast":
+            return df
+        splits = sum(included for included in [include_aggregate_name, include_granularity_name])
+        if splits == 0:
+            df.columns = ["-".join(external_ids[external_id]) for external_id in df.columns]
+        else:
+            column_parts = (col.rsplit("|", maxsplit=splits) for col in df.columns)
+            df.columns = [
+                "-".join(external_ids[external_id]) + "|" + "|".join(parts) for external_id, *parts in column_parts
+            ]
+        return df
 
 
 class ScenarioInstancePriceForecastAPI:
