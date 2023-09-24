@@ -11,6 +11,8 @@ from tutorial_apm_simple.client.data_classes._core import T_TypeApplyNode, T_Typ
 
 DEFAULT_LIMIT_READ = 25
 
+INSTANCE_QUERY_LIMIT = 10_000
+
 
 class TypeAPI(Generic[T_TypeNode, T_TypeApplyNode, T_TypeNodeList]):
     def __init__(
