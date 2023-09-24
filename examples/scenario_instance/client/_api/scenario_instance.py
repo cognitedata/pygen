@@ -10,7 +10,7 @@ from cognite.client.data_classes import TimeSeriesList, DatapointsList, Datapoin
 from cognite.client.data_classes.datapoints import Aggregate
 from cognite.client import data_modeling as dm
 
-from ._core import DEFAULT_LIMIT_READ, TypeAPI
+from ._core import DEFAULT_LIMIT_READ, TypeAPI, INSTANCE_QUERY_LIMIT
 from scenario_instance.client.data_classes import (
     ScenarioInstance,
     ScenarioInstanceApply,
@@ -175,9 +175,13 @@ class ScenarioInstancePriceForecastQuery:
         include_aggregate_name: bool = True,
         include_granularity_name: bool = False,
         column_names: ColumnNames | list[ColumnNames] = "priceForecast",
+        warning: bool = True,
         **kwargs,
     ) -> None:
-        warnings.warn("This methods if an experiment and might be removed in the future without notice.", stacklevel=2)
+        if warning:
+            warnings.warn(
+                "This methods if an experiment and might be removed in the future without notice.", stacklevel=2
+            )
         if all(isinstance(time, datetime.datetime) and time.tzinfo is not None for time in [start, end]):
             df = self.retrieve_dataframe_in_tz(
                 start=start,
@@ -340,7 +344,7 @@ def _retrieve_timeseries_external_ids_with_extra(
     external_ids: dict[str, list[str]] = {}
     total_retrieved = 0
     while True:
-        query_limit = min(10_000, limit - total_retrieved)
+        query_limit = min(INSTANCE_QUERY_LIMIT, limit - total_retrieved)
         selected_nodes = dm.query.NodeResultSetExpression(filter=filter_, limit=query_limit)
         query = dm.query.Query(
             with_={
