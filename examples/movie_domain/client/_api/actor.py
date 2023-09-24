@@ -160,15 +160,14 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> ActorList:
-        filters = []
-        if won_oscar and isinstance(won_oscar, str):
-            filters.append(dm.filters.Equals(self.view_id.as_property_ref("wonOscar"), value=won_oscar))
-        if external_id_prefix:
-            filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-        if filter:
-            filters.append(filter)
+        filter_ = _create_filter(
+            self.view_id,
+            won_oscar,
+            external_id_prefix,
+            filter,
+        )
 
-        actors = self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)
+        actors = self._list(limit=limit, filter=filter_)
 
         if retrieve_edges:
             movie_edges = self.movies.list(actors.as_external_ids(), limit=-1)
@@ -199,3 +198,19 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
             node_id = actor.id_tuple()
             if node_id in edges_by_start_node:
                 actor.nomination = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
+
+
+def _create_filter(
+    view_id: dm.ViewId,
+    won_oscar: bool | None = None,
+    external_id_prefix: str | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if won_oscar and isinstance(won_oscar, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("wonOscar"), value=won_oscar))
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

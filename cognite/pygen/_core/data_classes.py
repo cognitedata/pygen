@@ -445,7 +445,9 @@ class DataClass:
 
     @property
     def primitive_fields_literal(self) -> str:
-        return ", ".join(f'"{field_.prop_name}"' for field_ in self.primitive_fields)
+        return ", ".join(
+            f'"{field_.prop_name}"' for field_ in self if isinstance(field_, (PrimitiveField, CDFExternalField))
+        )
 
 
 @dataclass(frozen=True)

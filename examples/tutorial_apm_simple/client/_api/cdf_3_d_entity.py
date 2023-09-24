@@ -10,7 +10,7 @@ from ._core import DEFAULT_LIMIT_READ, TypeAPI
 from tutorial_apm_simple.client.data_classes import CdfEntity, CdfEntityApply, CdfEntityList, CdfEntityApplyList
 
 
-class Cdf3dEntityInmodel3dAPI:
+class CdfEntityInModelAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
@@ -67,7 +67,7 @@ class CdfEntityAPI(TypeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
             class_list=CdfEntityList,
         )
         self.view_id = view_id
-        self.in_model_3_d = Cdf3dEntityInmodel3dAPI(client)
+        self.in_model_3_d = CdfEntityInModelAPI(client)
 
     def apply(
         self, cdf_3_d_entity: CdfEntityApply | Sequence[CdfEntityApply], replace: bool = False
@@ -123,13 +123,13 @@ class CdfEntityAPI(TypeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> CdfEntityList:
-        filters = []
-        if external_id_prefix:
-            filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-        if filter:
-            filters.append(filter)
+        filter_ = _create_filter(
+            self.view_id,
+            external_id_prefix,
+            filter,
+        )
 
-        cdf_3_d_entities = self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)
+        cdf_3_d_entities = self._list(limit=limit, filter=filter_)
 
         if retrieve_edges:
             in_model_3_d_edges = self.in_model_3_d.list(cdf_3_d_entities.as_external_ids(), limit=-1)
@@ -147,3 +147,16 @@ class CdfEntityAPI(TypeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
             node_id = cdf_3_d_entity.id_tuple()
             if node_id in edges_by_start_node:
                 cdf_3_d_entity.in_model_3_d = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
+
+
+def _create_filter(
+    view_id: dm.ViewId,
+    external_id_prefix: str | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

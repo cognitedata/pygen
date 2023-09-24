@@ -11,7 +11,7 @@ from ._core import DEFAULT_LIMIT_READ, TypeAPI
 from tutorial_apm_simple.client.data_classes import WorkOrder, WorkOrderApply, WorkOrderList, WorkOrderApplyList
 
 
-class WorkOrderLinkedassetsAPI:
+class WorkOrderLinkedAssetsAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
@@ -58,7 +58,7 @@ class WorkOrderLinkedassetsAPI:
         return self._client.data_modeling.instances.list("edge", limit=limit, filter=f.And(*filters))
 
 
-class WorkOrderWorkitemsAPI:
+class WorkOrderWorkItemsAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
@@ -115,8 +115,8 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
             class_list=WorkOrderList,
         )
         self.view_id = view_id
-        self.linked_assets = WorkOrderLinkedassetsAPI(client)
-        self.work_items = WorkOrderWorkitemsAPI(client)
+        self.linked_assets = WorkOrderLinkedAssetsAPI(client)
+        self.work_items = WorkOrderWorkItemsAPI(client)
 
     def apply(
         self, work_order: WorkOrderApply | Sequence[WorkOrderApply], replace: bool = False
@@ -204,125 +204,47 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> WorkOrderList:
-        filters = []
-        if min_actual_hours or max_actual_hours:
-            filters.append(
-                dm.filters.Range(
-                    self.view_id.as_property_ref("actualHours"), gte=min_actual_hours, lte=max_actual_hours
-                )
-            )
-        if min_created_date or max_created_date:
-            filters.append(
-                dm.filters.Range(
-                    self.view_id.as_property_ref("createdDate"), gte=min_created_date, lte=max_created_date
-                )
-            )
-        if description and isinstance(description, str):
-            filters.append(dm.filters.Equals(self.view_id.as_property_ref("description"), value=description))
-        if description and isinstance(description, list):
-            filters.append(dm.filters.In(self.view_id.as_property_ref("description"), values=description))
-        if description_prefix:
-            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("description"), value=description_prefix))
-        if min_due_date or max_due_date:
-            filters.append(
-                dm.filters.Range(self.view_id.as_property_ref("dueDate"), gte=min_due_date, lte=max_due_date)
-            )
-        if min_duration_hours or max_duration_hours:
-            filters.append(
-                dm.filters.Range(
-                    self.view_id.as_property_ref("durationHours"), gte=min_duration_hours, lte=max_duration_hours
-                )
-            )
-        if min_end_time or max_end_time:
-            filters.append(
-                dm.filters.Range(self.view_id.as_property_ref("endTime"), gte=min_end_time, lte=max_end_time)
-            )
-        if is_active and isinstance(is_active, str):
-            filters.append(dm.filters.Equals(self.view_id.as_property_ref("isActive"), value=is_active))
-        if is_cancelled and isinstance(is_cancelled, str):
-            filters.append(dm.filters.Equals(self.view_id.as_property_ref("isCancelled"), value=is_cancelled))
-        if is_completed and isinstance(is_completed, str):
-            filters.append(dm.filters.Equals(self.view_id.as_property_ref("isCompleted"), value=is_completed))
-        if is_safety_critical and isinstance(is_safety_critical, str):
-            filters.append(
-                dm.filters.Equals(self.view_id.as_property_ref("isSafetyCritical"), value=is_safety_critical)
-            )
-        if min_percentage_progress or max_percentage_progress:
-            filters.append(
-                dm.filters.Range(
-                    self.view_id.as_property_ref("percentageProgress"),
-                    gte=min_percentage_progress,
-                    lte=max_percentage_progress,
-                )
-            )
-        if min_planned_start or max_planned_start:
-            filters.append(
-                dm.filters.Range(
-                    self.view_id.as_property_ref("plannedStart"), gte=min_planned_start, lte=max_planned_start
-                )
-            )
-        if priority_description and isinstance(priority_description, str):
-            filters.append(
-                dm.filters.Equals(self.view_id.as_property_ref("priorityDescription"), value=priority_description)
-            )
-        if priority_description and isinstance(priority_description, list):
-            filters.append(
-                dm.filters.In(self.view_id.as_property_ref("priorityDescription"), values=priority_description)
-            )
-        if priority_description_prefix:
-            filters.append(
-                dm.filters.Prefix(
-                    self.view_id.as_property_ref("priorityDescription"), value=priority_description_prefix
-                )
-            )
-        if program_number and isinstance(program_number, str):
-            filters.append(dm.filters.Equals(self.view_id.as_property_ref("programNumber"), value=program_number))
-        if program_number and isinstance(program_number, list):
-            filters.append(dm.filters.In(self.view_id.as_property_ref("programNumber"), values=program_number))
-        if program_number_prefix:
-            filters.append(
-                dm.filters.Prefix(self.view_id.as_property_ref("programNumber"), value=program_number_prefix)
-            )
-        if min_start_time or max_start_time:
-            filters.append(
-                dm.filters.Range(self.view_id.as_property_ref("startTime"), gte=min_start_time, lte=max_start_time)
-            )
-        if status and isinstance(status, str):
-            filters.append(dm.filters.Equals(self.view_id.as_property_ref("status"), value=status))
-        if status and isinstance(status, list):
-            filters.append(dm.filters.In(self.view_id.as_property_ref("status"), values=status))
-        if status_prefix:
-            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("status"), value=status_prefix))
-        if title and isinstance(title, str):
-            filters.append(dm.filters.Equals(self.view_id.as_property_ref("title"), value=title))
-        if title and isinstance(title, list):
-            filters.append(dm.filters.In(self.view_id.as_property_ref("title"), values=title))
-        if title_prefix:
-            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("title"), value=title_prefix))
-        if work_order_number and isinstance(work_order_number, str):
-            filters.append(dm.filters.Equals(self.view_id.as_property_ref("workOrderNumber"), value=work_order_number))
-        if work_order_number and isinstance(work_order_number, list):
-            filters.append(dm.filters.In(self.view_id.as_property_ref("workOrderNumber"), values=work_order_number))
-        if work_order_number_prefix:
-            filters.append(
-                dm.filters.Prefix(self.view_id.as_property_ref("workOrderNumber"), value=work_order_number_prefix)
-            )
-        if work_package_number and isinstance(work_package_number, str):
-            filters.append(
-                dm.filters.Equals(self.view_id.as_property_ref("workPackageNumber"), value=work_package_number)
-            )
-        if work_package_number and isinstance(work_package_number, list):
-            filters.append(dm.filters.In(self.view_id.as_property_ref("workPackageNumber"), values=work_package_number))
-        if work_package_number_prefix:
-            filters.append(
-                dm.filters.Prefix(self.view_id.as_property_ref("workPackageNumber"), value=work_package_number_prefix)
-            )
-        if external_id_prefix:
-            filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-        if filter:
-            filters.append(filter)
+        filter_ = _create_filter(
+            self.view_id,
+            min_actual_hours,
+            max_actual_hours,
+            min_created_date,
+            max_created_date,
+            description,
+            description_prefix,
+            min_due_date,
+            max_due_date,
+            min_duration_hours,
+            max_duration_hours,
+            min_end_time,
+            max_end_time,
+            is_active,
+            is_cancelled,
+            is_completed,
+            is_safety_critical,
+            min_percentage_progress,
+            max_percentage_progress,
+            min_planned_start,
+            max_planned_start,
+            priority_description,
+            priority_description_prefix,
+            program_number,
+            program_number_prefix,
+            min_start_time,
+            max_start_time,
+            status,
+            status_prefix,
+            title,
+            title_prefix,
+            work_order_number,
+            work_order_number_prefix,
+            work_package_number,
+            work_package_number_prefix,
+            external_id_prefix,
+            filter,
+        )
 
-        work_orders = self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)
+        work_orders = self._list(limit=limit, filter=filter_)
 
         if retrieve_edges:
             linked_asset_edges = self.linked_assets.list(work_orders.as_external_ids(), limit=-1)
@@ -353,3 +275,158 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
             node_id = work_order.id_tuple()
             if node_id in edges_by_start_node:
                 work_order.work_items = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
+
+
+def _create_filter(
+    view_id: dm.ViewId,
+    min_actual_hours: int | None = None,
+    max_actual_hours: int | None = None,
+    min_created_date: datetime.datetime | None = None,
+    max_created_date: datetime.datetime | None = None,
+    description: str | list[str] | None = None,
+    description_prefix: str | None = None,
+    min_due_date: datetime.datetime | None = None,
+    max_due_date: datetime.datetime | None = None,
+    min_duration_hours: int | None = None,
+    max_duration_hours: int | None = None,
+    min_end_time: datetime.datetime | None = None,
+    max_end_time: datetime.datetime | None = None,
+    is_active: bool | None = None,
+    is_cancelled: bool | None = None,
+    is_completed: bool | None = None,
+    is_safety_critical: bool | None = None,
+    min_percentage_progress: int | None = None,
+    max_percentage_progress: int | None = None,
+    min_planned_start: datetime.datetime | None = None,
+    max_planned_start: datetime.datetime | None = None,
+    priority_description: str | list[str] | None = None,
+    priority_description_prefix: str | None = None,
+    program_number: str | list[str] | None = None,
+    program_number_prefix: str | None = None,
+    min_start_time: datetime.datetime | None = None,
+    max_start_time: datetime.datetime | None = None,
+    status: str | list[str] | None = None,
+    status_prefix: str | None = None,
+    title: str | list[str] | None = None,
+    title_prefix: str | None = None,
+    work_order_number: str | list[str] | None = None,
+    work_order_number_prefix: str | None = None,
+    work_package_number: str | list[str] | None = None,
+    work_package_number_prefix: str | None = None,
+    external_id_prefix: str | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if min_actual_hours or max_actual_hours:
+        filters.append(
+            dm.filters.Range(view_id.as_property_ref("actualHours"), gte=min_actual_hours, lte=max_actual_hours)
+        )
+    if min_created_date or max_created_date:
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("createdDate"),
+                gte=min_created_date.isoformat() if min_created_date else None,
+                lte=max_created_date.isoformat() if max_created_date else None,
+            )
+        )
+    if description and isinstance(description, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("description"), value=description))
+    if description and isinstance(description, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("description"), values=description))
+    if description_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("description"), value=description_prefix))
+    if min_due_date or max_due_date:
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("dueDate"),
+                gte=min_due_date.isoformat() if min_due_date else None,
+                lte=max_due_date.isoformat() if max_due_date else None,
+            )
+        )
+    if min_duration_hours or max_duration_hours:
+        filters.append(
+            dm.filters.Range(view_id.as_property_ref("durationHours"), gte=min_duration_hours, lte=max_duration_hours)
+        )
+    if min_end_time or max_end_time:
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("endTime"),
+                gte=min_end_time.isoformat() if min_end_time else None,
+                lte=max_end_time.isoformat() if max_end_time else None,
+            )
+        )
+    if is_active and isinstance(is_active, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("isActive"), value=is_active))
+    if is_cancelled and isinstance(is_cancelled, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("isCancelled"), value=is_cancelled))
+    if is_completed and isinstance(is_completed, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("isCompleted"), value=is_completed))
+    if is_safety_critical and isinstance(is_safety_critical, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("isSafetyCritical"), value=is_safety_critical))
+    if min_percentage_progress or max_percentage_progress:
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("percentageProgress"), gte=min_percentage_progress, lte=max_percentage_progress
+            )
+        )
+    if min_planned_start or max_planned_start:
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("plannedStart"),
+                gte=min_planned_start.isoformat() if min_planned_start else None,
+                lte=max_planned_start.isoformat() if max_planned_start else None,
+            )
+        )
+    if priority_description and isinstance(priority_description, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("priorityDescription"), value=priority_description))
+    if priority_description and isinstance(priority_description, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("priorityDescription"), values=priority_description))
+    if priority_description_prefix:
+        filters.append(
+            dm.filters.Prefix(view_id.as_property_ref("priorityDescription"), value=priority_description_prefix)
+        )
+    if program_number and isinstance(program_number, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("programNumber"), value=program_number))
+    if program_number and isinstance(program_number, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("programNumber"), values=program_number))
+    if program_number_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("programNumber"), value=program_number_prefix))
+    if min_start_time or max_start_time:
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("startTime"),
+                gte=min_start_time.isoformat() if min_start_time else None,
+                lte=max_start_time.isoformat() if max_start_time else None,
+            )
+        )
+    if status and isinstance(status, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("status"), value=status))
+    if status and isinstance(status, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("status"), values=status))
+    if status_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("status"), value=status_prefix))
+    if title and isinstance(title, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("title"), value=title))
+    if title and isinstance(title, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("title"), values=title))
+    if title_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("title"), value=title_prefix))
+    if work_order_number and isinstance(work_order_number, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("workOrderNumber"), value=work_order_number))
+    if work_order_number and isinstance(work_order_number, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("workOrderNumber"), values=work_order_number))
+    if work_order_number_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("workOrderNumber"), value=work_order_number_prefix))
+    if work_package_number and isinstance(work_package_number, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("workPackageNumber"), value=work_package_number))
+    if work_package_number and isinstance(work_package_number, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("workPackageNumber"), values=work_package_number))
+    if work_package_number_prefix:
+        filters.append(
+            dm.filters.Prefix(view_id.as_property_ref("workPackageNumber"), value=work_package_number_prefix)
+        )
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

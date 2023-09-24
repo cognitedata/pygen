@@ -67,32 +67,65 @@ class PygenBidAPI(TypeAPI[PygenBid, PygenBidApply, PygenBidList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> PygenBidList:
-        filters = []
-        if min_date or max_date:
-            filters.append(dm.filters.Range(self.view_id.as_property_ref("date"), gte=min_date, lte=max_date))
-        if is_block and isinstance(is_block, str):
-            filters.append(dm.filters.Equals(self.view_id.as_property_ref("isBlock"), value=is_block))
-        if min_minimum_price or max_minimum_price:
-            filters.append(
-                dm.filters.Range(
-                    self.view_id.as_property_ref("minimumPrice"), gte=min_minimum_price, lte=max_minimum_price
-                )
-            )
-        if name and isinstance(name, str):
-            filters.append(dm.filters.Equals(self.view_id.as_property_ref("name"), value=name))
-        if name and isinstance(name, list):
-            filters.append(dm.filters.In(self.view_id.as_property_ref("name"), values=name))
-        if name_prefix:
-            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("name"), value=name_prefix))
-        if min_price_premium or max_price_premium:
-            filters.append(
-                dm.filters.Range(
-                    self.view_id.as_property_ref("pricePremium"), gte=min_price_premium, lte=max_price_premium
-                )
-            )
-        if external_id_prefix:
-            filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-        if filter:
-            filters.append(filter)
+        filter_ = _create_filter(
+            self.view_id,
+            min_date,
+            max_date,
+            is_block,
+            min_minimum_price,
+            max_minimum_price,
+            name,
+            name_prefix,
+            min_price_premium,
+            max_price_premium,
+            external_id_prefix,
+            filter,
+        )
 
-        return self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)
+        return self._list(limit=limit, filter=filter_)
+
+
+def _create_filter(
+    view_id: dm.ViewId,
+    min_date: datetime.date | None = None,
+    max_date: datetime.date | None = None,
+    is_block: bool | None = None,
+    min_minimum_price: float | None = None,
+    max_minimum_price: float | None = None,
+    name: str | list[str] | None = None,
+    name_prefix: str | None = None,
+    min_price_premium: float | None = None,
+    max_price_premium: float | None = None,
+    external_id_prefix: str | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if min_date or max_date:
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("date"),
+                gte=min_date.isoformat() if min_date else None,
+                lte=max_date.isoformat() if max_date else None,
+            )
+        )
+    if is_block and isinstance(is_block, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("isBlock"), value=is_block))
+    if min_minimum_price or max_minimum_price:
+        filters.append(
+            dm.filters.Range(view_id.as_property_ref("minimumPrice"), gte=min_minimum_price, lte=max_minimum_price)
+        )
+    if name and isinstance(name, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
+    if name and isinstance(name, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("name"), values=name))
+    if name_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
+    if min_price_premium or max_price_premium:
+        filters.append(
+            dm.filters.Range(view_id.as_property_ref("pricePremium"), gte=min_price_premium, lte=max_price_premium)
+        )
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

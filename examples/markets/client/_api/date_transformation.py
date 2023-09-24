@@ -64,16 +64,33 @@ class DateTransformationAPI(TypeAPI[DateTransformation, DateTransformationApply,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> DateTransformationList:
-        filters = []
-        if method and isinstance(method, str):
-            filters.append(dm.filters.Equals(self.view_id.as_property_ref("method"), value=method))
-        if method and isinstance(method, list):
-            filters.append(dm.filters.In(self.view_id.as_property_ref("method"), values=method))
-        if method_prefix:
-            filters.append(dm.filters.Prefix(self.view_id.as_property_ref("method"), value=method_prefix))
-        if external_id_prefix:
-            filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-        if filter:
-            filters.append(filter)
+        filter_ = _create_filter(
+            self.view_id,
+            method,
+            method_prefix,
+            external_id_prefix,
+            filter,
+        )
 
-        return self._list(limit=limit, filter=dm.filters.And(*filters) if filters else None)
+        return self._list(limit=limit, filter=filter_)
+
+
+def _create_filter(
+    view_id: dm.ViewId,
+    method: str | list[str] | None = None,
+    method_prefix: str | None = None,
+    external_id_prefix: str | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if method and isinstance(method, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("method"), value=method))
+    if method and isinstance(method, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("method"), values=method))
+    if method_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("method"), value=method_prefix))
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None
