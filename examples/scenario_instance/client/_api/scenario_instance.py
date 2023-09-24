@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import datetime
-from typing import Sequence, overload
+import warnings
+from typing import Sequence, overload, Literal
 
 import pandas as pd
 from cognite.client import CogniteClient
-from cognite.client.data_classes import TimeSeriesList, DatapointsList, Datapoints, DatapointsArray, DatapointsArrayList
+from cognite.client.data_classes import TimeSeriesList, DatapointsList, Datapoints, DatapointsArrayList
 from cognite.client.data_classes.datapoints import Aggregate
 from cognite.client import data_modeling as dm
 
@@ -16,6 +17,8 @@ from scenario_instance.client.data_classes import (
     ScenarioInstanceList,
     ScenarioInstanceApplyList,
 )
+
+ColumnNames = Literal["priceForecast", "aggregation", "country", "instance", "market", "priceArea", "scenario", "start"]
 
 
 class ScenarioInstancePriceForecastQuery:
@@ -30,7 +33,6 @@ class ScenarioInstancePriceForecastQuery:
         self._view_id = view_id
         self._timeseries_limit = timeseries_limit
         self._filter = filter
-        self._timeseries_external_ids: list[str] | None = None
 
     def retrieve(
         self,
@@ -42,10 +44,10 @@ class ScenarioInstancePriceForecastQuery:
         limit: int | None = None,
         include_outside_points: bool = False,
     ) -> DatapointsList:
-        external_ids = self._retrieve_timeseries_external_ids()
+        external_ids = self._retrieve_timeseries_external_ids_with_extra()
         if external_ids:
             return self._client.time_series.data.retrieve(
-                external_id=external_ids,
+                external_id=list(external_ids),
                 start=start,
                 end=end,
                 aggregates=aggregates,
@@ -66,10 +68,10 @@ class ScenarioInstancePriceForecastQuery:
         limit: int | None = None,
         include_outside_points: bool = False,
     ) -> DatapointsArrayList:
-        external_ids = self._retrieve_timeseries_external_ids()
+        external_ids = self._retrieve_timeseries_external_ids_with_extra()
         if external_ids:
             return self._client.time_series.data.retrieve_arrays(
-                external_id=external_ids,
+                external_id=list(external_ids),
                 start=start,
                 end=end,
                 aggregates=aggregates,
@@ -92,11 +94,12 @@ class ScenarioInstancePriceForecastQuery:
         uniform_index: bool = False,
         include_aggregate_name: bool = True,
         include_granularity_name: bool = False,
+        column_names: ColumnNames | list[ColumnNames] = "priceForecast",
     ) -> pd.DataFrame:
-        external_ids = self._retrieve_timeseries_external_ids()
+        external_ids = self._retrieve_timeseries_external_ids_with_extra(column_names)
         if external_ids:
-            return self._client.time_series.data.retrieve_dataframe(
-                external_id=external_ids,
+            df = self._client.time_series.data.retrieve_dataframe(
+                external_id=list(external_ids),
                 start=start,
                 end=end,
                 aggregates=aggregates,
@@ -107,6 +110,17 @@ class ScenarioInstancePriceForecastQuery:
                 include_aggregate_name=include_aggregate_name,
                 include_granularity_name=include_granularity_name,
             )
+            if isinstance(column_names, str) and column_names == "priceForecast":
+                return df
+            splits = sum(included for included in [include_aggregate_name, include_granularity_name])
+            if splits == 0:
+                df.columns = ["-".join(external_ids[external_id]) for external_id in df.columns]
+            else:
+                column_parts = (col.rsplit("|", maxsplit=splits) for col in df.columns)
+                df.columns = [
+                    "-".join(external_ids[external_id]) + "|" + "|".join(parts) for external_id, *parts in column_parts
+                ]
+            return df
         else:
             return pd.DataFrame()
 
@@ -120,11 +134,12 @@ class ScenarioInstancePriceForecastQuery:
         uniform_index: bool = False,
         include_aggregate_name: bool = True,
         include_granularity_name: bool = False,
+        column_names: ColumnNames | list[ColumnNames] = "priceForecast",
     ) -> pd.DataFrame:
-        external_ids = self._retrieve_timeseries_external_ids()
+        external_ids = self._retrieve_timeseries_external_ids_with_extra(column_names)
         if external_ids:
             return self._client.time_series.data.retrieve_dataframe_in_tz(
-                external_id=external_ids,
+                external_id=list(external_ids),
                 start=start,
                 end=end,
                 aggregates=aggregates,
@@ -140,10 +155,10 @@ class ScenarioInstancePriceForecastQuery:
         self,
         before: None | int | str | datetime = None,
     ) -> Datapoints | DatapointsList | None:
-        external_ids = self._retrieve_timeseries_external_ids()
+        external_ids = self._retrieve_timeseries_external_ids_with_extra()
         if external_ids:
             return self._client.time_series.data.retrieve_latest(
-                external_id=external_ids,
+                external_id=list(external_ids),
                 before=before,
             )
         else:
@@ -159,32 +174,44 @@ class ScenarioInstancePriceForecastQuery:
         uniform_index: bool = False,
         include_aggregate_name: bool = True,
         include_granularity_name: bool = False,
+        column_names: ColumnNames | list[ColumnNames] = "priceForecast",
         **kwargs,
     ) -> None:
-        external_ids = self._retrieve_timeseries_external_ids()
-        if not external_ids:
-            return
-        df = self._client.time_series.data.retrieve_dataframe(
-            external_id=external_ids,
-            start=start,
-            end=end,
-            aggregates=aggregates,
-            granularity=granularity,
-            uniform_index=uniform_index,
-            include_aggregate_name=include_aggregate_name,
-            include_granularity_name=include_granularity_name,
-        )
+        warnings.warn("This methods if an experiment and might be removed in the future without notice.", stacklevel=2)
+        if all(isinstance(time, datetime.datetime) and time.tzinfo is not None for time in [start, end]):
+            df = self.retrieve_dataframe_in_tz(
+                start=start,
+                end=end,
+                aggregates=aggregates,
+                granularity=granularity,
+                uniform_index=uniform_index,
+                include_aggregate_name=include_aggregate_name,
+                include_granularity_name=include_granularity_name,
+                column_names=column_names,
+            )
+        else:
+            df = self.retrieve_dataframe(
+                start=start,
+                end=end,
+                aggregates=aggregates,
+                granularity=granularity,
+                uniform_index=uniform_index,
+                include_aggregate_name=include_aggregate_name,
+                include_granularity_name=include_granularity_name,
+                column_names=column_names,
+            )
         df.plot(**kwargs)
 
-    def _retrieve_timeseries_external_ids(self) -> list[str]:
-        if self._timeseries_external_ids is None:
-            self._timeseries_external_ids = _retrieve_timeseries_external_ids(
-                self._client,
-                self._view_id,
-                self._filter,
-                self._timeseries_limit,
-            )
-        return self._timeseries_external_ids
+    def _retrieve_timeseries_external_ids_with_extra(
+        self, extra_properties: ColumnNames | list[ColumnNames] = "priceForecast"
+    ) -> dict[str, list[str]]:
+        return _retrieve_timeseries_external_ids_with_extra(
+            self._client,
+            self._view_id,
+            self._filter,
+            self._timeseries_limit,
+            extra_properties,
+        )
 
 
 class ScenarioInstancePriceForecastAPI:
@@ -278,16 +305,33 @@ class ScenarioInstancePriceForecastAPI:
             external_id_prefix,
             filter,
         )
-        external_ids = _retrieve_timeseries_external_ids(self._client, self._view_id, filter_, limit)
+        external_ids = _retrieve_timeseries_external_ids_with_extra(self._client, self._view_id, filter_, limit)
         if external_ids:
-            return self._client.time_series.retrieve_multiple(external_ids=external_ids)
+            return self._client.time_series.retrieve_multiple(external_ids=list(external_ids))
         else:
             return TimeSeriesList([])
 
 
-def _retrieve_timeseries_external_ids(
-    client: CogniteClient, view_id: dm.ViewId, filter_: dm.Filter | None, limit: int
-) -> list[str]:
+def _retrieve_timeseries_external_ids_with_extra(
+    client: CogniteClient,
+    view_id: dm.ViewId,
+    filter_: dm.Filter | None,
+    limit: int,
+    extra_properties: ColumnNames | list[ColumnNames] = "priceForecast",
+) -> dict[str, list[str]]:
+    properties = ["priceForecast"]
+    if isinstance(extra_properties, str) and extra_properties != "priceForecast":
+        properties.append(extra_properties)
+    elif isinstance(extra_properties, list):
+        properties.extend([prop for prop in extra_properties if prop != "priceForecast"])
+    else:
+        raise ValueError(f"Invalid value for extra_properties: {extra_properties}")
+
+    if isinstance(extra_properties, str):
+        extra_list = [extra_properties]
+    else:
+        extra_list = extra_properties
+
     has_data = dm.filters.HasData([dm.ContainerId("IntegrationTestsImmutable", "ScenarioInstance")], [view_id])
     filter_ = dm.filters.And(filter_, has_data) if filter_ else has_data
     selected_nodes = dm.query.NodeResultSetExpression(filter=filter_, limit=limit)
@@ -297,13 +341,16 @@ def _retrieve_timeseries_external_ids(
         },
         select={
             "nodes": dm.query.Select(
-                [dm.query.SourceSelector(view_id, ["priceForecast"])],
+                [dm.query.SourceSelector(view_id, properties)],
             )
         },
     )
     # Todo implement paging
     result = client.data_modeling.instances.query(query)
-    external_ids = [node.properties[view_id]["priceForecast"] for node in result.data["nodes"].data]
+    external_ids = {
+        node.properties[view_id]["priceForecast"]: [node.properties[view_id][prop] for prop in extra_list]
+        for node in result.data["nodes"].data
+    }
     return external_ids
 
 

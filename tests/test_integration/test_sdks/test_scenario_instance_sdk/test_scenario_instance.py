@@ -69,6 +69,70 @@ def test_retrieve_dataframe(client: ScenarioInstanceClient) -> None:
     assert len(data.columns) == 2
 
 
+def test_retrieve_dataframe_column_names_aggregate_and_granularity(client: ScenarioInstanceClient) -> None:
+    # Act
+    data = client.scenario_instance.price_forecast(country="Norway", limit=1).retrieve_dataframe(
+        aggregates=["min", "max"],
+        granularity="1d",
+        include_aggregate_name=True,
+        include_granularity_name=True,
+        column_names="country",
+    )
+
+    # Assert
+    assert isinstance(data, pd.DataFrame)
+    assert len(data.columns) == 2
+    assert sorted(data.columns) == sorted(["Norway|min|1d", "Norway|max|1d"])
+
+
+def test_retrieve_dataframe_column_names_aggregate(client: ScenarioInstanceClient) -> None:
+    # Act
+    data = client.scenario_instance.price_forecast(country="Norway", limit=1).retrieve_dataframe(
+        aggregates=["min", "max"],
+        granularity="1d",
+        include_aggregate_name=True,
+        include_granularity_name=False,
+        column_names="country",
+    )
+
+    # Assert
+    assert isinstance(data, pd.DataFrame)
+    assert len(data.columns) == 2
+    assert sorted(data.columns) == sorted(["Norway|min", "Norway|max"])
+
+
+def test_retrieve_dataframe_column_names(client: ScenarioInstanceClient) -> None:
+    # Act
+    data = client.scenario_instance.price_forecast(country="Norway", limit=1).retrieve_dataframe(
+        aggregates="min",
+        granularity="1d",
+        include_aggregate_name=False,
+        include_granularity_name=False,
+        column_names="country",
+    )
+
+    # Assert
+    assert isinstance(data, pd.DataFrame)
+    assert len(data.columns) == 1
+    assert data.columns[0] == "Norway"
+
+
+def test_retrieve_dataframe_multiple_column_names(client: ScenarioInstanceClient) -> None:
+    # Act
+    data = client.scenario_instance.price_forecast(country="Norway", price_area="NO1", limit=1).retrieve_dataframe(
+        aggregates="min",
+        granularity="1d",
+        include_aggregate_name=False,
+        include_granularity_name=False,
+        column_names=["country", "priceArea"],
+    )
+
+    # Assert
+    assert isinstance(data, pd.DataFrame)
+    assert len(data.columns) == 1
+    assert data.columns[0] == "Norway-NO1"
+
+
 def test_retrieve_arrays(client: ScenarioInstanceClient) -> None:
     # Act
     data = client.scenario_instance.price_forecast(aggregation="mean", limit=1).retrieve_arrays(
