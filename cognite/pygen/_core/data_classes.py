@@ -100,22 +100,32 @@ class Field(ABC):
                     prop=prop,
                     pydantic_field=pydantic_field,
                 )
-
-            # Used for timeseries. Consider moving external CDF resources to a separate class.
-            edge_api_class_input = f"{view_name}_{prop_name}"
-            edge_api_class = f"{create_name(edge_api_class_input, field_naming.edge_api_class)}"
-            edge_api_attribute = create_name(prop_name, field_naming.api_class_attribute)
-            return PrimitiveField(
-                name=name,
-                prop_name=prop_name,
-                type_=type_,
-                is_nullable=prop.nullable,
-                default=prop.default_value,
-                prop=prop,
-                pydantic_field=pydantic_field,
-                edge_api_class=edge_api_class,
-                edge_api_attribute=edge_api_attribute,
-            )
+            elif isinstance(prop.type, dm.CDFExternalIdReference):
+                # Note: these are only CDF External Fields that are not listable. Listable CDF External Fields
+                # are handled above.
+                edge_api_class_input = f"{view_name}_{prop_name}"
+                edge_api_class = f"{create_name(edge_api_class_input, field_naming.edge_api_class)}"
+                edge_api_attribute = create_name(prop_name, field_naming.api_class_attribute)
+                return CDFExternalField(
+                    name=name,
+                    prop_name=prop_name,
+                    type_=type_,
+                    is_nullable=prop.nullable,
+                    prop=prop,
+                    pydantic_field=pydantic_field,
+                    edge_api_class=edge_api_class,
+                    edge_api_attribute=edge_api_attribute,
+                )
+            else:
+                return PrimitiveField(
+                    name=name,
+                    prop_name=prop_name,
+                    type_=type_,
+                    is_nullable=prop.nullable,
+                    default=prop.default_value,
+                    prop=prop,
+                    pydantic_field=pydantic_field,
+                )
         elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation):
             # For direct relation the source is required.
             view_id = cast(dm.ViewId, prop.source)
@@ -171,8 +181,6 @@ class PrimitiveField(PrimitiveFieldCore):
     This represents a basic type such as str, int, float, bool, datetime.datetime, datetime.date.
     """
 
-    edge_api_class: str
-    edge_api_attribute: str
     default: str | int | dict | None = None
 
     def as_read_type_hint(self) -> str:
@@ -212,6 +220,25 @@ class PrimitiveListField(PrimitiveFieldCore):
         if self.is_nullable:
             rhs = " = []"
         return f"list[{self.type_}]{rhs}"
+
+
+@dataclass(frozen=True)
+class CDFExternalField(PrimitiveFieldCore):
+    edge_api_class: str
+    edge_api_attribute: str
+
+    def as_read_type_hint(self) -> str:
+        rhs = "None"
+        if self.need_alias:
+            rhs = f'{self.pydantic_field}({rhs}, alias="{self.prop_name}")'
+
+        return f"Optional[{self.type_}] = {rhs}"
+
+    def as_write_type_hint(self) -> str:
+        out_type = self.type_
+        if self.is_nullable:
+            out_type = f"Optional[{out_type}] = None"
+        return out_type
 
 
 @dataclass(frozen=True)
@@ -348,8 +375,12 @@ class DataClass:
         return (field_ for field_ in self.fields if isinstance(field_, PrimitiveField))
 
     @property
-    def single_timeseries_fields(self) -> Iterable[PrimitiveField]:
-        return (field_ for field_ in self.primitive_fields if isinstance(field_.prop.type, dm.TimeSeriesReference))
+    def cdf_external_fields(self) -> Iterable[CDFExternalField]:
+        return (field_ for field_ in self.fields if isinstance(field_, CDFExternalField))
+
+    @property
+    def single_timeseries_fields(self) -> Iterable[CDFExternalField]:
+        return (field_ for field_ in self.cdf_external_fields if isinstance(field_.prop.type, dm.TimeSeriesReference))
 
     @property
     def has_one_to_many_edges(self) -> bool:
@@ -544,8 +575,6 @@ _EXTERNAL_ID_FIELD = PrimitiveField(
         container=dm.ContainerId("dummy", "dummy"),
     ),
     pydantic_field="Field",
-    edge_api_class="",
-    edge_api_attribute="",
 )
 
 
