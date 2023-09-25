@@ -123,7 +123,7 @@ def load_data_classes_test_cases():
             variable="series",
             variable_list="series_list",
             view_name="Series",
-            file_name="series",
+            file_name="_series",
             fields=[],
         ),
         id="DataClass variable and variable_list the same.",

@@ -317,6 +317,8 @@ class DataClass:
         class_name = create_name(view_name, data_class.name)
         variable_name = create_name(view_name, data_class.variable)
         variable_list = create_name(view_name, data_class.variable_list)
+        if variable_name == variable_list:
+            variable_list = f"{variable_list}_list"
         file_name = f"_{create_name(view_name, data_class.file)}"
         return cls(
             view_name=view_name,
