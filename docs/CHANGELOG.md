@@ -13,6 +13,11 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.20.3] - 25-09-23
+### Fixed
+* The views with properties of type primitive listable, caused `pygen` to generate invalid
+  Python syntax. This is now fixed.
+
 ## [0.20.2] - 25-09-23
 ### Added
 * The `as_apply` to all generated read and read list classes.
