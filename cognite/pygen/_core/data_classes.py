@@ -210,7 +210,7 @@ class PrimitiveListField(PrimitiveFieldCore):
             alias = f', alias="{self.prop_name}"'
 
         if alias:
-            rhs = f", {self.pydantic_field}(default_factory=list{alias})"
+            rhs = f" = {self.pydantic_field}(default_factory=list{alias})"
         else:
             rhs = " = []"
         return f"list[{self.type_}]{rhs}"
