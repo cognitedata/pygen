@@ -13,7 +13,12 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## [0.20.0] - 23-09-23
+## [0.20.1] - 25-09-23
+### Fixed
+* In the generated SDK, when calling `client.generator.production(... filter for generator ).retrieve_dataframe()`
+  with `column_names` set to optional fields with a missing value raises `KeyError`. This is now fixed.
+
+## [0.20.0] - 24-09-23
 ### Added
 * Support for reading `TimesSeries` and `DataPoints` in generated SDKs for fields of type a single `TimeSeries`.
   For example, if you have a `Generator` with a field `production` of type `TimeSeries`, you can now do
