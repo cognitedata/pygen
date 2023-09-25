@@ -22,6 +22,15 @@ class Director(DomainModel):
     person: Optional[str] = None
     won_oscar: Optional[bool] = Field(None, alias="wonOscar")
 
+    def as_apply(self) -> DirectorApply:
+        return DirectorApply(
+            external_id=self.external_id,
+            movies=self.movies,
+            nomination=self.nomination,
+            person=self.person,
+            won_oscar=self.won_oscar,
+        )
+
 
 class DirectorApply(DomainModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
@@ -127,6 +136,9 @@ class DirectorApply(DomainModelApply):
 
 class DirectorList(TypeList[Director]):
     _NODE = Director
+
+    def as_apply(self) -> DirectorApplyList:
+        return DirectorApplyList([node.as_apply() for node in self.data])
 
 
 class DirectorApplyList(TypeApplyList[DirectorApply]):

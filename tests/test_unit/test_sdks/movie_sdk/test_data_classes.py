@@ -1,3 +1,5 @@
+import datetime
+
 import pytest
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Properties
@@ -328,3 +330,43 @@ def test_to_instances_with_recursive():
     # Assert
     assert len(instances.nodes) == 2
     assert len(instances.edges) == 1
+
+
+@pytest.fixture(scope="module")
+def person_and_person_apply() -> tuple[movie.Person, movie.PersonApply]:
+    person = movie.Person(
+        external_id="person:christoph_waltz",
+        birthYear=1956,
+        name="Christoph Waltz",
+        roles=["actor:christoph_waltz"],
+        version=1,
+        created_time=datetime.datetime(2023, 6, 7),
+        last_updated_time=datetime.datetime(2023, 8, 8),
+    )
+
+    person_apply = movie.PersonApply(
+        name="Christoph Waltz", birth_year=1956, external_id="person:christoph_waltz", roles=["actor:christoph_waltz"]
+    )
+    return person, person_apply
+
+
+def test_as_apply(person_and_person_apply: tuple[movie.Person, movie.PersonApply]):
+    # Arrange
+    person, person_apply = person_and_person_apply
+
+    # Act
+    actual = person.as_apply()
+
+    # Assert
+    assert actual == person_apply
+
+
+def test_as_apply_list(person_and_person_apply: tuple[movie.Person, movie.PersonApply]):
+    # Arrange
+    person, person_apply = person_and_person_apply
+
+    # Act
+    actual = movie.PersonList([person]).as_apply()
+
+    # Assert
+    assert actual == movie.PersonApplyList([person_apply])

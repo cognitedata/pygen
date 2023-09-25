@@ -27,6 +27,21 @@ class Case(DomainModel):
     scenario: Optional[str] = None
     start_time: Optional[datetime.datetime] = None
 
+    def as_apply(self) -> CaseApply:
+        return CaseApply(
+            external_id=self.external_id,
+            arguments=self.arguments,
+            bid=self.bid,
+            bid_history=self.bid_history,
+            commands=self.commands,
+            cut_files=self.cut_files,
+            end_time=self.end_time,
+            name=self.name,
+            run_status=self.run_status,
+            scenario=self.scenario,
+            start_time=self.start_time,
+        )
+
 
 class CaseApply(DomainModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
@@ -100,6 +115,9 @@ class CaseApply(DomainModelApply):
 
 class CaseList(TypeList[Case]):
     _NODE = Case
+
+    def as_apply(self) -> CaseApplyList:
+        return CaseApplyList([node.as_apply() for node in self.data])
 
 
 class CaseApplyList(TypeApplyList[CaseApply]):

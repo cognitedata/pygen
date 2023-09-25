@@ -23,6 +23,17 @@ class PygenBid(DomainModel):
     name: Optional[str] = None
     price_premium: Optional[float] = Field(None, alias="pricePremium")
 
+    def as_apply(self) -> PygenBidApply:
+        return PygenBidApply(
+            external_id=self.external_id,
+            date=self.date,
+            is_block=self.is_block,
+            market=self.market,
+            minimum_price=self.minimum_price,
+            name=self.name,
+            price_premium=self.price_premium,
+        )
+
 
 class PygenBidApply(DomainModelApply):
     space: ClassVar[str] = "market"
@@ -91,6 +102,9 @@ class PygenBidApply(DomainModelApply):
 
 class PygenBidList(TypeList[PygenBid]):
     _NODE = PygenBid
+
+    def as_apply(self) -> PygenBidApplyList:
+        return PygenBidApplyList([node.as_apply() for node in self.data])
 
 
 class PygenBidApplyList(TypeApplyList[PygenBidApply]):

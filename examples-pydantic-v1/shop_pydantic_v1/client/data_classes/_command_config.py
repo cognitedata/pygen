@@ -14,6 +14,13 @@ class CommandConfig(DomainModel):
     configs: list[str] = []
     source: Optional[str] = None
 
+    def as_apply(self) -> CommandConfigApply:
+        return CommandConfigApply(
+            external_id=self.external_id,
+            configs=self.configs,
+            source=self.source,
+        )
+
 
 class CommandConfigApply(DomainModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
@@ -55,6 +62,9 @@ class CommandConfigApply(DomainModelApply):
 
 class CommandConfigList(TypeList[CommandConfig]):
     _NODE = CommandConfig
+
+    def as_apply(self) -> CommandConfigApplyList:
+        return CommandConfigApplyList([node.as_apply() for node in self.data])
 
 
 class CommandConfigApplyList(TypeApplyList[CommandConfigApply]):

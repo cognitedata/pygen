@@ -11,7 +11,7 @@ from scenario_instance_pydantic_v1.client.data_classes._core import T_TypeApplyN
 
 DEFAULT_LIMIT_READ = 25
 
-INSTANCE_QUERY_LIMIT = 10_000
+INSTANCE_QUERY_LIMIT = 1_000
 
 
 class TypeAPI(Generic[T_TypeNode, T_TypeApplyNode, T_TypeNodeList]):

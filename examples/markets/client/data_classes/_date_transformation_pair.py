@@ -23,6 +23,13 @@ class DateTransformationPair(DomainModel):
     end: list[str] = []
     start: list[str] = []
 
+    def as_apply(self) -> DateTransformationPairApply:
+        return DateTransformationPairApply(
+            external_id=self.external_id,
+            end=self.end,
+            start=self.start,
+        )
+
 
 class DateTransformationPairApply(DomainModelApply):
     space: ClassVar[str] = "market"
@@ -97,6 +104,9 @@ class DateTransformationPairApply(DomainModelApply):
 
 class DateTransformationPairList(TypeList[DateTransformationPair]):
     _NODE = DateTransformationPair
+
+    def as_apply(self) -> DateTransformationPairApplyList:
+        return DateTransformationPairApplyList([node.as_apply() for node in self.data])
 
 
 class DateTransformationPairApplyList(TypeApplyList[DateTransformationPairApply]):

@@ -36,6 +36,29 @@ class Asset(DomainModel):
     trajectory: Optional[str] = None
     updated_date: Optional[datetime.datetime] = Field(None, alias="updatedDate")
 
+    def as_apply(self) -> AssetApply:
+        return AssetApply(
+            external_id=self.external_id,
+            area_id=self.area_id,
+            category_id=self.category_id,
+            children=self.children,
+            created_date=self.created_date,
+            description=self.description,
+            documents=self.documents,
+            in_model_3_d=self.in_model_3_d,
+            is_active=self.is_active,
+            is_critical_line=self.is_critical_line,
+            measurements=self.measurements,
+            metrics=self.metrics,
+            parent=self.parent,
+            pressure=self.pressure,
+            source_db=self.source_db,
+            specification=self.specification,
+            tag=self.tag,
+            trajectory=self.trajectory,
+            updated_date=self.updated_date,
+        )
+
 
 class AssetApply(DomainModelApply):
     space: ClassVar[str] = "tutorial_apm_simple"
@@ -183,6 +206,9 @@ class AssetApply(DomainModelApply):
 
 class AssetList(TypeList[Asset]):
     _NODE = Asset
+
+    def as_apply(self) -> AssetApplyList:
+        return AssetApplyList([node.as_apply() for node in self.data])
 
 
 class AssetApplyList(TypeApplyList[AssetApply]):

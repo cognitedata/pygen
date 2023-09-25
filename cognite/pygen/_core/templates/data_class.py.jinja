@@ -18,6 +18,12 @@ class {{ data_class.read_name }}(DomainModel):
     space: ClassVar[str] = "{{ space }}"{% for field in data_class %}
     {{ field.name }}: {{ field.as_read_type_hint() }}{% endfor %}
 
+    def as_apply(self) -> {{ data_class.write_name }}:
+        return {{ data_class.write_name }}(
+            external_id=self.external_id,{% for field in data_class %}
+            {{ field.name }}=self.{{ field.name }},{% endfor %}
+        )
+
 
 class {{ data_class.write_name }}(DomainModelApply):
     space: ClassVar[str] = "{{ space }}"{% for field in data_class %}
@@ -91,6 +97,9 @@ class {{ data_class.write_name }}(DomainModelApply):
 
 class {{ data_class.read_list_name }}(TypeList[{{ data_class.read_name }}]):
     _NODE = {{ data_class.read_name }}
+
+    def as_apply(self) -> {{ data_class.write_list_name }}:
+        return {{ data_class.write_list_name }}([node.as_apply() for node in self.data])
 
 
 class {{ data_class.write_list_name }}(TypeApplyList[{{ data_class.write_name }}]):

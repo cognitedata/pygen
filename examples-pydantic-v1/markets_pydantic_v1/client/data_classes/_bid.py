@@ -20,6 +20,14 @@ class Bid(DomainModel):
     market: Optional[str] = None
     name: Optional[str] = None
 
+    def as_apply(self) -> BidApply:
+        return BidApply(
+            external_id=self.external_id,
+            date=self.date,
+            market=self.market,
+            name=self.name,
+        )
+
 
 class BidApply(DomainModelApply):
     space: ClassVar[str] = "market"
@@ -72,6 +80,9 @@ class BidApply(DomainModelApply):
 
 class BidList(TypeList[Bid]):
     _NODE = Bid
+
+    def as_apply(self) -> BidApplyList:
+        return BidApplyList([node.as_apply() for node in self.data])
 
 
 class BidApplyList(TypeApplyList[BidApply]):

@@ -27,6 +27,21 @@ class WorkItem(DomainModel):
     to_be_done: Optional[bool] = Field(None, alias="toBeDone")
     work_order: Optional[str] = None
 
+    def as_apply(self) -> WorkItemApply:
+        return WorkItemApply(
+            external_id=self.external_id,
+            criticality=self.criticality,
+            description=self.description,
+            is_completed=self.is_completed,
+            item_info=self.item_info,
+            item_name=self.item_name,
+            linked_assets=self.linked_assets,
+            method=self.method,
+            title=self.title,
+            to_be_done=self.to_be_done,
+            work_order=self.work_order,
+        )
+
 
 class WorkItemApply(DomainModelApply):
     space: ClassVar[str] = "tutorial_apm_simple"
@@ -125,6 +140,9 @@ class WorkItemApply(DomainModelApply):
 
 class WorkItemList(TypeList[WorkItem]):
     _NODE = WorkItem
+
+    def as_apply(self) -> WorkItemApplyList:
+        return WorkItemApplyList([node.as_apply() for node in self.data])
 
 
 class WorkItemApplyList(TypeApplyList[WorkItemApply]):

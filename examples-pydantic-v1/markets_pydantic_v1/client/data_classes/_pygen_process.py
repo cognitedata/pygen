@@ -22,6 +22,15 @@ class PygenProcess(DomainModel):
     name: Optional[str] = None
     transformation: Optional[str] = None
 
+    def as_apply(self) -> PygenProcessApply:
+        return PygenProcessApply(
+            external_id=self.external_id,
+            bid=self.bid,
+            date_transformations=self.date_transformations,
+            name=self.name,
+            transformation=self.transformation,
+        )
+
 
 class PygenProcessApply(DomainModelApply):
     space: ClassVar[str] = "market"
@@ -104,6 +113,9 @@ class PygenProcessApply(DomainModelApply):
 
 class PygenProcessList(TypeList[PygenProcess]):
     _NODE = PygenProcess
+
+    def as_apply(self) -> PygenProcessApplyList:
+        return PygenProcessApplyList([node.as_apply() for node in self.data])
 
 
 class PygenProcessApplyList(TypeApplyList[PygenProcessApply]):

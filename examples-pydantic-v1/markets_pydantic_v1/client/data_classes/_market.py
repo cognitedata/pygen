@@ -14,6 +14,13 @@ class Market(DomainModel):
     name: Optional[str] = None
     timezone: Optional[str] = None
 
+    def as_apply(self) -> MarketApply:
+        return MarketApply(
+            external_id=self.external_id,
+            name=self.name,
+            timezone=self.timezone,
+        )
+
 
 class MarketApply(DomainModelApply):
     space: ClassVar[str] = "market"
@@ -55,6 +62,9 @@ class MarketApply(DomainModelApply):
 
 class MarketList(TypeList[Market]):
     _NODE = Market
+
+    def as_apply(self) -> MarketApplyList:
+        return MarketApplyList([node.as_apply() for node in self.data])
 
 
 class MarketApplyList(TypeApplyList[MarketApply]):

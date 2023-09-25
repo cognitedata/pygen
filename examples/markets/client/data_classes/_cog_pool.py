@@ -18,6 +18,16 @@ class CogPool(DomainModel):
     time_unit: Optional[str] = Field(None, alias="timeUnit")
     timezone: Optional[str] = None
 
+    def as_apply(self) -> CogPoolApply:
+        return CogPoolApply(
+            external_id=self.external_id,
+            max_price=self.max_price,
+            min_price=self.min_price,
+            name=self.name,
+            time_unit=self.time_unit,
+            timezone=self.timezone,
+        )
+
 
 class CogPoolApply(DomainModelApply):
     space: ClassVar[str] = "market"
@@ -75,6 +85,9 @@ class CogPoolApply(DomainModelApply):
 
 class CogPoolList(TypeList[CogPool]):
     _NODE = CogPool
+
+    def as_apply(self) -> CogPoolApplyList:
+        return CogPoolApplyList([node.as_apply() for node in self.data])
 
 
 class CogPoolApplyList(TypeApplyList[CogPoolApply]):

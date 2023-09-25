@@ -14,6 +14,13 @@ class DateTransformation(DomainModel):
     arguments: Optional[dict] = None
     method: Optional[str] = None
 
+    def as_apply(self) -> DateTransformationApply:
+        return DateTransformationApply(
+            external_id=self.external_id,
+            arguments=self.arguments,
+            method=self.method,
+        )
+
 
 class DateTransformationApply(DomainModelApply):
     space: ClassVar[str] = "market"
@@ -55,6 +62,9 @@ class DateTransformationApply(DomainModelApply):
 
 class DateTransformationList(TypeList[DateTransformation]):
     _NODE = DateTransformation
+
+    def as_apply(self) -> DateTransformationApplyList:
+        return DateTransformationApplyList([node.as_apply() for node in self.data])
 
 
 class DateTransformationApplyList(TypeApplyList[DateTransformationApply]):

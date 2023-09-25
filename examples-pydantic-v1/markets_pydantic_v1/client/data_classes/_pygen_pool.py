@@ -16,6 +16,14 @@ class PygenPool(DomainModel):
     name: Optional[str] = None
     timezone: Optional[str] = None
 
+    def as_apply(self) -> PygenPoolApply:
+        return PygenPoolApply(
+            external_id=self.external_id,
+            day_of_week=self.day_of_week,
+            name=self.name,
+            timezone=self.timezone,
+        )
+
 
 class PygenPoolApply(DomainModelApply):
     space: ClassVar[str] = "market"
@@ -67,6 +75,9 @@ class PygenPoolApply(DomainModelApply):
 
 class PygenPoolList(TypeList[PygenPool]):
     _NODE = PygenPool
+
+    def as_apply(self) -> PygenPoolApplyList:
+        return PygenPoolApplyList([node.as_apply() for node in self.data])
 
 
 class PygenPoolApplyList(TypeApplyList[PygenPoolApply]):

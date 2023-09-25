@@ -14,6 +14,13 @@ class Nomination(DomainModel):
     name: Optional[str] = None
     year: Optional[int] = None
 
+    def as_apply(self) -> NominationApply:
+        return NominationApply(
+            external_id=self.external_id,
+            name=self.name,
+            year=self.year,
+        )
+
 
 class NominationApply(DomainModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
@@ -55,6 +62,9 @@ class NominationApply(DomainModelApply):
 
 class NominationList(TypeList[Nomination]):
     _NODE = Nomination
+
+    def as_apply(self) -> NominationApplyList:
+        return NominationApplyList([node.as_apply() for node in self.data])
 
 
 class NominationApplyList(TypeApplyList[NominationApply]):

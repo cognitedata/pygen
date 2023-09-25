@@ -25,6 +25,18 @@ class Movie(DomainModel):
     run_time_minutes: Optional[float] = Field(None, alias="runTimeMinutes")
     title: Optional[str] = None
 
+    def as_apply(self) -> MovieApply:
+        return MovieApply(
+            external_id=self.external_id,
+            actors=self.actors,
+            directors=self.directors,
+            meta=self.meta,
+            rating=self.rating,
+            release_year=self.release_year,
+            run_time_minutes=self.run_time_minutes,
+            title=self.title,
+        )
+
 
 class MovieApply(DomainModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
@@ -139,6 +151,9 @@ class MovieApply(DomainModelApply):
 
 class MovieList(TypeList[Movie]):
     _NODE = Movie
+
+    def as_apply(self) -> MovieApplyList:
+        return MovieApplyList([node.as_apply() for node in self.data])
 
 
 class MovieApplyList(TypeApplyList[MovieApply]):

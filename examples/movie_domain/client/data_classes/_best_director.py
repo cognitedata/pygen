@@ -14,6 +14,13 @@ class BestDirector(DomainModel):
     name: Optional[str] = None
     year: Optional[int] = None
 
+    def as_apply(self) -> BestDirectorApply:
+        return BestDirectorApply(
+            external_id=self.external_id,
+            name=self.name,
+            year=self.year,
+        )
+
 
 class BestDirectorApply(DomainModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
@@ -55,6 +62,9 @@ class BestDirectorApply(DomainModelApply):
 
 class BestDirectorList(TypeList[BestDirector]):
     _NODE = BestDirector
+
+    def as_apply(self) -> BestDirectorApplyList:
+        return BestDirectorApplyList([node.as_apply() for node in self.data])
 
 
 class BestDirectorApplyList(TypeApplyList[BestDirectorApply]):

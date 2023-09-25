@@ -39,6 +39,32 @@ class WorkOrder(DomainModel):
     work_order_number: Optional[str] = Field(None, alias="workOrderNumber")
     work_package_number: Optional[str] = Field(None, alias="workPackageNumber")
 
+    def as_apply(self) -> WorkOrderApply:
+        return WorkOrderApply(
+            external_id=self.external_id,
+            actual_hours=self.actual_hours,
+            created_date=self.created_date,
+            description=self.description,
+            due_date=self.due_date,
+            duration_hours=self.duration_hours,
+            end_time=self.end_time,
+            is_active=self.is_active,
+            is_cancelled=self.is_cancelled,
+            is_completed=self.is_completed,
+            is_safety_critical=self.is_safety_critical,
+            linked_assets=self.linked_assets,
+            percentage_progress=self.percentage_progress,
+            planned_start=self.planned_start,
+            priority_description=self.priority_description,
+            program_number=self.program_number,
+            start_time=self.start_time,
+            status=self.status,
+            title=self.title,
+            work_items=self.work_items,
+            work_order_number=self.work_order_number,
+            work_package_number=self.work_package_number,
+        )
+
 
 class WorkOrderApply(DomainModelApply):
     space: ClassVar[str] = "tutorial_apm_simple"
@@ -187,6 +213,9 @@ class WorkOrderApply(DomainModelApply):
 
 class WorkOrderList(TypeList[WorkOrder]):
     _NODE = WorkOrder
+
+    def as_apply(self) -> WorkOrderApplyList:
+        return WorkOrderApplyList([node.as_apply() for node in self.data])
 
 
 class WorkOrderApplyList(TypeApplyList[WorkOrderApply]):
