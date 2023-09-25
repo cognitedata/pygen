@@ -13,6 +13,10 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.20.5] - 25-09-23
+### Fixed
+* Listing/retrieving a value of type `JSONObject` in the generated SDK failed with `ValueError`. This is now fixed.
+
 ## [0.20.4] - 25-09-23
 ### Fixed
 * The views with singular == plural caused `pygen` to generate invalid Python syntax. This is now fixed.

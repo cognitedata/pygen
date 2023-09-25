@@ -18,7 +18,7 @@ class ApmSimpleClient:
     ApmSimpleClient
 
     Generated with:
-        pygen = 0.20.4
+        pygen = 0.20.5
         cognite-sdk = 6.25.3
         pydantic = 2.3.0
 
