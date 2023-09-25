@@ -22,7 +22,7 @@ class MovieClient:
     MovieClient
 
     Generated with:
-        pygen = 0.20.3
+        pygen = 0.20.4
         cognite-sdk = 6.25.3
         pydantic = 1.10.7
 
@@ -71,7 +71,7 @@ class MovieClient:
         if section is not None:
             try:
                 toml_content = toml_content[section]
-            except KeyError:
-                raise ValueError(f"Could not find section '{section}' in {file_path}")
+            except KeyError as e:
+                raise ValueError(f"Could not find section '{section}' in {file_path}") from e
 
         return cls.azure_project(**toml_content)
