@@ -19,6 +19,14 @@ class Person(DomainModel):
     name: Optional[str] = None
     roles: list[str] = []
 
+    def as_apply(self) -> PersonApply:
+        return PersonApply(
+            external_id=self.external_id,
+            birth_year=self.birth_year,
+            name=self.name,
+            roles=self.roles,
+        )
+
 
 class PersonApply(DomainModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
@@ -88,6 +96,9 @@ class PersonApply(DomainModelApply):
 
 class PersonList(TypeList[Person]):
     _NODE = Person
+
+    def as_apply(self) -> PersonApplyList:
+        return PersonApplyList([node.as_apply() for node in self.data])
 
 
 class PersonApplyList(TypeApplyList[PersonApply]):

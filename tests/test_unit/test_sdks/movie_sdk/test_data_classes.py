@@ -1,3 +1,5 @@
+import datetime
+
 import pytest
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Properties
@@ -333,8 +335,15 @@ def test_to_instances_with_recursive():
 @pytest.fixture(scope="module")
 def person_and_person_apply() -> tuple[movie.Person, movie.PersonApply]:
     person = movie.Person(
-        name="Christoph Waltz", birth_year=1956, external_id="person:christoph_waltz", roles=["actor:christoph_waltz"]
+        external_id="person:christoph_waltz",
+        birthYear=1956,
+        name="Christoph Waltz",
+        roles=["actor:christoph_waltz"],
+        version=1,
+        created_time=datetime.datetime(2023, 6, 7),
+        last_updated_time=datetime.datetime(2023, 8, 8),
     )
+
     person_apply = movie.PersonApply(
         name="Christoph Waltz", birth_year=1956, external_id="person:christoph_waltz", roles=["actor:christoph_waltz"]
     )
