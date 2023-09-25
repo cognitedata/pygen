@@ -14,6 +14,13 @@ class Rating(DomainModel):
     score: Optional[str] = None
     votes: Optional[str] = None
 
+    def as_apply(self) -> RatingApply:
+        return RatingApply(
+            external_id=self.external_id,
+            score=self.score,
+            votes=self.votes,
+        )
+
 
 class RatingApply(DomainModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
@@ -55,6 +62,9 @@ class RatingApply(DomainModelApply):
 
 class RatingList(TypeList[Rating]):
     _NODE = Rating
+
+    def as_apply(self) -> RatingApplyList:
+        return RatingApplyList([node.as_apply() for node in self.data])
 
 
 class RatingApplyList(TypeApplyList[RatingApply]):

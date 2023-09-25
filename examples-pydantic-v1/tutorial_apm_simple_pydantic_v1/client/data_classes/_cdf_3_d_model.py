@@ -18,6 +18,13 @@ class CdfModel(DomainModel):
     entities: list[str] = []
     name: Optional[str] = None
 
+    def as_apply(self) -> CdfModelApply:
+        return CdfModelApply(
+            external_id=self.external_id,
+            entities=self.entities,
+            name=self.name,
+        )
+
 
 class CdfModelApply(DomainModelApply):
     space: ClassVar[str] = "cdf_3d_schema"
@@ -84,6 +91,9 @@ class CdfModelApply(DomainModelApply):
 
 class CdfModelList(TypeList[CdfModel]):
     _NODE = CdfModel
+
+    def as_apply(self) -> CdfModelApplyList:
+        return CdfModelApplyList([node.as_apply() for node in self.data])
 
 
 class CdfModelApplyList(TypeApplyList[CdfModelApply]):

@@ -14,6 +14,13 @@ class BestLeadingActor(DomainModel):
     name: Optional[str] = None
     year: Optional[int] = None
 
+    def as_apply(self) -> BestLeadingActorApply:
+        return BestLeadingActorApply(
+            external_id=self.external_id,
+            name=self.name,
+            year=self.year,
+        )
+
 
 class BestLeadingActorApply(DomainModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
@@ -55,6 +62,9 @@ class BestLeadingActorApply(DomainModelApply):
 
 class BestLeadingActorList(TypeList[BestLeadingActor]):
     _NODE = BestLeadingActor
+
+    def as_apply(self) -> BestLeadingActorApplyList:
+        return BestLeadingActorApplyList([node.as_apply() for node in self.data])
 
 
 class BestLeadingActorApplyList(TypeApplyList[BestLeadingActorApply]):

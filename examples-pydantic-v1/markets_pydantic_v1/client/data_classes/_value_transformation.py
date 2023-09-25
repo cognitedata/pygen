@@ -14,6 +14,13 @@ class ValueTransformation(DomainModel):
     arguments: Optional[dict] = None
     method: Optional[str] = None
 
+    def as_apply(self) -> ValueTransformationApply:
+        return ValueTransformationApply(
+            external_id=self.external_id,
+            arguments=self.arguments,
+            method=self.method,
+        )
+
 
 class ValueTransformationApply(DomainModelApply):
     space: ClassVar[str] = "market"
@@ -55,6 +62,9 @@ class ValueTransformationApply(DomainModelApply):
 
 class ValueTransformationList(TypeList[ValueTransformation]):
     _NODE = ValueTransformation
+
+    def as_apply(self) -> ValueTransformationApplyList:
+        return ValueTransformationApplyList([node.as_apply() for node in self.data])
 
 
 class ValueTransformationApplyList(TypeApplyList[ValueTransformationApply]):

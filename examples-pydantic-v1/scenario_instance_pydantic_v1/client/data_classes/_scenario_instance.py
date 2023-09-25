@@ -22,6 +22,19 @@ class ScenarioInstance(DomainModel):
     scenario: Optional[str] = None
     start: Optional[datetime.datetime] = None
 
+    def as_apply(self) -> ScenarioInstanceApply:
+        return ScenarioInstanceApply(
+            external_id=self.external_id,
+            aggregation=self.aggregation,
+            country=self.country,
+            instance=self.instance,
+            market=self.market,
+            price_area=self.price_area,
+            price_forecast=self.price_forecast,
+            scenario=self.scenario,
+            start=self.start,
+        )
+
 
 class ScenarioInstanceApply(DomainModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
@@ -81,6 +94,9 @@ class ScenarioInstanceApply(DomainModelApply):
 
 class ScenarioInstanceList(TypeList[ScenarioInstance]):
     _NODE = ScenarioInstance
+
+    def as_apply(self) -> ScenarioInstanceApplyList:
+        return ScenarioInstanceApplyList([node.as_apply() for node in self.data])
 
 
 class ScenarioInstanceApplyList(TypeApplyList[ScenarioInstanceApply]):

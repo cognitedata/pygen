@@ -22,6 +22,15 @@ class Role(DomainModel):
     person: Optional[str] = None
     won_oscar: Optional[bool] = Field(None, alias="wonOscar")
 
+    def as_apply(self) -> RoleApply:
+        return RoleApply(
+            external_id=self.external_id,
+            movies=self.movies,
+            nomination=self.nomination,
+            person=self.person,
+            won_oscar=self.won_oscar,
+        )
+
 
 class RoleApply(DomainModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
@@ -127,6 +136,9 @@ class RoleApply(DomainModelApply):
 
 class RoleList(TypeList[Role]):
     _NODE = Role
+
+    def as_apply(self) -> RoleApplyList:
+        return RoleApplyList([node.as_apply() for node in self.data])
 
 
 class RoleApplyList(TypeApplyList[RoleApply]):

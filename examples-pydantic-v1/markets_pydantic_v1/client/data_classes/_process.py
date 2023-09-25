@@ -18,6 +18,13 @@ class Process(DomainModel):
     bid: Optional[str] = None
     name: Optional[str] = None
 
+    def as_apply(self) -> ProcessApply:
+        return ProcessApply(
+            external_id=self.external_id,
+            bid=self.bid,
+            name=self.name,
+        )
+
 
 class ProcessApply(DomainModelApply):
     space: ClassVar[str] = "market"
@@ -67,6 +74,9 @@ class ProcessApply(DomainModelApply):
 
 class ProcessList(TypeList[Process]):
     _NODE = Process
+
+    def as_apply(self) -> ProcessApplyList:
+        return ProcessApplyList([node.as_apply() for node in self.data])
 
 
 class ProcessApplyList(TypeApplyList[ProcessApply]):
