@@ -13,6 +13,13 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.20.2] - 25-09-23
+### Added
+* The `as_apply` to all generated read and read list classes.
+
+### Changed
+* Reduced the limit of timeseries to retrieve when querying from 10 000 to 1 000. Recommendation from the FDM team.
+
 ## [0.20.1] - 25-09-23
 ### Fixed
 * In the generated SDK, when calling `client.generator.production(... filter for generator ).retrieve_dataframe()`
