@@ -45,8 +45,8 @@ class AssetPressureQuery:
 
     def retrieve(
         self,
-        start: int | str | datetime | None = None,
-        end: int | str | datetime | None = None,
+        start: int | str | datetime.datetime | None = None,
+        end: int | str | datetime.datetime | None = None,
         *,
         aggregates: Aggregate | list[Aggregate] | None = None,
         granularity: str | None = None,
@@ -69,8 +69,8 @@ class AssetPressureQuery:
 
     def retrieve_arrays(
         self,
-        start: int | str | datetime | None = None,
-        end: int | str | datetime | None = None,
+        start: int | str | datetime.datetime | None = None,
+        end: int | str | datetime.datetime | None = None,
         *,
         aggregates: Aggregate | list[Aggregate] | None = None,
         granularity: str | None = None,
@@ -93,8 +93,8 @@ class AssetPressureQuery:
 
     def retrieve_dataframe(
         self,
-        start: int | str | datetime | None = None,
-        end: int | str | datetime | None = None,
+        start: int | str | datetime.datetime | None = None,
+        end: int | str | datetime.datetime | None = None,
         *,
         aggregates: Aggregate | list[Aggregate] | None = None,
         granularity: str | None = None,
@@ -132,8 +132,8 @@ class AssetPressureQuery:
 
     def retrieve_dataframe_in_tz(
         self,
-        start: datetime,
-        end: datetime,
+        start: datetime.datetime,
+        end: datetime.datetime,
         *,
         aggregates: Aggregate | Sequence[Aggregate] | None = None,
         granularity: str | None = None,
@@ -167,7 +167,7 @@ class AssetPressureQuery:
 
     def retrieve_latest(
         self,
-        before: None | int | str | datetime = None,
+        before: None | int | str | datetime.datetime = None,
     ) -> Datapoints | DatapointsList | None:
         external_ids = self._retrieve_timeseries_external_ids_with_extra()
         if external_ids:
@@ -180,8 +180,8 @@ class AssetPressureQuery:
 
     def plot(
         self,
-        start: int | str | datetime | None = None,
-        end: int | str | datetime | None = None,
+        start: int | str | datetime.datetime | None = None,
+        end: int | str | datetime.datetime | None = None,
         *,
         aggregates: Aggregate | Sequence[Aggregate] | None = None,
         granularity: str | None = None,

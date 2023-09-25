@@ -51,7 +51,7 @@ class ScenarioInstanceClient:
         if section is not None:
             try:
                 toml_content = toml_content[section]
-            except KeyError:
-                raise ValueError(f"Could not find section '{section}' in {file_path}")
+            except KeyError as e:
+                raise ValueError(f"Could not find section '{section}' in {file_path}") from e
 
         return cls.azure_project(**toml_content)
