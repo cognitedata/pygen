@@ -328,3 +328,36 @@ def test_to_instances_with_recursive():
     # Assert
     assert len(instances.nodes) == 2
     assert len(instances.edges) == 1
+
+
+@pytest.fixture(scope="module")
+def person_and_person_apply() -> tuple[movie.Person, movie.PersonApply]:
+    person = movie.Person(
+        name="Christoph Waltz", birth_year=1956, external_id="person:christoph_waltz", roles=["actor:christoph_waltz"]
+    )
+    person_apply = movie.PersonApply(
+        name="Christoph Waltz", birth_year=1956, external_id="person:christoph_waltz", roles=["actor:christoph_waltz"]
+    )
+    return person, person_apply
+
+
+def test_as_apply(person_and_person_apply: tuple[movie.Person, movie.PersonApply]):
+    # Arrange
+    person, person_apply = person_and_person_apply
+
+    # Act
+    actual = person.as_apply()
+
+    # Assert
+    assert actual == person_apply
+
+
+def test_as_apply_list(person_and_person_apply: tuple[movie.Person, movie.PersonApply]):
+    # Arrange
+    person, person_apply = person_and_person_apply
+
+    # Act
+    actual = movie.PersonList([person]).as_apply()
+
+    # Assert
+    assert actual == movie.PersonApplyList([person_apply])
