@@ -1,5 +1,5 @@
 from __future__ import annotations
-{% if data_class.has_time_field %}
+{% if data_class.has_time_field or data_class.has_single_timeseries_fields %}
 import datetime{% endif %}{% if data_class.has_single_timeseries_fields %}
 import warnings{% endif %}
 {% if data_class.has_one_to_many_edges %}from collections import defaultdict

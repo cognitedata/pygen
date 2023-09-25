@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from collections import defaultdict
+from unittest.mock import MagicMock
+
 import pytest
 from cognite.client import data_modeling as dm
 
@@ -137,3 +140,82 @@ def test_load_data_class(view: dm.View, expected: DataClass, pygen_config: Pygen
 
     # Assert
     assert actual == expected
+
+
+def test_data_class_is_time(pygen_config: PygenConfig) -> None:
+    # Arrange
+    raw_data = {
+        "space": "power-ops",
+        "externalId": "PriceArea",
+        "name": "PriceArea",
+        "version": "6849ae787cd368",
+        "writable": True,
+        "usedFor": "node",
+        "isGlobal": False,
+        "properties": {
+            "name": {
+                "container": {"space": "power-ops", "externalId": "PriceArea"},
+                "containerPropertyIdentifier": "name",
+                "type": {"list": False, "collation": "ucs_basic", "type": "text"},
+                "nullable": True,
+                "autoIncrement": False,
+                "source": None,
+                "defaultValue": None,
+                "name": "name",
+                "description": None,
+            },
+            "description": {
+                "container": {"space": "power-ops", "externalId": "PriceArea"},
+                "containerPropertyIdentifier": "description",
+                "type": {"list": False, "collation": "ucs_basic", "type": "text"},
+                "nullable": True,
+                "autoIncrement": False,
+                "source": None,
+                "defaultValue": None,
+                "name": "description",
+                "description": None,
+            },
+            "dayAheadPrice": {
+                "container": {"space": "power-ops", "externalId": "PriceArea"},
+                "containerPropertyIdentifier": "dayAheadPrice",
+                "type": {"list": False, "type": "timeseries"},
+                "nullable": True,
+                "autoIncrement": False,
+                "source": None,
+                "defaultValue": None,
+                "name": "dayAheadPrice",
+                "description": None,
+            },
+            "plants": {
+                "type": {"space": "power-ops", "externalId": "PriceArea.plants"},
+                "source": {"space": "power-ops", "externalId": "Plant", "version": "836dcb3f5da1df", "type": "view"},
+                "name": "plants",
+                "description": None,
+                "edgeSource": None,
+                "direction": "outwards",
+            },
+            "watercourses": {
+                "type": {"space": "power-ops", "externalId": "PriceArea.watercourses"},
+                "source": {
+                    "space": "power-ops",
+                    "externalId": "Watercourse",
+                    "version": "96f5170f35ef70",
+                    "type": "view",
+                },
+                "name": "watercourses",
+                "description": None,
+                "edgeSource": None,
+                "direction": "outwards",
+            },
+        },
+        "lastUpdatedTime": 1692020117686,
+        "createdTime": 1692020117686,
+    }
+    view = dm.View.load(raw_data)
+
+    # Act
+    data_class = DataClass.from_view(view, pygen_config.naming.data_class)
+    data_class.update_fields(view.properties, defaultdict(lambda: MagicMock(spec=DataClass)), pygen_config.naming.field)
+
+    # Assert
+    assert data_class.has_single_timeseries_fields is True
