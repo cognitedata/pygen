@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Properties
@@ -24,8 +24,8 @@ def test_from_node_with_json() -> None:
     expected = ValueTransformation(
         external_id="myExternalId",
         version=1,
-        last_updated_time=datetime.fromtimestamp(0),
-        created_time=datetime.fromtimestamp(0),
+        last_updated_time=datetime.fromtimestamp(0, tz=timezone.utc),
+        created_time=datetime.fromtimestamp(0, tz=timezone.utc),
         arguments={"a": 1},
         method="myMethod",
     )
