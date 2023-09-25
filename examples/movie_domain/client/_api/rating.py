@@ -322,7 +322,7 @@ def _retrieve_timeseries_external_ids_with_extra_score(
         )
         result = client.data_modeling.instances.query(query)
         batch_external_ids = {
-            node.properties[view_id]["score"]: [node.properties[view_id][prop] for prop in extra_list]
+            node.properties[view_id]["score"]: [node.properties[view_id].get(prop, "") for prop in extra_list]
             for node in result.data["nodes"].data
         }
         total_retrieved += len(batch_external_ids)
@@ -640,7 +640,7 @@ def _retrieve_timeseries_external_ids_with_extra_votes(
         )
         result = client.data_modeling.instances.query(query)
         batch_external_ids = {
-            node.properties[view_id]["votes"]: [node.properties[view_id][prop] for prop in extra_list]
+            node.properties[view_id]["votes"]: [node.properties[view_id].get(prop, "") for prop in extra_list]
             for node in result.data["nodes"].data
         }
         total_retrieved += len(batch_external_ids)
