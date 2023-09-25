@@ -133,6 +133,22 @@ def test_retrieve_dataframe_multiple_column_names(client: ScenarioInstanceClient
     assert data.columns[0] == "Norway-NO1"
 
 
+def test_retrieve_dataframe_multiple_column_names_missing_values(client: ScenarioInstanceClient) -> None:
+    # Act
+    data = client.scenario_instance.price_forecast(aggregation="mean", limit=1).retrieve_dataframe(
+        aggregates="min",
+        granularity="6h",
+        include_aggregate_name=False,
+        include_granularity_name=False,
+        column_names=["scenario", "market"],
+    )
+
+    # Assert
+    assert isinstance(data, pd.DataFrame)
+    assert len(data.columns) == 1
+    assert data.columns[0] == "-"
+
+
 def test_retrieve_arrays(client: ScenarioInstanceClient) -> None:
     # Act
     data = client.scenario_instance.price_forecast(aggregation="mean", limit=1).retrieve_arrays(
