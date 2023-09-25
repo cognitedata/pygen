@@ -14,6 +14,13 @@ class BestLeadingActress(DomainModel):
     name: Optional[str] = None
     year: Optional[int] = None
 
+    def as_apply(self) -> BestLeadingActressApply:
+        return BestLeadingActressApply(
+            external_id=self.external_id,
+            name=self.name,
+            year=self.year,
+        )
+
 
 class BestLeadingActressApply(DomainModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
@@ -55,6 +62,9 @@ class BestLeadingActressApply(DomainModelApply):
 
 class BestLeadingActressList(TypeList[BestLeadingActress]):
     _NODE = BestLeadingActress
+
+    def as_apply(self) -> BestLeadingActressApplyList:
+        return BestLeadingActressApplyList([node.as_apply() for node in self.data])
 
 
 class BestLeadingActressApplyList(TypeApplyList[BestLeadingActressApply]):

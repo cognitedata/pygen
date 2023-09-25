@@ -23,6 +23,17 @@ class CogBid(DomainModel):
     price_area: Optional[str] = Field(None, alias="priceArea")
     quantity: Optional[int] = None
 
+    def as_apply(self) -> CogBidApply:
+        return CogBidApply(
+            external_id=self.external_id,
+            date=self.date,
+            market=self.market,
+            name=self.name,
+            price=self.price,
+            price_area=self.price_area,
+            quantity=self.quantity,
+        )
+
 
 class CogBidApply(DomainModelApply):
     space: ClassVar[str] = "market"
@@ -91,6 +102,9 @@ class CogBidApply(DomainModelApply):
 
 class CogBidList(TypeList[CogBid]):
     _NODE = CogBid
+
+    def as_apply(self) -> CogBidApplyList:
+        return CogBidApplyList([node.as_apply() for node in self.data])
 
 
 class CogBidApplyList(TypeApplyList[CogBidApply]):

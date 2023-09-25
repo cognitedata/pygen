@@ -22,6 +22,15 @@ class Actor(DomainModel):
     person: Optional[str] = None
     won_oscar: Optional[bool] = Field(None, alias="wonOscar")
 
+    def as_apply(self) -> ActorApply:
+        return ActorApply(
+            external_id=self.external_id,
+            movies=self.movies,
+            nomination=self.nomination,
+            person=self.person,
+            won_oscar=self.won_oscar,
+        )
+
 
 class ActorApply(DomainModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
@@ -127,6 +136,9 @@ class ActorApply(DomainModelApply):
 
 class ActorList(TypeList[Actor]):
     _NODE = Actor
+
+    def as_apply(self) -> ActorApplyList:
+        return ActorApplyList([node.as_apply() for node in self.data])
 
 
 class ActorApplyList(TypeApplyList[ActorApply]):

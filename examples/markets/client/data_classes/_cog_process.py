@@ -22,6 +22,15 @@ class CogProcess(DomainModel):
     name: Optional[str] = None
     transformation: Optional[str] = None
 
+    def as_apply(self) -> CogProcessApply:
+        return CogProcessApply(
+            external_id=self.external_id,
+            bid=self.bid,
+            date_transformations=self.date_transformations,
+            name=self.name,
+            transformation=self.transformation,
+        )
+
 
 class CogProcessApply(DomainModelApply):
     space: ClassVar[str] = "market"
@@ -104,6 +113,9 @@ class CogProcessApply(DomainModelApply):
 
 class CogProcessList(TypeList[CogProcess]):
     _NODE = CogProcess
+
+    def as_apply(self) -> CogProcessApplyList:
+        return CogProcessApplyList([node.as_apply() for node in self.data])
 
 
 class CogProcessApplyList(TypeApplyList[CogProcessApply]):

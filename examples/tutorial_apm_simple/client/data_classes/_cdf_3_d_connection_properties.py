@@ -20,6 +20,13 @@ class CdfConnectionProperties(DomainModel):
     revision_id: Optional[int] = Field(None, alias="revisionId")
     revision_node_id: Optional[int] = Field(None, alias="revisionNodeId")
 
+    def as_apply(self) -> CdfConnectionPropertiesApply:
+        return CdfConnectionPropertiesApply(
+            external_id=self.external_id,
+            revision_id=self.revision_id,
+            revision_node_id=self.revision_node_id,
+        )
+
 
 class CdfConnectionPropertiesApply(DomainModelApply):
     space: ClassVar[str] = "cdf_3d_schema"
@@ -61,6 +68,9 @@ class CdfConnectionPropertiesApply(DomainModelApply):
 
 class CdfConnectionPropertiesList(TypeList[CdfConnectionProperties]):
     _NODE = CdfConnectionProperties
+
+    def as_apply(self) -> CdfConnectionPropertiesApplyList:
+        return CdfConnectionPropertiesApplyList([node.as_apply() for node in self.data])
 
 
 class CdfConnectionPropertiesApplyList(TypeApplyList[CdfConnectionPropertiesApply]):
