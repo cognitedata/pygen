@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, ClassVar, Optional, Union  # noqa: F401
+from typing import TYPE_CHECKING, ClassVar, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -20,8 +20,8 @@ __all__ = [
 
 class DateTransformationPair(DomainModel):
     space: ClassVar[str] = "market"
-    end: list[str] = []
-    start: list[str] = []
+    end: Optional[list[str]] = None
+    start: Optional[list[str]] = None
 
     def as_apply(self) -> DateTransformationPairApply:
         return DateTransformationPairApply(
@@ -33,8 +33,8 @@ class DateTransformationPair(DomainModel):
 
 class DateTransformationPairApply(DomainModelApply):
     space: ClassVar[str] = "market"
-    end: Union[list[DateTransformationApply], list[str]] = Field(default_factory=list, repr=False)
-    start: Union[list[DateTransformationApply], list[str]] = Field(default_factory=list, repr=False)
+    end: Union[list[DateTransformationApply], list[str], None] = Field(default=None, repr=False)
+    start: Union[list[DateTransformationApply], list[str], None] = Field(default=None, repr=False)
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:
@@ -45,7 +45,7 @@ class DateTransformationPairApply(DomainModelApply):
         edges = []
         cache.add(self.external_id)
 
-        for end in self.end:
+        for end in self.end or []:
             edge = self._create_end_edge(end)
             if edge.external_id not in cache:
                 edges.append(edge)
@@ -56,7 +56,7 @@ class DateTransformationPairApply(DomainModelApply):
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
-        for start in self.start:
+        for start in self.start or []:
             edge = self._create_start_edge(start)
             if edge.external_id not in cache:
                 edges.append(edge)

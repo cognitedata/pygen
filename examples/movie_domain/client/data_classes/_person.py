@@ -17,7 +17,7 @@ class Person(DomainModel):
     space: ClassVar[str] = "IntegrationTestsImmutable"
     birth_year: Optional[int] = Field(None, alias="birthYear")
     name: Optional[str] = None
-    roles: list[str] = []
+    roles: Optional[list[str]] = None
 
     def as_apply(self) -> PersonApply:
         return PersonApply(
@@ -32,7 +32,7 @@ class PersonApply(DomainModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
     birth_year: Optional[int] = None
     name: str
-    roles: Union[list[RoleApply], list[str]] = Field(default_factory=list, repr=False)
+    roles: Union[list[RoleApply], list[str], None] = Field(default=None, repr=False)
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:
@@ -64,7 +64,7 @@ class PersonApply(DomainModelApply):
         edges = []
         cache.add(self.external_id)
 
-        for role in self.roles:
+        for role in self.roles or []:
             edge = self._create_role_edge(role)
             if edge.external_id not in cache:
                 edges.append(edge)

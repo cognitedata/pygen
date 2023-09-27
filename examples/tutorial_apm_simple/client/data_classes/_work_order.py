@@ -27,7 +27,7 @@ class WorkOrder(DomainModel):
     is_cancelled: Optional[bool] = Field(None, alias="isCancelled")
     is_completed: Optional[bool] = Field(None, alias="isCompleted")
     is_safety_critical: Optional[bool] = Field(None, alias="isSafetyCritical")
-    linked_assets: list[str] = []
+    linked_assets: Optional[list[str]] = None
     percentage_progress: Optional[int] = Field(None, alias="percentageProgress")
     planned_start: Optional[datetime.datetime] = Field(None, alias="plannedStart")
     priority_description: Optional[str] = Field(None, alias="priorityDescription")
@@ -35,7 +35,7 @@ class WorkOrder(DomainModel):
     start_time: Optional[datetime.datetime] = Field(None, alias="startTime")
     status: Optional[str] = None
     title: Optional[str] = None
-    work_items: list[str] = []
+    work_items: Optional[list[str]] = None
     work_order_number: Optional[str] = Field(None, alias="workOrderNumber")
     work_package_number: Optional[str] = Field(None, alias="workPackageNumber")
 
@@ -78,7 +78,7 @@ class WorkOrderApply(DomainModelApply):
     is_cancelled: Optional[bool] = None
     is_completed: Optional[bool] = None
     is_safety_critical: Optional[bool] = None
-    linked_assets: Union[list[AssetApply], list[str]] = Field(default_factory=list, repr=False)
+    linked_assets: Union[list[AssetApply], list[str], None] = Field(default=None, repr=False)
     percentage_progress: Optional[int] = None
     planned_start: Optional[datetime.datetime] = None
     priority_description: Optional[str] = None
@@ -86,7 +86,7 @@ class WorkOrderApply(DomainModelApply):
     start_time: Optional[datetime.datetime] = None
     status: Optional[str] = None
     title: Optional[str] = None
-    work_items: Union[list[WorkItemApply], list[str]] = Field(default_factory=list, repr=False)
+    work_items: Union[list[WorkItemApply], list[str], None] = Field(default=None, repr=False)
     work_order_number: Optional[str] = None
     work_package_number: Optional[str] = None
 
@@ -154,7 +154,7 @@ class WorkOrderApply(DomainModelApply):
         edges = []
         cache.add(self.external_id)
 
-        for linked_asset in self.linked_assets:
+        for linked_asset in self.linked_assets or []:
             edge = self._create_linked_asset_edge(linked_asset)
             if edge.external_id not in cache:
                 edges.append(edge)
@@ -165,7 +165,7 @@ class WorkOrderApply(DomainModelApply):
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
-        for work_item in self.work_items:
+        for work_item in self.work_items or []:
             edge = self._create_work_item_edge(work_item)
             if edge.external_id not in cache:
                 edges.append(edge)

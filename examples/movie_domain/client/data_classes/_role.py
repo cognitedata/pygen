@@ -17,8 +17,8 @@ __all__ = ["Role", "RoleApply", "RoleList", "RoleApplyList"]
 
 class Role(DomainModel):
     space: ClassVar[str] = "IntegrationTestsImmutable"
-    movies: list[str] = []
-    nomination: list[str] = []
+    movies: Optional[list[str]] = None
+    nomination: Optional[list[str]] = None
     person: Optional[str] = None
     won_oscar: Optional[bool] = Field(None, alias="wonOscar")
 
@@ -34,8 +34,8 @@ class Role(DomainModel):
 
 class RoleApply(DomainModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
-    movies: Union[list[MovieApply], list[str]] = Field(default_factory=list, repr=False)
-    nomination: Union[list[NominationApply], list[str]] = Field(default_factory=list, repr=False)
+    movies: Union[list[MovieApply], list[str], None] = Field(default=None, repr=False)
+    nomination: Union[list[NominationApply], list[str], None] = Field(default=None, repr=False)
     person: Union[PersonApply, str, None] = Field(None, repr=False)
     won_oscar: Optional[bool] = None
 
@@ -72,7 +72,7 @@ class RoleApply(DomainModelApply):
         edges = []
         cache.add(self.external_id)
 
-        for movie in self.movies:
+        for movie in self.movies or []:
             edge = self._create_movie_edge(movie)
             if edge.external_id not in cache:
                 edges.append(edge)
@@ -83,7 +83,7 @@ class RoleApply(DomainModelApply):
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
-        for nomination in self.nomination:
+        for nomination in self.nomination or []:
             edge = self._create_nomination_edge(nomination)
             if edge.external_id not in cache:
                 edges.append(edge)

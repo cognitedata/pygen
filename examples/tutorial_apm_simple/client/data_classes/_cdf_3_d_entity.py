@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, ClassVar, Optional, Union  # noqa: F401
+from typing import TYPE_CHECKING, ClassVar, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -15,7 +15,7 @@ __all__ = ["CdfEntity", "CdfEntityApply", "CdfEntityList", "CdfEntityApplyList"]
 
 class CdfEntity(DomainModel):
     space: ClassVar[str] = "cdf_3d_schema"
-    in_model_3_d: list[str] = []
+    in_model_3_d: Optional[list[str]] = None
 
     def as_apply(self) -> CdfEntityApply:
         return CdfEntityApply(
@@ -26,7 +26,7 @@ class CdfEntity(DomainModel):
 
 class CdfEntityApply(DomainModelApply):
     space: ClassVar[str] = "cdf_3d_schema"
-    in_model_3_d: Union[list[CdfModelApply], list[str]] = Field(default_factory=list, repr=False)
+    in_model_3_d: Union[list[CdfModelApply], list[str], None] = Field(default=None, repr=False)
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:
@@ -37,7 +37,7 @@ class CdfEntityApply(DomainModelApply):
         edges = []
         cache.add(self.external_id)
 
-        for in_model_3_d in self.in_model_3_d:
+        for in_model_3_d in self.in_model_3_d or []:
             edge = self._create_in_model_3_d_edge(in_model_3_d)
             if edge.external_id not in cache:
                 edges.append(edge)

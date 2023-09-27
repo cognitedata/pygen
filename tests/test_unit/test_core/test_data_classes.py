@@ -33,8 +33,8 @@ def load_field_test_cases():
             is_nullable=True,
             prop=mapped,
         ),
-        'list[str] = Field(default_factory=list, alias="runEvents")',
-        "list[str] = []",
+        'Union[list[str], None] = Field(default=None, alias="runEvents")',
+        "Union[list[str], None] = None",
         id="PrimitiveListField that require alias.",
     )
 

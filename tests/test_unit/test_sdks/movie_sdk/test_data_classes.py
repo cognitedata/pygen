@@ -61,33 +61,24 @@ def test_person_to_pandas():
     assert len(df) == 1
 
 
-def test_person_one_to_many_fields():
-    # Arrange
-    expected = ["roles"]
-
-    # Act
-    actual = movie.Person.one_to_many_fields()
-
-    # Assert
-    assert actual == expected
-
-
 def person_apply_to_instances_test_cases():
     person = movie.PersonApply(name="Christoph Waltz", birth_year=1956, external_id="person:christoph_waltz")
     expected = dm.InstancesApply(
-        [
-            dm.NodeApply(
-                "IntegrationTestsImmutable",
-                "person:christoph_waltz",
-                sources=[
-                    dm.NodeOrEdgeData(
-                        source=dm.ContainerId("IntegrationTestsImmutable", "Person"),
-                        properties={"name": "Christoph Waltz", "birthYear": 1956},
-                    )
-                ],
-            )
-        ],
-        [],
+        dm.NodeApplyList(
+            [
+                dm.NodeApply(
+                    "IntegrationTestsImmutable",
+                    "person:christoph_waltz",
+                    sources=[
+                        dm.NodeOrEdgeData(
+                            source=dm.ContainerId("IntegrationTestsImmutable", "Person"),
+                            properties={"name": "Christoph Waltz", "birthYear": 1956},
+                        )
+                    ],
+                )
+            ]
+        ),
+        dm.EdgeApplyList([]),
     )
     yield pytest.param(person, expected, id="Person no extra dependencies")
 
@@ -320,7 +311,7 @@ def test_unpack_properties(raw_properties: dict, expected: dict):
 
 def test_to_instances_with_recursive():
     # Arrange
-    person = movie.PersonApply(external_id="person:anders", name="Anders", birth_year=0)
+    person = movie.PersonApply(external_id="person:anders", name="Anders", birth_year=0, roles=[])
     actor = movie.ActorApply(external_id="actor:anders", movies=[], nomination=[], person=person, won_oscar=False)
     person.roles.append(actor)
 

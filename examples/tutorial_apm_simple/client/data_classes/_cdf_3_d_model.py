@@ -15,7 +15,7 @@ __all__ = ["CdfModel", "CdfModelApply", "CdfModelList", "CdfModelApplyList"]
 
 class CdfModel(DomainModel):
     space: ClassVar[str] = "cdf_3d_schema"
-    entities: list[str] = []
+    entities: Optional[list[str]] = None
     name: Optional[str] = None
 
     def as_apply(self) -> CdfModelApply:
@@ -28,7 +28,7 @@ class CdfModel(DomainModel):
 
 class CdfModelApply(DomainModelApply):
     space: ClassVar[str] = "cdf_3d_schema"
-    entities: Union[list[CdfEntityApply], list[str]] = Field(default_factory=list, repr=False)
+    entities: Union[list[CdfEntityApply], list[str], None] = Field(default=None, repr=False)
     name: str
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
@@ -59,7 +59,7 @@ class CdfModelApply(DomainModelApply):
         edges = []
         cache.add(self.external_id)
 
-        for entity in self.entities:
+        for entity in self.entities or []:
             edge = self._create_entity_edge(entity)
             if edge.external_id not in cache:
                 edges.append(edge)

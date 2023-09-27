@@ -19,15 +19,15 @@ class Asset(DomainModel):
     space: ClassVar[str] = "tutorial_apm_simple"
     area_id: Optional[int] = Field(None, alias="areaId")
     category_id: Optional[int] = Field(None, alias="categoryId")
-    children: list[str] = []
+    children: Optional[list[str]] = None
     created_date: Optional[datetime.datetime] = Field(None, alias="createdDate")
     description: Optional[str] = None
-    documents: list[str] = []
-    in_model_3_d: list[str] = []
+    documents: Union[list[str], None] = None
+    in_model_3_d: Optional[list[str]] = None
     is_active: Optional[bool] = Field(None, alias="isActive")
     is_critical_line: Optional[bool] = Field(None, alias="isCriticalLine")
-    measurements: list[str] = []
-    metrics: list[str] = []
+    measurements: Union[list[str], None] = None
+    metrics: Union[list[str], None] = None
     parent: Optional[str] = None
     pressure: Optional[str] = None
     source_db: Optional[str] = Field(None, alias="sourceDb")
@@ -64,15 +64,15 @@ class AssetApply(DomainModelApply):
     space: ClassVar[str] = "tutorial_apm_simple"
     area_id: Optional[int] = None
     category_id: Optional[int] = None
-    children: Union[list[AssetApply], list[str]] = Field(default_factory=list, repr=False)
+    children: Union[list[AssetApply], list[str], None] = Field(default=None, repr=False)
     created_date: Optional[datetime.datetime] = None
     description: Optional[str] = None
-    documents: list[str] = []
-    in_model_3_d: Union[list[CdfModelApply], list[str]] = Field(default_factory=list, repr=False)
+    documents: Union[list[str], None] = None
+    in_model_3_d: Union[list[CdfModelApply], list[str], None] = Field(default=None, repr=False)
     is_active: Optional[bool] = None
     is_critical_line: Optional[bool] = None
-    measurements: list[str] = []
-    metrics: list[str] = []
+    measurements: Union[list[str], None] = None
+    metrics: Union[list[str], None] = None
     parent: Union[AssetApply, str, None] = Field(None, repr=False)
     pressure: Optional[str] = None
     source_db: Optional[str] = None
@@ -142,7 +142,7 @@ class AssetApply(DomainModelApply):
         edges = []
         cache.add(self.external_id)
 
-        for child in self.children:
+        for child in self.children or []:
             edge = self._create_child_edge(child)
             if edge.external_id not in cache:
                 edges.append(edge)
@@ -153,7 +153,7 @@ class AssetApply(DomainModelApply):
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
-        for in_model_3_d in self.in_model_3_d:
+        for in_model_3_d in self.in_model_3_d or []:
             edge = self._create_in_model_3_d_edge(in_model_3_d)
             if edge.external_id not in cache:
                 edges.append(edge)

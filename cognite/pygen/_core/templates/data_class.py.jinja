@@ -60,7 +60,7 @@ class {{ data_class.write_name }}(DomainModelApply):
         edges = []
         cache.add(self.external_id)
 {%  for field in data_class.one_to_many_edges %}
-        for {{ field.variable }} in self.{{ field.name }}:
+        for {{ field.variable }} in self.{{ field.name }} or []:
             edge = self._create_{{field.variable}}_edge({{ field.variable }})
             if edge.external_id not in cache:
                 edges.append(edge)

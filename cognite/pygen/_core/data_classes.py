@@ -131,11 +131,7 @@ class Field(ABC):
             view_id = cast(dm.ViewId, prop.source)
             target_data_class = data_class_by_view_id[ViewSpaceExternalId(view_id.space, view_id.external_id)]
             return EdgeOneToOne(
-                name=name,
-                prop_name=prop_name,
-                prop=prop,
-                data_class=target_data_class,
-                pydantic_field=pydantic_field,
+                name=name, prop_name=prop_name, prop=prop, data_class=target_data_class, pydantic_field=pydantic_field
             )
 
         else:
@@ -210,16 +206,16 @@ class PrimitiveListField(PrimitiveFieldCore):
             alias = f', alias="{self.prop_name}"'
 
         if alias:
-            rhs = f" = {self.pydantic_field}(default_factory=list{alias})"
+            rhs = f" = {self.pydantic_field}(default=None{alias})"
         else:
-            rhs = " = []"
-        return f"list[{self.type_}]{rhs}"
+            rhs = " = None"
+        return f"Union[list[{self.type_}], None]{rhs}"
 
     def as_write_type_hint(self) -> str:
-        rhs = ""
         if self.is_nullable:
-            rhs = " = []"
-        return f"list[{self.type_}]{rhs}"
+            return f"Union[list[{self.type_}], None] = None"
+        else:
+            return f"list[{self.type_}]"
 
 
 @dataclass(frozen=True)
@@ -285,12 +281,12 @@ class EdgeOneToMany(EdgeField):
     prop: dm.SingleHopConnectionDefinition
 
     def as_read_type_hint(self) -> str:
-        return "list[str] = []"
+        return "Optional[list[str]] = None"
 
     def as_write_type_hint(self) -> str:
         return (
-            f"Union[list[{self.data_class.write_name}], list[str]] "
-            f"= {self.pydantic_field}(default_factory=list, repr=False)"
+            f"Union[list[{self.data_class.write_name}], list[str], None]"
+            f" = {self.pydantic_field}(default=None, repr=False)"
         )
 
 
@@ -608,9 +604,7 @@ class ListMethod:
                         parameter.type_ = f"{field_.type_} | {parameter.type_}"
                     list_filters.append(
                         ListFilter(
-                            filter=selected_filter,
-                            prop_name=field_.prop_name,
-                            keyword_arguments=dict(value=parameter),
+                            filter=selected_filter, prop_name=field_.prop_name, keyword_arguments=dict(value=parameter)
                         )
                     )
                 elif selected_filter is dm.filters.In:
@@ -623,9 +617,7 @@ class ListMethod:
                         parameter.type_ = f"{parameter.type_} | list[{field_.type_}]"
                     list_filters.append(
                         ListFilter(
-                            filter=selected_filter,
-                            prop_name=field_.prop_name,
-                            keyword_arguments=dict(values=parameter),
+                            filter=selected_filter, prop_name=field_.prop_name, keyword_arguments=dict(values=parameter)
                         )
                     )
                 elif selected_filter is dm.filters.Prefix:
@@ -633,9 +625,7 @@ class ListMethod:
                     parameters_by_name[parameter.name] = parameter
                     list_filters.append(
                         ListFilter(
-                            filter=selected_filter,
-                            prop_name=field_.prop_name,
-                            keyword_arguments=dict(value=parameter),
+                            filter=selected_filter, prop_name=field_.prop_name, keyword_arguments=dict(value=parameter)
                         )
                     )
                 elif selected_filter is dm.filters.Range:
@@ -653,10 +643,7 @@ class ListMethod:
                 else:
                     # This is a filter that is not supported by the list method.
                     continue
-        return cls(
-            parameters=list(parameters_by_name.values()),
-            filters=list_filters,
-        )
+        return cls(parameters=list(parameters_by_name.values()), filters=list_filters)
 
 
 def _to_python_type(type_: dm.DirectRelationReference | dm.PropertyType) -> str:

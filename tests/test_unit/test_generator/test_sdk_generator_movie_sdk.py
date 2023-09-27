@@ -112,8 +112,8 @@ def create_fields_test_cases():
             edge_api_attribute="roles",
             edge_api_class="PersonRolesAPI",
         ),
-        "list[str] = []",
-        "Union[list[RoleApply], list[str]] = Field(default_factory=list, repr=False)",
+        "Optional[list[str]] = None",
+        "Union[list[RoleApply], list[str], None] = Field(default=None, repr=False)",
         id="List of edges",
     )
     prop = {
@@ -141,7 +141,7 @@ def create_fields_test_cases():
             is_nullable=False,
             pydantic_field="Field",
         ),
-        "list[str] = []",
+        "Union[list[str], None] = None",
         "list[str]",
         id="List of strings",
     )
