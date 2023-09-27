@@ -154,7 +154,7 @@ class WorkOrderApply(DomainModelApply):
         edges = []
         cache.add(self.external_id)
 
-        for linked_asset in self.linked_assets:
+        for linked_asset in self.linked_assets or []:
             edge = self._create_linked_asset_edge(linked_asset)
             if edge.external_id not in cache:
                 edges.append(edge)
@@ -165,7 +165,7 @@ class WorkOrderApply(DomainModelApply):
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
-        for work_item in self.work_items:
+        for work_item in self.work_items or []:
             edge = self._create_work_item_edge(work_item)
             if edge.external_id not in cache:
                 edges.append(edge)

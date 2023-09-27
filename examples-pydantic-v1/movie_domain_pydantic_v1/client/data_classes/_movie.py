@@ -87,7 +87,7 @@ class MovieApply(DomainModelApply):
         edges = []
         cache.add(self.external_id)
 
-        for actor in self.actors:
+        for actor in self.actors or []:
             edge = self._create_actor_edge(actor)
             if edge.external_id not in cache:
                 edges.append(edge)
@@ -98,7 +98,7 @@ class MovieApply(DomainModelApply):
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
-        for director in self.directors:
+        for director in self.directors or []:
             edge = self._create_director_edge(director)
             if edge.external_id not in cache:
                 edges.append(edge)

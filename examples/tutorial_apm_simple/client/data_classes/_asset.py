@@ -142,7 +142,7 @@ class AssetApply(DomainModelApply):
         edges = []
         cache.add(self.external_id)
 
-        for child in self.children:
+        for child in self.children or []:
             edge = self._create_child_edge(child)
             if edge.external_id not in cache:
                 edges.append(edge)
@@ -153,7 +153,7 @@ class AssetApply(DomainModelApply):
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
-        for in_model_3_d in self.in_model_3_d:
+        for in_model_3_d in self.in_model_3_d or []:
             edge = self._create_in_model_3_d_edge(in_model_3_d)
             if edge.external_id not in cache:
                 edges.append(edge)

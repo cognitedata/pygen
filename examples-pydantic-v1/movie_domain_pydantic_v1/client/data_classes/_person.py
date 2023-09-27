@@ -64,7 +64,7 @@ class PersonApply(DomainModelApply):
         edges = []
         cache.add(self.external_id)
 
-        for role in self.roles:
+        for role in self.roles or []:
             edge = self._create_role_edge(role)
             if edge.external_id not in cache:
                 edges.append(edge)

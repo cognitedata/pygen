@@ -103,7 +103,7 @@ class WorkItemApply(DomainModelApply):
         edges = []
         cache.add(self.external_id)
 
-        for linked_asset in self.linked_assets:
+        for linked_asset in self.linked_assets or []:
             edge = self._create_linked_asset_edge(linked_asset)
             if edge.external_id not in cache:
                 edges.append(edge)

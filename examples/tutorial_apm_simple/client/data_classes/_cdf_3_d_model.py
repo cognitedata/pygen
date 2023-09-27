@@ -59,7 +59,7 @@ class CdfModelApply(DomainModelApply):
         edges = []
         cache.add(self.external_id)
 
-        for entity in self.entities:
+        for entity in self.entities or []:
             edge = self._create_entity_edge(entity)
             if edge.external_id not in cache:
                 edges.append(edge)

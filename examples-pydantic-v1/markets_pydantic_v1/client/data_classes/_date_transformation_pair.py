@@ -45,7 +45,7 @@ class DateTransformationPairApply(DomainModelApply):
         edges = []
         cache.add(self.external_id)
 
-        for end in self.end:
+        for end in self.end or []:
             edge = self._create_end_edge(end)
             if edge.external_id not in cache:
                 edges.append(edge)
@@ -56,7 +56,7 @@ class DateTransformationPairApply(DomainModelApply):
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
-        for start in self.start:
+        for start in self.start or []:
             edge = self._create_start_edge(start)
             if edge.external_id not in cache:
                 edges.append(edge)
