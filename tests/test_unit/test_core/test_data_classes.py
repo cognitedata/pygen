@@ -5,8 +5,16 @@ from unittest.mock import MagicMock
 
 import pytest
 from cognite.client import data_modeling as dm
+from yaml import safe_load
 
-from cognite.pygen._core.data_classes import DataClass, EdgeOneToOne, Field, PrimitiveListField, ViewSpaceExternalId
+from cognite.pygen._core.data_classes import (
+    DataClass,
+    EdgeOneToOne,
+    Field,
+    PrimitiveField,
+    PrimitiveListField,
+    ViewSpaceExternalId,
+)
 from cognite.pygen.config import PygenConfig
 
 
@@ -69,6 +77,39 @@ def load_field_test_cases():
         'Optional[str] = Field(None, alias="modelTemplate")',
         "Union[ModelTemplateApply, str, None] = Field(None, repr=False)",
         id="EdgeField that require alias.",
+    )
+    raw_data = """
+    auto_increment: false
+    container:
+      external_id: Market
+      space: market
+    container_property_identifier: name
+    default_value: null
+    description: null
+    name: name
+    nullable: true
+    source: null
+    type:
+      collation: ucs_basic
+      list: false
+      type: text
+    """
+    mapped = dm.MappedProperty.load(safe_load(raw_data))
+    yield pytest.param(
+        mapped,
+        PrimitiveField(
+            name="name",
+            prop_name="name",
+            pydantic_field="Field",
+            type_="str",
+            is_nullable=True,
+            prop=mapped,
+            default=None,
+        ),
+        {},
+        "Optional[str] = None",
+        "Optional[str] = None",
+        id="Field that does not require alias.",
     )
 
 

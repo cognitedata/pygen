@@ -183,7 +183,7 @@ class PrimitiveField(PrimitiveFieldCore):
         if self.need_alias:
             return f'Optional[{self.type_}] = {self.pydantic_field}({self.default}, alias="{self.prop_name}")'
         else:
-            return f"{self.type_} = {self.default}"
+            return f"Optional[{self.type_}] = {self.default}"
 
     def as_write_type_hint(self) -> str:
         out_type = self.type_
