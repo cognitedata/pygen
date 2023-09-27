@@ -13,6 +13,12 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.21.1] - 27-09-23
+### Fixed
+* Edges with property name not equal to field name in generated data class failed to create the correct alias. Example
+  a property named `linkedAssets` with a field named `linked_assets` would fail to create the correct alias. This is
+  now fixed.
+
 ## [0.21.0] - 27-09-23
 ### Changed
 * Listable primitive and one-to-many edges no accepts None if they are optional, and has `None` as a default value. Earlier
