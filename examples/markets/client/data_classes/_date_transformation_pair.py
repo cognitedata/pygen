@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, ClassVar, Optional, Union  # noqa: F401
+from typing import TYPE_CHECKING, ClassVar, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -20,8 +20,8 @@ __all__ = [
 
 class DateTransformationPair(DomainModel):
     space: ClassVar[str] = "market"
-    end: list[str] = []
-    start: list[str] = []
+    end: Optional[list[str]] = None
+    start: Optional[list[str]] = None
 
     def as_apply(self) -> DateTransformationPairApply:
         return DateTransformationPairApply(
@@ -33,8 +33,8 @@ class DateTransformationPair(DomainModel):
 
 class DateTransformationPairApply(DomainModelApply):
     space: ClassVar[str] = "market"
-    end: Union[list[DateTransformationApply], list[str]] = Field(default_factory=list, repr=False)
-    start: Union[list[DateTransformationApply], list[str]] = Field(default_factory=list, repr=False)
+    end: Union[list[DateTransformationApply], list[str], None] = Field(default_factory=None, repr=False)
+    start: Union[list[DateTransformationApply], list[str], None] = Field(default_factory=None, repr=False)
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:

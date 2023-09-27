@@ -17,8 +17,8 @@ __all__ = ["Movie", "MovieApply", "MovieList", "MovieApplyList"]
 
 class Movie(DomainModel):
     space: ClassVar[str] = "IntegrationTestsImmutable"
-    actors: list[str] = []
-    directors: list[str] = []
+    actors: Optional[list[str]] = None
+    directors: Optional[list[str]] = None
     meta: Optional[dict] = None
     rating: Optional[str] = None
     release_year: Optional[int] = Field(None, alias="releaseYear")
@@ -40,8 +40,8 @@ class Movie(DomainModel):
 
 class MovieApply(DomainModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
-    actors: Union[list[ActorApply], list[str]] = Field(default_factory=list, repr=False)
-    directors: Union[list[DirectorApply], list[str]] = Field(default_factory=list, repr=False)
+    actors: Union[list[ActorApply], list[str], None] = Field(default_factory=None, repr=False)
+    directors: Union[list[DirectorApply], list[str], None] = Field(default_factory=None, repr=False)
     meta: Optional[dict] = None
     rating: Union[RatingApply, str, None] = Field(None, repr=False)
     release_year: Optional[int] = None
