@@ -286,7 +286,7 @@ class EdgeOneToMany(EdgeField):
     def as_write_type_hint(self) -> str:
         return (
             f"Union[list[{self.data_class.write_name}], list[str], None]"
-            f"= {self.pydantic_field}(default=None, repr=False)"
+            f" = {self.pydantic_field}(default=None, repr=False)"
         )
 
 
