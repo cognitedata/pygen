@@ -17,7 +17,9 @@ Changes are grouped as follows
 ### Changed
 * Listable primitive and one-to-many edges no accepts None if they are optional, and has `None` as a default value. Earlier
   the default value was an empty list.
-
+### Removed
+* Helper method `one_to_many_fields` for DomainCore. This did not distinguish between one-to-many edges and a list of
+  strings.
 
 ## [0.20.5] - 25-09-23
 ### Fixed

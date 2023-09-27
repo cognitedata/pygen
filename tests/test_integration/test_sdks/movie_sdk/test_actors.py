@@ -12,8 +12,8 @@ def test_actor_list(movie_client: MovieClient):
     actors = movie_client.actor.list(limit=-1)
 
     assert len(actors) > 0
-    assert all(isinstance(movie, str) for actor in actors for movie in actor.movies)
-    assert all(isinstance(nomination, str) for actor in actors for nomination in actor.nomination)
+    assert all(isinstance(movie, str) for actor in actors for movie in actor.movies or [])
+    assert all(isinstance(nomination, str) for actor in actors for nomination in actor.nomination or [])
 
 
 def test_actor_apply_with_person(movie_client: MovieClient):

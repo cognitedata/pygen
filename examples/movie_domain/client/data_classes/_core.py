@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import datetime
-import types
+
 from abc import abstractmethod
 from collections import UserList
 from collections.abc import Collection, Mapping, Iterator
-from typing import Any, ClassVar, Generic, Optional, TypeVar, Union, overload
+from typing import Any, ClassVar, Generic, Optional, TypeVar, overload
 
 import pandas as pd
 from cognite.client import data_modeling as dm
@@ -36,14 +36,6 @@ class DomainModel(DomainModelCore):
         # Extra unpacking to avoid crashing between core and property fields
         # can happen in there is a field named 'version' in the DominModel.
         return cls(**{**data, **unpack_properties(node.properties)})  # type: ignore[arg-type]
-
-    @classmethod
-    def one_to_many_fields(cls) -> list[str]:
-        return [
-            field_name
-            for field_name, field in cls.model_fields.items()
-            if isinstance(field.annotation, types.GenericAlias)
-        ]
 
 
 T_TypeNode = TypeVar("T_TypeNode", bound=DomainModel)
