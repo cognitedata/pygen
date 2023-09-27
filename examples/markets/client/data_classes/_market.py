@@ -11,8 +11,8 @@ __all__ = ["Market", "MarketApply", "MarketList", "MarketApplyList"]
 
 class Market(DomainModel):
     space: ClassVar[str] = "market"
-    name: Optional[str] = None
-    timezone: Optional[str] = None
+    name: str = None
+    timezone: str = None
 
     def as_apply(self) -> MarketApply:
         return MarketApply(

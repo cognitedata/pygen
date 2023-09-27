@@ -16,7 +16,7 @@ __all__ = ["Process", "ProcessApply", "ProcessList", "ProcessApplyList"]
 class Process(DomainModel):
     space: ClassVar[str] = "market"
     bid: Optional[str] = None
-    name: Optional[str] = None
+    name: str = None
 
     def as_apply(self) -> ProcessApply:
         return ProcessApply(

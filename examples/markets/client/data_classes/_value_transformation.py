@@ -11,8 +11,8 @@ __all__ = ["ValueTransformation", "ValueTransformationApply", "ValueTransformati
 
 class ValueTransformation(DomainModel):
     space: ClassVar[str] = "market"
-    arguments: Optional[dict] = None
-    method: Optional[str] = None
+    arguments: dict = None
+    method: str = None
 
     def as_apply(self) -> ValueTransformationApply:
         return ValueTransformationApply(

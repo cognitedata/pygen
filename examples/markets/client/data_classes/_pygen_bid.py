@@ -16,11 +16,11 @@ __all__ = ["PygenBid", "PygenBidApply", "PygenBidList", "PygenBidApplyList"]
 
 class PygenBid(DomainModel):
     space: ClassVar[str] = "market"
-    date: Optional[datetime.date] = None
+    date: datetime.date = None
     is_block: Optional[bool] = Field(None, alias="isBlock")
     market: Optional[str] = None
     minimum_price: Optional[float] = Field(None, alias="minimumPrice")
-    name: Optional[str] = None
+    name: str = None
     price_premium: Optional[float] = Field(None, alias="pricePremium")
 
     def as_apply(self) -> PygenBidApply:

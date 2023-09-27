@@ -16,16 +16,16 @@ __all__ = ["Case", "CaseApply", "CaseList", "CaseApplyList"]
 
 class Case(DomainModel):
     space: ClassVar[str] = "IntegrationTestsImmutable"
-    arguments: Optional[str] = None
+    arguments: str = None
     bid: Optional[str] = None
-    bid_history: Union[list[str], None] = None
+    bid_history: Optional[list[str]] = None
     commands: Optional[str] = None
-    cut_files: Union[list[str], None] = None
-    end_time: Optional[datetime.datetime] = None
-    name: Optional[str] = None
+    cut_files: Optional[list[str]] = None
+    end_time: datetime.datetime = None
+    name: str = None
     run_status: Optional[str] = Field(None, alias="runStatus")
-    scenario: Optional[str] = None
-    start_time: Optional[datetime.datetime] = None
+    scenario: str = None
+    start_time: datetime.datetime = None
 
     def as_apply(self) -> CaseApply:
         return CaseApply(
@@ -47,9 +47,9 @@ class CaseApply(DomainModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
     arguments: Optional[str] = None
     bid: Optional[str] = None
-    bid_history: Union[list[str], None] = None
+    bid_history: Optional[list[str]] = None
     commands: Union[CommandConfigApply, str, None] = Field(None, repr=False)
-    cut_files: Union[list[str], None] = None
+    cut_files: Optional[list[str]] = None
     end_time: Optional[datetime.datetime] = None
     name: str
     run_status: str

@@ -16,16 +16,16 @@ __all__ = ["WorkItem", "WorkItemApply", "WorkItemList", "WorkItemApplyList"]
 
 class WorkItem(DomainModel):
     space: ClassVar[str] = "tutorial_apm_simple"
-    criticality: Optional[str] = None
-    description: Optional[str] = None
+    criticality: str = None
+    description: str = None
     is_completed: Optional[bool] = Field(None, alias="isCompleted")
     item_info: Optional[str] = Field(None, alias="itemInfo")
     item_name: Optional[str] = Field(None, alias="itemName")
-    linked_assets: Optional[list[str]] = None
-    method: Optional[str] = None
-    title: Optional[str] = None
+    linked_assets: Optional[str] = Field(None, alias="linkedAssets")
+    method: str = None
+    title: str = None
     to_be_done: Optional[bool] = Field(None, alias="toBeDone")
-    work_order: Optional[str] = None
+    work_order: Optional[str] = Field(None, alias="workOrder")
 
     def as_apply(self) -> WorkItemApply:
         return WorkItemApply(

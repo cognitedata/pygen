@@ -20,8 +20,8 @@ __all__ = [
 
 class DateTransformationPair(DomainModel):
     space: ClassVar[str] = "market"
-    end: Optional[list[str]] = None
-    start: Optional[list[str]] = None
+    end: Optional[str] = None
+    start: Optional[str] = None
 
     def as_apply(self) -> DateTransformationPairApply:
         return DateTransformationPairApply(

@@ -16,8 +16,8 @@ __all__ = ["Person", "PersonApply", "PersonList", "PersonApplyList"]
 class Person(DomainModel):
     space: ClassVar[str] = "IntegrationTestsImmutable"
     birth_year: Optional[int] = Field(None, alias="birthYear")
-    name: Optional[str] = None
-    roles: Optional[list[str]] = None
+    name: str = None
+    roles: Optional[str] = None
 
     def as_apply(self) -> PersonApply:
         return PersonApply(

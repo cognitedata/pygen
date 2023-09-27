@@ -17,13 +17,13 @@ __all__ = ["Movie", "MovieApply", "MovieList", "MovieApplyList"]
 
 class Movie(DomainModel):
     space: ClassVar[str] = "IntegrationTestsImmutable"
-    actors: Optional[list[str]] = None
-    directors: Optional[list[str]] = None
-    meta: Optional[dict] = None
+    actors: Optional[str] = None
+    directors: Optional[str] = None
+    meta: dict = None
     rating: Optional[str] = None
     release_year: Optional[int] = Field(None, alias="releaseYear")
     run_time_minutes: Optional[float] = Field(None, alias="runTimeMinutes")
-    title: Optional[str] = None
+    title: str = None
 
     def as_apply(self) -> MovieApply:
         return MovieApply(

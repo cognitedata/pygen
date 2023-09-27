@@ -18,8 +18,8 @@ __all__ = ["CogProcess", "CogProcessApply", "CogProcessList", "CogProcessApplyLi
 class CogProcess(DomainModel):
     space: ClassVar[str] = "market"
     bid: Optional[str] = None
-    date_transformations: Optional[str] = None
-    name: Optional[str] = None
+    date_transformations: Optional[str] = Field(None, alias="dateTransformations")
+    name: str = None
     transformation: Optional[str] = None
 
     def as_apply(self) -> CogProcessApply:

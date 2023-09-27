@@ -16,12 +16,12 @@ __all__ = ["CogBid", "CogBidApply", "CogBidList", "CogBidApplyList"]
 
 class CogBid(DomainModel):
     space: ClassVar[str] = "market"
-    date: Optional[datetime.date] = None
+    date: datetime.date = None
     market: Optional[str] = None
-    name: Optional[str] = None
-    price: Optional[float] = None
+    name: str = None
+    price: float = None
     price_area: Optional[str] = Field(None, alias="priceArea")
-    quantity: Optional[int] = None
+    quantity: int = None
 
     def as_apply(self) -> CogBidApply:
         return CogBidApply(

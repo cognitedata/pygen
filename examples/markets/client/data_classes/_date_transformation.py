@@ -11,8 +11,8 @@ __all__ = ["DateTransformation", "DateTransformationApply", "DateTransformationL
 
 class DateTransformation(DomainModel):
     space: ClassVar[str] = "market"
-    arguments: Optional[dict] = None
-    method: Optional[str] = None
+    arguments: dict = None
+    method: str = None
 
     def as_apply(self) -> DateTransformationApply:
         return DateTransformationApply(

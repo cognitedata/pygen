@@ -15,8 +15,8 @@ __all__ = ["CdfModel", "CdfModelApply", "CdfModelList", "CdfModelApplyList"]
 
 class CdfModel(DomainModel):
     space: ClassVar[str] = "cdf_3d_schema"
-    entities: Optional[list[str]] = None
-    name: Optional[str] = None
+    entities: Optional[str] = None
+    name: str = None
 
     def as_apply(self) -> CdfModelApply:
         return CdfModelApply(
