@@ -17,8 +17,8 @@ __all__ = ["Movie", "MovieApply", "MovieList", "MovieApplyList"]
 
 class Movie(DomainModel):
     space: ClassVar[str] = "IntegrationTestsImmutable"
-    actors: Optional[str] = None
-    directors: Optional[str] = None
+    actors: Optional[list[str]] = None
+    directors: Optional[list[str]] = None
     meta: Optional[dict] = None
     rating: Optional[str] = None
     release_year: Optional[int] = Field(None, alias="releaseYear")

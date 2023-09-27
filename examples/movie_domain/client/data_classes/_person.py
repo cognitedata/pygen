@@ -17,7 +17,7 @@ class Person(DomainModel):
     space: ClassVar[str] = "IntegrationTestsImmutable"
     birth_year: Optional[int] = Field(None, alias="birthYear")
     name: Optional[str] = None
-    roles: Optional[str] = None
+    roles: Optional[list[str]] = None
 
     def as_apply(self) -> PersonApply:
         return PersonApply(

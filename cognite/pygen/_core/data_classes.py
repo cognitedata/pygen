@@ -278,9 +278,9 @@ class EdgeOneToMany(EdgeField):
 
     def as_read_type_hint(self) -> str:
         if self.need_alias:
-            return f"Optional[str] = {self.pydantic_field}(None, alias='{self.prop_name}')"
+            return f"Optional[list[str]] = {self.pydantic_field}(None, alias='{self.prop_name}')"
         else:
-            return "Optional[str] = None"
+            return "Optional[list[str]] = None"
 
     def as_write_type_hint(self) -> str:
         return (

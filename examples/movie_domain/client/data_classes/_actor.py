@@ -17,8 +17,8 @@ __all__ = ["Actor", "ActorApply", "ActorList", "ActorApplyList"]
 
 class Actor(DomainModel):
     space: ClassVar[str] = "IntegrationTestsImmutable"
-    movies: Optional[str] = None
-    nomination: Optional[str] = None
+    movies: Optional[list[str]] = None
+    nomination: Optional[list[str]] = None
     person: Optional[str] = None
     won_oscar: Optional[bool] = Field(None, alias="wonOscar")
 
