@@ -17,8 +17,8 @@ __all__ = ["Actor", "ActorApply", "ActorList", "ActorApplyList"]
 
 class Actor(DomainModel):
     space: ClassVar[str] = "IntegrationTestsImmutable"
-    movies: list[str] = []
-    nomination: list[str] = []
+    movies: Optional[list[str]] = None
+    nomination: Optional[list[str]] = None
     person: Optional[str] = None
     won_oscar: Optional[bool] = Field(None, alias="wonOscar")
 
@@ -34,8 +34,8 @@ class Actor(DomainModel):
 
 class ActorApply(DomainModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
-    movies: Union[list[MovieApply], list[str]] = Field(default_factory=list, repr=False)
-    nomination: Union[list[NominationApply], list[str]] = Field(default_factory=list, repr=False)
+    movies: Union[list[MovieApply], list[str], None] = Field(default_factory=None, repr=False)
+    nomination: Union[list[NominationApply], list[str], None] = Field(default_factory=None, repr=False)
     person: Union[PersonApply, str, None] = Field(None, repr=False)
     won_oscar: Optional[bool] = None
 

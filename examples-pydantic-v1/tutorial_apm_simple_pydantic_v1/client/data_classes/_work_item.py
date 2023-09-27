@@ -21,7 +21,7 @@ class WorkItem(DomainModel):
     is_completed: Optional[bool] = Field(None, alias="isCompleted")
     item_info: Optional[str] = Field(None, alias="itemInfo")
     item_name: Optional[str] = Field(None, alias="itemName")
-    linked_assets: list[str] = []
+    linked_assets: Optional[list[str]] = None
     method: Optional[str] = None
     title: Optional[str] = None
     to_be_done: Optional[bool] = Field(None, alias="toBeDone")
@@ -50,7 +50,7 @@ class WorkItemApply(DomainModelApply):
     is_completed: Optional[bool] = None
     item_info: Optional[str] = None
     item_name: Optional[str] = None
-    linked_assets: Union[list[AssetApply], list[str]] = Field(default_factory=list, repr=False)
+    linked_assets: Union[list[AssetApply], list[str], None] = Field(default_factory=None, repr=False)
     method: Optional[str] = None
     title: Optional[str] = None
     to_be_done: Optional[bool] = None

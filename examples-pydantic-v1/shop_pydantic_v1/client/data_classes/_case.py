@@ -18,9 +18,9 @@ class Case(DomainModel):
     space: ClassVar[str] = "IntegrationTestsImmutable"
     arguments: Optional[str] = None
     bid: Optional[str] = None
-    bid_history: list[str] = []
+    bid_history: Union[list[str], None] = None
     commands: Optional[str] = None
-    cut_files: list[str] = []
+    cut_files: Union[list[str], None] = None
     end_time: Optional[datetime.datetime] = None
     name: Optional[str] = None
     run_status: Optional[str] = Field(None, alias="runStatus")
@@ -47,9 +47,9 @@ class CaseApply(DomainModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
     arguments: Optional[str] = None
     bid: Optional[str] = None
-    bid_history: list[str] = []
+    bid_history: Union[list[str], None] = None
     commands: Union[CommandConfigApply, str, None] = Field(None, repr=False)
-    cut_files: list[str] = []
+    cut_files: Union[list[str], None] = None
     end_time: Optional[datetime.datetime] = None
     name: str
     run_status: str
