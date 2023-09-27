@@ -22,12 +22,12 @@ class Asset(DomainModel):
     children: Optional[list[str]] = None
     created_date: Optional[datetime.datetime] = Field(None, alias="createdDate")
     description: Optional[str] = None
-    documents: Union[list[str], None] = None
-    in_model_3_d: Optional[list[str]] = None
+    documents: Optional[list[str]] = None
+    in_model_3_d: Optional[list[str]] = Field(None, alias="inModel3d")
     is_active: Optional[bool] = Field(None, alias="isActive")
     is_critical_line: Optional[bool] = Field(None, alias="isCriticalLine")
-    measurements: Union[list[str], None] = None
-    metrics: Union[list[str], None] = None
+    measurements: Optional[list[str]] = None
+    metrics: Optional[list[str]] = None
     parent: Optional[str] = None
     pressure: Optional[str] = None
     source_db: Optional[str] = Field(None, alias="sourceDb")
@@ -67,12 +67,12 @@ class AssetApply(DomainModelApply):
     children: Union[list[AssetApply], list[str], None] = Field(default=None, repr=False)
     created_date: Optional[datetime.datetime] = None
     description: Optional[str] = None
-    documents: Union[list[str], None] = None
+    documents: Optional[list[str]] = None
     in_model_3_d: Union[list[CdfModelApply], list[str], None] = Field(default=None, repr=False)
     is_active: Optional[bool] = None
     is_critical_line: Optional[bool] = None
-    measurements: Union[list[str], None] = None
-    metrics: Union[list[str], None] = None
+    measurements: Optional[list[str]] = None
+    metrics: Optional[list[str]] = None
     parent: Union[AssetApply, str, None] = Field(None, repr=False)
     pressure: Optional[str] = None
     source_db: Optional[str] = None
