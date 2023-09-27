@@ -13,14 +13,14 @@ __all__ = ["ScenarioInstance", "ScenarioInstanceApply", "ScenarioInstanceList", 
 
 class ScenarioInstance(DomainModel):
     space: ClassVar[str] = "IntegrationTestsImmutable"
-    aggregation: str = None
-    country: str = None
-    instance: datetime.datetime = None
-    market: str = None
+    aggregation: Optional[str] = None
+    country: Optional[str] = None
+    instance: Optional[datetime.datetime] = None
+    market: Optional[str] = None
     price_area: Optional[str] = Field(None, alias="priceArea")
     price_forecast: Optional[str] = Field(None, alias="priceForecast")
-    scenario: str = None
-    start: datetime.datetime = None
+    scenario: Optional[str] = None
+    start: Optional[datetime.datetime] = None
 
     def as_apply(self) -> ScenarioInstanceApply:
         return ScenarioInstanceApply(

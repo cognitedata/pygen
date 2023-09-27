@@ -14,9 +14,9 @@ class CogPool(DomainModel):
     space: ClassVar[str] = "market"
     max_price: Optional[float] = Field(None, alias="maxPrice")
     min_price: Optional[float] = Field(None, alias="minPrice")
-    name: str = None
+    name: Optional[str] = None
     time_unit: Optional[str] = Field(None, alias="timeUnit")
-    timezone: str = None
+    timezone: Optional[str] = None
 
     def as_apply(self) -> CogPoolApply:
         return CogPoolApply(

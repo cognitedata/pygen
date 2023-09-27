@@ -21,7 +21,7 @@ class Asset(DomainModel):
     category_id: Optional[int] = Field(None, alias="categoryId")
     children: Optional[str] = None
     created_date: Optional[datetime.datetime] = Field(None, alias="createdDate")
-    description: str = None
+    description: Optional[str] = None
     documents: Optional[list[str]] = None
     in_model_3_d: Optional[str] = Field(None, alias="inModel3d")
     is_active: Optional[bool] = Field(None, alias="isActive")
@@ -32,7 +32,7 @@ class Asset(DomainModel):
     pressure: Optional[str] = None
     source_db: Optional[str] = Field(None, alias="sourceDb")
     specification: Optional[str] = None
-    tag: str = None
+    tag: Optional[str] = None
     trajectory: Optional[str] = None
     updated_date: Optional[datetime.datetime] = Field(None, alias="updatedDate")
 

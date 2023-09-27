@@ -16,9 +16,9 @@ __all__ = ["Bid", "BidApply", "BidList", "BidApplyList"]
 
 class Bid(DomainModel):
     space: ClassVar[str] = "market"
-    date: datetime.date = None
+    date: Optional[datetime.date] = None
     market: Optional[str] = None
-    name: str = None
+    name: Optional[str] = None
 
     def as_apply(self) -> BidApply:
         return BidApply(

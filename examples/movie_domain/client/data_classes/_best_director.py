@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import ClassVar, Optional  # noqa: F401
+from typing import ClassVar, Optional
 
 from cognite.client import data_modeling as dm
 
@@ -11,8 +11,8 @@ __all__ = ["BestDirector", "BestDirectorApply", "BestDirectorList", "BestDirecto
 
 class BestDirector(DomainModel):
     space: ClassVar[str] = "IntegrationTestsImmutable"
-    name: str = None
-    year: int = None
+    name: Optional[str] = None
+    year: Optional[int] = None
 
     def as_apply(self) -> BestDirectorApply:
         return BestDirectorApply(

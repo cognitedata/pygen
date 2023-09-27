@@ -19,7 +19,7 @@ class WorkOrder(DomainModel):
     space: ClassVar[str] = "tutorial_apm_simple"
     actual_hours: Optional[int] = Field(None, alias="actualHours")
     created_date: Optional[datetime.datetime] = Field(None, alias="createdDate")
-    description: str = None
+    description: Optional[str] = None
     due_date: Optional[datetime.datetime] = Field(None, alias="dueDate")
     duration_hours: Optional[int] = Field(None, alias="durationHours")
     end_time: Optional[datetime.datetime] = Field(None, alias="endTime")
@@ -33,8 +33,8 @@ class WorkOrder(DomainModel):
     priority_description: Optional[str] = Field(None, alias="priorityDescription")
     program_number: Optional[str] = Field(None, alias="programNumber")
     start_time: Optional[datetime.datetime] = Field(None, alias="startTime")
-    status: str = None
-    title: str = None
+    status: Optional[str] = None
+    title: Optional[str] = None
     work_items: Optional[str] = Field(None, alias="workItems")
     work_order_number: Optional[str] = Field(None, alias="workOrderNumber")
     work_package_number: Optional[str] = Field(None, alias="workPackageNumber")

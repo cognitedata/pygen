@@ -19,11 +19,11 @@ class Movie(DomainModel):
     space: ClassVar[str] = "IntegrationTestsImmutable"
     actors: Optional[str] = None
     directors: Optional[str] = None
-    meta: dict = None
+    meta: Optional[dict] = None
     rating: Optional[str] = None
     release_year: Optional[int] = Field(None, alias="releaseYear")
     run_time_minutes: Optional[float] = Field(None, alias="runTimeMinutes")
-    title: str = None
+    title: Optional[str] = None
 
     def as_apply(self) -> MovieApply:
         return MovieApply(

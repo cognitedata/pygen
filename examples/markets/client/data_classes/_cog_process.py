@@ -19,7 +19,7 @@ class CogProcess(DomainModel):
     space: ClassVar[str] = "market"
     bid: Optional[str] = None
     date_transformations: Optional[str] = Field(None, alias="dateTransformations")
-    name: str = None
+    name: Optional[str] = None
     transformation: Optional[str] = None
 
     def as_apply(self) -> CogProcessApply:

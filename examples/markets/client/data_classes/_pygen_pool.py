@@ -13,8 +13,8 @@ __all__ = ["PygenPool", "PygenPoolApply", "PygenPoolList", "PygenPoolApplyList"]
 class PygenPool(DomainModel):
     space: ClassVar[str] = "market"
     day_of_week: Optional[int] = Field(None, alias="dayOfWeek")
-    name: str = None
-    timezone: str = None
+    name: Optional[str] = None
+    timezone: Optional[str] = None
 
     def as_apply(self) -> PygenPoolApply:
         return PygenPoolApply(

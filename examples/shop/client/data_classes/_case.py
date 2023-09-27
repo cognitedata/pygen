@@ -16,16 +16,16 @@ __all__ = ["Case", "CaseApply", "CaseList", "CaseApplyList"]
 
 class Case(DomainModel):
     space: ClassVar[str] = "IntegrationTestsImmutable"
-    arguments: str = None
+    arguments: Optional[str] = None
     bid: Optional[str] = None
     bid_history: Optional[list[str]] = None
     commands: Optional[str] = None
     cut_files: Optional[list[str]] = None
-    end_time: datetime.datetime = None
-    name: str = None
+    end_time: Optional[datetime.datetime] = None
+    name: Optional[str] = None
     run_status: Optional[str] = Field(None, alias="runStatus")
-    scenario: str = None
-    start_time: datetime.datetime = None
+    scenario: Optional[str] = None
+    start_time: Optional[datetime.datetime] = None
 
     def as_apply(self) -> CaseApply:
         return CaseApply(
