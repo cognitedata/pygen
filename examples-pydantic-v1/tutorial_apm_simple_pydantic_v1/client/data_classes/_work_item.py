@@ -21,11 +21,11 @@ class WorkItem(DomainModel):
     is_completed: Optional[bool] = Field(None, alias="isCompleted")
     item_info: Optional[str] = Field(None, alias="itemInfo")
     item_name: Optional[str] = Field(None, alias="itemName")
-    linked_assets: Optional[list[str]] = None
+    linked_assets: Optional[list[str]] = Field(None, alias="linkedAssets")
     method: Optional[str] = None
     title: Optional[str] = None
     to_be_done: Optional[bool] = Field(None, alias="toBeDone")
-    work_order: Optional[str] = None
+    work_order: Optional[str] = Field(None, alias="workOrder")
 
     def as_apply(self) -> WorkItemApply:
         return WorkItemApply(

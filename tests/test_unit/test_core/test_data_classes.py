@@ -5,8 +5,16 @@ from unittest.mock import MagicMock
 
 import pytest
 from cognite.client import data_modeling as dm
+from yaml import safe_load
 
-from cognite.pygen._core.data_classes import DataClass, Field, PrimitiveListField, ViewSpaceExternalId
+from cognite.pygen._core.data_classes import (
+    DataClass,
+    EdgeOneToOne,
+    Field,
+    PrimitiveField,
+    PrimitiveListField,
+    ViewSpaceExternalId,
+)
 from cognite.pygen.config import PygenConfig
 
 
@@ -33,22 +41,93 @@ def load_field_test_cases():
             is_nullable=True,
             prop=mapped,
         ),
-        'Union[list[str], None] = Field(default=None, alias="runEvents")',
-        "Union[list[str], None] = None",
+        {},
+        'Optional[list[str]] = Field(None, alias="runEvents")',
+        "Optional[list[str]] = None",
         id="PrimitiveListField that require alias.",
+    )
+    raw_data = {
+        "container": {"space": "cogShop", "external_id": "Scenario"},
+        "container_property_identifier": "modelTemplate",
+        "type": {
+            "container": None,
+            "type": "direct",
+            "source": {"space": "cogShop", "external_id": "ModelTemplate", "version": "8ae35635bb3f8a"},
+        },
+        "nullable": True,
+        "auto_increment": False,
+        "default_value": None,
+        "name": "modelTemplate",
+        "description": None,
+    }
+    mapped = dm.MappedProperty.load(raw_data)
+    data_class = MagicMock(spec=DataClass)
+    data_class.write_name = "ModelTemplateApply"
+
+    yield pytest.param(
+        mapped,
+        EdgeOneToOne(
+            name="model_template",
+            prop_name="modelTemplate",
+            pydantic_field="Field",
+            data_class=data_class,
+            prop=mapped,
+        ),
+        {ViewSpaceExternalId("cogShop", "ModelTemplate"): data_class},
+        'Optional[str] = Field(None, alias="modelTemplate")',
+        "Union[ModelTemplateApply, str, None] = Field(None, repr=False)",
+        id="EdgeField that require alias.",
+    )
+    raw_data = """
+    auto_increment: false
+    container:
+      external_id: Market
+      space: market
+    container_property_identifier: name
+    default_value: null
+    description: null
+    name: name
+    nullable: true
+    source: null
+    type:
+      collation: ucs_basic
+      list: false
+      type: text
+    """
+    mapped = dm.MappedProperty.load(safe_load(raw_data))
+    yield pytest.param(
+        mapped,
+        PrimitiveField(
+            name="name",
+            prop_name="name",
+            pydantic_field="Field",
+            type_="str",
+            is_nullable=True,
+            prop=mapped,
+            default=None,
+        ),
+        {},
+        "Optional[str] = None",
+        "Optional[str] = None",
+        id="Field that does not require alias.",
     )
 
 
-@pytest.mark.parametrize("property_, expected, read_type_hint, write_type_hint", load_field_test_cases())
+@pytest.mark.parametrize(
+    "property_, expected, data_class_by_id, read_type_hint, write_type_hint", load_field_test_cases()
+)
 def test_load_field(
     property_: dm.MappedProperty | dm.ConnectionDefinition,
     expected: Field,
+    data_class_by_id: dict[ViewSpaceExternalId, DataClass],
     read_type_hint: str,
     write_type_hint: str,
     pygen_config: PygenConfig,
 ) -> None:
     # Act
-    actual = Field.from_property(property_.name, property_, {}, pygen_config.naming.field, view_name="dummy")
+    actual = Field.from_property(
+        property_.name, property_, data_class_by_id, pygen_config.naming.field, view_name="dummy"
+    )
 
     # Assert
     assert actual == expected

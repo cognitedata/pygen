@@ -27,7 +27,7 @@ class WorkOrder(DomainModel):
     is_cancelled: Optional[bool] = Field(None, alias="isCancelled")
     is_completed: Optional[bool] = Field(None, alias="isCompleted")
     is_safety_critical: Optional[bool] = Field(None, alias="isSafetyCritical")
-    linked_assets: Optional[list[str]] = None
+    linked_assets: Optional[list[str]] = Field(None, alias="linkedAssets")
     percentage_progress: Optional[int] = Field(None, alias="percentageProgress")
     planned_start: Optional[datetime.datetime] = Field(None, alias="plannedStart")
     priority_description: Optional[str] = Field(None, alias="priorityDescription")
@@ -35,7 +35,7 @@ class WorkOrder(DomainModel):
     start_time: Optional[datetime.datetime] = Field(None, alias="startTime")
     status: Optional[str] = None
     title: Optional[str] = None
-    work_items: Optional[list[str]] = None
+    work_items: Optional[list[str]] = Field(None, alias="workItems")
     work_order_number: Optional[str] = Field(None, alias="workOrderNumber")
     work_package_number: Optional[str] = Field(None, alias="workPackageNumber")
 

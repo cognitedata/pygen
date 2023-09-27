@@ -24,7 +24,11 @@ app = typer.Typer(
 
 
 @app.command("generate-sdks", help=f"Generate all example SDKs in directory '{EXAMPLES_DIR.relative_to(REPO_ROOT)}/'")
-def generate_sdks(overwrite_manual_files: bool = typer.Option(False, help="Overwrite manual files in examples")):
+def generate_sdks(
+    overwrite: bool = typer.Option(
+        False, help="Whether to overwrite the files expected to be manually maintained in the examples"
+    )
+):
     for example_sdk in EXAMPLE_SDKS:
         if example_sdk.download_only:
             continue
@@ -38,7 +42,7 @@ def generate_sdks(overwrite_manual_files: bool = typer.Option(False, help="Overw
 
         sdk = sdk_generator.generate_sdk()
         manual_files = []
-        if overwrite_manual_files is not True:
+        if overwrite is not True:
             for manual_file in example_sdk.manual_files:
                 manual_path = manual_file.relative_to(EXAMPLES_DIR)
                 popped = sdk.pop(manual_path, None)

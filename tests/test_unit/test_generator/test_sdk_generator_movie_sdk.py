@@ -141,7 +141,7 @@ def create_fields_test_cases():
             is_nullable=False,
             pydantic_field="Field",
         ),
-        "Union[list[str], None] = None",
+        "Optional[list[str]] = None",
         "list[str]",
         id="List of strings",
     )
