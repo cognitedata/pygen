@@ -180,11 +180,10 @@ class PrimitiveField(PrimitiveFieldCore):
     default: str | int | dict | None = None
 
     def as_read_type_hint(self) -> str:
-        rhs = str(self.default)
         if self.need_alias:
-            rhs = f'{self.pydantic_field}({rhs}, alias="{self.prop_name}")'
-
-        return f"Optional[{self.type_}] = {rhs}"
+            return f'Optional[{self.type_}] = {self.pydantic_field}({self.default}, alias="{self.prop_name}")'
+        else:
+            return f"{self.type_} = {self.default}"
 
     def as_write_type_hint(self) -> str:
         out_type = self.type_
@@ -201,19 +200,14 @@ class PrimitiveListField(PrimitiveFieldCore):
     """
 
     def as_read_type_hint(self) -> str:
-        alias = ""
         if self.need_alias:
-            alias = f', alias="{self.prop_name}"'
-
-        if alias:
-            rhs = f" = {self.pydantic_field}(default=None{alias})"
+            return f'Optional[list[{self.type_}]] = {self.pydantic_field}(None, alias="{self.prop_name}")'
         else:
-            rhs = " = None"
-        return f"Union[list[{self.type_}], None]{rhs}"
+            return f"Optional[list[{self.type_}]] = None"
 
     def as_write_type_hint(self) -> str:
         if self.is_nullable:
-            return f"Union[list[{self.type_}], None] = None"
+            return f"Optional[list[{self.type_}]] = None"
         else:
             return f"list[{self.type_}]"
 
@@ -224,11 +218,10 @@ class CDFExternalField(PrimitiveFieldCore):
     edge_api_attribute: str
 
     def as_read_type_hint(self) -> str:
-        rhs = "None"
         if self.need_alias:
-            rhs = f'{self.pydantic_field}({rhs}, alias="{self.prop_name}")'
-
-        return f"Optional[{self.type_}] = {rhs}"
+            return f'Optional[{self.type_}] = {self.pydantic_field}(None, alias="{self.prop_name}")'
+        else:
+            return f"Optional[{self.type_}] = None"
 
     def as_write_type_hint(self) -> str:
         out_type = self.type_
@@ -263,7 +256,10 @@ class EdgeOneToOne(EdgeField):
     prop: dm.MappedProperty
 
     def as_read_type_hint(self) -> str:
-        return "Optional[str] = None"
+        if self.need_alias:
+            return f'Optional[str] = {self.pydantic_field}(None, alias="{self.prop_name}")'
+        else:
+            return "Optional[str] = None"
 
     def as_write_type_hint(self) -> str:
         return f"Union[{self.data_class.write_name}, str, None] = {self.pydantic_field}(None, repr=False)"
@@ -281,7 +277,10 @@ class EdgeOneToMany(EdgeField):
     prop: dm.SingleHopConnectionDefinition
 
     def as_read_type_hint(self) -> str:
-        return "Optional[list[str]] = None"
+        if self.need_alias:
+            return f"Optional[str] = {self.pydantic_field}(None, alias='{self.prop_name}')"
+        else:
+            return "Optional[str] = None"
 
     def as_write_type_hint(self) -> str:
         return (
