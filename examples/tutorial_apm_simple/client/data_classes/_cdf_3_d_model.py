@@ -28,7 +28,7 @@ class CdfModel(DomainModel):
 
 class CdfModelApply(DomainModelApply):
     space: ClassVar[str] = "cdf_3d_schema"
-    entities: Union[list[CdfEntityApply], list[str], None] = Field(default_factory=None, repr=False)
+    entities: Union[list[CdfEntityApply], list[str], None] = Field(default=None, repr=False)
     name: str
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:

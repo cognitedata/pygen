@@ -33,8 +33,8 @@ class DateTransformationPair(DomainModel):
 
 class DateTransformationPairApply(DomainModelApply):
     space: ClassVar[str] = "market"
-    end: Union[list[DateTransformationApply], list[str], None] = Field(default_factory=None, repr=False)
-    start: Union[list[DateTransformationApply], list[str], None] = Field(default_factory=None, repr=False)
+    end: Union[list[DateTransformationApply], list[str], None] = Field(default=None, repr=False)
+    start: Union[list[DateTransformationApply], list[str], None] = Field(default=None, repr=False)
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:

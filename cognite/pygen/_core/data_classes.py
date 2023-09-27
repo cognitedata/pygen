@@ -206,7 +206,7 @@ class PrimitiveListField(PrimitiveFieldCore):
             alias = f', alias="{self.prop_name}"'
 
         if alias:
-            rhs = f" = {self.pydantic_field}(default_factory=None{alias})"
+            rhs = f" = {self.pydantic_field}(default=None{alias})"
         else:
             rhs = " = None"
         return f"Union[list[{self.type_}], None]{rhs}"
@@ -286,7 +286,7 @@ class EdgeOneToMany(EdgeField):
     def as_write_type_hint(self) -> str:
         return (
             f"Union[list[{self.data_class.write_name}], list[str], None]"
-            f"= {self.pydantic_field}(default_factory=None, repr=False)"
+            f"= {self.pydantic_field}(default=None, repr=False)"
         )
 
 

@@ -13,6 +13,12 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.21.0] - 27-09-23
+### Changed
+* Listable primitive and one-to-many edges no accepts None if they are optional, and has `None` as a default value. Earlier
+  the default value was an empty list.
+
+
 ## [0.20.5] - 25-09-23
 ### Fixed
 * Listing/retrieving a value of type `JSONObject` in the generated SDK failed with `ValueError`. This is now fixed.

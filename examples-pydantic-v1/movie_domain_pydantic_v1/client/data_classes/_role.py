@@ -34,8 +34,8 @@ class Role(DomainModel):
 
 class RoleApply(DomainModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
-    movies: Union[list[MovieApply], list[str], None] = Field(default_factory=None, repr=False)
-    nomination: Union[list[NominationApply], list[str], None] = Field(default_factory=None, repr=False)
+    movies: Union[list[MovieApply], list[str], None] = Field(default=None, repr=False)
+    nomination: Union[list[NominationApply], list[str], None] = Field(default=None, repr=False)
     person: Union[PersonApply, str, None] = Field(None, repr=False)
     won_oscar: Optional[bool] = None
 

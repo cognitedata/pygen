@@ -64,11 +64,11 @@ class AssetApply(DomainModelApply):
     space: ClassVar[str] = "tutorial_apm_simple"
     area_id: Optional[int] = None
     category_id: Optional[int] = None
-    children: Union[list[AssetApply], list[str], None] = Field(default_factory=None, repr=False)
+    children: Union[list[AssetApply], list[str], None] = Field(default=None, repr=False)
     created_date: Optional[datetime.datetime] = None
     description: Optional[str] = None
     documents: Union[list[str], None] = None
-    in_model_3_d: Union[list[CdfModelApply], list[str], None] = Field(default_factory=None, repr=False)
+    in_model_3_d: Union[list[CdfModelApply], list[str], None] = Field(default=None, repr=False)
     is_active: Optional[bool] = None
     is_critical_line: Optional[bool] = None
     measurements: Union[list[str], None] = None

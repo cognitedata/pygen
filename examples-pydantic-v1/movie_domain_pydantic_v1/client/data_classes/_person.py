@@ -32,7 +32,7 @@ class PersonApply(DomainModelApply):
     space: ClassVar[str] = "IntegrationTestsImmutable"
     birth_year: Optional[int] = None
     name: str
-    roles: Union[list[RoleApply], list[str], None] = Field(default_factory=None, repr=False)
+    roles: Union[list[RoleApply], list[str], None] = Field(default=None, repr=False)
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:

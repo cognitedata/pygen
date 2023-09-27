@@ -78,7 +78,7 @@ class WorkOrderApply(DomainModelApply):
     is_cancelled: Optional[bool] = None
     is_completed: Optional[bool] = None
     is_safety_critical: Optional[bool] = None
-    linked_assets: Union[list[AssetApply], list[str], None] = Field(default_factory=None, repr=False)
+    linked_assets: Union[list[AssetApply], list[str], None] = Field(default=None, repr=False)
     percentage_progress: Optional[int] = None
     planned_start: Optional[datetime.datetime] = None
     priority_description: Optional[str] = None
@@ -86,7 +86,7 @@ class WorkOrderApply(DomainModelApply):
     start_time: Optional[datetime.datetime] = None
     status: Optional[str] = None
     title: Optional[str] = None
-    work_items: Union[list[WorkItemApply], list[str], None] = Field(default_factory=None, repr=False)
+    work_items: Union[list[WorkItemApply], list[str], None] = Field(default=None, repr=False)
     work_order_number: Optional[str] = None
     work_package_number: Optional[str] = None
 
