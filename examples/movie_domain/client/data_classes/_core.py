@@ -4,7 +4,7 @@ import datetime
 from abc import abstractmethod
 from collections import UserList
 from collections.abc import Collection, Mapping, Iterator
-from typing import Any, ClassVar, Generic, Optional, TypeVar, overload
+from typing import Any, Generic, Optional, TypeVar, overload
 
 import pandas as pd
 from cognite.client import data_modeling as dm

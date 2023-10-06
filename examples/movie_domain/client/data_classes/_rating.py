@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import ClassVar, Optional
+from typing import Optional
 
 from cognite.client import data_modeling as dm
 
@@ -10,7 +10,7 @@ __all__ = ["Rating", "RatingApply", "RatingList", "RatingApplyList"]
 
 
 class Rating(DomainModel):
-    space: ClassVar[str] = "IntegrationTestsImmutable"
+    space: str = "IntegrationTestsImmutable"
     score: Optional[str] = None
     votes: Optional[str] = None
 
@@ -23,7 +23,7 @@ class Rating(DomainModel):
 
 
 class RatingApply(DomainModelApply):
-    space: ClassVar[str] = "IntegrationTestsImmutable"
+    space: str = "IntegrationTestsImmutable"
     score: Optional[str] = None
     votes: Optional[str] = None
 

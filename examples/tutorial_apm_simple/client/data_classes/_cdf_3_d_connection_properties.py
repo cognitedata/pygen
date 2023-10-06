@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import ClassVar, Optional
+from typing import Optional
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -16,7 +16,7 @@ __all__ = [
 
 
 class CdfConnectionProperties(DomainModel):
-    space: ClassVar[str] = "cdf_3d_schema"
+    space: str = "cdf_3d_schema"
     revision_id: Optional[int] = Field(None, alias="revisionId")
     revision_node_id: Optional[int] = Field(None, alias="revisionNodeId")
 
@@ -29,7 +29,7 @@ class CdfConnectionProperties(DomainModel):
 
 
 class CdfConnectionPropertiesApply(DomainModelApply):
-    space: ClassVar[str] = "cdf_3d_schema"
+    space: str = "cdf_3d_schema"
     revision_id: int
     revision_node_id: int
 
