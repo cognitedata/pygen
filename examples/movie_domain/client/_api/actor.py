@@ -134,7 +134,7 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
 
     def retrieve(self, external_id: str | Sequence[str]) -> Actor | ActorList:
         if isinstance(external_id, str):
-            actor = self._retrieve((self.sources.space, external_id))
+            actor = self._retrieve((self._sources.space, external_id))
 
             movie_edges = self.movies.retrieve(external_id)
             actor.movies = [edge.end_node.external_id for edge in movie_edges]
@@ -143,7 +143,7 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
 
             return actor
         else:
-            actors = self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
+            actors = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
 
             movie_edges = self.movies.retrieve(external_id)
             self._set_movies(actors, movie_edges)

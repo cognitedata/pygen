@@ -134,7 +134,7 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
 
     def retrieve(self, external_id: str | Sequence[str]) -> Role | RoleList:
         if isinstance(external_id, str):
-            role = self._retrieve((self.sources.space, external_id))
+            role = self._retrieve((self._sources.space, external_id))
 
             movie_edges = self.movies.retrieve(external_id)
             role.movies = [edge.end_node.external_id for edge in movie_edges]
@@ -143,7 +143,7 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
 
             return role
         else:
-            roles = self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
+            roles = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
 
             movie_edges = self.movies.retrieve(external_id)
             self._set_movies(roles, movie_edges)

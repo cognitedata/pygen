@@ -136,7 +136,7 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
 
     def retrieve(self, external_id: str | Sequence[str]) -> Director | DirectorList:
         if isinstance(external_id, str):
-            director = self._retrieve((self.sources.space, external_id))
+            director = self._retrieve((self._sources.space, external_id))
 
             movie_edges = self.movies.retrieve(external_id)
             director.movies = [edge.end_node.external_id for edge in movie_edges]
@@ -145,7 +145,7 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
 
             return director
         else:
-            directors = self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
+            directors = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
 
             movie_edges = self.movies.retrieve(external_id)
             self._set_movies(directors, movie_edges)
