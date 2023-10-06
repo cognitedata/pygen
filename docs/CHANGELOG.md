@@ -13,7 +13,7 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## [0.22.1] - 06-10-23
+## [0.22.0] - 06-10-23
 ### Changed
 * The attribute `space` is now an attribute in all generated data classes (it used to be a class variable).
 * Attributes `sources`, `view_id`, `class_type`, `class_apply_type`, `class_list` in the generated API class
