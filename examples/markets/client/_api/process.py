@@ -45,9 +45,9 @@ class ProcessAPI(TypeAPI[Process, ProcessApply, ProcessList]):
 
     def retrieve(self, external_id: str | Sequence[str]) -> Process | ProcessList:
         if isinstance(external_id, str):
-            return self._retrieve((self.sources.space, external_id))
+            return self._retrieve((self._sources.space, external_id))
         else:
-            return self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
 
     def list(
         self,
