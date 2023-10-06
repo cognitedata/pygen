@@ -13,7 +13,7 @@ from pydantic import BaseModel, Extra, Field
 
 
 class DomainModelCore(BaseModel):
-    space: ClassVar[str]
+    space: str
     external_id: str = Field(min_length=1, max_length=255)
 
     def id_tuple(self) -> tuple[str, str]:

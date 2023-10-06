@@ -14,22 +14,17 @@ __all__ = ["Person", "PersonApply", "PersonList", "PersonApplyList"]
 
 
 class Person(DomainModel):
-    space: ClassVar[str] = "IntegrationTestsImmutable"
+    space: str = "IntegrationTestsImmutable"
     birth_year: Optional[int] = Field(None, alias="birthYear")
     name: Optional[str] = None
     roles: Optional[list[str]] = None
 
     def as_apply(self) -> PersonApply:
-        return PersonApply(
-            external_id=self.external_id,
-            birth_year=self.birth_year,
-            name=self.name,
-            roles=self.roles,
-        )
+        return PersonApply(external_id=self.external_id, birth_year=self.birth_year, name=self.name, roles=self.roles)
 
 
 class PersonApply(DomainModelApply):
-    space: ClassVar[str] = "IntegrationTestsImmutable"
+    space: str = "IntegrationTestsImmutable"
     birth_year: Optional[int] = None
     name: str
     roles: Union[list[RoleApply], list[str], None] = Field(default=None, repr=False)
@@ -46,16 +41,12 @@ class PersonApply(DomainModelApply):
             properties["name"] = self.name
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("IntegrationTestsImmutable", "Person"),
-                properties=properties,
+                source=dm.ContainerId("IntegrationTestsImmutable", "Person"), properties=properties
             )
             sources.append(source)
         if sources:
             this_node = dm.NodeApply(
-                space=self.space,
-                external_id=self.external_id,
-                existing_version=self.existing_version,
-                sources=sources,
+                space=self.space, external_id=self.external_id, existing_version=self.existing_version, sources=sources
             )
             nodes = [this_node]
         else:
