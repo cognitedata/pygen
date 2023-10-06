@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, ClassVar, Optional, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -14,7 +14,7 @@ __all__ = ["CdfModel", "CdfModelApply", "CdfModelList", "CdfModelApplyList"]
 
 
 class CdfModel(DomainModel):
-    space: ClassVar[str] = "cdf_3d_schema"
+    space: str = "cdf_3d_schema"
     entities: Optional[list[str]] = None
     name: Optional[str] = None
 
@@ -27,7 +27,7 @@ class CdfModel(DomainModel):
 
 
 class CdfModelApply(DomainModelApply):
-    space: ClassVar[str] = "cdf_3d_schema"
+    space: str = "cdf_3d_schema"
     entities: Union[list[CdfEntityApply], list[str], None] = Field(default=None, repr=False)
     name: str
 

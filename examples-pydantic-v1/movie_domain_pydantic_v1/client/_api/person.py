@@ -14,39 +14,41 @@ class PersonRolesAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str]) -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": "IntegrationTestsImmutable", "externalId": "Person.roles"},
+            {"space": space, "externalId": "Person.roles"},
         )
         if isinstance(external_id, str):
             is_person = f.Equals(
                 ["edge", "startNode"],
-                {"space": "IntegrationTestsImmutable", "externalId": external_id},
+                {"space": space, "externalId": external_id},
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_person))
 
         else:
             is_persons = f.In(
                 ["edge", "startNode"],
-                [{"space": "IntegrationTestsImmutable", "externalId": ext_id} for ext_id in external_id],
+                [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_persons))
 
-    def list(self, person_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
+    def list(
+        self, person_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="IntegrationTestsImmutable"
+    ) -> dm.EdgeList:
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": "IntegrationTestsImmutable", "externalId": "Person.roles"},
+            {"space": space, "externalId": "Person.roles"},
         )
         filters.append(is_edge_type)
         if person_id:
             person_ids = [person_id] if isinstance(person_id, str) else person_id
             is_persons = f.In(
                 ["edge", "startNode"],
-                [{"space": "IntegrationTestsImmutable", "externalId": ext_id} for ext_id in person_ids],
+                [{"space": space, "externalId": ext_id} for ext_id in person_ids],
             )
             filters.append(is_persons)
 
@@ -62,7 +64,7 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
             class_apply_type=PersonApply,
             class_list=PersonList,
         )
-        self.view_id = view_id
+        self._view_id = view_id
         self.roles = PersonRolesAPI(client)
 
     def apply(self, person: PersonApply | Sequence[PersonApply], replace: bool = False) -> dm.InstancesApplyResult:
@@ -72,12 +74,12 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
             instances = PersonApplyList(person).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
-    def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(PersonApply.space, external_id))
+            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
             return self._client.data_modeling.instances.delete(
-                nodes=[(PersonApply.space, id) for id in external_id],
+                nodes=[(space, id) for id in external_id],
             )
 
     @overload
@@ -90,14 +92,14 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
 
     def retrieve(self, external_id: str | Sequence[str]) -> Person | PersonList:
         if isinstance(external_id, str):
-            person = self._retrieve((self.sources.space, external_id))
+            person = self._retrieve((self._sources.space, external_id))
 
             role_edges = self.roles.retrieve(external_id)
             person.roles = [edge.end_node.external_id for edge in role_edges]
 
             return person
         else:
-            persons = self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
+            persons = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
 
             role_edges = self.roles.retrieve(external_id)
             self._set_roles(persons, role_edges)
@@ -116,7 +118,7 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
         retrieve_edges: bool = True,
     ) -> PersonList:
         filter_ = _create_filter(
-            self.view_id,
+            self._view_id,
             min_birth_year,
             max_birth_year,
             name,

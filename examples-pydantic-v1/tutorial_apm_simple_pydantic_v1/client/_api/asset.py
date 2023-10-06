@@ -418,39 +418,41 @@ class AssetChildrenAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str]) -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space="tutorial_apm_simple") -> dm.EdgeList:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": "tutorial_apm_simple", "externalId": "Asset.children"},
+            {"space": space, "externalId": "Asset.children"},
         )
         if isinstance(external_id, str):
             is_asset = f.Equals(
                 ["edge", "startNode"],
-                {"space": "tutorial_apm_simple", "externalId": external_id},
+                {"space": space, "externalId": external_id},
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_asset))
 
         else:
             is_assets = f.In(
                 ["edge", "startNode"],
-                [{"space": "tutorial_apm_simple", "externalId": ext_id} for ext_id in external_id],
+                [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_assets))
 
-    def list(self, asset_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
+    def list(
+        self, asset_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="tutorial_apm_simple"
+    ) -> dm.EdgeList:
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": "tutorial_apm_simple", "externalId": "Asset.children"},
+            {"space": space, "externalId": "Asset.children"},
         )
         filters.append(is_edge_type)
         if asset_id:
             asset_ids = [asset_id] if isinstance(asset_id, str) else asset_id
             is_assets = f.In(
                 ["edge", "startNode"],
-                [{"space": "tutorial_apm_simple", "externalId": ext_id} for ext_id in asset_ids],
+                [{"space": space, "externalId": ext_id} for ext_id in asset_ids],
             )
             filters.append(is_assets)
 
@@ -461,39 +463,41 @@ class AssetInModelAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str]) -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space="cdf_3d_schema") -> dm.EdgeList:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": "cdf_3d_schema", "externalId": "cdf3dEntityConnection"},
+            {"space": space, "externalId": "cdf3dEntityConnection"},
         )
         if isinstance(external_id, str):
             is_asset = f.Equals(
                 ["edge", "startNode"],
-                {"space": "cdf_3d_schema", "externalId": external_id},
+                {"space": space, "externalId": external_id},
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_asset))
 
         else:
             is_assets = f.In(
                 ["edge", "startNode"],
-                [{"space": "cdf_3d_schema", "externalId": ext_id} for ext_id in external_id],
+                [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_assets))
 
-    def list(self, asset_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
+    def list(
+        self, asset_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="cdf_3d_schema"
+    ) -> dm.EdgeList:
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": "cdf_3d_schema", "externalId": "cdf3dEntityConnection"},
+            {"space": space, "externalId": "cdf3dEntityConnection"},
         )
         filters.append(is_edge_type)
         if asset_id:
             asset_ids = [asset_id] if isinstance(asset_id, str) else asset_id
             is_assets = f.In(
                 ["edge", "startNode"],
-                [{"space": "cdf_3d_schema", "externalId": ext_id} for ext_id in asset_ids],
+                [{"space": space, "externalId": ext_id} for ext_id in asset_ids],
             )
             filters.append(is_assets)
 
@@ -509,7 +513,7 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
             class_apply_type=AssetApply,
             class_list=AssetList,
         )
-        self.view_id = view_id
+        self._view_id = view_id
         self.children = AssetChildrenAPI(client)
         self.in_model_3_d = AssetInModelAPI(client)
         self.pressure = AssetPressureAPI(client, view_id)
@@ -521,12 +525,12 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
             instances = AssetApplyList(asset).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
-    def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space="tutorial_apm_simple") -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(AssetApply.space, external_id))
+            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
             return self._client.data_modeling.instances.delete(
-                nodes=[(AssetApply.space, id) for id in external_id],
+                nodes=[(space, id) for id in external_id],
             )
 
     @overload
@@ -539,7 +543,7 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
 
     def retrieve(self, external_id: str | Sequence[str]) -> Asset | AssetList:
         if isinstance(external_id, str):
-            asset = self._retrieve((self.sources.space, external_id))
+            asset = self._retrieve((self._sources.space, external_id))
 
             child_edges = self.children.retrieve(external_id)
             asset.children = [edge.end_node.external_id for edge in child_edges]
@@ -548,7 +552,7 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
 
             return asset
         else:
-            assets = self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
+            assets = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
 
             child_edges = self.children.retrieve(external_id)
             self._set_children(assets, child_edges)
@@ -581,7 +585,7 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
         retrieve_edges: bool = True,
     ) -> AssetList:
         filter_ = _create_filter(
-            self.view_id,
+            self._view_id,
             min_area_id,
             max_area_id,
             min_category_id,

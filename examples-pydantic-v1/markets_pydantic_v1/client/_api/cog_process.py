@@ -18,7 +18,7 @@ class CogProcessAPI(TypeAPI[CogProcess, CogProcessApply, CogProcessList]):
             class_apply_type=CogProcessApply,
             class_list=CogProcessList,
         )
-        self.view_id = view_id
+        self._view_id = view_id
 
     def apply(
         self, cog_proces: CogProcessApply | Sequence[CogProcessApply], replace: bool = False
@@ -29,12 +29,12 @@ class CogProcessAPI(TypeAPI[CogProcess, CogProcessApply, CogProcessList]):
             instances = CogProcessApplyList(cog_proces).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
-    def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space="market") -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(CogProcessApply.space, external_id))
+            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
             return self._client.data_modeling.instances.delete(
-                nodes=[(CogProcessApply.space, id) for id in external_id],
+                nodes=[(space, id) for id in external_id],
             )
 
     @overload
@@ -60,7 +60,7 @@ class CogProcessAPI(TypeAPI[CogProcess, CogProcessApply, CogProcessList]):
         filter: dm.Filter | None = None,
     ) -> CogProcessList:
         filter_ = _create_filter(
-            self.view_id,
+            self._view_id,
             name,
             name_prefix,
             external_id_prefix,

@@ -18,7 +18,7 @@ class CogPoolAPI(TypeAPI[CogPool, CogPoolApply, CogPoolList]):
             class_apply_type=CogPoolApply,
             class_list=CogPoolList,
         )
-        self.view_id = view_id
+        self._view_id = view_id
 
     def apply(self, cog_pool: CogPoolApply | Sequence[CogPoolApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(cog_pool, CogPoolApply):
@@ -27,12 +27,12 @@ class CogPoolAPI(TypeAPI[CogPool, CogPoolApply, CogPoolList]):
             instances = CogPoolApplyList(cog_pool).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
-    def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space="market") -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(CogPoolApply.space, external_id))
+            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
             return self._client.data_modeling.instances.delete(
-                nodes=[(CogPoolApply.space, id) for id in external_id],
+                nodes=[(space, id) for id in external_id],
             )
 
     @overload
@@ -66,7 +66,7 @@ class CogPoolAPI(TypeAPI[CogPool, CogPoolApply, CogPoolList]):
         filter: dm.Filter | None = None,
     ) -> CogPoolList:
         filter_ = _create_filter(
-            self.view_id,
+            self._view_id,
             min_max_price,
             max_max_price,
             min_min_price,

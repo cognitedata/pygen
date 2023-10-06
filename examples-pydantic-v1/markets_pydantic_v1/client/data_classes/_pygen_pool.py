@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import ClassVar, Optional
+from typing import Optional
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -11,7 +11,7 @@ __all__ = ["PygenPool", "PygenPoolApply", "PygenPoolList", "PygenPoolApplyList"]
 
 
 class PygenPool(DomainModel):
-    space: ClassVar[str] = "market"
+    space: str = "market"
     day_of_week: Optional[int] = Field(None, alias="dayOfWeek")
     name: Optional[str] = None
     timezone: Optional[str] = None
@@ -26,7 +26,7 @@ class PygenPool(DomainModel):
 
 
 class PygenPoolApply(DomainModelApply):
-    space: ClassVar[str] = "market"
+    space: str = "market"
     day_of_week: Optional[int] = None
     name: Optional[str] = None
     timezone: Optional[str] = None

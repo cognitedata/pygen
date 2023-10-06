@@ -18,7 +18,7 @@ class ProcessAPI(TypeAPI[Process, ProcessApply, ProcessList]):
             class_apply_type=ProcessApply,
             class_list=ProcessList,
         )
-        self.view_id = view_id
+        self._view_id = view_id
 
     def apply(self, proces: ProcessApply | Sequence[ProcessApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(proces, ProcessApply):
@@ -27,12 +27,12 @@ class ProcessAPI(TypeAPI[Process, ProcessApply, ProcessList]):
             instances = ProcessApplyList(proces).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
-    def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space="market") -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(ProcessApply.space, external_id))
+            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
             return self._client.data_modeling.instances.delete(
-                nodes=[(ProcessApply.space, id) for id in external_id],
+                nodes=[(space, id) for id in external_id],
             )
 
     @overload
@@ -58,7 +58,7 @@ class ProcessAPI(TypeAPI[Process, ProcessApply, ProcessList]):
         filter: dm.Filter | None = None,
     ) -> ProcessList:
         filter_ = _create_filter(
-            self.view_id,
+            self._view_id,
             name,
             name_prefix,
             external_id_prefix,

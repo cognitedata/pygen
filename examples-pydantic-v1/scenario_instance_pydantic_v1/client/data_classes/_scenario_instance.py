@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import ClassVar, Optional
+from typing import Optional
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -12,7 +12,7 @@ __all__ = ["ScenarioInstance", "ScenarioInstanceApply", "ScenarioInstanceList", 
 
 
 class ScenarioInstance(DomainModel):
-    space: ClassVar[str] = "IntegrationTestsImmutable"
+    space: str = "IntegrationTestsImmutable"
     aggregation: Optional[str] = None
     country: Optional[str] = None
     instance: Optional[datetime.datetime] = None
@@ -37,7 +37,7 @@ class ScenarioInstance(DomainModel):
 
 
 class ScenarioInstanceApply(DomainModelApply):
-    space: ClassVar[str] = "IntegrationTestsImmutable"
+    space: str = "IntegrationTestsImmutable"
     aggregation: Optional[str] = None
     country: Optional[str] = None
     instance: Optional[datetime.datetime] = None

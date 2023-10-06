@@ -19,7 +19,7 @@ class CogBidAPI(TypeAPI[CogBid, CogBidApply, CogBidList]):
             class_apply_type=CogBidApply,
             class_list=CogBidList,
         )
-        self.view_id = view_id
+        self._view_id = view_id
 
     def apply(self, cog_bid: CogBidApply | Sequence[CogBidApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(cog_bid, CogBidApply):
@@ -28,12 +28,12 @@ class CogBidAPI(TypeAPI[CogBid, CogBidApply, CogBidList]):
             instances = CogBidApplyList(cog_bid).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
-    def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space="market") -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(CogBidApply.space, external_id))
+            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
             return self._client.data_modeling.instances.delete(
-                nodes=[(CogBidApply.space, id) for id in external_id],
+                nodes=[(space, id) for id in external_id],
             )
 
     @overload
@@ -67,7 +67,7 @@ class CogBidAPI(TypeAPI[CogBid, CogBidApply, CogBidList]):
         filter: dm.Filter | None = None,
     ) -> CogBidList:
         filter_ = _create_filter(
-            self.view_id,
+            self._view_id,
             min_date,
             max_date,
             name,

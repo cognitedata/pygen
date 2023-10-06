@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import ClassVar, Optional
+from typing import Optional
 
 from cognite.client import data_modeling as dm
 
@@ -10,7 +10,7 @@ __all__ = ["Market", "MarketApply", "MarketList", "MarketApplyList"]
 
 
 class Market(DomainModel):
-    space: ClassVar[str] = "market"
+    space: str = "market"
     name: Optional[str] = None
     timezone: Optional[str] = None
 
@@ -23,7 +23,7 @@ class Market(DomainModel):
 
 
 class MarketApply(DomainModelApply):
-    space: ClassVar[str] = "market"
+    space: str = "market"
     name: Optional[str] = None
     timezone: Optional[str] = None
 

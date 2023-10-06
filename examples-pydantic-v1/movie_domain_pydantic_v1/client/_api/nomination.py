@@ -23,7 +23,7 @@ class NominationAPI(TypeAPI[Nomination, NominationApply, NominationList]):
             class_apply_type=NominationApply,
             class_list=NominationList,
         )
-        self.view_id = view_id
+        self._view_id = view_id
 
     def apply(
         self, nomination: NominationApply | Sequence[NominationApply], replace: bool = False
@@ -34,12 +34,12 @@ class NominationAPI(TypeAPI[Nomination, NominationApply, NominationList]):
             instances = NominationApplyList(nomination).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
-    def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(NominationApply.space, external_id))
+            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
             return self._client.data_modeling.instances.delete(
-                nodes=[(NominationApply.space, id) for id in external_id],
+                nodes=[(space, id) for id in external_id],
             )
 
     @overload
@@ -67,7 +67,7 @@ class NominationAPI(TypeAPI[Nomination, NominationApply, NominationList]):
         filter: dm.Filter | None = None,
     ) -> NominationList:
         filter_ = _create_filter(
-            self.view_id,
+            self._view_id,
             name,
             name_prefix,
             min_year,

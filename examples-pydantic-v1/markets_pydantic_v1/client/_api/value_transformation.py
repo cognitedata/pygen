@@ -23,7 +23,7 @@ class ValueTransformationAPI(TypeAPI[ValueTransformation, ValueTransformationApp
             class_apply_type=ValueTransformationApply,
             class_list=ValueTransformationList,
         )
-        self.view_id = view_id
+        self._view_id = view_id
 
     def apply(
         self, value_transformation: ValueTransformationApply | Sequence[ValueTransformationApply], replace: bool = False
@@ -34,12 +34,12 @@ class ValueTransformationAPI(TypeAPI[ValueTransformation, ValueTransformationApp
             instances = ValueTransformationApplyList(value_transformation).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
-    def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space="market") -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(ValueTransformationApply.space, external_id))
+            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
             return self._client.data_modeling.instances.delete(
-                nodes=[(ValueTransformationApply.space, id) for id in external_id],
+                nodes=[(space, id) for id in external_id],
             )
 
     @overload
@@ -65,7 +65,7 @@ class ValueTransformationAPI(TypeAPI[ValueTransformation, ValueTransformationApp
         filter: dm.Filter | None = None,
     ) -> ValueTransformationList:
         filter_ = _create_filter(
-            self.view_id,
+            self._view_id,
             method,
             method_prefix,
             external_id_prefix,

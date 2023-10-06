@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, ClassVar, Optional, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -15,7 +15,7 @@ __all__ = ["WorkItem", "WorkItemApply", "WorkItemList", "WorkItemApplyList"]
 
 
 class WorkItem(DomainModel):
-    space: ClassVar[str] = "tutorial_apm_simple"
+    space: str = "tutorial_apm_simple"
     criticality: Optional[str] = None
     description: Optional[str] = None
     is_completed: Optional[bool] = Field(None, alias="isCompleted")
@@ -44,7 +44,7 @@ class WorkItem(DomainModel):
 
 
 class WorkItemApply(DomainModelApply):
-    space: ClassVar[str] = "tutorial_apm_simple"
+    space: str = "tutorial_apm_simple"
     criticality: Optional[str] = None
     description: Optional[str] = None
     is_completed: Optional[bool] = None

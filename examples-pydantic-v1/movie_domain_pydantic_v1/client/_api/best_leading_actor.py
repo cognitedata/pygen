@@ -23,7 +23,7 @@ class BestLeadingActorAPI(TypeAPI[BestLeadingActor, BestLeadingActorApply, BestL
             class_apply_type=BestLeadingActorApply,
             class_list=BestLeadingActorList,
         )
-        self.view_id = view_id
+        self._view_id = view_id
 
     def apply(
         self, best_leading_actor: BestLeadingActorApply | Sequence[BestLeadingActorApply], replace: bool = False
@@ -34,12 +34,12 @@ class BestLeadingActorAPI(TypeAPI[BestLeadingActor, BestLeadingActorApply, BestL
             instances = BestLeadingActorApplyList(best_leading_actor).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
-    def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(BestLeadingActorApply.space, external_id))
+            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
             return self._client.data_modeling.instances.delete(
-                nodes=[(BestLeadingActorApply.space, id) for id in external_id],
+                nodes=[(space, id) for id in external_id],
             )
 
     @overload
@@ -67,7 +67,7 @@ class BestLeadingActorAPI(TypeAPI[BestLeadingActor, BestLeadingActorApply, BestL
         filter: dm.Filter | None = None,
     ) -> BestLeadingActorList:
         filter_ = _create_filter(
-            self.view_id,
+            self._view_id,
             name,
             name_prefix,
             min_year,

@@ -14,41 +14,43 @@ class WorkItemLinkedAssetsAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str]) -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space="tutorial_apm_simple") -> dm.EdgeList:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": "tutorial_apm_simple", "externalId": "WorkItem.linkedAssets"},
+            {"space": space, "externalId": "WorkItem.linkedAssets"},
         )
         if isinstance(external_id, str):
             is_work_item = f.Equals(
                 ["edge", "startNode"],
-                {"space": "tutorial_apm_simple", "externalId": external_id},
+                {"space": space, "externalId": external_id},
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_work_item))
 
         else:
             is_work_items = f.In(
                 ["edge", "startNode"],
-                [{"space": "tutorial_apm_simple", "externalId": ext_id} for ext_id in external_id],
+                [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
             return self._client.data_modeling.instances.list(
                 "edge", limit=-1, filter=f.And(is_edge_type, is_work_items)
             )
 
-    def list(self, work_item_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
+    def list(
+        self, work_item_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="tutorial_apm_simple"
+    ) -> dm.EdgeList:
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": "tutorial_apm_simple", "externalId": "WorkItem.linkedAssets"},
+            {"space": space, "externalId": "WorkItem.linkedAssets"},
         )
         filters.append(is_edge_type)
         if work_item_id:
             work_item_ids = [work_item_id] if isinstance(work_item_id, str) else work_item_id
             is_work_items = f.In(
                 ["edge", "startNode"],
-                [{"space": "tutorial_apm_simple", "externalId": ext_id} for ext_id in work_item_ids],
+                [{"space": space, "externalId": ext_id} for ext_id in work_item_ids],
             )
             filters.append(is_work_items)
 
@@ -64,7 +66,7 @@ class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
             class_apply_type=WorkItemApply,
             class_list=WorkItemList,
         )
-        self.view_id = view_id
+        self._view_id = view_id
         self.linked_assets = WorkItemLinkedAssetsAPI(client)
 
     def apply(
@@ -76,12 +78,12 @@ class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
             instances = WorkItemApplyList(work_item).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
-    def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space="tutorial_apm_simple") -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(WorkItemApply.space, external_id))
+            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
             return self._client.data_modeling.instances.delete(
-                nodes=[(WorkItemApply.space, id) for id in external_id],
+                nodes=[(space, id) for id in external_id],
             )
 
     @overload
@@ -94,14 +96,14 @@ class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
 
     def retrieve(self, external_id: str | Sequence[str]) -> WorkItem | WorkItemList:
         if isinstance(external_id, str):
-            work_item = self._retrieve((self.sources.space, external_id))
+            work_item = self._retrieve((self._sources.space, external_id))
 
             linked_asset_edges = self.linked_assets.retrieve(external_id)
             work_item.linked_assets = [edge.end_node.external_id for edge in linked_asset_edges]
 
             return work_item
         else:
-            work_items = self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
+            work_items = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
 
             linked_asset_edges = self.linked_assets.retrieve(external_id)
             self._set_linked_assets(work_items, linked_asset_edges)
@@ -130,7 +132,7 @@ class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
         retrieve_edges: bool = True,
     ) -> WorkItemList:
         filter_ = _create_filter(
-            self.view_id,
+            self._view_id,
             criticality,
             criticality_prefix,
             description,
