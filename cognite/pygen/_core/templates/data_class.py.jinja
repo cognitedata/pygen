@@ -1,7 +1,7 @@
 from __future__ import annotations
 {% if data_class.has_time_field %}
 import datetime{% endif %}
-{% if data_class.has_edges %}from typing import TYPE_CHECKING, ClassVar, Optional, Union{% else %}from typing import ClassVar, Optional{% endif %}{% if not data_class.use_optional_type %}  # noqa: F401{% endif %}
+{% if data_class.has_edges %}from typing import TYPE_CHECKING, Optional, Union{% else %}from typing import Optional{% endif %}{% if not data_class.use_optional_type %}  # noqa: F401{% endif %}
 
 from cognite.client import data_modeling as dm{% if data_class.use_pydantic_field %}
 {{ data_class.import_pydantic_field }}{% endif %}
@@ -15,7 +15,7 @@ __all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data
 
 
 class {{ data_class.read_name }}(DomainModel):
-    space: ClassVar[str] = "{{ space }}"{% for field in data_class %}
+    space: str = "{{ space }}"{% for field in data_class %}
     {{ field.name }}: {{ field.as_read_type_hint() }}{% endfor %}
 
     def as_apply(self) -> {{ data_class.write_name }}:
@@ -26,7 +26,7 @@ class {{ data_class.read_name }}(DomainModel):
 
 
 class {{ data_class.write_name }}(DomainModelApply):
-    space: ClassVar[str] = "{{ space }}"{% for field in data_class %}
+    space: str = "{{ space }}"{% for field in data_class %}
     {{ field.name }}: {{ field.as_write_type_hint() }}{% endfor %}
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:

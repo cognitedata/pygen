@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, ClassVar, Optional, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -20,7 +20,12 @@ class Person(DomainModel):
     roles: Optional[list[str]] = None
 
     def as_apply(self) -> PersonApply:
-        return PersonApply(external_id=self.external_id, birth_year=self.birth_year, name=self.name, roles=self.roles)
+        return PersonApply(
+            external_id=self.external_id,
+            birth_year=self.birth_year,
+            name=self.name,
+            roles=self.roles,
+        )
 
 
 class PersonApply(DomainModelApply):
@@ -41,12 +46,16 @@ class PersonApply(DomainModelApply):
             properties["name"] = self.name
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("IntegrationTestsImmutable", "Person"), properties=properties
+                source=dm.ContainerId("IntegrationTestsImmutable", "Person"),
+                properties=properties,
             )
             sources.append(source)
         if sources:
             this_node = dm.NodeApply(
-                space=self.space, external_id=self.external_id, existing_version=self.existing_version, sources=sources
+                space=self.space,
+                external_id=self.external_id,
+                existing_version=self.existing_version,
+                sources=sources,
             )
             nodes = [this_node]
         else:
