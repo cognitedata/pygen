@@ -23,7 +23,7 @@ class BestLeadingActressAPI(TypeAPI[BestLeadingActress, BestLeadingActressApply,
             class_apply_type=BestLeadingActressApply,
             class_list=BestLeadingActressList,
         )
-        self.view_id = view_id
+        self._view_id = view_id
 
     def apply(
         self, best_leading_actress: BestLeadingActressApply | Sequence[BestLeadingActressApply], replace: bool = False
@@ -34,12 +34,12 @@ class BestLeadingActressAPI(TypeAPI[BestLeadingActress, BestLeadingActressApply,
             instances = BestLeadingActressApplyList(best_leading_actress).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
-    def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(BestLeadingActressApply.space, external_id))
+            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
             return self._client.data_modeling.instances.delete(
-                nodes=[(BestLeadingActressApply.space, id) for id in external_id],
+                nodes=[(space, id) for id in external_id],
             )
 
     @overload
@@ -52,9 +52,9 @@ class BestLeadingActressAPI(TypeAPI[BestLeadingActress, BestLeadingActressApply,
 
     def retrieve(self, external_id: str | Sequence[str]) -> BestLeadingActress | BestLeadingActressList:
         if isinstance(external_id, str):
-            return self._retrieve((self.sources.space, external_id))
+            return self._retrieve((self._sources.space, external_id))
         else:
-            return self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
 
     def list(
         self,
@@ -67,7 +67,7 @@ class BestLeadingActressAPI(TypeAPI[BestLeadingActress, BestLeadingActressApply,
         filter: dm.Filter | None = None,
     ) -> BestLeadingActressList:
         filter_ = _create_filter(
-            self.view_id,
+            self._view_id,
             name,
             name_prefix,
             min_year,

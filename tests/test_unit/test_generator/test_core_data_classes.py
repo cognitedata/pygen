@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import ClassVar, Optional
+from typing import Optional
 
 from pydantic import Field
 
@@ -17,11 +17,11 @@ class TestDomainModel:
     def test_repr(self):
         # Arrange
         class Foo(DomainModel):
-            space: ClassVar[str] = "FooSpace"
+            space: str = "FooSpace"
             bar: Optional[Bar] = Field(None, repr=False)
 
         class Bar(DomainModel):
-            space: ClassVar[str] = "BarSpace"
+            space: str = "BarSpace"
             foo: Optional[Foo] = Field(None, repr=False)
 
         try:
@@ -56,10 +56,12 @@ class TestDomainModel:
 
         # Assert
         assert (
-            foo_repr == "Foo(external_id='foo', version=1, last_updated_time=datetime.datetime(2024, 1, 1, 0, 0), "
+            foo_repr == "Foo(space='FooSpace', external_id='foo', "
+            "version=1, last_updated_time=datetime.datetime(2024, 1, 1, 0, 0), "
             "created_time=datetime.datetime(2023, 1, 1, 0, 0), deleted_time=None)"
         )
         assert (
-            bar_repr == "Bar(external_id='bar', version=1, last_updated_time=datetime.datetime(2024, 1, 1, 0, 0), "
+            bar_repr == "Bar(space='BarSpace', external_id='bar', "
+            "version=1, last_updated_time=datetime.datetime(2024, 1, 1, 0, 0), "
             "created_time=datetime.datetime(2023, 1, 1, 0, 0), deleted_time=None)"
         )

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import ClassVar, Optional
+from typing import Optional
 
 from cognite.client import data_modeling as dm
 
@@ -10,7 +10,7 @@ __all__ = ["BestLeadingActor", "BestLeadingActorApply", "BestLeadingActorList", 
 
 
 class BestLeadingActor(DomainModel):
-    space: ClassVar[str] = "IntegrationTestsImmutable"
+    space: str = "IntegrationTestsImmutable"
     name: Optional[str] = None
     year: Optional[int] = None
 
@@ -23,7 +23,7 @@ class BestLeadingActor(DomainModel):
 
 
 class BestLeadingActorApply(DomainModelApply):
-    space: ClassVar[str] = "IntegrationTestsImmutable"
+    space: str = "IntegrationTestsImmutable"
     name: str
     year: int
 

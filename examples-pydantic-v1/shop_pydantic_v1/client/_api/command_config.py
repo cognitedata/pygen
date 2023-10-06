@@ -23,7 +23,7 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
             class_apply_type=CommandConfigApply,
             class_list=CommandConfigList,
         )
-        self.view_id = view_id
+        self._view_id = view_id
 
     def apply(
         self, command_config: CommandConfigApply | Sequence[CommandConfigApply], replace: bool = False
@@ -34,12 +34,12 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
             instances = CommandConfigApplyList(command_config).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
-    def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(CommandConfigApply.space, external_id))
+            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
             return self._client.data_modeling.instances.delete(
-                nodes=[(CommandConfigApply.space, id) for id in external_id],
+                nodes=[(space, id) for id in external_id],
             )
 
     @overload
@@ -52,9 +52,9 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
 
     def retrieve(self, external_id: str | Sequence[str]) -> CommandConfig | CommandConfigList:
         if isinstance(external_id, str):
-            return self._retrieve((self.sources.space, external_id))
+            return self._retrieve((self._sources.space, external_id))
         else:
-            return self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
 
     def list(
         self,
@@ -63,7 +63,7 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
         filter: dm.Filter | None = None,
     ) -> CommandConfigList:
         filter_ = _create_filter(
-            self.view_id,
+            self._view_id,
             external_id_prefix,
             filter,
         )

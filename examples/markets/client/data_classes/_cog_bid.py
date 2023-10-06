@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING, ClassVar, Optional, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -15,7 +15,7 @@ __all__ = ["CogBid", "CogBidApply", "CogBidList", "CogBidApplyList"]
 
 
 class CogBid(DomainModel):
-    space: ClassVar[str] = "market"
+    space: str = "market"
     date: Optional[datetime.date] = None
     market: Optional[str] = None
     name: Optional[str] = None
@@ -36,7 +36,7 @@ class CogBid(DomainModel):
 
 
 class CogBidApply(DomainModelApply):
-    space: ClassVar[str] = "market"
+    space: str = "market"
     date: Optional[datetime.date] = None
     market: Union[MarketApply, str, None] = Field(None, repr=False)
     name: Optional[str] = None

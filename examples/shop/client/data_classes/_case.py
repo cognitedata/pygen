@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING, ClassVar, Optional, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -15,7 +15,7 @@ __all__ = ["Case", "CaseApply", "CaseList", "CaseApplyList"]
 
 
 class Case(DomainModel):
-    space: ClassVar[str] = "IntegrationTestsImmutable"
+    space: str = "IntegrationTestsImmutable"
     arguments: Optional[str] = None
     bid: Optional[str] = None
     bid_history: Optional[list[str]] = None
@@ -44,7 +44,7 @@ class Case(DomainModel):
 
 
 class CaseApply(DomainModelApply):
-    space: ClassVar[str] = "IntegrationTestsImmutable"
+    space: str = "IntegrationTestsImmutable"
     arguments: Optional[str] = None
     bid: Optional[str] = None
     bid_history: Optional[list[str]] = None

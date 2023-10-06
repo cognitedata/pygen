@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING, ClassVar, Optional, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -16,7 +16,7 @@ __all__ = ["Asset", "AssetApply", "AssetList", "AssetApplyList"]
 
 
 class Asset(DomainModel):
-    space: ClassVar[str] = "tutorial_apm_simple"
+    space: str = "tutorial_apm_simple"
     area_id: Optional[int] = Field(None, alias="areaId")
     category_id: Optional[int] = Field(None, alias="categoryId")
     children: Optional[list[str]] = None
@@ -61,7 +61,7 @@ class Asset(DomainModel):
 
 
 class AssetApply(DomainModelApply):
-    space: ClassVar[str] = "tutorial_apm_simple"
+    space: str = "tutorial_apm_simple"
     area_id: Optional[int] = None
     category_id: Optional[int] = None
     children: Union[list[AssetApply], list[str], None] = Field(default=None, repr=False)

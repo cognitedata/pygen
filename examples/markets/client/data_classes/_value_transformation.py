@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import ClassVar, Optional
+from typing import Optional
 
 from cognite.client import data_modeling as dm
 
@@ -10,7 +10,7 @@ __all__ = ["ValueTransformation", "ValueTransformationApply", "ValueTransformati
 
 
 class ValueTransformation(DomainModel):
-    space: ClassVar[str] = "market"
+    space: str = "market"
     arguments: Optional[dict] = None
     method: Optional[str] = None
 
@@ -23,7 +23,7 @@ class ValueTransformation(DomainModel):
 
 
 class ValueTransformationApply(DomainModelApply):
-    space: ClassVar[str] = "market"
+    space: str = "market"
     arguments: Optional[dict] = None
     method: Optional[str] = None
 

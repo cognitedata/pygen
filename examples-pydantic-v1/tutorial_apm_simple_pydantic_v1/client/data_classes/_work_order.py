@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING, ClassVar, Optional, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -16,7 +16,7 @@ __all__ = ["WorkOrder", "WorkOrderApply", "WorkOrderList", "WorkOrderApplyList"]
 
 
 class WorkOrder(DomainModel):
-    space: ClassVar[str] = "tutorial_apm_simple"
+    space: str = "tutorial_apm_simple"
     actual_hours: Optional[int] = Field(None, alias="actualHours")
     created_date: Optional[datetime.datetime] = Field(None, alias="createdDate")
     description: Optional[str] = None
@@ -67,7 +67,7 @@ class WorkOrder(DomainModel):
 
 
 class WorkOrderApply(DomainModelApply):
-    space: ClassVar[str] = "tutorial_apm_simple"
+    space: str = "tutorial_apm_simple"
     actual_hours: Optional[int] = None
     created_date: Optional[datetime.datetime] = None
     description: Optional[str] = None

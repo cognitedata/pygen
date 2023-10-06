@@ -14,39 +14,41 @@ class DirectorMoviesAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str]) -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": "IntegrationTestsImmutable", "externalId": "Role.movies"},
+            {"space": space, "externalId": "Role.movies"},
         )
         if isinstance(external_id, str):
             is_director = f.Equals(
                 ["edge", "startNode"],
-                {"space": "IntegrationTestsImmutable", "externalId": external_id},
+                {"space": space, "externalId": external_id},
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_director))
 
         else:
             is_directors = f.In(
                 ["edge", "startNode"],
-                [{"space": "IntegrationTestsImmutable", "externalId": ext_id} for ext_id in external_id],
+                [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_directors))
 
-    def list(self, director_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
+    def list(
+        self, director_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="IntegrationTestsImmutable"
+    ) -> dm.EdgeList:
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": "IntegrationTestsImmutable", "externalId": "Role.movies"},
+            {"space": space, "externalId": "Role.movies"},
         )
         filters.append(is_edge_type)
         if director_id:
             director_ids = [director_id] if isinstance(director_id, str) else director_id
             is_directors = f.In(
                 ["edge", "startNode"],
-                [{"space": "IntegrationTestsImmutable", "externalId": ext_id} for ext_id in director_ids],
+                [{"space": space, "externalId": ext_id} for ext_id in director_ids],
             )
             filters.append(is_directors)
 
@@ -57,39 +59,41 @@ class DirectorNominationAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str]) -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": "IntegrationTestsImmutable", "externalId": "Role.nomination"},
+            {"space": space, "externalId": "Role.nomination"},
         )
         if isinstance(external_id, str):
             is_director = f.Equals(
                 ["edge", "startNode"],
-                {"space": "IntegrationTestsImmutable", "externalId": external_id},
+                {"space": space, "externalId": external_id},
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_director))
 
         else:
             is_directors = f.In(
                 ["edge", "startNode"],
-                [{"space": "IntegrationTestsImmutable", "externalId": ext_id} for ext_id in external_id],
+                [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_directors))
 
-    def list(self, director_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
+    def list(
+        self, director_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="IntegrationTestsImmutable"
+    ) -> dm.EdgeList:
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": "IntegrationTestsImmutable", "externalId": "Role.nomination"},
+            {"space": space, "externalId": "Role.nomination"},
         )
         filters.append(is_edge_type)
         if director_id:
             director_ids = [director_id] if isinstance(director_id, str) else director_id
             is_directors = f.In(
                 ["edge", "startNode"],
-                [{"space": "IntegrationTestsImmutable", "externalId": ext_id} for ext_id in director_ids],
+                [{"space": space, "externalId": ext_id} for ext_id in director_ids],
             )
             filters.append(is_directors)
 
@@ -105,7 +109,7 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
             class_apply_type=DirectorApply,
             class_list=DirectorList,
         )
-        self.view_id = view_id
+        self._view_id = view_id
         self.movies = DirectorMoviesAPI(client)
         self.nomination = DirectorNominationAPI(client)
 
@@ -118,12 +122,12 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
             instances = DirectorApplyList(director).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
-    def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(DirectorApply.space, external_id))
+            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
             return self._client.data_modeling.instances.delete(
-                nodes=[(DirectorApply.space, id) for id in external_id],
+                nodes=[(space, id) for id in external_id],
             )
 
     @overload
@@ -136,7 +140,7 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
 
     def retrieve(self, external_id: str | Sequence[str]) -> Director | DirectorList:
         if isinstance(external_id, str):
-            director = self._retrieve((self.sources.space, external_id))
+            director = self._retrieve((self._sources.space, external_id))
 
             movie_edges = self.movies.retrieve(external_id)
             director.movies = [edge.end_node.external_id for edge in movie_edges]
@@ -145,7 +149,7 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
 
             return director
         else:
-            directors = self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
+            directors = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
 
             movie_edges = self.movies.retrieve(external_id)
             self._set_movies(directors, movie_edges)
@@ -163,7 +167,7 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
         retrieve_edges: bool = True,
     ) -> DirectorList:
         filter_ = _create_filter(
-            self.view_id,
+            self._view_id,
             won_oscar,
             external_id_prefix,
             filter,

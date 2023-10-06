@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, ClassVar, Optional, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -14,7 +14,7 @@ __all__ = ["Person", "PersonApply", "PersonList", "PersonApplyList"]
 
 
 class Person(DomainModel):
-    space: ClassVar[str] = "IntegrationTestsImmutable"
+    space: str = "IntegrationTestsImmutable"
     birth_year: Optional[int] = Field(None, alias="birthYear")
     name: Optional[str] = None
     roles: Optional[list[str]] = None
@@ -29,7 +29,7 @@ class Person(DomainModel):
 
 
 class PersonApply(DomainModelApply):
-    space: ClassVar[str] = "IntegrationTestsImmutable"
+    space: str = "IntegrationTestsImmutable"
     birth_year: Optional[int] = None
     name: str
     roles: Union[list[RoleApply], list[str], None] = Field(default=None, repr=False)

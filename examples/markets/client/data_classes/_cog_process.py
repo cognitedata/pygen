@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, ClassVar, Optional, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -16,7 +16,7 @@ __all__ = ["CogProcess", "CogProcessApply", "CogProcessList", "CogProcessApplyLi
 
 
 class CogProcess(DomainModel):
-    space: ClassVar[str] = "market"
+    space: str = "market"
     bid: Optional[str] = None
     date_transformations: Optional[str] = Field(None, alias="dateTransformations")
     name: Optional[str] = None
@@ -33,7 +33,7 @@ class CogProcess(DomainModel):
 
 
 class CogProcessApply(DomainModelApply):
-    space: ClassVar[str] = "market"
+    space: str = "market"
     bid: Union[BidApply, str, None] = Field(None, repr=False)
     date_transformations: Union[DateTransformationPairApply, str, None] = Field(None, repr=False)
     name: Optional[str] = None

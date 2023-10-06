@@ -406,7 +406,7 @@ class ScenarioInstanceAPI(TypeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
             class_apply_type=ScenarioInstanceApply,
             class_list=ScenarioInstanceList,
         )
-        self.view_id = view_id
+        self._view_id = view_id
         self.price_forecast = ScenarioInstancePriceForecastAPI(client, view_id)
 
     def apply(
@@ -418,12 +418,12 @@ class ScenarioInstanceAPI(TypeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
             instances = ScenarioInstanceApplyList(scenario_instance).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
-    def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(ScenarioInstanceApply.space, external_id))
+            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
             return self._client.data_modeling.instances.delete(
-                nodes=[(ScenarioInstanceApply.space, id) for id in external_id],
+                nodes=[(space, id) for id in external_id],
             )
 
     @overload
@@ -436,9 +436,9 @@ class ScenarioInstanceAPI(TypeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
 
     def retrieve(self, external_id: str | Sequence[str]) -> ScenarioInstance | ScenarioInstanceList:
         if isinstance(external_id, str):
-            return self._retrieve((self.sources.space, external_id))
+            return self._retrieve((self._sources.space, external_id))
         else:
-            return self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
 
     def list(
         self,
@@ -461,7 +461,7 @@ class ScenarioInstanceAPI(TypeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
         filter: dm.Filter | None = None,
     ) -> ScenarioInstanceList:
         filter_ = _create_filter(
-            self.view_id,
+            self._view_id,
             aggregation,
             aggregation_prefix,
             country,

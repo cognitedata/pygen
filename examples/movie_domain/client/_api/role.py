@@ -14,39 +14,41 @@ class RoleMoviesAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str]) -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": "IntegrationTestsImmutable", "externalId": "Role.movies"},
+            {"space": space, "externalId": "Role.movies"},
         )
         if isinstance(external_id, str):
             is_role = f.Equals(
                 ["edge", "startNode"],
-                {"space": "IntegrationTestsImmutable", "externalId": external_id},
+                {"space": space, "externalId": external_id},
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_role))
 
         else:
             is_roles = f.In(
                 ["edge", "startNode"],
-                [{"space": "IntegrationTestsImmutable", "externalId": ext_id} for ext_id in external_id],
+                [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_roles))
 
-    def list(self, role_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
+    def list(
+        self, role_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="IntegrationTestsImmutable"
+    ) -> dm.EdgeList:
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": "IntegrationTestsImmutable", "externalId": "Role.movies"},
+            {"space": space, "externalId": "Role.movies"},
         )
         filters.append(is_edge_type)
         if role_id:
             role_ids = [role_id] if isinstance(role_id, str) else role_id
             is_roles = f.In(
                 ["edge", "startNode"],
-                [{"space": "IntegrationTestsImmutable", "externalId": ext_id} for ext_id in role_ids],
+                [{"space": space, "externalId": ext_id} for ext_id in role_ids],
             )
             filters.append(is_roles)
 
@@ -57,39 +59,41 @@ class RoleNominationAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str]) -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": "IntegrationTestsImmutable", "externalId": "Role.nomination"},
+            {"space": space, "externalId": "Role.nomination"},
         )
         if isinstance(external_id, str):
             is_role = f.Equals(
                 ["edge", "startNode"],
-                {"space": "IntegrationTestsImmutable", "externalId": external_id},
+                {"space": space, "externalId": external_id},
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_role))
 
         else:
             is_roles = f.In(
                 ["edge", "startNode"],
-                [{"space": "IntegrationTestsImmutable", "externalId": ext_id} for ext_id in external_id],
+                [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_roles))
 
-    def list(self, role_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
+    def list(
+        self, role_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="IntegrationTestsImmutable"
+    ) -> dm.EdgeList:
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": "IntegrationTestsImmutable", "externalId": "Role.nomination"},
+            {"space": space, "externalId": "Role.nomination"},
         )
         filters.append(is_edge_type)
         if role_id:
             role_ids = [role_id] if isinstance(role_id, str) else role_id
             is_roles = f.In(
                 ["edge", "startNode"],
-                [{"space": "IntegrationTestsImmutable", "externalId": ext_id} for ext_id in role_ids],
+                [{"space": space, "externalId": ext_id} for ext_id in role_ids],
             )
             filters.append(is_roles)
 
@@ -105,7 +109,7 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
             class_apply_type=RoleApply,
             class_list=RoleList,
         )
-        self.view_id = view_id
+        self._view_id = view_id
         self.movies = RoleMoviesAPI(client)
         self.nomination = RoleNominationAPI(client)
 
@@ -116,12 +120,12 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
             instances = RoleApplyList(role).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
-    def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(RoleApply.space, external_id))
+            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
             return self._client.data_modeling.instances.delete(
-                nodes=[(RoleApply.space, id) for id in external_id],
+                nodes=[(space, id) for id in external_id],
             )
 
     @overload
@@ -134,7 +138,7 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
 
     def retrieve(self, external_id: str | Sequence[str]) -> Role | RoleList:
         if isinstance(external_id, str):
-            role = self._retrieve((self.sources.space, external_id))
+            role = self._retrieve((self._sources.space, external_id))
 
             movie_edges = self.movies.retrieve(external_id)
             role.movies = [edge.end_node.external_id for edge in movie_edges]
@@ -143,7 +147,7 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
 
             return role
         else:
-            roles = self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
+            roles = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
 
             movie_edges = self.movies.retrieve(external_id)
             self._set_movies(roles, movie_edges)
@@ -161,7 +165,7 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
         retrieve_edges: bool = True,
     ) -> RoleList:
         filter_ = _create_filter(
-            self.view_id,
+            self._view_id,
             won_oscar,
             external_id_prefix,
             filter,

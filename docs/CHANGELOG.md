@@ -13,6 +13,15 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.22.1] - 06-10-23
+### Changed
+* The attribute `space` is now an attribute in all generated data classes (it used to be a class variable).
+* Attributes `sources`, `view_id`, `class_type`, `class_apply_type`, `class_list` in the generated API class
+  are made private. This is to avoid cluttering the method space when using the generated SDK for exploration.
+
+### Added
+* Option for setting `space` in generated `delete` methods for nodes, and `retrieve` methods for edges.
+
 ## [0.21.1] - 27-09-23
 ### Fixed
 * Edges with property name not equal to field name in generated data class failed to create the correct alias. Example

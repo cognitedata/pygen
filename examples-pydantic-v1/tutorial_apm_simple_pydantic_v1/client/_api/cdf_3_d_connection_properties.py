@@ -25,7 +25,7 @@ class CdfConnectionPropertiesAPI(
             class_apply_type=CdfConnectionPropertiesApply,
             class_list=CdfConnectionPropertiesList,
         )
-        self.view_id = view_id
+        self._view_id = view_id
 
     def apply(
         self,
@@ -38,12 +38,12 @@ class CdfConnectionPropertiesAPI(
             instances = CdfConnectionPropertiesApplyList(cdf_3_d_connection_property).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
-    def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space="cdf_3d_schema") -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(CdfConnectionPropertiesApply.space, external_id))
+            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
             return self._client.data_modeling.instances.delete(
-                nodes=[(CdfConnectionPropertiesApply.space, id) for id in external_id],
+                nodes=[(space, id) for id in external_id],
             )
 
     @overload
@@ -56,9 +56,9 @@ class CdfConnectionPropertiesAPI(
 
     def retrieve(self, external_id: str | Sequence[str]) -> CdfConnectionProperties | CdfConnectionPropertiesList:
         if isinstance(external_id, str):
-            return self._retrieve((self.sources.space, external_id))
+            return self._retrieve((self._sources.space, external_id))
         else:
-            return self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
 
     def list(
         self,
@@ -71,7 +71,7 @@ class CdfConnectionPropertiesAPI(
         filter: dm.Filter | None = None,
     ) -> CdfConnectionPropertiesList:
         filter_ = _create_filter(
-            self.view_id,
+            self._view_id,
             min_revision_id,
             max_revision_id,
             min_revision_node_id,

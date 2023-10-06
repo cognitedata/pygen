@@ -18,7 +18,7 @@ class MarketAPI(TypeAPI[Market, MarketApply, MarketList]):
             class_apply_type=MarketApply,
             class_list=MarketList,
         )
-        self.view_id = view_id
+        self._view_id = view_id
 
     def apply(self, market: MarketApply | Sequence[MarketApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(market, MarketApply):
@@ -27,12 +27,12 @@ class MarketAPI(TypeAPI[Market, MarketApply, MarketList]):
             instances = MarketApplyList(market).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
-    def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space="market") -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(MarketApply.space, external_id))
+            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
             return self._client.data_modeling.instances.delete(
-                nodes=[(MarketApply.space, id) for id in external_id],
+                nodes=[(space, id) for id in external_id],
             )
 
     @overload
@@ -45,9 +45,9 @@ class MarketAPI(TypeAPI[Market, MarketApply, MarketList]):
 
     def retrieve(self, external_id: str | Sequence[str]) -> Market | MarketList:
         if isinstance(external_id, str):
-            return self._retrieve((self.sources.space, external_id))
+            return self._retrieve((self._sources.space, external_id))
         else:
-            return self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
 
     def list(
         self,
@@ -60,7 +60,7 @@ class MarketAPI(TypeAPI[Market, MarketApply, MarketList]):
         filter: dm.Filter | None = None,
     ) -> MarketList:
         filter_ = _create_filter(
-            self.view_id,
+            self._view_id,
             name,
             name_prefix,
             timezone,

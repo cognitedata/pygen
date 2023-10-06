@@ -19,7 +19,7 @@ class BidAPI(TypeAPI[Bid, BidApply, BidList]):
             class_apply_type=BidApply,
             class_list=BidList,
         )
-        self.view_id = view_id
+        self._view_id = view_id
 
     def apply(self, bid: BidApply | Sequence[BidApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(bid, BidApply):
@@ -28,12 +28,12 @@ class BidAPI(TypeAPI[Bid, BidApply, BidList]):
             instances = BidApplyList(bid).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
-    def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space="market") -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(BidApply.space, external_id))
+            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
             return self._client.data_modeling.instances.delete(
-                nodes=[(BidApply.space, id) for id in external_id],
+                nodes=[(space, id) for id in external_id],
             )
 
     @overload
@@ -46,9 +46,9 @@ class BidAPI(TypeAPI[Bid, BidApply, BidList]):
 
     def retrieve(self, external_id: str | Sequence[str]) -> Bid | BidList:
         if isinstance(external_id, str):
-            return self._retrieve((self.sources.space, external_id))
+            return self._retrieve((self._sources.space, external_id))
         else:
-            return self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
 
     def list(
         self,
@@ -61,7 +61,7 @@ class BidAPI(TypeAPI[Bid, BidApply, BidList]):
         filter: dm.Filter | None = None,
     ) -> BidList:
         filter_ = _create_filter(
-            self.view_id,
+            self._view_id,
             min_date,
             max_date,
             name,

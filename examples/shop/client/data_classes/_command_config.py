@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import ClassVar, Optional
+from typing import Optional
 
 from cognite.client import data_modeling as dm
 
@@ -10,7 +10,7 @@ __all__ = ["CommandConfig", "CommandConfigApply", "CommandConfigList", "CommandC
 
 
 class CommandConfig(DomainModel):
-    space: ClassVar[str] = "IntegrationTestsImmutable"
+    space: str = "IntegrationTestsImmutable"
     configs: Optional[list[str]] = None
     source: Optional[str] = None
 
@@ -23,7 +23,7 @@ class CommandConfig(DomainModel):
 
 
 class CommandConfigApply(DomainModelApply):
-    space: ClassVar[str] = "IntegrationTestsImmutable"
+    space: str = "IntegrationTestsImmutable"
     configs: list[str]
     source: Optional[str] = None
 

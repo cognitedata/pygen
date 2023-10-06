@@ -18,7 +18,7 @@ class PygenProcessAPI(TypeAPI[PygenProcess, PygenProcessApply, PygenProcessList]
             class_apply_type=PygenProcessApply,
             class_list=PygenProcessList,
         )
-        self.view_id = view_id
+        self._view_id = view_id
 
     def apply(
         self, pygen_proces: PygenProcessApply | Sequence[PygenProcessApply], replace: bool = False
@@ -29,12 +29,12 @@ class PygenProcessAPI(TypeAPI[PygenProcess, PygenProcessApply, PygenProcessList]
             instances = PygenProcessApplyList(pygen_proces).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
-    def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space="market") -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(PygenProcessApply.space, external_id))
+            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
             return self._client.data_modeling.instances.delete(
-                nodes=[(PygenProcessApply.space, id) for id in external_id],
+                nodes=[(space, id) for id in external_id],
             )
 
     @overload
@@ -47,9 +47,9 @@ class PygenProcessAPI(TypeAPI[PygenProcess, PygenProcessApply, PygenProcessList]
 
     def retrieve(self, external_id: str | Sequence[str]) -> PygenProcess | PygenProcessList:
         if isinstance(external_id, str):
-            return self._retrieve((self.sources.space, external_id))
+            return self._retrieve((self._sources.space, external_id))
         else:
-            return self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
 
     def list(
         self,
@@ -60,7 +60,7 @@ class PygenProcessAPI(TypeAPI[PygenProcess, PygenProcessApply, PygenProcessList]
         filter: dm.Filter | None = None,
     ) -> PygenProcessList:
         filter_ = _create_filter(
-            self.view_id,
+            self._view_id,
             name,
             name_prefix,
             external_id_prefix,

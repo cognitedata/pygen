@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, ClassVar, Optional, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -19,7 +19,7 @@ __all__ = [
 
 
 class DateTransformationPair(DomainModel):
-    space: ClassVar[str] = "market"
+    space: str = "market"
     end: Optional[list[str]] = None
     start: Optional[list[str]] = None
 
@@ -32,7 +32,7 @@ class DateTransformationPair(DomainModel):
 
 
 class DateTransformationPairApply(DomainModelApply):
-    space: ClassVar[str] = "market"
+    space: str = "market"
     end: Union[list[DateTransformationApply], list[str], None] = Field(default=None, repr=False)
     start: Union[list[DateTransformationApply], list[str], None] = Field(default=None, repr=False)
 

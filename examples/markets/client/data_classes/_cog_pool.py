@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import ClassVar, Optional
+from typing import Optional
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -11,7 +11,7 @@ __all__ = ["CogPool", "CogPoolApply", "CogPoolList", "CogPoolApplyList"]
 
 
 class CogPool(DomainModel):
-    space: ClassVar[str] = "market"
+    space: str = "market"
     max_price: Optional[float] = Field(None, alias="maxPrice")
     min_price: Optional[float] = Field(None, alias="minPrice")
     name: Optional[str] = None
@@ -30,7 +30,7 @@ class CogPool(DomainModel):
 
 
 class CogPoolApply(DomainModelApply):
-    space: ClassVar[str] = "market"
+    space: str = "market"
     max_price: Optional[float] = None
     min_price: Optional[float] = None
     name: Optional[str] = None

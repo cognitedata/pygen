@@ -19,7 +19,7 @@ class PygenBidAPI(TypeAPI[PygenBid, PygenBidApply, PygenBidList]):
             class_apply_type=PygenBidApply,
             class_list=PygenBidList,
         )
-        self.view_id = view_id
+        self._view_id = view_id
 
     def apply(
         self, pygen_bid: PygenBidApply | Sequence[PygenBidApply], replace: bool = False
@@ -30,12 +30,12 @@ class PygenBidAPI(TypeAPI[PygenBid, PygenBidApply, PygenBidList]):
             instances = PygenBidApplyList(pygen_bid).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
-    def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space="market") -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(PygenBidApply.space, external_id))
+            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
             return self._client.data_modeling.instances.delete(
-                nodes=[(PygenBidApply.space, id) for id in external_id],
+                nodes=[(space, id) for id in external_id],
             )
 
     @overload
@@ -48,9 +48,9 @@ class PygenBidAPI(TypeAPI[PygenBid, PygenBidApply, PygenBidList]):
 
     def retrieve(self, external_id: str | Sequence[str]) -> PygenBid | PygenBidList:
         if isinstance(external_id, str):
-            return self._retrieve((self.sources.space, external_id))
+            return self._retrieve((self._sources.space, external_id))
         else:
-            return self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
 
     def list(
         self,
@@ -68,7 +68,7 @@ class PygenBidAPI(TypeAPI[PygenBid, PygenBidApply, PygenBidList]):
         filter: dm.Filter | None = None,
     ) -> PygenBidList:
         filter_ = _create_filter(
-            self.view_id,
+            self._view_id,
             min_date,
             max_date,
             is_block,

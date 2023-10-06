@@ -14,39 +14,41 @@ class MovieActorsAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str]) -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": "IntegrationTestsImmutable", "externalId": "Movie.actors"},
+            {"space": space, "externalId": "Movie.actors"},
         )
         if isinstance(external_id, str):
             is_movie = f.Equals(
                 ["edge", "startNode"],
-                {"space": "IntegrationTestsImmutable", "externalId": external_id},
+                {"space": space, "externalId": external_id},
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_movie))
 
         else:
             is_movies = f.In(
                 ["edge", "startNode"],
-                [{"space": "IntegrationTestsImmutable", "externalId": ext_id} for ext_id in external_id],
+                [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_movies))
 
-    def list(self, movie_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
+    def list(
+        self, movie_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="IntegrationTestsImmutable"
+    ) -> dm.EdgeList:
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": "IntegrationTestsImmutable", "externalId": "Movie.actors"},
+            {"space": space, "externalId": "Movie.actors"},
         )
         filters.append(is_edge_type)
         if movie_id:
             movie_ids = [movie_id] if isinstance(movie_id, str) else movie_id
             is_movies = f.In(
                 ["edge", "startNode"],
-                [{"space": "IntegrationTestsImmutable", "externalId": ext_id} for ext_id in movie_ids],
+                [{"space": space, "externalId": ext_id} for ext_id in movie_ids],
             )
             filters.append(is_movies)
 
@@ -57,39 +59,41 @@ class MovieDirectorsAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str]) -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": "IntegrationTestsImmutable", "externalId": "Movie.directors"},
+            {"space": space, "externalId": "Movie.directors"},
         )
         if isinstance(external_id, str):
             is_movie = f.Equals(
                 ["edge", "startNode"],
-                {"space": "IntegrationTestsImmutable", "externalId": external_id},
+                {"space": space, "externalId": external_id},
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_movie))
 
         else:
             is_movies = f.In(
                 ["edge", "startNode"],
-                [{"space": "IntegrationTestsImmutable", "externalId": ext_id} for ext_id in external_id],
+                [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_movies))
 
-    def list(self, movie_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
+    def list(
+        self, movie_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="IntegrationTestsImmutable"
+    ) -> dm.EdgeList:
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": "IntegrationTestsImmutable", "externalId": "Movie.directors"},
+            {"space": space, "externalId": "Movie.directors"},
         )
         filters.append(is_edge_type)
         if movie_id:
             movie_ids = [movie_id] if isinstance(movie_id, str) else movie_id
             is_movies = f.In(
                 ["edge", "startNode"],
-                [{"space": "IntegrationTestsImmutable", "externalId": ext_id} for ext_id in movie_ids],
+                [{"space": space, "externalId": ext_id} for ext_id in movie_ids],
             )
             filters.append(is_movies)
 
@@ -105,7 +109,7 @@ class MovieAPI(TypeAPI[Movie, MovieApply, MovieList]):
             class_apply_type=MovieApply,
             class_list=MovieList,
         )
-        self.view_id = view_id
+        self._view_id = view_id
         self.actors = MovieActorsAPI(client)
         self.directors = MovieDirectorsAPI(client)
 
@@ -116,12 +120,12 @@ class MovieAPI(TypeAPI[Movie, MovieApply, MovieList]):
             instances = MovieApplyList(movie).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
-    def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(MovieApply.space, external_id))
+            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
             return self._client.data_modeling.instances.delete(
-                nodes=[(MovieApply.space, id) for id in external_id],
+                nodes=[(space, id) for id in external_id],
             )
 
     @overload
@@ -134,7 +138,7 @@ class MovieAPI(TypeAPI[Movie, MovieApply, MovieList]):
 
     def retrieve(self, external_id: str | Sequence[str]) -> Movie | MovieList:
         if isinstance(external_id, str):
-            movie = self._retrieve((self.sources.space, external_id))
+            movie = self._retrieve((self._sources.space, external_id))
 
             actor_edges = self.actors.retrieve(external_id)
             movie.actors = [edge.end_node.external_id for edge in actor_edges]
@@ -143,7 +147,7 @@ class MovieAPI(TypeAPI[Movie, MovieApply, MovieList]):
 
             return movie
         else:
-            movies = self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
+            movies = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
 
             actor_edges = self.actors.retrieve(external_id)
             self._set_actors(movies, actor_edges)
@@ -166,7 +170,7 @@ class MovieAPI(TypeAPI[Movie, MovieApply, MovieList]):
         retrieve_edges: bool = True,
     ) -> MovieList:
         filter_ = _create_filter(
-            self.view_id,
+            self._view_id,
             min_release_year,
             max_release_year,
             min_run_time_minutes,
