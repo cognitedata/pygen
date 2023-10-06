@@ -14,39 +14,41 @@ class ActorMoviesAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str]) -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": "IntegrationTestsImmutable", "externalId": "Role.movies"},
+            {"space": space, "externalId": "Role.movies"},
         )
         if isinstance(external_id, str):
             is_actor = f.Equals(
                 ["edge", "startNode"],
-                {"space": "IntegrationTestsImmutable", "externalId": external_id},
+                {"space": space, "externalId": external_id},
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_actor))
 
         else:
             is_actors = f.In(
                 ["edge", "startNode"],
-                [{"space": "IntegrationTestsImmutable", "externalId": ext_id} for ext_id in external_id],
+                [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_actors))
 
-    def list(self, actor_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
+    def list(
+        self, actor_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="IntegrationTestsImmutable"
+    ) -> dm.EdgeList:
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": "IntegrationTestsImmutable", "externalId": "Role.movies"},
+            {"space": space, "externalId": "Role.movies"},
         )
         filters.append(is_edge_type)
         if actor_id:
             actor_ids = [actor_id] if isinstance(actor_id, str) else actor_id
             is_actors = f.In(
                 ["edge", "startNode"],
-                [{"space": "IntegrationTestsImmutable", "externalId": ext_id} for ext_id in actor_ids],
+                [{"space": space, "externalId": ext_id} for ext_id in actor_ids],
             )
             filters.append(is_actors)
 
@@ -57,39 +59,41 @@ class ActorNominationAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str]) -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": "IntegrationTestsImmutable", "externalId": "Role.nomination"},
+            {"space": space, "externalId": "Role.nomination"},
         )
         if isinstance(external_id, str):
             is_actor = f.Equals(
                 ["edge", "startNode"],
-                {"space": "IntegrationTestsImmutable", "externalId": external_id},
+                {"space": space, "externalId": external_id},
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_actor))
 
         else:
             is_actors = f.In(
                 ["edge", "startNode"],
-                [{"space": "IntegrationTestsImmutable", "externalId": ext_id} for ext_id in external_id],
+                [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_actors))
 
-    def list(self, actor_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
+    def list(
+        self, actor_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="IntegrationTestsImmutable"
+    ) -> dm.EdgeList:
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": "IntegrationTestsImmutable", "externalId": "Role.nomination"},
+            {"space": space, "externalId": "Role.nomination"},
         )
         filters.append(is_edge_type)
         if actor_id:
             actor_ids = [actor_id] if isinstance(actor_id, str) else actor_id
             is_actors = f.In(
                 ["edge", "startNode"],
-                [{"space": "IntegrationTestsImmutable", "externalId": ext_id} for ext_id in actor_ids],
+                [{"space": space, "externalId": ext_id} for ext_id in actor_ids],
             )
             filters.append(is_actors)
 
@@ -105,7 +109,7 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
             class_apply_type=ActorApply,
             class_list=ActorList,
         )
-        self.view_id = view_id
+        self._view_id = view_id
         self.movies = ActorMoviesAPI(client)
         self.nomination = ActorNominationAPI(client)
 
@@ -116,12 +120,12 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
             instances = ActorApplyList(actor).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
-    def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(ActorApply.space, external_id))
+            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
             return self._client.data_modeling.instances.delete(
-                nodes=[(ActorApply.space, id) for id in external_id],
+                nodes=[(space, id) for id in external_id],
             )
 
     @overload
@@ -161,7 +165,7 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
         retrieve_edges: bool = True,
     ) -> ActorList:
         filter_ = _create_filter(
-            self.view_id,
+            self._view_id,
             won_oscar,
             external_id_prefix,
             filter,

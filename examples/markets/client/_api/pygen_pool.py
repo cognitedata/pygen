@@ -18,7 +18,7 @@ class PygenPoolAPI(TypeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
             class_apply_type=PygenPoolApply,
             class_list=PygenPoolList,
         )
-        self.view_id = view_id
+        self._view_id = view_id
 
     def apply(
         self, pygen_pool: PygenPoolApply | Sequence[PygenPoolApply], replace: bool = False
@@ -29,12 +29,12 @@ class PygenPoolAPI(TypeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
             instances = PygenPoolApplyList(pygen_pool).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
-    def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space="market") -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(PygenPoolApply.space, external_id))
+            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
             return self._client.data_modeling.instances.delete(
-                nodes=[(PygenPoolApply.space, id) for id in external_id],
+                nodes=[(space, id) for id in external_id],
             )
 
     @overload
@@ -64,7 +64,7 @@ class PygenPoolAPI(TypeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
         filter: dm.Filter | None = None,
     ) -> PygenPoolList:
         filter_ = _create_filter(
-            self.view_id,
+            self._view_id,
             min_day_of_week,
             max_day_of_week,
             name,

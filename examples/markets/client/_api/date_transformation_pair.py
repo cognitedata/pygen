@@ -19,16 +19,16 @@ class DateTransformationPairEndAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str]) -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space="market") -> dm.EdgeList:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": "market", "externalId": "DateTransformationPair.end"},
+            {"space": space, "externalId": "DateTransformationPair.end"},
         )
         if isinstance(external_id, str):
             is_date_transformation_pair = f.Equals(
                 ["edge", "startNode"],
-                {"space": "market", "externalId": external_id},
+                {"space": space, "externalId": external_id},
             )
             return self._client.data_modeling.instances.list(
                 "edge", limit=-1, filter=f.And(is_edge_type, is_date_transformation_pair)
@@ -37,18 +37,20 @@ class DateTransformationPairEndAPI:
         else:
             is_date_transformation_pairs = f.In(
                 ["edge", "startNode"],
-                [{"space": "market", "externalId": ext_id} for ext_id in external_id],
+                [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
             return self._client.data_modeling.instances.list(
                 "edge", limit=-1, filter=f.And(is_edge_type, is_date_transformation_pairs)
             )
 
-    def list(self, date_transformation_pair_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
+    def list(
+        self, date_transformation_pair_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="market"
+    ) -> dm.EdgeList:
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": "market", "externalId": "DateTransformationPair.end"},
+            {"space": space, "externalId": "DateTransformationPair.end"},
         )
         filters.append(is_edge_type)
         if date_transformation_pair_id:
@@ -59,7 +61,7 @@ class DateTransformationPairEndAPI:
             )
             is_date_transformation_pairs = f.In(
                 ["edge", "startNode"],
-                [{"space": "market", "externalId": ext_id} for ext_id in date_transformation_pair_ids],
+                [{"space": space, "externalId": ext_id} for ext_id in date_transformation_pair_ids],
             )
             filters.append(is_date_transformation_pairs)
 
@@ -70,16 +72,16 @@ class DateTransformationPairStartAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str]) -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space="market") -> dm.EdgeList:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": "market", "externalId": "DateTransformationPair.start"},
+            {"space": space, "externalId": "DateTransformationPair.start"},
         )
         if isinstance(external_id, str):
             is_date_transformation_pair = f.Equals(
                 ["edge", "startNode"],
-                {"space": "market", "externalId": external_id},
+                {"space": space, "externalId": external_id},
             )
             return self._client.data_modeling.instances.list(
                 "edge", limit=-1, filter=f.And(is_edge_type, is_date_transformation_pair)
@@ -88,18 +90,20 @@ class DateTransformationPairStartAPI:
         else:
             is_date_transformation_pairs = f.In(
                 ["edge", "startNode"],
-                [{"space": "market", "externalId": ext_id} for ext_id in external_id],
+                [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
             return self._client.data_modeling.instances.list(
                 "edge", limit=-1, filter=f.And(is_edge_type, is_date_transformation_pairs)
             )
 
-    def list(self, date_transformation_pair_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
+    def list(
+        self, date_transformation_pair_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="market"
+    ) -> dm.EdgeList:
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": "market", "externalId": "DateTransformationPair.start"},
+            {"space": space, "externalId": "DateTransformationPair.start"},
         )
         filters.append(is_edge_type)
         if date_transformation_pair_id:
@@ -110,7 +114,7 @@ class DateTransformationPairStartAPI:
             )
             is_date_transformation_pairs = f.In(
                 ["edge", "startNode"],
-                [{"space": "market", "externalId": ext_id} for ext_id in date_transformation_pair_ids],
+                [{"space": space, "externalId": ext_id} for ext_id in date_transformation_pair_ids],
             )
             filters.append(is_date_transformation_pairs)
 
@@ -128,7 +132,7 @@ class DateTransformationPairAPI(
             class_apply_type=DateTransformationPairApply,
             class_list=DateTransformationPairList,
         )
-        self.view_id = view_id
+        self._view_id = view_id
         self.end = DateTransformationPairEndAPI(client)
         self.start = DateTransformationPairStartAPI(client)
 
@@ -149,12 +153,12 @@ class DateTransformationPairAPI(
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space="market") -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(DateTransformationPairApply.space, external_id))
+            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
             return self._client.data_modeling.instances.delete(
-                nodes=[(DateTransformationPairApply.space, id) for id in external_id],
+                nodes=[(space, id) for id in external_id],
             )
 
     @overload
@@ -167,7 +171,7 @@ class DateTransformationPairAPI(
 
     def retrieve(self, external_id: str | Sequence[str]) -> DateTransformationPair | DateTransformationPairList:
         if isinstance(external_id, str):
-            date_transformation_pair = self._retrieve((self.sources.space, external_id))
+            date_transformation_pair = self._retrieve((self._sources.space, external_id))
 
             end_edges = self.end.retrieve(external_id)
             date_transformation_pair.end = [edge.end_node.external_id for edge in end_edges]
@@ -176,7 +180,7 @@ class DateTransformationPairAPI(
 
             return date_transformation_pair
         else:
-            date_transformation_pairs = self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
+            date_transformation_pairs = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
 
             end_edges = self.end.retrieve(external_id)
             self._set_end(date_transformation_pairs, end_edges)
@@ -193,7 +197,7 @@ class DateTransformationPairAPI(
         retrieve_edges: bool = True,
     ) -> DateTransformationPairList:
         filter_ = _create_filter(
-            self.view_id,
+            self._view_id,
             external_id_prefix,
             filter,
         )

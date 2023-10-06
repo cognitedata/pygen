@@ -24,10 +24,10 @@ class TypeAPI(Generic[T_TypeNode, T_TypeApplyNode, T_TypeNodeList]):
         class_list: type[T_TypeNodeList],
     ):
         self._client = client
-        self.sources = sources
-        self.class_type = class_type
-        self.class_apply_type = class_apply_type
-        self.class_list = class_list
+        self._sources = sources
+        self._class_type = class_type
+        self._class_apply_type = class_apply_type
+        self._class_list = class_list
 
     @overload
     def _retrieve(self, external_id: str) -> T_TypeNode:
@@ -45,11 +45,11 @@ class TypeAPI(Generic[T_TypeNode, T_TypeApplyNode, T_TypeNodeList]):
             and not isinstance(nodes, str)
             and not (isinstance(nodes, tuple) and isinstance(nodes[0], str))
         )
-        instances = self._client.data_modeling.instances.retrieve(nodes=nodes, sources=self.sources)
+        instances = self._client.data_modeling.instances.retrieve(nodes=nodes, sources=self._sources)
         if is_multiple:
-            return self.class_list([self.class_type.from_node(node) for node in instances.nodes])
-        return self.class_type.from_node(instances.nodes[0])
+            return self._class_list([self._class_type.from_node(node) for node in instances.nodes])
+        return self._class_type.from_node(instances.nodes[0])
 
     def _list(self, limit: int = DEFAULT_LIMIT_READ, filter: dm.Filter | None = None) -> T_TypeNodeList:
-        nodes = self._client.data_modeling.instances.list("node", sources=self.sources, limit=limit, filter=filter)
-        return self.class_list([self.class_type.from_node(node) for node in nodes])
+        nodes = self._client.data_modeling.instances.list("node", sources=self._sources, limit=limit, filter=filter)
+        return self._class_list([self._class_type.from_node(node) for node in nodes])

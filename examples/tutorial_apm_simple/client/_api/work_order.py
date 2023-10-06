@@ -15,16 +15,16 @@ class WorkOrderLinkedAssetsAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str]) -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space="tutorial_apm_simple") -> dm.EdgeList:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": "tutorial_apm_simple", "externalId": "WorkOrder.linkedAssets"},
+            {"space": space, "externalId": "WorkOrder.linkedAssets"},
         )
         if isinstance(external_id, str):
             is_work_order = f.Equals(
                 ["edge", "startNode"],
-                {"space": "tutorial_apm_simple", "externalId": external_id},
+                {"space": space, "externalId": external_id},
             )
             return self._client.data_modeling.instances.list(
                 "edge", limit=-1, filter=f.And(is_edge_type, is_work_order)
@@ -33,25 +33,27 @@ class WorkOrderLinkedAssetsAPI:
         else:
             is_work_orders = f.In(
                 ["edge", "startNode"],
-                [{"space": "tutorial_apm_simple", "externalId": ext_id} for ext_id in external_id],
+                [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
             return self._client.data_modeling.instances.list(
                 "edge", limit=-1, filter=f.And(is_edge_type, is_work_orders)
             )
 
-    def list(self, work_order_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
+    def list(
+        self, work_order_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="tutorial_apm_simple"
+    ) -> dm.EdgeList:
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": "tutorial_apm_simple", "externalId": "WorkOrder.linkedAssets"},
+            {"space": space, "externalId": "WorkOrder.linkedAssets"},
         )
         filters.append(is_edge_type)
         if work_order_id:
             work_order_ids = [work_order_id] if isinstance(work_order_id, str) else work_order_id
             is_work_orders = f.In(
                 ["edge", "startNode"],
-                [{"space": "tutorial_apm_simple", "externalId": ext_id} for ext_id in work_order_ids],
+                [{"space": space, "externalId": ext_id} for ext_id in work_order_ids],
             )
             filters.append(is_work_orders)
 
@@ -62,16 +64,16 @@ class WorkOrderWorkItemsAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str]) -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space="tutorial_apm_simple") -> dm.EdgeList:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": "tutorial_apm_simple", "externalId": "WorkOrder.workItems"},
+            {"space": space, "externalId": "WorkOrder.workItems"},
         )
         if isinstance(external_id, str):
             is_work_order = f.Equals(
                 ["edge", "startNode"],
-                {"space": "tutorial_apm_simple", "externalId": external_id},
+                {"space": space, "externalId": external_id},
             )
             return self._client.data_modeling.instances.list(
                 "edge", limit=-1, filter=f.And(is_edge_type, is_work_order)
@@ -80,25 +82,27 @@ class WorkOrderWorkItemsAPI:
         else:
             is_work_orders = f.In(
                 ["edge", "startNode"],
-                [{"space": "tutorial_apm_simple", "externalId": ext_id} for ext_id in external_id],
+                [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
             return self._client.data_modeling.instances.list(
                 "edge", limit=-1, filter=f.And(is_edge_type, is_work_orders)
             )
 
-    def list(self, work_order_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ) -> dm.EdgeList:
+    def list(
+        self, work_order_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="tutorial_apm_simple"
+    ) -> dm.EdgeList:
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": "tutorial_apm_simple", "externalId": "WorkOrder.workItems"},
+            {"space": space, "externalId": "WorkOrder.workItems"},
         )
         filters.append(is_edge_type)
         if work_order_id:
             work_order_ids = [work_order_id] if isinstance(work_order_id, str) else work_order_id
             is_work_orders = f.In(
                 ["edge", "startNode"],
-                [{"space": "tutorial_apm_simple", "externalId": ext_id} for ext_id in work_order_ids],
+                [{"space": space, "externalId": ext_id} for ext_id in work_order_ids],
             )
             filters.append(is_work_orders)
 
@@ -114,7 +118,7 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
             class_apply_type=WorkOrderApply,
             class_list=WorkOrderList,
         )
-        self.view_id = view_id
+        self._view_id = view_id
         self.linked_assets = WorkOrderLinkedAssetsAPI(client)
         self.work_items = WorkOrderWorkItemsAPI(client)
 
@@ -127,12 +131,12 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
             instances = WorkOrderApplyList(work_order).to_instances_apply()
         return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
 
-    def delete(self, external_id: str | Sequence[str]) -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space="tutorial_apm_simple") -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(WorkOrderApply.space, external_id))
+            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
             return self._client.data_modeling.instances.delete(
-                nodes=[(WorkOrderApply.space, id) for id in external_id],
+                nodes=[(space, id) for id in external_id],
             )
 
     @overload
@@ -145,7 +149,7 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
 
     def retrieve(self, external_id: str | Sequence[str]) -> WorkOrder | WorkOrderList:
         if isinstance(external_id, str):
-            work_order = self._retrieve((self.sources.space, external_id))
+            work_order = self._retrieve((self._sources.space, external_id))
 
             linked_asset_edges = self.linked_assets.retrieve(external_id)
             work_order.linked_assets = [edge.end_node.external_id for edge in linked_asset_edges]
@@ -154,7 +158,7 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
 
             return work_order
         else:
-            work_orders = self._retrieve([(self.sources.space, ext_id) for ext_id in external_id])
+            work_orders = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
 
             linked_asset_edges = self.linked_assets.retrieve(external_id)
             self._set_linked_assets(work_orders, linked_asset_edges)
@@ -205,7 +209,7 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         retrieve_edges: bool = True,
     ) -> WorkOrderList:
         filter_ = _create_filter(
-            self.view_id,
+            self._view_id,
             min_actual_hours,
             max_actual_hours,
             min_created_date,
