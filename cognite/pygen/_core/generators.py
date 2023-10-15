@@ -25,7 +25,7 @@ class SDKGenerator:
     Args:
         top_level_package: The name of the top level package for the SDK. Example "movie.client"
         client_name: The name of the client class. Example "MovieClient"
-        data_model: The data model(s) to generate a SDK for.
+        data_model: The data model(s) to generate an SDK for.
         pydantic_version: The version of pydantic to use. "infer" will use the version of pydantic installed in
                           the environment.
         logger: A logger function to use for logging. If None, print will be done.
