@@ -6,7 +6,7 @@ from typing import Dict, List, Sequence, Tuple, overload
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
-from ._core import DEFAULT_LIMIT_READ, TypeAPI
+from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from movie_domain.client.data_classes import Person, PersonApply, PersonList, PersonApplyList
 
 
@@ -136,7 +136,10 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
         persons = self._list(limit=limit, filter=filter_)
 
         if retrieve_edges:
-            role_edges = self.roles.list(persons.as_external_ids(), limit=-1)
+            if len(external_ids := persons.as_external_ids()) > IN_FILTER_LIMIT:
+                role_edges = self.roles.list(limit=-1)
+            else:
+                role_edges = self.roles.list(external_ids, limit=-1)
             self._set_roles(persons, role_edges)
 
         return persons
