@@ -98,3 +98,17 @@ def test_person_apply_multiple_requests(movie_client: MovieClient) -> None:
 
     instances = person.to_instances_apply()
     movie_client.person._client.data_modeling.instances.delete(instances.nodes.as_ids(), instances.edges.as_ids())
+
+
+def test_list_above_5000_persons(movie_client: MovieClient) -> None:
+    # Arrange
+    persons = [
+        movie.PersonApply(external_id=f"person_5000:{i}", birth_year=1980, name=f"Person {i}") for i in range(5001)
+    ]
+    movie_client.person.apply(persons)
+
+    # Act
+    persons = movie_client.person.list(limit=-1, external_id_prefix="person_5000:")
+
+    # Assert
+    assert len(persons) == 5001
