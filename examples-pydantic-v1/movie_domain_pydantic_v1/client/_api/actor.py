@@ -118,7 +118,13 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
             instances = actor.to_instances_apply()
         else:
             instances = ActorApplyList(actor).to_instances_apply()
-        return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
+        return self._client.data_modeling.instances.apply(
+            nodes=instances.nodes,
+            edges=instances.edges,
+            auto_create_start_nodes=True,
+            auto_create_end_nodes=True,
+            replace=replace,
+        )
 
     def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):
@@ -162,7 +168,7 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
         external_id_prefix: str | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-        retrieve_edges: bool = True,
+        retrieve_edges: bool = False,
     ) -> ActorList:
         filter_ = _create_filter(
             self._view_id,
