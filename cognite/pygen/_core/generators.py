@@ -35,7 +35,7 @@ class SDKGenerator:
         self,
         top_level_package: str,
         client_name: str,
-        data_model: dm.DataModel | dm.DataModelList,
+        data_model: dm.DataModel | Sequence[dm.DataModel],
         pydantic_version: Literal["v1", "v2", "infer"] = "infer",
         logger: Callable[[str], None] | None = None,
         config: PygenConfig = PygenConfig(),
