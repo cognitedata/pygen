@@ -132,8 +132,8 @@ if _has_typer:
             )
             try:
                 generate_sdk(
-                    client,
                     (space, external_id, version),
+                    client,
                     top_level_package,
                     client_name,
                     output_dir,
