@@ -35,7 +35,7 @@ class SDKGenerator:
         self,
         top_level_package: str,
         client_name: str,
-        data_model: dm.DataModelApply | dm.DataModelApplyList,
+        data_model: dm.DataModel | dm.DataModelList,
         pydantic_version: Literal["v1", "v2", "infer"] = "infer",
         logger: Callable[[str], None] | None = None,
         config: PygenConfig = PygenConfig(),
@@ -44,7 +44,7 @@ class SDKGenerator:
         self.top_level_package = top_level_package
         self.client_name = client_name
         self._multi_api_classes: list[MultiAPIClass]
-        if isinstance(data_model, dm.DataModelApply):
+        if isinstance(data_model, dm.DataModel):
             self._multi_api_generator = MultiAPIGenerator(
                 top_level_package, client_name, data_model.views, pydantic_version, logger, config
             )
@@ -143,7 +143,7 @@ class MultiAPIGenerator:
         self,
         top_level_package: str,
         client_name: str,
-        views: Sequence[dm.ViewApply],
+        views: Sequence[dm.View],
         pydantic_version: Literal["v1", "v2", "infer"] = "infer",
         logger: Callable[[str], None] | None = None,
         config: PygenConfig = PygenConfig(),

@@ -1,6 +1,6 @@
 from cognite.client import CogniteClient
 
-from cognite.pygen import SDKGenerator
+from cognite.pygen._core.generators import SDKGenerator
 
 
 def test_generate_movie_sdk(cognite_client: CogniteClient) -> None:

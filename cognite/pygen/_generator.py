@@ -20,7 +20,7 @@ from .config import PygenConfig
 from .exceptions import DataModelNotFound
 from .utils.text import to_pascal, to_snake
 
-DataModel: TypeAlias = Union[DataModelIdentifier, dm.DataModel[dm.View], dm.DataModelApply]
+DataModel: TypeAlias = Union[DataModelIdentifier, dm.DataModel[dm.View]]
 
 
 def generate_sdk(
@@ -147,29 +147,25 @@ def _default_client_name(external_id: str) -> str:
     return f"{to_pascal(external_id)}Client"
 
 
-def _extract_external_id(data_model: dm.DataModelApply | dm.DataModelApplyList) -> str:
-    if isinstance(data_model, dm.DataModelApply):
+def _extract_external_id(data_model: dm.DataModel | dm.DataModelList) -> str:
+    if isinstance(data_model, dm.DataModel):
         return data_model.external_id.replace(" ", "_")
     else:
         return data_model[0].external_id.replace(" ", "_")
 
 
-def _get_data_model(model_id, client, logger) -> dm.DataModelApply | dm.DataModelApplyList:
+def _get_data_model(model_id, client, logger) -> dm.DataModel | dm.DataModelList:
     if isinstance(model_id, dm.DataModel):
-        return model_id.as_apply()
-    elif isinstance(model_id, dm.DataModelApply):
         return model_id
     elif isinstance(model_id, Sequence) and all(isinstance(model, dm.DataModel) for model in model_id):
-        return dm.DataModelList(model_id).as_apply()
-    elif isinstance(model_id, Sequence) and all(isinstance(model, dm.DataModelApply) for model in model_id):
-        return dm.DataModelApplyList(model_id)
+        return dm.DataModelList(model_id)
     elif isinstance(model_id, (dm.DataModelId, tuple)) or (
         isinstance(model_id, Sequence) and all(isinstance(model, (dm.DataModelId, tuple)) for model in model_id)
     ):
         if client is None:
             raise ValueError("client must be provided when passing in DataModelId")
 
-        data_model = _load_data_model(client, model_id, logger).as_apply()  # type: ignore[arg-type]
+        data_model = _load_data_model(client, model_id, logger)
         logger(f"Successfully retrieved data model(s) {model_id}")
         return data_model
 

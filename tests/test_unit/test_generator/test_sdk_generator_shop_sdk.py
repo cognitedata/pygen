@@ -3,9 +3,8 @@ from pathlib import Path
 import pytest
 from cognite.client import data_modeling as dm
 
-from cognite import pygen
 from cognite.pygen._core.generators import APIGenerator, MultiAPIGenerator, SDKGenerator
-from cognite.pygen._generator import CodeFormatter
+from cognite.pygen._generator import CodeFormatter, write_sdk_to_disk
 from tests.constants import EXAMPLES_DIR, IS_PYDANTIC_V1, ShopSDKFiles
 
 
@@ -89,7 +88,7 @@ def test_create_api_classes(
 def test_generate_sdk(sdk_generator: SDKGenerator, movie_model: dm.DataModel, tmp_path: Path):
     # Act
     files_by_path = sdk_generator.generate_sdk()
-    pygen.write_sdk_to_disk(files_by_path, tmp_path, overwrite=True, format_code=True)
+    write_sdk_to_disk(files_by_path, tmp_path, overwrite=True, format_code=True)
 
     # Assert
     for file_path in tmp_path.glob("**/*.py"):
