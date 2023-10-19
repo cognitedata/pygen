@@ -45,11 +45,23 @@ class SDKGenerator:
         self.client_name = client_name
         self._multi_api_classes: list[MultiAPIClass]
         if isinstance(data_model, dm.DataModel):
+            if view_ids := [view for view in data_model.views if isinstance(view, dm.ViewId)]:
+                raise ValueError(
+                    f"Data model ({data_model.space}, {data_model.external_id} contains ViewIDs: {view_ids}. "
+                    "pygen requires Views to generate an SDK."
+                )
+
             self._multi_api_generator = MultiAPIGenerator(
                 top_level_package, client_name, data_model.views, pydantic_version, logger, config
             )
             self._multi_api_classes = []
         elif isinstance(data_model, Sequence):
+            if view_ids := [view for model in data_model for view in model.views if isinstance(view, dm.ViewId)]:
+                raise ValueError(
+                    f"Data models ({', '.join(f'{model.space}, {model.external_id}' for model in data_model)}) "
+                    f"contains ViewIDs: {view_ids}. pygen requires Views to generate an SDK."
+                )
+
             unique_views = get_unique_views(*[view for model in data_model for view in model.views])
 
             self._multi_api_generator = MultiAPIGenerator(
