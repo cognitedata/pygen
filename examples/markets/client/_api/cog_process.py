@@ -27,7 +27,13 @@ class CogProcessAPI(TypeAPI[CogProcess, CogProcessApply, CogProcessList]):
             instances = cog_proces.to_instances_apply()
         else:
             instances = CogProcessApplyList(cog_proces).to_instances_apply()
-        return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace)
+        return self._client.data_modeling.instances.apply(
+            nodes=instances.nodes,
+            edges=instances.edges,
+            auto_create_start_nodes=True,
+            auto_create_end_nodes=True,
+            replace=replace,
+        )
 
     def delete(self, external_id: str | Sequence[str], space="market") -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):

@@ -61,3 +61,40 @@ def test_person_apply_multiple(movie_client: MovieClient) -> None:
         assert len(result.nodes) == 2
     finally:
         movie_client.person.delete([person.external_id for person in persons])
+
+
+def test_person_apply_multiple_requests(movie_client: MovieClient) -> None:
+    # Arrange
+    person = movie.PersonApply(
+        external_id="person1",
+        name="Person 1",
+        birth_year=1990,
+        roles=[
+            movie.RoleApply(
+                external_id="actor1",
+                person="person1",
+                won_oscar=True,
+                movies=[
+                    movie.MovieApply(
+                        external_id="movie1",
+                        title="Movie 1",
+                        release_year=2020,
+                        actors=["actor1"],
+                        run_time_minutes=120,
+                    )
+                ],
+            ),
+        ],
+    )
+
+    limit = movie_client.person._client.data_modeling.instances._CREATE_LIMIT
+    try:
+        movie_client.person._client.data_modeling.instances._CREATE_LIMIT = 1
+
+        # Act
+        movie_client.person.apply(person)
+    finally:
+        movie_client.person._client.data_modeling.instances._CREATE_LIMIT = limit
+
+    instances = person.to_instances_apply()
+    movie_client.person._client.data_modeling.instances.delete(instances.nodes.as_ids(), instances.edges.as_ids())

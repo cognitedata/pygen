@@ -13,6 +13,13 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.22.1] - 19-10-23
+### Fixed
+* Auto creating start and end nodes when calling `.apply()` method of generated SDK. This was an issue when
+  creating more than 1 000 instances (nodes and edges), which get split into multiple requests. This could cause
+  an edge to be created before the source or target node. `pygen` generated SDKs always create edges based on the
+  source and target nodes, so it is always safe to auto create these.
+
 ## [0.22.0] - 06-10-23
 ### Changed
 * The attribute `space` is now an attribute in all generated data classes (it used to be a class variable).
