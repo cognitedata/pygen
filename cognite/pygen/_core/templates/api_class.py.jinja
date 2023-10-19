@@ -121,7 +121,7 @@ class {{ api_class.name }}(TypeAPI[{{ data_class.read_name }}, {{ data_class.wri
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,{% if data_class.has_one_to_many_edges %}
-        retrieve_edges: bool = False,{% endif %}
+        retrieve_edges: bool = True,{% endif %}
     ) -> {{ data_class.read_list_name }}:
         filter_ = _create_filter(
             self._view_id,{% for parm in list_method.parameters %}
