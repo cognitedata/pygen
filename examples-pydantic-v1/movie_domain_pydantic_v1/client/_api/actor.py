@@ -6,7 +6,7 @@ from typing import Dict, List, Sequence, Tuple, overload
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
-from ._core import DEFAULT_LIMIT_READ, TypeAPI
+from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from movie_domain_pydantic_v1.client.data_classes import Actor, ActorApply, ActorList, ActorApplyList
 
 
@@ -180,9 +180,15 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
         actors = self._list(limit=limit, filter=filter_)
 
         if retrieve_edges:
-            movie_edges = self.movies.list(actors.as_external_ids(), limit=-1)
+            if len(external_ids := actors.as_external_ids()) > IN_FILTER_LIMIT:
+                movie_edges = self.movies.list(limit=-1)
+            else:
+                movie_edges = self.movies.list(external_ids, limit=-1)
             self._set_movies(actors, movie_edges)
-            nomination_edges = self.nomination.list(actors.as_external_ids(), limit=-1)
+            if len(external_ids := actors.as_external_ids()) > IN_FILTER_LIMIT:
+                nomination_edges = self.nomination.list(limit=-1)
+            else:
+                nomination_edges = self.nomination.list(external_ids, limit=-1)
             self._set_nomination(actors, nomination_edges)
 
         return actors

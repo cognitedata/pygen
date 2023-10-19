@@ -6,7 +6,7 @@ from typing import Dict, List, Sequence, Tuple, overload
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
-from ._core import DEFAULT_LIMIT_READ, TypeAPI
+from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from tutorial_apm_simple.client.data_classes import WorkItem, WorkItemApply, WorkItemList, WorkItemApplyList
 
 
@@ -160,7 +160,10 @@ class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
         work_items = self._list(limit=limit, filter=filter_)
 
         if retrieve_edges:
-            linked_asset_edges = self.linked_assets.list(work_items.as_external_ids(), limit=-1)
+            if len(external_ids := work_items.as_external_ids()) > IN_FILTER_LIMIT:
+                linked_asset_edges = self.linked_assets.list(limit=-1)
+            else:
+                linked_asset_edges = self.linked_assets.list(external_ids, limit=-1)
             self._set_linked_assets(work_items, linked_asset_edges)
 
         return work_items

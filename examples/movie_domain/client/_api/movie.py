@@ -6,7 +6,7 @@ from typing import Dict, List, Sequence, Tuple, overload
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
-from ._core import DEFAULT_LIMIT_READ, TypeAPI
+from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from movie_domain.client.data_classes import Movie, MovieApply, MovieList, MovieApplyList
 
 
@@ -190,9 +190,15 @@ class MovieAPI(TypeAPI[Movie, MovieApply, MovieList]):
         movies = self._list(limit=limit, filter=filter_)
 
         if retrieve_edges:
-            actor_edges = self.actors.list(movies.as_external_ids(), limit=-1)
+            if len(external_ids := movies.as_external_ids()) > IN_FILTER_LIMIT:
+                actor_edges = self.actors.list(limit=-1)
+            else:
+                actor_edges = self.actors.list(external_ids, limit=-1)
             self._set_actors(movies, actor_edges)
-            director_edges = self.directors.list(movies.as_external_ids(), limit=-1)
+            if len(external_ids := movies.as_external_ids()) > IN_FILTER_LIMIT:
+                director_edges = self.directors.list(limit=-1)
+            else:
+                director_edges = self.directors.list(external_ids, limit=-1)
             self._set_directors(movies, director_edges)
 
         return movies

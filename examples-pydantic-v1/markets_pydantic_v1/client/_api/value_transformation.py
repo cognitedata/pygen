@@ -5,7 +5,7 @@ from typing import Sequence, overload
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
-from ._core import DEFAULT_LIMIT_READ, TypeAPI
+from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from markets_pydantic_v1.client.data_classes import (
     ValueTransformation,
     ValueTransformationApply,

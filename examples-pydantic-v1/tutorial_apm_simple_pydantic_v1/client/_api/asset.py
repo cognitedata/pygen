@@ -11,7 +11,7 @@ from cognite.client.data_classes import TimeSeriesList, DatapointsList, Datapoin
 from cognite.client.data_classes.datapoints import Aggregate
 from cognite.client import data_modeling as dm
 
-from ._core import DEFAULT_LIMIT_READ, TypeAPI, INSTANCE_QUERY_LIMIT
+from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT, INSTANCE_QUERY_LIMIT
 from tutorial_apm_simple_pydantic_v1.client.data_classes import Asset, AssetApply, AssetList, AssetApplyList
 
 ColumnNames = Literal[
@@ -615,9 +615,15 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
         assets = self._list(limit=limit, filter=filter_)
 
         if retrieve_edges:
-            child_edges = self.children.list(assets.as_external_ids(), limit=-1)
+            if len(external_ids := assets.as_external_ids()) > IN_FILTER_LIMIT:
+                child_edges = self.children.list(limit=-1)
+            else:
+                child_edges = self.children.list(external_ids, limit=-1)
             self._set_children(assets, child_edges)
-            in_model_3_d_edges = self.in_model_3_d.list(assets.as_external_ids(), limit=-1)
+            if len(external_ids := assets.as_external_ids()) > IN_FILTER_LIMIT:
+                in_model_3_d_edges = self.in_model_3_d.list(limit=-1)
+            else:
+                in_model_3_d_edges = self.in_model_3_d.list(external_ids, limit=-1)
             self._set_in_model_3_d(assets, in_model_3_d_edges)
 
         return assets

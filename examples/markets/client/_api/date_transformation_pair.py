@@ -6,7 +6,7 @@ from typing import Dict, List, Sequence, Tuple, overload
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
-from ._core import DEFAULT_LIMIT_READ, TypeAPI
+from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from markets.client.data_classes import (
     DateTransformationPair,
     DateTransformationPairApply,
@@ -205,9 +205,15 @@ class DateTransformationPairAPI(
         date_transformation_pairs = self._list(limit=limit, filter=filter_)
 
         if retrieve_edges:
-            end_edges = self.end.list(date_transformation_pairs.as_external_ids(), limit=-1)
+            if len(external_ids := date_transformation_pairs.as_external_ids()) > IN_FILTER_LIMIT:
+                end_edges = self.end.list(limit=-1)
+            else:
+                end_edges = self.end.list(external_ids, limit=-1)
             self._set_end(date_transformation_pairs, end_edges)
-            start_edges = self.start.list(date_transformation_pairs.as_external_ids(), limit=-1)
+            if len(external_ids := date_transformation_pairs.as_external_ids()) > IN_FILTER_LIMIT:
+                start_edges = self.start.list(limit=-1)
+            else:
+                start_edges = self.start.list(external_ids, limit=-1)
             self._set_start(date_transformation_pairs, start_edges)
 
         return date_transformation_pairs
