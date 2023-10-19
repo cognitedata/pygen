@@ -5,12 +5,16 @@ import json
 from typing import Any
 
 from cognite.client.data_classes import data_modeling as dm
+from cognite.client.data_classes.data_modeling.views import (
+    SingleHopConnectionDefinitionApply,
+    ConnectionDefinitionApply,
+)
 
 
 def _unique_properties(
-    prop: dm.MappedProperty | dm.SingleHopConnectionDefinition | dm.MappedProperty | dm.ConnectionDefinition,
+    prop: dm.MappedPropertyApply | SingleHopConnectionDefinitionApply | ConnectionDefinitionApply,
 ) -> dict[str, Any]:
-    if isinstance(prop, dm.MappedProperty):
+    if isinstance(prop, dm.MappedPropertyApply):
         return {
             "container": prop.container.dump(),
             "container_property_identifier": prop.container_property_identifier,
@@ -19,7 +23,7 @@ def _unique_properties(
             "nullable": prop.nullable,
             "type": prop.type.dump(),
         }
-    elif isinstance(prop, dm.SingleHopConnectionDefinition):
+    elif isinstance(prop, SingleHopConnectionDefinitionApply):
         return {
             "direction": prop.direction,
             "name": prop.name,
@@ -29,7 +33,7 @@ def _unique_properties(
         raise ValueError(f"Unknown property type {prop}")
 
 
-def _unique_views_properties(view: dm.View) -> dict[str, Any]:
+def _unique_views_properties(view: dm.ViewApply) -> dict[str, Any]:
     """
     Returns the properties from a view that uniquely defines it.
 
@@ -51,7 +55,7 @@ def _unique_views_properties(view: dm.View) -> dict[str, Any]:
     }
 
 
-def get_unique_views(*views: dm.View) -> list[dm.View]:
+def get_unique_views(*views: dm.ViewApply) -> list[dm.ViewApply]:
     view_hashes = set()
     unique_views = []
     for view in views:

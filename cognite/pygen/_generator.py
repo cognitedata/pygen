@@ -49,7 +49,7 @@ def generate_sdk(
           the package will be [external_id:snake].client of the first data model given, while
           the client name will be [external_id:pascal_case]
         client_name: The name of the client class. For example, `APMClient`. See above for more details.
-        output_dir: The location to output the generated SDK.
+        output_dir: The location to output the generated SDK. Defaults to the current working directory.
         logger: A logger function to log progress. Defaults to print.
         pydantic_version: The version of pydantic to use. Defaults to "infer" which will use
                           the environment to detect the installed version of pydantic.
@@ -58,37 +58,20 @@ def generate_sdk(
         config: The configuration used to control how to generate the SDK.
     """
     logger = logger or print
-    data_model: Union[dm.DataModelApply, dm.DataModelApplyList]
-    if isinstance(model_id, dm.DataModel):
-        data_model = model_id.as_apply()
-    elif isinstance(model_id, dm.DataModelApply):
-        data_model = model_id
-    elif isinstance(model_id, Sequence) and all(isinstance(model, dm.DataModel) for model in model_id):
-        data_model = dm.DataModelList(model_id).as_apply()
-    elif isinstance(model_id, Sequence) and all(isinstance(model, dm.DataModelApply) for model in model_id):
-        data_model = dm.DataModelApplyList(model_id)
-    elif isinstance(model_id, DataModelIdentifier) or (
-        isinstance(model_id, Sequence) and all(isinstance(model, DataModelIdentifier) for model in model_id)
-    ):
-        data_model = _load_data_model(client, model_id, logger).as_apply()
-        logger(f"Successfully retrieved data model(s) {model_id}")
-    else:
-        raise TypeError(f"Invalid type for model_id: {type(model_id)}")
+    data_model = _get_data_model(model_id, client, logger)
 
-    if isinstance(data_model, dm.DataModelApply):
-        external_id = data_model.external_id.replace(" ", "_")
-    else:
-        external_id = data_model[0].external_id.replace(" ", "_")
+    external_id = _extract_external_id(data_model)
 
     if top_level_package is None:
-        top_level_package = f"{to_snake(external_id)}.client"
+        top_level_package = _default_top_level_package(external_id)
     if client_name is None:
-        client_name = f"{to_pascal(external_id)}Client"
+        client_name = _default_client_name(external_id)
 
     sdk_generator = SDKGenerator(
         top_level_package, client_name, data_model, pydantic_version, logger, config or PygenConfig()
     )
     sdk = sdk_generator.generate_sdk()
+    output_dir = output_dir or Path.cwd()
     logger(f"Writing SDK to {output_dir}")
     write_sdk_to_disk(sdk, output_dir, overwrite, format_code)
     logger("Done!")
@@ -110,6 +93,7 @@ def generate_sdk_notebook(
     * The SDK is generated in a temporary directory and added to the sys.path. This is such that it
       becomes available to be imported in the current Python session.
     * The signature is simplified.
+    * An instantiated client of the generated SDK is returned.
 
 
     Args:
@@ -129,9 +113,17 @@ def generate_sdk_notebook(
         The instantiated generated client class.
     """
     output_dir = Path(tempfile.gettempdir()) / "pygen"
+    data_model = _get_data_model(model_id, client, print)
+    external_id = _extract_external_id(data_model)
+    if top_level_package is None:
+        top_level_package = _default_top_level_package(external_id)
+    if client_name is None:
+        client_name = _default_client_name(external_id)
     generate_sdk(
-        model_id,
+        data_model,
         client,
+        top_level_package=top_level_package,
+        client_name=client_name,
         output_dir=output_dir,
         overwrite=True,
         format_code=False,
@@ -145,6 +137,43 @@ def generate_sdk_notebook(
     module = vars(importlib.import_module(top_level_package))
     print(f"Imported {top_level_package}")
     return module[client_name](client)
+
+
+def _default_top_level_package(external_id: str) -> str:
+    return f"{to_snake(external_id)}.client"
+
+
+def _default_client_name(external_id: str) -> str:
+    return f"{to_pascal(external_id)}Client"
+
+
+def _extract_external_id(data_model: dm.DataModelApply | dm.DataModelApplyList) -> str:
+    if isinstance(data_model, dm.DataModelApply):
+        return data_model.external_id.replace(" ", "_")
+    else:
+        return data_model[0].external_id.replace(" ", "_")
+
+
+def _get_data_model(model_id, client, logger) -> dm.DataModelApply | dm.DataModelApplyList:
+    if isinstance(model_id, dm.DataModel):
+        return model_id.as_apply()
+    elif isinstance(model_id, dm.DataModelApply):
+        return model_id
+    elif isinstance(model_id, Sequence) and all(isinstance(model, dm.DataModel) for model in model_id):
+        return dm.DataModelList(model_id).as_apply()
+    elif isinstance(model_id, Sequence) and all(isinstance(model, dm.DataModelApply) for model in model_id):
+        return dm.DataModelApplyList(model_id)
+    elif isinstance(model_id, (dm.DataModelId, tuple)) or (
+        isinstance(model_id, Sequence) and all(isinstance(model, (dm.DataModelId, tuple)) for model in model_id)
+    ):
+        if client is None:
+            raise ValueError("client must be provided when passing in DataModelId")
+
+        data_model = _load_data_model(client, model_id, logger).as_apply()  # type: ignore[arg-type]
+        logger(f"Successfully retrieved data model(s) {model_id}")
+        return data_model
+
+    raise TypeError(f"Invalid type for model_id: {type(model_id)}")
 
 
 @overload

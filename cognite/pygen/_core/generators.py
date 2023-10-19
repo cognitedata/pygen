@@ -143,7 +143,7 @@ class MultiAPIGenerator:
         self,
         top_level_package: str,
         client_name: str,
-        views: Sequence[dm.View],
+        views: Sequence[dm.ViewApply],
         pydantic_version: Literal["v1", "v2", "infer"] = "infer",
         logger: Callable[[str], None] | None = None,
         config: PygenConfig = PygenConfig(),

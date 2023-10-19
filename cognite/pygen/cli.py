@@ -90,8 +90,8 @@ if _has_typer:
                 )
             try:
                 generate_sdk(
-                    client,
                     data_models,
+                    client,
                     top_level_package,
                     client_name,
                     output_dir,

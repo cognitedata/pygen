@@ -173,8 +173,8 @@ class SolarFarmAPM:
 
         """
         if self._data_model is None:
-            return generate_sdk_notebook(client, self._data_model_id, logger=self._echo, overwrite=True)
-        return generate_sdk_notebook(client, self._data_model, logger=self._echo, overwrite=True)
+            return generate_sdk_notebook(self._data_model_id, client)
+        return generate_sdk_notebook(self._data_model, client)
 
     def clean(self, client: CogniteClient, delete_space: bool = True, auto_confirm: bool = False):
         """
