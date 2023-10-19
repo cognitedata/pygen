@@ -76,13 +76,13 @@ class {{ api_class.name }}(TypeAPI[{{ data_class.read_name }}, {{ data_class.wri
             instances = {{ data_class.variable }}.to_instances_apply()
         else:
             instances = {{ data_class.write_list_name }}({{ data_class.variable }}).to_instances_apply()
-        {% if data_class.has_only_one_to_many_edges %}return self._client.data_modeling.instances.apply(
+        return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
             auto_create_start_nodes=True,
             auto_create_end_nodes=True,
             replace=replace,
-        ){% else %}return self._client.data_modeling.instances.apply(nodes=instances.nodes, edges=instances.edges, replace=replace){% endif %}
+        )
 
     def delete(self, external_id: str | Sequence[str], space="{{ data_class.view_id.space }}") -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):
