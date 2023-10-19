@@ -194,7 +194,7 @@ class DateTransformationPairAPI(
         external_id_prefix: str | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-        retrieve_edges: bool = False,
+        retrieve_edges: bool = True,
     ) -> DateTransformationPairList:
         filter_ = _create_filter(
             self._view_id,
