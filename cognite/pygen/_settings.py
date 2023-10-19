@@ -46,8 +46,8 @@ class PygenSettings(BaseModel):
     if is_pydantic_v2:
 
         @field_validator("*", mode="before")
-        def parse_string(cls, value, info: FieldValidationInfo) -> Argument:
-            if info.field_name == "data_models":
+        def parse_string(cls, value, info: FieldValidationInfo) -> Argument:  # type: ignore[valid-type]
+            if info.field_name == "data_models":  # type: ignore[attr-defined]
                 return value
             field = cls.model_fields[info.field_name]  # type: ignore[attr-defined]
             return _parse_string(value, field)
