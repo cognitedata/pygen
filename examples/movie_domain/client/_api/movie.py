@@ -173,7 +173,7 @@ class MovieAPI(TypeAPI[Movie, MovieApply, MovieList]):
         external_id_prefix: str | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-        retrieve_edges: bool = True,
+        retrieve_edges: bool = False,
     ) -> MovieList:
         filter_ = _create_filter(
             self._view_id,

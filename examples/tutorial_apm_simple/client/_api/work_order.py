@@ -212,7 +212,7 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         external_id_prefix: str | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-        retrieve_edges: bool = True,
+        retrieve_edges: bool = False,
     ) -> WorkOrderList:
         filter_ = _create_filter(
             self._view_id,
