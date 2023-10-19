@@ -75,9 +75,9 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
-            replace=replace,
-            auto_create_end_nodes=True,
             auto_create_start_nodes=True,
+            auto_create_end_nodes=True,
+            replace=replace,
         )
 
     def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
