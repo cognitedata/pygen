@@ -1,13 +1,16 @@
-from ._core.generators import SDKGenerator
-from ._generator import generate_sdk, generate_sdk_notebook, write_sdk_to_disk
+"""
+This is the main entry point for the pygen package. It contains the main functions for
+generating SDKs.
+"""
+
+
+from ._generator import generate_sdk, generate_sdk_notebook
 from ._version import __version__
 from .utils.cdf import load_cognite_client_from_toml
 
 __all__ = [
     "__version__",
-    "load_cognite_client_from_toml",
     "generate_sdk",
     "generate_sdk_notebook",
-    "write_sdk_to_disk",
-    "SDKGenerator",
+    "load_cognite_client_from_toml",
 ]

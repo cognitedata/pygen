@@ -8,7 +8,7 @@ from cognite.client.data_classes import data_modeling as dm
 
 
 def _unique_properties(
-    prop: dm.MappedProperty | dm.SingleHopConnectionDefinition | dm.MappedProperty | dm.ConnectionDefinition,
+    prop: dm.MappedProperty | dm.SingleHopConnectionDefinition | dm.ConnectionDefinition,
 ) -> dict[str, Any]:
     if isinstance(prop, dm.MappedProperty):
         return {

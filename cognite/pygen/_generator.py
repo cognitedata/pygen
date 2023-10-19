@@ -5,120 +5,171 @@ import sys
 import tempfile
 from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Callable, Literal, Optional, cast, overload
+from typing import Any, Callable, Literal, Optional, Union, cast, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling import DataModelIdentifier
 from cognite.client.data_classes.data_modeling.ids import DataModelId
 from cognite.client.exceptions import CogniteAPIError
+from typing_extensions import TypeAlias
 
-from cognite.pygen._core.generators import SDKGenerator
-
+from ._core.generators import SDKGenerator
 from ._settings import _load_pyproject_toml
+from .config import PygenConfig
 from .exceptions import DataModelNotFound
 from .utils.text import to_pascal, to_snake
 
-
-def generate_sdk_notebook(
-    client: CogniteClient,
-    model_id: DataModelIdentifier | Sequence[DataModelIdentifier] | dm.DataModel[dm.View] | dm.DataModelList[dm.View],
-    top_level_package: Optional[str] = None,
-    client_name: Optional[str] = None,
-    logger: Callable[[str], None] | None = None,
-    overwrite: bool = True,
-    format_code: bool = False,
-) -> Any:
-    """
-    Generates a Python SDK from the given Data Model(s).
-
-    The SDK is generated in a temporary directory and added to the sys.path. This is such that it becomes available
-    to be imported in the current Python session.
-
-    Args:
-        client: The cognite client used for fetching the data model.
-        model_id: The id(s) of the data model(s) to generate the SDK from. You can also pass in the data model(s)
-                  directly to avoid fetching them from CDF.
-        top_level_package: The name of the top level package for the SDK. Example "movie.client". If nothing is passed
-                            the package will [external_id:snake].client of the first data model given.
-        client_name: The name of the client class. Example "MovieClient". If nothing is passed the clien name will be
-                     [external_id:pascal_case]Client of the first data model given.
-        logger: A logger function that will be called with the progress of the generation.
-        overwrite: Whether to overwrite the output directory if it already exists. Defaults to True.
-        format_code: Whether to format the generated code using black. Defaults to False.
-
-    Returns:
-        The instantiated generated client class.
-    """
-    output_dir = Path(tempfile.gettempdir()) / "pygen"
-    logger = logger or print
-    identifier = _load_data_model_identifier(model_id)
-    external_id = identifier[0].external_id.replace(" ", "_")
-    if top_level_package is None:
-        top_level_package = f"{to_snake(external_id)}.client"
-    if client_name is None:
-        client_name = f"{to_pascal(external_id)}Client"
-
-    generate_sdk(
-        client,
-        model_id,
-        top_level_package,
-        client_name,
-        output_dir,
-        logger,
-        pydantic_version="infer",
-        overwrite=overwrite,
-        format_code=format_code,
-    )
-    if str(output_dir) not in sys.path:
-        sys.path.append(str(output_dir))
-        logger(f"Added {output_dir} to sys.path to enable import")
-    else:
-        logger(f"{output_dir} already in sys.path")
-    module = vars(importlib.import_module(top_level_package))
-    logger(f"Imported {top_level_package}")
-    return module[client_name](client)
+DataModel: TypeAlias = Union[DataModelIdentifier, dm.DataModel[dm.View]]
 
 
 def generate_sdk(
-    client: CogniteClient,
-    model_id: DataModelIdentifier | Sequence[DataModelIdentifier] | dm.DataModel[dm.View] | dm.DataModelList[dm.View],
-    top_level_package: str,
-    client_name: str,
-    output_dir: Path,
+    model_id: DataModel | Sequence[DataModel],
+    client: Optional[CogniteClient] = None,
+    top_level_package: Optional[str] = None,
+    client_name: Optional[str] = None,
+    output_dir: Optional[Path] = None,
     logger: Optional[Callable[[str], None]] = None,
     pydantic_version: Literal["v1", "v2", "infer"] = "infer",
     overwrite: bool = False,
     format_code: bool = True,
+    config: Optional[PygenConfig] = None,
 ) -> None:
     """
-    Generates a Python SDK from the given Data Model(s).
+    Generates a Python SDK tailored to the given Data Model(s).
 
     Args:
-        client: The cognite client used for fetching the data model.
-        model_id: The id(s) of the data model(s) to generate the SDK from. You can also pass in the data model(s)
-                  directly to avoid fetching them from CDF.
-        top_level_package: The name of the top level package for the SDK. Example "movie.client"
-        client_name: The name of the client class. Example "MovieClient"
-        output_dir: The directory to write the SDK to.
+        model_id: The ID(s) of the data model(s) used to create a tailored SDK. You can also pass in the data model(s)
+          directly to avoid fetching them from CDF.
+        client: The cognite client used for fetching the data model. This is required if you pass in
+          data models ID(s) in the `model_id` argument and not a data model.
+        top_level_package: The name of the top level package for the SDK. For example,
+          if we have top_level_package=`apm.client` and the client_name=`APMClient`, then
+          the importing the client will be `from apm.client import APMClient`. If nothing is passed,
+          the package will be [external_id:snake].client of the first data model given, while
+          the client name will be [external_id:pascal_case]
+        client_name: The name of the client class. For example, `APMClient`. See above for more details.
+        output_dir: The location to output the generated SDK. Defaults to the current working directory.
         logger: A logger function to log progress. Defaults to print.
         pydantic_version: The version of pydantic to use. Defaults to "infer" which will use
                           the environment to detect the installed version of pydantic.
         overwrite: Whether to overwrite the output directory if it already exists. Defaults to False.
         format_code: Whether to format the generated code using black. Defaults to True.
-
+        config: The configuration used to control how to generate the SDK.
     """
     logger = logger or print
-    if isinstance(model_id, (dm.DataModel, dm.DataModelList)):
-        data_model = model_id
-    else:
-        data_model = _load_data_model(client, model_id, logger)
-        logger(f"Successfully retrieved data model(s) {model_id}")
-    sdk_generator = SDKGenerator(top_level_package, client_name, data_model, pydantic_version, logger)
+    data_model = _get_data_model(model_id, client, logger)
+
+    external_id = _extract_external_id(data_model)
+
+    if top_level_package is None:
+        top_level_package = _default_top_level_package(external_id)
+    if client_name is None:
+        client_name = _default_client_name(external_id)
+
+    sdk_generator = SDKGenerator(
+        top_level_package, client_name, data_model, pydantic_version, logger, config or PygenConfig()
+    )
     sdk = sdk_generator.generate_sdk()
+    output_dir = output_dir or Path.cwd()
     logger(f"Writing SDK to {output_dir}")
     write_sdk_to_disk(sdk, output_dir, overwrite, format_code)
     logger("Done!")
+
+
+def generate_sdk_notebook(
+    model_id: DataModel | Sequence[DataModel],
+    client: Optional[CogniteClient] = None,
+    top_level_package: Optional[str] = None,
+    client_name: Optional[str] = None,
+    config: Optional[PygenConfig] = None,
+) -> Any:
+    """
+    Generates a Python SDK tailored to the given Data Model(s) and imports it into the current Python session.
+
+    This function is wrapper around generate_sdk. It is intended to be used in a Jupyter notebook.
+    The differences are that it:
+
+    * The SDK is generated in a temporary directory and added to the sys.path. This is such that it
+      becomes available to be imported in the current Python session.
+    * The signature is simplified.
+    * An instantiated client of the generated SDK is returned.
+
+
+    Args:
+        model_id: The ID(s) of the data model(s) used to create a tailored SDK. You can also pass in the data model(s)
+          directly to avoid fetching them from CDF.
+        client: The cognite client used for fetching the data model. This is required if you pass in
+          data models ID(s) in the `model_id` argument and not a data model.
+        top_level_package: The name of the top level package for the SDK. For example,
+          if we have top_level_package=`apm.client` and the client_name=`APMClient`, then
+          the importing the client will be `from apm.client import APMClient`. If nothing is passed,
+          the package will be [external_id:snake].client of the first data model given, while
+          the client name will be [external_id:pascal_case]
+        client_name: The name of the client class. For example, `APMClient`. See above for more details.
+        config: The configuration used to control how to generate the SDK.
+
+    Returns:
+        The instantiated generated client class.
+    """
+    output_dir = Path(tempfile.gettempdir()) / "pygen"
+    data_model = _get_data_model(model_id, client, print)
+    external_id = _extract_external_id(data_model)
+    if top_level_package is None:
+        top_level_package = _default_top_level_package(external_id)
+    if client_name is None:
+        client_name = _default_client_name(external_id)
+    generate_sdk(
+        data_model,
+        client,
+        top_level_package=top_level_package,
+        client_name=client_name,
+        output_dir=output_dir,
+        overwrite=True,
+        format_code=False,
+        config=config,
+    )
+    if str(output_dir) not in sys.path:
+        sys.path.append(str(output_dir))
+        print(f"Added {output_dir} to sys.path to enable import")
+    else:
+        print(f"{output_dir} already in sys.path")
+    module = vars(importlib.import_module(top_level_package))
+    print(f"Imported {top_level_package}")
+    return module[client_name](client)
+
+
+def _default_top_level_package(external_id: str) -> str:
+    return f"{to_snake(external_id)}.client"
+
+
+def _default_client_name(external_id: str) -> str:
+    return f"{to_pascal(external_id)}Client"
+
+
+def _extract_external_id(data_model: dm.DataModel | dm.DataModelList) -> str:
+    if isinstance(data_model, dm.DataModel):
+        return data_model.external_id.replace(" ", "_")
+    else:
+        return data_model[0].external_id.replace(" ", "_")
+
+
+def _get_data_model(model_id, client, logger) -> dm.DataModel | dm.DataModelList:
+    if isinstance(model_id, dm.DataModel):
+        return model_id
+    elif isinstance(model_id, Sequence) and all(isinstance(model, dm.DataModel) for model in model_id):
+        return dm.DataModelList(model_id)
+    elif isinstance(model_id, (dm.DataModelId, tuple)) or (
+        isinstance(model_id, Sequence) and all(isinstance(model, (dm.DataModelId, tuple)) for model in model_id)
+    ):
+        if client is None:
+            raise ValueError("client must be provided when passing in DataModelId")
+
+        data_model = _load_data_model(client, model_id, logger)
+        logger(f"Successfully retrieved data model(s) {model_id}")
+        return data_model
+
+    raise TypeError(f"Invalid type for model_id: {type(model_id)}")
 
 
 @overload

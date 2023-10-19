@@ -10,6 +10,7 @@ from cognite.pygen.config import Case, Naming, Number
 def create_name(raw_name: str, naming: Naming) -> str:
     """
     Create a name from a raw name and following the given naming convention.
+
     Args:
         raw_name: The raw string to convert.
         naming: The naming convention to follow.

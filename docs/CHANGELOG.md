@@ -13,6 +13,25 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.23.0] - 19-10-23
+### Added
+* Parameter `config` to `cognite.pygen.generate_sdk` and `cognite.pygen.generate_sdk_notebook`
+  to allow configuration of the generated SDK, i.e., naming convention, formatting, etc.
+* Validation of `model_id` argument in `cognite.pygen.generate_sdk` and `cognite.pygen.generate_sdk_notebook`.
+  To ensure all `views` are passed in with the data model.
+
+### Removed
+* `cognite.pygen.SDKGenerator` and `cognite.pygen.write_to_disk` are removed. These functions
+  contained duplicated functionality which has been covered by `generate_sdk`.
+* The parameters `logger`, `overwrite` and `format_code` have been removed from `cognite.pygen.generate_sdk_notebook`.
+  This is to simply the signature of this function.
+
+### Changed
+* The order of `client` and `model_id` in `cognite.pygen.generate_sdk` and `cognite.pygen.generate_sdk_notebook`
+  has been swapped. This is because `client` has become an optional argument (it is not necessary when passing in
+  a data model as the `model_id` argument). **Note** This is a **breaking change**, but since `pygen` is still
+  on 0-version, it is allowed.
+
 ## [0.22.1] - 19-10-23
 ### Fixed
 * Auto creating start and end nodes when calling `.apply()` method of generated SDK. This was an issue when

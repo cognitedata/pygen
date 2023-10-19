@@ -40,6 +40,17 @@ def load_cognite_client_from_toml(
     """
     This is a small helper function to load a CogniteClient from a toml file.
 
+    The default name of the config file is "config.toml" and it should look like this:
+
+    ```toml
+    [cognite]
+    project = "<cdf-project>"
+    tenant_id = "<tenant-id>"
+    cdf_cluster = "<cdf-cluster>"
+    client_id = "<client-id>"
+    client_secret = "<client-secret>"
+    ```
+
     Args:
         toml_file: Path to toml file
         section: Name of the section in the toml file to use. If None, use the top level of the toml file.

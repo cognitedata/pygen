@@ -5,7 +5,7 @@ This is a small CLI used for development of Pygen.
 import re
 import typer
 
-from cognite.pygen import SDKGenerator, write_sdk_to_disk
+from cognite.pygen._generator import SDKGenerator, write_sdk_to_disk
 from cognite.pygen.utils.cdf import load_cognite_client_from_toml
 from tests.constants import EXAMPLE_SDKS, EXAMPLES_DIR, REPO_ROOT
 from cognite.client.data_classes.data_modeling import DataModel

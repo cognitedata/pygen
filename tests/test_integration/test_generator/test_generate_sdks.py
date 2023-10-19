@@ -1,37 +1,22 @@
+from pathlib import Path
+
 from cognite.client import CogniteClient
 
-from cognite.pygen import SDKGenerator
+from cognite.pygen import generate_sdk
 
 
-def test_generate_movie_sdk(cognite_client: CogniteClient) -> None:
-    # Arrange
-    data_models = cognite_client.data_modeling.data_models.retrieve(
-        ("IntegrationTestsImmutable", "Movie", "2"), inline_views=True
+def test_generate_movie_sdk(cognite_client: CogniteClient, tmp_path: Path) -> None:
+    # Act/Assert
+    generate_sdk(
+        ("IntegrationTestsImmutable", "Movie", "2"),
+        cognite_client,
+        output_dir=tmp_path,
     )
-    assert data_models, "Please add a data model with id (IntegrationTestsImmutable, Movie, 2) to the test environment"
-    data_model = data_models[0]
-    generator = SDKGenerator("movie_domain", "Movie", data_model)
-
-    # Act
-    sdk = generator.generate_sdk()
-
-    # Assert
-    assert sdk
 
 
-def test_generate_shop_sdk(cognite_client: CogniteClient) -> None:
-    # Arrange
-    data_model = cognite_client.data_modeling.data_models.retrieve(
-        ("IntegrationTestsImmutable", "SHOP_Model", "2"), inline_views=True
+def test_generate_shop_sdk(cognite_client: CogniteClient, tmp_path: Path) -> None:
+    generate_sdk(
+        ("IntegrationTestsImmutable", "SHOP_Model", "2"),
+        cognite_client,
+        output_dir=tmp_path,
     )
-    assert (
-        data_model
-    ), "Please add a data model with id (IntegrationTestsImmutable, SHOP_Model, 2) to the test environment"
-    data_model = data_model[0]
-    generator = SDKGenerator("shop_domain", "Shop", data_model)
-
-    # Act
-    sdk = generator.generate_sdk()
-
-    # Assert
-    assert sdk

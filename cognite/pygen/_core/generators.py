@@ -25,7 +25,7 @@ class SDKGenerator:
     Args:
         top_level_package: The name of the top level package for the SDK. Example "movie.client"
         client_name: The name of the client class. Example "MovieClient"
-        data_model: The data model(s) to generate a SDK for.
+        data_model: The data model(s) to generate an SDK for.
         pydantic_version: The version of pydantic to use. "infer" will use the version of pydantic installed in
                           the environment.
         logger: A logger function to use for logging. If None, print will be done.
@@ -45,11 +45,23 @@ class SDKGenerator:
         self.client_name = client_name
         self._multi_api_classes: list[MultiAPIClass]
         if isinstance(data_model, dm.DataModel):
+            if view_ids := [view for view in data_model.views if isinstance(view, dm.ViewId)]:
+                raise ValueError(
+                    f"Data model ({data_model.space}, {data_model.external_id} contains ViewIDs: {view_ids}. "
+                    "pygen requires Views to generate an SDK."
+                )
+
             self._multi_api_generator = MultiAPIGenerator(
                 top_level_package, client_name, data_model.views, pydantic_version, logger, config
             )
             self._multi_api_classes = []
         elif isinstance(data_model, Sequence):
+            if view_ids := [view for model in data_model for view in model.views if isinstance(view, dm.ViewId)]:
+                raise ValueError(
+                    f"Data models ({', '.join(f'{model.space}, {model.external_id}' for model in data_model)}) "
+                    f"contains ViewIDs: {view_ids}. pygen requires Views to generate an SDK."
+                )
+
             unique_views = get_unique_views(*[view for model in data_model for view in model.views])
 
             self._multi_api_generator = MultiAPIGenerator(
