@@ -29,7 +29,8 @@ Changes are grouped as follows
 ### Changed
 * The order of `client` and `model_id` in `cognite.pygen.generate_sdk` and `cognite.pygen.generate_sdk_notebook`
   has been swapped. This is because `client` has become an optional argument (it is not necessary when passing in
-  a data model as the `model_id` argument).
+  a data model as the `model_id` argument). **Note** This is a **breaking change**, but since `pygen` is still
+  on 0-version, it is allowed.
 
 ## [0.22.1] - 19-10-23
 ### Fixed
