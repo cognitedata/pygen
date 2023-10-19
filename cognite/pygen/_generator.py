@@ -36,30 +36,50 @@ def generate_sdk(
     config: Optional[PygenConfig] = None,
 ) -> None:
     """
-    Generates a Python SDK from the given Data Model(s).
+    Generates a Python SDK tailored to the given Data Model(s).
 
     Args:
-        model_id: The id(s) of the data model(s) to generate the SDK from. You can also pass in the data model(s)
+        model_id: The ID(s) of the data model(s) used to create a tailored SDK. You can also pass in the data model(s)
           directly to avoid fetching them from CDF.
-        client: The cognite client used for fetching the data model.
-        top_level_package: The name of the top level package for the SDK. Example "movie.client"
-        client_name: The name of the client class. Example "MovieClient"
-        output_dir: The directory to write the SDK to.
+        client: The cognite client used for fetching the data model. This is required if you pass in
+          data models ID(s) in the `model_id` argument and not a data model.
+        top_level_package: The name of the top level package for the SDK. For example,
+          if we have top_level_package=`apm.client` and the client_name=`APMClient`, then
+          the importing the client will be `from apm.client import APMClient`. If nothing is passed,
+          the package will be [external_id:snake].client of the first data model given, while
+          the client name will be [external_id:pascal_case]
+        client_name: The name of the client class. For example, `APMClient`. See above for more details.
+        output_dir: The location to output the generated SDK.
         logger: A logger function to log progress. Defaults to print.
         pydantic_version: The version of pydantic to use. Defaults to "infer" which will use
                           the environment to detect the installed version of pydantic.
-        overwrite: Whether t`o overwrite the output directory if it already exists. Defaults to False.
+        overwrite: Whether to overwrite the output directory if it already exists. Defaults to False.
         format_code: Whether to format the generated code using black. Defaults to True.
-
+        config: The configuration used to control how to generate the SDK.
     """
     logger = logger or print
-    if isinstance(model_id, (dm.DataModel, dm.DataModelList)):
+    data_model: Union[dm.DataModelApply, dm.DataModelApplyList]
+    if isinstance(model_id, dm.DataModel):
+        data_model = model_id.as_apply()
+    elif isinstance(model_id, dm.DataModelApply):
         data_model = model_id
-    else:
-        data_model = _load_data_model(client, model_id, logger)
+    elif isinstance(model_id, Sequence) and all(isinstance(model, dm.DataModel) for model in model_id):
+        data_model = dm.DataModelList(model_id).as_apply()
+    elif isinstance(model_id, Sequence) and all(isinstance(model, dm.DataModelApply) for model in model_id):
+        data_model = dm.DataModelApplyList(model_id)
+    elif isinstance(model_id, DataModelIdentifier) or (
+        isinstance(model_id, Sequence) and all(isinstance(model, DataModelIdentifier) for model in model_id)
+    ):
+        data_model = _load_data_model(client, model_id, logger).as_apply()
         logger(f"Successfully retrieved data model(s) {model_id}")
+    else:
+        raise TypeError(f"Invalid type for model_id: {type(model_id)}")
 
-    external_id = identifier[0].external_id.replace(" ", "_")
+    if isinstance(data_model, dm.DataModelApply):
+        external_id = data_model.external_id.replace(" ", "_")
+    else:
+        external_id = data_model[0].external_id.replace(" ", "_")
+
     if top_level_package is None:
         top_level_package = f"{to_snake(external_id)}.client"
     if client_name is None:
@@ -82,32 +102,28 @@ def generate_sdk_notebook(
     config: Optional[PygenConfig] = None,
 ) -> Any:
     """
-    Generates a Python SDK from the given Data Model(s) and imports it into the current Python session.
+    Generates a Python SDK tailored to the given Data Model(s) and imports it into the current Python session.
 
     This function is wrapper around generate_sdk. It is intended to be used in a Jupyter notebook.
-    The differences is that it:
+    The differences are that it:
 
     * The SDK is generated in a temporary directory and added to the sys.path. This is such that it
       becomes available to be imported in the current Python session.
-    * The signature is simplified
-
+    * The signature is simplified.
 
 
     Args:
-        model_id: The ID(s) of the data model(s) to generate the SDK from.
-        You can also pass in the data model(s)
-            directly to avoid fetching them from CDF.
-        client: The cognite client used for fetching the data model.
-        This is required if you pass in data model ID(s).
-        top_level_package: The name of the top level package for the SDK.
-        Example "movie.client".
-        If nothing is passed
-                            the package will [external_id:snake].client of the first data model given.
-        client_name: The name of the client class.
-        Example "MovieClient".
-        If nothing is passed, the, client name will be
-                     [external_id:pascal_case]Client of the first data model given.
-        config: The configuration for the SDK generation.
+        model_id: The ID(s) of the data model(s) used to create a tailored SDK. You can also pass in the data model(s)
+          directly to avoid fetching them from CDF.
+        client: The cognite client used for fetching the data model. This is required if you pass in
+          data models ID(s) in the `model_id` argument and not a data model.
+        top_level_package: The name of the top level package for the SDK. For example,
+          if we have top_level_package=`apm.client` and the client_name=`APMClient`, then
+          the importing the client will be `from apm.client import APMClient`. If nothing is passed,
+          the package will be [external_id:snake].client of the first data model given, while
+          the client name will be [external_id:pascal_case]
+        client_name: The name of the client class. For example, `APMClient`. See above for more details.
+        config: The configuration used to control how to generate the SDK.
 
     Returns:
         The instantiated generated client class.
