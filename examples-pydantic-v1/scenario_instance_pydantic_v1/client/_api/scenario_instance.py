@@ -10,7 +10,7 @@ from cognite.client.data_classes import TimeSeriesList, DatapointsList, Datapoin
 from cognite.client.data_classes.datapoints import Aggregate
 from cognite.client import data_modeling as dm
 
-from ._core import DEFAULT_LIMIT_READ, TypeAPI, INSTANCE_QUERY_LIMIT
+from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT, INSTANCE_QUERY_LIMIT
 from scenario_instance_pydantic_v1.client.data_classes import (
     ScenarioInstance,
     ScenarioInstanceApply,

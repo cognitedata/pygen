@@ -6,7 +6,7 @@ from typing import Sequence, overload
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
-from ._core import DEFAULT_LIMIT_READ, TypeAPI
+from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from shop.client.data_classes import Case, CaseApply, CaseList, CaseApplyList
 
 

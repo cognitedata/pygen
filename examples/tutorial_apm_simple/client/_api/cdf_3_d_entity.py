@@ -6,7 +6,7 @@ from typing import Dict, List, Sequence, Tuple, overload
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
-from ._core import DEFAULT_LIMIT_READ, TypeAPI
+from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from tutorial_apm_simple.client.data_classes import CdfEntity, CdfEntityApply, CdfEntityList, CdfEntityApplyList
 
 
@@ -134,7 +134,10 @@ class CdfEntityAPI(TypeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
         cdf_3_d_entities = self._list(limit=limit, filter=filter_)
 
         if retrieve_edges:
-            in_model_3_d_edges = self.in_model_3_d.list(cdf_3_d_entities.as_external_ids(), limit=-1)
+            if len(external_ids := cdf_3_d_entities.as_external_ids()) > IN_FILTER_LIMIT:
+                in_model_3_d_edges = self.in_model_3_d.list(limit=-1)
+            else:
+                in_model_3_d_edges = self.in_model_3_d.list(external_ids, limit=-1)
             self._set_in_model_3_d(cdf_3_d_entities, in_model_3_d_edges)
 
         return cdf_3_d_entities

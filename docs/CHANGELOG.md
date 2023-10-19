@@ -13,6 +13,11 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.23.1] - 19-10-23
+### Fixed
+* Listing a type with a one-to-many edges which returned more than 5000 nodes, resulted in a
+  `CogniteAPIError` with `400` status code. This is now fixed.
+
 ## [0.23.0] - 19-10-23
 ### Added
 * Parameter `config` to `cognite.pygen.generate_sdk` and `cognite.pygen.generate_sdk_notebook`
