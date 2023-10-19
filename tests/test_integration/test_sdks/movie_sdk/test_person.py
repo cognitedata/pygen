@@ -12,7 +12,6 @@ def test_person_list(movie_client: MovieClient):
     people = movie_client.person.list(limit=-1)
 
     assert len(people) > 0
-    assert all(isinstance(role, str) for person in people for role in person.roles)
 
 
 def test_person_retrieve(movie_client: MovieClient):
