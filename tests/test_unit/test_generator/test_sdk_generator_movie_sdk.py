@@ -13,6 +13,7 @@ from cognite.pygen._core.data_classes import (
     EdgeOneToOne,
     Field,
     FilterCondition,
+    FilterConditionOnetoOneEdge,
     FilterParameter,
     ListMethod,
     PrimitiveField,
@@ -408,27 +409,31 @@ def test_create_list_method_actors(actor_view: dm.View, pygen_config: PygenConfi
     # Arrange
     data_class = DataClass.from_view(actor_view, pygen_config.naming.data_class)
 
+    person_data_class = MagicMock(spec=DataClass)
+    person_data_class.view_id = ViewSpaceExternalId(space="IntegrationTestsImmutable", external_id="Person")
     data_class.update_fields(
         actor_view.properties,
         {
             ViewSpaceExternalId(space="IntegrationTestsImmutable", external_id="Movie"): MagicMock(spec=DataClass),
             ViewSpaceExternalId(space="IntegrationTestsImmutable", external_id="Nomination"): MagicMock(spec=DataClass),
-            ViewSpaceExternalId(space="IntegrationTestsImmutable", external_id="Person"): MagicMock(spec=DataClass),
+            ViewSpaceExternalId(space="IntegrationTestsImmutable", external_id="Person"): person_data_class,
         },
         field_naming=pygen_config.naming.field,
     )
     parameters = [
-        FilterParameter("person", "str | tuple[str, str] | list[str] | list[tuple[str, str]]"),
+        FilterParameter(
+            "person", "str | tuple[str, str] | list[str] | list[tuple[str, str]]", space="IntegrationTestsImmutable"
+        ),
         FilterParameter("won_oscar", "bool"),
         FilterParameter("external_id_prefix", "str"),
     ]
     expected = ListMethod(
         parameters=parameters,
         filters=[
-            FilterCondition(dm.filters.Equals, "person", dict(value=parameters[0]), condition_type=str),
-            FilterCondition(dm.filters.Equals, "person", dict(value=parameters[0]), condition_type=tuple),
-            FilterCondition(dm.filters.In, "person", dict(values=parameters[0]), condition_type=str),
-            FilterCondition(dm.filters.In, "person", dict(values=parameters[0]), condition_type=tuple),
+            FilterConditionOnetoOneEdge(dm.filters.Equals, "person", dict(value=parameters[0]), instance_type=str),
+            FilterConditionOnetoOneEdge(dm.filters.Equals, "person", dict(value=parameters[0]), instance_type=tuple),
+            FilterConditionOnetoOneEdge(dm.filters.In, "person", dict(values=parameters[0]), instance_type=str),
+            FilterConditionOnetoOneEdge(dm.filters.In, "person", dict(values=parameters[0]), instance_type=tuple),
             FilterCondition(dm.filters.Equals, "wonOscar", dict(value=parameters[1])),
             FilterCondition(dm.filters.Prefix, "externalId", dict(value=parameters[2])),
         ],

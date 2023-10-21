@@ -164,8 +164,8 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
 
     def list(
         self,
+        person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         won_oscar: bool | None = None,
-        person: str | list[str] | tuple[str, str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
@@ -173,8 +173,8 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
     ) -> ActorList:
         filter_ = _create_filter(
             self._view_id,
-            won_oscar,
             person,
+            won_oscar,
             external_id_prefix,
             filter,
         )
@@ -220,14 +220,12 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
 
 def _create_filter(
     view_id: dm.ViewId,
+    person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
     won_oscar: bool | None = None,
-    person: str | list[str] | tuple[str, str] | list[tuple[str, str]] | None = None,
     external_id_prefix: str | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
-    if won_oscar and isinstance(won_oscar, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("wonOscar"), value=won_oscar))
     if person and isinstance(person, str):
         filters.append(
             dm.filters.Equals(
@@ -242,15 +240,17 @@ def _create_filter(
         filters.append(
             dm.filters.In(
                 view_id.as_property_ref("person"),
-                values=[{"space": "IntegrationTestsImmutable", "externalId": p} for p in person],
+                values=[{"space": "IntegrationTestsImmutable", "externalId": item} for item in person],
             )
         )
     if person and isinstance(person, list) and isinstance(person[0], tuple):
         filters.append(
             dm.filters.In(
-                view_id.as_property_ref("person"), values=[{"space": p[0], "externalId": p[1]} for p in person]
+                view_id.as_property_ref("person"), values=[{"space": item[0], "externalId": item[1]} for item in person]
             )
         )
+    if won_oscar and isinstance(won_oscar, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("wonOscar"), value=won_oscar))
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if filter:

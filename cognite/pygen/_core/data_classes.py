@@ -512,6 +512,7 @@ class FilterParameter:
     name: str
     type_: str
     default: None = None
+    space: str | None = None
 
     @property
     def annotation(self) -> str:
@@ -527,7 +528,6 @@ class FilterCondition:
     filter: type[dm.Filter]
     prop_name: str
     keyword_arguments: dict[str, FilterParameter]
-    condition_type: type | None = None
 
     @property
     def condition(self) -> str:
@@ -547,17 +547,55 @@ class FilterCondition:
         else:
             property_ref = f'view_id.as_property_ref("{self.prop_name}"), '
 
-        filter_args = ", ".join(
-            (
-                f"{keyword}={arg.name}.isoformat() if {arg.name} else None" if arg.is_time else f"{keyword}={arg.name}"
-                for keyword, arg in self.keyword_arguments.items()
-            )
-        )
-        return f"{property_ref}{filter_args}"
+        filter_args = self._create_filter_args()
+
+        return f"{property_ref}{', '.join(filter_args)}"
+
+    def _create_filter_args(self) -> list[str]:
+        filter_args: list[str] = []
+        for keyword, arg in self.keyword_arguments.items():
+            if arg.is_time:
+                filter_args.append(f"{keyword}={arg.name}.isoformat() if {arg.name} else None")
+            else:
+                filter_args.append(f"{keyword}={arg.name}")
+        return filter_args
 
     @property
     def filter_call(self) -> str:
         return f"dm.filters.{self.filter.__name__}"
+
+
+@dataclass
+class FilterConditionOnetoOneEdge(FilterCondition):
+    instance_type: type
+
+    @property
+    def condition(self) -> str:
+        if self.filter is dm.filters.In:
+            parameter = next(iter(self.keyword_arguments.values())).name
+            return (
+                f"{parameter} and isinstance({parameter}, list) and "
+                f"isinstance({parameter}[0], {self.instance_type.__name__})"
+            )
+        elif self.filter is dm.filters.Equals:
+            parameter = next(iter(self.keyword_arguments.values())).name
+            return f"{parameter} and isinstance({parameter}, {self.instance_type.__name__})"
+        raise NotImplementedError(f"Unsupported filter {self.filter} for Direct Relation")
+
+    def _create_filter_args(self) -> list[str]:
+        filter_args: list[str] = []
+        for keyword, arg in self.keyword_arguments.items():
+            if self.instance_type is str and self.filter is dm.filters.Equals:
+                filter_args.append(f'{keyword}={{"space": "{arg.space}", "externalId": {arg.name}}}')
+            elif self.instance_type is tuple and self.filter is dm.filters.Equals:
+                filter_args.append(f'{keyword}={{"space": {arg.name}[0], "externalId": {arg.name}[1]}}')
+            elif self.instance_type is str and self.filter is dm.filters.In:
+                filter_args.append(f'{keyword}=[{{"space": "{arg.space}", "externalId": item}} for item in {arg.name}]')
+            elif self.instance_type is tuple and self.filter is dm.filters.In:
+                filter_args.append(f'{keyword}=[{{"space": item[0], "externalId": item[1]}} for item in {arg.name}]')
+            else:
+                raise NotImplementedError(f"Unsupported filter {self.filter} for Direct Relation")
+        return filter_args
 
 
 # This field is used when creating the list method.
@@ -651,7 +689,9 @@ class ListMethod:
                 for selected_filter in config.get(field_.prop.type, field_.prop_name):
                     if selected_filter is dm.filters.Equals:
                         if field_.name not in parameters_by_name:
-                            parameter = FilterParameter(name=field_.name, type_="str | tuple[str, str]")
+                            parameter = FilterParameter(
+                                name=field_.name, type_="str | tuple[str, str]", space=field_.data_class.view_id.space
+                            )
                             parameters_by_name[parameter.name] = parameter
                         else:
                             # Equals and In filter share parameter, you have to extend the type hint.
@@ -659,18 +699,22 @@ class ListMethod:
                             parameter.type_ = f"str | tuple[str, str] | {parameter.type_}"
                         list_filters.extend(
                             [
-                                FilterCondition(
+                                FilterConditionOnetoOneEdge(
                                     filter=selected_filter,
                                     prop_name=field_.prop_name,
                                     keyword_arguments=dict(value=parameter),
-                                    condition_type=condition_type,
+                                    instance_type=condition_type,
                                 )
                                 for condition_type in (str, tuple)
                             ]
                         )
                     elif selected_filter is dm.filters.In:
                         if field_.name not in parameters_by_name:
-                            parameter = FilterParameter(name=field_.name, type_="list[str] | list[tuple[str, str]]")
+                            parameter = FilterParameter(
+                                name=field_.name,
+                                type_="list[str] | list[tuple[str, str]]",
+                                space=field_.data_class.view_id.space,
+                            )
                             parameters_by_name[parameter.name] = parameter
                         else:
                             # Equals and In filter share parameter, you have to extend the type hint.
@@ -678,11 +722,11 @@ class ListMethod:
                             parameter.type_ = f"{parameter.type_} | list[str] | list[tuple[str, str]]"
                         list_filters.extend(
                             [
-                                FilterCondition(
+                                FilterConditionOnetoOneEdge(
                                     filter=selected_filter,
                                     prop_name=field_.prop_name,
                                     keyword_arguments=dict(values=parameter),
-                                    condition_type=condition_type,
+                                    instance_type=condition_type,
                                 )
                                 for condition_type in (str, tuple)
                             ]
