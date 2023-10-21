@@ -13,6 +13,12 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.24.1] - 21-10-23
+### Added
+* Support for filtering on direct edges in the generated SDK. Currently supported filters, `Equals` and `In`.
+* `.to_pandas()` method for all generated resource classes, and automatically displaying resource classes
+  in pandas dataframes in Jupyter notebooks.
+
 ## [0.23.1] - 19-10-23
 ### Fixed
 * Listing a type with a one-to-many edges which returned more than 5000 nodes, resulted in a
