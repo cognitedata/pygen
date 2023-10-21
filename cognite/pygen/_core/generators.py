@@ -271,7 +271,7 @@ class APIGenerator:
                 top_level_package=top_level_package,
                 api_class=self.api_class,
                 data_class=self.data_class,
-                list_method=ListMethod.from_fields(self.data_class.fields, self._config.list_method),
+                list_method=ListMethod.from_fields(self.data_class.fields, self._config.filtering),
             )
             + "\n"
         )

@@ -166,6 +166,7 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
 
     def list(
         self,
+        person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         won_oscar: bool | None = None,
         external_id_prefix: str | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -174,6 +175,7 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
     ) -> DirectorList:
         filter_ = _create_filter(
             self._view_id,
+            person,
             won_oscar,
             external_id_prefix,
             filter,
@@ -220,11 +222,35 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
 
 def _create_filter(
     view_id: dm.ViewId,
+    person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
     won_oscar: bool | None = None,
     external_id_prefix: str | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
+    if person and isinstance(person, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("person"), value={"space": "IntegrationTestsImmutable", "externalId": person}
+            )
+        )
+    if person and isinstance(person, tuple):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("person"), value={"space": person[0], "externalId": person[1]})
+        )
+    if person and isinstance(person, list) and isinstance(person[0], str):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("person"),
+                values=[{"space": "IntegrationTestsImmutable", "externalId": item} for item in person],
+            )
+        )
+    if person and isinstance(person, list) and isinstance(person[0], tuple):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("person"), values=[{"space": item[0], "externalId": item[1]} for item in person]
+            )
+        )
     if won_oscar and isinstance(won_oscar, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("wonOscar"), value=won_oscar))
     if external_id_prefix:

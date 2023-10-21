@@ -269,6 +269,7 @@ class AssetPressureAPI:
         description_prefix: str | None = None,
         is_active: bool | None = None,
         is_critical_line: bool | None = None,
+        parent: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         source_db: str | list[str] | None = None,
         source_db_prefix: str | None = None,
         tag: str | list[str] | None = None,
@@ -291,6 +292,7 @@ class AssetPressureAPI:
             description_prefix,
             is_active,
             is_critical_line,
+            parent,
             source_db,
             source_db_prefix,
             tag,
@@ -320,6 +322,7 @@ class AssetPressureAPI:
         description_prefix: str | None = None,
         is_active: bool | None = None,
         is_critical_line: bool | None = None,
+        parent: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         source_db: str | list[str] | None = None,
         source_db_prefix: str | None = None,
         tag: str | list[str] | None = None,
@@ -342,6 +345,7 @@ class AssetPressureAPI:
             description_prefix,
             is_active,
             is_critical_line,
+            parent,
             source_db,
             source_db_prefix,
             tag,
@@ -579,6 +583,7 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
         description_prefix: str | None = None,
         is_active: bool | None = None,
         is_critical_line: bool | None = None,
+        parent: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         source_db: str | list[str] | None = None,
         source_db_prefix: str | None = None,
         tag: str | list[str] | None = None,
@@ -602,6 +607,7 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
             description_prefix,
             is_active,
             is_critical_line,
+            parent,
             source_db,
             source_db_prefix,
             tag,
@@ -663,6 +669,7 @@ def _create_filter(
     description_prefix: str | None = None,
     is_active: bool | None = None,
     is_critical_line: bool | None = None,
+    parent: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
     source_db: str | list[str] | None = None,
     source_db_prefix: str | None = None,
     tag: str | list[str] | None = None,
@@ -697,6 +704,29 @@ def _create_filter(
         filters.append(dm.filters.Equals(view_id.as_property_ref("isActive"), value=is_active))
     if is_critical_line and isinstance(is_critical_line, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("isCriticalLine"), value=is_critical_line))
+    if parent and isinstance(parent, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("parent"), value={"space": "tutorial_apm_simple", "externalId": parent}
+            )
+        )
+    if parent and isinstance(parent, tuple):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("parent"), value={"space": parent[0], "externalId": parent[1]})
+        )
+    if parent and isinstance(parent, list) and isinstance(parent[0], str):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("parent"),
+                values=[{"space": "tutorial_apm_simple", "externalId": item} for item in parent],
+            )
+        )
+    if parent and isinstance(parent, list) and isinstance(parent[0], tuple):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("parent"), values=[{"space": item[0], "externalId": item[1]} for item in parent]
+            )
+        )
     if source_db and isinstance(source_db, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("sourceDb"), value=source_db))
     if source_db and isinstance(source_db, list):

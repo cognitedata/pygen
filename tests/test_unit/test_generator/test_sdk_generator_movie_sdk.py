@@ -12,9 +12,10 @@ from cognite.pygen._core.data_classes import (
     EdgeOneToMany,
     EdgeOneToOne,
     Field,
-    ListFilter,
+    FilterCondition,
+    FilterConditionOnetoOneEdge,
+    FilterParameter,
     ListMethod,
-    ListParameter,
     PrimitiveField,
     PrimitiveListField,
     ViewSpaceExternalId,
@@ -374,25 +375,72 @@ def test_create_list_method(person_view: dm.View, pygen_config: PygenConfig) -> 
         field_naming=pygen_config.naming.field,
     )
     parameters = [
-        ListParameter("min_birth_year", "int"),
-        ListParameter("max_birth_year", "int"),
-        ListParameter("name", "str | list[str]"),
-        ListParameter("name_prefix", "str"),
-        ListParameter("external_id_prefix", "str"),
+        FilterParameter("min_birth_year", "int"),
+        FilterParameter("max_birth_year", "int"),
+        FilterParameter("name", "str | list[str]"),
+        FilterParameter("name_prefix", "str"),
+        FilterParameter("external_id_prefix", "str"),
     ]
     expected = ListMethod(
         parameters=parameters,
         filters=[
-            ListFilter(dm.filters.Range, "birthYear", dict(gte=parameters[0], lte=parameters[1])),
-            ListFilter(dm.filters.Equals, "name", dict(value=parameters[2])),
-            ListFilter(dm.filters.In, "name", dict(values=parameters[2])),
-            ListFilter(dm.filters.Prefix, "name", dict(value=parameters[3])),
-            ListFilter(dm.filters.Prefix, "externalId", dict(value=parameters[4])),
+            FilterCondition(dm.filters.Range, "birthYear", dict(gte=parameters[0], lte=parameters[1])),
+            FilterCondition(dm.filters.Equals, "name", dict(value=parameters[2])),
+            FilterCondition(dm.filters.In, "name", dict(values=parameters[2])),
+            FilterCondition(dm.filters.Prefix, "name", dict(value=parameters[3])),
+            FilterCondition(dm.filters.Prefix, "externalId", dict(value=parameters[4])),
         ],
     )
 
     # Act
-    actual = ListMethod.from_fields(data_class.fields, pygen_config.list_method)
+    actual = ListMethod.from_fields(data_class.fields, pygen_config.filtering)
+
+    # Assert
+    assert actual.parameters == expected.parameters
+    for a, e in zip(actual.filters, expected.filters):
+        assert a.filter == e.filter
+        assert a.prop_name == e.prop_name
+        assert a.keyword_arguments == e.keyword_arguments
+        assert a == e
+    assert actual == expected
+
+
+def test_create_list_method_actors(actor_view: dm.View, pygen_config: PygenConfig) -> None:
+    # Arrange
+    data_class = DataClass.from_view(actor_view, pygen_config.naming.data_class)
+
+    person_data_class = MagicMock(spec=DataClass)
+    person_data_class.view_id = ViewSpaceExternalId(space="IntegrationTestsImmutable", external_id="Person")
+    data_class.update_fields(
+        actor_view.properties,
+        {
+            ViewSpaceExternalId(space="IntegrationTestsImmutable", external_id="Movie"): MagicMock(spec=DataClass),
+            ViewSpaceExternalId(space="IntegrationTestsImmutable", external_id="Nomination"): MagicMock(spec=DataClass),
+            ViewSpaceExternalId(space="IntegrationTestsImmutable", external_id="Person"): person_data_class,
+        },
+        field_naming=pygen_config.naming.field,
+    )
+    parameters = [
+        FilterParameter(
+            "person", "str | tuple[str, str] | list[str] | list[tuple[str, str]]", space="IntegrationTestsImmutable"
+        ),
+        FilterParameter("won_oscar", "bool"),
+        FilterParameter("external_id_prefix", "str"),
+    ]
+    expected = ListMethod(
+        parameters=parameters,
+        filters=[
+            FilterConditionOnetoOneEdge(dm.filters.Equals, "person", dict(value=parameters[0]), instance_type=str),
+            FilterConditionOnetoOneEdge(dm.filters.Equals, "person", dict(value=parameters[0]), instance_type=tuple),
+            FilterConditionOnetoOneEdge(dm.filters.In, "person", dict(values=parameters[0]), instance_type=str),
+            FilterConditionOnetoOneEdge(dm.filters.In, "person", dict(values=parameters[0]), instance_type=tuple),
+            FilterCondition(dm.filters.Equals, "wonOscar", dict(value=parameters[1])),
+            FilterCondition(dm.filters.Prefix, "externalId", dict(value=parameters[2])),
+        ],
+    )
+
+    # Act
+    actual = ListMethod.from_fields(data_class.fields, pygen_config.filtering)
 
     # Assert
     assert actual.parameters == expected.parameters

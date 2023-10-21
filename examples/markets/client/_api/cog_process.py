@@ -59,16 +59,22 @@ class CogProcessAPI(TypeAPI[CogProcess, CogProcessApply, CogProcessList]):
 
     def list(
         self,
+        bid: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        date_transformations: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
+        transformation: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> CogProcessList:
         filter_ = _create_filter(
             self._view_id,
+            bid,
+            date_transformations,
             name,
             name_prefix,
+            transformation,
             external_id_prefix,
             filter,
         )
@@ -78,18 +84,92 @@ class CogProcessAPI(TypeAPI[CogProcess, CogProcessApply, CogProcessList]):
 
 def _create_filter(
     view_id: dm.ViewId,
+    bid: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+    date_transformations: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
     name: str | list[str] | None = None,
     name_prefix: str | None = None,
+    transformation: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
     external_id_prefix: str | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
+    if bid and isinstance(bid, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("bid"), value={"space": "market", "externalId": bid}))
+    if bid and isinstance(bid, tuple):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("bid"), value={"space": bid[0], "externalId": bid[1]}))
+    if bid and isinstance(bid, list) and isinstance(bid[0], str):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("bid"), values=[{"space": "market", "externalId": item} for item in bid]
+            )
+        )
+    if bid and isinstance(bid, list) and isinstance(bid[0], tuple):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("bid"), values=[{"space": item[0], "externalId": item[1]} for item in bid]
+            )
+        )
+    if date_transformations and isinstance(date_transformations, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("dateTransformations"),
+                value={"space": "market", "externalId": date_transformations},
+            )
+        )
+    if date_transformations and isinstance(date_transformations, tuple):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("dateTransformations"),
+                value={"space": date_transformations[0], "externalId": date_transformations[1]},
+            )
+        )
+    if date_transformations and isinstance(date_transformations, list) and isinstance(date_transformations[0], str):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("dateTransformations"),
+                values=[{"space": "market", "externalId": item} for item in date_transformations],
+            )
+        )
+    if date_transformations and isinstance(date_transformations, list) and isinstance(date_transformations[0], tuple):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("dateTransformations"),
+                values=[{"space": item[0], "externalId": item[1]} for item in date_transformations],
+            )
+        )
     if name and isinstance(name, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
     if name and isinstance(name, list):
         filters.append(dm.filters.In(view_id.as_property_ref("name"), values=name))
     if name_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
+    if transformation and isinstance(transformation, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("transformation"), value={"space": "market", "externalId": transformation}
+            )
+        )
+    if transformation and isinstance(transformation, tuple):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("transformation"),
+                value={"space": transformation[0], "externalId": transformation[1]},
+            )
+        )
+    if transformation and isinstance(transformation, list) and isinstance(transformation[0], str):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("transformation"),
+                values=[{"space": "market", "externalId": item} for item in transformation],
+            )
+        )
+    if transformation and isinstance(transformation, list) and isinstance(transformation[0], tuple):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("transformation"),
+                values=[{"space": item[0], "externalId": item[1]} for item in transformation],
+            )
+        )
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if filter:
