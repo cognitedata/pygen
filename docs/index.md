@@ -75,8 +75,9 @@ pygen generate --space movies \
 
 ### Dependencies for the generated SDK
 
-* [cognite-sdk](https://cognite-sdk-python.readthedocs-hosted.com/en/latest/) This is the basis for all requests to the Cognite Data Fusion API. This is a dependency for the generated SDK.
-* [pydantic](https://docs.pydantic.dev/latest/) This is used for all data classes in the generated SDK. This is a dependency for the generated SDK.
+* [cognite-sdk](https://cognite-sdk-python.readthedocs-hosted.com/en/latest/) This is the basis for all requests to the Cognite Data Fusion API.
+* [pydantic](https://docs.pydantic.dev/latest/) This is used for all data classes in the generated SDK.
+* [pandas](https://pandas.pydata.org/docs/) This is used for `.to_pandas()` methods in the generated SDK.
 
 ### Dependencies for the `pygen`
 
