@@ -7,11 +7,11 @@ from cognite.client import data_modeling as dm
 
 
 @dataclass
-class ListMethodFilters:
+class Filtering:
     """The type of filters to use for each property type.
 
-    When pygen generates a list method, it uses the type of the property to determine which filters to
-    implement. For example, if you have two properties, `year` of type Int32 and `name` of type Text,
+    When pygen generates, for example, a list or timeseries method, it uses the type of the property to determine which
+    filters to implement. For example, if you have two properties, `year` of type Int32 and `name` of type Text,
     and you generate a list method with the default options, you will get the following filters:
 
     ```python
@@ -29,9 +29,9 @@ class ListMethodFilters:
     ```
 
     !!! warning "Not supported properties"
-        Currently only primitive type properties are supported. If you have a list of primitive types, e.g., list of
-        strings, it will not be used to generate filters. One-to-one and one-to-many edges will also not be used to
-        create filters in the `.list(...)` method.
+        Currently primitive type properties and one-to-one edges are supported. If you have a list of
+        primitive types, e.g., list of strings, it will not be used to generate filters. One-to-many edges will also
+        not be used to create filters.
 
     Args:
         integer: Filters to use for integer properties.
@@ -40,6 +40,7 @@ class ListMethodFilters:
         date: Filters to use for date properties.
         datetime: Filters to use for datetime properties.
         string: Filters to use for string properties.
+        edge_one_to_one: Filters to use for one-to-one edges, i.e., direct references to other resources.
         by_name: Filters to use for properties with a specific name. This
             overwrites the default filters for the property with the given name.
     """
@@ -50,6 +51,7 @@ class ListMethodFilters:
     date: tuple[type[dm.Filter], ...] = (dm.filters.Range,)
     datetime: tuple[type[dm.Filter], ...] = (dm.filters.Range,)
     string: tuple[type[dm.Filter], ...] = (dm.filters.Equals, dm.filters.In, dm.filters.Prefix)
+    edge_one_to_one: tuple[type[dm.Filter], ...] = (dm.filters.Equals, dm.filters.In)
     by_name: dict[str, tuple[type[dm.Filter], ...]] = dataclass_field(
         default_factory=lambda: {"externalId": (dm.filters.Prefix,)}
     )
@@ -70,6 +72,8 @@ class ListMethodFilters:
             return self.datetime
         elif isinstance(type_, dm.Text):
             return self.string
+        elif isinstance(type_, dm.DirectRelation):
+            return self.edge_one_to_one
         else:
             # Skip unsupported types
             return tuple([])

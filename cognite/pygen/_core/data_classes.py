@@ -508,7 +508,7 @@ class MultiAPIClass:
 
 
 @dataclass
-class ListParameter:
+class FilterParameter:
     name: str
     type_: str
     default: None = None
@@ -523,10 +523,11 @@ class ListParameter:
 
 
 @dataclass
-class ListFilter:
+class FilterCondition:
     filter: type[dm.Filter]
     prop_name: str
-    keyword_arguments: dict[str, ListParameter]
+    keyword_arguments: dict[str, FilterParameter]
+    condition_type: type | None = None
 
     @property
     def condition(self) -> str:
@@ -579,69 +580,117 @@ _EXTERNAL_ID_FIELD = PrimitiveField(
 
 @dataclass
 class ListMethod:
-    parameters: list[ListParameter]
-    filters: list[ListFilter]
+    parameters: list[FilterParameter]
+    filters: list[FilterCondition]
 
     @classmethod
-    def from_fields(cls, fields: Iterable[Field], config: pygen_config.ListMethodFilters) -> Self:
-        parameters_by_name: dict[str, ListParameter] = {}
-        list_filters: list[ListFilter] = []
+    def from_fields(cls, fields: Iterable[Field], config: pygen_config.Filtering) -> Self:
+        parameters_by_name: dict[str, FilterParameter] = {}
+        list_filters: list[FilterCondition] = []
 
         for field_ in itertools.chain(fields, (_EXTERNAL_ID_FIELD,)):
-            if not isinstance(field_, PrimitiveField):
-                # Only primitive fields supported for now
-                continue
+            # Only primitive and edge one-to-one fields supported for now
+            if isinstance(field_, PrimitiveField):
+                for selected_filter in config.get(field_.prop.type, field_.prop_name):
+                    if selected_filter is dm.filters.Equals:
+                        if field_.name not in parameters_by_name:
+                            parameter = FilterParameter(name=field_.name, type_=field_.type_)
+                            parameters_by_name[parameter.name] = parameter
+                        else:
+                            # Equals and In filter share parameter, you have to extend the type hint.
+                            parameter = parameters_by_name[field_.name]
+                            parameter.type_ = f"{field_.type_} | {parameter.type_}"
+                        list_filters.append(
+                            FilterCondition(
+                                filter=selected_filter,
+                                prop_name=field_.prop_name,
+                                keyword_arguments=dict(value=parameter),
+                            )
+                        )
+                    elif selected_filter is dm.filters.In:
+                        if field_.name not in parameters_by_name:
+                            parameter = FilterParameter(field_.name, type_=f"list[{field_.type_}]")
+                            parameters_by_name[parameter.name] = parameter
+                        else:
+                            # Equals and In filter share parameter, you have to extend the type hint.
+                            parameter = parameters_by_name[field_.name]
+                            parameter.type_ = f"{parameter.type_} | list[{field_.type_}]"
+                        list_filters.append(
+                            FilterCondition(
+                                filter=selected_filter,
+                                prop_name=field_.prop_name,
+                                keyword_arguments=dict(values=parameter),
+                            )
+                        )
+                    elif selected_filter is dm.filters.Prefix:
+                        parameter = FilterParameter(name=f"{field_.name}_prefix", type_=field_.type_)
+                        parameters_by_name[parameter.name] = parameter
+                        list_filters.append(
+                            FilterCondition(
+                                filter=selected_filter,
+                                prop_name=field_.prop_name,
+                                keyword_arguments=dict(value=parameter),
+                            )
+                        )
+                    elif selected_filter is dm.filters.Range:
+                        min_parameter = FilterParameter(name=f"min_{field_.name}", type_=field_.type_)
+                        max_parameter = FilterParameter(name=f"max_{field_.name}", type_=field_.type_)
+                        parameters_by_name[min_parameter.name] = min_parameter
+                        parameters_by_name[max_parameter.name] = max_parameter
+                        list_filters.append(
+                            FilterCondition(
+                                filter=selected_filter,
+                                prop_name=field_.prop_name,
+                                keyword_arguments=dict(gte=min_parameter, lte=max_parameter),
+                            )
+                        )
+                    else:
+                        # This is a filter not supported by the list method.
+                        continue
+            elif isinstance(field_, EdgeOneToOne):
+                for selected_filter in config.get(field_.prop.type, field_.prop_name):
+                    if selected_filter is dm.filters.Equals:
+                        if field_.name not in parameters_by_name:
+                            parameter = FilterParameter(name=field_.name, type_="str | tuple[str, str]")
+                            parameters_by_name[parameter.name] = parameter
+                        else:
+                            # Equals and In filter share parameter, you have to extend the type hint.
+                            parameter = parameters_by_name[field_.name]
+                            parameter.type_ = f"str | tuple[str, str] | {parameter.type_}"
+                        list_filters.extend(
+                            [
+                                FilterCondition(
+                                    filter=selected_filter,
+                                    prop_name=field_.prop_name,
+                                    keyword_arguments=dict(value=parameter),
+                                    condition_type=condition_type,
+                                )
+                                for condition_type in (str, tuple)
+                            ]
+                        )
+                    elif selected_filter is dm.filters.In:
+                        if field_.name not in parameters_by_name:
+                            parameter = FilterParameter(name=field_.name, type_="list[str] | list[tuple[str, str]]")
+                            parameters_by_name[parameter.name] = parameter
+                        else:
+                            # Equals and In filter share parameter, you have to extend the type hint.
+                            parameter = parameters_by_name[field_.name]
+                            parameter.type_ = f"{parameter.type_} | list[str] | list[tuple[str, str]]"
+                        list_filters.extend(
+                            [
+                                FilterCondition(
+                                    filter=selected_filter,
+                                    prop_name=field_.prop_name,
+                                    keyword_arguments=dict(values=parameter),
+                                    condition_type=condition_type,
+                                )
+                                for condition_type in (str, tuple)
+                            ]
+                        )
+                    else:
+                        # This is a filter not supported.
+                        continue
 
-            for selected_filter in config.get(field_.prop.type, field_.prop_name):
-                if selected_filter is dm.filters.Equals:
-                    if field_.name not in parameters_by_name:
-                        parameter = ListParameter(name=field_.name, type_=field_.type_)
-                        parameters_by_name[parameter.name] = parameter
-                    else:
-                        # Equals and In filter share parameter, you have to extend the type hint.
-                        parameter = parameters_by_name[field_.name]
-                        parameter.type_ = f"{field_.type_} | {parameter.type_}"
-                    list_filters.append(
-                        ListFilter(
-                            filter=selected_filter, prop_name=field_.prop_name, keyword_arguments=dict(value=parameter)
-                        )
-                    )
-                elif selected_filter is dm.filters.In:
-                    if field_.name not in parameters_by_name:
-                        parameter = ListParameter(field_.name, type_=f"list[{field_.type_}]")
-                        parameters_by_name[parameter.name] = parameter
-                    else:
-                        # Equals and In filter share parameter, you have to extend the typ hint.
-                        parameter = parameters_by_name[field_.name]
-                        parameter.type_ = f"{parameter.type_} | list[{field_.type_}]"
-                    list_filters.append(
-                        ListFilter(
-                            filter=selected_filter, prop_name=field_.prop_name, keyword_arguments=dict(values=parameter)
-                        )
-                    )
-                elif selected_filter is dm.filters.Prefix:
-                    parameter = ListParameter(name=f"{field_.name}_prefix", type_=field_.type_)
-                    parameters_by_name[parameter.name] = parameter
-                    list_filters.append(
-                        ListFilter(
-                            filter=selected_filter, prop_name=field_.prop_name, keyword_arguments=dict(value=parameter)
-                        )
-                    )
-                elif selected_filter is dm.filters.Range:
-                    min_parameter = ListParameter(name=f"min_{field_.name}", type_=field_.type_)
-                    max_parameter = ListParameter(name=f"max_{field_.name}", type_=field_.type_)
-                    parameters_by_name[min_parameter.name] = min_parameter
-                    parameters_by_name[max_parameter.name] = max_parameter
-                    list_filters.append(
-                        ListFilter(
-                            filter=selected_filter,
-                            prop_name=field_.prop_name,
-                            keyword_arguments=dict(gte=min_parameter, lte=max_parameter),
-                        )
-                    )
-                else:
-                    # This is a filter that is not supported by the list method.
-                    continue
         return cls(parameters=list(parameters_by_name.values()), filters=list_filters)
 
 
