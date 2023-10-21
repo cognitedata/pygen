@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+import pytest
+
 from tests.constants import IS_PYDANTIC_V1
 
 if IS_PYDANTIC_V1:
@@ -35,3 +39,30 @@ def test_actor_apply_with_person(movie_client: MovieClient):
     finally:
         movie_client.actor.delete(actor.external_id)
         movie_client.person.delete(actor.person.external_id)
+
+
+@pytest.mark.parametrize(
+    "person, expected_count, expected_person",
+    [
+        ("person:ethan_coen", 1, ["person:ethan_coen"]),
+        (["person:ethan_coen", "person:joel_coen"], 2, ["person:ethan_coen", "person:joel_coen"]),
+        (("IntegrationTestsImmutable", "person:ethan_coen"), 1, ["person:ethan_coen"]),
+        (
+            [("IntegrationTestsImmutable", "person:ethan_coen"), ("IntegrationTestsImmutable", "person:joel_coen")],
+            2,
+            ["person:ethan_coen", "person:joel_coen"],
+        ),
+    ],
+)
+def test_actor_list_filter_on_direct_edge(
+    person: str | list[str] | tuple[str, str] | list[tuple[str, str]],
+    expected_count: int,
+    expected_person: list[str],
+    movie_client: MovieClient,
+) -> None:
+    # Act
+    actors = movie_client.actor.list(person=person, limit=expected_count + 1, retrieve_edges=False)
+
+    # Assert
+    assert len(actors) == expected_count
+    assert sorted([actor.person for actor in actors]) == sorted(expected_person)
