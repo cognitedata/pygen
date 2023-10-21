@@ -19,6 +19,13 @@ class DomainModelCore(BaseModel):
     def id_tuple(self) -> tuple[str, str]:
         return self.space, self.external_id
 
+    def to_pandas(self) -> pd.Series:
+        return pd.Series(self.model_dump())
+
+    def _repr_html_(self) -> str:
+        """Returns HTML representation of DomainModel."""
+        return self.to_pandas().to_frame("value")._repr_html_()  # type: ignore[operator]
+
 
 T_TypeNodeCore = TypeVar("T_TypeNodeCore", bound=DomainModelCore)
 

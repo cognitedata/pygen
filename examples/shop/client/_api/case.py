@@ -60,6 +60,7 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
         self,
         arguments: str | list[str] | None = None,
         arguments_prefix: str | None = None,
+        commands: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         min_end_time: datetime.datetime | None = None,
         max_end_time: datetime.datetime | None = None,
         name: str | list[str] | None = None,
@@ -78,6 +79,7 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
             self._view_id,
             arguments,
             arguments_prefix,
+            commands,
             min_end_time,
             max_end_time,
             name,
@@ -99,6 +101,7 @@ def _create_filter(
     view_id: dm.ViewId,
     arguments: str | list[str] | None = None,
     arguments_prefix: str | None = None,
+    commands: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
     min_end_time: datetime.datetime | None = None,
     max_end_time: datetime.datetime | None = None,
     name: str | list[str] | None = None,
@@ -119,6 +122,33 @@ def _create_filter(
         filters.append(dm.filters.In(view_id.as_property_ref("arguments"), values=arguments))
     if arguments_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("arguments"), value=arguments_prefix))
+    if commands and isinstance(commands, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("commands"),
+                value={"space": "IntegrationTestsImmutable", "externalId": commands},
+            )
+        )
+    if commands and isinstance(commands, tuple):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("commands"), value={"space": commands[0], "externalId": commands[1]}
+            )
+        )
+    if commands and isinstance(commands, list) and isinstance(commands[0], str):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("commands"),
+                values=[{"space": "IntegrationTestsImmutable", "externalId": item} for item in commands],
+            )
+        )
+    if commands and isinstance(commands, list) and isinstance(commands[0], tuple):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("commands"),
+                values=[{"space": item[0], "externalId": item[1]} for item in commands],
+            )
+        )
     if min_end_time or max_end_time:
         filters.append(
             dm.filters.Range(

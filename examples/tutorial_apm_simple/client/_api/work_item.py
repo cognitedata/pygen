@@ -132,6 +132,7 @@ class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
         title: str | list[str] | None = None,
         title_prefix: str | None = None,
         to_be_done: bool | None = None,
+        work_order: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
@@ -153,6 +154,7 @@ class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
             title,
             title_prefix,
             to_be_done,
+            work_order,
             external_id_prefix,
             filter,
         )
@@ -196,6 +198,7 @@ def _create_filter(
     title: str | list[str] | None = None,
     title_prefix: str | None = None,
     to_be_done: bool | None = None,
+    work_order: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
     external_id_prefix: str | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
@@ -240,6 +243,32 @@ def _create_filter(
         filters.append(dm.filters.Prefix(view_id.as_property_ref("title"), value=title_prefix))
     if to_be_done and isinstance(to_be_done, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("toBeDone"), value=to_be_done))
+    if work_order and isinstance(work_order, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("workOrder"), value={"space": "tutorial_apm_simple", "externalId": work_order}
+            )
+        )
+    if work_order and isinstance(work_order, tuple):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("workOrder"), value={"space": work_order[0], "externalId": work_order[1]}
+            )
+        )
+    if work_order and isinstance(work_order, list) and isinstance(work_order[0], str):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("workOrder"),
+                values=[{"space": "tutorial_apm_simple", "externalId": item} for item in work_order],
+            )
+        )
+    if work_order and isinstance(work_order, list) and isinstance(work_order[0], tuple):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("workOrder"),
+                values=[{"space": item[0], "externalId": item[1]} for item in work_order],
+            )
+        )
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if filter:

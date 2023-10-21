@@ -164,6 +164,7 @@ class MovieAPI(TypeAPI[Movie, MovieApply, MovieList]):
 
     def list(
         self,
+        rating: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         min_release_year: int | None = None,
         max_release_year: int | None = None,
         min_run_time_minutes: float | None = None,
@@ -177,6 +178,7 @@ class MovieAPI(TypeAPI[Movie, MovieApply, MovieList]):
     ) -> MovieList:
         filter_ = _create_filter(
             self._view_id,
+            rating,
             min_release_year,
             max_release_year,
             min_run_time_minutes,
@@ -228,6 +230,7 @@ class MovieAPI(TypeAPI[Movie, MovieApply, MovieList]):
 
 def _create_filter(
     view_id: dm.ViewId,
+    rating: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
     min_release_year: int | None = None,
     max_release_year: int | None = None,
     min_run_time_minutes: float | None = None,
@@ -238,6 +241,29 @@ def _create_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
+    if rating and isinstance(rating, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("rating"), value={"space": "IntegrationTestsImmutable", "externalId": rating}
+            )
+        )
+    if rating and isinstance(rating, tuple):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("rating"), value={"space": rating[0], "externalId": rating[1]})
+        )
+    if rating and isinstance(rating, list) and isinstance(rating[0], str):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("rating"),
+                values=[{"space": "IntegrationTestsImmutable", "externalId": item} for item in rating],
+            )
+        )
+    if rating and isinstance(rating, list) and isinstance(rating[0], tuple):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("rating"), values=[{"space": item[0], "externalId": item[1]} for item in rating]
+            )
+        )
     if min_release_year or max_release_year:
         filters.append(
             dm.filters.Range(view_id.as_property_ref("releaseYear"), gte=min_release_year, lte=max_release_year)

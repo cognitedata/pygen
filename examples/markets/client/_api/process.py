@@ -57,6 +57,7 @@ class ProcessAPI(TypeAPI[Process, ProcessApply, ProcessList]):
 
     def list(
         self,
+        bid: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -65,6 +66,7 @@ class ProcessAPI(TypeAPI[Process, ProcessApply, ProcessList]):
     ) -> ProcessList:
         filter_ = _create_filter(
             self._view_id,
+            bid,
             name,
             name_prefix,
             external_id_prefix,
@@ -76,12 +78,29 @@ class ProcessAPI(TypeAPI[Process, ProcessApply, ProcessList]):
 
 def _create_filter(
     view_id: dm.ViewId,
+    bid: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
     name: str | list[str] | None = None,
     name_prefix: str | None = None,
     external_id_prefix: str | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
+    if bid and isinstance(bid, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("bid"), value={"space": "market", "externalId": bid}))
+    if bid and isinstance(bid, tuple):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("bid"), value={"space": bid[0], "externalId": bid[1]}))
+    if bid and isinstance(bid, list) and isinstance(bid[0], str):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("bid"), values=[{"space": "market", "externalId": item} for item in bid]
+            )
+        )
+    if bid and isinstance(bid, list) and isinstance(bid[0], tuple):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("bid"), values=[{"space": item[0], "externalId": item[1]} for item in bid]
+            )
+        )
     if name and isinstance(name, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
     if name and isinstance(name, list):

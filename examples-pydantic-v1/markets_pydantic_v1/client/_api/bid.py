@@ -60,6 +60,7 @@ class BidAPI(TypeAPI[Bid, BidApply, BidList]):
         self,
         min_date: datetime.date | None = None,
         max_date: datetime.date | None = None,
+        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -70,6 +71,7 @@ class BidAPI(TypeAPI[Bid, BidApply, BidList]):
             self._view_id,
             min_date,
             max_date,
+            market,
             name,
             name_prefix,
             external_id_prefix,
@@ -83,6 +85,7 @@ def _create_filter(
     view_id: dm.ViewId,
     min_date: datetime.date | None = None,
     max_date: datetime.date | None = None,
+    market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
     name: str | list[str] | None = None,
     name_prefix: str | None = None,
     external_id_prefix: str | None = None,
@@ -95,6 +98,26 @@ def _create_filter(
                 view_id.as_property_ref("date"),
                 gte=min_date.isoformat() if min_date else None,
                 lte=max_date.isoformat() if max_date else None,
+            )
+        )
+    if market and isinstance(market, str):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("market"), value={"space": "market", "externalId": market})
+        )
+    if market and isinstance(market, tuple):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("market"), value={"space": market[0], "externalId": market[1]})
+        )
+    if market and isinstance(market, list) and isinstance(market[0], str):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("market"), values=[{"space": "market", "externalId": item} for item in market]
+            )
+        )
+    if market and isinstance(market, list) and isinstance(market[0], tuple):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("market"), values=[{"space": item[0], "externalId": item[1]} for item in market]
             )
         )
     if name and isinstance(name, str):

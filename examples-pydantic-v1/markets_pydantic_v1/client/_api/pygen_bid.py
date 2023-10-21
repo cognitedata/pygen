@@ -63,6 +63,7 @@ class PygenBidAPI(TypeAPI[PygenBid, PygenBidApply, PygenBidList]):
         min_date: datetime.date | None = None,
         max_date: datetime.date | None = None,
         is_block: bool | None = None,
+        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         min_minimum_price: float | None = None,
         max_minimum_price: float | None = None,
         name: str | list[str] | None = None,
@@ -78,6 +79,7 @@ class PygenBidAPI(TypeAPI[PygenBid, PygenBidApply, PygenBidList]):
             min_date,
             max_date,
             is_block,
+            market,
             min_minimum_price,
             max_minimum_price,
             name,
@@ -96,6 +98,7 @@ def _create_filter(
     min_date: datetime.date | None = None,
     max_date: datetime.date | None = None,
     is_block: bool | None = None,
+    market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
     min_minimum_price: float | None = None,
     max_minimum_price: float | None = None,
     name: str | list[str] | None = None,
@@ -116,6 +119,26 @@ def _create_filter(
         )
     if is_block and isinstance(is_block, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("isBlock"), value=is_block))
+    if market and isinstance(market, str):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("market"), value={"space": "market", "externalId": market})
+        )
+    if market and isinstance(market, tuple):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("market"), value={"space": market[0], "externalId": market[1]})
+        )
+    if market and isinstance(market, list) and isinstance(market[0], str):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("market"), values=[{"space": "market", "externalId": item} for item in market]
+            )
+        )
+    if market and isinstance(market, list) and isinstance(market[0], tuple):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("market"), values=[{"space": item[0], "externalId": item[1]} for item in market]
+            )
+        )
     if min_minimum_price or max_minimum_price:
         filters.append(
             dm.filters.Range(view_id.as_property_ref("minimumPrice"), gte=min_minimum_price, lte=max_minimum_price)
