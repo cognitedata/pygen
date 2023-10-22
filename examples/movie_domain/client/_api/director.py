@@ -9,6 +9,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from movie_domain.client.data_classes import Director, DirectorApply, DirectorList, DirectorApplyList, DirectorFields
+from movie_domain.client.data_classes._director import _DIRECTOR_PROPERTIES_BY_FIELD
 
 
 class DirectorMoviesAPI:
@@ -165,25 +166,6 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
 
             return directors
 
-    def search(
-        self,
-        query: str,
-        properties: DirectorTextFields | Sequence[DirectorTextFields] | None = None,
-        person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        won_oscar: bool | None = None,
-        external_id_prefix: str | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
-        filter: dm.Filter | None = None,
-    ) -> DirectorList:
-        filter_ = _create_filter(
-            self._view_id,
-            person,
-            won_oscar,
-            external_id_prefix,
-            filter,
-        )
-        return self._search(self._view_id, query, _DIRECTOR_PROPERTIES_BY_FIELD, properties, filter_, limit)
-
     @overload
     def aggregate(
         self,
@@ -193,8 +175,6 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
         | Sequence[dm.aggregations.MetricAggregation],
         property: DirectorFields | Sequence[DirectorFields] | None = None,
         group_by: None = None,
-        query: str | None = None,
-        search_properties: DirectorTextFields | Sequence[DirectorTextFields] | None = None,
         person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         won_oscar: bool | None = None,
         external_id_prefix: str | None = None,
@@ -212,8 +192,6 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
         | Sequence[dm.aggregations.MetricAggregation],
         property: DirectorFields | Sequence[DirectorFields] | None = None,
         group_by: DirectorFields | Sequence[DirectorFields] = None,
-        query: str | None = None,
-        search_properties: DirectorTextFields | Sequence[DirectorTextFields] | None = None,
         person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         won_oscar: bool | None = None,
         external_id_prefix: str | None = None,
@@ -230,8 +208,6 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
         | Sequence[dm.aggregations.MetricAggregation],
         property: DirectorFields | Sequence[DirectorFields] | None = None,
         group_by: DirectorFields | Sequence[DirectorFields] | None = None,
-        query: str | None = None,
-        search_property: DirectorTextFields | Sequence[DirectorTextFields] | None = None,
         person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         won_oscar: bool | None = None,
         external_id_prefix: str | None = None,
@@ -251,8 +227,8 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
             _DIRECTOR_PROPERTIES_BY_FIELD,
             property,
             group_by,
-            query,
-            search_property,
+            None,
+            None,
             limit,
             filter_,
         )
@@ -261,8 +237,6 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
         self,
         property: DirectorFields,
         interval: float,
-        query: str | None = None,
-        search_property: DirectorTextFields | Sequence[DirectorTextFields] | None = None,
         person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         won_oscar: bool | None = None,
         external_id_prefix: str | None = None,
@@ -281,8 +255,8 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
             property,
             interval,
             _DIRECTOR_PROPERTIES_BY_FIELD,
-            query,
-            search_property,
+            None,
+            None,
             limit,
             filter_,
         )

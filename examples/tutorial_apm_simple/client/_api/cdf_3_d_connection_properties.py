@@ -14,6 +14,9 @@ from tutorial_apm_simple.client.data_classes import (
     CdfConnectionPropertiesApplyList,
     CdfConnectionPropertiesFields,
 )
+from tutorial_apm_simple.client.data_classes._cdf_3_d_connection_properties import (
+    _CDFCONNECTIONPROPERTIES_PROPERTIES_BY_FIELD,
+)
 
 
 class CdfConnectionPropertiesAPI(
@@ -68,31 +71,6 @@ class CdfConnectionPropertiesAPI(
         else:
             return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
 
-    def search(
-        self,
-        query: str,
-        properties: CdfConnectionPropertiesTextFields | Sequence[CdfConnectionPropertiesTextFields] | None = None,
-        min_revision_id: int | None = None,
-        max_revision_id: int | None = None,
-        min_revision_node_id: int | None = None,
-        max_revision_node_id: int | None = None,
-        external_id_prefix: str | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
-        filter: dm.Filter | None = None,
-    ) -> CdfConnectionPropertiesList:
-        filter_ = _create_filter(
-            self._view_id,
-            min_revision_id,
-            max_revision_id,
-            min_revision_node_id,
-            max_revision_node_id,
-            external_id_prefix,
-            filter,
-        )
-        return self._search(
-            self._view_id, query, _CDFCONNECTIONPROPERTIES_PROPERTIES_BY_FIELD, properties, filter_, limit
-        )
-
     @overload
     def aggregate(
         self,
@@ -102,10 +80,6 @@ class CdfConnectionPropertiesAPI(
         | Sequence[dm.aggregations.MetricAggregation],
         property: CdfConnectionPropertiesFields | Sequence[CdfConnectionPropertiesFields] | None = None,
         group_by: None = None,
-        query: str | None = None,
-        search_properties: CdfConnectionPropertiesTextFields
-        | Sequence[CdfConnectionPropertiesTextFields]
-        | None = None,
         min_revision_id: int | None = None,
         max_revision_id: int | None = None,
         min_revision_node_id: int | None = None,
@@ -125,10 +99,6 @@ class CdfConnectionPropertiesAPI(
         | Sequence[dm.aggregations.MetricAggregation],
         property: CdfConnectionPropertiesFields | Sequence[CdfConnectionPropertiesFields] | None = None,
         group_by: CdfConnectionPropertiesFields | Sequence[CdfConnectionPropertiesFields] = None,
-        query: str | None = None,
-        search_properties: CdfConnectionPropertiesTextFields
-        | Sequence[CdfConnectionPropertiesTextFields]
-        | None = None,
         min_revision_id: int | None = None,
         max_revision_id: int | None = None,
         min_revision_node_id: int | None = None,
@@ -147,8 +117,6 @@ class CdfConnectionPropertiesAPI(
         | Sequence[dm.aggregations.MetricAggregation],
         property: CdfConnectionPropertiesFields | Sequence[CdfConnectionPropertiesFields] | None = None,
         group_by: CdfConnectionPropertiesFields | Sequence[CdfConnectionPropertiesFields] | None = None,
-        query: str | None = None,
-        search_property: CdfConnectionPropertiesTextFields | Sequence[CdfConnectionPropertiesTextFields] | None = None,
         min_revision_id: int | None = None,
         max_revision_id: int | None = None,
         min_revision_node_id: int | None = None,
@@ -172,8 +140,8 @@ class CdfConnectionPropertiesAPI(
             _CDFCONNECTIONPROPERTIES_PROPERTIES_BY_FIELD,
             property,
             group_by,
-            query,
-            search_property,
+            None,
+            None,
             limit,
             filter_,
         )
@@ -182,8 +150,6 @@ class CdfConnectionPropertiesAPI(
         self,
         property: CdfConnectionPropertiesFields,
         interval: float,
-        query: str | None = None,
-        search_property: CdfConnectionPropertiesTextFields | Sequence[CdfConnectionPropertiesTextFields] | None = None,
         min_revision_id: int | None = None,
         max_revision_id: int | None = None,
         min_revision_node_id: int | None = None,
@@ -206,8 +172,8 @@ class CdfConnectionPropertiesAPI(
             property,
             interval,
             _CDFCONNECTIONPROPERTIES_PROPERTIES_BY_FIELD,
-            query,
-            search_property,
+            None,
+            None,
             limit,
             filter_,
         )

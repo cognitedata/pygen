@@ -9,6 +9,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from movie_domain.client.data_classes import Role, RoleApply, RoleList, RoleApplyList, RoleFields
+from movie_domain.client.data_classes._role import _ROLE_PROPERTIES_BY_FIELD
 
 
 class RoleMoviesAPI:
@@ -163,25 +164,6 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
 
             return roles
 
-    def search(
-        self,
-        query: str,
-        properties: RoleTextFields | Sequence[RoleTextFields] | None = None,
-        person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        won_oscar: bool | None = None,
-        external_id_prefix: str | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
-        filter: dm.Filter | None = None,
-    ) -> RoleList:
-        filter_ = _create_filter(
-            self._view_id,
-            person,
-            won_oscar,
-            external_id_prefix,
-            filter,
-        )
-        return self._search(self._view_id, query, _ROLE_PROPERTIES_BY_FIELD, properties, filter_, limit)
-
     @overload
     def aggregate(
         self,
@@ -191,8 +173,6 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
         | Sequence[dm.aggregations.MetricAggregation],
         property: RoleFields | Sequence[RoleFields] | None = None,
         group_by: None = None,
-        query: str | None = None,
-        search_properties: RoleTextFields | Sequence[RoleTextFields] | None = None,
         person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         won_oscar: bool | None = None,
         external_id_prefix: str | None = None,
@@ -210,8 +190,6 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
         | Sequence[dm.aggregations.MetricAggregation],
         property: RoleFields | Sequence[RoleFields] | None = None,
         group_by: RoleFields | Sequence[RoleFields] = None,
-        query: str | None = None,
-        search_properties: RoleTextFields | Sequence[RoleTextFields] | None = None,
         person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         won_oscar: bool | None = None,
         external_id_prefix: str | None = None,
@@ -228,8 +206,6 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
         | Sequence[dm.aggregations.MetricAggregation],
         property: RoleFields | Sequence[RoleFields] | None = None,
         group_by: RoleFields | Sequence[RoleFields] | None = None,
-        query: str | None = None,
-        search_property: RoleTextFields | Sequence[RoleTextFields] | None = None,
         person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         won_oscar: bool | None = None,
         external_id_prefix: str | None = None,
@@ -249,8 +225,8 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
             _ROLE_PROPERTIES_BY_FIELD,
             property,
             group_by,
-            query,
-            search_property,
+            None,
+            None,
             limit,
             filter_,
         )
@@ -259,8 +235,6 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
         self,
         property: RoleFields,
         interval: float,
-        query: str | None = None,
-        search_property: RoleTextFields | Sequence[RoleTextFields] | None = None,
         person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         won_oscar: bool | None = None,
         external_id_prefix: str | None = None,
@@ -279,8 +253,8 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
             property,
             interval,
             _ROLE_PROPERTIES_BY_FIELD,
-            query,
-            search_property,
+            None,
+            None,
             limit,
             filter_,
         )
