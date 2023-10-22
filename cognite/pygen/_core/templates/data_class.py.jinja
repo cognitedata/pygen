@@ -12,8 +12,8 @@ if TYPE_CHECKING:{% for dependency_class in data_class.dependencies %}
     from .{{ dependency_class.file_name }} import {{ dependency_class.write_name }}{% endfor %}
 {% endif %}
 __all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data_class.read_list_name }}", "{{ data_class.write_list_name }}"{% if data_class.has_text_field %}, "{{ data_class.text_field_name }}"{% endif %}]
-
 {% if data_class.has_text_field %}
+
 {{ data_class.text_field_name }} = Literal[{{ data_class.text_fields_literals }}]
 
 {{ data_class.text_properties_dict_name }} = {% raw %}{{% endraw %}{% for field in data_class.text_fields %}
