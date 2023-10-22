@@ -14,11 +14,12 @@ __all__ = ["Person", "PersonApply", "PersonList", "PersonApplyList", "PersonFiel
 
 
 PersonTextFields = Literal["name"]
-PersonFields = Literal["name", "birth_year"]
+PersonFields = Literal["birth_year", "name"]
 
 _PERSON_PROPERTIES_BY_FIELD = {
     "birth_year": "birthYear",
     "name": "name",
+    "roles": "roles",
 }
 
 

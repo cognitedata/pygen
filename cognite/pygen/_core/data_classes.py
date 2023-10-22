@@ -358,8 +358,12 @@ class DataClass:
         return f"{self.read_name}TextFields"
 
     @property
-    def text_properties_dict_name(self) -> str:
-        return f"_{self.read_name.upper()}_TEXT_PROPERTIES_BY_FIELD"
+    def field_name(self) -> str:
+        return f"{self.read_name}Fields"
+
+    @property
+    def properties_dict_name(self) -> str:
+        return f"_{self.read_name.upper()}_PROPERTIES_BY_FIELD"
 
     @property
     def pydantic_field(self) -> str:
@@ -481,6 +485,10 @@ class DataClass:
     @property
     def text_fields_literals(self) -> str:
         return ", ".join(f'"{field_.name}"' for field_ in self.text_fields)
+
+    @property
+    def fields_literals(self) -> str:
+        return ", ".join(f'"{field_.name}"' for field_ in self if isinstance(field_, PrimitiveFieldCore))
 
 
 @dataclass(frozen=True)
