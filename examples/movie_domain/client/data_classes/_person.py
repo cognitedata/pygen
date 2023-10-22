@@ -13,7 +13,11 @@ if TYPE_CHECKING:
 __all__ = ["Person", "PersonApply", "PersonList", "PersonApplyList"]
 
 
-PersonProperties = Literal["birthYear", "name"]
+PersonTextFields = Literal["name"]
+
+_PERSON_TEXT_PROPERTIES_BY_FIELD = {
+    "name": "name",
+}
 
 
 class Person(DomainModel):

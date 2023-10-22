@@ -15,7 +15,7 @@ from ._best_leading_actress import (
 from ._director import Director, DirectorApply, DirectorList, DirectorApplyList
 from ._movie import Movie, MovieApply, MovieList, MovieApplyList
 from ._nomination import Nomination, NominationApply, NominationList, NominationApplyList
-from ._person import Person, PersonApply, PersonList, PersonApplyList, PersonProperties
+from ._person import Person, PersonApply, PersonList, PersonApplyList, PersonTextFields
 from ._rating import Rating, RatingApply, RatingList, RatingApplyList
 from ._role import Role, RoleApply, RoleList, RoleApplyList
 
@@ -58,7 +58,7 @@ __all__ = [
     "PersonApply",
     "PersonList",
     "PersonApplyList",
-    "PersonProperties",
+    "PersonTextFields",
     "Rating",
     "RatingApply",
     "RatingList",

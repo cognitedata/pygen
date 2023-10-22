@@ -54,12 +54,16 @@ class TypeAPI(Generic[T_TypeNode, T_TypeApplyNode, T_TypeNodeList]):
         self,
         view_id: dm.ViewId,
         query: str,
+        properties_by_field: dict[str, str],
         properties: str | Sequence[str],
         filter_: dm.Filter | None = None,
         limit: int = DEFAULT_LIMIT_READ,
     ) -> T_TypeNodeList:
         if isinstance(properties, str):
             properties = [properties]
+
+        if properties:
+            properties = [properties_by_field.get(prop, prop) for prop in properties]
 
         nodes = self._client.data_modeling.instances.search(view_id, query, "node", properties, filter_, limit)
         return self._class_list([self._class_type.from_node(node) for node in nodes])
