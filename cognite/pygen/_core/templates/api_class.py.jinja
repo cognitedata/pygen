@@ -13,9 +13,9 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
 from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT{% if data_class.has_single_timeseries_fields %}, INSTANCE_QUERY_LIMIT{% endif %}
-from {{ top_level_package }}.data_classes import {{ data_class.read_name }}, {{ data_class.write_name }}, {{ data_class.read_list_name }}, {{ data_class.write_list_name }}, {{ data_class.field_names }}{% if data_class.has_text_field %}, {{ data_class.text_field_names }}
+from {{ top_level_package }}.data_classes import {{ data_class.read_name }}, {{ data_class.write_name }}, {{ data_class.read_list_name }}, {{ data_class.write_list_name }}{% if not data_class.has_only_one_to_many_edges %}, {{ data_class.field_names }}{% endif %}{% if data_class.has_text_field %}, {{ data_class.text_field_names }}{% endif %}
 from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import {{ data_class.properties_dict_name }}
-{% endif %}
+
 
 {% if data_class.has_single_timeseries_fields %}{% include "api_class_timeseries.py.jinja" %}{% endif %}
 {% for field in data_class.one_to_many_edges %}
@@ -119,7 +119,7 @@ class {{ api_class.name }}(TypeAPI[{{ data_class.read_name }}, {{ data_class.wri
             self._set_{{ field.name }}({{ data_class.variable_list }}, {{ field.variable }}_edges){% endfor %}
 
             return {{ data_class.variable_list }}{% else %}return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id]){% endif %}
-
+{% if data_class.has_text_field %}
     def search(
         self,
         query: str,
@@ -133,7 +133,7 @@ class {{ api_class.name }}(TypeAPI[{{ data_class.read_name }}, {{ data_class.wri
             {{ parm.name }},{% endfor %}
             filter,
         )
-        return self._search(self._view_id, query, {{ data_class.properties_dict_name }}, properties, filter_, limit)
+        return self._search(self._view_id, query, {{ data_class.properties_dict_name }}, properties, filter_, limit){% endif %}
 
     @overload
     def aggregate(
@@ -143,9 +143,9 @@ class {{ api_class.name }}(TypeAPI[{{ data_class.read_name }}, {{ data_class.wri
         | Sequence[Aggregations]
         | Sequence[dm.aggregations.MetricAggregation],
         property: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,
-        group_by: None = None,
+        group_by: None = None,{% if data_class.has_text_field %}
         query: str | None = None,
-        search_properties: {{ data_class.text_field_names }} | Sequence[{{ data_class.text_field_names }}] | None = None,{% for parm in list_method.parameters %}
+        search_properties: {{ data_class.text_field_names }} | Sequence[{{ data_class.text_field_names }}] | None = None,{% endif %}{% for parm in list_method.parameters %}
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
@@ -160,9 +160,9 @@ class {{ api_class.name }}(TypeAPI[{{ data_class.read_name }}, {{ data_class.wri
         | Sequence[Aggregations]
         | Sequence[dm.aggregations.MetricAggregation],
         property: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,
-        group_by: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] = None,
+        group_by: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] = None,{% if data_class.has_text_field %}
         query: str | None = None,
-        search_properties: {{ data_class.text_field_names }} | Sequence[{{ data_class.text_field_names }}] | None = None,{% for parm in list_method.parameters %}
+        search_properties: {{ data_class.text_field_names }} | Sequence[{{ data_class.text_field_names }}] | None = None,{% endif %}{% for parm in list_method.parameters %}
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
@@ -176,9 +176,9 @@ class {{ api_class.name }}(TypeAPI[{{ data_class.read_name }}, {{ data_class.wri
         | Sequence[Aggregations]
         | Sequence[dm.aggregations.MetricAggregation],
         property: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,
-        group_by: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,
+        group_by: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,{% if data_class.has_text_field %}
         query: str | None = None,
-        search_property: {{ data_class.text_field_names }} | Sequence[{{ data_class.text_field_names }}] | None = None,{% for parm in list_method.parameters %}
+        search_property: {{ data_class.text_field_names }} | Sequence[{{ data_class.text_field_names }}] | None = None,{% endif %}{% for parm in list_method.parameters %}
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
@@ -193,9 +193,11 @@ class {{ api_class.name }}(TypeAPI[{{ data_class.read_name }}, {{ data_class.wri
             aggregate,
             {{ data_class.properties_dict_name }},
             property,
-            group_by,
+            group_by,{% if data_class.has_text_field %}
             query,
-            search_property,
+            search_property,{% else %}
+            None,
+            None,{% endif %}
             limit,
             filter_,
         )
@@ -203,9 +205,9 @@ class {{ api_class.name }}(TypeAPI[{{ data_class.read_name }}, {{ data_class.wri
     def histogram(
         self,
         property: {{ data_class.field_names }},
-        interval: float,
+        interval: float,{% if data_class.has_text_field %}
         query: str | None = None,
-        search_property: {{ data_class.text_field_names }} | Sequence[{{ data_class.text_field_names }}] | None = None,{% for parm in list_method.parameters %}
+        search_property: {{ data_class.text_field_names }} | Sequence[{{ data_class.text_field_names }}] | None = None,{% endif %}{% for parm in list_method.parameters %}
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
@@ -219,9 +221,11 @@ class {{ api_class.name }}(TypeAPI[{{ data_class.read_name }}, {{ data_class.wri
             self._view_id,
             property,
             interval,
-            {{ data_class.properties_dict_name }},
+            {{ data_class.properties_dict_name }},{% if data_class.has_text_field %}
             query,
-            search_property,
+            search_property,{% else %}
+            None,
+            None,{% endif %}
             limit,
             filter_,
         )
