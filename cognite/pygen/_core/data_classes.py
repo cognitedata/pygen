@@ -372,10 +372,13 @@ class DataClass:
 
     @property
     def init_import(self) -> str:
-        return (
+        import_line = (
             f"from .{self.file_name} "
             f"import {self.read_name}, {self.write_name}, {self.read_list_name}, {self.write_list_name}"
         )
+        if self.has_text_field:
+            import_line += f", {self.text_field_name}"
+        return import_line
 
     def __iter__(self) -> Iterator[Field]:
         return iter(self.fields)
