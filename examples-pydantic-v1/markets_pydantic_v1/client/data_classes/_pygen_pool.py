@@ -1,13 +1,21 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import Literal, Optional
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 
-__all__ = ["PygenPool", "PygenPoolApply", "PygenPoolList", "PygenPoolApplyList"]
+__all__ = ["PygenPool", "PygenPoolApply", "PygenPoolList", "PygenPoolApplyList", "PygenPoolTextFields"]
+
+
+PygenPoolTextFields = Literal["name", "timezone"]
+
+_PYGENPOOL_TEXT_PROPERTIES_BY_FIELD = {
+    "name": "name",
+    "timezone": "timezone",
+}
 
 
 class PygenPool(DomainModel):

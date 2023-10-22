@@ -1,12 +1,26 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import Literal, Optional
 
 from cognite.client import data_modeling as dm
 
 from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 
-__all__ = ["CommandConfig", "CommandConfigApply", "CommandConfigList", "CommandConfigApplyList"]
+__all__ = [
+    "CommandConfig",
+    "CommandConfigApply",
+    "CommandConfigList",
+    "CommandConfigApplyList",
+    "CommandConfigTextFields",
+]
+
+
+CommandConfigTextFields = Literal["configs", "source"]
+
+_COMMANDCONFIG_TEXT_PROPERTIES_BY_FIELD = {
+    "configs": "configs",
+    "source": "source",
+}
 
 
 class CommandConfig(DomainModel):

@@ -11,7 +11,9 @@ from movie_domain.client.data_classes import (
     BestLeadingActorApply,
     BestLeadingActorList,
     BestLeadingActorApplyList,
+    BestLeadingActorTextFields,
 )
+from movie_domain.client.data_classes._best_leading_actor import _BESTLEADINGACTOR_TEXT_PROPERTIES_BY_FIELD
 
 
 class BestLeadingActorAPI(TypeAPI[BestLeadingActor, BestLeadingActorApply, BestLeadingActorList]):
@@ -61,6 +63,31 @@ class BestLeadingActorAPI(TypeAPI[BestLeadingActor, BestLeadingActorApply, BestL
             return self._retrieve((self._sources.space, external_id))
         else:
             return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+
+    def search(
+        self,
+        query: str,
+        properties: BestLeadingActorTextFields | Sequence[BestLeadingActorTextFields] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        min_year: int | None = None,
+        max_year: int | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> BestLeadingActorList:
+        filter_ = _create_filter(
+            self._view_id,
+            name,
+            name_prefix,
+            min_year,
+            max_year,
+            external_id_prefix,
+            filter,
+        )
+        return self._search(
+            self._view_id, query, _BESTLEADINGACTOR_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit
+        )
 
     def list(
         self,

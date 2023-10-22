@@ -1,4 +1,4 @@
-from ._asset import Asset, AssetApply, AssetList, AssetApplyList
+from ._asset import Asset, AssetApply, AssetList, AssetApplyList, AssetTextFields
 from ._cdf_3_d_connection_properties import (
     CdfConnectionProperties,
     CdfConnectionPropertiesApply,
@@ -6,9 +6,9 @@ from ._cdf_3_d_connection_properties import (
     CdfConnectionPropertiesApplyList,
 )
 from ._cdf_3_d_entity import CdfEntity, CdfEntityApply, CdfEntityList, CdfEntityApplyList
-from ._cdf_3_d_model import CdfModel, CdfModelApply, CdfModelList, CdfModelApplyList
-from ._work_item import WorkItem, WorkItemApply, WorkItemList, WorkItemApplyList
-from ._work_order import WorkOrder, WorkOrderApply, WorkOrderList, WorkOrderApplyList
+from ._cdf_3_d_model import CdfModel, CdfModelApply, CdfModelList, CdfModelApplyList, CdfModelTextFields
+from ._work_item import WorkItem, WorkItemApply, WorkItemList, WorkItemApplyList, WorkItemTextFields
+from ._work_order import WorkOrder, WorkOrderApply, WorkOrderList, WorkOrderApplyList, WorkOrderTextFields
 
 AssetApply.model_rebuild()
 CdfEntityApply.model_rebuild()
@@ -21,6 +21,7 @@ __all__ = [
     "AssetApply",
     "AssetList",
     "AssetApplyList",
+    "AssetTextFields",
     "CdfConnectionProperties",
     "CdfConnectionPropertiesApply",
     "CdfConnectionPropertiesList",
@@ -33,12 +34,15 @@ __all__ = [
     "CdfModelApply",
     "CdfModelList",
     "CdfModelApplyList",
+    "CdfModelTextFields",
     "WorkItem",
     "WorkItemApply",
     "WorkItemList",
     "WorkItemApplyList",
+    "WorkItemTextFields",
     "WorkOrder",
     "WorkOrderApply",
     "WorkOrderList",
     "WorkOrderApplyList",
+    "WorkOrderTextFields",
 ]

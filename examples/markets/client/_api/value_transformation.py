@@ -11,7 +11,9 @@ from markets.client.data_classes import (
     ValueTransformationApply,
     ValueTransformationList,
     ValueTransformationApplyList,
+    ValueTransformationTextFields,
 )
+from markets.client.data_classes._value_transformation import _VALUETRANSFORMATION_TEXT_PROPERTIES_BY_FIELD
 
 
 class ValueTransformationAPI(TypeAPI[ValueTransformation, ValueTransformationApply, ValueTransformationList]):
@@ -61,6 +63,27 @@ class ValueTransformationAPI(TypeAPI[ValueTransformation, ValueTransformationApp
             return self._retrieve((self._sources.space, external_id))
         else:
             return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+
+    def search(
+        self,
+        query: str,
+        properties: ValueTransformationTextFields | Sequence[ValueTransformationTextFields] | None = None,
+        method: str | list[str] | None = None,
+        method_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> ValueTransformationList:
+        filter_ = _create_filter(
+            self._view_id,
+            method,
+            method_prefix,
+            external_id_prefix,
+            filter,
+        )
+        return self._search(
+            self._view_id, query, _VALUETRANSFORMATION_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit
+        )
 
     def list(
         self,

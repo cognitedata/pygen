@@ -66,6 +66,31 @@ class CdfConnectionPropertiesAPI(
         else:
             return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
 
+    def search(
+        self,
+        query: str,
+        properties: CdfConnectionPropertiesTextFields | Sequence[CdfConnectionPropertiesTextFields] | None = None,
+        min_revision_id: int | None = None,
+        max_revision_id: int | None = None,
+        min_revision_node_id: int | None = None,
+        max_revision_node_id: int | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> CdfConnectionPropertiesList:
+        filter_ = _create_filter(
+            self._view_id,
+            min_revision_id,
+            max_revision_id,
+            min_revision_node_id,
+            max_revision_node_id,
+            external_id_prefix,
+            filter,
+        )
+        return self._search(
+            self._view_id, query, _CDFCONNECTIONPROPERTIES_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit
+        )
+
     def list(
         self,
         min_revision_id: int | None = None,

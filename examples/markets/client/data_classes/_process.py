@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional, Union
+from typing import Literal, TYPE_CHECKING, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -10,7 +10,14 @@ from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 if TYPE_CHECKING:
     from ._bid import BidApply
 
-__all__ = ["Process", "ProcessApply", "ProcessList", "ProcessApplyList"]
+__all__ = ["Process", "ProcessApply", "ProcessList", "ProcessApplyList", "ProcessTextFields"]
+
+
+ProcessTextFields = Literal["name"]
+
+_PROCESS_TEXT_PROPERTIES_BY_FIELD = {
+    "name": "name",
+}
 
 
 class Process(DomainModel):

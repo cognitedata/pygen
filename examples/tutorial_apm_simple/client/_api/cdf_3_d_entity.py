@@ -118,6 +118,21 @@ class CdfEntityAPI(TypeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
 
             return cdf_3_d_entities
 
+    def search(
+        self,
+        query: str,
+        properties: CdfEntityTextFields | Sequence[CdfEntityTextFields] | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> CdfEntityList:
+        filter_ = _create_filter(
+            self._view_id,
+            external_id_prefix,
+            filter,
+        )
+        return self._search(self._view_id, query, _CDFENTITY_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit)
+
     def list(
         self,
         external_id_prefix: str | None = None,

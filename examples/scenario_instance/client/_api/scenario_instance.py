@@ -16,7 +16,10 @@ from scenario_instance.client.data_classes import (
     ScenarioInstanceApply,
     ScenarioInstanceList,
     ScenarioInstanceApplyList,
+    ScenarioInstanceTextFields,
 )
+from scenario_instance.client.data_classes._scenario_instance import _SCENARIOINSTANCE_TEXT_PROPERTIES_BY_FIELD
+
 
 ColumnNames = Literal["aggregation", "country", "instance", "market", "priceArea", "priceForecast", "scenario", "start"]
 
@@ -445,6 +448,51 @@ class ScenarioInstanceAPI(TypeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
             return self._retrieve((self._sources.space, external_id))
         else:
             return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+
+    def search(
+        self,
+        query: str,
+        properties: ScenarioInstanceTextFields | Sequence[ScenarioInstanceTextFields] | None = None,
+        aggregation: str | list[str] | None = None,
+        aggregation_prefix: str | None = None,
+        country: str | list[str] | None = None,
+        country_prefix: str | None = None,
+        min_instance: datetime.datetime | None = None,
+        max_instance: datetime.datetime | None = None,
+        market: str | list[str] | None = None,
+        market_prefix: str | None = None,
+        price_area: str | list[str] | None = None,
+        price_area_prefix: str | None = None,
+        scenario: str | list[str] | None = None,
+        scenario_prefix: str | None = None,
+        min_start: datetime.datetime | None = None,
+        max_start: datetime.datetime | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> ScenarioInstanceList:
+        filter_ = _create_filter(
+            self._view_id,
+            aggregation,
+            aggregation_prefix,
+            country,
+            country_prefix,
+            min_instance,
+            max_instance,
+            market,
+            market_prefix,
+            price_area,
+            price_area_prefix,
+            scenario,
+            scenario_prefix,
+            min_start,
+            max_start,
+            external_id_prefix,
+            filter,
+        )
+        return self._search(
+            self._view_id, query, _SCENARIOINSTANCE_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit
+        )
 
     def list(
         self,

@@ -23,7 +23,7 @@ app = typer.Typer(
 )
 
 
-@app.command("generate-sdks", help=f"Generate all example SDKs in directory '{EXAMPLES_DIR.relative_to(REPO_ROOT)}/'")
+@app.command("generate", help=f"Generate all example SDKs in directory '{EXAMPLES_DIR.relative_to(REPO_ROOT)}/'")
 def generate_sdks(
     overwrite: bool = typer.Option(
         False, help="Whether to overwrite the files expected to be manually maintained in the examples"

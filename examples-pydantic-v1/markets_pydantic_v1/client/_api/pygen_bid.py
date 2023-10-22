@@ -7,7 +7,14 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
-from markets_pydantic_v1.client.data_classes import PygenBid, PygenBidApply, PygenBidList, PygenBidApplyList
+from markets_pydantic_v1.client.data_classes import (
+    PygenBid,
+    PygenBidApply,
+    PygenBidList,
+    PygenBidApplyList,
+    PygenBidTextFields,
+)
+from markets_pydantic_v1.client.data_classes._pygen_bid import _PYGENBID_TEXT_PROPERTIES_BY_FIELD
 
 
 class PygenBidAPI(TypeAPI[PygenBid, PygenBidApply, PygenBidList]):
@@ -57,6 +64,41 @@ class PygenBidAPI(TypeAPI[PygenBid, PygenBidApply, PygenBidList]):
             return self._retrieve((self._sources.space, external_id))
         else:
             return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+
+    def search(
+        self,
+        query: str,
+        properties: PygenBidTextFields | Sequence[PygenBidTextFields] | None = None,
+        min_date: datetime.date | None = None,
+        max_date: datetime.date | None = None,
+        is_block: bool | None = None,
+        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        min_minimum_price: float | None = None,
+        max_minimum_price: float | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        min_price_premium: float | None = None,
+        max_price_premium: float | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> PygenBidList:
+        filter_ = _create_filter(
+            self._view_id,
+            min_date,
+            max_date,
+            is_block,
+            market,
+            min_minimum_price,
+            max_minimum_price,
+            name,
+            name_prefix,
+            min_price_premium,
+            max_price_premium,
+            external_id_prefix,
+            filter,
+        )
+        return self._search(self._view_id, query, _PYGENBID_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit)
 
     def list(
         self,

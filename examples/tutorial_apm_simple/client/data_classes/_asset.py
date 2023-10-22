@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING, Optional, Union
+from typing import Literal, TYPE_CHECKING, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -12,7 +12,24 @@ if TYPE_CHECKING:
     from ._asset import AssetApply
     from ._cdf_3_d_model import CdfModelApply
 
-__all__ = ["Asset", "AssetApply", "AssetList", "AssetApplyList"]
+__all__ = ["Asset", "AssetApply", "AssetList", "AssetApplyList", "AssetTextFields"]
+
+
+AssetTextFields = Literal[
+    "description", "documents", "measurements", "metrics", "pressure", "source_db", "specification", "tag", "trajectory"
+]
+
+_ASSET_TEXT_PROPERTIES_BY_FIELD = {
+    "description": "description",
+    "documents": "documents",
+    "measurements": "measurements",
+    "metrics": "metrics",
+    "pressure": "pressure",
+    "source_db": "source_db",
+    "specification": "specification",
+    "tag": "tag",
+    "trajectory": "trajectory",
+}
 
 
 class Asset(DomainModel):

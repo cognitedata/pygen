@@ -11,7 +11,9 @@ from markets.client.data_classes import (
     DateTransformationApply,
     DateTransformationList,
     DateTransformationApplyList,
+    DateTransformationTextFields,
 )
+from markets.client.data_classes._date_transformation import _DATETRANSFORMATION_TEXT_PROPERTIES_BY_FIELD
 
 
 class DateTransformationAPI(TypeAPI[DateTransformation, DateTransformationApply, DateTransformationList]):
@@ -61,6 +63,27 @@ class DateTransformationAPI(TypeAPI[DateTransformation, DateTransformationApply,
             return self._retrieve((self._sources.space, external_id))
         else:
             return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+
+    def search(
+        self,
+        query: str,
+        properties: DateTransformationTextFields | Sequence[DateTransformationTextFields] | None = None,
+        method: str | list[str] | None = None,
+        method_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> DateTransformationList:
+        filter_ = _create_filter(
+            self._view_id,
+            method,
+            method_prefix,
+            external_id_prefix,
+            filter,
+        )
+        return self._search(
+            self._view_id, query, _DATETRANSFORMATION_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit
+        )
 
     def list(
         self,

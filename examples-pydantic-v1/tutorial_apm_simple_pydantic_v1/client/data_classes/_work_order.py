@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING, Optional, Union
+from typing import Literal, TYPE_CHECKING, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -12,7 +12,28 @@ if TYPE_CHECKING:
     from ._asset import AssetApply
     from ._work_item import WorkItemApply
 
-__all__ = ["WorkOrder", "WorkOrderApply", "WorkOrderList", "WorkOrderApplyList"]
+__all__ = ["WorkOrder", "WorkOrderApply", "WorkOrderList", "WorkOrderApplyList", "WorkOrderTextFields"]
+
+
+WorkOrderTextFields = Literal[
+    "description",
+    "priority_description",
+    "program_number",
+    "status",
+    "title",
+    "work_order_number",
+    "work_package_number",
+]
+
+_WORKORDER_TEXT_PROPERTIES_BY_FIELD = {
+    "description": "description",
+    "priority_description": "priority_description",
+    "program_number": "program_number",
+    "status": "status",
+    "title": "title",
+    "work_order_number": "work_order_number",
+    "work_package_number": "work_package_number",
+}
 
 
 class WorkOrder(DomainModel):

@@ -1,12 +1,25 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import Literal, Optional
 
 from cognite.client import data_modeling as dm
 
 from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 
-__all__ = ["ValueTransformation", "ValueTransformationApply", "ValueTransformationList", "ValueTransformationApplyList"]
+__all__ = [
+    "ValueTransformation",
+    "ValueTransformationApply",
+    "ValueTransformationList",
+    "ValueTransformationApplyList",
+    "ValueTransformationTextFields",
+]
+
+
+ValueTransformationTextFields = Literal["method"]
+
+_VALUETRANSFORMATION_TEXT_PROPERTIES_BY_FIELD = {
+    "method": "method",
+}
 
 
 class ValueTransformation(DomainModel):

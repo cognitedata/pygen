@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional, Union
+from typing import Literal, TYPE_CHECKING, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -12,7 +12,14 @@ if TYPE_CHECKING:
     from ._director import DirectorApply
     from ._rating import RatingApply
 
-__all__ = ["Movie", "MovieApply", "MovieList", "MovieApplyList"]
+__all__ = ["Movie", "MovieApply", "MovieList", "MovieApplyList", "MovieTextFields"]
+
+
+MovieTextFields = Literal["title"]
+
+_MOVIE_TEXT_PROPERTIES_BY_FIELD = {
+    "title": "title",
+}
 
 
 class Movie(DomainModel):

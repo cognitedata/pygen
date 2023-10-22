@@ -162,6 +162,25 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
 
             return actors
 
+    def search(
+        self,
+        query: str,
+        properties: ActorTextFields | Sequence[ActorTextFields] | None = None,
+        person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        won_oscar: bool | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> ActorList:
+        filter_ = _create_filter(
+            self._view_id,
+            person,
+            won_oscar,
+            external_id_prefix,
+            filter,
+        )
+        return self._search(self._view_id, query, _ACTOR_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit)
+
     def list(
         self,
         person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
