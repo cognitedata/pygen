@@ -5,10 +5,18 @@ from typing import Dict, List, Sequence, Tuple, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
+from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
-from movie_domain.client.data_classes import Person, PersonApply, PersonList, PersonApplyList, PersonTextFields
-from movie_domain.client.data_classes._person import _PERSON_TEXT_PROPERTIES_BY_FIELD
+from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
+from movie_domain.client.data_classes import (
+    Person,
+    PersonApply,
+    PersonList,
+    PersonApplyList,
+    PersonFields,
+    PersonTextFields,
+)
+from movie_domain.client.data_classes._person import _PERSON_PROPERTIES_BY_FIELD
 
 
 class PersonRolesAPI:
@@ -134,7 +142,69 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
             external_id_prefix,
             filter,
         )
-        return self._search(self._view_id, query, _PERSON_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit)
+        return self._search(self._view_id, query, _PERSON_PROPERTIES_BY_FIELD, properties, filter_, limit)
+
+    @overload
+    def aggregate(
+        self,
+        aggregations: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        properties: PersonFields | Sequence[PersonFields] | None = None,
+        group_by: None = None,
+        query: str | None = None,
+        search_properties: PersonTextFields | Sequence[PersonTextFields] | None = None,
+        min_birth_year: int | None = None,
+        max_birth_year: int | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.AggregatedNumberedValue:
+        ...
+
+    @overload
+    def aggregate(
+        self,
+        aggregations: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        properties: PersonFields | Sequence[PersonFields] | None = None,
+        group_by: PersonFields | Sequence[PersonFields] = None,
+        query: str | None = None,
+        search_properties: PersonTextFields | Sequence[PersonTextFields] | None = None,
+        min_birth_year: int | None = None,
+        max_birth_year: int | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> InstanceAggregationResultList:
+        ...
+
+    def aggregate(
+        self,
+        aggregations: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        properties: PersonFields | Sequence[PersonFields] | None = None,
+        group_by: PersonFields | Sequence[PersonFields] | None = None,
+        query: str | None = None,
+        search_properties: PersonTextFields | Sequence[PersonTextFields] | None = None,
+        min_birth_year: int | None = None,
+        max_birth_year: int | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.AggregatedNumberedValue | InstanceAggregationResultList:
+        raise NotImplementedError()
 
     def list(
         self,

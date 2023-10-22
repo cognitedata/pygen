@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import Generic, overload
+from typing import Generic, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -12,6 +12,8 @@ from movie_domain.client.data_classes._core import T_TypeApplyNode, T_TypeNode, 
 DEFAULT_LIMIT_READ = 25
 INSTANCE_QUERY_LIMIT = 1_000
 IN_FILTER_LIMIT = 5_000
+
+Aggregations = Literal["avg", "count", "max", "min", "sum"]
 
 
 class TypeAPI(Generic[T_TypeNode, T_TypeApplyNode, T_TypeNodeList]):

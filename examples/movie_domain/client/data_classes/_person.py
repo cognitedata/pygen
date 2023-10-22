@@ -10,12 +10,14 @@ from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 if TYPE_CHECKING:
     from ._role import RoleApply
 
-__all__ = ["Person", "PersonApply", "PersonList", "PersonApplyList", "PersonTextFields"]
+__all__ = ["Person", "PersonApply", "PersonList", "PersonApplyList", "PersonFields", "PersonTextFields"]
 
 
 PersonTextFields = Literal["name"]
+PersonFields = Literal["name", "birth_year"]
 
-_PERSON_TEXT_PROPERTIES_BY_FIELD = {
+_PERSON_PROPERTIES_BY_FIELD = {
+    "birth_year": "birthYear",
     "name": "name",
 }
 

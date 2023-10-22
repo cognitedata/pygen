@@ -122,3 +122,21 @@ def test_search_person(movie_client: MovieClient) -> None:
     assert results[0].external_id == "person:quentin_tarantino"
     assert results[0].name == "Quentin Tarantino"
     assert results[0].birth_year == 1963
+
+
+def test_aggregate_person_count(movie_client: MovieClient) -> None:
+    # Act
+    result = movie_client.person.aggregate("count")
+
+    # Assert
+    assert result.value > 5000
+
+
+def test_aggregate_person_count_with_group_by(movie_client: MovieClient) -> None:
+    # Act
+    result = movie_client.person.aggregate("count", "name", group_by="birth_year")
+
+    # Assert
+    assert len(result) > 0
+    assert isinstance(result[0].group, int)
+    assert result[0].value > 0
