@@ -12,7 +12,10 @@ from cognite.client.data_classes.datapoints import Aggregate{% endif %}
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT{% if data_class.has_single_timeseries_fields %}, INSTANCE_QUERY_LIMIT{% endif %}
-from {{ top_level_package }}.data_classes import {{ data_class.read_name }}, {{ data_class.write_name }}, {{ data_class.read_list_name }}, {{ data_class.write_list_name }}
+from {{ top_level_package }}.data_classes import {{ data_class.read_name }}, {{ data_class.write_name }}, {{ data_class.read_list_name }}, {{ data_class.write_list_name }}{% if data_class.has_text_field %}, {{ data_class.text_field_name }}
+from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import {{ data_class.text_properties_dict_name }}
+{% endif %}
+
 {% if data_class.has_single_timeseries_fields %}{% include "api_class_timeseries.py.jinja" %}{% endif %}
 {% for field in data_class.one_to_many_edges %}
 class {{ field.edge_api_class }}:
@@ -115,6 +118,21 @@ class {{ api_class.name }}(TypeAPI[{{ data_class.read_name }}, {{ data_class.wri
             self._set_{{ field.name }}({{ data_class.variable_list }}, {{ field.variable }}_edges){% endfor %}
 
             return {{ data_class.variable_list }}{% else %}return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id]){% endif %}
+
+    def search(
+        self,
+        query: str,
+        properties: {{ data_class.text_field_name }} | Sequence[{{ data_class.text_field_name }}] | None = None,{% for parm in list_method.parameters %}
+        {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> {{ data_class.read_list_name }}:
+        filter_ = _create_filter(
+            self._view_id,{% for parm in list_method.parameters %}
+            {{ parm.name }},{% endfor %}
+            filter,
+        )
+        return self._search(self._view_id, query, {{ data_class.text_properties_dict_name }}, properties, filter_, limit)
 
     def list(
         self,{% for parm in list_method.parameters %}
