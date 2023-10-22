@@ -354,11 +354,11 @@ class DataClass:
             self.fields.append(field_)
 
     @property
-    def text_field_name(self) -> str:
+    def text_field_names(self) -> str:
         return f"{self.read_name}TextFields"
 
     @property
-    def field_name(self) -> str:
+    def field_names(self) -> str:
         return f"{self.read_name}Fields"
 
     @property
@@ -376,13 +376,10 @@ class DataClass:
 
     @property
     def init_import(self) -> str:
-        import_line = (
-            f"from .{self.file_name} "
-            f"import {self.read_name}, {self.write_name}, {self.read_list_name}, {self.write_list_name}"
-        )
+        import_classes = [self.read_name, self.write_name, self.read_list_name, self.write_list_name, self.field_names]
         if self.has_text_field:
-            import_line += f", {self.text_field_name}"
-        return import_line
+            import_classes.append(self.text_field_names)
+        return f"from .{self.file_name} import {', '.join(sorted(import_classes))}"
 
     def __iter__(self) -> Iterator[Field]:
         return iter(self.fields)
