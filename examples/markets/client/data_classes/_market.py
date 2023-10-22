@@ -6,12 +6,13 @@ from cognite.client import data_modeling as dm
 
 from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 
-__all__ = ["Market", "MarketApply", "MarketList", "MarketApplyList", "MarketTextFields"]
+__all__ = ["Market", "MarketApply", "MarketList", "MarketApplyList", "MarketFields", "MarketTextFields"]
 
 
 MarketTextFields = Literal["name", "timezone"]
+MarketFields = Literal["name", "timezone"]
 
-_MARKET_TEXT_PROPERTIES_BY_FIELD = {
+_MARKET_PROPERTIES_BY_FIELD = {
     "name": "name",
     "timezone": "timezone",
 }

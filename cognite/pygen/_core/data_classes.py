@@ -354,12 +354,16 @@ class DataClass:
             self.fields.append(field_)
 
     @property
-    def text_field_name(self) -> str:
+    def text_field_names(self) -> str:
         return f"{self.read_name}TextFields"
 
     @property
-    def text_properties_dict_name(self) -> str:
-        return f"_{self.read_name.upper()}_TEXT_PROPERTIES_BY_FIELD"
+    def field_names(self) -> str:
+        return f"{self.read_name}Fields"
+
+    @property
+    def properties_dict_name(self) -> str:
+        return f"_{self.read_name.upper()}_PROPERTIES_BY_FIELD"
 
     @property
     def pydantic_field(self) -> str:
@@ -372,13 +376,12 @@ class DataClass:
 
     @property
     def init_import(self) -> str:
-        import_line = (
-            f"from .{self.file_name} "
-            f"import {self.read_name}, {self.write_name}, {self.read_list_name}, {self.write_list_name}"
-        )
+        import_classes = [self.read_name, self.write_name, self.read_list_name, self.write_list_name]
+        if not self.has_only_one_to_many_edges:
+            import_classes.append(self.field_names)
         if self.has_text_field:
-            import_line += f", {self.text_field_name}"
-        return import_line
+            import_classes.append(self.text_field_names)
+        return f"from .{self.file_name} import {', '.join(sorted(import_classes))}"
 
     def __iter__(self) -> Iterator[Field]:
         return iter(self.fields)
@@ -396,8 +399,12 @@ class DataClass:
         return (field_ for field_ in self.fields if isinstance(field_, PrimitiveField))
 
     @property
+    def primitive_core_fields(self) -> Iterable[PrimitiveFieldCore]:
+        return (field_ for field_ in self.fields if isinstance(field_, PrimitiveFieldCore))
+
+    @property
     def text_fields(self) -> Iterable[PrimitiveFieldCore]:
-        return (field_ for field_ in self.fields if isinstance(field_, PrimitiveFieldCore) and field_.is_text_field)
+        return (field_ for field_ in self.primitive_core_fields if field_.is_text_field)
 
     @property
     def cdf_external_fields(self) -> Iterable[CDFExternalField]:
@@ -414,6 +421,10 @@ class DataClass:
     @property
     def has_edges(self) -> bool:
         return any(isinstance(field_, EdgeField) for field_ in self.fields)
+
+    @property
+    def has_primitive_fields(self) -> bool:
+        return any(isinstance(field_, PrimitiveFieldCore) for field_ in self.fields)
 
     @property
     def has_only_one_to_many_edges(self) -> bool:
@@ -481,6 +492,10 @@ class DataClass:
     @property
     def text_fields_literals(self) -> str:
         return ", ".join(f'"{field_.name}"' for field_ in self.text_fields)
+
+    @property
+    def fields_literals(self) -> str:
+        return ", ".join(f'"{field_.name}"' for field_ in self if isinstance(field_, PrimitiveFieldCore))
 
 
 @dataclass(frozen=True)

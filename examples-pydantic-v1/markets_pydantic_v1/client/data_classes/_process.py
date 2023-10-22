@@ -10,12 +10,13 @@ from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 if TYPE_CHECKING:
     from ._bid import BidApply
 
-__all__ = ["Process", "ProcessApply", "ProcessList", "ProcessApplyList", "ProcessTextFields"]
+__all__ = ["Process", "ProcessApply", "ProcessList", "ProcessApplyList", "ProcessFields", "ProcessTextFields"]
 
 
 ProcessTextFields = Literal["name"]
+ProcessFields = Literal["name"]
 
-_PROCESS_TEXT_PROPERTIES_BY_FIELD = {
+_PROCESS_PROPERTIES_BY_FIELD = {
     "name": "name",
 }
 

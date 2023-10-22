@@ -5,16 +5,18 @@ from typing import Dict, List, Sequence, Tuple, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
+from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
+from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from tutorial_apm_simple.client.data_classes import (
     WorkItem,
     WorkItemApply,
     WorkItemList,
     WorkItemApplyList,
+    WorkItemFields,
     WorkItemTextFields,
 )
-from tutorial_apm_simple.client.data_classes._work_item import _WORKITEM_TEXT_PROPERTIES_BY_FIELD
+from tutorial_apm_simple.client.data_classes._work_item import _WORKITEM_PROPERTIES_BY_FIELD
 
 
 class WorkItemLinkedAssetsAPI:
@@ -166,7 +168,188 @@ class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
             external_id_prefix,
             filter,
         )
-        return self._search(self._view_id, query, _WORKITEM_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit)
+        return self._search(self._view_id, query, _WORKITEM_PROPERTIES_BY_FIELD, properties, filter_, limit)
+
+    @overload
+    def aggregate(
+        self,
+        aggregations: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: WorkItemFields | Sequence[WorkItemFields] | None = None,
+        group_by: None = None,
+        query: str | None = None,
+        search_properties: WorkItemTextFields | Sequence[WorkItemTextFields] | None = None,
+        criticality: str | list[str] | None = None,
+        criticality_prefix: str | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        is_completed: bool | None = None,
+        item_info: str | list[str] | None = None,
+        item_info_prefix: str | None = None,
+        item_name: str | list[str] | None = None,
+        item_name_prefix: str | None = None,
+        method: str | list[str] | None = None,
+        method_prefix: str | None = None,
+        title: str | list[str] | None = None,
+        title_prefix: str | None = None,
+        to_be_done: bool | None = None,
+        work_order: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> list[dm.aggregations.AggregatedNumberedValue]:
+        ...
+
+    @overload
+    def aggregate(
+        self,
+        aggregations: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: WorkItemFields | Sequence[WorkItemFields] | None = None,
+        group_by: WorkItemFields | Sequence[WorkItemFields] = None,
+        query: str | None = None,
+        search_properties: WorkItemTextFields | Sequence[WorkItemTextFields] | None = None,
+        criticality: str | list[str] | None = None,
+        criticality_prefix: str | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        is_completed: bool | None = None,
+        item_info: str | list[str] | None = None,
+        item_info_prefix: str | None = None,
+        item_name: str | list[str] | None = None,
+        item_name_prefix: str | None = None,
+        method: str | list[str] | None = None,
+        method_prefix: str | None = None,
+        title: str | list[str] | None = None,
+        title_prefix: str | None = None,
+        to_be_done: bool | None = None,
+        work_order: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> InstanceAggregationResultList:
+        ...
+
+    def aggregate(
+        self,
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: WorkItemFields | Sequence[WorkItemFields] | None = None,
+        group_by: WorkItemFields | Sequence[WorkItemFields] | None = None,
+        query: str | None = None,
+        search_property: WorkItemTextFields | Sequence[WorkItemTextFields] | None = None,
+        criticality: str | list[str] | None = None,
+        criticality_prefix: str | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        is_completed: bool | None = None,
+        item_info: str | list[str] | None = None,
+        item_info_prefix: str | None = None,
+        item_name: str | list[str] | None = None,
+        item_name_prefix: str | None = None,
+        method: str | list[str] | None = None,
+        method_prefix: str | None = None,
+        title: str | list[str] | None = None,
+        title_prefix: str | None = None,
+        to_be_done: bool | None = None,
+        work_order: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        filter_ = _create_filter(
+            self._view_id,
+            criticality,
+            criticality_prefix,
+            description,
+            description_prefix,
+            is_completed,
+            item_info,
+            item_info_prefix,
+            item_name,
+            item_name_prefix,
+            method,
+            method_prefix,
+            title,
+            title_prefix,
+            to_be_done,
+            work_order,
+            external_id_prefix,
+            filter,
+        )
+        return self._aggregate(
+            self._view_id,
+            aggregate,
+            _WORKITEM_PROPERTIES_BY_FIELD,
+            property,
+            group_by,
+            query,
+            search_property,
+            limit,
+            filter_,
+        )
+
+    def histogram(
+        self,
+        property: WorkItemFields,
+        interval: float,
+        query: str | None = None,
+        search_property: WorkItemTextFields | Sequence[WorkItemTextFields] | None = None,
+        criticality: str | list[str] | None = None,
+        criticality_prefix: str | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        is_completed: bool | None = None,
+        item_info: str | list[str] | None = None,
+        item_info_prefix: str | None = None,
+        item_name: str | list[str] | None = None,
+        item_name_prefix: str | None = None,
+        method: str | list[str] | None = None,
+        method_prefix: str | None = None,
+        title: str | list[str] | None = None,
+        title_prefix: str | None = None,
+        to_be_done: bool | None = None,
+        work_order: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.HistogramValue:
+        filter_ = _create_filter(
+            self._view_id,
+            criticality,
+            criticality_prefix,
+            description,
+            description_prefix,
+            is_completed,
+            item_info,
+            item_info_prefix,
+            item_name,
+            item_name_prefix,
+            method,
+            method_prefix,
+            title,
+            title_prefix,
+            to_be_done,
+            work_order,
+            external_id_prefix,
+            filter,
+        )
+        return self._histogram(
+            self._view_id,
+            property,
+            interval,
+            _WORKITEM_PROPERTIES_BY_FIELD,
+            query,
+            search_property,
+            limit,
+            filter_,
+        )
 
     def list(
         self,

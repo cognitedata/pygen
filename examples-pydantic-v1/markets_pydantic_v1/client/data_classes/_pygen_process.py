@@ -12,12 +12,20 @@ if TYPE_CHECKING:
     from ._date_transformation_pair import DateTransformationPairApply
     from ._value_transformation import ValueTransformationApply
 
-__all__ = ["PygenProcess", "PygenProcessApply", "PygenProcessList", "PygenProcessApplyList", "PygenProcessTextFields"]
+__all__ = [
+    "PygenProcess",
+    "PygenProcessApply",
+    "PygenProcessList",
+    "PygenProcessApplyList",
+    "PygenProcessFields",
+    "PygenProcessTextFields",
+]
 
 
 PygenProcessTextFields = Literal["name"]
+PygenProcessFields = Literal["name"]
 
-_PYGENPROCESS_TEXT_PROPERTIES_BY_FIELD = {
+_PYGENPROCESS_PROPERTIES_BY_FIELD = {
     "name": "name",
 }
 

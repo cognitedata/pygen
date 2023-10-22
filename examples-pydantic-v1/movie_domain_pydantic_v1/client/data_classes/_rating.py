@@ -6,12 +6,13 @@ from cognite.client import data_modeling as dm
 
 from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 
-__all__ = ["Rating", "RatingApply", "RatingList", "RatingApplyList", "RatingTextFields"]
+__all__ = ["Rating", "RatingApply", "RatingList", "RatingApplyList", "RatingFields", "RatingTextFields"]
 
 
 RatingTextFields = Literal["score", "votes"]
+RatingFields = Literal["score", "votes"]
 
-_RATING_TEXT_PROPERTIES_BY_FIELD = {
+_RATING_PROPERTIES_BY_FIELD = {
     "score": "score",
     "votes": "votes",
 }

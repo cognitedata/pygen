@@ -11,12 +11,14 @@ from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 if TYPE_CHECKING:
     from ._market import MarketApply
 
-__all__ = ["Bid", "BidApply", "BidList", "BidApplyList", "BidTextFields"]
+__all__ = ["Bid", "BidApply", "BidList", "BidApplyList", "BidFields", "BidTextFields"]
 
 
 BidTextFields = Literal["name"]
+BidFields = Literal["date", "name"]
 
-_BID_TEXT_PROPERTIES_BY_FIELD = {
+_BID_PROPERTIES_BY_FIELD = {
+    "date": "date",
     "name": "name",
 }
 

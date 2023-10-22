@@ -9,16 +9,18 @@ from cognite.client import CogniteClient
 from cognite.client.data_classes import TimeSeriesList, DatapointsList, Datapoints, DatapointsArrayList
 from cognite.client.data_classes.datapoints import Aggregate
 from cognite.client import data_modeling as dm
+from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT, INSTANCE_QUERY_LIMIT
+from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT, INSTANCE_QUERY_LIMIT
 from scenario_instance.client.data_classes import (
     ScenarioInstance,
     ScenarioInstanceApply,
     ScenarioInstanceList,
     ScenarioInstanceApplyList,
+    ScenarioInstanceFields,
     ScenarioInstanceTextFields,
 )
-from scenario_instance.client.data_classes._scenario_instance import _SCENARIOINSTANCE_TEXT_PROPERTIES_BY_FIELD
+from scenario_instance.client.data_classes._scenario_instance import _SCENARIOINSTANCE_PROPERTIES_BY_FIELD
 
 
 ColumnNames = Literal["aggregation", "country", "instance", "market", "priceArea", "priceForecast", "scenario", "start"]
@@ -490,8 +492,181 @@ class ScenarioInstanceAPI(TypeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
             external_id_prefix,
             filter,
         )
-        return self._search(
-            self._view_id, query, _SCENARIOINSTANCE_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit
+        return self._search(self._view_id, query, _SCENARIOINSTANCE_PROPERTIES_BY_FIELD, properties, filter_, limit)
+
+    @overload
+    def aggregate(
+        self,
+        aggregations: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: ScenarioInstanceFields | Sequence[ScenarioInstanceFields] | None = None,
+        group_by: None = None,
+        query: str | None = None,
+        search_properties: ScenarioInstanceTextFields | Sequence[ScenarioInstanceTextFields] | None = None,
+        aggregation: str | list[str] | None = None,
+        aggregation_prefix: str | None = None,
+        country: str | list[str] | None = None,
+        country_prefix: str | None = None,
+        min_instance: datetime.datetime | None = None,
+        max_instance: datetime.datetime | None = None,
+        market: str | list[str] | None = None,
+        market_prefix: str | None = None,
+        price_area: str | list[str] | None = None,
+        price_area_prefix: str | None = None,
+        scenario: str | list[str] | None = None,
+        scenario_prefix: str | None = None,
+        min_start: datetime.datetime | None = None,
+        max_start: datetime.datetime | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> list[dm.aggregations.AggregatedNumberedValue]:
+        ...
+
+    @overload
+    def aggregate(
+        self,
+        aggregations: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: ScenarioInstanceFields | Sequence[ScenarioInstanceFields] | None = None,
+        group_by: ScenarioInstanceFields | Sequence[ScenarioInstanceFields] = None,
+        query: str | None = None,
+        search_properties: ScenarioInstanceTextFields | Sequence[ScenarioInstanceTextFields] | None = None,
+        aggregation: str | list[str] | None = None,
+        aggregation_prefix: str | None = None,
+        country: str | list[str] | None = None,
+        country_prefix: str | None = None,
+        min_instance: datetime.datetime | None = None,
+        max_instance: datetime.datetime | None = None,
+        market: str | list[str] | None = None,
+        market_prefix: str | None = None,
+        price_area: str | list[str] | None = None,
+        price_area_prefix: str | None = None,
+        scenario: str | list[str] | None = None,
+        scenario_prefix: str | None = None,
+        min_start: datetime.datetime | None = None,
+        max_start: datetime.datetime | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> InstanceAggregationResultList:
+        ...
+
+    def aggregate(
+        self,
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: ScenarioInstanceFields | Sequence[ScenarioInstanceFields] | None = None,
+        group_by: ScenarioInstanceFields | Sequence[ScenarioInstanceFields] | None = None,
+        query: str | None = None,
+        search_property: ScenarioInstanceTextFields | Sequence[ScenarioInstanceTextFields] | None = None,
+        aggregation: str | list[str] | None = None,
+        aggregation_prefix: str | None = None,
+        country: str | list[str] | None = None,
+        country_prefix: str | None = None,
+        min_instance: datetime.datetime | None = None,
+        max_instance: datetime.datetime | None = None,
+        market: str | list[str] | None = None,
+        market_prefix: str | None = None,
+        price_area: str | list[str] | None = None,
+        price_area_prefix: str | None = None,
+        scenario: str | list[str] | None = None,
+        scenario_prefix: str | None = None,
+        min_start: datetime.datetime | None = None,
+        max_start: datetime.datetime | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        filter_ = _create_filter(
+            self._view_id,
+            aggregation,
+            aggregation_prefix,
+            country,
+            country_prefix,
+            min_instance,
+            max_instance,
+            market,
+            market_prefix,
+            price_area,
+            price_area_prefix,
+            scenario,
+            scenario_prefix,
+            min_start,
+            max_start,
+            external_id_prefix,
+            filter,
+        )
+        return self._aggregate(
+            self._view_id,
+            aggregate,
+            _SCENARIOINSTANCE_PROPERTIES_BY_FIELD,
+            property,
+            group_by,
+            query,
+            search_property,
+            limit,
+            filter_,
+        )
+
+    def histogram(
+        self,
+        property: ScenarioInstanceFields,
+        interval: float,
+        query: str | None = None,
+        search_property: ScenarioInstanceTextFields | Sequence[ScenarioInstanceTextFields] | None = None,
+        aggregation: str | list[str] | None = None,
+        aggregation_prefix: str | None = None,
+        country: str | list[str] | None = None,
+        country_prefix: str | None = None,
+        min_instance: datetime.datetime | None = None,
+        max_instance: datetime.datetime | None = None,
+        market: str | list[str] | None = None,
+        market_prefix: str | None = None,
+        price_area: str | list[str] | None = None,
+        price_area_prefix: str | None = None,
+        scenario: str | list[str] | None = None,
+        scenario_prefix: str | None = None,
+        min_start: datetime.datetime | None = None,
+        max_start: datetime.datetime | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.HistogramValue:
+        filter_ = _create_filter(
+            self._view_id,
+            aggregation,
+            aggregation_prefix,
+            country,
+            country_prefix,
+            min_instance,
+            max_instance,
+            market,
+            market_prefix,
+            price_area,
+            price_area_prefix,
+            scenario,
+            scenario_prefix,
+            min_start,
+            max_start,
+            external_id_prefix,
+            filter,
+        )
+        return self._histogram(
+            self._view_id,
+            property,
+            interval,
+            _SCENARIOINSTANCE_PROPERTIES_BY_FIELD,
+            query,
+            search_property,
+            limit,
+            filter_,
         )
 
     def list(

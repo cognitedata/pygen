@@ -12,7 +12,14 @@ if TYPE_CHECKING:
     from ._asset import AssetApply
     from ._work_item import WorkItemApply
 
-__all__ = ["WorkOrder", "WorkOrderApply", "WorkOrderList", "WorkOrderApplyList", "WorkOrderTextFields"]
+__all__ = [
+    "WorkOrder",
+    "WorkOrderApply",
+    "WorkOrderList",
+    "WorkOrderApplyList",
+    "WorkOrderFields",
+    "WorkOrderTextFields",
+]
 
 
 WorkOrderTextFields = Literal[
@@ -24,15 +31,48 @@ WorkOrderTextFields = Literal[
     "work_order_number",
     "work_package_number",
 ]
+WorkOrderFields = Literal[
+    "actual_hours",
+    "created_date",
+    "description",
+    "due_date",
+    "duration_hours",
+    "end_time",
+    "is_active",
+    "is_cancelled",
+    "is_completed",
+    "is_safety_critical",
+    "percentage_progress",
+    "planned_start",
+    "priority_description",
+    "program_number",
+    "start_time",
+    "status",
+    "title",
+    "work_order_number",
+    "work_package_number",
+]
 
-_WORKORDER_TEXT_PROPERTIES_BY_FIELD = {
+_WORKORDER_PROPERTIES_BY_FIELD = {
+    "actual_hours": "actualHours",
+    "created_date": "createdDate",
     "description": "description",
-    "priority_description": "priority_description",
-    "program_number": "program_number",
+    "due_date": "dueDate",
+    "duration_hours": "durationHours",
+    "end_time": "endTime",
+    "is_active": "isActive",
+    "is_cancelled": "isCancelled",
+    "is_completed": "isCompleted",
+    "is_safety_critical": "isSafetyCritical",
+    "percentage_progress": "percentageProgress",
+    "planned_start": "plannedStart",
+    "priority_description": "priorityDescription",
+    "program_number": "programNumber",
+    "start_time": "startTime",
     "status": "status",
     "title": "title",
-    "work_order_number": "work_order_number",
-    "work_package_number": "work_package_number",
+    "work_order_number": "workOrderNumber",
+    "work_package_number": "workPackageNumber",
 }
 
 

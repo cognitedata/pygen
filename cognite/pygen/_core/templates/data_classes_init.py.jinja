@@ -5,6 +5,7 @@ __all__ = [{% for class_ in classes %}
     "{{ class_.read_name }}",
     "{{ class_.write_name }}",
     "{{ class_.read_list_name }}",
-    "{{ class_.write_list_name }}",{% if class_.has_text_field %}
-    "{{ class_.text_field_name }}", {% endif %}{% endfor %}
+    "{{ class_.write_list_name }}",
+    "{{ class_.field_names }}",{% if class_.has_text_field %}
+    "{{ class_.text_field_names }}", {% endif %}{% endfor %}
 ]

@@ -1,14 +1,22 @@
-from ._asset import Asset, AssetApply, AssetList, AssetApplyList, AssetTextFields
+from ._asset import Asset, AssetApply, AssetApplyList, AssetFields, AssetList, AssetTextFields
 from ._cdf_3_d_connection_properties import (
     CdfConnectionProperties,
     CdfConnectionPropertiesApply,
-    CdfConnectionPropertiesList,
     CdfConnectionPropertiesApplyList,
+    CdfConnectionPropertiesFields,
+    CdfConnectionPropertiesList,
 )
-from ._cdf_3_d_entity import CdfEntity, CdfEntityApply, CdfEntityList, CdfEntityApplyList
-from ._cdf_3_d_model import CdfModel, CdfModelApply, CdfModelList, CdfModelApplyList, CdfModelTextFields
-from ._work_item import WorkItem, WorkItemApply, WorkItemList, WorkItemApplyList, WorkItemTextFields
-from ._work_order import WorkOrder, WorkOrderApply, WorkOrderList, WorkOrderApplyList, WorkOrderTextFields
+from ._cdf_3_d_entity import CdfEntity, CdfEntityApply, CdfEntityApplyList, CdfEntityList
+from ._cdf_3_d_model import CdfModel, CdfModelApply, CdfModelApplyList, CdfModelFields, CdfModelList, CdfModelTextFields
+from ._work_item import WorkItem, WorkItemApply, WorkItemApplyList, WorkItemFields, WorkItemList, WorkItemTextFields
+from ._work_order import (
+    WorkOrder,
+    WorkOrderApply,
+    WorkOrderApplyList,
+    WorkOrderFields,
+    WorkOrderList,
+    WorkOrderTextFields,
+)
 
 AssetApply.model_rebuild()
 CdfEntityApply.model_rebuild()
@@ -21,28 +29,34 @@ __all__ = [
     "AssetApply",
     "AssetList",
     "AssetApplyList",
+    "AssetFields",
     "AssetTextFields",
     "CdfConnectionProperties",
     "CdfConnectionPropertiesApply",
     "CdfConnectionPropertiesList",
     "CdfConnectionPropertiesApplyList",
+    "CdfConnectionPropertiesFields",
     "CdfEntity",
     "CdfEntityApply",
     "CdfEntityList",
     "CdfEntityApplyList",
+    "CdfEntityFields",
     "CdfModel",
     "CdfModelApply",
     "CdfModelList",
     "CdfModelApplyList",
+    "CdfModelFields",
     "CdfModelTextFields",
     "WorkItem",
     "WorkItemApply",
     "WorkItemList",
     "WorkItemApplyList",
+    "WorkItemFields",
     "WorkItemTextFields",
     "WorkOrder",
     "WorkOrderApply",
     "WorkOrderList",
     "WorkOrderApplyList",
+    "WorkOrderFields",
     "WorkOrderTextFields",
 ]

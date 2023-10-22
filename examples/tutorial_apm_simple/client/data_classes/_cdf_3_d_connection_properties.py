@@ -12,7 +12,14 @@ __all__ = [
     "CdfConnectionPropertiesApply",
     "CdfConnectionPropertiesList",
     "CdfConnectionPropertiesApplyList",
+    "CdfConnectionPropertiesFields",
 ]
+CdfConnectionPropertiesFields = Literal["revision_id", "revision_node_id"]
+
+_CDFCONNECTIONPROPERTIES_PROPERTIES_BY_FIELD = {
+    "revision_id": "revisionId",
+    "revision_node_id": "revisionNodeId",
+}
 
 
 class CdfConnectionProperties(DomainModel):

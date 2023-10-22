@@ -1,36 +1,53 @@
-from ._bid import Bid, BidApply, BidList, BidApplyList, BidTextFields
-from ._cog_bid import CogBid, CogBidApply, CogBidList, CogBidApplyList, CogBidTextFields
-from ._cog_pool import CogPool, CogPoolApply, CogPoolList, CogPoolApplyList, CogPoolTextFields
-from ._cog_process import CogProcess, CogProcessApply, CogProcessList, CogProcessApplyList, CogProcessTextFields
+from ._bid import Bid, BidApply, BidApplyList, BidFields, BidList, BidTextFields
+from ._cog_bid import CogBid, CogBidApply, CogBidApplyList, CogBidFields, CogBidList, CogBidTextFields
+from ._cog_pool import CogPool, CogPoolApply, CogPoolApplyList, CogPoolFields, CogPoolList, CogPoolTextFields
+from ._cog_process import (
+    CogProcess,
+    CogProcessApply,
+    CogProcessApplyList,
+    CogProcessFields,
+    CogProcessList,
+    CogProcessTextFields,
+)
 from ._date_transformation import (
     DateTransformation,
     DateTransformationApply,
-    DateTransformationList,
     DateTransformationApplyList,
+    DateTransformationFields,
+    DateTransformationList,
     DateTransformationTextFields,
 )
 from ._date_transformation_pair import (
     DateTransformationPair,
     DateTransformationPairApply,
-    DateTransformationPairList,
     DateTransformationPairApplyList,
+    DateTransformationPairList,
 )
-from ._market import Market, MarketApply, MarketList, MarketApplyList, MarketTextFields
-from ._process import Process, ProcessApply, ProcessList, ProcessApplyList, ProcessTextFields
-from ._pygen_bid import PygenBid, PygenBidApply, PygenBidList, PygenBidApplyList, PygenBidTextFields
-from ._pygen_pool import PygenPool, PygenPoolApply, PygenPoolList, PygenPoolApplyList, PygenPoolTextFields
+from ._market import Market, MarketApply, MarketApplyList, MarketFields, MarketList, MarketTextFields
+from ._process import Process, ProcessApply, ProcessApplyList, ProcessFields, ProcessList, ProcessTextFields
+from ._pygen_bid import PygenBid, PygenBidApply, PygenBidApplyList, PygenBidFields, PygenBidList, PygenBidTextFields
+from ._pygen_pool import (
+    PygenPool,
+    PygenPoolApply,
+    PygenPoolApplyList,
+    PygenPoolFields,
+    PygenPoolList,
+    PygenPoolTextFields,
+)
 from ._pygen_process import (
     PygenProcess,
     PygenProcessApply,
-    PygenProcessList,
     PygenProcessApplyList,
+    PygenProcessFields,
+    PygenProcessList,
     PygenProcessTextFields,
 )
 from ._value_transformation import (
     ValueTransformation,
     ValueTransformationApply,
-    ValueTransformationList,
     ValueTransformationApplyList,
+    ValueTransformationFields,
+    ValueTransformationList,
     ValueTransformationTextFields,
 )
 
@@ -47,59 +64,71 @@ __all__ = [
     "BidApply",
     "BidList",
     "BidApplyList",
+    "BidFields",
     "BidTextFields",
     "CogBid",
     "CogBidApply",
     "CogBidList",
     "CogBidApplyList",
+    "CogBidFields",
     "CogBidTextFields",
     "CogPool",
     "CogPoolApply",
     "CogPoolList",
     "CogPoolApplyList",
+    "CogPoolFields",
     "CogPoolTextFields",
     "CogProcess",
     "CogProcessApply",
     "CogProcessList",
     "CogProcessApplyList",
+    "CogProcessFields",
     "CogProcessTextFields",
     "DateTransformation",
     "DateTransformationApply",
     "DateTransformationList",
     "DateTransformationApplyList",
+    "DateTransformationFields",
     "DateTransformationTextFields",
     "DateTransformationPair",
     "DateTransformationPairApply",
     "DateTransformationPairList",
     "DateTransformationPairApplyList",
+    "DateTransformationPairFields",
     "Market",
     "MarketApply",
     "MarketList",
     "MarketApplyList",
+    "MarketFields",
     "MarketTextFields",
     "Process",
     "ProcessApply",
     "ProcessList",
     "ProcessApplyList",
+    "ProcessFields",
     "ProcessTextFields",
     "PygenBid",
     "PygenBidApply",
     "PygenBidList",
     "PygenBidApplyList",
+    "PygenBidFields",
     "PygenBidTextFields",
     "PygenPool",
     "PygenPoolApply",
     "PygenPoolList",
     "PygenPoolApplyList",
+    "PygenPoolFields",
     "PygenPoolTextFields",
     "PygenProcess",
     "PygenProcessApply",
     "PygenProcessList",
     "PygenProcessApplyList",
+    "PygenProcessFields",
     "PygenProcessTextFields",
     "ValueTransformation",
     "ValueTransformationApply",
     "ValueTransformationList",
     "ValueTransformationApplyList",
+    "ValueTransformationFields",
     "ValueTransformationTextFields",
 ]

@@ -1,9 +1,10 @@
-from ._case import Case, CaseApply, CaseList, CaseApplyList, CaseTextFields
+from ._case import Case, CaseApply, CaseApplyList, CaseFields, CaseList, CaseTextFields
 from ._command_config import (
     CommandConfig,
     CommandConfigApply,
-    CommandConfigList,
     CommandConfigApplyList,
+    CommandConfigFields,
+    CommandConfigList,
     CommandConfigTextFields,
 )
 
@@ -14,10 +15,12 @@ __all__ = [
     "CaseApply",
     "CaseList",
     "CaseApplyList",
+    "CaseFields",
     "CaseTextFields",
     "CommandConfig",
     "CommandConfigApply",
     "CommandConfigList",
     "CommandConfigApplyList",
+    "CommandConfigFields",
     "CommandConfigTextFields",
 ]

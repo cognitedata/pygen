@@ -10,16 +10,18 @@ from cognite.client import CogniteClient
 from cognite.client.data_classes import TimeSeriesList, DatapointsList, Datapoints, DatapointsArrayList
 from cognite.client.data_classes.datapoints import Aggregate
 from cognite.client import data_modeling as dm
+from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT, INSTANCE_QUERY_LIMIT
+from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT, INSTANCE_QUERY_LIMIT
 from tutorial_apm_simple_pydantic_v1.client.data_classes import (
     Asset,
     AssetApply,
     AssetList,
     AssetApplyList,
+    AssetFields,
     AssetTextFields,
 )
-from tutorial_apm_simple_pydantic_v1.client.data_classes._asset import _ASSET_TEXT_PROPERTIES_BY_FIELD
+from tutorial_apm_simple_pydantic_v1.client.data_classes._asset import _ASSET_PROPERTIES_BY_FIELD
 
 
 ColumnNames = Literal[
@@ -626,7 +628,200 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
             external_id_prefix,
             filter,
         )
-        return self._search(self._view_id, query, _ASSET_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit)
+        return self._search(self._view_id, query, _ASSET_PROPERTIES_BY_FIELD, properties, filter_, limit)
+
+    @overload
+    def aggregate(
+        self,
+        aggregations: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: AssetFields | Sequence[AssetFields] | None = None,
+        group_by: None = None,
+        query: str | None = None,
+        search_properties: AssetTextFields | Sequence[AssetTextFields] | None = None,
+        min_area_id: int | None = None,
+        max_area_id: int | None = None,
+        min_category_id: int | None = None,
+        max_category_id: int | None = None,
+        min_created_date: datetime.datetime | None = None,
+        max_created_date: datetime.datetime | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        is_active: bool | None = None,
+        is_critical_line: bool | None = None,
+        parent: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        source_db: str | list[str] | None = None,
+        source_db_prefix: str | None = None,
+        tag: str | list[str] | None = None,
+        tag_prefix: str | None = None,
+        min_updated_date: datetime.datetime | None = None,
+        max_updated_date: datetime.datetime | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> list[dm.aggregations.AggregatedNumberedValue]:
+        ...
+
+    @overload
+    def aggregate(
+        self,
+        aggregations: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: AssetFields | Sequence[AssetFields] | None = None,
+        group_by: AssetFields | Sequence[AssetFields] = None,
+        query: str | None = None,
+        search_properties: AssetTextFields | Sequence[AssetTextFields] | None = None,
+        min_area_id: int | None = None,
+        max_area_id: int | None = None,
+        min_category_id: int | None = None,
+        max_category_id: int | None = None,
+        min_created_date: datetime.datetime | None = None,
+        max_created_date: datetime.datetime | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        is_active: bool | None = None,
+        is_critical_line: bool | None = None,
+        parent: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        source_db: str | list[str] | None = None,
+        source_db_prefix: str | None = None,
+        tag: str | list[str] | None = None,
+        tag_prefix: str | None = None,
+        min_updated_date: datetime.datetime | None = None,
+        max_updated_date: datetime.datetime | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> InstanceAggregationResultList:
+        ...
+
+    def aggregate(
+        self,
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: AssetFields | Sequence[AssetFields] | None = None,
+        group_by: AssetFields | Sequence[AssetFields] | None = None,
+        query: str | None = None,
+        search_property: AssetTextFields | Sequence[AssetTextFields] | None = None,
+        min_area_id: int | None = None,
+        max_area_id: int | None = None,
+        min_category_id: int | None = None,
+        max_category_id: int | None = None,
+        min_created_date: datetime.datetime | None = None,
+        max_created_date: datetime.datetime | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        is_active: bool | None = None,
+        is_critical_line: bool | None = None,
+        parent: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        source_db: str | list[str] | None = None,
+        source_db_prefix: str | None = None,
+        tag: str | list[str] | None = None,
+        tag_prefix: str | None = None,
+        min_updated_date: datetime.datetime | None = None,
+        max_updated_date: datetime.datetime | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        filter_ = _create_filter(
+            self._view_id,
+            min_area_id,
+            max_area_id,
+            min_category_id,
+            max_category_id,
+            min_created_date,
+            max_created_date,
+            description,
+            description_prefix,
+            is_active,
+            is_critical_line,
+            parent,
+            source_db,
+            source_db_prefix,
+            tag,
+            tag_prefix,
+            min_updated_date,
+            max_updated_date,
+            external_id_prefix,
+            filter,
+        )
+        return self._aggregate(
+            self._view_id,
+            aggregate,
+            _ASSET_PROPERTIES_BY_FIELD,
+            property,
+            group_by,
+            query,
+            search_property,
+            limit,
+            filter_,
+        )
+
+    def histogram(
+        self,
+        property: AssetFields,
+        interval: float,
+        query: str | None = None,
+        search_property: AssetTextFields | Sequence[AssetTextFields] | None = None,
+        min_area_id: int | None = None,
+        max_area_id: int | None = None,
+        min_category_id: int | None = None,
+        max_category_id: int | None = None,
+        min_created_date: datetime.datetime | None = None,
+        max_created_date: datetime.datetime | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        is_active: bool | None = None,
+        is_critical_line: bool | None = None,
+        parent: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        source_db: str | list[str] | None = None,
+        source_db_prefix: str | None = None,
+        tag: str | list[str] | None = None,
+        tag_prefix: str | None = None,
+        min_updated_date: datetime.datetime | None = None,
+        max_updated_date: datetime.datetime | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.HistogramValue:
+        filter_ = _create_filter(
+            self._view_id,
+            min_area_id,
+            max_area_id,
+            min_category_id,
+            max_category_id,
+            min_created_date,
+            max_created_date,
+            description,
+            description_prefix,
+            is_active,
+            is_critical_line,
+            parent,
+            source_db,
+            source_db_prefix,
+            tag,
+            tag_prefix,
+            min_updated_date,
+            max_updated_date,
+            external_id_prefix,
+            filter,
+        )
+        return self._histogram(
+            self._view_id,
+            property,
+            interval,
+            _ASSET_PROPERTIES_BY_FIELD,
+            query,
+            search_property,
+            limit,
+            filter_,
+        )
 
     def list(
         self,

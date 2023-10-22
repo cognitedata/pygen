@@ -4,16 +4,18 @@ from typing import Sequence, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
+from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
+from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from movie_domain_pydantic_v1.client.data_classes import (
     BestLeadingActor,
     BestLeadingActorApply,
     BestLeadingActorList,
     BestLeadingActorApplyList,
+    BestLeadingActorFields,
     BestLeadingActorTextFields,
 )
-from movie_domain_pydantic_v1.client.data_classes._best_leading_actor import _BESTLEADINGACTOR_TEXT_PROPERTIES_BY_FIELD
+from movie_domain_pydantic_v1.client.data_classes._best_leading_actor import _BESTLEADINGACTOR_PROPERTIES_BY_FIELD
 
 
 class BestLeadingActorAPI(TypeAPI[BestLeadingActor, BestLeadingActorApply, BestLeadingActorList]):
@@ -85,8 +87,121 @@ class BestLeadingActorAPI(TypeAPI[BestLeadingActor, BestLeadingActorApply, BestL
             external_id_prefix,
             filter,
         )
-        return self._search(
-            self._view_id, query, _BESTLEADINGACTOR_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit
+        return self._search(self._view_id, query, _BESTLEADINGACTOR_PROPERTIES_BY_FIELD, properties, filter_, limit)
+
+    @overload
+    def aggregate(
+        self,
+        aggregations: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: BestLeadingActorFields | Sequence[BestLeadingActorFields] | None = None,
+        group_by: None = None,
+        query: str | None = None,
+        search_properties: BestLeadingActorTextFields | Sequence[BestLeadingActorTextFields] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        min_year: int | None = None,
+        max_year: int | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> list[dm.aggregations.AggregatedNumberedValue]:
+        ...
+
+    @overload
+    def aggregate(
+        self,
+        aggregations: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: BestLeadingActorFields | Sequence[BestLeadingActorFields] | None = None,
+        group_by: BestLeadingActorFields | Sequence[BestLeadingActorFields] = None,
+        query: str | None = None,
+        search_properties: BestLeadingActorTextFields | Sequence[BestLeadingActorTextFields] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        min_year: int | None = None,
+        max_year: int | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> InstanceAggregationResultList:
+        ...
+
+    def aggregate(
+        self,
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: BestLeadingActorFields | Sequence[BestLeadingActorFields] | None = None,
+        group_by: BestLeadingActorFields | Sequence[BestLeadingActorFields] | None = None,
+        query: str | None = None,
+        search_property: BestLeadingActorTextFields | Sequence[BestLeadingActorTextFields] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        min_year: int | None = None,
+        max_year: int | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        filter_ = _create_filter(
+            self._view_id,
+            name,
+            name_prefix,
+            min_year,
+            max_year,
+            external_id_prefix,
+            filter,
+        )
+        return self._aggregate(
+            self._view_id,
+            aggregate,
+            _BESTLEADINGACTOR_PROPERTIES_BY_FIELD,
+            property,
+            group_by,
+            query,
+            search_property,
+            limit,
+            filter_,
+        )
+
+    def histogram(
+        self,
+        property: BestLeadingActorFields,
+        interval: float,
+        query: str | None = None,
+        search_property: BestLeadingActorTextFields | Sequence[BestLeadingActorTextFields] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        min_year: int | None = None,
+        max_year: int | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.HistogramValue:
+        filter_ = _create_filter(
+            self._view_id,
+            name,
+            name_prefix,
+            min_year,
+            max_year,
+            external_id_prefix,
+            filter,
+        )
+        return self._histogram(
+            self._view_id,
+            property,
+            interval,
+            _BESTLEADINGACTOR_PROPERTIES_BY_FIELD,
+            query,
+            search_property,
+            limit,
+            filter_,
         )
 
     def list(

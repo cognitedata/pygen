@@ -11,13 +11,16 @@ __all__ = [
     "DateTransformationApply",
     "DateTransformationList",
     "DateTransformationApplyList",
+    "DateTransformationFields",
     "DateTransformationTextFields",
 ]
 
 
 DateTransformationTextFields = Literal["method"]
+DateTransformationFields = Literal["arguments", "method"]
 
-_DATETRANSFORMATION_TEXT_PROPERTIES_BY_FIELD = {
+_DATETRANSFORMATION_PROPERTIES_BY_FIELD = {
+    "arguments": "arguments",
     "method": "method",
 }
 

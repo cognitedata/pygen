@@ -11,13 +11,15 @@ __all__ = [
     "CommandConfigApply",
     "CommandConfigList",
     "CommandConfigApplyList",
+    "CommandConfigFields",
     "CommandConfigTextFields",
 ]
 
 
 CommandConfigTextFields = Literal["configs", "source"]
+CommandConfigFields = Literal["configs", "source"]
 
-_COMMANDCONFIG_TEXT_PROPERTIES_BY_FIELD = {
+_COMMANDCONFIG_PROPERTIES_BY_FIELD = {
     "configs": "configs",
     "source": "source",
 }

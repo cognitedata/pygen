@@ -5,10 +5,11 @@ from typing import Dict, List, Sequence, Tuple, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
+from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
-from movie_domain.client.data_classes import Movie, MovieApply, MovieList, MovieApplyList, MovieTextFields
-from movie_domain.client.data_classes._movie import _MOVIE_TEXT_PROPERTIES_BY_FIELD
+from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
+from movie_domain.client.data_classes import Movie, MovieApply, MovieList, MovieApplyList, MovieFields, MovieTextFields
+from movie_domain.client.data_classes._movie import _MOVIE_PROPERTIES_BY_FIELD
 
 
 class MovieActorsAPI:
@@ -190,7 +191,140 @@ class MovieAPI(TypeAPI[Movie, MovieApply, MovieList]):
             external_id_prefix,
             filter,
         )
-        return self._search(self._view_id, query, _MOVIE_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit)
+        return self._search(self._view_id, query, _MOVIE_PROPERTIES_BY_FIELD, properties, filter_, limit)
+
+    @overload
+    def aggregate(
+        self,
+        aggregations: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: MovieFields | Sequence[MovieFields] | None = None,
+        group_by: None = None,
+        query: str | None = None,
+        search_properties: MovieTextFields | Sequence[MovieTextFields] | None = None,
+        rating: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        min_release_year: int | None = None,
+        max_release_year: int | None = None,
+        min_run_time_minutes: float | None = None,
+        max_run_time_minutes: float | None = None,
+        title: str | list[str] | None = None,
+        title_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> list[dm.aggregations.AggregatedNumberedValue]:
+        ...
+
+    @overload
+    def aggregate(
+        self,
+        aggregations: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: MovieFields | Sequence[MovieFields] | None = None,
+        group_by: MovieFields | Sequence[MovieFields] = None,
+        query: str | None = None,
+        search_properties: MovieTextFields | Sequence[MovieTextFields] | None = None,
+        rating: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        min_release_year: int | None = None,
+        max_release_year: int | None = None,
+        min_run_time_minutes: float | None = None,
+        max_run_time_minutes: float | None = None,
+        title: str | list[str] | None = None,
+        title_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> InstanceAggregationResultList:
+        ...
+
+    def aggregate(
+        self,
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: MovieFields | Sequence[MovieFields] | None = None,
+        group_by: MovieFields | Sequence[MovieFields] | None = None,
+        query: str | None = None,
+        search_property: MovieTextFields | Sequence[MovieTextFields] | None = None,
+        rating: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        min_release_year: int | None = None,
+        max_release_year: int | None = None,
+        min_run_time_minutes: float | None = None,
+        max_run_time_minutes: float | None = None,
+        title: str | list[str] | None = None,
+        title_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        filter_ = _create_filter(
+            self._view_id,
+            rating,
+            min_release_year,
+            max_release_year,
+            min_run_time_minutes,
+            max_run_time_minutes,
+            title,
+            title_prefix,
+            external_id_prefix,
+            filter,
+        )
+        return self._aggregate(
+            self._view_id,
+            aggregate,
+            _MOVIE_PROPERTIES_BY_FIELD,
+            property,
+            group_by,
+            query,
+            search_property,
+            limit,
+            filter_,
+        )
+
+    def histogram(
+        self,
+        property: MovieFields,
+        interval: float,
+        query: str | None = None,
+        search_property: MovieTextFields | Sequence[MovieTextFields] | None = None,
+        rating: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        min_release_year: int | None = None,
+        max_release_year: int | None = None,
+        min_run_time_minutes: float | None = None,
+        max_run_time_minutes: float | None = None,
+        title: str | list[str] | None = None,
+        title_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.HistogramValue:
+        filter_ = _create_filter(
+            self._view_id,
+            rating,
+            min_release_year,
+            max_release_year,
+            min_run_time_minutes,
+            max_run_time_minutes,
+            title,
+            title_prefix,
+            external_id_prefix,
+            filter,
+        )
+        return self._histogram(
+            self._view_id,
+            property,
+            interval,
+            _MOVIE_PROPERTIES_BY_FIELD,
+            query,
+            search_property,
+            limit,
+            filter_,
+        )
 
     def list(
         self,

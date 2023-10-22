@@ -12,7 +12,12 @@ if TYPE_CHECKING:
     from ._nomination import NominationApply
     from ._person import PersonApply
 
-__all__ = ["Actor", "ActorApply", "ActorList", "ActorApplyList"]
+__all__ = ["Actor", "ActorApply", "ActorList", "ActorApplyList", "ActorFields"]
+ActorFields = Literal["won_oscar"]
+
+_ACTOR_PROPERTIES_BY_FIELD = {
+    "won_oscar": "wonOscar",
+}
 
 
 class Actor(DomainModel):

@@ -11,14 +11,17 @@ __all__ = [
     "BestLeadingActorApply",
     "BestLeadingActorList",
     "BestLeadingActorApplyList",
+    "BestLeadingActorFields",
     "BestLeadingActorTextFields",
 ]
 
 
 BestLeadingActorTextFields = Literal["name"]
+BestLeadingActorFields = Literal["name", "year"]
 
-_BESTLEADINGACTOR_TEXT_PROPERTIES_BY_FIELD = {
+_BESTLEADINGACTOR_PROPERTIES_BY_FIELD = {
     "name": "name",
+    "year": "year",
 }
 
 

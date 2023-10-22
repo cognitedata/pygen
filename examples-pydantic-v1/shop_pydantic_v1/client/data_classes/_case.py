@@ -11,19 +11,24 @@ from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 if TYPE_CHECKING:
     from ._command_config import CommandConfigApply
 
-__all__ = ["Case", "CaseApply", "CaseList", "CaseApplyList", "CaseTextFields"]
+__all__ = ["Case", "CaseApply", "CaseList", "CaseApplyList", "CaseFields", "CaseTextFields"]
 
 
 CaseTextFields = Literal["arguments", "bid", "bid_history", "cut_files", "name", "run_status", "scenario"]
+CaseFields = Literal[
+    "arguments", "bid", "bid_history", "cut_files", "end_time", "name", "run_status", "scenario", "start_time"
+]
 
-_CASE_TEXT_PROPERTIES_BY_FIELD = {
+_CASE_PROPERTIES_BY_FIELD = {
     "arguments": "arguments",
     "bid": "bid",
     "bid_history": "bid_history",
     "cut_files": "cut_files",
+    "end_time": "end_time",
     "name": "name",
-    "run_status": "run_status",
+    "run_status": "runStatus",
     "scenario": "scenario",
+    "start_time": "start_time",
 }
 
 

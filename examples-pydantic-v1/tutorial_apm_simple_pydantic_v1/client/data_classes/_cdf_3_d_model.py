@@ -10,12 +10,13 @@ from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 if TYPE_CHECKING:
     from ._cdf_3_d_entity import CdfEntityApply
 
-__all__ = ["CdfModel", "CdfModelApply", "CdfModelList", "CdfModelApplyList", "CdfModelTextFields"]
+__all__ = ["CdfModel", "CdfModelApply", "CdfModelList", "CdfModelApplyList", "CdfModelFields", "CdfModelTextFields"]
 
 
 CdfModelTextFields = Literal["name"]
+CdfModelFields = Literal["name"]
 
-_CDFMODEL_TEXT_PROPERTIES_BY_FIELD = {
+_CDFMODEL_PROPERTIES_BY_FIELD = {
     "name": "name",
 }
 

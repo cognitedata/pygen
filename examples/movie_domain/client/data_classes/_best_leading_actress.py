@@ -11,14 +11,17 @@ __all__ = [
     "BestLeadingActressApply",
     "BestLeadingActressList",
     "BestLeadingActressApplyList",
+    "BestLeadingActressFields",
     "BestLeadingActressTextFields",
 ]
 
 
 BestLeadingActressTextFields = Literal["name"]
+BestLeadingActressFields = Literal["name", "year"]
 
-_BESTLEADINGACTRESS_TEXT_PROPERTIES_BY_FIELD = {
+_BESTLEADINGACTRESS_PROPERTIES_BY_FIELD = {
     "name": "name",
+    "year": "year",
 }
 
 

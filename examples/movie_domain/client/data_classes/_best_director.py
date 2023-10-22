@@ -6,13 +6,22 @@ from cognite.client import data_modeling as dm
 
 from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 
-__all__ = ["BestDirector", "BestDirectorApply", "BestDirectorList", "BestDirectorApplyList", "BestDirectorTextFields"]
+__all__ = [
+    "BestDirector",
+    "BestDirectorApply",
+    "BestDirectorList",
+    "BestDirectorApplyList",
+    "BestDirectorFields",
+    "BestDirectorTextFields",
+]
 
 
 BestDirectorTextFields = Literal["name"]
+BestDirectorFields = Literal["name", "year"]
 
-_BESTDIRECTOR_TEXT_PROPERTIES_BY_FIELD = {
+_BESTDIRECTOR_PROPERTIES_BY_FIELD = {
     "name": "name",
+    "year": "year",
 }
 
 

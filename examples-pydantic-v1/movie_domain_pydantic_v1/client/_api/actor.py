@@ -5,9 +5,11 @@ from typing import Dict, List, Sequence, Tuple, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
+from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
-from movie_domain_pydantic_v1.client.data_classes import Actor, ActorApply, ActorList, ActorApplyList
+from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
+from movie_domain_pydantic_v1.client.data_classes import Actor, ActorApply, ActorList, ActorApplyList, ActorFields
+from movie_domain_pydantic_v1.client.data_classes._actor import _ACTOR_PROPERTIES_BY_FIELD
 
 
 class ActorMoviesAPI:
@@ -162,16 +164,54 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
 
             return actors
 
-    def search(
+    @overload
+    def aggregate(
         self,
-        query: str,
-        properties: ActorTextFields | Sequence[ActorTextFields] | None = None,
+        aggregations: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: ActorFields | Sequence[ActorFields] | None = None,
+        group_by: None = None,
         person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         won_oscar: bool | None = None,
         external_id_prefix: str | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> ActorList:
+    ) -> list[dm.aggregations.AggregatedNumberedValue]:
+        ...
+
+    @overload
+    def aggregate(
+        self,
+        aggregations: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: ActorFields | Sequence[ActorFields] | None = None,
+        group_by: ActorFields | Sequence[ActorFields] = None,
+        person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        won_oscar: bool | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> InstanceAggregationResultList:
+        ...
+
+    def aggregate(
+        self,
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: ActorFields | Sequence[ActorFields] | None = None,
+        group_by: ActorFields | Sequence[ActorFields] | None = None,
+        person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        won_oscar: bool | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
         filter_ = _create_filter(
             self._view_id,
             person,
@@ -179,7 +219,45 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
             external_id_prefix,
             filter,
         )
-        return self._search(self._view_id, query, _ACTOR_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit)
+        return self._aggregate(
+            self._view_id,
+            aggregate,
+            _ACTOR_PROPERTIES_BY_FIELD,
+            property,
+            group_by,
+            None,
+            None,
+            limit,
+            filter_,
+        )
+
+    def histogram(
+        self,
+        property: ActorFields,
+        interval: float,
+        person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        won_oscar: bool | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.HistogramValue:
+        filter_ = _create_filter(
+            self._view_id,
+            person,
+            won_oscar,
+            external_id_prefix,
+            filter,
+        )
+        return self._histogram(
+            self._view_id,
+            property,
+            interval,
+            _ACTOR_PROPERTIES_BY_FIELD,
+            None,
+            None,
+            limit,
+            filter_,
+        )
 
     def list(
         self,

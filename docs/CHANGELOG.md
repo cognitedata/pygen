@@ -13,6 +13,12 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.26.0] - 22-10-23
+### Added
+* Support for aggregation in generated SDK.
+### Fixed
+* `pygen` generated invalid code for views without text fields. This is now fixed.
+
 ## [0.25.0] - 22-10-23
 ### Added
 * Support for search in generated SDK.

@@ -11,13 +11,16 @@ __all__ = [
     "ValueTransformationApply",
     "ValueTransformationList",
     "ValueTransformationApplyList",
+    "ValueTransformationFields",
     "ValueTransformationTextFields",
 ]
 
 
 ValueTransformationTextFields = Literal["method"]
+ValueTransformationFields = Literal["arguments", "method"]
 
-_VALUETRANSFORMATION_TEXT_PROPERTIES_BY_FIELD = {
+_VALUETRANSFORMATION_PROPERTIES_BY_FIELD = {
+    "arguments": "arguments",
     "method": "method",
 }
 

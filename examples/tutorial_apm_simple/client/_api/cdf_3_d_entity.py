@@ -6,7 +6,7 @@ from typing import Dict, List, Sequence, Tuple, overload
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
-from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
+from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from tutorial_apm_simple.client.data_classes import CdfEntity, CdfEntityApply, CdfEntityList, CdfEntityApplyList
 
 
@@ -117,21 +117,6 @@ class CdfEntityAPI(TypeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
             self._set_in_model_3_d(cdf_3_d_entities, in_model_3_d_edges)
 
             return cdf_3_d_entities
-
-    def search(
-        self,
-        query: str,
-        properties: CdfEntityTextFields | Sequence[CdfEntityTextFields] | None = None,
-        external_id_prefix: str | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
-        filter: dm.Filter | None = None,
-    ) -> CdfEntityList:
-        filter_ = _create_filter(
-            self._view_id,
-            external_id_prefix,
-            filter,
-        )
-        return self._search(self._view_id, query, _CDFENTITY_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit)
 
     def list(
         self,

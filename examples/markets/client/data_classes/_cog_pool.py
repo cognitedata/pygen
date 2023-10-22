@@ -7,14 +7,17 @@ from pydantic import Field
 
 from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 
-__all__ = ["CogPool", "CogPoolApply", "CogPoolList", "CogPoolApplyList", "CogPoolTextFields"]
+__all__ = ["CogPool", "CogPoolApply", "CogPoolList", "CogPoolApplyList", "CogPoolFields", "CogPoolTextFields"]
 
 
 CogPoolTextFields = Literal["name", "time_unit", "timezone"]
+CogPoolFields = Literal["max_price", "min_price", "name", "time_unit", "timezone"]
 
-_COGPOOL_TEXT_PROPERTIES_BY_FIELD = {
+_COGPOOL_PROPERTIES_BY_FIELD = {
+    "max_price": "maxPrice",
+    "min_price": "minPrice",
     "name": "name",
-    "time_unit": "time_unit",
+    "time_unit": "timeUnit",
     "timezone": "timezone",
 }
 
