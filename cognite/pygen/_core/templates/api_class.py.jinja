@@ -9,11 +9,11 @@ import pandas as pd{% endif %}
 from cognite.client import CogniteClient{% if data_class.has_single_timeseries_fields %}
 from cognite.client.data_classes import TimeSeriesList, DatapointsList, Datapoints, DatapointsArrayList
 from cognite.client.data_classes.datapoints import Aggregate{% endif %}
-from cognite.client import data_modeling as dm{% if not data_class.has_only_one_to_many_edges %}
+from cognite.client import data_modeling as dm{% if data_class.has_primitive_fields %}
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList{% endif %}
 
 from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT{% if data_class.has_single_timeseries_fields %}, INSTANCE_QUERY_LIMIT{% endif %}
-from {{ top_level_package }}.data_classes import {{ data_class.read_name }}, {{ data_class.write_name }}, {{ data_class.read_list_name }}, {{ data_class.write_list_name }}{% if not data_class.has_only_one_to_many_edges %}, {{ data_class.field_names }}{% endif %}{% if data_class.has_text_field %}, {{ data_class.text_field_names }}{% endif %}{% if not data_class.has_only_one_to_many_edges %}
+from {{ top_level_package }}.data_classes import {{ data_class.read_name }}, {{ data_class.write_name }}, {{ data_class.read_list_name }}, {{ data_class.write_list_name }}{% if data_class.has_primitive_fields %}, {{ data_class.field_names }}{% endif %}{% if data_class.has_text_field %}, {{ data_class.text_field_names }}{% endif %}{% if data_class.has_primitive_fields %}
 from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import {{ data_class.properties_dict_name }}{% endif %}
 
 
@@ -134,7 +134,7 @@ class {{ api_class.name }}(TypeAPI[{{ data_class.read_name }}, {{ data_class.wri
             filter,
         )
         return self._search(self._view_id, query, {{ data_class.properties_dict_name }}, properties, filter_, limit){% endif %}
-{% if not data_class.has_only_one_to_many_edges %}
+{% if data_class.has_primitive_fields %}
     @overload
     def aggregate(
         self,

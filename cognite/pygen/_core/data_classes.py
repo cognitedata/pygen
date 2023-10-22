@@ -399,8 +399,12 @@ class DataClass:
         return (field_ for field_ in self.fields if isinstance(field_, PrimitiveField))
 
     @property
+    def primitive_core_fields(self) -> Iterable[PrimitiveFieldCore]:
+        return (field_ for field_ in self.fields if isinstance(field_, PrimitiveFieldCore))
+
+    @property
     def text_fields(self) -> Iterable[PrimitiveFieldCore]:
-        return (field_ for field_ in self.fields if isinstance(field_, PrimitiveFieldCore) and field_.is_text_field)
+        return (field_ for field_ in self.primitive_core_fields if field_.is_text_field)
 
     @property
     def cdf_external_fields(self) -> Iterable[CDFExternalField]:
@@ -417,6 +421,10 @@ class DataClass:
     @property
     def has_edges(self) -> bool:
         return any(isinstance(field_, EdgeField) for field_ in self.fields)
+
+    @property
+    def has_primitive_fields(self) -> bool:
+        return any(isinstance(field_, PrimitiveFieldCore) for field_ in self.fields)
 
     @property
     def has_only_one_to_many_edges(self) -> bool:
