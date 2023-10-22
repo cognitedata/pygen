@@ -192,10 +192,10 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
         | dm.aggregations.MetricAggregation
         | Sequence[Aggregations]
         | Sequence[dm.aggregations.MetricAggregation],
-        properties: PersonFields | Sequence[PersonFields] | None = None,
+        property: PersonFields | Sequence[PersonFields] | None = None,
         group_by: PersonFields | Sequence[PersonFields] | None = None,
         query: str | None = None,
-        search_properties: PersonTextFields | Sequence[PersonTextFields] | None = None,
+        search_property: PersonTextFields | Sequence[PersonTextFields] | None = None,
         min_birth_year: int | None = None,
         max_birth_year: int | None = None,
         name: str | list[str] | None = None,
@@ -217,13 +217,29 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
             self._view_id,
             aggregate,
             _PERSON_PROPERTIES_BY_FIELD,
-            properties,
+            property,
             group_by,
             query,
-            search_properties,
+            search_property,
             limit,
             filter_,
         )
+
+    def histogram(
+        self,
+        property: PersonFields,
+        interval: float,
+        query: str | None = None,
+        search_property: PersonTextFields | Sequence[PersonTextFields] | None = None,
+        min_birth_year: int | None = None,
+        max_birth_year: int | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.HistogramValue:
+        raise NotImplementedError
 
     def list(
         self,

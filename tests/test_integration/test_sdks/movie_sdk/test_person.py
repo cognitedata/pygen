@@ -140,3 +140,13 @@ def test_aggregate_person_count_with_group_by(movie_client: MovieClient) -> None
     assert len(result) > 0
     assert "birthYear" in result[0].group
     assert result[0].aggregates[0].value > 0
+
+
+def test_histogram_birth_year(movie_client: MovieClient) -> None:
+    # Act
+    result = movie_client.person.histogram("birth_year", 10.0)
+
+    # Assert
+    assert len(result) > 0
+    assert result.buckets[0].count > 0
+    assert result.buckets[0].start == 1900.0
