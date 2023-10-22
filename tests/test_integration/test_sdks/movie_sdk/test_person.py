@@ -129,7 +129,7 @@ def test_aggregate_person_count(movie_client: MovieClient) -> None:
     result = movie_client.person.aggregate("count")
 
     # Assert
-    assert result.value > 5000
+    assert result[0].value > 5000
 
 
 def test_aggregate_person_count_with_group_by(movie_client: MovieClient) -> None:
@@ -138,5 +138,5 @@ def test_aggregate_person_count_with_group_by(movie_client: MovieClient) -> None
 
     # Assert
     assert len(result) > 0
-    assert isinstance(result[0].group, int)
-    assert result[0].value > 0
+    assert "birthYear" in result[0].group
+    assert result[0].aggregates[0].value > 0

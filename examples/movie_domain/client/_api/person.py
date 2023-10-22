@@ -162,7 +162,7 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
         external_id_prefix: str | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> dm.aggregations.AggregatedNumberedValue:
+    ) -> list[dm.aggregations.AggregatedNumberedValue]:
         ...
 
     @overload
@@ -188,7 +188,7 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
 
     def aggregate(
         self,
-        aggregations: Aggregations
+        aggregate: Aggregations
         | dm.aggregations.MetricAggregation
         | Sequence[Aggregations]
         | Sequence[dm.aggregations.MetricAggregation],
@@ -203,8 +203,27 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
         external_id_prefix: str | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> dm.aggregations.AggregatedNumberedValue | InstanceAggregationResultList:
-        raise NotImplementedError()
+    ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        filter_ = _create_filter(
+            self._view_id,
+            min_birth_year,
+            max_birth_year,
+            name,
+            name_prefix,
+            external_id_prefix,
+            filter,
+        )
+        return self._aggregate(
+            self._view_id,
+            aggregate,
+            _PERSON_PROPERTIES_BY_FIELD,
+            properties,
+            group_by,
+            query,
+            search_properties,
+            limit,
+            filter_,
+        )
 
     def list(
         self,
