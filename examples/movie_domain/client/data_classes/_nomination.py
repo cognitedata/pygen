@@ -6,13 +6,22 @@ from cognite.client import data_modeling as dm
 
 from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 
-__all__ = ["Nomination", "NominationApply", "NominationList", "NominationApplyList", "NominationTextFields"]
+__all__ = [
+    "Nomination",
+    "NominationApply",
+    "NominationList",
+    "NominationApplyList",
+    "NominationFields",
+    "NominationTextFields",
+]
 
 
 NominationTextFields = Literal["name"]
+NominationFields = Literal["name", "year"]
 
-_NOMINATION_TEXT_PROPERTIES_BY_FIELD = {
+_NOMINATION_PROPERTIES_BY_FIELD = {
     "name": "name",
+    "year": "year",
 }
 
 

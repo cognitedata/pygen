@@ -5,16 +5,18 @@ from typing import Dict, List, Sequence, Tuple, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
+from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
+from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from tutorial_apm_simple.client.data_classes import (
     CdfModel,
     CdfModelApply,
     CdfModelList,
     CdfModelApplyList,
+    CdfModelFields,
     CdfModelTextFields,
 )
-from tutorial_apm_simple.client.data_classes._cdf_3_d_model import _CDFMODEL_TEXT_PROPERTIES_BY_FIELD
+from tutorial_apm_simple.client.data_classes._cdf_3_d_model import _CDFMODEL_PROPERTIES_BY_FIELD
 
 
 class CdfModelEntitiesAPI:
@@ -142,7 +144,110 @@ class CdfModelAPI(TypeAPI[CdfModel, CdfModelApply, CdfModelList]):
             external_id_prefix,
             filter,
         )
-        return self._search(self._view_id, query, _CDFMODEL_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit)
+        return self._search(self._view_id, query, _CDFMODEL_PROPERTIES_BY_FIELD, properties, filter_, limit)
+
+    @overload
+    def aggregate(
+        self,
+        aggregations: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: CdfModelFields | Sequence[CdfModelFields] | None = None,
+        group_by: None = None,
+        query: str | None = None,
+        search_properties: CdfModelTextFields | Sequence[CdfModelTextFields] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> list[dm.aggregations.AggregatedNumberedValue]:
+        ...
+
+    @overload
+    def aggregate(
+        self,
+        aggregations: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: CdfModelFields | Sequence[CdfModelFields] | None = None,
+        group_by: CdfModelFields | Sequence[CdfModelFields] = None,
+        query: str | None = None,
+        search_properties: CdfModelTextFields | Sequence[CdfModelTextFields] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> InstanceAggregationResultList:
+        ...
+
+    def aggregate(
+        self,
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: CdfModelFields | Sequence[CdfModelFields] | None = None,
+        group_by: CdfModelFields | Sequence[CdfModelFields] | None = None,
+        query: str | None = None,
+        search_property: CdfModelTextFields | Sequence[CdfModelTextFields] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        filter_ = _create_filter(
+            self._view_id,
+            name,
+            name_prefix,
+            external_id_prefix,
+            filter,
+        )
+        return self._aggregate(
+            self._view_id,
+            aggregate,
+            _CDFMODEL_PROPERTIES_BY_FIELD,
+            property,
+            group_by,
+            query,
+            search_property,
+            limit,
+            filter_,
+        )
+
+    def histogram(
+        self,
+        property: CdfModelFields,
+        interval: float,
+        query: str | None = None,
+        search_property: CdfModelTextFields | Sequence[CdfModelTextFields] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.HistogramValue:
+        filter_ = _create_filter(
+            self._view_id,
+            name,
+            name_prefix,
+            external_id_prefix,
+            filter,
+        )
+        return self._histogram(
+            self._view_id,
+            property,
+            interval,
+            _CDFMODEL_PROPERTIES_BY_FIELD,
+            query,
+            search_property,
+            limit,
+            filter_,
+        )
 
     def list(
         self,

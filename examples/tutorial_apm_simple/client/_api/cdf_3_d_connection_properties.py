@@ -4,13 +4,15 @@ from typing import Sequence, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
+from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
+from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from tutorial_apm_simple.client.data_classes import (
     CdfConnectionProperties,
     CdfConnectionPropertiesApply,
     CdfConnectionPropertiesList,
     CdfConnectionPropertiesApplyList,
+    CdfConnectionPropertiesFields,
 )
 
 
@@ -88,7 +90,126 @@ class CdfConnectionPropertiesAPI(
             filter,
         )
         return self._search(
-            self._view_id, query, _CDFCONNECTIONPROPERTIES_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit
+            self._view_id, query, _CDFCONNECTIONPROPERTIES_PROPERTIES_BY_FIELD, properties, filter_, limit
+        )
+
+    @overload
+    def aggregate(
+        self,
+        aggregations: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: CdfConnectionPropertiesFields | Sequence[CdfConnectionPropertiesFields] | None = None,
+        group_by: None = None,
+        query: str | None = None,
+        search_properties: CdfConnectionPropertiesTextFields
+        | Sequence[CdfConnectionPropertiesTextFields]
+        | None = None,
+        min_revision_id: int | None = None,
+        max_revision_id: int | None = None,
+        min_revision_node_id: int | None = None,
+        max_revision_node_id: int | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> list[dm.aggregations.AggregatedNumberedValue]:
+        ...
+
+    @overload
+    def aggregate(
+        self,
+        aggregations: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: CdfConnectionPropertiesFields | Sequence[CdfConnectionPropertiesFields] | None = None,
+        group_by: CdfConnectionPropertiesFields | Sequence[CdfConnectionPropertiesFields] = None,
+        query: str | None = None,
+        search_properties: CdfConnectionPropertiesTextFields
+        | Sequence[CdfConnectionPropertiesTextFields]
+        | None = None,
+        min_revision_id: int | None = None,
+        max_revision_id: int | None = None,
+        min_revision_node_id: int | None = None,
+        max_revision_node_id: int | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> InstanceAggregationResultList:
+        ...
+
+    def aggregate(
+        self,
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: CdfConnectionPropertiesFields | Sequence[CdfConnectionPropertiesFields] | None = None,
+        group_by: CdfConnectionPropertiesFields | Sequence[CdfConnectionPropertiesFields] | None = None,
+        query: str | None = None,
+        search_property: CdfConnectionPropertiesTextFields | Sequence[CdfConnectionPropertiesTextFields] | None = None,
+        min_revision_id: int | None = None,
+        max_revision_id: int | None = None,
+        min_revision_node_id: int | None = None,
+        max_revision_node_id: int | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        filter_ = _create_filter(
+            self._view_id,
+            min_revision_id,
+            max_revision_id,
+            min_revision_node_id,
+            max_revision_node_id,
+            external_id_prefix,
+            filter,
+        )
+        return self._aggregate(
+            self._view_id,
+            aggregate,
+            _CDFCONNECTIONPROPERTIES_PROPERTIES_BY_FIELD,
+            property,
+            group_by,
+            query,
+            search_property,
+            limit,
+            filter_,
+        )
+
+    def histogram(
+        self,
+        property: CdfConnectionPropertiesFields,
+        interval: float,
+        query: str | None = None,
+        search_property: CdfConnectionPropertiesTextFields | Sequence[CdfConnectionPropertiesTextFields] | None = None,
+        min_revision_id: int | None = None,
+        max_revision_id: int | None = None,
+        min_revision_node_id: int | None = None,
+        max_revision_node_id: int | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.HistogramValue:
+        filter_ = _create_filter(
+            self._view_id,
+            min_revision_id,
+            max_revision_id,
+            min_revision_node_id,
+            max_revision_node_id,
+            external_id_prefix,
+            filter,
+        )
+        return self._histogram(
+            self._view_id,
+            property,
+            interval,
+            _CDFCONNECTIONPROPERTIES_PROPERTIES_BY_FIELD,
+            query,
+            search_property,
+            limit,
+            filter_,
         )
 
     def list(

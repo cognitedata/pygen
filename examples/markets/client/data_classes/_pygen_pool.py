@@ -7,12 +7,21 @@ from pydantic import Field
 
 from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 
-__all__ = ["PygenPool", "PygenPoolApply", "PygenPoolList", "PygenPoolApplyList", "PygenPoolTextFields"]
+__all__ = [
+    "PygenPool",
+    "PygenPoolApply",
+    "PygenPoolList",
+    "PygenPoolApplyList",
+    "PygenPoolFields",
+    "PygenPoolTextFields",
+]
 
 
 PygenPoolTextFields = Literal["name", "timezone"]
+PygenPoolFields = Literal["day_of_week", "name", "timezone"]
 
-_PYGENPOOL_TEXT_PROPERTIES_BY_FIELD = {
+_PYGENPOOL_PROPERTIES_BY_FIELD = {
+    "day_of_week": "dayOfWeek",
     "name": "name",
     "timezone": "timezone",
 }

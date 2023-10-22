@@ -12,23 +12,49 @@ if TYPE_CHECKING:
     from ._asset import AssetApply
     from ._cdf_3_d_model import CdfModelApply
 
-__all__ = ["Asset", "AssetApply", "AssetList", "AssetApplyList", "AssetTextFields"]
+__all__ = ["Asset", "AssetApply", "AssetList", "AssetApplyList", "AssetFields", "AssetTextFields"]
 
 
 AssetTextFields = Literal[
     "description", "documents", "measurements", "metrics", "pressure", "source_db", "specification", "tag", "trajectory"
 ]
+AssetFields = Literal[
+    "area_id",
+    "category_id",
+    "created_date",
+    "description",
+    "documents",
+    "is_active",
+    "is_critical_line",
+    "measurements",
+    "metrics",
+    "pressure",
+    "source_db",
+    "specification",
+    "tag",
+    "trajectory",
+    "updated_date",
+]
 
-_ASSET_TEXT_PROPERTIES_BY_FIELD = {
+_ASSET_PROPERTIES_BY_FIELD = {
+    "area_id": "areaId",
+    "category_id": "categoryId",
+    "children": "children",
+    "created_date": "createdDate",
     "description": "description",
     "documents": "documents",
+    "in_model_3_d": "inModel3d",
+    "is_active": "isActive",
+    "is_critical_line": "isCriticalLine",
     "measurements": "measurements",
     "metrics": "metrics",
+    "parent": "parent",
     "pressure": "pressure",
-    "source_db": "source_db",
+    "source_db": "sourceDb",
     "specification": "specification",
     "tag": "tag",
     "trajectory": "trajectory",
+    "updated_date": "updatedDate",
 }
 
 

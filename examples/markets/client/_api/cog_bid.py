@@ -5,10 +5,11 @@ from typing import Sequence, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
+from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
-from markets.client.data_classes import CogBid, CogBidApply, CogBidList, CogBidApplyList, CogBidTextFields
-from markets.client.data_classes._cog_bid import _COGBID_TEXT_PROPERTIES_BY_FIELD
+from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
+from markets.client.data_classes import CogBid, CogBidApply, CogBidList, CogBidApplyList, CogBidFields, CogBidTextFields
+from markets.client.data_classes._cog_bid import _COGBID_PROPERTIES_BY_FIELD
 
 
 class CogBidAPI(TypeAPI[CogBid, CogBidApply, CogBidList]):
@@ -92,7 +93,164 @@ class CogBidAPI(TypeAPI[CogBid, CogBidApply, CogBidList]):
             external_id_prefix,
             filter,
         )
-        return self._search(self._view_id, query, _COGBID_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit)
+        return self._search(self._view_id, query, _COGBID_PROPERTIES_BY_FIELD, properties, filter_, limit)
+
+    @overload
+    def aggregate(
+        self,
+        aggregations: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: CogBidFields | Sequence[CogBidFields] | None = None,
+        group_by: None = None,
+        query: str | None = None,
+        search_properties: CogBidTextFields | Sequence[CogBidTextFields] | None = None,
+        min_date: datetime.date | None = None,
+        max_date: datetime.date | None = None,
+        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        min_price: float | None = None,
+        max_price: float | None = None,
+        price_area: str | list[str] | None = None,
+        price_area_prefix: str | None = None,
+        min_quantity: int | None = None,
+        max_quantity: int | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> list[dm.aggregations.AggregatedNumberedValue]:
+        ...
+
+    @overload
+    def aggregate(
+        self,
+        aggregations: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: CogBidFields | Sequence[CogBidFields] | None = None,
+        group_by: CogBidFields | Sequence[CogBidFields] = None,
+        query: str | None = None,
+        search_properties: CogBidTextFields | Sequence[CogBidTextFields] | None = None,
+        min_date: datetime.date | None = None,
+        max_date: datetime.date | None = None,
+        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        min_price: float | None = None,
+        max_price: float | None = None,
+        price_area: str | list[str] | None = None,
+        price_area_prefix: str | None = None,
+        min_quantity: int | None = None,
+        max_quantity: int | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> InstanceAggregationResultList:
+        ...
+
+    def aggregate(
+        self,
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: CogBidFields | Sequence[CogBidFields] | None = None,
+        group_by: CogBidFields | Sequence[CogBidFields] | None = None,
+        query: str | None = None,
+        search_property: CogBidTextFields | Sequence[CogBidTextFields] | None = None,
+        min_date: datetime.date | None = None,
+        max_date: datetime.date | None = None,
+        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        min_price: float | None = None,
+        max_price: float | None = None,
+        price_area: str | list[str] | None = None,
+        price_area_prefix: str | None = None,
+        min_quantity: int | None = None,
+        max_quantity: int | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        filter_ = _create_filter(
+            self._view_id,
+            min_date,
+            max_date,
+            market,
+            name,
+            name_prefix,
+            min_price,
+            max_price,
+            price_area,
+            price_area_prefix,
+            min_quantity,
+            max_quantity,
+            external_id_prefix,
+            filter,
+        )
+        return self._aggregate(
+            self._view_id,
+            aggregate,
+            _COGBID_PROPERTIES_BY_FIELD,
+            property,
+            group_by,
+            query,
+            search_property,
+            limit,
+            filter_,
+        )
+
+    def histogram(
+        self,
+        property: CogBidFields,
+        interval: float,
+        query: str | None = None,
+        search_property: CogBidTextFields | Sequence[CogBidTextFields] | None = None,
+        min_date: datetime.date | None = None,
+        max_date: datetime.date | None = None,
+        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        min_price: float | None = None,
+        max_price: float | None = None,
+        price_area: str | list[str] | None = None,
+        price_area_prefix: str | None = None,
+        min_quantity: int | None = None,
+        max_quantity: int | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.HistogramValue:
+        filter_ = _create_filter(
+            self._view_id,
+            min_date,
+            max_date,
+            market,
+            name,
+            name_prefix,
+            min_price,
+            max_price,
+            price_area,
+            price_area_prefix,
+            min_quantity,
+            max_quantity,
+            external_id_prefix,
+            filter,
+        )
+        return self._histogram(
+            self._view_id,
+            property,
+            interval,
+            _COGBID_PROPERTIES_BY_FIELD,
+            query,
+            search_property,
+            limit,
+            filter_,
+        )
 
     def list(
         self,
