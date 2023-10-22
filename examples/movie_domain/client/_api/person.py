@@ -124,7 +124,16 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> PersonList:
-        ...
+        filter_ = _create_filter(
+            self._view_id,
+            min_birth_year,
+            max_birth_year,
+            name,
+            name_prefix,
+            external_id_prefix,
+            filter,
+        )
+        return self._search(self._view_id, query, properties, filter_, limit)
 
     def list(
         self,
