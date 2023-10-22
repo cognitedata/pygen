@@ -12,13 +12,24 @@ if TYPE_CHECKING:
     from ._date_transformation_pair import DateTransformationPairApply
     from ._value_transformation import ValueTransformationApply
 
-__all__ = ["CogProcess", "CogProcessApply", "CogProcessList", "CogProcessApplyList", "CogProcessTextFields"]
+__all__ = [
+    "CogProcess",
+    "CogProcessApply",
+    "CogProcessList",
+    "CogProcessApplyList",
+    "CogProcessFields",
+    "CogProcessTextFields",
+]
 
 
 CogProcessTextFields = Literal["name"]
+CogProcessFields = Literal["name"]
 
-_COGPROCESS_TEXT_PROPERTIES_BY_FIELD = {
+_COGPROCESS_PROPERTIES_BY_FIELD = {
+    "bid": "bid",
+    "date_transformations": "dateTransformations",
     "name": "name",
+    "transformation": "transformation",
 }
 
 

@@ -4,16 +4,18 @@ from typing import Sequence, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
+from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
+from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from shop_pydantic_v1.client.data_classes import (
     CommandConfig,
     CommandConfigApply,
     CommandConfigList,
     CommandConfigApplyList,
+    CommandConfigFields,
     CommandConfigTextFields,
 )
-from shop_pydantic_v1.client.data_classes._command_config import _COMMANDCONFIG_TEXT_PROPERTIES_BY_FIELD
+from shop_pydantic_v1.client.data_classes._command_config import _COMMANDCONFIG_PROPERTIES_BY_FIELD
 
 
 class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigList]):
@@ -77,7 +79,98 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
             external_id_prefix,
             filter,
         )
-        return self._search(self._view_id, query, _COMMANDCONFIG_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit)
+        return self._search(self._view_id, query, _COMMANDCONFIG_PROPERTIES_BY_FIELD, properties, filter_, limit)
+
+    @overload
+    def aggregate(
+        self,
+        aggregations: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: CommandConfigFields | Sequence[CommandConfigFields] | None = None,
+        group_by: None = None,
+        query: str | None = None,
+        search_properties: CommandConfigTextFields | Sequence[CommandConfigTextFields] | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> list[dm.aggregations.AggregatedNumberedValue]:
+        ...
+
+    @overload
+    def aggregate(
+        self,
+        aggregations: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: CommandConfigFields | Sequence[CommandConfigFields] | None = None,
+        group_by: CommandConfigFields | Sequence[CommandConfigFields] = None,
+        query: str | None = None,
+        search_properties: CommandConfigTextFields | Sequence[CommandConfigTextFields] | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> InstanceAggregationResultList:
+        ...
+
+    def aggregate(
+        self,
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: CommandConfigFields | Sequence[CommandConfigFields] | None = None,
+        group_by: CommandConfigFields | Sequence[CommandConfigFields] | None = None,
+        query: str | None = None,
+        search_property: CommandConfigTextFields | Sequence[CommandConfigTextFields] | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        filter_ = _create_filter(
+            self._view_id,
+            external_id_prefix,
+            filter,
+        )
+        return self._aggregate(
+            self._view_id,
+            aggregate,
+            _COMMANDCONFIG_PROPERTIES_BY_FIELD,
+            property,
+            group_by,
+            query,
+            search_property,
+            limit,
+            filter_,
+        )
+
+    def histogram(
+        self,
+        property: CommandConfigFields,
+        interval: float,
+        query: str | None = None,
+        search_property: CommandConfigTextFields | Sequence[CommandConfigTextFields] | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.HistogramValue:
+        filter_ = _create_filter(
+            self._view_id,
+            external_id_prefix,
+            filter,
+        )
+        return self._histogram(
+            self._view_id,
+            property,
+            interval,
+            _COMMANDCONFIG_PROPERTIES_BY_FIELD,
+            query,
+            search_property,
+            limit,
+            filter_,
+        )
 
     def list(
         self,

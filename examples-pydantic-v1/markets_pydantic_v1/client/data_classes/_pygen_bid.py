@@ -11,13 +11,19 @@ from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 if TYPE_CHECKING:
     from ._market import MarketApply
 
-__all__ = ["PygenBid", "PygenBidApply", "PygenBidList", "PygenBidApplyList", "PygenBidTextFields"]
+__all__ = ["PygenBid", "PygenBidApply", "PygenBidList", "PygenBidApplyList", "PygenBidFields", "PygenBidTextFields"]
 
 
 PygenBidTextFields = Literal["name"]
+PygenBidFields = Literal["date", "is_block", "minimum_price", "name", "price_premium"]
 
-_PYGENBID_TEXT_PROPERTIES_BY_FIELD = {
+_PYGENBID_PROPERTIES_BY_FIELD = {
+    "date": "date",
+    "is_block": "isBlock",
+    "market": "market",
+    "minimum_price": "minimumPrice",
     "name": "name",
+    "price_premium": "pricePremium",
 }
 
 

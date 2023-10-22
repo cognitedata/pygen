@@ -13,19 +13,25 @@ __all__ = [
     "ScenarioInstanceApply",
     "ScenarioInstanceList",
     "ScenarioInstanceApplyList",
+    "ScenarioInstanceFields",
     "ScenarioInstanceTextFields",
 ]
 
 
 ScenarioInstanceTextFields = Literal["aggregation", "country", "market", "price_area", "price_forecast", "scenario"]
+ScenarioInstanceFields = Literal[
+    "aggregation", "country", "instance", "market", "price_area", "price_forecast", "scenario", "start"
+]
 
-_SCENARIOINSTANCE_TEXT_PROPERTIES_BY_FIELD = {
+_SCENARIOINSTANCE_PROPERTIES_BY_FIELD = {
     "aggregation": "aggregation",
     "country": "country",
+    "instance": "instance",
     "market": "market",
-    "price_area": "price_area",
-    "price_forecast": "price_forecast",
+    "price_area": "priceArea",
+    "price_forecast": "priceForecast",
     "scenario": "scenario",
+    "start": "start",
 }
 
 

@@ -11,14 +11,19 @@ from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 if TYPE_CHECKING:
     from ._market import MarketApply
 
-__all__ = ["CogBid", "CogBidApply", "CogBidList", "CogBidApplyList", "CogBidTextFields"]
+__all__ = ["CogBid", "CogBidApply", "CogBidList", "CogBidApplyList", "CogBidFields", "CogBidTextFields"]
 
 
 CogBidTextFields = Literal["name", "price_area"]
+CogBidFields = Literal["date", "name", "price", "price_area", "quantity"]
 
-_COGBID_TEXT_PROPERTIES_BY_FIELD = {
+_COGBID_PROPERTIES_BY_FIELD = {
+    "date": "date",
+    "market": "market",
     "name": "name",
-    "price_area": "price_area",
+    "price": "price",
+    "price_area": "priceArea",
+    "quantity": "quantity",
 }
 
 

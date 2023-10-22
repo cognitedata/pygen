@@ -1,8 +1,9 @@
 from ._scenario_instance import (
     ScenarioInstance,
     ScenarioInstanceApply,
-    ScenarioInstanceList,
     ScenarioInstanceApplyList,
+    ScenarioInstanceFields,
+    ScenarioInstanceList,
     ScenarioInstanceTextFields,
 )
 
@@ -12,5 +13,6 @@ __all__ = [
     "ScenarioInstanceApply",
     "ScenarioInstanceList",
     "ScenarioInstanceApplyList",
+    "ScenarioInstanceFields",
     "ScenarioInstanceTextFields",
 ]

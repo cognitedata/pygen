@@ -9,16 +9,18 @@ from cognite.client import CogniteClient
 from cognite.client.data_classes import TimeSeriesList, DatapointsList, Datapoints, DatapointsArrayList
 from cognite.client.data_classes.datapoints import Aggregate
 from cognite.client import data_modeling as dm
+from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT, INSTANCE_QUERY_LIMIT
+from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT, INSTANCE_QUERY_LIMIT
 from movie_domain_pydantic_v1.client.data_classes import (
     Rating,
     RatingApply,
     RatingList,
     RatingApplyList,
+    RatingFields,
     RatingTextFields,
 )
-from movie_domain_pydantic_v1.client.data_classes._rating import _RATING_TEXT_PROPERTIES_BY_FIELD
+from movie_domain_pydantic_v1.client.data_classes._rating import _RATING_PROPERTIES_BY_FIELD
 
 
 ColumnNames = Literal["score", "votes"]
@@ -721,7 +723,98 @@ class RatingAPI(TypeAPI[Rating, RatingApply, RatingList]):
             external_id_prefix,
             filter,
         )
-        return self._search(self._view_id, query, _RATING_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit)
+        return self._search(self._view_id, query, _RATING_PROPERTIES_BY_FIELD, properties, filter_, limit)
+
+    @overload
+    def aggregate(
+        self,
+        aggregations: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: RatingFields | Sequence[RatingFields] | None = None,
+        group_by: None = None,
+        query: str | None = None,
+        search_properties: RatingTextFields | Sequence[RatingTextFields] | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> list[dm.aggregations.AggregatedNumberedValue]:
+        ...
+
+    @overload
+    def aggregate(
+        self,
+        aggregations: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: RatingFields | Sequence[RatingFields] | None = None,
+        group_by: RatingFields | Sequence[RatingFields] = None,
+        query: str | None = None,
+        search_properties: RatingTextFields | Sequence[RatingTextFields] | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> InstanceAggregationResultList:
+        ...
+
+    def aggregate(
+        self,
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: RatingFields | Sequence[RatingFields] | None = None,
+        group_by: RatingFields | Sequence[RatingFields] | None = None,
+        query: str | None = None,
+        search_property: RatingTextFields | Sequence[RatingTextFields] | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        filter_ = _create_filter(
+            self._view_id,
+            external_id_prefix,
+            filter,
+        )
+        return self._aggregate(
+            self._view_id,
+            aggregate,
+            _RATING_PROPERTIES_BY_FIELD,
+            property,
+            group_by,
+            query,
+            search_property,
+            limit,
+            filter_,
+        )
+
+    def histogram(
+        self,
+        property: RatingFields,
+        interval: float,
+        query: str | None = None,
+        search_property: RatingTextFields | Sequence[RatingTextFields] | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.HistogramValue:
+        filter_ = _create_filter(
+            self._view_id,
+            external_id_prefix,
+            filter,
+        )
+        return self._histogram(
+            self._view_id,
+            property,
+            interval,
+            _RATING_PROPERTIES_BY_FIELD,
+            query,
+            search_property,
+            limit,
+            filter_,
+        )
 
     def list(
         self,

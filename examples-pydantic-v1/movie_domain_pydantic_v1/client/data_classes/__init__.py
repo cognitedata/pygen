@@ -1,31 +1,41 @@
-from ._actor import Actor, ActorApply, ActorList, ActorApplyList
+from ._actor import Actor, ActorApply, ActorApplyList, ActorFields, ActorList
 from ._best_director import (
     BestDirector,
     BestDirectorApply,
-    BestDirectorList,
     BestDirectorApplyList,
+    BestDirectorFields,
+    BestDirectorList,
     BestDirectorTextFields,
 )
 from ._best_leading_actor import (
     BestLeadingActor,
     BestLeadingActorApply,
-    BestLeadingActorList,
     BestLeadingActorApplyList,
+    BestLeadingActorFields,
+    BestLeadingActorList,
     BestLeadingActorTextFields,
 )
 from ._best_leading_actress import (
     BestLeadingActress,
     BestLeadingActressApply,
-    BestLeadingActressList,
     BestLeadingActressApplyList,
+    BestLeadingActressFields,
+    BestLeadingActressList,
     BestLeadingActressTextFields,
 )
-from ._director import Director, DirectorApply, DirectorList, DirectorApplyList
-from ._movie import Movie, MovieApply, MovieList, MovieApplyList, MovieTextFields
-from ._nomination import Nomination, NominationApply, NominationList, NominationApplyList, NominationTextFields
-from ._person import Person, PersonApply, PersonList, PersonApplyList, PersonTextFields
-from ._rating import Rating, RatingApply, RatingList, RatingApplyList, RatingTextFields
-from ._role import Role, RoleApply, RoleList, RoleApplyList
+from ._director import Director, DirectorApply, DirectorApplyList, DirectorFields, DirectorList
+from ._movie import Movie, MovieApply, MovieApplyList, MovieFields, MovieList, MovieTextFields
+from ._nomination import (
+    Nomination,
+    NominationApply,
+    NominationApplyList,
+    NominationFields,
+    NominationList,
+    NominationTextFields,
+)
+from ._person import Person, PersonApply, PersonApplyList, PersonFields, PersonList, PersonTextFields
+from ._rating import Rating, RatingApply, RatingApplyList, RatingFields, RatingList, RatingTextFields
+from ._role import Role, RoleApply, RoleApplyList, RoleFields, RoleList
 
 ActorApply.update_forward_refs(
     MovieApply=MovieApply,
@@ -56,47 +66,57 @@ __all__ = [
     "ActorApply",
     "ActorList",
     "ActorApplyList",
+    "ActorFields",
     "BestDirector",
     "BestDirectorApply",
     "BestDirectorList",
     "BestDirectorApplyList",
+    "BestDirectorFields",
     "BestDirectorTextFields",
     "BestLeadingActor",
     "BestLeadingActorApply",
     "BestLeadingActorList",
     "BestLeadingActorApplyList",
+    "BestLeadingActorFields",
     "BestLeadingActorTextFields",
     "BestLeadingActress",
     "BestLeadingActressApply",
     "BestLeadingActressList",
     "BestLeadingActressApplyList",
+    "BestLeadingActressFields",
     "BestLeadingActressTextFields",
     "Director",
     "DirectorApply",
     "DirectorList",
     "DirectorApplyList",
+    "DirectorFields",
     "Movie",
     "MovieApply",
     "MovieList",
     "MovieApplyList",
+    "MovieFields",
     "MovieTextFields",
     "Nomination",
     "NominationApply",
     "NominationList",
     "NominationApplyList",
+    "NominationFields",
     "NominationTextFields",
     "Person",
     "PersonApply",
     "PersonList",
     "PersonApplyList",
+    "PersonFields",
     "PersonTextFields",
     "Rating",
     "RatingApply",
     "RatingList",
     "RatingApplyList",
+    "RatingFields",
     "RatingTextFields",
     "Role",
     "RoleApply",
     "RoleList",
     "RoleApplyList",
+    "RoleFields",
 ]
