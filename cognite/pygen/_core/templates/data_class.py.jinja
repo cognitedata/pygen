@@ -11,15 +11,15 @@ from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 if TYPE_CHECKING:{% for dependency_class in data_class.dependencies %}
     from .{{ dependency_class.file_name }} import {{ dependency_class.write_name }}{% endfor %}
 {% endif %}
-__all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data_class.read_list_name }}", "{{ data_class.write_list_name }}", "{{ data_class.field_names }}"{% if data_class.has_text_field %}, "{{ data_class.text_field_names }}"{% endif %}]
+__all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data_class.read_list_name }}", "{{ data_class.write_list_name }}"{% if not data_class.has_only_one_to_many_edges %}, "{{ data_class.field_names }}"{% endif %}{% if data_class.has_text_field %}, "{{ data_class.text_field_names }}"{% endif %}]
 {% if data_class.has_text_field %}
 
 {{ data_class.text_field_names }} = Literal[{{ data_class.text_fields_literals }}]
-{% endif %}{{ data_class.field_names }} = Literal[{{ data_class.fields_literals }}]
+{% endif %}{% if not data_class.has_only_one_to_many_edges %}{{ data_class.field_names }} = Literal[{{ data_class.fields_literals }}]
 
 {{ data_class.properties_dict_name }} = {% raw %}{{% endraw %}{% for field in data_class %}
     "{{ field.name }}": "{{ field.prop_name }}",{% endfor %}
-{% raw %}}{% endraw %}
+{% raw %}}{% endraw %}{% endif %}
 
 
 class {{ data_class.read_name }}(DomainModel):
