@@ -1,13 +1,22 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import Literal, Optional
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 
-__all__ = ["CogPool", "CogPoolApply", "CogPoolList", "CogPoolApplyList"]
+__all__ = ["CogPool", "CogPoolApply", "CogPoolList", "CogPoolApplyList", "CogPoolTextFields"]
+
+
+CogPoolTextFields = Literal["name", "time_unit", "timezone"]
+
+_COGPOOL_TEXT_PROPERTIES_BY_FIELD = {
+    "name": "name",
+    "time_unit": "time_unit",
+    "timezone": "timezone",
+}
 
 
 class CogPool(DomainModel):

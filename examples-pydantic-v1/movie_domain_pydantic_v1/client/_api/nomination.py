@@ -11,7 +11,9 @@ from movie_domain_pydantic_v1.client.data_classes import (
     NominationApply,
     NominationList,
     NominationApplyList,
+    NominationTextFields,
 )
+from movie_domain_pydantic_v1.client.data_classes._nomination import _NOMINATION_TEXT_PROPERTIES_BY_FIELD
 
 
 class NominationAPI(TypeAPI[Nomination, NominationApply, NominationList]):
@@ -61,6 +63,29 @@ class NominationAPI(TypeAPI[Nomination, NominationApply, NominationList]):
             return self._retrieve((self._sources.space, external_id))
         else:
             return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+
+    def search(
+        self,
+        query: str,
+        properties: NominationTextFields | Sequence[NominationTextFields] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        min_year: int | None = None,
+        max_year: int | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> NominationList:
+        filter_ = _create_filter(
+            self._view_id,
+            name,
+            name_prefix,
+            min_year,
+            max_year,
+            external_id_prefix,
+            filter,
+        )
+        return self._search(self._view_id, query, _NOMINATION_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit)
 
     def list(
         self,

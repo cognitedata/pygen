@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING, Optional, Union
+from typing import Literal, TYPE_CHECKING, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -11,7 +11,20 @@ from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 if TYPE_CHECKING:
     from ._command_config import CommandConfigApply
 
-__all__ = ["Case", "CaseApply", "CaseList", "CaseApplyList"]
+__all__ = ["Case", "CaseApply", "CaseList", "CaseApplyList", "CaseTextFields"]
+
+
+CaseTextFields = Literal["arguments", "bid", "bid_history", "cut_files", "name", "run_status", "scenario"]
+
+_CASE_TEXT_PROPERTIES_BY_FIELD = {
+    "arguments": "arguments",
+    "bid": "bid",
+    "bid_history": "bid_history",
+    "cut_files": "cut_files",
+    "name": "name",
+    "run_status": "run_status",
+    "scenario": "scenario",
+}
 
 
 class Case(DomainModel):

@@ -7,7 +7,14 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
-from tutorial_apm_simple_pydantic_v1.client.data_classes import WorkItem, WorkItemApply, WorkItemList, WorkItemApplyList
+from tutorial_apm_simple_pydantic_v1.client.data_classes import (
+    WorkItem,
+    WorkItemApply,
+    WorkItemList,
+    WorkItemApplyList,
+    WorkItemTextFields,
+)
+from tutorial_apm_simple_pydantic_v1.client.data_classes._work_item import _WORKITEM_TEXT_PROPERTIES_BY_FIELD
 
 
 class WorkItemLinkedAssetsAPI:
@@ -115,6 +122,51 @@ class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
             self._set_linked_assets(work_items, linked_asset_edges)
 
             return work_items
+
+    def search(
+        self,
+        query: str,
+        properties: WorkItemTextFields | Sequence[WorkItemTextFields] | None = None,
+        criticality: str | list[str] | None = None,
+        criticality_prefix: str | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        is_completed: bool | None = None,
+        item_info: str | list[str] | None = None,
+        item_info_prefix: str | None = None,
+        item_name: str | list[str] | None = None,
+        item_name_prefix: str | None = None,
+        method: str | list[str] | None = None,
+        method_prefix: str | None = None,
+        title: str | list[str] | None = None,
+        title_prefix: str | None = None,
+        to_be_done: bool | None = None,
+        work_order: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> WorkItemList:
+        filter_ = _create_filter(
+            self._view_id,
+            criticality,
+            criticality_prefix,
+            description,
+            description_prefix,
+            is_completed,
+            item_info,
+            item_info_prefix,
+            item_name,
+            item_name_prefix,
+            method,
+            method_prefix,
+            title,
+            title_prefix,
+            to_be_done,
+            work_order,
+            external_id_prefix,
+            filter,
+        )
+        return self._search(self._view_id, query, _WORKITEM_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit)
 
     def list(
         self,

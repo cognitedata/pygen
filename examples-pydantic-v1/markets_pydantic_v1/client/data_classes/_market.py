@@ -1,12 +1,20 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import Literal, Optional
 
 from cognite.client import data_modeling as dm
 
 from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 
-__all__ = ["Market", "MarketApply", "MarketList", "MarketApplyList"]
+__all__ = ["Market", "MarketApply", "MarketList", "MarketApplyList", "MarketTextFields"]
+
+
+MarketTextFields = Literal["name", "timezone"]
+
+_MARKET_TEXT_PROPERTIES_BY_FIELD = {
+    "name": "name",
+    "timezone": "timezone",
+}
 
 
 class Market(DomainModel):

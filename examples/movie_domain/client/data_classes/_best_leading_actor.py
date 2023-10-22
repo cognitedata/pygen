@@ -1,12 +1,25 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import Literal, Optional
 
 from cognite.client import data_modeling as dm
 
 from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 
-__all__ = ["BestLeadingActor", "BestLeadingActorApply", "BestLeadingActorList", "BestLeadingActorApplyList"]
+__all__ = [
+    "BestLeadingActor",
+    "BestLeadingActorApply",
+    "BestLeadingActorList",
+    "BestLeadingActorApplyList",
+    "BestLeadingActorTextFields",
+]
+
+
+BestLeadingActorTextFields = Literal["name"]
+
+_BESTLEADINGACTOR_TEXT_PROPERTIES_BY_FIELD = {
+    "name": "name",
+}
 
 
 class BestLeadingActor(DomainModel):

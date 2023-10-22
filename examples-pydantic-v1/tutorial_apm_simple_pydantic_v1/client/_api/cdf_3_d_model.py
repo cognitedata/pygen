@@ -7,7 +7,14 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
-from tutorial_apm_simple_pydantic_v1.client.data_classes import CdfModel, CdfModelApply, CdfModelList, CdfModelApplyList
+from tutorial_apm_simple_pydantic_v1.client.data_classes import (
+    CdfModel,
+    CdfModelApply,
+    CdfModelList,
+    CdfModelApplyList,
+    CdfModelTextFields,
+)
+from tutorial_apm_simple_pydantic_v1.client.data_classes._cdf_3_d_model import _CDFMODEL_TEXT_PROPERTIES_BY_FIELD
 
 
 class CdfModelEntitiesAPI:
@@ -117,6 +124,25 @@ class CdfModelAPI(TypeAPI[CdfModel, CdfModelApply, CdfModelList]):
             self._set_entities(cdf_3_d_models, entity_edges)
 
             return cdf_3_d_models
+
+    def search(
+        self,
+        query: str,
+        properties: CdfModelTextFields | Sequence[CdfModelTextFields] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> CdfModelList:
+        filter_ = _create_filter(
+            self._view_id,
+            name,
+            name_prefix,
+            external_id_prefix,
+            filter,
+        )
+        return self._search(self._view_id, query, _CDFMODEL_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit)
 
     def list(
         self,

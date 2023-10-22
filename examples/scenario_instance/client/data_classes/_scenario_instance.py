@@ -1,14 +1,32 @@
 from __future__ import annotations
 
 import datetime
-from typing import Optional
+from typing import Literal, Optional
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 
-__all__ = ["ScenarioInstance", "ScenarioInstanceApply", "ScenarioInstanceList", "ScenarioInstanceApplyList"]
+__all__ = [
+    "ScenarioInstance",
+    "ScenarioInstanceApply",
+    "ScenarioInstanceList",
+    "ScenarioInstanceApplyList",
+    "ScenarioInstanceTextFields",
+]
+
+
+ScenarioInstanceTextFields = Literal["aggregation", "country", "market", "price_area", "price_forecast", "scenario"]
+
+_SCENARIOINSTANCE_TEXT_PROPERTIES_BY_FIELD = {
+    "aggregation": "aggregation",
+    "country": "country",
+    "market": "market",
+    "price_area": "price_area",
+    "price_forecast": "price_forecast",
+    "scenario": "scenario",
+}
 
 
 class ScenarioInstance(DomainModel):

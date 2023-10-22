@@ -6,7 +6,8 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
-from markets_pydantic_v1.client.data_classes import Market, MarketApply, MarketList, MarketApplyList
+from markets_pydantic_v1.client.data_classes import Market, MarketApply, MarketList, MarketApplyList, MarketTextFields
+from markets_pydantic_v1.client.data_classes._market import _MARKET_TEXT_PROPERTIES_BY_FIELD
 
 
 class MarketAPI(TypeAPI[Market, MarketApply, MarketList]):
@@ -54,6 +55,29 @@ class MarketAPI(TypeAPI[Market, MarketApply, MarketList]):
             return self._retrieve((self._sources.space, external_id))
         else:
             return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+
+    def search(
+        self,
+        query: str,
+        properties: MarketTextFields | Sequence[MarketTextFields] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        timezone: str | list[str] | None = None,
+        timezone_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> MarketList:
+        filter_ = _create_filter(
+            self._view_id,
+            name,
+            name_prefix,
+            timezone,
+            timezone_prefix,
+            external_id_prefix,
+            filter,
+        )
+        return self._search(self._view_id, query, _MARKET_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit)
 
     def list(
         self,

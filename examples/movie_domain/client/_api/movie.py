@@ -7,7 +7,8 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
-from movie_domain.client.data_classes import Movie, MovieApply, MovieList, MovieApplyList
+from movie_domain.client.data_classes import Movie, MovieApply, MovieList, MovieApplyList, MovieTextFields
+from movie_domain.client.data_classes._movie import _MOVIE_TEXT_PROPERTIES_BY_FIELD
 
 
 class MovieActorsAPI:
@@ -161,6 +162,35 @@ class MovieAPI(TypeAPI[Movie, MovieApply, MovieList]):
             self._set_directors(movies, director_edges)
 
             return movies
+
+    def search(
+        self,
+        query: str,
+        properties: MovieTextFields | Sequence[MovieTextFields] | None = None,
+        rating: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        min_release_year: int | None = None,
+        max_release_year: int | None = None,
+        min_run_time_minutes: float | None = None,
+        max_run_time_minutes: float | None = None,
+        title: str | list[str] | None = None,
+        title_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> MovieList:
+        filter_ = _create_filter(
+            self._view_id,
+            rating,
+            min_release_year,
+            max_release_year,
+            min_run_time_minutes,
+            max_run_time_minutes,
+            title,
+            title_prefix,
+            external_id_prefix,
+            filter,
+        )
+        return self._search(self._view_id, query, _MOVIE_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit)
 
     def list(
         self,

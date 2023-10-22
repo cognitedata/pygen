@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING, Optional, Union
+from typing import Literal, TYPE_CHECKING, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -11,7 +11,15 @@ from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 if TYPE_CHECKING:
     from ._market import MarketApply
 
-__all__ = ["CogBid", "CogBidApply", "CogBidList", "CogBidApplyList"]
+__all__ = ["CogBid", "CogBidApply", "CogBidList", "CogBidApplyList", "CogBidTextFields"]
+
+
+CogBidTextFields = Literal["name", "price_area"]
+
+_COGBID_TEXT_PROPERTIES_BY_FIELD = {
+    "name": "name",
+    "price_area": "price_area",
+}
 
 
 class CogBid(DomainModel):

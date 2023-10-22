@@ -6,7 +6,14 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
-from markets.client.data_classes import PygenProcess, PygenProcessApply, PygenProcessList, PygenProcessApplyList
+from markets.client.data_classes import (
+    PygenProcess,
+    PygenProcessApply,
+    PygenProcessList,
+    PygenProcessApplyList,
+    PygenProcessTextFields,
+)
+from markets.client.data_classes._pygen_process import _PYGENPROCESS_TEXT_PROPERTIES_BY_FIELD
 
 
 class PygenProcessAPI(TypeAPI[PygenProcess, PygenProcessApply, PygenProcessList]):
@@ -56,6 +63,31 @@ class PygenProcessAPI(TypeAPI[PygenProcess, PygenProcessApply, PygenProcessList]
             return self._retrieve((self._sources.space, external_id))
         else:
             return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+
+    def search(
+        self,
+        query: str,
+        properties: PygenProcessTextFields | Sequence[PygenProcessTextFields] | None = None,
+        bid: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        date_transformations: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        transformation: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> PygenProcessList:
+        filter_ = _create_filter(
+            self._view_id,
+            bid,
+            date_transformations,
+            name,
+            name_prefix,
+            transformation,
+            external_id_prefix,
+            filter,
+        )
+        return self._search(self._view_id, query, _PYGENPROCESS_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit)
 
     def list(
         self,

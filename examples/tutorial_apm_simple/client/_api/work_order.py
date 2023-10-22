@@ -8,7 +8,14 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
-from tutorial_apm_simple.client.data_classes import WorkOrder, WorkOrderApply, WorkOrderList, WorkOrderApplyList
+from tutorial_apm_simple.client.data_classes import (
+    WorkOrder,
+    WorkOrderApply,
+    WorkOrderList,
+    WorkOrderApplyList,
+    WorkOrderTextFields,
+)
+from tutorial_apm_simple.client.data_classes._work_order import _WORKORDER_TEXT_PROPERTIES_BY_FIELD
 
 
 class WorkOrderLinkedAssetsAPI:
@@ -172,6 +179,89 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
             self._set_work_items(work_orders, work_item_edges)
 
             return work_orders
+
+    def search(
+        self,
+        query: str,
+        properties: WorkOrderTextFields | Sequence[WorkOrderTextFields] | None = None,
+        min_actual_hours: int | None = None,
+        max_actual_hours: int | None = None,
+        min_created_date: datetime.datetime | None = None,
+        max_created_date: datetime.datetime | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        min_due_date: datetime.datetime | None = None,
+        max_due_date: datetime.datetime | None = None,
+        min_duration_hours: int | None = None,
+        max_duration_hours: int | None = None,
+        min_end_time: datetime.datetime | None = None,
+        max_end_time: datetime.datetime | None = None,
+        is_active: bool | None = None,
+        is_cancelled: bool | None = None,
+        is_completed: bool | None = None,
+        is_safety_critical: bool | None = None,
+        min_percentage_progress: int | None = None,
+        max_percentage_progress: int | None = None,
+        min_planned_start: datetime.datetime | None = None,
+        max_planned_start: datetime.datetime | None = None,
+        priority_description: str | list[str] | None = None,
+        priority_description_prefix: str | None = None,
+        program_number: str | list[str] | None = None,
+        program_number_prefix: str | None = None,
+        min_start_time: datetime.datetime | None = None,
+        max_start_time: datetime.datetime | None = None,
+        status: str | list[str] | None = None,
+        status_prefix: str | None = None,
+        title: str | list[str] | None = None,
+        title_prefix: str | None = None,
+        work_order_number: str | list[str] | None = None,
+        work_order_number_prefix: str | None = None,
+        work_package_number: str | list[str] | None = None,
+        work_package_number_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> WorkOrderList:
+        filter_ = _create_filter(
+            self._view_id,
+            min_actual_hours,
+            max_actual_hours,
+            min_created_date,
+            max_created_date,
+            description,
+            description_prefix,
+            min_due_date,
+            max_due_date,
+            min_duration_hours,
+            max_duration_hours,
+            min_end_time,
+            max_end_time,
+            is_active,
+            is_cancelled,
+            is_completed,
+            is_safety_critical,
+            min_percentage_progress,
+            max_percentage_progress,
+            min_planned_start,
+            max_planned_start,
+            priority_description,
+            priority_description_prefix,
+            program_number,
+            program_number_prefix,
+            min_start_time,
+            max_start_time,
+            status,
+            status_prefix,
+            title,
+            title_prefix,
+            work_order_number,
+            work_order_number_prefix,
+            work_package_number,
+            work_package_number_prefix,
+            external_id_prefix,
+            filter,
+        )
+        return self._search(self._view_id, query, _WORKORDER_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit)
 
     def list(
         self,

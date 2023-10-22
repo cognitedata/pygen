@@ -6,7 +6,14 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
-from markets_pydantic_v1.client.data_classes import PygenPool, PygenPoolApply, PygenPoolList, PygenPoolApplyList
+from markets_pydantic_v1.client.data_classes import (
+    PygenPool,
+    PygenPoolApply,
+    PygenPoolList,
+    PygenPoolApplyList,
+    PygenPoolTextFields,
+)
+from markets_pydantic_v1.client.data_classes._pygen_pool import _PYGENPOOL_TEXT_PROPERTIES_BY_FIELD
 
 
 class PygenPoolAPI(TypeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
@@ -56,6 +63,33 @@ class PygenPoolAPI(TypeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
             return self._retrieve((self._sources.space, external_id))
         else:
             return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+
+    def search(
+        self,
+        query: str,
+        properties: PygenPoolTextFields | Sequence[PygenPoolTextFields] | None = None,
+        min_day_of_week: int | None = None,
+        max_day_of_week: int | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        timezone: str | list[str] | None = None,
+        timezone_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> PygenPoolList:
+        filter_ = _create_filter(
+            self._view_id,
+            min_day_of_week,
+            max_day_of_week,
+            name,
+            name_prefix,
+            timezone,
+            timezone_prefix,
+            external_id_prefix,
+            filter,
+        )
+        return self._search(self._view_id, query, _PYGENPOOL_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit)
 
     def list(
         self,

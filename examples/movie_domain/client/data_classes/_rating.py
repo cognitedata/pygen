@@ -1,12 +1,20 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import Literal, Optional
 
 from cognite.client import data_modeling as dm
 
 from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 
-__all__ = ["Rating", "RatingApply", "RatingList", "RatingApplyList"]
+__all__ = ["Rating", "RatingApply", "RatingList", "RatingApplyList", "RatingTextFields"]
+
+
+RatingTextFields = Literal["score", "votes"]
+
+_RATING_TEXT_PROPERTIES_BY_FIELD = {
+    "score": "score",
+    "votes": "votes",
+}
 
 
 class Rating(DomainModel):

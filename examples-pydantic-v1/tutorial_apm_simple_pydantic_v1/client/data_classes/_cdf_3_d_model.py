@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional, Union
+from typing import Literal, TYPE_CHECKING, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -10,7 +10,14 @@ from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 if TYPE_CHECKING:
     from ._cdf_3_d_entity import CdfEntityApply
 
-__all__ = ["CdfModel", "CdfModelApply", "CdfModelList", "CdfModelApplyList"]
+__all__ = ["CdfModel", "CdfModelApply", "CdfModelList", "CdfModelApplyList", "CdfModelTextFields"]
+
+
+CdfModelTextFields = Literal["name"]
+
+_CDFMODEL_TEXT_PROPERTIES_BY_FIELD = {
+    "name": "name",
+}
 
 
 class CdfModel(DomainModel):

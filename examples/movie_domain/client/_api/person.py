@@ -7,7 +7,8 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
-from movie_domain.client.data_classes import Person, PersonApply, PersonList, PersonApplyList
+from movie_domain.client.data_classes import Person, PersonApply, PersonList, PersonApplyList, PersonTextFields
+from movie_domain.client.data_classes._person import _PERSON_TEXT_PROPERTIES_BY_FIELD
 
 
 class PersonRolesAPI:
@@ -111,6 +112,29 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
             self._set_roles(persons, role_edges)
 
             return persons
+
+    def search(
+        self,
+        query: str,
+        properties: PersonTextFields | Sequence[PersonTextFields] | None = None,
+        min_birth_year: int | None = None,
+        max_birth_year: int | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> PersonList:
+        filter_ = _create_filter(
+            self._view_id,
+            min_birth_year,
+            max_birth_year,
+            name,
+            name_prefix,
+            external_id_prefix,
+            filter,
+        )
+        return self._search(self._view_id, query, _PERSON_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit)
 
     def list(
         self,

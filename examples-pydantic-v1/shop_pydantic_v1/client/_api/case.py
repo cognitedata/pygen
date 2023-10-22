@@ -7,7 +7,8 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
-from shop_pydantic_v1.client.data_classes import Case, CaseApply, CaseList, CaseApplyList
+from shop_pydantic_v1.client.data_classes import Case, CaseApply, CaseList, CaseApplyList, CaseTextFields
+from shop_pydantic_v1.client.data_classes._case import _CASE_TEXT_PROPERTIES_BY_FIELD
 
 
 class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
@@ -55,6 +56,47 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
             return self._retrieve((self._sources.space, external_id))
         else:
             return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+
+    def search(
+        self,
+        query: str,
+        properties: CaseTextFields | Sequence[CaseTextFields] | None = None,
+        arguments: str | list[str] | None = None,
+        arguments_prefix: str | None = None,
+        commands: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        min_end_time: datetime.datetime | None = None,
+        max_end_time: datetime.datetime | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        run_status: str | list[str] | None = None,
+        run_status_prefix: str | None = None,
+        scenario: str | list[str] | None = None,
+        scenario_prefix: str | None = None,
+        min_start_time: datetime.datetime | None = None,
+        max_start_time: datetime.datetime | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> CaseList:
+        filter_ = _create_filter(
+            self._view_id,
+            arguments,
+            arguments_prefix,
+            commands,
+            min_end_time,
+            max_end_time,
+            name,
+            name_prefix,
+            run_status,
+            run_status_prefix,
+            scenario,
+            scenario_prefix,
+            min_start_time,
+            max_start_time,
+            external_id_prefix,
+            filter,
+        )
+        return self._search(self._view_id, query, _CASE_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit)
 
     def list(
         self,

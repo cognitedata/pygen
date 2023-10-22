@@ -6,7 +6,8 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
-from markets.client.data_classes import Process, ProcessApply, ProcessList, ProcessApplyList
+from markets.client.data_classes import Process, ProcessApply, ProcessList, ProcessApplyList, ProcessTextFields
+from markets.client.data_classes._process import _PROCESS_TEXT_PROPERTIES_BY_FIELD
 
 
 class ProcessAPI(TypeAPI[Process, ProcessApply, ProcessList]):
@@ -54,6 +55,27 @@ class ProcessAPI(TypeAPI[Process, ProcessApply, ProcessList]):
             return self._retrieve((self._sources.space, external_id))
         else:
             return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+
+    def search(
+        self,
+        query: str,
+        properties: ProcessTextFields | Sequence[ProcessTextFields] | None = None,
+        bid: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> ProcessList:
+        filter_ = _create_filter(
+            self._view_id,
+            bid,
+            name,
+            name_prefix,
+            external_id_prefix,
+            filter,
+        )
+        return self._search(self._view_id, query, _PROCESS_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit)
 
     def list(
         self,

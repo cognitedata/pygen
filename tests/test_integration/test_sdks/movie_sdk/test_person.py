@@ -111,3 +111,14 @@ def test_list_above_5000_persons(movie_client: MovieClient) -> None:
 
     # Assert
     assert len(persons) == 5001
+
+
+def test_search_person(movie_client: MovieClient) -> None:
+    # Act
+    results = movie_client.person.search("Quentin", limit=1)
+
+    # Assert
+    assert len(results) == 1
+    assert results[0].external_id == "person:quentin_tarantino"
+    assert results[0].name == "Quentin Tarantino"
+    assert results[0].birth_year == 1963

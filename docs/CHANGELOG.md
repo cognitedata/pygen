@@ -13,6 +13,10 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.25.0] - 22-10-23
+### Added
+* Support for search in generated SDK.
+
 ## [0.24.0] - 21-10-23
 ### Added
 * Support for filtering on direct edges in the generated SDK. Currently supported filters, `Equals` and `In`.

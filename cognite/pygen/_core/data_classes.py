@@ -155,6 +155,11 @@ class Field(ABC):
     def is_time_field(self) -> bool:
         raise NotImplementedError()
 
+    @property
+    @abstractmethod
+    def is_text_field(self) -> bool:
+        raise NotImplementedError()
+
 
 @dataclass(frozen=True)
 class PrimitiveFieldCore(Field, ABC):
@@ -169,6 +174,10 @@ class PrimitiveFieldCore(Field, ABC):
     @property
     def is_time_field(self) -> bool:
         return self.type_ in ("datetime.datetime", "datetime.date")
+
+    @property
+    def is_text_field(self) -> bool:
+        return self.type_ == "str"
 
 
 @dataclass(frozen=True)
@@ -244,6 +253,10 @@ class EdgeField(Field, ABC):
 
     @property
     def is_time_field(self) -> bool:
+        return False
+
+    @property
+    def is_text_field(self) -> bool:
         return False
 
 
@@ -341,6 +354,14 @@ class DataClass:
             self.fields.append(field_)
 
     @property
+    def text_field_name(self) -> str:
+        return f"{self.read_name}TextFields"
+
+    @property
+    def text_properties_dict_name(self) -> str:
+        return f"_{self.read_name.upper()}_TEXT_PROPERTIES_BY_FIELD"
+
+    @property
     def pydantic_field(self) -> str:
         if any(
             name == "Field" for name in [self.read_name, self.write_name, self.read_list_name, self.write_list_name]
@@ -351,10 +372,13 @@ class DataClass:
 
     @property
     def init_import(self) -> str:
-        return (
+        import_line = (
             f"from .{self.file_name} "
             f"import {self.read_name}, {self.write_name}, {self.read_list_name}, {self.write_list_name}"
         )
+        if self.has_text_field:
+            import_line += f", {self.text_field_name}"
+        return import_line
 
     def __iter__(self) -> Iterator[Field]:
         return iter(self.fields)
@@ -370,6 +394,10 @@ class DataClass:
     @property
     def primitive_fields(self) -> Iterable[PrimitiveField]:
         return (field_ for field_ in self.fields if isinstance(field_, PrimitiveField))
+
+    @property
+    def text_fields(self) -> Iterable[PrimitiveFieldCore]:
+        return (field_ for field_ in self.fields if isinstance(field_, PrimitiveFieldCore) and field_.is_text_field)
 
     @property
     def cdf_external_fields(self) -> Iterable[CDFExternalField]:
@@ -402,6 +430,10 @@ class DataClass:
     @property
     def has_time_field(self) -> bool:
         return any(field_.is_time_field for field_ in self.fields)
+
+    @property
+    def has_text_field(self) -> bool:
+        return any(field_.is_text_field for field_ in self.fields)
 
     @property
     def _field_type_hints(self) -> Iterable[str]:
@@ -445,6 +477,10 @@ class DataClass:
         return ", ".join(
             f'"{field_.prop_name}"' for field_ in self if isinstance(field_, (PrimitiveField, CDFExternalField))
         )
+
+    @property
+    def text_fields_literals(self) -> str:
+        return ", ".join(f'"{field_.name}"' for field_ in self.text_fields)
 
 
 @dataclass(frozen=True)

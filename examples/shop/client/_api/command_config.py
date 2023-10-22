@@ -6,7 +6,14 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
-from shop.client.data_classes import CommandConfig, CommandConfigApply, CommandConfigList, CommandConfigApplyList
+from shop.client.data_classes import (
+    CommandConfig,
+    CommandConfigApply,
+    CommandConfigList,
+    CommandConfigApplyList,
+    CommandConfigTextFields,
+)
+from shop.client.data_classes._command_config import _COMMANDCONFIG_TEXT_PROPERTIES_BY_FIELD
 
 
 class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigList]):
@@ -56,6 +63,21 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
             return self._retrieve((self._sources.space, external_id))
         else:
             return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+
+    def search(
+        self,
+        query: str,
+        properties: CommandConfigTextFields | Sequence[CommandConfigTextFields] | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> CommandConfigList:
+        filter_ = _create_filter(
+            self._view_id,
+            external_id_prefix,
+            filter,
+        )
+        return self._search(self._view_id, query, _COMMANDCONFIG_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit)
 
     def list(
         self,

@@ -162,6 +162,25 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
 
             return roles
 
+    def search(
+        self,
+        query: str,
+        properties: RoleTextFields | Sequence[RoleTextFields] | None = None,
+        person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        won_oscar: bool | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> RoleList:
+        filter_ = _create_filter(
+            self._view_id,
+            person,
+            won_oscar,
+            external_id_prefix,
+            filter,
+        )
+        return self._search(self._view_id, query, _ROLE_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit)
+
     def list(
         self,
         person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,

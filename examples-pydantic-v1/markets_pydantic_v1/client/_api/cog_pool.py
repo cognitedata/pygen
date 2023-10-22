@@ -6,7 +6,14 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
-from markets_pydantic_v1.client.data_classes import CogPool, CogPoolApply, CogPoolList, CogPoolApplyList
+from markets_pydantic_v1.client.data_classes import (
+    CogPool,
+    CogPoolApply,
+    CogPoolList,
+    CogPoolApplyList,
+    CogPoolTextFields,
+)
+from markets_pydantic_v1.client.data_classes._cog_pool import _COGPOOL_TEXT_PROPERTIES_BY_FIELD
 
 
 class CogPoolAPI(TypeAPI[CogPool, CogPoolApply, CogPoolList]):
@@ -54,6 +61,41 @@ class CogPoolAPI(TypeAPI[CogPool, CogPoolApply, CogPoolList]):
             return self._retrieve((self._sources.space, external_id))
         else:
             return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+
+    def search(
+        self,
+        query: str,
+        properties: CogPoolTextFields | Sequence[CogPoolTextFields] | None = None,
+        min_max_price: float | None = None,
+        max_max_price: float | None = None,
+        min_min_price: float | None = None,
+        max_min_price: float | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        time_unit: str | list[str] | None = None,
+        time_unit_prefix: str | None = None,
+        timezone: str | list[str] | None = None,
+        timezone_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> CogPoolList:
+        filter_ = _create_filter(
+            self._view_id,
+            min_max_price,
+            max_max_price,
+            min_min_price,
+            max_min_price,
+            name,
+            name_prefix,
+            time_unit,
+            time_unit_prefix,
+            timezone,
+            timezone_prefix,
+            external_id_prefix,
+            filter,
+        )
+        return self._search(self._view_id, query, _COGPOOL_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit)
 
     def list(
         self,

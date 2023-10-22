@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional, Union
+from typing import Literal, TYPE_CHECKING, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -12,7 +12,14 @@ if TYPE_CHECKING:
     from ._date_transformation_pair import DateTransformationPairApply
     from ._value_transformation import ValueTransformationApply
 
-__all__ = ["PygenProcess", "PygenProcessApply", "PygenProcessList", "PygenProcessApplyList"]
+__all__ = ["PygenProcess", "PygenProcessApply", "PygenProcessList", "PygenProcessApplyList", "PygenProcessTextFields"]
+
+
+PygenProcessTextFields = Literal["name"]
+
+_PYGENPROCESS_TEXT_PROPERTIES_BY_FIELD = {
+    "name": "name",
+}
 
 
 class PygenProcess(DomainModel):

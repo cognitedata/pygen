@@ -7,7 +7,8 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
-from markets_pydantic_v1.client.data_classes import Bid, BidApply, BidList, BidApplyList
+from markets_pydantic_v1.client.data_classes import Bid, BidApply, BidList, BidApplyList, BidTextFields
+from markets_pydantic_v1.client.data_classes._bid import _BID_TEXT_PROPERTIES_BY_FIELD
 
 
 class BidAPI(TypeAPI[Bid, BidApply, BidList]):
@@ -55,6 +56,31 @@ class BidAPI(TypeAPI[Bid, BidApply, BidList]):
             return self._retrieve((self._sources.space, external_id))
         else:
             return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+
+    def search(
+        self,
+        query: str,
+        properties: BidTextFields | Sequence[BidTextFields] | None = None,
+        min_date: datetime.date | None = None,
+        max_date: datetime.date | None = None,
+        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> BidList:
+        filter_ = _create_filter(
+            self._view_id,
+            min_date,
+            max_date,
+            market,
+            name,
+            name_prefix,
+            external_id_prefix,
+            filter,
+        )
+        return self._search(self._view_id, query, _BID_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit)
 
     def list(
         self,

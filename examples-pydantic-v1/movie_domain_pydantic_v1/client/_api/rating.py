@@ -11,7 +11,15 @@ from cognite.client.data_classes.datapoints import Aggregate
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT, INSTANCE_QUERY_LIMIT
-from movie_domain_pydantic_v1.client.data_classes import Rating, RatingApply, RatingList, RatingApplyList
+from movie_domain_pydantic_v1.client.data_classes import (
+    Rating,
+    RatingApply,
+    RatingList,
+    RatingApplyList,
+    RatingTextFields,
+)
+from movie_domain_pydantic_v1.client.data_classes._rating import _RATING_TEXT_PROPERTIES_BY_FIELD
+
 
 ColumnNames = Literal["score", "votes"]
 
@@ -699,6 +707,21 @@ class RatingAPI(TypeAPI[Rating, RatingApply, RatingList]):
             return self._retrieve((self._sources.space, external_id))
         else:
             return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+
+    def search(
+        self,
+        query: str,
+        properties: RatingTextFields | Sequence[RatingTextFields] | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> RatingList:
+        filter_ = _create_filter(
+            self._view_id,
+            external_id_prefix,
+            filter,
+        )
+        return self._search(self._view_id, query, _RATING_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit)
 
     def list(
         self,

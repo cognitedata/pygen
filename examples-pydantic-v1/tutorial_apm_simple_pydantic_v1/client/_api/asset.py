@@ -12,7 +12,15 @@ from cognite.client.data_classes.datapoints import Aggregate
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT, INSTANCE_QUERY_LIMIT
-from tutorial_apm_simple_pydantic_v1.client.data_classes import Asset, AssetApply, AssetList, AssetApplyList
+from tutorial_apm_simple_pydantic_v1.client.data_classes import (
+    Asset,
+    AssetApply,
+    AssetList,
+    AssetApplyList,
+    AssetTextFields,
+)
+from tutorial_apm_simple_pydantic_v1.client.data_classes._asset import _ASSET_TEXT_PROPERTIES_BY_FIELD
+
 
 ColumnNames = Literal[
     "areaId",
@@ -570,6 +578,55 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
             self._set_in_model_3_d(assets, in_model_3_d_edges)
 
             return assets
+
+    def search(
+        self,
+        query: str,
+        properties: AssetTextFields | Sequence[AssetTextFields] | None = None,
+        min_area_id: int | None = None,
+        max_area_id: int | None = None,
+        min_category_id: int | None = None,
+        max_category_id: int | None = None,
+        min_created_date: datetime.datetime | None = None,
+        max_created_date: datetime.datetime | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        is_active: bool | None = None,
+        is_critical_line: bool | None = None,
+        parent: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        source_db: str | list[str] | None = None,
+        source_db_prefix: str | None = None,
+        tag: str | list[str] | None = None,
+        tag_prefix: str | None = None,
+        min_updated_date: datetime.datetime | None = None,
+        max_updated_date: datetime.datetime | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> AssetList:
+        filter_ = _create_filter(
+            self._view_id,
+            min_area_id,
+            max_area_id,
+            min_category_id,
+            max_category_id,
+            min_created_date,
+            max_created_date,
+            description,
+            description_prefix,
+            is_active,
+            is_critical_line,
+            parent,
+            source_db,
+            source_db_prefix,
+            tag,
+            tag_prefix,
+            min_updated_date,
+            max_updated_date,
+            external_id_prefix,
+            filter,
+        )
+        return self._search(self._view_id, query, _ASSET_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit)
 
     def list(
         self,

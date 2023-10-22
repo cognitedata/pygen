@@ -6,7 +6,14 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
-from movie_domain.client.data_classes import BestDirector, BestDirectorApply, BestDirectorList, BestDirectorApplyList
+from movie_domain.client.data_classes import (
+    BestDirector,
+    BestDirectorApply,
+    BestDirectorList,
+    BestDirectorApplyList,
+    BestDirectorTextFields,
+)
+from movie_domain.client.data_classes._best_director import _BESTDIRECTOR_TEXT_PROPERTIES_BY_FIELD
 
 
 class BestDirectorAPI(TypeAPI[BestDirector, BestDirectorApply, BestDirectorList]):
@@ -56,6 +63,29 @@ class BestDirectorAPI(TypeAPI[BestDirector, BestDirectorApply, BestDirectorList]
             return self._retrieve((self._sources.space, external_id))
         else:
             return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+
+    def search(
+        self,
+        query: str,
+        properties: BestDirectorTextFields | Sequence[BestDirectorTextFields] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        min_year: int | None = None,
+        max_year: int | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> BestDirectorList:
+        filter_ = _create_filter(
+            self._view_id,
+            name,
+            name_prefix,
+            min_year,
+            max_year,
+            external_id_prefix,
+            filter,
+        )
+        return self._search(self._view_id, query, _BESTDIRECTOR_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit)
 
     def list(
         self,

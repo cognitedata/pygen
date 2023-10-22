@@ -189,6 +189,23 @@ class DateTransformationPairAPI(
 
             return date_transformation_pairs
 
+    def search(
+        self,
+        query: str,
+        properties: DateTransformationPairTextFields | Sequence[DateTransformationPairTextFields] | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> DateTransformationPairList:
+        filter_ = _create_filter(
+            self._view_id,
+            external_id_prefix,
+            filter,
+        )
+        return self._search(
+            self._view_id, query, _DATETRANSFORMATIONPAIR_TEXT_PROPERTIES_BY_FIELD, properties, filter_, limit
+        )
+
     def list(
         self,
         external_id_prefix: str | None = None,
