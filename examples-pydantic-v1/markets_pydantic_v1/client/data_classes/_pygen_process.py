@@ -26,10 +26,7 @@ PygenProcessTextFields = Literal["name"]
 PygenProcessFields = Literal["name"]
 
 _PYGENPROCESS_PROPERTIES_BY_FIELD = {
-    "bid": "bid",
-    "date_transformations": "dateTransformations",
     "name": "name",
-    "transformation": "transformation",
 }
 
 

@@ -23,7 +23,6 @@ _CASE_PROPERTIES_BY_FIELD = {
     "arguments": "arguments",
     "bid": "bid",
     "bid_history": "bid_history",
-    "commands": "commands",
     "cut_files": "cut_files",
     "end_time": "end_time",
     "name": "name",

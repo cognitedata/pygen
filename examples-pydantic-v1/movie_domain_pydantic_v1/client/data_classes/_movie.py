@@ -19,10 +19,7 @@ MovieTextFields = Literal["title"]
 MovieFields = Literal["meta", "release_year", "run_time_minutes", "title"]
 
 _MOVIE_PROPERTIES_BY_FIELD = {
-    "actors": "actors",
-    "directors": "directors",
     "meta": "meta",
-    "rating": "rating",
     "release_year": "releaseYear",
     "run_time_minutes": "runTimeMinutes",
     "title": "title",

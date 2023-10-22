@@ -20,7 +20,6 @@ PygenBidFields = Literal["date", "is_block", "minimum_price", "name", "price_pre
 _PYGENBID_PROPERTIES_BY_FIELD = {
     "date": "date",
     "is_block": "isBlock",
-    "market": "market",
     "minimum_price": "minimumPrice",
     "name": "name",
     "price_premium": "pricePremium",

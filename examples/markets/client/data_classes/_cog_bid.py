@@ -19,7 +19,6 @@ CogBidFields = Literal["date", "name", "price", "price_area", "quantity"]
 
 _COGBID_PROPERTIES_BY_FIELD = {
     "date": "date",
-    "market": "market",
     "name": "name",
     "price": "price",
     "price_area": "priceArea",

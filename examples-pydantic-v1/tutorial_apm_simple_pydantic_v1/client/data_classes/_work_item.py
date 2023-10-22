@@ -25,11 +25,9 @@ _WORKITEM_PROPERTIES_BY_FIELD = {
     "is_completed": "isCompleted",
     "item_info": "itemInfo",
     "item_name": "itemName",
-    "linked_assets": "linkedAssets",
     "method": "method",
     "title": "title",
     "to_be_done": "toBeDone",
-    "work_order": "workOrder",
 }
 
 

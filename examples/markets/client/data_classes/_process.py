@@ -17,7 +17,6 @@ ProcessTextFields = Literal["name"]
 ProcessFields = Literal["name"]
 
 _PROCESS_PROPERTIES_BY_FIELD = {
-    "bid": "bid",
     "name": "name",
 }
 

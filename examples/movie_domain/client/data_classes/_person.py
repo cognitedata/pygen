@@ -19,7 +19,6 @@ PersonFields = Literal["birth_year", "name"]
 _PERSON_PROPERTIES_BY_FIELD = {
     "birth_year": "birthYear",
     "name": "name",
-    "roles": "roles",
 }
 
 

@@ -16,9 +16,6 @@ __all__ = ["Actor", "ActorApply", "ActorList", "ActorApplyList", "ActorFields"]
 ActorFields = Literal["won_oscar"]
 
 _ACTOR_PROPERTIES_BY_FIELD = {
-    "movies": "movies",
-    "nomination": "nomination",
-    "person": "person",
     "won_oscar": "wonOscar",
 }
 

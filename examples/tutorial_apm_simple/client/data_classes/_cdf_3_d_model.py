@@ -17,7 +17,6 @@ CdfModelTextFields = Literal["name"]
 CdfModelFields = Literal["name"]
 
 _CDFMODEL_PROPERTIES_BY_FIELD = {
-    "entities": "entities",
     "name": "name",
 }
 

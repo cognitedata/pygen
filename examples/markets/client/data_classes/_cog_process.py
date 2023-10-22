@@ -26,10 +26,7 @@ CogProcessTextFields = Literal["name"]
 CogProcessFields = Literal["name"]
 
 _COGPROCESS_PROPERTIES_BY_FIELD = {
-    "bid": "bid",
-    "date_transformations": "dateTransformations",
     "name": "name",
-    "transformation": "transformation",
 }
 
 

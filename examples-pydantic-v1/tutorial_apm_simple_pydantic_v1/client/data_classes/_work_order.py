@@ -64,7 +64,6 @@ _WORKORDER_PROPERTIES_BY_FIELD = {
     "is_cancelled": "isCancelled",
     "is_completed": "isCompleted",
     "is_safety_critical": "isSafetyCritical",
-    "linked_assets": "linkedAssets",
     "percentage_progress": "percentageProgress",
     "planned_start": "plannedStart",
     "priority_description": "priorityDescription",
@@ -72,7 +71,6 @@ _WORKORDER_PROPERTIES_BY_FIELD = {
     "start_time": "startTime",
     "status": "status",
     "title": "title",
-    "work_items": "workItems",
     "work_order_number": "workOrderNumber",
     "work_package_number": "workPackageNumber",
 }

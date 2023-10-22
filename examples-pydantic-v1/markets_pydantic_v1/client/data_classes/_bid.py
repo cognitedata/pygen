@@ -19,7 +19,6 @@ BidFields = Literal["date", "name"]
 
 _BID_PROPERTIES_BY_FIELD = {
     "date": "date",
-    "market": "market",
     "name": "name",
 }
 
