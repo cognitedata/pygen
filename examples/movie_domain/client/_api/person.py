@@ -151,7 +151,7 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
         | dm.aggregations.MetricAggregation
         | Sequence[Aggregations]
         | Sequence[dm.aggregations.MetricAggregation],
-        properties: PersonFields | Sequence[PersonFields] | None = None,
+        property: PersonFields | Sequence[PersonFields] | None = None,
         group_by: None = None,
         query: str | None = None,
         search_properties: PersonTextFields | Sequence[PersonTextFields] | None = None,
@@ -172,7 +172,7 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
         | dm.aggregations.MetricAggregation
         | Sequence[Aggregations]
         | Sequence[dm.aggregations.MetricAggregation],
-        properties: PersonFields | Sequence[PersonFields] | None = None,
+        property: PersonFields | Sequence[PersonFields] | None = None,
         group_by: PersonFields | Sequence[PersonFields] = None,
         query: str | None = None,
         search_properties: PersonTextFields | Sequence[PersonTextFields] | None = None,
