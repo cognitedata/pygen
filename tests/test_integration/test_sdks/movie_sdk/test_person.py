@@ -147,6 +147,6 @@ def test_histogram_birth_year(movie_client: MovieClient) -> None:
     result = movie_client.person.histogram("birth_year", 10.0)
 
     # Assert
-    assert len(result) > 0
+    assert len(result.buckets) > 0
     assert result.buckets[0].count > 0
-    assert result.buckets[0].start == 1900.0
+    assert result.buckets[0].start == 1900

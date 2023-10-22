@@ -178,6 +178,28 @@ class TypeAPI(Generic[T_TypeNode, T_TypeApplyNode, T_TypeNodeList]):
             return result[0].aggregates
         return result
 
+    def _histogram(
+        self,
+        view_id: dm.ViewId,
+        property: str,
+        interval: float,
+        properties_by_field: dict[str, str],
+        query: str | None = None,
+        search_properties: str | Sequence[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.HistogramValue:
+        property = properties_by_field.get(property, property)
+
+        if isinstance(search_properties, str):
+            search_properties = [search_properties]
+        if search_properties:
+            search_properties = [properties_by_field.get(prop, prop) for prop in search_properties]
+
+        return self._client.data_modeling.instances.histogram(
+            view_id, dm.aggregations.Histogram(property, interval), "node", query, search_properties, filter, limit
+        )
+
     def _list(self, limit: int = DEFAULT_LIMIT_READ, filter: dm.Filter | None = None) -> T_TypeNodeList:
         nodes = self._client.data_modeling.instances.list("node", sources=self._sources, limit=limit, filter=filter)
         return self._class_list([self._class_type.from_node(node) for node in nodes])

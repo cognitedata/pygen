@@ -239,7 +239,25 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
-        raise NotImplementedError
+        filter_ = _create_filter(
+            self._view_id,
+            min_birth_year,
+            max_birth_year,
+            name,
+            name_prefix,
+            external_id_prefix,
+            filter,
+        )
+        return self._histogram(
+            self._view_id,
+            property,
+            interval,
+            _PERSON_PROPERTIES_BY_FIELD,
+            query,
+            search_property,
+            limit,
+            filter_,
+        )
 
     def list(
         self,
