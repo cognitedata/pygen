@@ -34,7 +34,7 @@ def command_api_generator(multi_api_generator: MultiAPIGenerator, command_config
 
 
 def test_create_view_data_classes_case(
-    multi_api_generator: MultiAPIGenerator, case_view: dm.View, top_level_package: str
+    multi_api_generator: MultiAPIGenerator, case_view: dm.View, top_level_package: str, code_formatter: CodeFormatter
 ):
     # Arrange
     expected = ShopSDKFiles.cases_data.read_text()
@@ -43,6 +43,7 @@ def test_create_view_data_classes_case(
 
     # Act
     actual = api_generator.generate_data_class_file()
+    actual = code_formatter.format_code(actual)
 
     # Assert
     assert expected == actual
