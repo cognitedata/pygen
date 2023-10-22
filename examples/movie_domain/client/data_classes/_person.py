@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional, Literal, Union
+from typing import Literal, TYPE_CHECKING, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -10,7 +10,7 @@ from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 if TYPE_CHECKING:
     from ._role import RoleApply
 
-__all__ = ["Person", "PersonApply", "PersonList", "PersonApplyList"]
+__all__ = ["Person", "PersonApply", "PersonList", "PersonApplyList", "PersonTextFields"]
 
 
 PersonTextFields = Literal["name"]
