@@ -13,6 +13,10 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.26.1] - 23-10-23
+### Changed
+* Loosen requirement on typing_extensions to >=4.5
+
 ## [0.26.0] - 22-10-23
 ### Added
 * Support for aggregation in generated SDK.

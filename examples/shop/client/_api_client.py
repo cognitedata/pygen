@@ -14,7 +14,7 @@ class ShopClient:
     ShopClient
 
     Generated with:
-        pygen = 0.26.0
+        pygen = 0.26.1
         cognite-sdk = 6.34.0
         pydantic = 2.4.2
 
