@@ -155,11 +155,6 @@ class Field(ABC):
     def is_time_field(self) -> bool:
         raise NotImplementedError()
 
-    @property
-    @abstractmethod
-    def is_text_field(self) -> bool:
-        raise NotImplementedError()
-
 
 @dataclass(frozen=True)
 class PrimitiveFieldCore(Field, ABC):
@@ -174,10 +169,6 @@ class PrimitiveFieldCore(Field, ABC):
     @property
     def is_time_field(self) -> bool:
         return self.type_ in ("datetime.datetime", "datetime.date")
-
-    @property
-    def is_text_field(self) -> bool:
-        return self.type_ == "str"
 
 
 @dataclass(frozen=True)
@@ -278,10 +269,6 @@ class EdgeField(Field, ABC):
     def is_time_field(self) -> bool:
         return False
 
-    @property
-    def is_text_field(self) -> bool:
-        return False
-
 
 @dataclass(frozen=True)
 class EdgeOneToOne(EdgeField):
@@ -300,10 +287,9 @@ class EdgeOneToOne(EdgeField):
     def as_write_type_hint(self) -> str:
         # TODO: 231009 pa: need alias for write type hints too
         if self.need_alias:
-            # splitting long string over multiple lines
             return (
-                f"Union[{self.data_class.write_name}, str, None] ="
-                f" {self.pydantic_field}(None, repr=False, alias='{self.prop_name}')"
+                f"Union[{self.data_class.write_name}, str, None] "
+                f"= {self.pydantic_field}(None, repr=False, alias='{self.prop_name}')"
             )
         else:
             return f"Union[{self.data_class.write_name}, str, None] = {self.pydantic_field}(None, repr=False)"
@@ -392,18 +378,6 @@ class DataClass:
             self.fields.append(field_)
 
     @property
-    def text_field_names(self) -> str:
-        return f"{self.read_name}TextFields"
-
-    @property
-    def field_names(self) -> str:
-        return f"{self.read_name}Fields"
-
-    @property
-    def properties_dict_name(self) -> str:
-        return f"_{self.read_name.upper()}_PROPERTIES_BY_FIELD"
-
-    @property
     def pydantic_field(self) -> str:
         if any(
             name == "Field" for name in [self.read_name, self.write_name, self.read_list_name, self.write_list_name]
@@ -414,12 +388,10 @@ class DataClass:
 
     @property
     def init_import(self) -> str:
-        import_classes = [self.read_name, self.write_name, self.read_list_name, self.write_list_name]
-        if not self.has_only_one_to_many_edges:
-            import_classes.append(self.field_names)
-        if self.has_text_field:
-            import_classes.append(self.text_field_names)
-        return f"from .{self.file_name} import {', '.join(sorted(import_classes))}"
+        return (
+            f"from .{self.file_name} "
+            f"import {self.read_name}, {self.write_name}, {self.read_list_name}, {self.write_list_name}"
+        )
 
     def __iter__(self) -> Iterator[Field]:
         return iter(self.fields)
@@ -435,14 +407,6 @@ class DataClass:
     @property
     def primitive_fields(self) -> Iterable[PrimitiveField]:
         return (field_ for field_ in self.fields if isinstance(field_, PrimitiveField))
-
-    @property
-    def primitive_core_fields(self) -> Iterable[PrimitiveFieldCore]:
-        return (field_ for field_ in self.fields if isinstance(field_, PrimitiveFieldCore))
-
-    @property
-    def text_fields(self) -> Iterable[PrimitiveFieldCore]:
-        return (field_ for field_ in self.primitive_core_fields if field_.is_text_field)
 
     @property
     def cdf_external_fields(self) -> Iterable[CDFExternalField]:
@@ -461,10 +425,6 @@ class DataClass:
         return any(isinstance(field_, EdgeField) for field_ in self.fields)
 
     @property
-    def has_primitive_fields(self) -> bool:
-        return any(isinstance(field_, PrimitiveFieldCore) for field_ in self.fields)
-
-    @property
     def has_only_one_to_many_edges(self) -> bool:
         return all(isinstance(field_, EdgeOneToMany) for field_ in self.fields)
 
@@ -479,10 +439,6 @@ class DataClass:
     @property
     def has_time_field(self) -> bool:
         return any(field_.is_time_field for field_ in self.fields)
-
-    @property
-    def has_text_field(self) -> bool:
-        return any(field_.is_text_field for field_ in self.fields)
 
     @property
     def _field_type_hints(self) -> Iterable[str]:
@@ -526,14 +482,6 @@ class DataClass:
         return ", ".join(
             f'"{field_.prop_name}"' for field_ in self if isinstance(field_, (PrimitiveField, CDFExternalField))
         )
-
-    @property
-    def text_fields_literals(self) -> str:
-        return ", ".join(f'"{field_.name}"' for field_ in self.text_fields)
-
-    @property
-    def fields_literals(self) -> str:
-        return ", ".join(f'"{field_.name}"' for field_ in self if isinstance(field_, PrimitiveFieldCore))
 
 
 @dataclass(frozen=True)
@@ -597,11 +545,10 @@ class MultiAPIClass:
 
 
 @dataclass
-class FilterParameter:
+class ListParameter:
     name: str
     type_: str
     default: None = None
-    space: str | None = None
 
     @property
     def annotation(self) -> str:
@@ -613,10 +560,10 @@ class FilterParameter:
 
 
 @dataclass
-class FilterCondition:
+class ListFilter:
     filter: type[dm.Filter]
     prop_name: str
-    keyword_arguments: dict[str, FilterParameter]
+    keyword_arguments: dict[str, ListParameter]
 
     @property
     def condition(self) -> str:
@@ -636,55 +583,17 @@ class FilterCondition:
         else:
             property_ref = f'view_id.as_property_ref("{self.prop_name}"), '
 
-        filter_args = self._create_filter_args()
-
-        return f"{property_ref}{', '.join(filter_args)}"
-
-    def _create_filter_args(self) -> list[str]:
-        filter_args: list[str] = []
-        for keyword, arg in self.keyword_arguments.items():
-            if arg.is_time:
-                filter_args.append(f"{keyword}={arg.name}.isoformat() if {arg.name} else None")
-            else:
-                filter_args.append(f"{keyword}={arg.name}")
-        return filter_args
+        filter_args = ", ".join(
+            (
+                f"{keyword}={arg.name}.isoformat() if {arg.name} else None" if arg.is_time else f"{keyword}={arg.name}"
+                for keyword, arg in self.keyword_arguments.items()
+            )
+        )
+        return f"{property_ref}{filter_args}"
 
     @property
     def filter_call(self) -> str:
         return f"dm.filters.{self.filter.__name__}"
-
-
-@dataclass
-class FilterConditionOnetoOneEdge(FilterCondition):
-    instance_type: type
-
-    @property
-    def condition(self) -> str:
-        if self.filter is dm.filters.In:
-            parameter = next(iter(self.keyword_arguments.values())).name
-            return (
-                f"{parameter} and isinstance({parameter}, list) and "
-                f"isinstance({parameter}[0], {self.instance_type.__name__})"
-            )
-        elif self.filter is dm.filters.Equals:
-            parameter = next(iter(self.keyword_arguments.values())).name
-            return f"{parameter} and isinstance({parameter}, {self.instance_type.__name__})"
-        raise NotImplementedError(f"Unsupported filter {self.filter} for Direct Relation")
-
-    def _create_filter_args(self) -> list[str]:
-        filter_args: list[str] = []
-        for keyword, arg in self.keyword_arguments.items():
-            if self.instance_type is str and self.filter is dm.filters.Equals:
-                filter_args.append(f'{keyword}={{"space": "{arg.space}", "externalId": {arg.name}}}')
-            elif self.instance_type is tuple and self.filter is dm.filters.Equals:
-                filter_args.append(f'{keyword}={{"space": {arg.name}[0], "externalId": {arg.name}[1]}}')
-            elif self.instance_type is str and self.filter is dm.filters.In:
-                filter_args.append(f'{keyword}=[{{"space": "{arg.space}", "externalId": item}} for item in {arg.name}]')
-            elif self.instance_type is tuple and self.filter is dm.filters.In:
-                filter_args.append(f'{keyword}=[{{"space": item[0], "externalId": item[1]}} for item in {arg.name}]')
-            else:
-                raise NotImplementedError(f"Unsupported filter {self.filter} for Direct Relation")
-        return filter_args
 
 
 # This field is used when creating the list method.
@@ -707,123 +616,69 @@ _EXTERNAL_ID_FIELD = PrimitiveField(
 
 @dataclass
 class ListMethod:
-    parameters: list[FilterParameter]
-    filters: list[FilterCondition]
+    parameters: list[ListParameter]
+    filters: list[ListFilter]
 
     @classmethod
-    def from_fields(cls, fields: Iterable[Field], config: pygen_config.Filtering) -> Self:
-        parameters_by_name: dict[str, FilterParameter] = {}
-        list_filters: list[FilterCondition] = []
+    def from_fields(cls, fields: Iterable[Field], config: pygen_config.ListMethodFilters) -> Self:
+        parameters_by_name: dict[str, ListParameter] = {}
+        list_filters: list[ListFilter] = []
 
         for field_ in itertools.chain(fields, (_EXTERNAL_ID_FIELD,)):
-            # Only primitive and edge one-to-one fields supported for now
-            if isinstance(field_, PrimitiveField):
-                for selected_filter in config.get(field_.prop.type, field_.prop_name):
-                    if selected_filter is dm.filters.Equals:
-                        if field_.name not in parameters_by_name:
-                            parameter = FilterParameter(name=field_.name, type_=field_.type_)
-                            parameters_by_name[parameter.name] = parameter
-                        else:
-                            # Equals and In filter share parameter, you have to extend the type hint.
-                            parameter = parameters_by_name[field_.name]
-                            parameter.type_ = f"{field_.type_} | {parameter.type_}"
-                        list_filters.append(
-                            FilterCondition(
-                                filter=selected_filter,
-                                prop_name=field_.prop_name,
-                                keyword_arguments=dict(value=parameter),
-                            )
-                        )
-                    elif selected_filter is dm.filters.In:
-                        if field_.name not in parameters_by_name:
-                            parameter = FilterParameter(field_.name, type_=f"list[{field_.type_}]")
-                            parameters_by_name[parameter.name] = parameter
-                        else:
-                            # Equals and In filter share parameter, you have to extend the type hint.
-                            parameter = parameters_by_name[field_.name]
-                            parameter.type_ = f"{parameter.type_} | list[{field_.type_}]"
-                        list_filters.append(
-                            FilterCondition(
-                                filter=selected_filter,
-                                prop_name=field_.prop_name,
-                                keyword_arguments=dict(values=parameter),
-                            )
-                        )
-                    elif selected_filter is dm.filters.Prefix:
-                        parameter = FilterParameter(name=f"{field_.name}_prefix", type_=field_.type_)
-                        parameters_by_name[parameter.name] = parameter
-                        list_filters.append(
-                            FilterCondition(
-                                filter=selected_filter,
-                                prop_name=field_.prop_name,
-                                keyword_arguments=dict(value=parameter),
-                            )
-                        )
-                    elif selected_filter is dm.filters.Range:
-                        min_parameter = FilterParameter(name=f"min_{field_.name}", type_=field_.type_)
-                        max_parameter = FilterParameter(name=f"max_{field_.name}", type_=field_.type_)
-                        parameters_by_name[min_parameter.name] = min_parameter
-                        parameters_by_name[max_parameter.name] = max_parameter
-                        list_filters.append(
-                            FilterCondition(
-                                filter=selected_filter,
-                                prop_name=field_.prop_name,
-                                keyword_arguments=dict(gte=min_parameter, lte=max_parameter),
-                            )
-                        )
-                    else:
-                        # This is a filter not supported by the list method.
-                        continue
-            elif isinstance(field_, EdgeOneToOne):
-                for selected_filter in config.get(field_.prop.type, field_.prop_name):
-                    if selected_filter is dm.filters.Equals:
-                        if field_.name not in parameters_by_name:
-                            parameter = FilterParameter(
-                                name=field_.name, type_="str | tuple[str, str]", space=field_.data_class.view_id.space
-                            )
-                            parameters_by_name[parameter.name] = parameter
-                        else:
-                            # Equals and In filter share parameter, you have to extend the type hint.
-                            parameter = parameters_by_name[field_.name]
-                            parameter.type_ = f"str | tuple[str, str] | {parameter.type_}"
-                        list_filters.extend(
-                            [
-                                FilterConditionOnetoOneEdge(
-                                    filter=selected_filter,
-                                    prop_name=field_.prop_name,
-                                    keyword_arguments=dict(value=parameter),
-                                    instance_type=condition_type,
-                                )
-                                for condition_type in (str, tuple)
-                            ]
-                        )
-                    elif selected_filter is dm.filters.In:
-                        if field_.name not in parameters_by_name:
-                            parameter = FilterParameter(
-                                name=field_.name,
-                                type_="list[str] | list[tuple[str, str]]",
-                                space=field_.data_class.view_id.space,
-                            )
-                            parameters_by_name[parameter.name] = parameter
-                        else:
-                            # Equals and In filter share parameter, you have to extend the type hint.
-                            parameter = parameters_by_name[field_.name]
-                            parameter.type_ = f"{parameter.type_} | list[str] | list[tuple[str, str]]"
-                        list_filters.extend(
-                            [
-                                FilterConditionOnetoOneEdge(
-                                    filter=selected_filter,
-                                    prop_name=field_.prop_name,
-                                    keyword_arguments=dict(values=parameter),
-                                    instance_type=condition_type,
-                                )
-                                for condition_type in (str, tuple)
-                            ]
-                        )
-                    else:
-                        # This is a filter not supported.
-                        continue
+            if not isinstance(field_, PrimitiveField):
+                # Only primitive fields supported for now
+                continue
 
+            for selected_filter in config.get(field_.prop.type, field_.prop_name):
+                if selected_filter is dm.filters.Equals:
+                    if field_.name not in parameters_by_name:
+                        parameter = ListParameter(name=field_.name, type_=field_.type_)
+                        parameters_by_name[parameter.name] = parameter
+                    else:
+                        # Equals and In filter share parameter, you have to extend the type hint.
+                        parameter = parameters_by_name[field_.name]
+                        parameter.type_ = f"{field_.type_} | {parameter.type_}"
+                    list_filters.append(
+                        ListFilter(
+                            filter=selected_filter, prop_name=field_.prop_name, keyword_arguments=dict(value=parameter)
+                        )
+                    )
+                elif selected_filter is dm.filters.In:
+                    if field_.name not in parameters_by_name:
+                        parameter = ListParameter(field_.name, type_=f"list[{field_.type_}]")
+                        parameters_by_name[parameter.name] = parameter
+                    else:
+                        # Equals and In filter share parameter, you have to extend the typ hint.
+                        parameter = parameters_by_name[field_.name]
+                        parameter.type_ = f"{parameter.type_} | list[{field_.type_}]"
+                    list_filters.append(
+                        ListFilter(
+                            filter=selected_filter, prop_name=field_.prop_name, keyword_arguments=dict(values=parameter)
+                        )
+                    )
+                elif selected_filter is dm.filters.Prefix:
+                    parameter = ListParameter(name=f"{field_.name}_prefix", type_=field_.type_)
+                    parameters_by_name[parameter.name] = parameter
+                    list_filters.append(
+                        ListFilter(
+                            filter=selected_filter, prop_name=field_.prop_name, keyword_arguments=dict(value=parameter)
+                        )
+                    )
+                elif selected_filter is dm.filters.Range:
+                    min_parameter = ListParameter(name=f"min_{field_.name}", type_=field_.type_)
+                    max_parameter = ListParameter(name=f"max_{field_.name}", type_=field_.type_)
+                    parameters_by_name[min_parameter.name] = min_parameter
+                    parameters_by_name[max_parameter.name] = max_parameter
+                    list_filters.append(
+                        ListFilter(
+                            filter=selected_filter,
+                            prop_name=field_.prop_name,
+                            keyword_arguments=dict(gte=min_parameter, lte=max_parameter),
+                        )
+                    )
+                else:
+                    # This is a filter that is not supported by the list method.
+                    continue
         return cls(parameters=list(parameters_by_name.values()), filters=list_filters)
 
 

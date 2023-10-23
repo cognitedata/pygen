@@ -1,0 +1,6 @@
+[cognite]
+project = "your-project"
+tenant_id = "1111111-2222-3333-4444-555555555"
+cdf_cluster = "api"
+client_id = "***"
+client_secret = "***"

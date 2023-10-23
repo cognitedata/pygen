@@ -1,0 +1,497 @@
+type HistoricalInterests {
+  InterestTypeID: String
+  EffectiveDateTime: String
+  TerminationDateTime: String
+}
+
+type VerticalMeasurements {
+  VerticalMeasurementID: String
+  RigID: String
+  EffectiveDateTime: String
+  VerticalMeasurement: Float
+  TerminationDateTime: String
+  VerticalMeasurementTypeID: String
+  VerticalMeasurementPathID: String
+  VerticalMeasurementSourceID: String
+  WellboreTVDTrajectoryID: String
+  VerticalMeasurementUnitOfMeasureID: String
+  VerticalCRSID: String
+  VerticalReferenceID: String
+  VerticalReferenceEntityID: String
+  VerticalMeasurementDescription: String
+}
+
+type FacilitySpecifications {
+  EffectiveDateTime: String
+  TerminationDateTime: String
+  FacilitySpecificationQuantity: Float
+  FacilitySpecificationDateTime: String
+  FacilitySpecificationIndicator: Boolean
+  FacilitySpecificationText: String
+  UnitOfMeasureID: String
+  ParameterTypeID: String
+}
+
+type FacilityEvents {
+  FacilityEventTypeID: String
+  EffectiveDateTime: String
+  TerminationDateTime: String
+  Remark: String
+}
+
+type FacilityStates {
+  EffectiveDateTime: String
+  TerminationDateTime: String
+  FacilityStateTypeID: String
+  Remark: String
+}
+
+type FacilityOperators {
+  FacilityOperatorID: String
+  FacilityOperatorOrganisationID: String
+  EffectiveDateTime: String
+  TerminationDateTime: String
+  Remark: String
+}
+
+type UnacceptableUsage {
+  WorkflowUsageTypeID: String
+  WorkflowPersonaTypeID: String
+  DataQualityRuleSetID: String
+  DataQualityID: String
+  ValueChainStatusTypeID: String
+}
+
+type AcceptableUsage {
+  WorkflowUsageTypeID: String
+  WorkflowPersonaTypeID: String
+  DataQualityRuleSetID: String
+  DataQualityID: String
+  ValueChainStatusTypeID: String
+}
+
+type Reviewers {
+  RoleTypeID: String
+  DataGovernanceRoleTypeID: String
+  WorkflowPersonaTypeID: String
+  OrganisationID: String
+  Name: String
+}
+
+type TechnicalAssurances {
+  TechnicalAssuranceTypeID: String
+  EffectiveDate: String
+  Comment: String
+  UnacceptableUsage: [UnacceptableUsage]
+  AcceptableUsage: [AcceptableUsage]
+  Reviewers: [Reviewers]
+}
+
+type Geometry {
+  type: String
+  bbox: [Float]
+  coordinates: [Float]
+}
+
+type Features {
+  type: String
+  bbox: [Float]
+  geometry: Geometry
+}
+
+type Wgs84Coordinates {
+  type: String
+  bbox: [Float]
+  features: [Features]
+}
+
+type AsIngestedCoordinates {
+  type: String
+  CoordinateReferenceSystemID: String
+  VerticalCoordinateReferenceSystemID: String
+  VerticalUnitID: String
+  persistableReferenceCrs: String
+  persistableReferenceVerticalCrs: String
+  persistableReferenceUnitZ: String
+  bbox: [Float]
+  features: [Features]
+}
+
+type SpatialLocation {
+  SpatialLocationCoordinatesDate: String
+  QuantitativeAccuracyBandID: String
+  QualitativeSpatialAccuracyTypeID: String
+  CoordinateQualityCheckPerformedBy: String
+  CoordinateQualityCheckDateTime: String
+  SpatialParameterTypeID: String
+  SpatialGeometryTypeID: String
+  AppliedOperations: [String]
+  Wgs84Coordinates: Wgs84Coordinates
+  AsIngestedCoordinates: AsIngestedCoordinates
+  CoordinateQualityCheckRemarks: [String]
+}
+
+type GeoContexts {
+  GeoPoliticalEntityID: String
+  BasinID: String
+  FieldID: String
+  PlayID: String
+  ProspectID: String
+  GeoTypeID: String
+}
+
+type NameAliases {
+  AliasName: String
+  AliasNameTypeID: String
+  DefinitionOrganisationID: String
+  EffectiveDateTime: String
+  TerminationDateTime: String
+}
+
+type WellData {
+  ResourceHomeRegionID: String
+  ResourceCurationStatus: String
+  ResourceLifecycleStatus: String
+  ResourceSecurityClassification: String
+  Source: String
+  ExistenceKind: String
+  VersionCreationReason: String
+  TechnicalAssuranceTypeID: String
+  FacilityID: String
+  FacilityTypeID: String
+  InitialOperatorID: String
+  CurrentOperatorID: String
+  DataSourceOrganisationID: String
+  OperatingEnvironmentID: String
+  FacilityName: String
+  FacilityDescription: String
+  DefaultVerticalMeasurementID: String
+  DefaultVerticalCRSID: String
+  InterestTypeID: String
+  BusinessIntentionID: String
+  RoleID: String
+  WasBusinessInterestFinancialOperated: Boolean
+  WasBusinessInterestFinancialNonOperated: Boolean
+  WasBusinessInterestObligatory: Boolean
+  WasBusinessInterestTechnical: Boolean
+  ConditionID: String
+  OutcomeID: String
+  StatusSummaryID: String
+  HistoricalInterests: [HistoricalInterests]
+  VerticalMeasurements: [VerticalMeasurements]
+  FacilitySpecifications: [FacilitySpecifications]
+  FacilityEvents: [FacilityEvents]
+  FacilityStates: [FacilityStates]
+  FacilityOperators: [FacilityOperators]
+  TechnicalAssurances: [TechnicalAssurances]
+  SpatialLocation: SpatialLocation
+  GeoContexts: [GeoContexts]
+  NameAliases: [NameAliases]
+  ResourceHostRegionIDs: [String]
+}
+
+type Meta {
+  kind: String
+  name: String
+  persistableReference: String
+  unitOfMeasureID: String
+  propertyNames: [String]
+}
+
+type Ancestry {
+  parents: [String]
+}
+
+type Tags {
+  NameOfKey: String
+}
+
+type Legal {
+  status: String
+  otherRelevantDataCountries: [String]
+  legaltags: [String]
+}
+
+type Acl {
+  viewers: [String]
+  owners: [String]
+}
+
+type Well{
+  id: String
+  kind: String
+  version: Int64
+  createTime: String
+  createUser: String
+  modifyTime: String
+  modifyUser: String
+  data: WellData
+  meta: [Meta]
+  ancestry: Ancestry
+  tags: Tags
+  legal: Legal
+  acl: Acl
+}
+
+# Types with identical fields:
+# UnacceptableUsage AcceptableUsage
+
+
+type WellboreCosts {
+  ActivityTypeID: String
+  Cost: Float
+}
+
+type GeographicBottomHoleLocation {
+  SpatialLocationCoordinatesDate: String
+  QuantitativeAccuracyBandID: String
+  QualitativeSpatialAccuracyTypeID: String
+  CoordinateQualityCheckPerformedBy: String
+  CoordinateQualityCheckDateTime: String
+  SpatialParameterTypeID: String
+  SpatialGeometryTypeID: String
+  AppliedOperations: [String]
+  Wgs84Coordinates: Wgs84Coordinates
+  AsIngestedCoordinates: AsIngestedCoordinates
+  CoordinateQualityCheckRemarks: [String]
+}
+
+type ProjectedBottomHoleLocation {
+  SpatialLocationCoordinatesDate: String
+  QuantitativeAccuracyBandID: String
+  QualitativeSpatialAccuracyTypeID: String
+  CoordinateQualityCheckPerformedBy: String
+  CoordinateQualityCheckDateTime: String
+  SpatialParameterTypeID: String
+  SpatialGeometryTypeID: String
+  AppliedOperations: [String]
+  Wgs84Coordinates: Wgs84Coordinates
+  AsIngestedCoordinates: AsIngestedCoordinates
+  CoordinateQualityCheckRemarks: [String]
+}
+
+type DrillingReasons {
+  LaheeClassID: String
+  EffectiveDateTime: String
+  TerminationDateTime: String
+  Remark: String
+}
+
+
+type WellboreData {
+  ResourceHomeRegionID: String
+  ResourceCurationStatus: String
+  ResourceLifecycleStatus: String
+  ResourceSecurityClassification: String
+  Source: String
+  ExistenceKind: String
+  VersionCreationReason: String
+  TechnicalAssuranceTypeID: String
+  FacilityID: String
+  FacilityTypeID: String
+  InitialOperatorID: String
+  CurrentOperatorID: String
+  DataSourceOrganisationID: String
+  OperatingEnvironmentID: String
+  FacilityName: String
+  FacilityDescription: String
+  WellID: String
+  SequenceNumber: Int
+  WellboreReasonID: String
+  KickOffWellbore: String
+  TrajectoryTypeID: String
+  DefinitiveTrajectoryID: String
+  TargetFormation: String
+  FormationNameAtTotalDepth: String
+  DefaultVerticalMeasurementID: String
+  BusinessIntentionID: String
+  RoleID: String
+  InterestTypeID: String
+  WasBusinessInterestFinancialOperated: Boolean
+  WasBusinessInterestFinancialNonOperated: Boolean
+  WasBusinessInterestObligatory: Boolean
+  WasBusinessInterestTechnical: Boolean
+  PrimaryProductTypeID: String
+  SecondaryProductTypeID: String
+  TertiaryProductTypeID: String
+  ShowProductTypeID: String
+  ConditionID: String
+  FluidDirectionID: String
+  OutcomeID: String
+  StatusSummaryID: String
+  WellboreCosts: [WellboreCosts]
+  HistoricalInterests: [HistoricalInterests]
+  GeographicBottomHoleLocation: GeographicBottomHoleLocation
+  ProjectedBottomHoleLocation: ProjectedBottomHoleLocation
+  DrillingReasons: [DrillingReasons]
+  VerticalMeasurements: [VerticalMeasurements]
+  FacilitySpecifications: [FacilitySpecifications]
+  FacilityEvents: [FacilityEvents]
+  FacilityStates: [FacilityStates]
+  FacilityOperators: [FacilityOperators]
+  TechnicalAssurances: [TechnicalAssurances]
+  SpatialLocation: SpatialLocation
+  GeoContexts: [GeoContexts]
+  NameAliases: [NameAliases]
+  ResourceHostRegionIDs: [String]
+}
+
+type Wellbore {
+  id: String
+  kind: String
+  version: Int64
+  createTime: String
+  createUser: String
+  modifyTime: String
+  modifyUser: String
+  data: WellboreData
+  meta: [Meta]
+  ancestry: Ancestry
+  tags: Tags
+  legal: Legal
+  acl: Acl
+}
+
+# Types with identical fields:
+# GeographicBottomHoleLocation ProjectedBottomHoleLocation SpatialLocation
+# UnacceptableUsage AcceptableUsage
+
+
+type AvailableTrajectoryStationProperties {
+  TrajectoryStationPropertyTypeID: String
+  StationPropertyUnitID: String
+  Name: String
+}
+
+type VerticalMeasurement {
+  EffectiveDateTime: String
+  VerticalMeasurement: Float
+  TerminationDateTime: String
+  VerticalMeasurementTypeID: String
+  VerticalMeasurementPathID: String
+  VerticalMeasurementSourceID: String
+  WellboreTVDTrajectoryID: String
+  VerticalMeasurementUnitOfMeasureID: String
+  VerticalCRSID: String
+  VerticalReferenceID: String
+  VerticalReferenceEntityID: String
+  VerticalMeasurementDescription: String
+}
+
+type LineageAssertions {
+  ID: String
+  LineageRelationshipType: String
+}
+
+type SpatialArea {
+  SpatialLocationCoordinatesDate: String
+  QuantitativeAccuracyBandID: String
+  QualitativeSpatialAccuracyTypeID: String
+  CoordinateQualityCheckPerformedBy: String
+  CoordinateQualityCheckDateTime: String
+  SpatialParameterTypeID: String
+  SpatialGeometryTypeID: String
+  AppliedOperations: [String]
+  Wgs84Coordinates: Wgs84Coordinates
+  AsIngestedCoordinates: AsIngestedCoordinates
+  CoordinateQualityCheckRemarks: [String]
+}
+
+type SpatialPoint {
+  SpatialLocationCoordinatesDate: String
+  QuantitativeAccuracyBandID: String
+  QualitativeSpatialAccuracyTypeID: String
+  CoordinateQualityCheckPerformedBy: String
+  CoordinateQualityCheckDateTime: String
+  SpatialParameterTypeID: String
+  SpatialGeometryTypeID: String
+  AppliedOperations: [String]
+  Wgs84Coordinates: Wgs84Coordinates
+  AsIngestedCoordinates: AsIngestedCoordinates
+  CoordinateQualityCheckRemarks: [String]
+}
+
+type Artefacts {
+  RoleID: String
+  ResourceKind: String
+  ResourceID: String
+}
+
+type WellboreTrajectoryData {
+  ResourceHomeRegionID: String
+  ResourceCurationStatus: String
+  ResourceLifecycleStatus: String
+  ResourceSecurityClassification: String
+  Source: String
+  ExistenceKind: String
+  IsExtendedLoad: Boolean
+  IsDiscoverable: Boolean
+  Name: String
+  Description: String
+  CreationDateTime: String
+  SubmitterName: String
+  ServiceCompanyID: String
+  WellboreID: String
+  TopDepthMeasuredDepth: Int
+  AzimuthReferenceType: String
+  CalculationMethodType: String
+  ProjectedCRSID: String
+  ActiveIndicator: Boolean
+  SurveyType: String
+  AcquisitionDate: String
+  GeographicCRSID: String
+  AcquisitionRemark: String
+  SurveyReferenceIdentifier: String
+  SurveyToolTypeID: String
+  SurveyVersion: String
+  ExtrapolatedMeasuredDepth: Int
+  ExtrapolatedMeasuredDepthRemark: String
+  BaseDepthMeasuredDepth: Int
+  TieMeasuredDepth: Int
+  TieTrueVerticalDepth: Int
+  AppliedOperationsDateTime: String
+  AppliedOperationsUser: String
+  AppliedOperationsRemarks: String
+  StartDateTime: String
+  EndDateTime: String
+  CompanyID: String
+  SurfaceGridConvergence: Float
+  SurfaceScaleFactor: Float
+  Tortuosity: Float
+  AppliedOperations: [String]
+  AvailableTrajectoryStationProperties: [AvailableTrajectoryStationProperties]
+  VerticalMeasurement: VerticalMeasurement
+  LineageAssertions: [LineageAssertions]
+  AuthorIDs: [String]
+  BusinessActivities: [String]
+  GeoContexts: [GeoContexts]
+  SpatialArea: SpatialArea
+  SpatialPoint: SpatialPoint
+  Tags: [String]
+  NameAliases: [NameAliases]
+  TechnicalAssurances: [TechnicalAssurances]
+  Artefacts: [Artefacts]
+  DDMSDatasets: [String]
+  Datasets: [String]
+  ResourceHostRegionIDs: [String]
+}
+
+type WellboreTrajectory {
+  id: String
+  kind: String
+  version: Int64
+  createTime: String
+  createUser: String
+  modifyTime: String
+  modifyUser: String
+  data: WellboreTrajectoryData
+  meta: [Meta]
+  ancestry: Ancestry
+  tags: Tags
+  legal: Legal
+  acl: Acl
+}
+
+# Types with identical fields:
+# SpatialArea SpatialPoint
+# UnacceptableUsage AcceptableUsage
