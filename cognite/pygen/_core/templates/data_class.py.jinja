@@ -47,7 +47,7 @@ class {{ data_class.write_name }}(DomainModelApply):
             properties["{{ field.prop_name }}"] = {% if field.is_edge %}{
                 "space": "{{ field.prop.source.space }}",
                 "externalId": self.{{ field.name }} if isinstance(self.{{ field.name }}, str) else self.{{ field.name }}.external_id,
-            }{% else %}self.{{ field.name }}{% if field.is_time_field %}.isoformat(){% endif %}{% endif %}{% endfor %}
+            }{% else %}self.{{ field.name }}{% if field.is_time_field %}.isoformat(timespec="milliseconds"){% endif %}{% endif %}{% endfor %}
         if properties:
             source = dm.NodeOrEdgeData(
                 source=dm.ContainerId("{{ container.space }}", "{{ container.external_id }}"),
