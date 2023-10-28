@@ -70,7 +70,7 @@ class CaseApply(DomainModelApply):
     cut_files: Optional[list[str]] = None
     end_time: Optional[datetime.datetime] = None
     name: str
-    run_status: str
+    run_status: str = Field(alias="runStatus")
     scenario: Optional[str] = None
     start_time: datetime.datetime
 

@@ -1,3 +1,4 @@
+from ._core import DomainModel, DomainModelApply
 from ._actor import Actor, ActorApply, ActorApplyList, ActorFields, ActorList
 from ._best_director import (
     BestDirector,
@@ -62,6 +63,8 @@ RoleApply.update_forward_refs(
 )
 
 __all__ = [
+    "DomainModel",
+    "DomainModelApply",
     "Actor",
     "ActorApply",
     "ActorList",
