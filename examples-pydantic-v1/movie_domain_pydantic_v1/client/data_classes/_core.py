@@ -52,6 +52,7 @@ class DomainModelApply(DomainModelCore):
 
     class Config:
         extra = Extra.forbid
+        allow_population_by_field_name = True
 
     def to_instances_apply(self) -> dm.InstancesApply:
         return self._to_instances_apply(set())
