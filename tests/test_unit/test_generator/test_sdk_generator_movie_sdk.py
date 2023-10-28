@@ -220,7 +220,7 @@ def create_fields_test_cases():
             pydantic_field="Field",
         ),
         'Optional[bool] = Field(None, alias="wonOscar")',
-        "Optional[bool] = None",
+        'Optional[bool] = Field(None, alias="wonOscar")',
         id="Boolean property with pascal name",
     )
 
