@@ -66,8 +66,8 @@ class ScenarioInstanceApply(DomainModelApply):
     country: Optional[str] = None
     instance: Optional[datetime.datetime] = None
     market: Optional[str] = None
-    price_area: Optional[str] = None
-    price_forecast: Optional[str] = None
+    price_area: Optional[str] = Field(None, alias="priceArea")
+    price_forecast: Optional[str] = Field(None, alias="priceForecast")
     scenario: Optional[str] = None
     start: Optional[datetime.datetime] = None
 

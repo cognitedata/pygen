@@ -122,10 +122,10 @@ python scripts/dev.py generate-sdks
 This command must be run with both Python environments, `pydantic` `v1` and `v2`.
 
 ### Developer CLI
-Note that `python scrips/dev.py` is a CLI with a few commands that can be useful when developing `pygen`.
+Note that `python dev.py` is a CLI with a few commands that can be useful when developing `pygen`.
 To see the available commands run:
 ```bash
-python scripts/dev.py --help
+python dev.py --help
 ```
 
 ### Documentation

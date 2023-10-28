@@ -1,3 +1,4 @@
+from ._core import DomainModel, DomainModelApply
 from ._scenario_instance import (
     ScenarioInstance,
     ScenarioInstanceApply,
@@ -9,6 +10,8 @@ from ._scenario_instance import (
 
 
 __all__ = [
+    "DomainModel",
+    "DomainModelApply",
     "ScenarioInstance",
     "ScenarioInstanceApply",
     "ScenarioInstanceList",

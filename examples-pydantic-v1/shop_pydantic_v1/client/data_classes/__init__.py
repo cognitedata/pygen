@@ -1,3 +1,4 @@
+from ._core import DomainModel, DomainModelApply
 from ._case import Case, CaseApply, CaseApplyList, CaseFields, CaseList, CaseTextFields
 from ._command_config import (
     CommandConfig,
@@ -13,6 +14,8 @@ CaseApply.update_forward_refs(
 )
 
 __all__ = [
+    "DomainModel",
+    "DomainModelApply",
     "Case",
     "CaseApply",
     "CaseList",

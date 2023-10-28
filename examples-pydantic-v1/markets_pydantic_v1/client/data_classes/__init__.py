@@ -1,3 +1,4 @@
+from ._core import DomainModel, DomainModelApply
 from ._bid import Bid, BidApply, BidApplyList, BidFields, BidList, BidTextFields
 from ._cog_bid import CogBid, CogBidApply, CogBidApplyList, CogBidFields, CogBidList, CogBidTextFields
 from ._cog_pool import CogPool, CogPoolApply, CogPoolApplyList, CogPoolFields, CogPoolList, CogPoolTextFields
@@ -78,6 +79,8 @@ PygenProcessApply.update_forward_refs(
 )
 
 __all__ = [
+    "DomainModel",
+    "DomainModelApply",
     "Bid",
     "BidApply",
     "BidList",

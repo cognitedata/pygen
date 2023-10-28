@@ -16,10 +16,12 @@ def test_from_node_with_json() -> None:
     node = dm.Node(
         space="market",
         external_id="myExternalId",
-        version="1",
+        version=1,
         last_updated_time=0,
         created_time=0,
         properties=Properties({dm.ViewId("market", "myView", "1"): {"arguments": {"a": 1}, "method": "myMethod"}}),
+        deleted_time=None,
+        type=None,
     )
     expected = ValueTransformation(
         external_id="myExternalId",

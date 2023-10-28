@@ -28,8 +28,9 @@ def validate_data_classes(data_classes: list[DataClass]) -> None:
     ]
     if len(classes_with_version) > 1:
         warnings.warn(
-            f"The dataclasses: {classes_with_version}, this field will overwrite the node.version thus making "
-            f"it unavailable in the generated SDK.",
+            f"The view(s): {[c.view_id for c in classes_with_version]} have a field with property 'version'. "
+            "This field will overwrite the node.version thus making "
+            "it unavailable in the generated SDK.",
             stacklevel=2,
         )
     if conflicts := [data_class.view_id for data_class in data_classes if data_class.view_name == "core"]:

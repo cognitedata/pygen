@@ -1,13 +1,12 @@
 from datetime import datetime
 
-try:
+from tests.constants import IS_PYDANTIC_V2
+
+if IS_PYDANTIC_V2:
     from shop.client.data_classes import CaseApply, CommandConfigApply
-except AttributeError as e:
-    if "has no attribute 'model_rebuild" in str(e):
-        # is pydantic v1
-        from shop_pydantic_v1.client.data_classes import CaseApply, CommandConfigApply
-    else:
-        raise e
+else:
+    # is pydantic v1
+    from shop_pydantic_v1.client.data_classes import CaseApply, CommandConfigApply
 
 
 def test_to_instances_apply_case():

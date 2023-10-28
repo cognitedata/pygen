@@ -43,7 +43,7 @@ def load_field_test_cases():
         ),
         {},
         'Optional[list[str]] = Field(None, alias="runEvents")',
-        "Optional[list[str]] = None",
+        'Optional[list[str]] = Field(None, alias="runEvents")',
         id="PrimitiveListField that require alias.",
     )
     raw_data = {
@@ -75,7 +75,7 @@ def load_field_test_cases():
         ),
         {ViewSpaceExternalId("cogShop", "ModelTemplate"): data_class},
         'Optional[str] = Field(None, alias="modelTemplate")',
-        "Union[ModelTemplateApply, str, None] = Field(None, repr=False)",
+        'Union[ModelTemplateApply, str, None] = Field(None, repr=False, alias="modelTemplate")',
         id="EdgeField that require alias.",
     )
     raw_data = """

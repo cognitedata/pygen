@@ -1,3 +1,4 @@
+from ._core import DomainModel, DomainModelApply
 from ._actor import Actor, ActorApply, ActorApplyList, ActorFields, ActorList
 from ._best_director import (
     BestDirector,
@@ -44,6 +45,8 @@ PersonApply.model_rebuild()
 RoleApply.model_rebuild()
 
 __all__ = [
+    "DomainModel",
+    "DomainModelApply",
     "Actor",
     "ActorApply",
     "ActorList",

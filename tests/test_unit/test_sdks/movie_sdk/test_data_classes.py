@@ -4,28 +4,26 @@ import pytest
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Properties
 
-try:
+from tests.constants import IS_PYDANTIC_V2
+
+if IS_PYDANTIC_V2:
     from movie_domain.client import data_classes as movie
     from movie_domain.client.data_classes._core import unpack_properties
-except AttributeError as e:
-    if "has no attribute 'model_rebuild" in str(e):
-        # is pydantic v1
-        from movie_domain_pydantic_v1.client import data_classes as movie
-        from movie_domain_pydantic_v1.client.data_classes._core import unpack_properties
-    else:
-        raise e
+else:
+    from movie_domain_pydantic_v1.client import data_classes as movie
+    from movie_domain_pydantic_v1.client.data_classes._core import unpack_properties
 
 
 def test_person_from_node():
     # Arrange
     node = dm.Node.load(
         {
-            "instance_type": "node",
+            "instanceType": "node",
             "space": "IntegrationTestsImmutable",
-            "external_id": "person:christoph_waltz",
+            "externalId": "person:christoph_waltz",
             "version": 1,
-            "last_updated_time": 1684170308732,
-            "created_time": 1684170308732,
+            "lastUpdatedTime": 1684170308732,
+            "createdTime": 1684170308732,
             "properties": {"IntegrationTestsImmutable": {"Person/2": {"name": "Christoph Waltz", "birthYear": 1956}}},
         }
     )
@@ -41,12 +39,12 @@ def test_person_to_pandas():
     # Arrange
     node = dm.Node.load(
         {
-            "instance_type": "node",
+            "instanceType": "node",
             "space": "IntegrationTestsImmutable",
-            "external_id": "person:christoph_waltz",
+            "externalId": "person:christoph_waltz",
             "version": 1,
-            "last_updated_time": 1684170308732,
-            "created_time": 1684170308732,
+            "lastUpdatedTime": 1684170308732,
+            "createdTime": 1684170308732,
             "properties": {"IntegrationTestsImmutable": {"Person/2": {"name": "Christoph Waltz", "birthYear": 1956}}},
         }
     )

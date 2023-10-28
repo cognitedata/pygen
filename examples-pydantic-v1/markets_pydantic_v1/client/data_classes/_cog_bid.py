@@ -53,7 +53,7 @@ class CogBidApply(DomainModelApply):
     market: Union[MarketApply, str, None] = Field(None, repr=False)
     name: Optional[str] = None
     price: Optional[float] = None
-    price_area: Optional[str] = None
+    price_area: Optional[str] = Field(None, alias="priceArea")
     quantity: Optional[int] = None
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:

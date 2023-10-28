@@ -50,7 +50,9 @@ class PygenProcess(DomainModel):
 class PygenProcessApply(DomainModelApply):
     space: str = "market"
     bid: Union[BidApply, str, None] = Field(None, repr=False)
-    date_transformations: Union[DateTransformationPairApply, str, None] = Field(None, repr=False)
+    date_transformations: Union[DateTransformationPairApply, str, None] = Field(
+        None, repr=False, alias="dateTransformations"
+    )
     name: Optional[str] = None
     transformation: Union[ValueTransformationApply, str, None] = Field(None, repr=False)
 

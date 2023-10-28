@@ -39,7 +39,7 @@ class Person(DomainModel):
 
 class PersonApply(DomainModelApply):
     space: str = "IntegrationTestsImmutable"
-    birth_year: Optional[int] = None
+    birth_year: Optional[int] = Field(None, alias="birthYear")
     name: str
     roles: Union[list[RoleApply], list[str], None] = Field(default=None, repr=False)
 
