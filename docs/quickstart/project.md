@@ -1,3 +1,12 @@
+**Prerequisites**
+
+- Access to a CDF Project.
+- Know how to install and setup `Python` using `poetry` and `pyproject.toml`.
+- Know how to use `git` for version control.
+- Know how to use a terminal, so you can run `pygen` from the command line to
+  generate the SDK.
+
+
 When you are ready to develop a solution based on a data model, you can use `pygen` to genrate a SDK that you check
 into version history. This SDK can be used by the developer team to interact with CDF.
 

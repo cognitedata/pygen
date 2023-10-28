@@ -10,9 +10,11 @@ theme:
 nav:
     - Home: index.md
     - Quickstart:
-        - CDF Hosted Notebook: quickstart/cdf_notebook.ipynb
-        - Local Notebook: quickstart/notebook.ipynb
-        - Python Application: quickstart/project.md
+        - Where to Start: quickstart/where_to_start.md
+        - Exploration CDF Notebook: quickstart/cdf_notebook.ipynb
+        - Exploration Local Notebook: quickstart/notebook.ipynb
+        - Building Solution: quickstart/project.md
+        - Data Population (Ingestion): quickstart/ingestion.ipynb
     - Installation: installation.md
     - CLI: cli.md
     - Examples:
@@ -29,6 +31,7 @@ nav:
         - Utilities:
             - CDF: api/utils_cdf.md
             - Text: api/utils_text.md
+            - ExternalID Factories: api/utils_external_id_factory.md
     - Changelog: CHANGELOG.md
 
 markdown_extensions:
