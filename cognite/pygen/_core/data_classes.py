@@ -196,18 +196,12 @@ class PrimitiveField(PrimitiveFieldCore):
 
     def as_write_type_hint(self) -> str:
         # TODO: 231009 pa: need alias for write type hints too
-        if self.need_alias:
-            out_type = self.type_
-            if self.is_nullable:
-                out_type = f"Optional[{self.type_}] = {self.pydantic_field}({self.default}, alias='{self.prop_name}')"
-            else:
-                out_type = f"Optional[{self.type_}] = {self.pydantic_field}(alias='{self.prop_name}')"
-            return out_type
-        else:
-            out_type = self.type_
-            if self.is_nullable:
-                out_type = f"Optional[{out_type}] = {self.default}"
-            return out_type
+        # if self.need_alias:
+        #     if self.is_nullable:
+        out_type = self.type_
+        if self.is_nullable:
+            out_type = f"Optional[{out_type}] = {self.default}"
+        return out_type
 
 
 @dataclass(frozen=True)
@@ -224,17 +218,13 @@ class PrimitiveListField(PrimitiveFieldCore):
             return f"Optional[list[{self.type_}]] = None"
 
     def as_write_type_hint(self) -> str:
-        # TODO: 231009 pa: need alias for write type hints too
-        if self.need_alias:
-            if self.is_nullable:
-                return f"Optional[list[{self.type_}]] = {self.pydantic_field}(None, alias='{self.prop_name}')"
-            else:
-                return f"list[{self.type_}] = {self.pydantic_field}(alias='{self.prop_name}')"
+        # # TODO: 231009 pa: need alias for write type hints too
+        # if self.need_alias:
+        #     if self.is_nullable:
+        if self.is_nullable:
+            return f"Optional[list[{self.type_}]] = None"
         else:
-            if self.is_nullable:
-                return f"Optional[list[{self.type_}]] = None"
-            else:
-                return f"list[{self.type_}]"
+            return f"list[{self.type_}]"
 
 
 @dataclass(frozen=True)

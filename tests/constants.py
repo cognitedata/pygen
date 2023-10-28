@@ -83,6 +83,12 @@ MOVIE_SDK = ExampleSDK(
     client_name="MovieClient",
 )
 
+OSDU_SDK = ExampleSDK(
+    data_models=[DataModelId("IntegrationTestsImmutable", "OSDUWells", "1")],
+    _top_level_package="osdu.client",
+    client_name="OSDUClient",
+)
+
 APM_SDK = ExampleSDK(
     data_models=[DataModelId("tutorial_apm_simple", "ApmSimple", "6")],
     _top_level_package="tutorial_apm_simple.client",
