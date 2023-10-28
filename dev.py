@@ -3,16 +3,17 @@ This is a small CLI used for development of Pygen.
 
 """
 import re
+
+import toml
 import typer
+from cognite.client._version import __version__ as cognite_sdk_version
+from cognite.client.data_classes.data_modeling import DataModel
+from pydantic.version import VERSION as PYDANTIC_VERSION
+from yaml import safe_dump, safe_load
 
 from cognite.pygen._generator import SDKGenerator, write_sdk_to_disk
 from cognite.pygen.utils.cdf import load_cognite_client_from_toml
 from tests.constants import EXAMPLE_SDKS, EXAMPLES_DIR, REPO_ROOT
-from cognite.client.data_classes.data_modeling import DataModel
-from yaml import safe_load, safe_dump
-import toml
-from cognite.client._version import __version__ as cognite_sdk_version
-from pydantic.version import VERSION as PYDANTIC_VERSION
 
 app = typer.Typer(
     add_completion=False,
@@ -64,7 +65,7 @@ def generate_sdks(
 
 @app.command("download", help="Download the DMS representation of all example SDKs")
 def download():
-    client = load_cognite_client_from_toml("config.toml")
+    client = load_cognite_client_from_toml("scripts/config.toml")
     for example_sdk in EXAMPLE_SDKS:
         for datamodel_id, dms_file in zip(example_sdk.data_models, example_sdk.dms_files):
             dms_model = client.data_modeling.data_models.retrieve(datamodel_id, inline_views=True)
@@ -98,7 +99,7 @@ def bump(major: bool = False, minor: bool = False, patch: bool = False, skip: bo
     api_client_files = api_client_files_v1 + api_client_files_v2
     current_version = toml.loads(pyproject_toml.read_text())["tool"]["poetry"]["version"]
 
-    current_major, current_minor, current_patch = [int(x) for x in current_version.split(".")]
+    current_major, current_minor, current_patch = (int(x) for x in current_version.split("."))
     if major:
         current_major += 1
         current_minor = 0
