@@ -21,18 +21,21 @@ T_TypeNode = TypeVar("T_TypeNode", bound=DomainModelApply)
 
 
 def clear_nested_dependencies(loaded: T_TypeNode, loaded_json: dict):
+    # Clean nested dependencies for easy comparison
+
     if IS_PYDANTIC_V2:
-        # Clean nested dependencies for easy comparison
-        for name, field in loaded.model_fields.items():
-            if not (
-                isinstance(value := getattr(loaded, name), DomainModelApply)
-                or (isinstance(value, list) and value and isinstance(value[0], DomainModelApply))
-            ):
-                continue
-            setattr(loaded, name, None)
-            loaded_json.pop(field.alias or name)
+        fields = loaded.model_fields.items()
     else:
-        raise NotImplementedError("Not implemented for pydantic v1")
+        fields = loaded.__fields__.items()
+
+    for name, field in fields:
+        if not (
+            isinstance(value := getattr(loaded, name), DomainModelApply)
+            or (isinstance(value, list) and value and isinstance(value[0], DomainModelApply))
+        ):
+            continue
+        setattr(loaded, name, None)
+        loaded_json.pop(field.alias or name)
 
 
 @pytest.mark.parametrize(
@@ -70,7 +73,7 @@ def test_load_wells_from_json(
         if IS_PYDANTIC_V2:
             assert json.loads(loaded.model_dump_json(by_alias=True, exclude=exclude, exclude_none=True)) == loaded_json
         else:
-            assert json.loads(loaded.json(by_alias=True, exclude=exclude, exclude_none=True)) == json.loads(raw_json)
+            assert json.loads(loaded.json(by_alias=True, exclude=exclude, exclude_none=True)) == loaded_json
 
         assert expected_node_count == len(created.nodes)
         assert expected_edge_count == len(created.edges)
