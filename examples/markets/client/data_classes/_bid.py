@@ -51,7 +51,7 @@ class BidApply(DomainModelApply):
         sources = []
         properties = {}
         if self.date is not None:
-            properties["date"] = self.date.isoformat()
+            properties["date"] = self.date.isoformat(timespec="milliseconds")
         if self.market is not None:
             properties["market"] = {
                 "space": "market",

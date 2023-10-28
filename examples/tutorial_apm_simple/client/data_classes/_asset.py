@@ -132,7 +132,7 @@ class AssetApply(DomainModelApply):
         if self.category_id is not None:
             properties["categoryId"] = self.category_id
         if self.created_date is not None:
-            properties["createdDate"] = self.created_date.isoformat()
+            properties["createdDate"] = self.created_date.isoformat(timespec="milliseconds")
         if self.description is not None:
             properties["description"] = self.description
         if self.documents is not None:
@@ -161,7 +161,7 @@ class AssetApply(DomainModelApply):
         if self.trajectory is not None:
             properties["trajectory"] = self.trajectory
         if self.updated_date is not None:
-            properties["updatedDate"] = self.updated_date.isoformat()
+            properties["updatedDate"] = self.updated_date.isoformat(timespec="milliseconds")
         if properties:
             source = dm.NodeOrEdgeData(
                 source=dm.ContainerId("tutorial_apm_simple", "Asset"),

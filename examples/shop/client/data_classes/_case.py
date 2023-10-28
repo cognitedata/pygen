@@ -94,7 +94,7 @@ class CaseApply(DomainModelApply):
         if self.cut_files is not None:
             properties["cut_files"] = self.cut_files
         if self.end_time is not None:
-            properties["end_time"] = self.end_time.isoformat()
+            properties["end_time"] = self.end_time.isoformat(timespec="milliseconds")
         if self.name is not None:
             properties["name"] = self.name
         if self.run_status is not None:
@@ -102,7 +102,7 @@ class CaseApply(DomainModelApply):
         if self.scenario is not None:
             properties["scenario"] = self.scenario
         if self.start_time is not None:
-            properties["start_time"] = self.start_time.isoformat()
+            properties["start_time"] = self.start_time.isoformat(timespec="milliseconds")
         if properties:
             source = dm.NodeOrEdgeData(
                 source=dm.ContainerId("IntegrationTestsImmutable", "Case"),
