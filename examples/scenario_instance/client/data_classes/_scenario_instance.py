@@ -82,7 +82,7 @@ class ScenarioInstanceApply(DomainModelApply):
         if self.country is not None:
             properties["country"] = self.country
         if self.instance is not None:
-            properties["instance"] = self.instance.isoformat()
+            properties["instance"] = self.instance.isoformat(timespec="milliseconds")
         if self.market is not None:
             properties["market"] = self.market
         if self.price_area is not None:
@@ -92,7 +92,7 @@ class ScenarioInstanceApply(DomainModelApply):
         if self.scenario is not None:
             properties["scenario"] = self.scenario
         if self.start is not None:
-            properties["start"] = self.start.isoformat()
+            properties["start"] = self.start.isoformat(timespec="milliseconds")
         if properties:
             source = dm.NodeOrEdgeData(
                 source=dm.ContainerId("IntegrationTestsImmutable", "ScenarioInstance"),

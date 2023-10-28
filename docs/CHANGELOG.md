@@ -13,6 +13,11 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.27.1] - 28-10-23
+### Fixed
+* Pygen automatically converts `datetime` to `datetime.datetime` in the generated SDK to the timespec (milliseconds)
+  used by the API when writing to CDF
+
 ## [0.27.0] - 28-10-23
 ### Added
 * Hook for `external_id` factory method in generated SDK. This allows for custom external id generation. This is useful

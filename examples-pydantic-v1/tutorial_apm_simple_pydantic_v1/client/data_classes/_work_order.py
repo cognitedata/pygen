@@ -160,15 +160,15 @@ class WorkOrderApply(DomainModelApply):
         if self.actual_hours is not None:
             properties["actualHours"] = self.actual_hours
         if self.created_date is not None:
-            properties["createdDate"] = self.created_date.isoformat()
+            properties["createdDate"] = self.created_date.isoformat(timespec="milliseconds")
         if self.description is not None:
             properties["description"] = self.description
         if self.due_date is not None:
-            properties["dueDate"] = self.due_date.isoformat()
+            properties["dueDate"] = self.due_date.isoformat(timespec="milliseconds")
         if self.duration_hours is not None:
             properties["durationHours"] = self.duration_hours
         if self.end_time is not None:
-            properties["endTime"] = self.end_time.isoformat()
+            properties["endTime"] = self.end_time.isoformat(timespec="milliseconds")
         if self.is_active is not None:
             properties["isActive"] = self.is_active
         if self.is_cancelled is not None:
@@ -180,13 +180,13 @@ class WorkOrderApply(DomainModelApply):
         if self.percentage_progress is not None:
             properties["percentageProgress"] = self.percentage_progress
         if self.planned_start is not None:
-            properties["plannedStart"] = self.planned_start.isoformat()
+            properties["plannedStart"] = self.planned_start.isoformat(timespec="milliseconds")
         if self.priority_description is not None:
             properties["priorityDescription"] = self.priority_description
         if self.program_number is not None:
             properties["programNumber"] = self.program_number
         if self.start_time is not None:
-            properties["startTime"] = self.start_time.isoformat()
+            properties["startTime"] = self.start_time.isoformat(timespec="milliseconds")
         if self.status is not None:
             properties["status"] = self.status
         if self.title is not None:
