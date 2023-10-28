@@ -32,6 +32,7 @@ from ._available_trajectory_station_properties import (
     AvailableTrajectoryStationPropertiesList,
     AvailableTrajectoryStationPropertiesTextFields,
 )
+from ._core import DomainModelApply, DomainModel
 from ._drilling_reasons import (
     DrillingReasons,
     DrillingReasonsApply,
@@ -250,6 +251,8 @@ WellboreTrajectoryDataApply.model_rebuild()
 WgsCoordinatesApply.model_rebuild()
 
 __all__ = [
+    "DomainModelApply",
+    "DomainModel",
     "AcceptableUsage",
     "AcceptableUsageApply",
     "AcceptableUsageList",
