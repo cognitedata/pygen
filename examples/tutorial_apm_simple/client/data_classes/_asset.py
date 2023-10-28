@@ -108,7 +108,7 @@ class AssetApply(DomainModelApply):
     created_date: Optional[datetime.datetime] = None
     description: Optional[str] = None
     documents: Optional[list[str]] = None
-    in_model_3_d: Union[list[CdfModelApply], list[str], None] = Field(default=None, repr=False)
+    in_model_3_d: Union[list[CdfModelApply], list[str], None] = Field(default=None, repr=False, alias="inModel3d")
     is_active: Optional[bool] = None
     is_critical_line: Optional[bool] = None
     measurements: Optional[list[str]] = None

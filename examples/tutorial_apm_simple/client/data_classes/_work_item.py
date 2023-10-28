@@ -67,11 +67,11 @@ class WorkItemApply(DomainModelApply):
     is_completed: Optional[bool] = None
     item_info: Optional[str] = None
     item_name: Optional[str] = None
-    linked_assets: Union[list[AssetApply], list[str], None] = Field(default=None, repr=False)
+    linked_assets: Union[list[AssetApply], list[str], None] = Field(default=None, repr=False, alias="linkedAssets")
     method: Optional[str] = None
     title: Optional[str] = None
     to_be_done: Optional[bool] = None
-    work_order: Union[WorkOrderApply, str, None] = Field(None, repr=False)
+    work_order: Union[WorkOrderApply, str, None] = Field(None, repr=False, alias="workOrder")
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:

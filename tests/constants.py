@@ -85,7 +85,7 @@ MOVIE_SDK = ExampleSDK(
 
 OSDU_SDK = ExampleSDK(
     data_models=[DataModelId("IntegrationTestsImmutable", "OSDUWells", "1")],
-    _top_level_package="osdu.client",
+    _top_level_package="osdu_wells.client",
     client_name="OSDUClient",
 )
 
@@ -108,7 +108,7 @@ SCENARIO_INSTANCE_SDK = ExampleSDK(
     client_name="ScenarioInstanceClient",
 )
 
-# The following files are manually controlled and should not be overwritten by the generator.
+# The following files are manually controlled and should not be overwritten by the generator by default.
 
 
 class MarketSDKFiles:
