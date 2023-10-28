@@ -4,13 +4,12 @@ import datetime
 from abc import abstractmethod
 from collections import UserList
 from collections.abc import Collection, Mapping, Iterator
-from typing import Any, Generic, Optional, TypeVar, overload, Callable, ClassVar
+from typing import Any, Callable, ClassVar, Generic, Optional, TypeVar, overload
 
 import pandas as pd
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Properties, PropertyValue
-from pydantic import BaseModel, Extra, Field, field_validator, model_validator
-from typing_extensions import Self
+from pydantic import BaseModel, Extra, Field, model_validator
 
 
 class DomainModelCore(BaseModel):
@@ -49,7 +48,7 @@ T_TypeNode = TypeVar("T_TypeNode", bound=DomainModel)
 
 
 class DomainModelApply(DomainModelCore, extra=Extra.forbid, populate_by_name=True):
-    external_id_factory: ClassVar[Optional[Callable[[type, dict], str]]] = Field(None, repr=False)
+    external_id_factory: ClassVar[Optional[Callable[[type[DomainModelApply], dict], str]]] = None
     existing_version: Optional[int] = None
 
     def to_instances_apply(self) -> dm.InstancesApply:
