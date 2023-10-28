@@ -48,7 +48,7 @@ T_TypeNode = TypeVar("T_TypeNode", bound=DomainModel)
 
 
 class DomainModelApply(DomainModelCore, extra=Extra.forbid, populate_by_name=True):
-    external_id_factory: ClassVar[Optional[Callable[[type[DomainModelApply], dict], str]]] = Field(None, repr=False)
+    external_id_factory: ClassVar[Optional[Callable[[type[DomainModelApply], dict], str]]] = None
     existing_version: Optional[int] = None
 
     def to_instances_apply(self) -> dm.InstancesApply:
