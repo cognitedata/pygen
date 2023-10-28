@@ -118,7 +118,7 @@
           external_id: DateTransformationPair.start
           space: market
     space: market
-    used_for: node
+    used_for: all
     version: 310f933a9aca9b
     writable: false
   - created_time: 1689328127900

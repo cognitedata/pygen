@@ -163,4 +163,4 @@ class ScenarioInstanceFiles:
     scenario_instance_api = api / "scenario_instance.py"
 
 
-EXAMPLE_SDKS = [MARKET_SDK, SHOP_SDK, MOVIE_SDK, APM_SDK, PUMP_SDK, SCENARIO_INSTANCE_SDK]
+EXAMPLE_SDKS = [var for var in locals().values() if isinstance(var, ExampleSDK)]

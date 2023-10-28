@@ -65,7 +65,7 @@ def generate_sdks(
 
 @app.command("download", help="Download the DMS representation of all example SDKs")
 def download():
-    client = load_cognite_client_from_toml("scripts/config.toml")
+    client = load_cognite_client_from_toml("config.toml")
     for example_sdk in EXAMPLE_SDKS:
         for datamodel_id, dms_file in zip(example_sdk.data_models, example_sdk.dms_files):
             dms_model = client.data_modeling.data_models.retrieve(datamodel_id, inline_views=True)
