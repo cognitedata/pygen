@@ -47,7 +47,7 @@ class DomainModel(DomainModelCore):
 T_TypeNode = TypeVar("T_TypeNode", bound=DomainModel)
 
 
-class DomainModelApply(DomainModelCore, extra=Extra.forbid):
+class DomainModelApply(DomainModelCore, extra=Extra.forbid, populate_by_name=True):
     existing_version: Optional[int] = None
 
     def to_instances_apply(self) -> dm.InstancesApply:
