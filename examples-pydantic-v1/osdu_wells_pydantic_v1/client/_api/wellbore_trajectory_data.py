@@ -1,0 +1,2001 @@
+from __future__ import annotations
+
+from collections import defaultdict
+from typing import Dict, List, Sequence, Tuple, overload
+
+from cognite.client import CogniteClient
+from cognite.client import data_modeling as dm
+from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
+
+from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
+from osdu_wells_pydantic_v1.client.data_classes import (
+    WellboreTrajectoryData,
+    WellboreTrajectoryDataApply,
+    WellboreTrajectoryDataList,
+    WellboreTrajectoryDataApplyList,
+    WellboreTrajectoryDataFields,
+    WellboreTrajectoryDataTextFields,
+)
+from osdu_wells_pydantic_v1.client.data_classes._wellbore_trajectory_data import (
+    _WELLBORETRAJECTORYDATA_PROPERTIES_BY_FIELD,
+)
+
+
+class WellboreTrajectoryDataArtefactsAPI:
+    def __init__(self, client: CogniteClient):
+        self._client = client
+
+    def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        f = dm.filters
+        is_edge_type = f.Equals(
+            ["edge", "type"],
+            {"space": space, "externalId": "WellboreTrajectoryData.Artefacts"},
+        )
+        if isinstance(external_id, str):
+            is_wellbore_trajectory_datum = f.Equals(
+                ["edge", "startNode"],
+                {"space": space, "externalId": external_id},
+            )
+            return self._client.data_modeling.instances.list(
+                "edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_trajectory_datum)
+            )
+
+        else:
+            is_wellbore_trajectory_data = f.In(
+                ["edge", "startNode"],
+                [{"space": space, "externalId": ext_id} for ext_id in external_id],
+            )
+            return self._client.data_modeling.instances.list(
+                "edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_trajectory_data)
+            )
+
+    def list(
+        self,
+        wellbore_trajectory_datum_id: str | list[str] | None = None,
+        limit=DEFAULT_LIMIT_READ,
+        space="IntegrationTestsImmutable",
+    ) -> dm.EdgeList:
+        f = dm.filters
+        filters = []
+        is_edge_type = f.Equals(
+            ["edge", "type"],
+            {"space": space, "externalId": "WellboreTrajectoryData.Artefacts"},
+        )
+        filters.append(is_edge_type)
+        if wellbore_trajectory_datum_id:
+            wellbore_trajectory_datum_ids = (
+                [wellbore_trajectory_datum_id]
+                if isinstance(wellbore_trajectory_datum_id, str)
+                else wellbore_trajectory_datum_id
+            )
+            is_wellbore_trajectory_data = f.In(
+                ["edge", "startNode"],
+                [{"space": space, "externalId": ext_id} for ext_id in wellbore_trajectory_datum_ids],
+            )
+            filters.append(is_wellbore_trajectory_data)
+
+        return self._client.data_modeling.instances.list("edge", limit=limit, filter=f.And(*filters))
+
+
+class WellboreTrajectoryDataAvailableTrajectoryStationPropertiesAPI:
+    def __init__(self, client: CogniteClient):
+        self._client = client
+
+    def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        f = dm.filters
+        is_edge_type = f.Equals(
+            ["edge", "type"],
+            {"space": space, "externalId": "WellboreTrajectoryData.AvailableTrajectoryStationProperties"},
+        )
+        if isinstance(external_id, str):
+            is_wellbore_trajectory_datum = f.Equals(
+                ["edge", "startNode"],
+                {"space": space, "externalId": external_id},
+            )
+            return self._client.data_modeling.instances.list(
+                "edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_trajectory_datum)
+            )
+
+        else:
+            is_wellbore_trajectory_data = f.In(
+                ["edge", "startNode"],
+                [{"space": space, "externalId": ext_id} for ext_id in external_id],
+            )
+            return self._client.data_modeling.instances.list(
+                "edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_trajectory_data)
+            )
+
+    def list(
+        self,
+        wellbore_trajectory_datum_id: str | list[str] | None = None,
+        limit=DEFAULT_LIMIT_READ,
+        space="IntegrationTestsImmutable",
+    ) -> dm.EdgeList:
+        f = dm.filters
+        filters = []
+        is_edge_type = f.Equals(
+            ["edge", "type"],
+            {"space": space, "externalId": "WellboreTrajectoryData.AvailableTrajectoryStationProperties"},
+        )
+        filters.append(is_edge_type)
+        if wellbore_trajectory_datum_id:
+            wellbore_trajectory_datum_ids = (
+                [wellbore_trajectory_datum_id]
+                if isinstance(wellbore_trajectory_datum_id, str)
+                else wellbore_trajectory_datum_id
+            )
+            is_wellbore_trajectory_data = f.In(
+                ["edge", "startNode"],
+                [{"space": space, "externalId": ext_id} for ext_id in wellbore_trajectory_datum_ids],
+            )
+            filters.append(is_wellbore_trajectory_data)
+
+        return self._client.data_modeling.instances.list("edge", limit=limit, filter=f.And(*filters))
+
+
+class WellboreTrajectoryDataGeoContextsAPI:
+    def __init__(self, client: CogniteClient):
+        self._client = client
+
+    def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        f = dm.filters
+        is_edge_type = f.Equals(
+            ["edge", "type"],
+            {"space": space, "externalId": "WellboreTrajectoryData.GeoContexts"},
+        )
+        if isinstance(external_id, str):
+            is_wellbore_trajectory_datum = f.Equals(
+                ["edge", "startNode"],
+                {"space": space, "externalId": external_id},
+            )
+            return self._client.data_modeling.instances.list(
+                "edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_trajectory_datum)
+            )
+
+        else:
+            is_wellbore_trajectory_data = f.In(
+                ["edge", "startNode"],
+                [{"space": space, "externalId": ext_id} for ext_id in external_id],
+            )
+            return self._client.data_modeling.instances.list(
+                "edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_trajectory_data)
+            )
+
+    def list(
+        self,
+        wellbore_trajectory_datum_id: str | list[str] | None = None,
+        limit=DEFAULT_LIMIT_READ,
+        space="IntegrationTestsImmutable",
+    ) -> dm.EdgeList:
+        f = dm.filters
+        filters = []
+        is_edge_type = f.Equals(
+            ["edge", "type"],
+            {"space": space, "externalId": "WellboreTrajectoryData.GeoContexts"},
+        )
+        filters.append(is_edge_type)
+        if wellbore_trajectory_datum_id:
+            wellbore_trajectory_datum_ids = (
+                [wellbore_trajectory_datum_id]
+                if isinstance(wellbore_trajectory_datum_id, str)
+                else wellbore_trajectory_datum_id
+            )
+            is_wellbore_trajectory_data = f.In(
+                ["edge", "startNode"],
+                [{"space": space, "externalId": ext_id} for ext_id in wellbore_trajectory_datum_ids],
+            )
+            filters.append(is_wellbore_trajectory_data)
+
+        return self._client.data_modeling.instances.list("edge", limit=limit, filter=f.And(*filters))
+
+
+class WellboreTrajectoryDataLineageAssertionsAPI:
+    def __init__(self, client: CogniteClient):
+        self._client = client
+
+    def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        f = dm.filters
+        is_edge_type = f.Equals(
+            ["edge", "type"],
+            {"space": space, "externalId": "WellboreTrajectoryData.LineageAssertions"},
+        )
+        if isinstance(external_id, str):
+            is_wellbore_trajectory_datum = f.Equals(
+                ["edge", "startNode"],
+                {"space": space, "externalId": external_id},
+            )
+            return self._client.data_modeling.instances.list(
+                "edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_trajectory_datum)
+            )
+
+        else:
+            is_wellbore_trajectory_data = f.In(
+                ["edge", "startNode"],
+                [{"space": space, "externalId": ext_id} for ext_id in external_id],
+            )
+            return self._client.data_modeling.instances.list(
+                "edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_trajectory_data)
+            )
+
+    def list(
+        self,
+        wellbore_trajectory_datum_id: str | list[str] | None = None,
+        limit=DEFAULT_LIMIT_READ,
+        space="IntegrationTestsImmutable",
+    ) -> dm.EdgeList:
+        f = dm.filters
+        filters = []
+        is_edge_type = f.Equals(
+            ["edge", "type"],
+            {"space": space, "externalId": "WellboreTrajectoryData.LineageAssertions"},
+        )
+        filters.append(is_edge_type)
+        if wellbore_trajectory_datum_id:
+            wellbore_trajectory_datum_ids = (
+                [wellbore_trajectory_datum_id]
+                if isinstance(wellbore_trajectory_datum_id, str)
+                else wellbore_trajectory_datum_id
+            )
+            is_wellbore_trajectory_data = f.In(
+                ["edge", "startNode"],
+                [{"space": space, "externalId": ext_id} for ext_id in wellbore_trajectory_datum_ids],
+            )
+            filters.append(is_wellbore_trajectory_data)
+
+        return self._client.data_modeling.instances.list("edge", limit=limit, filter=f.And(*filters))
+
+
+class WellboreTrajectoryDataNameAliasesAPI:
+    def __init__(self, client: CogniteClient):
+        self._client = client
+
+    def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        f = dm.filters
+        is_edge_type = f.Equals(
+            ["edge", "type"],
+            {"space": space, "externalId": "WellboreTrajectoryData.NameAliases"},
+        )
+        if isinstance(external_id, str):
+            is_wellbore_trajectory_datum = f.Equals(
+                ["edge", "startNode"],
+                {"space": space, "externalId": external_id},
+            )
+            return self._client.data_modeling.instances.list(
+                "edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_trajectory_datum)
+            )
+
+        else:
+            is_wellbore_trajectory_data = f.In(
+                ["edge", "startNode"],
+                [{"space": space, "externalId": ext_id} for ext_id in external_id],
+            )
+            return self._client.data_modeling.instances.list(
+                "edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_trajectory_data)
+            )
+
+    def list(
+        self,
+        wellbore_trajectory_datum_id: str | list[str] | None = None,
+        limit=DEFAULT_LIMIT_READ,
+        space="IntegrationTestsImmutable",
+    ) -> dm.EdgeList:
+        f = dm.filters
+        filters = []
+        is_edge_type = f.Equals(
+            ["edge", "type"],
+            {"space": space, "externalId": "WellboreTrajectoryData.NameAliases"},
+        )
+        filters.append(is_edge_type)
+        if wellbore_trajectory_datum_id:
+            wellbore_trajectory_datum_ids = (
+                [wellbore_trajectory_datum_id]
+                if isinstance(wellbore_trajectory_datum_id, str)
+                else wellbore_trajectory_datum_id
+            )
+            is_wellbore_trajectory_data = f.In(
+                ["edge", "startNode"],
+                [{"space": space, "externalId": ext_id} for ext_id in wellbore_trajectory_datum_ids],
+            )
+            filters.append(is_wellbore_trajectory_data)
+
+        return self._client.data_modeling.instances.list("edge", limit=limit, filter=f.And(*filters))
+
+
+class WellboreTrajectoryDataTechnicalAssurancesAPI:
+    def __init__(self, client: CogniteClient):
+        self._client = client
+
+    def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        f = dm.filters
+        is_edge_type = f.Equals(
+            ["edge", "type"],
+            {"space": space, "externalId": "WellboreTrajectoryData.TechnicalAssurances"},
+        )
+        if isinstance(external_id, str):
+            is_wellbore_trajectory_datum = f.Equals(
+                ["edge", "startNode"],
+                {"space": space, "externalId": external_id},
+            )
+            return self._client.data_modeling.instances.list(
+                "edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_trajectory_datum)
+            )
+
+        else:
+            is_wellbore_trajectory_data = f.In(
+                ["edge", "startNode"],
+                [{"space": space, "externalId": ext_id} for ext_id in external_id],
+            )
+            return self._client.data_modeling.instances.list(
+                "edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_trajectory_data)
+            )
+
+    def list(
+        self,
+        wellbore_trajectory_datum_id: str | list[str] | None = None,
+        limit=DEFAULT_LIMIT_READ,
+        space="IntegrationTestsImmutable",
+    ) -> dm.EdgeList:
+        f = dm.filters
+        filters = []
+        is_edge_type = f.Equals(
+            ["edge", "type"],
+            {"space": space, "externalId": "WellboreTrajectoryData.TechnicalAssurances"},
+        )
+        filters.append(is_edge_type)
+        if wellbore_trajectory_datum_id:
+            wellbore_trajectory_datum_ids = (
+                [wellbore_trajectory_datum_id]
+                if isinstance(wellbore_trajectory_datum_id, str)
+                else wellbore_trajectory_datum_id
+            )
+            is_wellbore_trajectory_data = f.In(
+                ["edge", "startNode"],
+                [{"space": space, "externalId": ext_id} for ext_id in wellbore_trajectory_datum_ids],
+            )
+            filters.append(is_wellbore_trajectory_data)
+
+        return self._client.data_modeling.instances.list("edge", limit=limit, filter=f.And(*filters))
+
+
+class WellboreTrajectoryDataAPI(
+    TypeAPI[WellboreTrajectoryData, WellboreTrajectoryDataApply, WellboreTrajectoryDataList]
+):
+    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+        super().__init__(
+            client=client,
+            sources=view_id,
+            class_type=WellboreTrajectoryData,
+            class_apply_type=WellboreTrajectoryDataApply,
+            class_list=WellboreTrajectoryDataList,
+        )
+        self._view_id = view_id
+        self.artefacts = WellboreTrajectoryDataArtefactsAPI(client)
+        self.available_trajectory_station_properties = WellboreTrajectoryDataAvailableTrajectoryStationPropertiesAPI(
+            client
+        )
+        self.geo_contexts = WellboreTrajectoryDataGeoContextsAPI(client)
+        self.lineage_assertions = WellboreTrajectoryDataLineageAssertionsAPI(client)
+        self.name_aliases = WellboreTrajectoryDataNameAliasesAPI(client)
+        self.technical_assurances = WellboreTrajectoryDataTechnicalAssurancesAPI(client)
+
+    def apply(
+        self,
+        wellbore_trajectory_datum: WellboreTrajectoryDataApply | Sequence[WellboreTrajectoryDataApply],
+        replace: bool = False,
+    ) -> dm.InstancesApplyResult:
+        if isinstance(wellbore_trajectory_datum, WellboreTrajectoryDataApply):
+            instances = wellbore_trajectory_datum.to_instances_apply()
+        else:
+            instances = WellboreTrajectoryDataApplyList(wellbore_trajectory_datum).to_instances_apply()
+        return self._client.data_modeling.instances.apply(
+            nodes=instances.nodes,
+            edges=instances.edges,
+            auto_create_start_nodes=True,
+            auto_create_end_nodes=True,
+            replace=replace,
+        )
+
+    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+        if isinstance(external_id, str):
+            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
+        else:
+            return self._client.data_modeling.instances.delete(
+                nodes=[(space, id) for id in external_id],
+            )
+
+    @overload
+    def retrieve(self, external_id: str) -> WellboreTrajectoryData:
+        ...
+
+    @overload
+    def retrieve(self, external_id: Sequence[str]) -> WellboreTrajectoryDataList:
+        ...
+
+    def retrieve(self, external_id: str | Sequence[str]) -> WellboreTrajectoryData | WellboreTrajectoryDataList:
+        if isinstance(external_id, str):
+            wellbore_trajectory_datum = self._retrieve((self._sources.space, external_id))
+
+            artefact_edges = self.artefacts.retrieve(external_id)
+            wellbore_trajectory_datum.artefacts = [edge.end_node.external_id for edge in artefact_edges]
+            available_trajectory_station_property_edges = self.available_trajectory_station_properties.retrieve(
+                external_id
+            )
+            wellbore_trajectory_datum.available_trajectory_station_properties = [
+                edge.end_node.external_id for edge in available_trajectory_station_property_edges
+            ]
+            geo_context_edges = self.geo_contexts.retrieve(external_id)
+            wellbore_trajectory_datum.geo_contexts = [edge.end_node.external_id for edge in geo_context_edges]
+            lineage_assertion_edges = self.lineage_assertions.retrieve(external_id)
+            wellbore_trajectory_datum.lineage_assertions = [
+                edge.end_node.external_id for edge in lineage_assertion_edges
+            ]
+            name_alias_edges = self.name_aliases.retrieve(external_id)
+            wellbore_trajectory_datum.name_aliases = [edge.end_node.external_id for edge in name_alias_edges]
+            technical_assurance_edges = self.technical_assurances.retrieve(external_id)
+            wellbore_trajectory_datum.technical_assurances = [
+                edge.end_node.external_id for edge in technical_assurance_edges
+            ]
+
+            return wellbore_trajectory_datum
+        else:
+            wellbore_trajectory_data = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+
+            artefact_edges = self.artefacts.retrieve(external_id)
+            self._set_artefacts(wellbore_trajectory_data, artefact_edges)
+            available_trajectory_station_property_edges = self.available_trajectory_station_properties.retrieve(
+                external_id
+            )
+            self._set_available_trajectory_station_properties(
+                wellbore_trajectory_data, available_trajectory_station_property_edges
+            )
+            geo_context_edges = self.geo_contexts.retrieve(external_id)
+            self._set_geo_contexts(wellbore_trajectory_data, geo_context_edges)
+            lineage_assertion_edges = self.lineage_assertions.retrieve(external_id)
+            self._set_lineage_assertions(wellbore_trajectory_data, lineage_assertion_edges)
+            name_alias_edges = self.name_aliases.retrieve(external_id)
+            self._set_name_aliases(wellbore_trajectory_data, name_alias_edges)
+            technical_assurance_edges = self.technical_assurances.retrieve(external_id)
+            self._set_technical_assurances(wellbore_trajectory_data, technical_assurance_edges)
+
+            return wellbore_trajectory_data
+
+    def search(
+        self,
+        query: str,
+        properties: WellboreTrajectoryDataTextFields | Sequence[WellboreTrajectoryDataTextFields] | None = None,
+        acquisition_date: str | list[str] | None = None,
+        acquisition_date_prefix: str | None = None,
+        acquisition_remark: str | list[str] | None = None,
+        acquisition_remark_prefix: str | None = None,
+        active_indicator: bool | None = None,
+        applied_operations_date_time: str | list[str] | None = None,
+        applied_operations_date_time_prefix: str | None = None,
+        applied_operations_remarks: str | list[str] | None = None,
+        applied_operations_remarks_prefix: str | None = None,
+        applied_operations_user: str | list[str] | None = None,
+        applied_operations_user_prefix: str | None = None,
+        azimuth_reference_type: str | list[str] | None = None,
+        azimuth_reference_type_prefix: str | None = None,
+        min_base_depth_measured_depth: int | None = None,
+        max_base_depth_measured_depth: int | None = None,
+        calculation_method_type: str | list[str] | None = None,
+        calculation_method_type_prefix: str | None = None,
+        company_id: str | list[str] | None = None,
+        company_id_prefix: str | None = None,
+        creation_date_time: str | list[str] | None = None,
+        creation_date_time_prefix: str | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        end_date_time: str | list[str] | None = None,
+        end_date_time_prefix: str | None = None,
+        existence_kind: str | list[str] | None = None,
+        existence_kind_prefix: str | None = None,
+        min_extrapolated_measured_depth: int | None = None,
+        max_extrapolated_measured_depth: int | None = None,
+        extrapolated_measured_depth_remark: str | list[str] | None = None,
+        extrapolated_measured_depth_remark_prefix: str | None = None,
+        geographic_crsid: str | list[str] | None = None,
+        geographic_crsid_prefix: str | None = None,
+        is_discoverable: bool | None = None,
+        is_extended_load: bool | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        projected_crsid: str | list[str] | None = None,
+        projected_crsid_prefix: str | None = None,
+        resource_curation_status: str | list[str] | None = None,
+        resource_curation_status_prefix: str | None = None,
+        resource_home_region_id: str | list[str] | None = None,
+        resource_home_region_id_prefix: str | None = None,
+        resource_lifecycle_status: str | list[str] | None = None,
+        resource_lifecycle_status_prefix: str | None = None,
+        resource_security_classification: str | list[str] | None = None,
+        resource_security_classification_prefix: str | None = None,
+        service_company_id: str | list[str] | None = None,
+        service_company_id_prefix: str | None = None,
+        source: str | list[str] | None = None,
+        source_prefix: str | None = None,
+        spatial_area: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        spatial_point: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        start_date_time: str | list[str] | None = None,
+        start_date_time_prefix: str | None = None,
+        submitter_name: str | list[str] | None = None,
+        submitter_name_prefix: str | None = None,
+        min_surface_grid_convergence: float | None = None,
+        max_surface_grid_convergence: float | None = None,
+        min_surface_scale_factor: float | None = None,
+        max_surface_scale_factor: float | None = None,
+        survey_reference_identifier: str | list[str] | None = None,
+        survey_reference_identifier_prefix: str | None = None,
+        survey_tool_type_id: str | list[str] | None = None,
+        survey_tool_type_id_prefix: str | None = None,
+        survey_type: str | list[str] | None = None,
+        survey_type_prefix: str | None = None,
+        survey_version: str | list[str] | None = None,
+        survey_version_prefix: str | None = None,
+        min_tie_measured_depth: int | None = None,
+        max_tie_measured_depth: int | None = None,
+        min_tie_true_vertical_depth: int | None = None,
+        max_tie_true_vertical_depth: int | None = None,
+        min_top_depth_measured_depth: int | None = None,
+        max_top_depth_measured_depth: int | None = None,
+        min_tortuosity: float | None = None,
+        max_tortuosity: float | None = None,
+        vertical_measurement: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        wellbore_id: str | list[str] | None = None,
+        wellbore_id_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> WellboreTrajectoryDataList:
+        filter_ = _create_filter(
+            self._view_id,
+            acquisition_date,
+            acquisition_date_prefix,
+            acquisition_remark,
+            acquisition_remark_prefix,
+            active_indicator,
+            applied_operations_date_time,
+            applied_operations_date_time_prefix,
+            applied_operations_remarks,
+            applied_operations_remarks_prefix,
+            applied_operations_user,
+            applied_operations_user_prefix,
+            azimuth_reference_type,
+            azimuth_reference_type_prefix,
+            min_base_depth_measured_depth,
+            max_base_depth_measured_depth,
+            calculation_method_type,
+            calculation_method_type_prefix,
+            company_id,
+            company_id_prefix,
+            creation_date_time,
+            creation_date_time_prefix,
+            description,
+            description_prefix,
+            end_date_time,
+            end_date_time_prefix,
+            existence_kind,
+            existence_kind_prefix,
+            min_extrapolated_measured_depth,
+            max_extrapolated_measured_depth,
+            extrapolated_measured_depth_remark,
+            extrapolated_measured_depth_remark_prefix,
+            geographic_crsid,
+            geographic_crsid_prefix,
+            is_discoverable,
+            is_extended_load,
+            name,
+            name_prefix,
+            projected_crsid,
+            projected_crsid_prefix,
+            resource_curation_status,
+            resource_curation_status_prefix,
+            resource_home_region_id,
+            resource_home_region_id_prefix,
+            resource_lifecycle_status,
+            resource_lifecycle_status_prefix,
+            resource_security_classification,
+            resource_security_classification_prefix,
+            service_company_id,
+            service_company_id_prefix,
+            source,
+            source_prefix,
+            spatial_area,
+            spatial_point,
+            start_date_time,
+            start_date_time_prefix,
+            submitter_name,
+            submitter_name_prefix,
+            min_surface_grid_convergence,
+            max_surface_grid_convergence,
+            min_surface_scale_factor,
+            max_surface_scale_factor,
+            survey_reference_identifier,
+            survey_reference_identifier_prefix,
+            survey_tool_type_id,
+            survey_tool_type_id_prefix,
+            survey_type,
+            survey_type_prefix,
+            survey_version,
+            survey_version_prefix,
+            min_tie_measured_depth,
+            max_tie_measured_depth,
+            min_tie_true_vertical_depth,
+            max_tie_true_vertical_depth,
+            min_top_depth_measured_depth,
+            max_top_depth_measured_depth,
+            min_tortuosity,
+            max_tortuosity,
+            vertical_measurement,
+            wellbore_id,
+            wellbore_id_prefix,
+            external_id_prefix,
+            filter,
+        )
+        return self._search(
+            self._view_id, query, _WELLBORETRAJECTORYDATA_PROPERTIES_BY_FIELD, properties, filter_, limit
+        )
+
+    @overload
+    def aggregate(
+        self,
+        aggregations: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: WellboreTrajectoryDataFields | Sequence[WellboreTrajectoryDataFields] | None = None,
+        group_by: None = None,
+        query: str | None = None,
+        search_properties: WellboreTrajectoryDataTextFields | Sequence[WellboreTrajectoryDataTextFields] | None = None,
+        acquisition_date: str | list[str] | None = None,
+        acquisition_date_prefix: str | None = None,
+        acquisition_remark: str | list[str] | None = None,
+        acquisition_remark_prefix: str | None = None,
+        active_indicator: bool | None = None,
+        applied_operations_date_time: str | list[str] | None = None,
+        applied_operations_date_time_prefix: str | None = None,
+        applied_operations_remarks: str | list[str] | None = None,
+        applied_operations_remarks_prefix: str | None = None,
+        applied_operations_user: str | list[str] | None = None,
+        applied_operations_user_prefix: str | None = None,
+        azimuth_reference_type: str | list[str] | None = None,
+        azimuth_reference_type_prefix: str | None = None,
+        min_base_depth_measured_depth: int | None = None,
+        max_base_depth_measured_depth: int | None = None,
+        calculation_method_type: str | list[str] | None = None,
+        calculation_method_type_prefix: str | None = None,
+        company_id: str | list[str] | None = None,
+        company_id_prefix: str | None = None,
+        creation_date_time: str | list[str] | None = None,
+        creation_date_time_prefix: str | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        end_date_time: str | list[str] | None = None,
+        end_date_time_prefix: str | None = None,
+        existence_kind: str | list[str] | None = None,
+        existence_kind_prefix: str | None = None,
+        min_extrapolated_measured_depth: int | None = None,
+        max_extrapolated_measured_depth: int | None = None,
+        extrapolated_measured_depth_remark: str | list[str] | None = None,
+        extrapolated_measured_depth_remark_prefix: str | None = None,
+        geographic_crsid: str | list[str] | None = None,
+        geographic_crsid_prefix: str | None = None,
+        is_discoverable: bool | None = None,
+        is_extended_load: bool | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        projected_crsid: str | list[str] | None = None,
+        projected_crsid_prefix: str | None = None,
+        resource_curation_status: str | list[str] | None = None,
+        resource_curation_status_prefix: str | None = None,
+        resource_home_region_id: str | list[str] | None = None,
+        resource_home_region_id_prefix: str | None = None,
+        resource_lifecycle_status: str | list[str] | None = None,
+        resource_lifecycle_status_prefix: str | None = None,
+        resource_security_classification: str | list[str] | None = None,
+        resource_security_classification_prefix: str | None = None,
+        service_company_id: str | list[str] | None = None,
+        service_company_id_prefix: str | None = None,
+        source: str | list[str] | None = None,
+        source_prefix: str | None = None,
+        spatial_area: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        spatial_point: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        start_date_time: str | list[str] | None = None,
+        start_date_time_prefix: str | None = None,
+        submitter_name: str | list[str] | None = None,
+        submitter_name_prefix: str | None = None,
+        min_surface_grid_convergence: float | None = None,
+        max_surface_grid_convergence: float | None = None,
+        min_surface_scale_factor: float | None = None,
+        max_surface_scale_factor: float | None = None,
+        survey_reference_identifier: str | list[str] | None = None,
+        survey_reference_identifier_prefix: str | None = None,
+        survey_tool_type_id: str | list[str] | None = None,
+        survey_tool_type_id_prefix: str | None = None,
+        survey_type: str | list[str] | None = None,
+        survey_type_prefix: str | None = None,
+        survey_version: str | list[str] | None = None,
+        survey_version_prefix: str | None = None,
+        min_tie_measured_depth: int | None = None,
+        max_tie_measured_depth: int | None = None,
+        min_tie_true_vertical_depth: int | None = None,
+        max_tie_true_vertical_depth: int | None = None,
+        min_top_depth_measured_depth: int | None = None,
+        max_top_depth_measured_depth: int | None = None,
+        min_tortuosity: float | None = None,
+        max_tortuosity: float | None = None,
+        vertical_measurement: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        wellbore_id: str | list[str] | None = None,
+        wellbore_id_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> list[dm.aggregations.AggregatedNumberedValue]:
+        ...
+
+    @overload
+    def aggregate(
+        self,
+        aggregations: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: WellboreTrajectoryDataFields | Sequence[WellboreTrajectoryDataFields] | None = None,
+        group_by: WellboreTrajectoryDataFields | Sequence[WellboreTrajectoryDataFields] = None,
+        query: str | None = None,
+        search_properties: WellboreTrajectoryDataTextFields | Sequence[WellboreTrajectoryDataTextFields] | None = None,
+        acquisition_date: str | list[str] | None = None,
+        acquisition_date_prefix: str | None = None,
+        acquisition_remark: str | list[str] | None = None,
+        acquisition_remark_prefix: str | None = None,
+        active_indicator: bool | None = None,
+        applied_operations_date_time: str | list[str] | None = None,
+        applied_operations_date_time_prefix: str | None = None,
+        applied_operations_remarks: str | list[str] | None = None,
+        applied_operations_remarks_prefix: str | None = None,
+        applied_operations_user: str | list[str] | None = None,
+        applied_operations_user_prefix: str | None = None,
+        azimuth_reference_type: str | list[str] | None = None,
+        azimuth_reference_type_prefix: str | None = None,
+        min_base_depth_measured_depth: int | None = None,
+        max_base_depth_measured_depth: int | None = None,
+        calculation_method_type: str | list[str] | None = None,
+        calculation_method_type_prefix: str | None = None,
+        company_id: str | list[str] | None = None,
+        company_id_prefix: str | None = None,
+        creation_date_time: str | list[str] | None = None,
+        creation_date_time_prefix: str | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        end_date_time: str | list[str] | None = None,
+        end_date_time_prefix: str | None = None,
+        existence_kind: str | list[str] | None = None,
+        existence_kind_prefix: str | None = None,
+        min_extrapolated_measured_depth: int | None = None,
+        max_extrapolated_measured_depth: int | None = None,
+        extrapolated_measured_depth_remark: str | list[str] | None = None,
+        extrapolated_measured_depth_remark_prefix: str | None = None,
+        geographic_crsid: str | list[str] | None = None,
+        geographic_crsid_prefix: str | None = None,
+        is_discoverable: bool | None = None,
+        is_extended_load: bool | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        projected_crsid: str | list[str] | None = None,
+        projected_crsid_prefix: str | None = None,
+        resource_curation_status: str | list[str] | None = None,
+        resource_curation_status_prefix: str | None = None,
+        resource_home_region_id: str | list[str] | None = None,
+        resource_home_region_id_prefix: str | None = None,
+        resource_lifecycle_status: str | list[str] | None = None,
+        resource_lifecycle_status_prefix: str | None = None,
+        resource_security_classification: str | list[str] | None = None,
+        resource_security_classification_prefix: str | None = None,
+        service_company_id: str | list[str] | None = None,
+        service_company_id_prefix: str | None = None,
+        source: str | list[str] | None = None,
+        source_prefix: str | None = None,
+        spatial_area: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        spatial_point: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        start_date_time: str | list[str] | None = None,
+        start_date_time_prefix: str | None = None,
+        submitter_name: str | list[str] | None = None,
+        submitter_name_prefix: str | None = None,
+        min_surface_grid_convergence: float | None = None,
+        max_surface_grid_convergence: float | None = None,
+        min_surface_scale_factor: float | None = None,
+        max_surface_scale_factor: float | None = None,
+        survey_reference_identifier: str | list[str] | None = None,
+        survey_reference_identifier_prefix: str | None = None,
+        survey_tool_type_id: str | list[str] | None = None,
+        survey_tool_type_id_prefix: str | None = None,
+        survey_type: str | list[str] | None = None,
+        survey_type_prefix: str | None = None,
+        survey_version: str | list[str] | None = None,
+        survey_version_prefix: str | None = None,
+        min_tie_measured_depth: int | None = None,
+        max_tie_measured_depth: int | None = None,
+        min_tie_true_vertical_depth: int | None = None,
+        max_tie_true_vertical_depth: int | None = None,
+        min_top_depth_measured_depth: int | None = None,
+        max_top_depth_measured_depth: int | None = None,
+        min_tortuosity: float | None = None,
+        max_tortuosity: float | None = None,
+        vertical_measurement: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        wellbore_id: str | list[str] | None = None,
+        wellbore_id_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> InstanceAggregationResultList:
+        ...
+
+    def aggregate(
+        self,
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: WellboreTrajectoryDataFields | Sequence[WellboreTrajectoryDataFields] | None = None,
+        group_by: WellboreTrajectoryDataFields | Sequence[WellboreTrajectoryDataFields] | None = None,
+        query: str | None = None,
+        search_property: WellboreTrajectoryDataTextFields | Sequence[WellboreTrajectoryDataTextFields] | None = None,
+        acquisition_date: str | list[str] | None = None,
+        acquisition_date_prefix: str | None = None,
+        acquisition_remark: str | list[str] | None = None,
+        acquisition_remark_prefix: str | None = None,
+        active_indicator: bool | None = None,
+        applied_operations_date_time: str | list[str] | None = None,
+        applied_operations_date_time_prefix: str | None = None,
+        applied_operations_remarks: str | list[str] | None = None,
+        applied_operations_remarks_prefix: str | None = None,
+        applied_operations_user: str | list[str] | None = None,
+        applied_operations_user_prefix: str | None = None,
+        azimuth_reference_type: str | list[str] | None = None,
+        azimuth_reference_type_prefix: str | None = None,
+        min_base_depth_measured_depth: int | None = None,
+        max_base_depth_measured_depth: int | None = None,
+        calculation_method_type: str | list[str] | None = None,
+        calculation_method_type_prefix: str | None = None,
+        company_id: str | list[str] | None = None,
+        company_id_prefix: str | None = None,
+        creation_date_time: str | list[str] | None = None,
+        creation_date_time_prefix: str | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        end_date_time: str | list[str] | None = None,
+        end_date_time_prefix: str | None = None,
+        existence_kind: str | list[str] | None = None,
+        existence_kind_prefix: str | None = None,
+        min_extrapolated_measured_depth: int | None = None,
+        max_extrapolated_measured_depth: int | None = None,
+        extrapolated_measured_depth_remark: str | list[str] | None = None,
+        extrapolated_measured_depth_remark_prefix: str | None = None,
+        geographic_crsid: str | list[str] | None = None,
+        geographic_crsid_prefix: str | None = None,
+        is_discoverable: bool | None = None,
+        is_extended_load: bool | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        projected_crsid: str | list[str] | None = None,
+        projected_crsid_prefix: str | None = None,
+        resource_curation_status: str | list[str] | None = None,
+        resource_curation_status_prefix: str | None = None,
+        resource_home_region_id: str | list[str] | None = None,
+        resource_home_region_id_prefix: str | None = None,
+        resource_lifecycle_status: str | list[str] | None = None,
+        resource_lifecycle_status_prefix: str | None = None,
+        resource_security_classification: str | list[str] | None = None,
+        resource_security_classification_prefix: str | None = None,
+        service_company_id: str | list[str] | None = None,
+        service_company_id_prefix: str | None = None,
+        source: str | list[str] | None = None,
+        source_prefix: str | None = None,
+        spatial_area: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        spatial_point: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        start_date_time: str | list[str] | None = None,
+        start_date_time_prefix: str | None = None,
+        submitter_name: str | list[str] | None = None,
+        submitter_name_prefix: str | None = None,
+        min_surface_grid_convergence: float | None = None,
+        max_surface_grid_convergence: float | None = None,
+        min_surface_scale_factor: float | None = None,
+        max_surface_scale_factor: float | None = None,
+        survey_reference_identifier: str | list[str] | None = None,
+        survey_reference_identifier_prefix: str | None = None,
+        survey_tool_type_id: str | list[str] | None = None,
+        survey_tool_type_id_prefix: str | None = None,
+        survey_type: str | list[str] | None = None,
+        survey_type_prefix: str | None = None,
+        survey_version: str | list[str] | None = None,
+        survey_version_prefix: str | None = None,
+        min_tie_measured_depth: int | None = None,
+        max_tie_measured_depth: int | None = None,
+        min_tie_true_vertical_depth: int | None = None,
+        max_tie_true_vertical_depth: int | None = None,
+        min_top_depth_measured_depth: int | None = None,
+        max_top_depth_measured_depth: int | None = None,
+        min_tortuosity: float | None = None,
+        max_tortuosity: float | None = None,
+        vertical_measurement: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        wellbore_id: str | list[str] | None = None,
+        wellbore_id_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        filter_ = _create_filter(
+            self._view_id,
+            acquisition_date,
+            acquisition_date_prefix,
+            acquisition_remark,
+            acquisition_remark_prefix,
+            active_indicator,
+            applied_operations_date_time,
+            applied_operations_date_time_prefix,
+            applied_operations_remarks,
+            applied_operations_remarks_prefix,
+            applied_operations_user,
+            applied_operations_user_prefix,
+            azimuth_reference_type,
+            azimuth_reference_type_prefix,
+            min_base_depth_measured_depth,
+            max_base_depth_measured_depth,
+            calculation_method_type,
+            calculation_method_type_prefix,
+            company_id,
+            company_id_prefix,
+            creation_date_time,
+            creation_date_time_prefix,
+            description,
+            description_prefix,
+            end_date_time,
+            end_date_time_prefix,
+            existence_kind,
+            existence_kind_prefix,
+            min_extrapolated_measured_depth,
+            max_extrapolated_measured_depth,
+            extrapolated_measured_depth_remark,
+            extrapolated_measured_depth_remark_prefix,
+            geographic_crsid,
+            geographic_crsid_prefix,
+            is_discoverable,
+            is_extended_load,
+            name,
+            name_prefix,
+            projected_crsid,
+            projected_crsid_prefix,
+            resource_curation_status,
+            resource_curation_status_prefix,
+            resource_home_region_id,
+            resource_home_region_id_prefix,
+            resource_lifecycle_status,
+            resource_lifecycle_status_prefix,
+            resource_security_classification,
+            resource_security_classification_prefix,
+            service_company_id,
+            service_company_id_prefix,
+            source,
+            source_prefix,
+            spatial_area,
+            spatial_point,
+            start_date_time,
+            start_date_time_prefix,
+            submitter_name,
+            submitter_name_prefix,
+            min_surface_grid_convergence,
+            max_surface_grid_convergence,
+            min_surface_scale_factor,
+            max_surface_scale_factor,
+            survey_reference_identifier,
+            survey_reference_identifier_prefix,
+            survey_tool_type_id,
+            survey_tool_type_id_prefix,
+            survey_type,
+            survey_type_prefix,
+            survey_version,
+            survey_version_prefix,
+            min_tie_measured_depth,
+            max_tie_measured_depth,
+            min_tie_true_vertical_depth,
+            max_tie_true_vertical_depth,
+            min_top_depth_measured_depth,
+            max_top_depth_measured_depth,
+            min_tortuosity,
+            max_tortuosity,
+            vertical_measurement,
+            wellbore_id,
+            wellbore_id_prefix,
+            external_id_prefix,
+            filter,
+        )
+        return self._aggregate(
+            self._view_id,
+            aggregate,
+            _WELLBORETRAJECTORYDATA_PROPERTIES_BY_FIELD,
+            property,
+            group_by,
+            query,
+            search_property,
+            limit,
+            filter_,
+        )
+
+    def histogram(
+        self,
+        property: WellboreTrajectoryDataFields,
+        interval: float,
+        query: str | None = None,
+        search_property: WellboreTrajectoryDataTextFields | Sequence[WellboreTrajectoryDataTextFields] | None = None,
+        acquisition_date: str | list[str] | None = None,
+        acquisition_date_prefix: str | None = None,
+        acquisition_remark: str | list[str] | None = None,
+        acquisition_remark_prefix: str | None = None,
+        active_indicator: bool | None = None,
+        applied_operations_date_time: str | list[str] | None = None,
+        applied_operations_date_time_prefix: str | None = None,
+        applied_operations_remarks: str | list[str] | None = None,
+        applied_operations_remarks_prefix: str | None = None,
+        applied_operations_user: str | list[str] | None = None,
+        applied_operations_user_prefix: str | None = None,
+        azimuth_reference_type: str | list[str] | None = None,
+        azimuth_reference_type_prefix: str | None = None,
+        min_base_depth_measured_depth: int | None = None,
+        max_base_depth_measured_depth: int | None = None,
+        calculation_method_type: str | list[str] | None = None,
+        calculation_method_type_prefix: str | None = None,
+        company_id: str | list[str] | None = None,
+        company_id_prefix: str | None = None,
+        creation_date_time: str | list[str] | None = None,
+        creation_date_time_prefix: str | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        end_date_time: str | list[str] | None = None,
+        end_date_time_prefix: str | None = None,
+        existence_kind: str | list[str] | None = None,
+        existence_kind_prefix: str | None = None,
+        min_extrapolated_measured_depth: int | None = None,
+        max_extrapolated_measured_depth: int | None = None,
+        extrapolated_measured_depth_remark: str | list[str] | None = None,
+        extrapolated_measured_depth_remark_prefix: str | None = None,
+        geographic_crsid: str | list[str] | None = None,
+        geographic_crsid_prefix: str | None = None,
+        is_discoverable: bool | None = None,
+        is_extended_load: bool | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        projected_crsid: str | list[str] | None = None,
+        projected_crsid_prefix: str | None = None,
+        resource_curation_status: str | list[str] | None = None,
+        resource_curation_status_prefix: str | None = None,
+        resource_home_region_id: str | list[str] | None = None,
+        resource_home_region_id_prefix: str | None = None,
+        resource_lifecycle_status: str | list[str] | None = None,
+        resource_lifecycle_status_prefix: str | None = None,
+        resource_security_classification: str | list[str] | None = None,
+        resource_security_classification_prefix: str | None = None,
+        service_company_id: str | list[str] | None = None,
+        service_company_id_prefix: str | None = None,
+        source: str | list[str] | None = None,
+        source_prefix: str | None = None,
+        spatial_area: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        spatial_point: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        start_date_time: str | list[str] | None = None,
+        start_date_time_prefix: str | None = None,
+        submitter_name: str | list[str] | None = None,
+        submitter_name_prefix: str | None = None,
+        min_surface_grid_convergence: float | None = None,
+        max_surface_grid_convergence: float | None = None,
+        min_surface_scale_factor: float | None = None,
+        max_surface_scale_factor: float | None = None,
+        survey_reference_identifier: str | list[str] | None = None,
+        survey_reference_identifier_prefix: str | None = None,
+        survey_tool_type_id: str | list[str] | None = None,
+        survey_tool_type_id_prefix: str | None = None,
+        survey_type: str | list[str] | None = None,
+        survey_type_prefix: str | None = None,
+        survey_version: str | list[str] | None = None,
+        survey_version_prefix: str | None = None,
+        min_tie_measured_depth: int | None = None,
+        max_tie_measured_depth: int | None = None,
+        min_tie_true_vertical_depth: int | None = None,
+        max_tie_true_vertical_depth: int | None = None,
+        min_top_depth_measured_depth: int | None = None,
+        max_top_depth_measured_depth: int | None = None,
+        min_tortuosity: float | None = None,
+        max_tortuosity: float | None = None,
+        vertical_measurement: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        wellbore_id: str | list[str] | None = None,
+        wellbore_id_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.HistogramValue:
+        filter_ = _create_filter(
+            self._view_id,
+            acquisition_date,
+            acquisition_date_prefix,
+            acquisition_remark,
+            acquisition_remark_prefix,
+            active_indicator,
+            applied_operations_date_time,
+            applied_operations_date_time_prefix,
+            applied_operations_remarks,
+            applied_operations_remarks_prefix,
+            applied_operations_user,
+            applied_operations_user_prefix,
+            azimuth_reference_type,
+            azimuth_reference_type_prefix,
+            min_base_depth_measured_depth,
+            max_base_depth_measured_depth,
+            calculation_method_type,
+            calculation_method_type_prefix,
+            company_id,
+            company_id_prefix,
+            creation_date_time,
+            creation_date_time_prefix,
+            description,
+            description_prefix,
+            end_date_time,
+            end_date_time_prefix,
+            existence_kind,
+            existence_kind_prefix,
+            min_extrapolated_measured_depth,
+            max_extrapolated_measured_depth,
+            extrapolated_measured_depth_remark,
+            extrapolated_measured_depth_remark_prefix,
+            geographic_crsid,
+            geographic_crsid_prefix,
+            is_discoverable,
+            is_extended_load,
+            name,
+            name_prefix,
+            projected_crsid,
+            projected_crsid_prefix,
+            resource_curation_status,
+            resource_curation_status_prefix,
+            resource_home_region_id,
+            resource_home_region_id_prefix,
+            resource_lifecycle_status,
+            resource_lifecycle_status_prefix,
+            resource_security_classification,
+            resource_security_classification_prefix,
+            service_company_id,
+            service_company_id_prefix,
+            source,
+            source_prefix,
+            spatial_area,
+            spatial_point,
+            start_date_time,
+            start_date_time_prefix,
+            submitter_name,
+            submitter_name_prefix,
+            min_surface_grid_convergence,
+            max_surface_grid_convergence,
+            min_surface_scale_factor,
+            max_surface_scale_factor,
+            survey_reference_identifier,
+            survey_reference_identifier_prefix,
+            survey_tool_type_id,
+            survey_tool_type_id_prefix,
+            survey_type,
+            survey_type_prefix,
+            survey_version,
+            survey_version_prefix,
+            min_tie_measured_depth,
+            max_tie_measured_depth,
+            min_tie_true_vertical_depth,
+            max_tie_true_vertical_depth,
+            min_top_depth_measured_depth,
+            max_top_depth_measured_depth,
+            min_tortuosity,
+            max_tortuosity,
+            vertical_measurement,
+            wellbore_id,
+            wellbore_id_prefix,
+            external_id_prefix,
+            filter,
+        )
+        return self._histogram(
+            self._view_id,
+            property,
+            interval,
+            _WELLBORETRAJECTORYDATA_PROPERTIES_BY_FIELD,
+            query,
+            search_property,
+            limit,
+            filter_,
+        )
+
+    def list(
+        self,
+        acquisition_date: str | list[str] | None = None,
+        acquisition_date_prefix: str | None = None,
+        acquisition_remark: str | list[str] | None = None,
+        acquisition_remark_prefix: str | None = None,
+        active_indicator: bool | None = None,
+        applied_operations_date_time: str | list[str] | None = None,
+        applied_operations_date_time_prefix: str | None = None,
+        applied_operations_remarks: str | list[str] | None = None,
+        applied_operations_remarks_prefix: str | None = None,
+        applied_operations_user: str | list[str] | None = None,
+        applied_operations_user_prefix: str | None = None,
+        azimuth_reference_type: str | list[str] | None = None,
+        azimuth_reference_type_prefix: str | None = None,
+        min_base_depth_measured_depth: int | None = None,
+        max_base_depth_measured_depth: int | None = None,
+        calculation_method_type: str | list[str] | None = None,
+        calculation_method_type_prefix: str | None = None,
+        company_id: str | list[str] | None = None,
+        company_id_prefix: str | None = None,
+        creation_date_time: str | list[str] | None = None,
+        creation_date_time_prefix: str | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        end_date_time: str | list[str] | None = None,
+        end_date_time_prefix: str | None = None,
+        existence_kind: str | list[str] | None = None,
+        existence_kind_prefix: str | None = None,
+        min_extrapolated_measured_depth: int | None = None,
+        max_extrapolated_measured_depth: int | None = None,
+        extrapolated_measured_depth_remark: str | list[str] | None = None,
+        extrapolated_measured_depth_remark_prefix: str | None = None,
+        geographic_crsid: str | list[str] | None = None,
+        geographic_crsid_prefix: str | None = None,
+        is_discoverable: bool | None = None,
+        is_extended_load: bool | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        projected_crsid: str | list[str] | None = None,
+        projected_crsid_prefix: str | None = None,
+        resource_curation_status: str | list[str] | None = None,
+        resource_curation_status_prefix: str | None = None,
+        resource_home_region_id: str | list[str] | None = None,
+        resource_home_region_id_prefix: str | None = None,
+        resource_lifecycle_status: str | list[str] | None = None,
+        resource_lifecycle_status_prefix: str | None = None,
+        resource_security_classification: str | list[str] | None = None,
+        resource_security_classification_prefix: str | None = None,
+        service_company_id: str | list[str] | None = None,
+        service_company_id_prefix: str | None = None,
+        source: str | list[str] | None = None,
+        source_prefix: str | None = None,
+        spatial_area: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        spatial_point: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        start_date_time: str | list[str] | None = None,
+        start_date_time_prefix: str | None = None,
+        submitter_name: str | list[str] | None = None,
+        submitter_name_prefix: str | None = None,
+        min_surface_grid_convergence: float | None = None,
+        max_surface_grid_convergence: float | None = None,
+        min_surface_scale_factor: float | None = None,
+        max_surface_scale_factor: float | None = None,
+        survey_reference_identifier: str | list[str] | None = None,
+        survey_reference_identifier_prefix: str | None = None,
+        survey_tool_type_id: str | list[str] | None = None,
+        survey_tool_type_id_prefix: str | None = None,
+        survey_type: str | list[str] | None = None,
+        survey_type_prefix: str | None = None,
+        survey_version: str | list[str] | None = None,
+        survey_version_prefix: str | None = None,
+        min_tie_measured_depth: int | None = None,
+        max_tie_measured_depth: int | None = None,
+        min_tie_true_vertical_depth: int | None = None,
+        max_tie_true_vertical_depth: int | None = None,
+        min_top_depth_measured_depth: int | None = None,
+        max_top_depth_measured_depth: int | None = None,
+        min_tortuosity: float | None = None,
+        max_tortuosity: float | None = None,
+        vertical_measurement: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        wellbore_id: str | list[str] | None = None,
+        wellbore_id_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+        retrieve_edges: bool = True,
+    ) -> WellboreTrajectoryDataList:
+        filter_ = _create_filter(
+            self._view_id,
+            acquisition_date,
+            acquisition_date_prefix,
+            acquisition_remark,
+            acquisition_remark_prefix,
+            active_indicator,
+            applied_operations_date_time,
+            applied_operations_date_time_prefix,
+            applied_operations_remarks,
+            applied_operations_remarks_prefix,
+            applied_operations_user,
+            applied_operations_user_prefix,
+            azimuth_reference_type,
+            azimuth_reference_type_prefix,
+            min_base_depth_measured_depth,
+            max_base_depth_measured_depth,
+            calculation_method_type,
+            calculation_method_type_prefix,
+            company_id,
+            company_id_prefix,
+            creation_date_time,
+            creation_date_time_prefix,
+            description,
+            description_prefix,
+            end_date_time,
+            end_date_time_prefix,
+            existence_kind,
+            existence_kind_prefix,
+            min_extrapolated_measured_depth,
+            max_extrapolated_measured_depth,
+            extrapolated_measured_depth_remark,
+            extrapolated_measured_depth_remark_prefix,
+            geographic_crsid,
+            geographic_crsid_prefix,
+            is_discoverable,
+            is_extended_load,
+            name,
+            name_prefix,
+            projected_crsid,
+            projected_crsid_prefix,
+            resource_curation_status,
+            resource_curation_status_prefix,
+            resource_home_region_id,
+            resource_home_region_id_prefix,
+            resource_lifecycle_status,
+            resource_lifecycle_status_prefix,
+            resource_security_classification,
+            resource_security_classification_prefix,
+            service_company_id,
+            service_company_id_prefix,
+            source,
+            source_prefix,
+            spatial_area,
+            spatial_point,
+            start_date_time,
+            start_date_time_prefix,
+            submitter_name,
+            submitter_name_prefix,
+            min_surface_grid_convergence,
+            max_surface_grid_convergence,
+            min_surface_scale_factor,
+            max_surface_scale_factor,
+            survey_reference_identifier,
+            survey_reference_identifier_prefix,
+            survey_tool_type_id,
+            survey_tool_type_id_prefix,
+            survey_type,
+            survey_type_prefix,
+            survey_version,
+            survey_version_prefix,
+            min_tie_measured_depth,
+            max_tie_measured_depth,
+            min_tie_true_vertical_depth,
+            max_tie_true_vertical_depth,
+            min_top_depth_measured_depth,
+            max_top_depth_measured_depth,
+            min_tortuosity,
+            max_tortuosity,
+            vertical_measurement,
+            wellbore_id,
+            wellbore_id_prefix,
+            external_id_prefix,
+            filter,
+        )
+
+        wellbore_trajectory_data = self._list(limit=limit, filter=filter_)
+
+        if retrieve_edges:
+            if len(external_ids := wellbore_trajectory_data.as_external_ids()) > IN_FILTER_LIMIT:
+                artefact_edges = self.artefacts.list(limit=-1)
+            else:
+                artefact_edges = self.artefacts.list(external_ids, limit=-1)
+            self._set_artefacts(wellbore_trajectory_data, artefact_edges)
+            if len(external_ids := wellbore_trajectory_data.as_external_ids()) > IN_FILTER_LIMIT:
+                available_trajectory_station_property_edges = self.available_trajectory_station_properties.list(
+                    limit=-1
+                )
+            else:
+                available_trajectory_station_property_edges = self.available_trajectory_station_properties.list(
+                    external_ids, limit=-1
+                )
+            self._set_available_trajectory_station_properties(
+                wellbore_trajectory_data, available_trajectory_station_property_edges
+            )
+            if len(external_ids := wellbore_trajectory_data.as_external_ids()) > IN_FILTER_LIMIT:
+                geo_context_edges = self.geo_contexts.list(limit=-1)
+            else:
+                geo_context_edges = self.geo_contexts.list(external_ids, limit=-1)
+            self._set_geo_contexts(wellbore_trajectory_data, geo_context_edges)
+            if len(external_ids := wellbore_trajectory_data.as_external_ids()) > IN_FILTER_LIMIT:
+                lineage_assertion_edges = self.lineage_assertions.list(limit=-1)
+            else:
+                lineage_assertion_edges = self.lineage_assertions.list(external_ids, limit=-1)
+            self._set_lineage_assertions(wellbore_trajectory_data, lineage_assertion_edges)
+            if len(external_ids := wellbore_trajectory_data.as_external_ids()) > IN_FILTER_LIMIT:
+                name_alias_edges = self.name_aliases.list(limit=-1)
+            else:
+                name_alias_edges = self.name_aliases.list(external_ids, limit=-1)
+            self._set_name_aliases(wellbore_trajectory_data, name_alias_edges)
+            if len(external_ids := wellbore_trajectory_data.as_external_ids()) > IN_FILTER_LIMIT:
+                technical_assurance_edges = self.technical_assurances.list(limit=-1)
+            else:
+                technical_assurance_edges = self.technical_assurances.list(external_ids, limit=-1)
+            self._set_technical_assurances(wellbore_trajectory_data, technical_assurance_edges)
+
+        return wellbore_trajectory_data
+
+    @staticmethod
+    def _set_artefacts(wellbore_trajectory_data: Sequence[WellboreTrajectoryData], artefact_edges: Sequence[dm.Edge]):
+        edges_by_start_node: Dict[Tuple, List] = defaultdict(list)
+        for edge in artefact_edges:
+            edges_by_start_node[edge.start_node.as_tuple()].append(edge)
+
+        for wellbore_trajectory_datum in wellbore_trajectory_data:
+            node_id = wellbore_trajectory_datum.id_tuple()
+            if node_id in edges_by_start_node:
+                wellbore_trajectory_datum.artefacts = [
+                    edge.end_node.external_id for edge in edges_by_start_node[node_id]
+                ]
+
+    @staticmethod
+    def _set_available_trajectory_station_properties(
+        wellbore_trajectory_data: Sequence[WellboreTrajectoryData],
+        available_trajectory_station_property_edges: Sequence[dm.Edge],
+    ):
+        edges_by_start_node: Dict[Tuple, List] = defaultdict(list)
+        for edge in available_trajectory_station_property_edges:
+            edges_by_start_node[edge.start_node.as_tuple()].append(edge)
+
+        for wellbore_trajectory_datum in wellbore_trajectory_data:
+            node_id = wellbore_trajectory_datum.id_tuple()
+            if node_id in edges_by_start_node:
+                wellbore_trajectory_datum.available_trajectory_station_properties = [
+                    edge.end_node.external_id for edge in edges_by_start_node[node_id]
+                ]
+
+    @staticmethod
+    def _set_geo_contexts(
+        wellbore_trajectory_data: Sequence[WellboreTrajectoryData], geo_context_edges: Sequence[dm.Edge]
+    ):
+        edges_by_start_node: Dict[Tuple, List] = defaultdict(list)
+        for edge in geo_context_edges:
+            edges_by_start_node[edge.start_node.as_tuple()].append(edge)
+
+        for wellbore_trajectory_datum in wellbore_trajectory_data:
+            node_id = wellbore_trajectory_datum.id_tuple()
+            if node_id in edges_by_start_node:
+                wellbore_trajectory_datum.geo_contexts = [
+                    edge.end_node.external_id for edge in edges_by_start_node[node_id]
+                ]
+
+    @staticmethod
+    def _set_lineage_assertions(
+        wellbore_trajectory_data: Sequence[WellboreTrajectoryData], lineage_assertion_edges: Sequence[dm.Edge]
+    ):
+        edges_by_start_node: Dict[Tuple, List] = defaultdict(list)
+        for edge in lineage_assertion_edges:
+            edges_by_start_node[edge.start_node.as_tuple()].append(edge)
+
+        for wellbore_trajectory_datum in wellbore_trajectory_data:
+            node_id = wellbore_trajectory_datum.id_tuple()
+            if node_id in edges_by_start_node:
+                wellbore_trajectory_datum.lineage_assertions = [
+                    edge.end_node.external_id for edge in edges_by_start_node[node_id]
+                ]
+
+    @staticmethod
+    def _set_name_aliases(
+        wellbore_trajectory_data: Sequence[WellboreTrajectoryData], name_alias_edges: Sequence[dm.Edge]
+    ):
+        edges_by_start_node: Dict[Tuple, List] = defaultdict(list)
+        for edge in name_alias_edges:
+            edges_by_start_node[edge.start_node.as_tuple()].append(edge)
+
+        for wellbore_trajectory_datum in wellbore_trajectory_data:
+            node_id = wellbore_trajectory_datum.id_tuple()
+            if node_id in edges_by_start_node:
+                wellbore_trajectory_datum.name_aliases = [
+                    edge.end_node.external_id for edge in edges_by_start_node[node_id]
+                ]
+
+    @staticmethod
+    def _set_technical_assurances(
+        wellbore_trajectory_data: Sequence[WellboreTrajectoryData], technical_assurance_edges: Sequence[dm.Edge]
+    ):
+        edges_by_start_node: Dict[Tuple, List] = defaultdict(list)
+        for edge in technical_assurance_edges:
+            edges_by_start_node[edge.start_node.as_tuple()].append(edge)
+
+        for wellbore_trajectory_datum in wellbore_trajectory_data:
+            node_id = wellbore_trajectory_datum.id_tuple()
+            if node_id in edges_by_start_node:
+                wellbore_trajectory_datum.technical_assurances = [
+                    edge.end_node.external_id for edge in edges_by_start_node[node_id]
+                ]
+
+
+def _create_filter(
+    view_id: dm.ViewId,
+    acquisition_date: str | list[str] | None = None,
+    acquisition_date_prefix: str | None = None,
+    acquisition_remark: str | list[str] | None = None,
+    acquisition_remark_prefix: str | None = None,
+    active_indicator: bool | None = None,
+    applied_operations_date_time: str | list[str] | None = None,
+    applied_operations_date_time_prefix: str | None = None,
+    applied_operations_remarks: str | list[str] | None = None,
+    applied_operations_remarks_prefix: str | None = None,
+    applied_operations_user: str | list[str] | None = None,
+    applied_operations_user_prefix: str | None = None,
+    azimuth_reference_type: str | list[str] | None = None,
+    azimuth_reference_type_prefix: str | None = None,
+    min_base_depth_measured_depth: int | None = None,
+    max_base_depth_measured_depth: int | None = None,
+    calculation_method_type: str | list[str] | None = None,
+    calculation_method_type_prefix: str | None = None,
+    company_id: str | list[str] | None = None,
+    company_id_prefix: str | None = None,
+    creation_date_time: str | list[str] | None = None,
+    creation_date_time_prefix: str | None = None,
+    description: str | list[str] | None = None,
+    description_prefix: str | None = None,
+    end_date_time: str | list[str] | None = None,
+    end_date_time_prefix: str | None = None,
+    existence_kind: str | list[str] | None = None,
+    existence_kind_prefix: str | None = None,
+    min_extrapolated_measured_depth: int | None = None,
+    max_extrapolated_measured_depth: int | None = None,
+    extrapolated_measured_depth_remark: str | list[str] | None = None,
+    extrapolated_measured_depth_remark_prefix: str | None = None,
+    geographic_crsid: str | list[str] | None = None,
+    geographic_crsid_prefix: str | None = None,
+    is_discoverable: bool | None = None,
+    is_extended_load: bool | None = None,
+    name: str | list[str] | None = None,
+    name_prefix: str | None = None,
+    projected_crsid: str | list[str] | None = None,
+    projected_crsid_prefix: str | None = None,
+    resource_curation_status: str | list[str] | None = None,
+    resource_curation_status_prefix: str | None = None,
+    resource_home_region_id: str | list[str] | None = None,
+    resource_home_region_id_prefix: str | None = None,
+    resource_lifecycle_status: str | list[str] | None = None,
+    resource_lifecycle_status_prefix: str | None = None,
+    resource_security_classification: str | list[str] | None = None,
+    resource_security_classification_prefix: str | None = None,
+    service_company_id: str | list[str] | None = None,
+    service_company_id_prefix: str | None = None,
+    source: str | list[str] | None = None,
+    source_prefix: str | None = None,
+    spatial_area: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+    spatial_point: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+    start_date_time: str | list[str] | None = None,
+    start_date_time_prefix: str | None = None,
+    submitter_name: str | list[str] | None = None,
+    submitter_name_prefix: str | None = None,
+    min_surface_grid_convergence: float | None = None,
+    max_surface_grid_convergence: float | None = None,
+    min_surface_scale_factor: float | None = None,
+    max_surface_scale_factor: float | None = None,
+    survey_reference_identifier: str | list[str] | None = None,
+    survey_reference_identifier_prefix: str | None = None,
+    survey_tool_type_id: str | list[str] | None = None,
+    survey_tool_type_id_prefix: str | None = None,
+    survey_type: str | list[str] | None = None,
+    survey_type_prefix: str | None = None,
+    survey_version: str | list[str] | None = None,
+    survey_version_prefix: str | None = None,
+    min_tie_measured_depth: int | None = None,
+    max_tie_measured_depth: int | None = None,
+    min_tie_true_vertical_depth: int | None = None,
+    max_tie_true_vertical_depth: int | None = None,
+    min_top_depth_measured_depth: int | None = None,
+    max_top_depth_measured_depth: int | None = None,
+    min_tortuosity: float | None = None,
+    max_tortuosity: float | None = None,
+    vertical_measurement: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+    wellbore_id: str | list[str] | None = None,
+    wellbore_id_prefix: str | None = None,
+    external_id_prefix: str | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if acquisition_date and isinstance(acquisition_date, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("AcquisitionDate"), value=acquisition_date))
+    if acquisition_date and isinstance(acquisition_date, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("AcquisitionDate"), values=acquisition_date))
+    if acquisition_date_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("AcquisitionDate"), value=acquisition_date_prefix))
+    if acquisition_remark and isinstance(acquisition_remark, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("AcquisitionRemark"), value=acquisition_remark))
+    if acquisition_remark and isinstance(acquisition_remark, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("AcquisitionRemark"), values=acquisition_remark))
+    if acquisition_remark_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("AcquisitionRemark"), value=acquisition_remark_prefix))
+    if active_indicator and isinstance(active_indicator, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("ActiveIndicator"), value=active_indicator))
+    if applied_operations_date_time and isinstance(applied_operations_date_time, str):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("AppliedOperationsDateTime"), value=applied_operations_date_time)
+        )
+    if applied_operations_date_time and isinstance(applied_operations_date_time, list):
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("AppliedOperationsDateTime"), values=applied_operations_date_time)
+        )
+    if applied_operations_date_time_prefix:
+        filters.append(
+            dm.filters.Prefix(
+                view_id.as_property_ref("AppliedOperationsDateTime"), value=applied_operations_date_time_prefix
+            )
+        )
+    if applied_operations_remarks and isinstance(applied_operations_remarks, str):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("AppliedOperationsRemarks"), value=applied_operations_remarks)
+        )
+    if applied_operations_remarks and isinstance(applied_operations_remarks, list):
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("AppliedOperationsRemarks"), values=applied_operations_remarks)
+        )
+    if applied_operations_remarks_prefix:
+        filters.append(
+            dm.filters.Prefix(
+                view_id.as_property_ref("AppliedOperationsRemarks"), value=applied_operations_remarks_prefix
+            )
+        )
+    if applied_operations_user and isinstance(applied_operations_user, str):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("AppliedOperationsUser"), value=applied_operations_user)
+        )
+    if applied_operations_user and isinstance(applied_operations_user, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("AppliedOperationsUser"), values=applied_operations_user))
+    if applied_operations_user_prefix:
+        filters.append(
+            dm.filters.Prefix(view_id.as_property_ref("AppliedOperationsUser"), value=applied_operations_user_prefix)
+        )
+    if azimuth_reference_type and isinstance(azimuth_reference_type, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("AzimuthReferenceType"), value=azimuth_reference_type))
+    if azimuth_reference_type and isinstance(azimuth_reference_type, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("AzimuthReferenceType"), values=azimuth_reference_type))
+    if azimuth_reference_type_prefix:
+        filters.append(
+            dm.filters.Prefix(view_id.as_property_ref("AzimuthReferenceType"), value=azimuth_reference_type_prefix)
+        )
+    if min_base_depth_measured_depth or max_base_depth_measured_depth:
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("BaseDepthMeasuredDepth"),
+                gte=min_base_depth_measured_depth,
+                lte=max_base_depth_measured_depth,
+            )
+        )
+    if calculation_method_type and isinstance(calculation_method_type, str):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("CalculationMethodType"), value=calculation_method_type)
+        )
+    if calculation_method_type and isinstance(calculation_method_type, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("CalculationMethodType"), values=calculation_method_type))
+    if calculation_method_type_prefix:
+        filters.append(
+            dm.filters.Prefix(view_id.as_property_ref("CalculationMethodType"), value=calculation_method_type_prefix)
+        )
+    if company_id and isinstance(company_id, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("CompanyID"), value=company_id))
+    if company_id and isinstance(company_id, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("CompanyID"), values=company_id))
+    if company_id_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("CompanyID"), value=company_id_prefix))
+    if creation_date_time and isinstance(creation_date_time, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("CreationDateTime"), value=creation_date_time))
+    if creation_date_time and isinstance(creation_date_time, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("CreationDateTime"), values=creation_date_time))
+    if creation_date_time_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("CreationDateTime"), value=creation_date_time_prefix))
+    if description and isinstance(description, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("Description"), value=description))
+    if description and isinstance(description, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("Description"), values=description))
+    if description_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("Description"), value=description_prefix))
+    if end_date_time and isinstance(end_date_time, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("EndDateTime"), value=end_date_time))
+    if end_date_time and isinstance(end_date_time, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("EndDateTime"), values=end_date_time))
+    if end_date_time_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("EndDateTime"), value=end_date_time_prefix))
+    if existence_kind and isinstance(existence_kind, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("ExistenceKind"), value=existence_kind))
+    if existence_kind and isinstance(existence_kind, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("ExistenceKind"), values=existence_kind))
+    if existence_kind_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("ExistenceKind"), value=existence_kind_prefix))
+    if min_extrapolated_measured_depth or max_extrapolated_measured_depth:
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("ExtrapolatedMeasuredDepth"),
+                gte=min_extrapolated_measured_depth,
+                lte=max_extrapolated_measured_depth,
+            )
+        )
+    if extrapolated_measured_depth_remark and isinstance(extrapolated_measured_depth_remark, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("ExtrapolatedMeasuredDepthRemark"), value=extrapolated_measured_depth_remark
+            )
+        )
+    if extrapolated_measured_depth_remark and isinstance(extrapolated_measured_depth_remark, list):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("ExtrapolatedMeasuredDepthRemark"), values=extrapolated_measured_depth_remark
+            )
+        )
+    if extrapolated_measured_depth_remark_prefix:
+        filters.append(
+            dm.filters.Prefix(
+                view_id.as_property_ref("ExtrapolatedMeasuredDepthRemark"),
+                value=extrapolated_measured_depth_remark_prefix,
+            )
+        )
+    if geographic_crsid and isinstance(geographic_crsid, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("GeographicCRSID"), value=geographic_crsid))
+    if geographic_crsid and isinstance(geographic_crsid, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("GeographicCRSID"), values=geographic_crsid))
+    if geographic_crsid_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("GeographicCRSID"), value=geographic_crsid_prefix))
+    if is_discoverable and isinstance(is_discoverable, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("IsDiscoverable"), value=is_discoverable))
+    if is_extended_load and isinstance(is_extended_load, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("IsExtendedLoad"), value=is_extended_load))
+    if name and isinstance(name, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("Name"), value=name))
+    if name and isinstance(name, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("Name"), values=name))
+    if name_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("Name"), value=name_prefix))
+    if projected_crsid and isinstance(projected_crsid, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("ProjectedCRSID"), value=projected_crsid))
+    if projected_crsid and isinstance(projected_crsid, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("ProjectedCRSID"), values=projected_crsid))
+    if projected_crsid_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("ProjectedCRSID"), value=projected_crsid_prefix))
+    if resource_curation_status and isinstance(resource_curation_status, str):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("ResourceCurationStatus"), value=resource_curation_status)
+        )
+    if resource_curation_status and isinstance(resource_curation_status, list):
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("ResourceCurationStatus"), values=resource_curation_status)
+        )
+    if resource_curation_status_prefix:
+        filters.append(
+            dm.filters.Prefix(view_id.as_property_ref("ResourceCurationStatus"), value=resource_curation_status_prefix)
+        )
+    if resource_home_region_id and isinstance(resource_home_region_id, str):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("ResourceHomeRegionID"), value=resource_home_region_id)
+        )
+    if resource_home_region_id and isinstance(resource_home_region_id, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("ResourceHomeRegionID"), values=resource_home_region_id))
+    if resource_home_region_id_prefix:
+        filters.append(
+            dm.filters.Prefix(view_id.as_property_ref("ResourceHomeRegionID"), value=resource_home_region_id_prefix)
+        )
+    if resource_lifecycle_status and isinstance(resource_lifecycle_status, str):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("ResourceLifecycleStatus"), value=resource_lifecycle_status)
+        )
+    if resource_lifecycle_status and isinstance(resource_lifecycle_status, list):
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("ResourceLifecycleStatus"), values=resource_lifecycle_status)
+        )
+    if resource_lifecycle_status_prefix:
+        filters.append(
+            dm.filters.Prefix(
+                view_id.as_property_ref("ResourceLifecycleStatus"), value=resource_lifecycle_status_prefix
+            )
+        )
+    if resource_security_classification and isinstance(resource_security_classification, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("ResourceSecurityClassification"), value=resource_security_classification
+            )
+        )
+    if resource_security_classification and isinstance(resource_security_classification, list):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("ResourceSecurityClassification"), values=resource_security_classification
+            )
+        )
+    if resource_security_classification_prefix:
+        filters.append(
+            dm.filters.Prefix(
+                view_id.as_property_ref("ResourceSecurityClassification"), value=resource_security_classification_prefix
+            )
+        )
+    if service_company_id and isinstance(service_company_id, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("ServiceCompanyID"), value=service_company_id))
+    if service_company_id and isinstance(service_company_id, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("ServiceCompanyID"), values=service_company_id))
+    if service_company_id_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("ServiceCompanyID"), value=service_company_id_prefix))
+    if source and isinstance(source, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("Source"), value=source))
+    if source and isinstance(source, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("Source"), values=source))
+    if source_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("Source"), value=source_prefix))
+    if spatial_area and isinstance(spatial_area, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("SpatialArea"),
+                value={"space": "IntegrationTestsImmutable", "externalId": spatial_area},
+            )
+        )
+    if spatial_area and isinstance(spatial_area, tuple):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("SpatialArea"), value={"space": spatial_area[0], "externalId": spatial_area[1]}
+            )
+        )
+    if spatial_area and isinstance(spatial_area, list) and isinstance(spatial_area[0], str):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("SpatialArea"),
+                values=[{"space": "IntegrationTestsImmutable", "externalId": item} for item in spatial_area],
+            )
+        )
+    if spatial_area and isinstance(spatial_area, list) and isinstance(spatial_area[0], tuple):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("SpatialArea"),
+                values=[{"space": item[0], "externalId": item[1]} for item in spatial_area],
+            )
+        )
+    if spatial_point and isinstance(spatial_point, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("SpatialPoint"),
+                value={"space": "IntegrationTestsImmutable", "externalId": spatial_point},
+            )
+        )
+    if spatial_point and isinstance(spatial_point, tuple):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("SpatialPoint"),
+                value={"space": spatial_point[0], "externalId": spatial_point[1]},
+            )
+        )
+    if spatial_point and isinstance(spatial_point, list) and isinstance(spatial_point[0], str):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("SpatialPoint"),
+                values=[{"space": "IntegrationTestsImmutable", "externalId": item} for item in spatial_point],
+            )
+        )
+    if spatial_point and isinstance(spatial_point, list) and isinstance(spatial_point[0], tuple):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("SpatialPoint"),
+                values=[{"space": item[0], "externalId": item[1]} for item in spatial_point],
+            )
+        )
+    if start_date_time and isinstance(start_date_time, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("StartDateTime"), value=start_date_time))
+    if start_date_time and isinstance(start_date_time, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("StartDateTime"), values=start_date_time))
+    if start_date_time_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("StartDateTime"), value=start_date_time_prefix))
+    if submitter_name and isinstance(submitter_name, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("SubmitterName"), value=submitter_name))
+    if submitter_name and isinstance(submitter_name, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("SubmitterName"), values=submitter_name))
+    if submitter_name_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("SubmitterName"), value=submitter_name_prefix))
+    if min_surface_grid_convergence or max_surface_grid_convergence:
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("SurfaceGridConvergence"),
+                gte=min_surface_grid_convergence,
+                lte=max_surface_grid_convergence,
+            )
+        )
+    if min_surface_scale_factor or max_surface_scale_factor:
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("SurfaceScaleFactor"),
+                gte=min_surface_scale_factor,
+                lte=max_surface_scale_factor,
+            )
+        )
+    if survey_reference_identifier and isinstance(survey_reference_identifier, str):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("SurveyReferenceIdentifier"), value=survey_reference_identifier)
+        )
+    if survey_reference_identifier and isinstance(survey_reference_identifier, list):
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("SurveyReferenceIdentifier"), values=survey_reference_identifier)
+        )
+    if survey_reference_identifier_prefix:
+        filters.append(
+            dm.filters.Prefix(
+                view_id.as_property_ref("SurveyReferenceIdentifier"), value=survey_reference_identifier_prefix
+            )
+        )
+    if survey_tool_type_id and isinstance(survey_tool_type_id, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("SurveyToolTypeID"), value=survey_tool_type_id))
+    if survey_tool_type_id and isinstance(survey_tool_type_id, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("SurveyToolTypeID"), values=survey_tool_type_id))
+    if survey_tool_type_id_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("SurveyToolTypeID"), value=survey_tool_type_id_prefix))
+    if survey_type and isinstance(survey_type, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("SurveyType"), value=survey_type))
+    if survey_type and isinstance(survey_type, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("SurveyType"), values=survey_type))
+    if survey_type_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("SurveyType"), value=survey_type_prefix))
+    if survey_version and isinstance(survey_version, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("SurveyVersion"), value=survey_version))
+    if survey_version and isinstance(survey_version, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("SurveyVersion"), values=survey_version))
+    if survey_version_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("SurveyVersion"), value=survey_version_prefix))
+    if min_tie_measured_depth or max_tie_measured_depth:
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("TieMeasuredDepth"), gte=min_tie_measured_depth, lte=max_tie_measured_depth
+            )
+        )
+    if min_tie_true_vertical_depth or max_tie_true_vertical_depth:
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("TieTrueVerticalDepth"),
+                gte=min_tie_true_vertical_depth,
+                lte=max_tie_true_vertical_depth,
+            )
+        )
+    if min_top_depth_measured_depth or max_top_depth_measured_depth:
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("TopDepthMeasuredDepth"),
+                gte=min_top_depth_measured_depth,
+                lte=max_top_depth_measured_depth,
+            )
+        )
+    if min_tortuosity or max_tortuosity:
+        filters.append(dm.filters.Range(view_id.as_property_ref("Tortuosity"), gte=min_tortuosity, lte=max_tortuosity))
+    if vertical_measurement and isinstance(vertical_measurement, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("VerticalMeasurement"),
+                value={"space": "IntegrationTestsImmutable", "externalId": vertical_measurement},
+            )
+        )
+    if vertical_measurement and isinstance(vertical_measurement, tuple):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("VerticalMeasurement"),
+                value={"space": vertical_measurement[0], "externalId": vertical_measurement[1]},
+            )
+        )
+    if vertical_measurement and isinstance(vertical_measurement, list) and isinstance(vertical_measurement[0], str):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("VerticalMeasurement"),
+                values=[{"space": "IntegrationTestsImmutable", "externalId": item} for item in vertical_measurement],
+            )
+        )
+    if vertical_measurement and isinstance(vertical_measurement, list) and isinstance(vertical_measurement[0], tuple):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("VerticalMeasurement"),
+                values=[{"space": item[0], "externalId": item[1]} for item in vertical_measurement],
+            )
+        )
+    if wellbore_id and isinstance(wellbore_id, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("WellboreID"), value=wellbore_id))
+    if wellbore_id and isinstance(wellbore_id, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("WellboreID"), values=wellbore_id))
+    if wellbore_id_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("WellboreID"), value=wellbore_id_prefix))
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

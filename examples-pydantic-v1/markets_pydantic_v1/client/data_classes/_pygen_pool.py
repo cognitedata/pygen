@@ -44,7 +44,7 @@ class PygenPool(DomainModel):
 
 class PygenPoolApply(DomainModelApply):
     space: str = "market"
-    day_of_week: Optional[int] = None
+    day_of_week: Optional[int] = Field(None, alias="dayOfWeek")
     name: Optional[str] = None
     timezone: Optional[str] = None
 

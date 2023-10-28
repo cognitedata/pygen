@@ -129,27 +129,27 @@ class WorkOrder(DomainModel):
 
 class WorkOrderApply(DomainModelApply):
     space: str = "tutorial_apm_simple"
-    actual_hours: Optional[int] = None
-    created_date: Optional[datetime.datetime] = None
+    actual_hours: Optional[int] = Field(None, alias="actualHours")
+    created_date: Optional[datetime.datetime] = Field(None, alias="createdDate")
     description: Optional[str] = None
-    due_date: Optional[datetime.datetime] = None
-    duration_hours: Optional[int] = None
-    end_time: Optional[datetime.datetime] = None
-    is_active: Optional[bool] = None
-    is_cancelled: Optional[bool] = None
-    is_completed: Optional[bool] = None
-    is_safety_critical: Optional[bool] = None
-    linked_assets: Union[list[AssetApply], list[str], None] = Field(default=None, repr=False)
-    percentage_progress: Optional[int] = None
-    planned_start: Optional[datetime.datetime] = None
-    priority_description: Optional[str] = None
-    program_number: Optional[str] = None
-    start_time: Optional[datetime.datetime] = None
+    due_date: Optional[datetime.datetime] = Field(None, alias="dueDate")
+    duration_hours: Optional[int] = Field(None, alias="durationHours")
+    end_time: Optional[datetime.datetime] = Field(None, alias="endTime")
+    is_active: Optional[bool] = Field(None, alias="isActive")
+    is_cancelled: Optional[bool] = Field(None, alias="isCancelled")
+    is_completed: Optional[bool] = Field(None, alias="isCompleted")
+    is_safety_critical: Optional[bool] = Field(None, alias="isSafetyCritical")
+    linked_assets: Union[list[AssetApply], list[str], None] = Field(default=None, repr=False, alias="linkedAssets")
+    percentage_progress: Optional[int] = Field(None, alias="percentageProgress")
+    planned_start: Optional[datetime.datetime] = Field(None, alias="plannedStart")
+    priority_description: Optional[str] = Field(None, alias="priorityDescription")
+    program_number: Optional[str] = Field(None, alias="programNumber")
+    start_time: Optional[datetime.datetime] = Field(None, alias="startTime")
     status: Optional[str] = None
     title: Optional[str] = None
-    work_items: Union[list[WorkItemApply], list[str], None] = Field(default=None, repr=False)
-    work_order_number: Optional[str] = None
-    work_package_number: Optional[str] = None
+    work_items: Union[list[WorkItemApply], list[str], None] = Field(default=None, repr=False, alias="workItems")
+    work_order_number: Optional[str] = Field(None, alias="workOrderNumber")
+    work_package_number: Optional[str] = Field(None, alias="workPackageNumber")
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:

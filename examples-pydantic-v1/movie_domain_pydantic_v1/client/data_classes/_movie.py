@@ -55,8 +55,8 @@ class MovieApply(DomainModelApply):
     directors: Union[list[DirectorApply], list[str], None] = Field(default=None, repr=False)
     meta: Optional[dict] = None
     rating: Union[RatingApply, str, None] = Field(None, repr=False)
-    release_year: Optional[int] = None
-    run_time_minutes: Optional[float] = None
+    release_year: Optional[int] = Field(None, alias="releaseYear")
+    run_time_minutes: Optional[float] = Field(None, alias="runTimeMinutes")
     title: str
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:

@@ -50,11 +50,11 @@ class PygenBid(DomainModel):
 class PygenBidApply(DomainModelApply):
     space: str = "market"
     date: Optional[datetime.date] = None
-    is_block: Optional[bool] = None
+    is_block: Optional[bool] = Field(None, alias="isBlock")
     market: Union[MarketApply, str, None] = Field(None, repr=False)
-    minimum_price: Optional[float] = None
+    minimum_price: Optional[float] = Field(None, alias="minimumPrice")
     name: Optional[str] = None
-    price_premium: Optional[float] = None
+    price_premium: Optional[float] = Field(None, alias="pricePremium")
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:
