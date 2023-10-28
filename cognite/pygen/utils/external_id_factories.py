@@ -8,14 +8,32 @@ instances of the DomainModelApply class.
 It is, however, recommended that you create your own external ids for each domain class, as this will make it easier
 to create external ids which are unique and meaningful.
 
-# Todo Add example of how to create external ids for each domain class.
+For example, if you are ingesting wells, you could create an external id based on an existing well id field
+you can write a factory like this:
+
 Example:
     ```python
-    from pygen import DomainModelApply
-    from pygen.utils.external_id_factories import uuid_factory
-    DomainModelApply.external_id_factory = uuid_factory
+    from cognite.pygen.utils.external_id_factories import uuid_factory
+    from osdu_wells.client.data_classes import DomainModelApply, WellApply
 
+    def well_factory(domain_cls: type, data: dict) -> str:
+        if domain_cls is WellApply:
+            return data["id"]
+        else:
+            # Fallback to uuid factory
+            return uuid_factory(domain_cls, data)
+
+    # Finally, we set the new factory
+    DomainModelApply.external_id_factory = well_factory
     ```
+
+The example above has created the SDK for the well data with the following configuration:
+
+```toml
+[tool.pygen]
+top_level_package = "osdu_wells.client"
+client_name = "OSDUClient"
+```
 
 """
 import uuid
