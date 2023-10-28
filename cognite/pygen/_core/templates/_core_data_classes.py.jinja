@@ -9,7 +9,7 @@ from typing import Any, Callable, ClassVar, Generic, Optional, TypeVar, overload
 import pandas as pd
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Properties, PropertyValue
-from pydantic import BaseModel, Extra, Field{% if is_pydantic_v2 %}, model_validator{% endif %}
+from pydantic import BaseModel, Extra, Field{% if is_pydantic_v2 %}, model_validator{% else %}, root_validator{% endif %}
 
 
 class DomainModelCore(BaseModel):
@@ -61,13 +61,17 @@ class DomainModelApply(DomainModelCore{% if is_pydantic_v2 %}, extra=Extra.forbi
     @abstractmethod
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         raise NotImplementedError()
-    {% if is_pydantic_v2 %}
+{% if is_pydantic_v2 %}
     @model_validator(mode="before")
     def create_external_id_if_factory(cls, data: Any) -> Any:
         if isinstance(data, dict) and cls.external_id_factory is not None:
             data["external_id"] = cls.external_id_factory(cls, data)
-        return data
-    {% endif %}
+        return data{% else %}
+    @root_validator(pre=True)
+    def create_external_id_if_factory(cls, data: Any) -> Any:
+        if isinstance(data, dict) and cls.external_id_factory is not None:
+            data["external_id"] = cls.external_id_factory(cls, data)
+        return data{% endif %}
 
 
 T_TypeNodeApply = TypeVar("T_TypeNodeApply", bound=DomainModelApply)

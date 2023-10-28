@@ -4,16 +4,14 @@ import pytest
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Properties
 
-try:
+from tests.constants import IS_PYDANTIC_V2
+
+if IS_PYDANTIC_V2:
     from movie_domain.client import data_classes as movie
     from movie_domain.client.data_classes._core import unpack_properties
-except AttributeError as e:
-    if "has no attribute 'model_rebuild" in str(e):
-        # is pydantic v1
-        from movie_domain_pydantic_v1.client import data_classes as movie
-        from movie_domain_pydantic_v1.client.data_classes._core import unpack_properties
-    else:
-        raise e
+else:
+    from movie_domain_pydantic_v1.client import data_classes as movie
+    from movie_domain_pydantic_v1.client.data_classes._core import unpack_properties
 
 
 def test_person_from_node():

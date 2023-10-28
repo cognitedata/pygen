@@ -14,11 +14,14 @@ DMS_DATA_MODELS = REPO_ROOT / "tests" / "dms_data_models"
 
 _pydantic_version = get_pydantic_version()
 IS_PYDANTIC_V1 = _pydantic_version == "v1"
+IS_PYDANTIC_V2 = _pydantic_version == "v2"
 
 EXAMPLES_DIR = {
     "v1": REPO_ROOT / "examples-pydantic-v1",
     "v2": REPO_ROOT / "examples",
 }[_pydantic_version]
+
+_EXAMPLES_DIR_V2 = REPO_ROOT / "examples"
 
 
 @dataclass
@@ -42,6 +45,11 @@ class ExampleSDK:
             first, *rest = self._top_level_package.split(".")
             return f"{first}_pydantic_v1." + ".".join(rest)
         return self._top_level_package
+
+    @property
+    def data_dir(self) -> Path:
+        first, *_ = self._top_level_package.split(".", maxsplit=1)
+        return _EXAMPLES_DIR_V2 / first / "data"
 
     @property
     def client_dir(self) -> Path:
@@ -167,7 +175,7 @@ class OSDUWellsFiles:
     client_dir = OSDU_SDK.client_dir
 
     class Data:
-        data_dir = OSDU_SDK.client_dir.parent / "data"
+        data_dir = OSDU_SDK.data_dir
         well = data_dir / "osdu-master-well_1.3.0.patched.json"
         wellbore = data_dir / "osdu-master-wellbore_1.5.0.patched.json"
         wellbore_trajectory = data_dir / "osdu-work-product-component-wellboretrajectory_1.3.0.patched.json"
