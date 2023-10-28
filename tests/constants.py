@@ -168,9 +168,9 @@ class OSDUWellsFiles:
 
     class Data:
         data_dir = OSDU_SDK.client_dir.parent / "data"
-        well = data_dir / "osdu-master-well_1.3.0.json"
-        wellbore = data_dir / "osdu-master-wellbore_1.5.0.json"
-        wellbore_trajectory = data_dir / "osdu-work-product-component-wellboretrajectory_1.3.0.json"
+        well = data_dir / "osdu-master-well_1.3.0.patched.json"
+        wellbore = data_dir / "osdu-master-wellbore_1.5.0.patched.json"
+        wellbore_trajectory = data_dir / "osdu-work-product-component-wellboretrajectory_1.3.0.patched.json"
 
 
 EXAMPLE_SDKS = [var for var in locals().values() if isinstance(var, ExampleSDK)]

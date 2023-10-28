@@ -56,7 +56,6 @@ tests/test_gqlpygen/tmp
 playground/
 data_models/
 examples/movie_domain/data/settings.toml
-examples-osdu/config/client_env.toml
 config.toml
 playground
 examples/playground.ipynb
