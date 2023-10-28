@@ -195,12 +195,13 @@ class PrimitiveField(PrimitiveFieldCore):
             return f"Optional[{self.type_}] = {self.default}"
 
     def as_write_type_hint(self) -> str:
-        # TODO: 231009 pa: need alias for write type hints too
-        # if self.need_alias:
-        #     if self.is_nullable:
         out_type = self.type_
-        if self.is_nullable:
-            out_type = f"Optional[{out_type}] = {self.default}"
+        if self.is_nullable and self.need_alias:
+            out_type = f'Optional[{out_type}] = {self.pydantic_field}({self.default}, alias="{self.prop_name}")'
+        elif self.need_alias:
+            out_type = f'Optional[{out_type}] = {self.pydantic_field}(alias="{self.prop_name}")'
+        elif self.default is not None or self.is_nullable:
+            out_type = f"{out_type} = {self.default}"
         return out_type
 
 
@@ -218,12 +219,13 @@ class PrimitiveListField(PrimitiveFieldCore):
             return f"Optional[list[{self.type_}]] = None"
 
     def as_write_type_hint(self) -> str:
-        # # TODO: 231009 pa: need alias for write type hints too
-        # if self.need_alias:
-        #     if self.is_nullable:
-        if self.is_nullable:
+        if self.is_nullable and self.need_alias:
+            return f'Optional[list[{self.type_}]] = {self.pydantic_field}(None, alias="{self.prop_name}")'
+        elif self.need_alias:
+            return f'list[{self.type_}] = {self.pydantic_field}(alias="{self.prop_name}")'
+        elif self.is_nullable:
             return f"Optional[list[{self.type_}]] = None"
-        else:
+        else:  # not self.is_nullable and not self.need_alias
             return f"list[{self.type_}]"
 
 
@@ -239,16 +241,12 @@ class CDFExternalField(PrimitiveFieldCore):
             return f"Optional[{self.type_}] = None"
 
     def as_write_type_hint(self) -> str:
-        # TODO: 231009 pa: need alias for write type hints too
-        out_type = None
+        out_type = self.type_
+        # CDF External Fields are always nullable
         if self.need_alias:
-            out_type = self.type_
-            if self.is_nullable:
-                out_type = f"Optional[{out_type}] = None"
+            out_type = f'Optional[{out_type}] = {self.pydantic_field}(None, alias="{self.prop_name}")'
         else:
-            out_type = self.type_
-            if self.is_nullable:
-                out_type = f"Optional[{out_type}] = None"
+            out_type = f"Optional[{out_type}] = None"
         return out_type
 
 
@@ -288,15 +286,12 @@ class EdgeOneToOne(EdgeField):
             return "Optional[str] = None"
 
     def as_write_type_hint(self) -> str:
-        # TODO: 231009 pa: need alias for write type hints too
+        left_side = f"Union[{self.data_class.write_name}, str, None] = "
+        # Edge fields are always nullable
         if self.need_alias:
-            # splitting long string over multiple lines
-            return (
-                f"Union[{self.data_class.write_name}, str, None] ="
-                f" {self.pydantic_field}(None, repr=False, alias='{self.prop_name}')"
-            )
+            return f'{left_side} {self.pydantic_field}(None, repr=False, alias="{self.prop_name}")'
         else:
-            return f"Union[{self.data_class.write_name}, str, None] = {self.pydantic_field}(None, repr=False)"
+            return f"{left_side} {self.pydantic_field}(None, repr=False)"
 
 
 @dataclass(frozen=True)
@@ -317,17 +312,12 @@ class EdgeOneToMany(EdgeField):
             return "Optional[list[str]] = None"
 
     def as_write_type_hint(self) -> str:
-        # TODO: 231009 pa: need alias for write type hints too
+        left_side = f"Union[list[{self.data_class.write_name}], list[str], None]"
+        # Edge fields are always nullable
         if self.need_alias:
-            return (
-                f"Union[list[{self.data_class.write_name}], list[str], None]"
-                f" = {self.pydantic_field}(default=None, repr=False, alias='{self.prop_name}')"
-            )
+            return f'{left_side} = {self.pydantic_field}(default=None, repr=False, alias="{self.prop_name}")'
         else:
-            return (
-                f"Union[list[{self.data_class.write_name}], list[str], None]"
-                f" = {self.pydantic_field}(default=None, repr=False)"
-            )
+            return f"{left_side} = {self.pydantic_field}(default=None, repr=False)"
 
 
 @dataclass(frozen=True)

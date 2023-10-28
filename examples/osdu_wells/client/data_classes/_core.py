@@ -4,12 +4,12 @@ import datetime
 from abc import abstractmethod
 from collections import UserList
 from collections.abc import Collection, Mapping, Iterator
-from typing import Any, Generic, Optional, TypeVar, overload
+from typing import Any, Generic, Optional, TypeVar, overload, ClassVar, Callable
 
 import pandas as pd
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Properties, PropertyValue
-from pydantic import BaseModel, Extra, Field
+from pydantic import BaseModel, Extra, Field, field_validator
 
 
 class DomainModelCore(BaseModel):
@@ -48,6 +48,7 @@ T_TypeNode = TypeVar("T_TypeNode", bound=DomainModel)
 
 
 class DomainModelApply(DomainModelCore, extra=Extra.forbid):
+    external_id_factory: ClassVar[Optional[Callable[[type[DomainModelApply]], str]]] = Field(None, repr=False)
     existing_version: Optional[int] = None
 
     def to_instances_apply(self) -> dm.InstancesApply:
@@ -56,6 +57,12 @@ class DomainModelApply(DomainModelCore, extra=Extra.forbid):
     @abstractmethod
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         raise NotImplementedError()
+
+    @field_validator("external_id", mode="before")
+    def create_external_id_if_missing(cls, value: str | None, info) -> str | None:
+        if cls.external_id_factory and not value:
+            return cls.external_id_factory(info.data)
+        return value
 
 
 T_TypeNodeApply = TypeVar("T_TypeNodeApply", bound=DomainModelApply)

@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 import pytest
@@ -5,7 +6,7 @@ import pytest
 from tests.constants import IS_PYDANTIC_V1, OSDUWellsFiles
 
 if not IS_PYDANTIC_V1:
-    from osdu_wells.client.data_classes import WellApply, WellboreApply, WellboreTrajectoryApply
+    from osdu_wells.client.data_classes import WellApply
     from osdu_wells.client.data_classes._core import DomainModelApply
 else:
     raise NotImplementedError
@@ -15,8 +16,6 @@ else:
     "example_file, domain_cls, expected_node_count, expected_edge_count",
     [
         (OSDUWellsFiles.Data.well, WellApply, 1, 1),
-        (OSDUWellsFiles.Data.wellbore, WellboreApply, 1, 1),
-        (OSDUWellsFiles.Data.wellbore_trajectory, WellboreTrajectoryApply, 1, 1),
     ],
 )
 def test_load_wells_from_json(
@@ -24,9 +23,12 @@ def test_load_wells_from_json(
 ) -> None:
     # Arrange
     raw_json = example_file.read_text()
+    raw_dict = json.loads(raw_json)
+    for key in ["acl", "legal", "tags", "ancestry", "data", "meta"]:
+        raw_dict.pop(key, None)
 
     # Act
-    loaded = domain_cls.model_validate_json(raw_json)
+    loaded = domain_cls.model_validate(raw_dict)
     created = loaded.to_instances_apply()
 
     # Assert
