@@ -1,3 +1,4 @@
+from ._core import DomainModel, DomainModelApply
 from ._acceptable_usage import (
     AcceptableUsage,
     AcceptableUsageApply,
@@ -250,6 +251,8 @@ WellboreTrajectoryDataApply.model_rebuild()
 WgsCoordinatesApply.model_rebuild()
 
 __all__ = [
+    "DomainModel",
+    "DomainModelApply",
     "AcceptableUsage",
     "AcceptableUsageApply",
     "AcceptableUsageList",

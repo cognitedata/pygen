@@ -1,3 +1,4 @@
+from ._core import DomainModel, DomainModelApply
 from ._bid import Bid, BidApply, BidApplyList, BidFields, BidList, BidTextFields
 from ._cog_bid import CogBid, CogBidApply, CogBidApplyList, CogBidFields, CogBidList, CogBidTextFields
 from ._cog_pool import CogPool, CogPoolApply, CogPoolApplyList, CogPoolFields, CogPoolList, CogPoolTextFields
@@ -60,6 +61,8 @@ PygenBidApply.model_rebuild()
 PygenProcessApply.model_rebuild()
 
 __all__ = [
+    "DomainModel",
+    "DomainModelApply",
     "Bid",
     "BidApply",
     "BidList",

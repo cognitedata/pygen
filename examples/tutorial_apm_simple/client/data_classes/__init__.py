@@ -1,3 +1,4 @@
+from ._core import DomainModel, DomainModelApply
 from ._asset import Asset, AssetApply, AssetApplyList, AssetFields, AssetList, AssetTextFields
 from ._cdf_3_d_connection_properties import (
     CdfConnectionProperties,
@@ -25,6 +26,8 @@ WorkItemApply.model_rebuild()
 WorkOrderApply.model_rebuild()
 
 __all__ = [
+    "DomainModel",
+    "DomainModelApply",
     "Asset",
     "AssetApply",
     "AssetList",
