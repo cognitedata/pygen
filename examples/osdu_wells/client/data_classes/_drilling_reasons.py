@@ -47,10 +47,10 @@ class DrillingReasons(DomainModel):
 
 class DrillingReasonsApply(DomainModelApply):
     space: str = "IntegrationTestsImmutable"
-    effective_date_time: Optional[str] = None
-    lahee_class_id: Optional[str] = None
-    remark: Optional[str] = None
-    termination_date_time: Optional[str] = None
+    effective_date_time: Optional[str] = Field(None, alias="EffectiveDateTime")
+    lahee_class_id: Optional[str] = Field(None, alias="LaheeClassID")
+    remark: Optional[str] = Field(None, alias="Remark")
+    termination_date_time: Optional[str] = Field(None, alias="TerminationDateTime")
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:

@@ -199,7 +199,9 @@ class PrimitiveField(PrimitiveFieldCore):
         if self.is_nullable and self.need_alias:
             out_type = f'Optional[{out_type}] = {self.pydantic_field}({self.default}, alias="{self.prop_name}")'
         elif self.need_alias:
-            out_type = f'Optional[{out_type}] = {self.pydantic_field}(alias="{self.prop_name}")'
+            out_type = f'{out_type} = {self.pydantic_field}(alias="{self.prop_name}")'
+        elif self.is_nullable:
+            out_type = f"Optional[{out_type}] = None"
         elif self.default is not None or self.is_nullable:
             out_type = f"{out_type} = {self.default}"
         return out_type

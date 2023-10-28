@@ -41,8 +41,8 @@ class LineageAssertions(DomainModel):
 
 class LineageAssertionsApply(DomainModelApply):
     space: str = "IntegrationTestsImmutable"
-    id: Optional[str] = None
-    lineage_relationship_type: Optional[str] = None
+    id: Optional[str] = Field(None, alias="ID")
+    lineage_relationship_type: Optional[str] = Field(None, alias="LineageRelationshipType")
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:

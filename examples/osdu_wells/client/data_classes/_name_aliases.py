@@ -54,11 +54,11 @@ class NameAliases(DomainModel):
 
 class NameAliasesApply(DomainModelApply):
     space: str = "IntegrationTestsImmutable"
-    alias_name: Optional[str] = None
-    alias_name_type_id: Optional[str] = None
-    definition_organisation_id: Optional[str] = None
-    effective_date_time: Optional[str] = None
-    termination_date_time: Optional[str] = None
+    alias_name: Optional[str] = Field(None, alias="AliasName")
+    alias_name_type_id: Optional[str] = Field(None, alias="AliasNameTypeID")
+    definition_organisation_id: Optional[str] = Field(None, alias="DefinitionOrganisationID")
+    effective_date_time: Optional[str] = Field(None, alias="EffectiveDateTime")
+    termination_date_time: Optional[str] = Field(None, alias="TerminationDateTime")
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:

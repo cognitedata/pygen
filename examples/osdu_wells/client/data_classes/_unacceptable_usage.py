@@ -62,11 +62,11 @@ class UnacceptableUsage(DomainModel):
 
 class UnacceptableUsageApply(DomainModelApply):
     space: str = "IntegrationTestsImmutable"
-    data_quality_id: Optional[str] = None
-    data_quality_rule_set_id: Optional[str] = None
-    value_chain_status_type_id: Optional[str] = None
-    workflow_persona_type_id: Optional[str] = None
-    workflow_usage_type_id: Optional[str] = None
+    data_quality_id: Optional[str] = Field(None, alias="DataQualityID")
+    data_quality_rule_set_id: Optional[str] = Field(None, alias="DataQualityRuleSetID")
+    value_chain_status_type_id: Optional[str] = Field(None, alias="ValueChainStatusTypeID")
+    workflow_persona_type_id: Optional[str] = Field(None, alias="WorkflowPersonaTypeID")
+    workflow_usage_type_id: Optional[str] = Field(None, alias="WorkflowUsageTypeID")
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:

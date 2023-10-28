@@ -292,70 +292,70 @@ class WellboreTrajectoryData(DomainModel):
 
 class WellboreTrajectoryDataApply(DomainModelApply):
     space: str = "IntegrationTestsImmutable"
-    acquisition_date: Optional[str] = None
-    acquisition_remark: Optional[str] = None
-    active_indicator: Optional[bool] = None
-    applied_operations: Optional[list[str]] = None
-    applied_operations_date_time: Optional[str] = None
-    applied_operations_remarks: Optional[str] = None
-    applied_operations_user: Optional[str] = None
+    acquisition_date: Optional[str] = Field(None, alias="AcquisitionDate")
+    acquisition_remark: Optional[str] = Field(None, alias="AcquisitionRemark")
+    active_indicator: Optional[bool] = Field(None, alias="ActiveIndicator")
+    applied_operations: Optional[list[str]] = Field(None, alias="AppliedOperations")
+    applied_operations_date_time: Optional[str] = Field(None, alias="AppliedOperationsDateTime")
+    applied_operations_remarks: Optional[str] = Field(None, alias="AppliedOperationsRemarks")
+    applied_operations_user: Optional[str] = Field(None, alias="AppliedOperationsUser")
     artefacts: Union[list[ArtefactsApply], list[str], None] = Field(default=None, repr=False, alias="Artefacts")
-    author_i_ds: Optional[list[str]] = None
+    author_i_ds: Optional[list[str]] = Field(None, alias="AuthorIDs")
     available_trajectory_station_properties: Union[
         list[AvailableTrajectoryStationPropertiesApply], list[str], None
     ] = Field(default=None, repr=False, alias="AvailableTrajectoryStationProperties")
-    azimuth_reference_type: Optional[str] = None
-    base_depth_measured_depth: Optional[int] = None
-    business_activities: Optional[list[str]] = None
-    calculation_method_type: Optional[str] = None
-    company_id: Optional[str] = None
-    creation_date_time: Optional[str] = None
-    ddms_datasets: Optional[list[str]] = None
-    datasets: Optional[list[str]] = None
-    description: Optional[str] = None
-    end_date_time: Optional[str] = None
-    existence_kind: Optional[str] = None
-    extrapolated_measured_depth: Optional[int] = None
-    extrapolated_measured_depth_remark: Optional[str] = None
+    azimuth_reference_type: Optional[str] = Field(None, alias="AzimuthReferenceType")
+    base_depth_measured_depth: Optional[int] = Field(None, alias="BaseDepthMeasuredDepth")
+    business_activities: Optional[list[str]] = Field(None, alias="BusinessActivities")
+    calculation_method_type: Optional[str] = Field(None, alias="CalculationMethodType")
+    company_id: Optional[str] = Field(None, alias="CompanyID")
+    creation_date_time: Optional[str] = Field(None, alias="CreationDateTime")
+    ddms_datasets: Optional[list[str]] = Field(None, alias="DDMSDatasets")
+    datasets: Optional[list[str]] = Field(None, alias="Datasets")
+    description: Optional[str] = Field(None, alias="Description")
+    end_date_time: Optional[str] = Field(None, alias="EndDateTime")
+    existence_kind: Optional[str] = Field(None, alias="ExistenceKind")
+    extrapolated_measured_depth: Optional[int] = Field(None, alias="ExtrapolatedMeasuredDepth")
+    extrapolated_measured_depth_remark: Optional[str] = Field(None, alias="ExtrapolatedMeasuredDepthRemark")
     geo_contexts: Union[list[GeoContextsApply], list[str], None] = Field(default=None, repr=False, alias="GeoContexts")
-    geographic_crsid: Optional[str] = None
-    is_discoverable: Optional[bool] = None
-    is_extended_load: Optional[bool] = None
+    geographic_crsid: Optional[str] = Field(None, alias="GeographicCRSID")
+    is_discoverable: Optional[bool] = Field(None, alias="IsDiscoverable")
+    is_extended_load: Optional[bool] = Field(None, alias="IsExtendedLoad")
     lineage_assertions: Union[list[LineageAssertionsApply], list[str], None] = Field(
         default=None, repr=False, alias="LineageAssertions"
     )
-    name: Optional[str] = None
+    name: Optional[str] = Field(None, alias="Name")
     name_aliases: Union[list[NameAliasesApply], list[str], None] = Field(default=None, repr=False, alias="NameAliases")
-    projected_crsid: Optional[str] = None
-    resource_curation_status: Optional[str] = None
-    resource_home_region_id: Optional[str] = None
-    resource_host_region_i_ds: Optional[list[str]] = None
-    resource_lifecycle_status: Optional[str] = None
-    resource_security_classification: Optional[str] = None
-    service_company_id: Optional[str] = None
-    source: Optional[str] = None
+    projected_crsid: Optional[str] = Field(None, alias="ProjectedCRSID")
+    resource_curation_status: Optional[str] = Field(None, alias="ResourceCurationStatus")
+    resource_home_region_id: Optional[str] = Field(None, alias="ResourceHomeRegionID")
+    resource_host_region_i_ds: Optional[list[str]] = Field(None, alias="ResourceHostRegionIDs")
+    resource_lifecycle_status: Optional[str] = Field(None, alias="ResourceLifecycleStatus")
+    resource_security_classification: Optional[str] = Field(None, alias="ResourceSecurityClassification")
+    service_company_id: Optional[str] = Field(None, alias="ServiceCompanyID")
+    source: Optional[str] = Field(None, alias="Source")
     spatial_area: Union[SpatialAreaApply, str, None] = Field(None, repr=False, alias="SpatialArea")
     spatial_point: Union[SpatialPointApply, str, None] = Field(None, repr=False, alias="SpatialPoint")
-    start_date_time: Optional[str] = None
-    submitter_name: Optional[str] = None
-    surface_grid_convergence: Optional[float] = None
-    surface_scale_factor: Optional[float] = None
-    survey_reference_identifier: Optional[str] = None
-    survey_tool_type_id: Optional[str] = None
-    survey_type: Optional[str] = None
-    survey_version: Optional[str] = None
-    tags: Optional[list[str]] = None
+    start_date_time: Optional[str] = Field(None, alias="StartDateTime")
+    submitter_name: Optional[str] = Field(None, alias="SubmitterName")
+    surface_grid_convergence: Optional[float] = Field(None, alias="SurfaceGridConvergence")
+    surface_scale_factor: Optional[float] = Field(None, alias="SurfaceScaleFactor")
+    survey_reference_identifier: Optional[str] = Field(None, alias="SurveyReferenceIdentifier")
+    survey_tool_type_id: Optional[str] = Field(None, alias="SurveyToolTypeID")
+    survey_type: Optional[str] = Field(None, alias="SurveyType")
+    survey_version: Optional[str] = Field(None, alias="SurveyVersion")
+    tags: Optional[list[str]] = Field(None, alias="Tags")
     technical_assurances: Union[list[TechnicalAssurancesApply], list[str], None] = Field(
         default=None, repr=False, alias="TechnicalAssurances"
     )
-    tie_measured_depth: Optional[int] = None
-    tie_true_vertical_depth: Optional[int] = None
-    top_depth_measured_depth: Optional[int] = None
-    tortuosity: Optional[float] = None
+    tie_measured_depth: Optional[int] = Field(None, alias="TieMeasuredDepth")
+    tie_true_vertical_depth: Optional[int] = Field(None, alias="TieTrueVerticalDepth")
+    top_depth_measured_depth: Optional[int] = Field(None, alias="TopDepthMeasuredDepth")
+    tortuosity: Optional[float] = Field(None, alias="Tortuosity")
     vertical_measurement: Union[VerticalMeasurementApply, str, None] = Field(
         None, repr=False, alias="VerticalMeasurement"
     )
-    wellbore_id: Optional[str] = None
+    wellbore_id: Optional[str] = Field(None, alias="WellboreID")
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:

@@ -90,18 +90,18 @@ class ProjectedBottomHoleLocation(DomainModel):
 
 class ProjectedBottomHoleLocationApply(DomainModelApply):
     space: str = "IntegrationTestsImmutable"
-    applied_operations: Optional[list[str]] = None
+    applied_operations: Optional[list[str]] = Field(None, alias="AppliedOperations")
     as_ingested_coordinates: Union[AsIngestedCoordinatesApply, str, None] = Field(
         None, repr=False, alias="AsIngestedCoordinates"
     )
-    coordinate_quality_check_date_time: Optional[str] = None
-    coordinate_quality_check_performed_by: Optional[str] = None
-    coordinate_quality_check_remarks: Optional[list[str]] = None
-    qualitative_spatial_accuracy_type_id: Optional[str] = None
-    quantitative_accuracy_band_id: Optional[str] = None
-    spatial_geometry_type_id: Optional[str] = None
-    spatial_location_coordinates_date: Optional[str] = None
-    spatial_parameter_type_id: Optional[str] = None
+    coordinate_quality_check_date_time: Optional[str] = Field(None, alias="CoordinateQualityCheckDateTime")
+    coordinate_quality_check_performed_by: Optional[str] = Field(None, alias="CoordinateQualityCheckPerformedBy")
+    coordinate_quality_check_remarks: Optional[list[str]] = Field(None, alias="CoordinateQualityCheckRemarks")
+    qualitative_spatial_accuracy_type_id: Optional[str] = Field(None, alias="QualitativeSpatialAccuracyTypeID")
+    quantitative_accuracy_band_id: Optional[str] = Field(None, alias="QuantitativeAccuracyBandID")
+    spatial_geometry_type_id: Optional[str] = Field(None, alias="SpatialGeometryTypeID")
+    spatial_location_coordinates_date: Optional[str] = Field(None, alias="SpatialLocationCoordinatesDate")
+    spatial_parameter_type_id: Optional[str] = Field(None, alias="SpatialParameterTypeID")
     wgs_84_coordinates: Union[WgsCoordinatesApply, str, None] = Field(None, repr=False, alias="Wgs84Coordinates")
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:

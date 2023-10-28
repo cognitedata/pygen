@@ -81,14 +81,14 @@ class AsIngestedCoordinates(DomainModel):
 
 class AsIngestedCoordinatesApply(DomainModelApply):
     space: str = "IntegrationTestsImmutable"
-    coordinate_reference_system_id: Optional[str] = None
-    vertical_coordinate_reference_system_id: Optional[str] = None
-    vertical_unit_id: Optional[str] = None
+    coordinate_reference_system_id: Optional[str] = Field(None, alias="CoordinateReferenceSystemID")
+    vertical_coordinate_reference_system_id: Optional[str] = Field(None, alias="VerticalCoordinateReferenceSystemID")
+    vertical_unit_id: Optional[str] = Field(None, alias="VerticalUnitID")
     bbox: Optional[list[float]] = None
     features: Union[list[FeaturesApply], list[str], None] = Field(default=None, repr=False)
-    persistable_reference_crs: Optional[str] = None
-    persistable_reference_unit_z: Optional[str] = None
-    persistable_reference_vertical_crs: Optional[str] = None
+    persistable_reference_crs: Optional[str] = Field(None, alias="persistableReferenceCrs")
+    persistable_reference_unit_z: Optional[str] = Field(None, alias="persistableReferenceUnitZ")
+    persistable_reference_vertical_crs: Optional[str] = Field(None, alias="persistableReferenceVerticalCrs")
     type: Optional[str] = None
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:

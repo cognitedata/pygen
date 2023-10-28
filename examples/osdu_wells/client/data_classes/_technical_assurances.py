@@ -58,10 +58,10 @@ class TechnicalAssurancesApply(DomainModelApply):
     acceptable_usage: Union[list[AcceptableUsageApply], list[str], None] = Field(
         default=None, repr=False, alias="AcceptableUsage"
     )
-    comment: Optional[str] = None
-    effective_date: Optional[str] = None
+    comment: Optional[str] = Field(None, alias="Comment")
+    effective_date: Optional[str] = Field(None, alias="EffectiveDate")
     reviewers: Union[list[ReviewersApply], list[str], None] = Field(default=None, repr=False, alias="Reviewers")
-    technical_assurance_type_id: Optional[str] = None
+    technical_assurance_type_id: Optional[str] = Field(None, alias="TechnicalAssuranceTypeID")
     unacceptable_usage: Union[list[UnacceptableUsageApply], list[str], None] = Field(
         default=None, repr=False, alias="UnacceptableUsage"
     )

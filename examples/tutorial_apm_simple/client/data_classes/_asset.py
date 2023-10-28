@@ -102,24 +102,24 @@ class Asset(DomainModel):
 
 class AssetApply(DomainModelApply):
     space: str = "tutorial_apm_simple"
-    area_id: Optional[int] = None
-    category_id: Optional[int] = None
+    area_id: Optional[int] = Field(None, alias="areaId")
+    category_id: Optional[int] = Field(None, alias="categoryId")
     children: Union[list[AssetApply], list[str], None] = Field(default=None, repr=False)
-    created_date: Optional[datetime.datetime] = None
+    created_date: Optional[datetime.datetime] = Field(None, alias="createdDate")
     description: Optional[str] = None
     documents: Optional[list[str]] = None
     in_model_3_d: Union[list[CdfModelApply], list[str], None] = Field(default=None, repr=False, alias="inModel3d")
-    is_active: Optional[bool] = None
-    is_critical_line: Optional[bool] = None
+    is_active: Optional[bool] = Field(None, alias="isActive")
+    is_critical_line: Optional[bool] = Field(None, alias="isCriticalLine")
     measurements: Optional[list[str]] = None
     metrics: Optional[list[str]] = None
     parent: Union[AssetApply, str, None] = Field(None, repr=False)
     pressure: Optional[str] = None
-    source_db: Optional[str] = None
+    source_db: Optional[str] = Field(None, alias="sourceDb")
     specification: Optional[str] = None
     tag: Optional[str] = None
     trajectory: Optional[str] = None
-    updated_date: Optional[datetime.datetime] = None
+    updated_date: Optional[datetime.datetime] = Field(None, alias="updatedDate")
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:

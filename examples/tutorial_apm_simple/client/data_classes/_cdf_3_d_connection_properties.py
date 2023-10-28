@@ -37,8 +37,8 @@ class CdfConnectionProperties(DomainModel):
 
 class CdfConnectionPropertiesApply(DomainModelApply):
     space: str = "cdf_3d_schema"
-    revision_id: int
-    revision_node_id: int
+    revision_id: int = Field(alias="revisionId")
+    revision_node_id: int = Field(alias="revisionNodeId")
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:

@@ -44,9 +44,9 @@ class Artefacts(DomainModel):
 
 class ArtefactsApply(DomainModelApply):
     space: str = "IntegrationTestsImmutable"
-    resource_id: Optional[str] = None
-    resource_kind: Optional[str] = None
-    role_id: Optional[str] = None
+    resource_id: Optional[str] = Field(None, alias="ResourceID")
+    resource_kind: Optional[str] = Field(None, alias="ResourceKind")
+    role_id: Optional[str] = Field(None, alias="RoleID")
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:

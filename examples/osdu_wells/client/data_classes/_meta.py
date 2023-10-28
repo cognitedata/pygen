@@ -45,9 +45,9 @@ class MetaApply(DomainModelApply):
     space: str = "IntegrationTestsImmutable"
     kind: Optional[str] = None
     name: Optional[str] = None
-    persistable_reference: Optional[str] = None
-    property_names: Optional[list[str]] = None
-    unit_of_measure_id: Optional[str] = None
+    persistable_reference: Optional[str] = Field(None, alias="persistableReference")
+    property_names: Optional[list[str]] = Field(None, alias="propertyNames")
+    unit_of_measure_id: Optional[str] = Field(None, alias="unitOfMeasureID")
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:

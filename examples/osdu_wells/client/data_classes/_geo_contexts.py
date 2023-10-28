@@ -55,12 +55,12 @@ class GeoContexts(DomainModel):
 
 class GeoContextsApply(DomainModelApply):
     space: str = "IntegrationTestsImmutable"
-    basin_id: Optional[str] = None
-    field_id: Optional[str] = None
-    geo_political_entity_id: Optional[str] = None
-    geo_type_id: Optional[str] = None
-    play_id: Optional[str] = None
-    prospect_id: Optional[str] = None
+    basin_id: Optional[str] = Field(None, alias="BasinID")
+    field_id: Optional[str] = Field(None, alias="FieldID")
+    geo_political_entity_id: Optional[str] = Field(None, alias="GeoPoliticalEntityID")
+    geo_type_id: Optional[str] = Field(None, alias="GeoTypeID")
+    play_id: Optional[str] = Field(None, alias="PlayID")
+    prospect_id: Optional[str] = Field(None, alias="ProspectID")
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:

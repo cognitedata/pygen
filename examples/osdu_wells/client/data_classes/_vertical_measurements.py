@@ -106,20 +106,20 @@ class VerticalMeasurements(DomainModel):
 
 class VerticalMeasurementsApply(DomainModelApply):
     space: str = "IntegrationTestsImmutable"
-    effective_date_time: Optional[str] = None
-    rig_id: Optional[str] = None
-    termination_date_time: Optional[str] = None
-    vertical_crsid: Optional[str] = None
-    vertical_measurement: Optional[float] = None
-    vertical_measurement_description: Optional[str] = None
-    vertical_measurement_id: Optional[str] = None
-    vertical_measurement_path_id: Optional[str] = None
-    vertical_measurement_source_id: Optional[str] = None
-    vertical_measurement_type_id: Optional[str] = None
-    vertical_measurement_unit_of_measure_id: Optional[str] = None
-    vertical_reference_entity_id: Optional[str] = None
-    vertical_reference_id: Optional[str] = None
-    wellbore_tvd_trajectory_id: Optional[str] = None
+    effective_date_time: Optional[str] = Field(None, alias="EffectiveDateTime")
+    rig_id: Optional[str] = Field(None, alias="RigID")
+    termination_date_time: Optional[str] = Field(None, alias="TerminationDateTime")
+    vertical_crsid: Optional[str] = Field(None, alias="VerticalCRSID")
+    vertical_measurement: Optional[float] = Field(None, alias="VerticalMeasurement")
+    vertical_measurement_description: Optional[str] = Field(None, alias="VerticalMeasurementDescription")
+    vertical_measurement_id: Optional[str] = Field(None, alias="VerticalMeasurementID")
+    vertical_measurement_path_id: Optional[str] = Field(None, alias="VerticalMeasurementPathID")
+    vertical_measurement_source_id: Optional[str] = Field(None, alias="VerticalMeasurementSourceID")
+    vertical_measurement_type_id: Optional[str] = Field(None, alias="VerticalMeasurementTypeID")
+    vertical_measurement_unit_of_measure_id: Optional[str] = Field(None, alias="VerticalMeasurementUnitOfMeasureID")
+    vertical_reference_entity_id: Optional[str] = Field(None, alias="VerticalReferenceEntityID")
+    vertical_reference_id: Optional[str] = Field(None, alias="VerticalReferenceID")
+    wellbore_tvd_trajectory_id: Optional[str] = Field(None, alias="WellboreTVDTrajectoryID")
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:

@@ -75,14 +75,14 @@ class FacilitySpecifications(DomainModel):
 
 class FacilitySpecificationsApply(DomainModelApply):
     space: str = "IntegrationTestsImmutable"
-    effective_date_time: Optional[str] = None
-    facility_specification_date_time: Optional[str] = None
-    facility_specification_indicator: Optional[bool] = None
-    facility_specification_quantity: Optional[float] = None
-    facility_specification_text: Optional[str] = None
-    parameter_type_id: Optional[str] = None
-    termination_date_time: Optional[str] = None
-    unit_of_measure_id: Optional[str] = None
+    effective_date_time: Optional[str] = Field(None, alias="EffectiveDateTime")
+    facility_specification_date_time: Optional[str] = Field(None, alias="FacilitySpecificationDateTime")
+    facility_specification_indicator: Optional[bool] = Field(None, alias="FacilitySpecificationIndicator")
+    facility_specification_quantity: Optional[float] = Field(None, alias="FacilitySpecificationQuantity")
+    facility_specification_text: Optional[str] = Field(None, alias="FacilitySpecificationText")
+    parameter_type_id: Optional[str] = Field(None, alias="ParameterTypeID")
+    termination_date_time: Optional[str] = Field(None, alias="TerminationDateTime")
+    unit_of_measure_id: Optional[str] = Field(None, alias="UnitOfMeasureID")
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:

@@ -43,10 +43,10 @@ class CogPool(DomainModel):
 
 class CogPoolApply(DomainModelApply):
     space: str = "market"
-    max_price: Optional[float] = None
-    min_price: Optional[float] = None
+    max_price: Optional[float] = Field(None, alias="maxPrice")
+    min_price: Optional[float] = Field(None, alias="minPrice")
     name: Optional[str] = None
-    time_unit: Optional[str] = None
+    time_unit: Optional[str] = Field(None, alias="timeUnit")
     timezone: Optional[str] = None
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:

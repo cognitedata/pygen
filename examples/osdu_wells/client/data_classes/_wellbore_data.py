@@ -283,22 +283,22 @@ class WellboreData(DomainModel):
 
 class WellboreDataApply(DomainModelApply):
     space: str = "IntegrationTestsImmutable"
-    business_intention_id: Optional[str] = None
-    condition_id: Optional[str] = None
-    current_operator_id: Optional[str] = None
-    data_source_organisation_id: Optional[str] = None
-    default_vertical_measurement_id: Optional[str] = None
-    definitive_trajectory_id: Optional[str] = None
+    business_intention_id: Optional[str] = Field(None, alias="BusinessIntentionID")
+    condition_id: Optional[str] = Field(None, alias="ConditionID")
+    current_operator_id: Optional[str] = Field(None, alias="CurrentOperatorID")
+    data_source_organisation_id: Optional[str] = Field(None, alias="DataSourceOrganisationID")
+    default_vertical_measurement_id: Optional[str] = Field(None, alias="DefaultVerticalMeasurementID")
+    definitive_trajectory_id: Optional[str] = Field(None, alias="DefinitiveTrajectoryID")
     drilling_reasons: Union[list[DrillingReasonsApply], list[str], None] = Field(
         default=None, repr=False, alias="DrillingReasons"
     )
-    existence_kind: Optional[str] = None
-    facility_description: Optional[str] = None
+    existence_kind: Optional[str] = Field(None, alias="ExistenceKind")
+    facility_description: Optional[str] = Field(None, alias="FacilityDescription")
     facility_events: Union[list[FacilityEventsApply], list[str], None] = Field(
         default=None, repr=False, alias="FacilityEvents"
     )
-    facility_id: Optional[str] = None
-    facility_name: Optional[str] = None
+    facility_id: Optional[str] = Field(None, alias="FacilityID")
+    facility_name: Optional[str] = Field(None, alias="FacilityName")
     facility_operators: Union[list[FacilityOperatorsApply], list[str], None] = Field(
         default=None, repr=False, alias="FacilityOperators"
     )
@@ -308,9 +308,9 @@ class WellboreDataApply(DomainModelApply):
     facility_states: Union[list[FacilityStatesApply], list[str], None] = Field(
         default=None, repr=False, alias="FacilityStates"
     )
-    facility_type_id: Optional[str] = None
-    fluid_direction_id: Optional[str] = None
-    formation_name_at_total_depth: Optional[str] = None
+    facility_type_id: Optional[str] = Field(None, alias="FacilityTypeID")
+    fluid_direction_id: Optional[str] = Field(None, alias="FluidDirectionID")
+    formation_name_at_total_depth: Optional[str] = Field(None, alias="FormationNameAtTotalDepth")
     geo_contexts: Union[list[GeoContextsApply], list[str], None] = Field(default=None, repr=False, alias="GeoContexts")
     geographic_bottom_hole_location: Union[GeographicBottomHoleLocationApply, str, None] = Field(
         None, repr=False, alias="GeographicBottomHoleLocation"
@@ -318,48 +318,50 @@ class WellboreDataApply(DomainModelApply):
     historical_interests: Union[list[HistoricalInterestsApply], list[str], None] = Field(
         default=None, repr=False, alias="HistoricalInterests"
     )
-    initial_operator_id: Optional[str] = None
-    interest_type_id: Optional[str] = None
-    kick_off_wellbore: Optional[str] = None
+    initial_operator_id: Optional[str] = Field(None, alias="InitialOperatorID")
+    interest_type_id: Optional[str] = Field(None, alias="InterestTypeID")
+    kick_off_wellbore: Optional[str] = Field(None, alias="KickOffWellbore")
     name_aliases: Union[list[NameAliasesApply], list[str], None] = Field(default=None, repr=False, alias="NameAliases")
-    operating_environment_id: Optional[str] = None
-    outcome_id: Optional[str] = None
-    primary_product_type_id: Optional[str] = None
+    operating_environment_id: Optional[str] = Field(None, alias="OperatingEnvironmentID")
+    outcome_id: Optional[str] = Field(None, alias="OutcomeID")
+    primary_product_type_id: Optional[str] = Field(None, alias="PrimaryProductTypeID")
     projected_bottom_hole_location: Union[ProjectedBottomHoleLocationApply, str, None] = Field(
         None, repr=False, alias="ProjectedBottomHoleLocation"
     )
-    resource_curation_status: Optional[str] = None
-    resource_home_region_id: Optional[str] = None
-    resource_host_region_i_ds: Optional[list[str]] = None
-    resource_lifecycle_status: Optional[str] = None
-    resource_security_classification: Optional[str] = None
-    role_id: Optional[str] = None
-    secondary_product_type_id: Optional[str] = None
-    sequence_number: Optional[int] = None
-    show_product_type_id: Optional[str] = None
-    source: Optional[str] = None
+    resource_curation_status: Optional[str] = Field(None, alias="ResourceCurationStatus")
+    resource_home_region_id: Optional[str] = Field(None, alias="ResourceHomeRegionID")
+    resource_host_region_i_ds: Optional[list[str]] = Field(None, alias="ResourceHostRegionIDs")
+    resource_lifecycle_status: Optional[str] = Field(None, alias="ResourceLifecycleStatus")
+    resource_security_classification: Optional[str] = Field(None, alias="ResourceSecurityClassification")
+    role_id: Optional[str] = Field(None, alias="RoleID")
+    secondary_product_type_id: Optional[str] = Field(None, alias="SecondaryProductTypeID")
+    sequence_number: Optional[int] = Field(None, alias="SequenceNumber")
+    show_product_type_id: Optional[str] = Field(None, alias="ShowProductTypeID")
+    source: Optional[str] = Field(None, alias="Source")
     spatial_location: Union[SpatialLocationApply, str, None] = Field(None, repr=False, alias="SpatialLocation")
-    status_summary_id: Optional[str] = None
-    target_formation: Optional[str] = None
-    technical_assurance_type_id: Optional[str] = None
+    status_summary_id: Optional[str] = Field(None, alias="StatusSummaryID")
+    target_formation: Optional[str] = Field(None, alias="TargetFormation")
+    technical_assurance_type_id: Optional[str] = Field(None, alias="TechnicalAssuranceTypeID")
     technical_assurances: Union[list[TechnicalAssurancesApply], list[str], None] = Field(
         default=None, repr=False, alias="TechnicalAssurances"
     )
-    tertiary_product_type_id: Optional[str] = None
-    trajectory_type_id: Optional[str] = None
-    version_creation_reason: Optional[str] = None
+    tertiary_product_type_id: Optional[str] = Field(None, alias="TertiaryProductTypeID")
+    trajectory_type_id: Optional[str] = Field(None, alias="TrajectoryTypeID")
+    version_creation_reason: Optional[str] = Field(None, alias="VersionCreationReason")
     vertical_measurements: Union[list[VerticalMeasurementsApply], list[str], None] = Field(
         default=None, repr=False, alias="VerticalMeasurements"
     )
-    was_business_interest_financial_non_operated: Optional[bool] = None
-    was_business_interest_financial_operated: Optional[bool] = None
-    was_business_interest_obligatory: Optional[bool] = None
-    was_business_interest_technical: Optional[bool] = None
-    well_id: Optional[str] = None
+    was_business_interest_financial_non_operated: Optional[bool] = Field(
+        None, alias="WasBusinessInterestFinancialNonOperated"
+    )
+    was_business_interest_financial_operated: Optional[bool] = Field(None, alias="WasBusinessInterestFinancialOperated")
+    was_business_interest_obligatory: Optional[bool] = Field(None, alias="WasBusinessInterestObligatory")
+    was_business_interest_technical: Optional[bool] = Field(None, alias="WasBusinessInterestTechnical")
+    well_id: Optional[str] = Field(None, alias="WellID")
     wellbore_costs: Union[list[WellboreCostsApply], list[str], None] = Field(
         default=None, repr=False, alias="WellboreCosts"
     )
-    wellbore_reason_id: Optional[str] = None
+    wellbore_reason_id: Optional[str] = Field(None, alias="WellboreReasonID")
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:

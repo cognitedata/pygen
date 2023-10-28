@@ -71,15 +71,15 @@ class WellApply(DomainModelApply):
     space: str = "IntegrationTestsImmutable"
     acl: Union[AclApply, str, None] = Field(None, repr=False)
     ancestry: Union[AncestryApply, str, None] = Field(None, repr=False)
-    create_time: Optional[str] = None
-    create_user: Optional[str] = None
+    create_time: Optional[str] = Field(None, alias="createTime")
+    create_user: Optional[str] = Field(None, alias="createUser")
     data: Union[WellDataApply, str, None] = Field(None, repr=False)
     id: Optional[str] = None
     kind: Optional[str] = None
     legal: Union[LegalApply, str, None] = Field(None, repr=False)
     meta: Union[list[MetaApply], list[str], None] = Field(default=None, repr=False)
-    modify_time: Optional[str] = None
-    modify_user: Optional[str] = None
+    modify_time: Optional[str] = Field(None, alias="modifyTime")
+    modify_user: Optional[str] = Field(None, alias="modifyUser")
     tags: Union[TagsApply, str, None] = Field(None, repr=False)
     version: Optional[int] = None
 

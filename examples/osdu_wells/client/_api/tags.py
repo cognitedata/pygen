@@ -6,7 +6,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI
+from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from osdu_wells.client.data_classes import Tags, TagsApply, TagsList, TagsApplyList, TagsFields, TagsTextFields
 from osdu_wells.client.data_classes._tags import _TAGS_PROPERTIES_BY_FIELD
 

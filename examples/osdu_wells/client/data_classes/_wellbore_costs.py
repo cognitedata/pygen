@@ -41,8 +41,8 @@ class WellboreCosts(DomainModel):
 
 class WellboreCostsApply(DomainModelApply):
     space: str = "IntegrationTestsImmutable"
-    activity_type_id: Optional[str] = None
-    cost: Optional[float] = None
+    activity_type_id: Optional[str] = Field(None, alias="ActivityTypeID")
+    cost: Optional[float] = Field(None, alias="Cost")
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:

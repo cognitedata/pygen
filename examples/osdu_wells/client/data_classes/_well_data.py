@@ -205,19 +205,19 @@ class WellData(DomainModel):
 
 class WellDataApply(DomainModelApply):
     space: str = "IntegrationTestsImmutable"
-    business_intention_id: Optional[str] = None
-    condition_id: Optional[str] = None
-    current_operator_id: Optional[str] = None
-    data_source_organisation_id: Optional[str] = None
-    default_vertical_crsid: Optional[str] = None
-    default_vertical_measurement_id: Optional[str] = None
-    existence_kind: Optional[str] = None
-    facility_description: Optional[str] = None
+    business_intention_id: Optional[str] = Field(None, alias="BusinessIntentionID")
+    condition_id: Optional[str] = Field(None, alias="ConditionID")
+    current_operator_id: Optional[str] = Field(None, alias="CurrentOperatorID")
+    data_source_organisation_id: Optional[str] = Field(None, alias="DataSourceOrganisationID")
+    default_vertical_crsid: Optional[str] = Field(None, alias="DefaultVerticalCRSID")
+    default_vertical_measurement_id: Optional[str] = Field(None, alias="DefaultVerticalMeasurementID")
+    existence_kind: Optional[str] = Field(None, alias="ExistenceKind")
+    facility_description: Optional[str] = Field(None, alias="FacilityDescription")
     facility_events: Union[list[FacilityEventsApply], list[str], None] = Field(
         default=None, repr=False, alias="FacilityEvents"
     )
-    facility_id: Optional[str] = None
-    facility_name: Optional[str] = None
+    facility_id: Optional[str] = Field(None, alias="FacilityID")
+    facility_name: Optional[str] = Field(None, alias="FacilityName")
     facility_operators: Union[list[FacilityOperatorsApply], list[str], None] = Field(
         default=None, repr=False, alias="FacilityOperators"
     )
@@ -227,37 +227,39 @@ class WellDataApply(DomainModelApply):
     facility_states: Union[list[FacilityStatesApply], list[str], None] = Field(
         default=None, repr=False, alias="FacilityStates"
     )
-    facility_type_id: Optional[str] = None
+    facility_type_id: Optional[str] = Field(None, alias="FacilityTypeID")
     geo_contexts: Union[list[GeoContextsApply], list[str], None] = Field(default=None, repr=False, alias="GeoContexts")
     historical_interests: Union[list[HistoricalInterestsApply], list[str], None] = Field(
         default=None, repr=False, alias="HistoricalInterests"
     )
-    initial_operator_id: Optional[str] = None
-    interest_type_id: Optional[str] = None
+    initial_operator_id: Optional[str] = Field(None, alias="InitialOperatorID")
+    interest_type_id: Optional[str] = Field(None, alias="InterestTypeID")
     name_aliases: Union[list[NameAliasesApply], list[str], None] = Field(default=None, repr=False, alias="NameAliases")
-    operating_environment_id: Optional[str] = None
-    outcome_id: Optional[str] = None
-    resource_curation_status: Optional[str] = None
-    resource_home_region_id: Optional[str] = None
-    resource_host_region_i_ds: Optional[list[str]] = None
-    resource_lifecycle_status: Optional[str] = None
-    resource_security_classification: Optional[str] = None
-    role_id: Optional[str] = None
-    source: Optional[str] = None
+    operating_environment_id: Optional[str] = Field(None, alias="OperatingEnvironmentID")
+    outcome_id: Optional[str] = Field(None, alias="OutcomeID")
+    resource_curation_status: Optional[str] = Field(None, alias="ResourceCurationStatus")
+    resource_home_region_id: Optional[str] = Field(None, alias="ResourceHomeRegionID")
+    resource_host_region_i_ds: Optional[list[str]] = Field(None, alias="ResourceHostRegionIDs")
+    resource_lifecycle_status: Optional[str] = Field(None, alias="ResourceLifecycleStatus")
+    resource_security_classification: Optional[str] = Field(None, alias="ResourceSecurityClassification")
+    role_id: Optional[str] = Field(None, alias="RoleID")
+    source: Optional[str] = Field(None, alias="Source")
     spatial_location: Union[SpatialLocationApply, str, None] = Field(None, repr=False, alias="SpatialLocation")
-    status_summary_id: Optional[str] = None
-    technical_assurance_type_id: Optional[str] = None
+    status_summary_id: Optional[str] = Field(None, alias="StatusSummaryID")
+    technical_assurance_type_id: Optional[str] = Field(None, alias="TechnicalAssuranceTypeID")
     technical_assurances: Union[list[TechnicalAssurancesApply], list[str], None] = Field(
         default=None, repr=False, alias="TechnicalAssurances"
     )
-    version_creation_reason: Optional[str] = None
+    version_creation_reason: Optional[str] = Field(None, alias="VersionCreationReason")
     vertical_measurements: Union[list[VerticalMeasurementsApply], list[str], None] = Field(
         default=None, repr=False, alias="VerticalMeasurements"
     )
-    was_business_interest_financial_non_operated: Optional[bool] = None
-    was_business_interest_financial_operated: Optional[bool] = None
-    was_business_interest_obligatory: Optional[bool] = None
-    was_business_interest_technical: Optional[bool] = None
+    was_business_interest_financial_non_operated: Optional[bool] = Field(
+        None, alias="WasBusinessInterestFinancialNonOperated"
+    )
+    was_business_interest_financial_operated: Optional[bool] = Field(None, alias="WasBusinessInterestFinancialOperated")
+    was_business_interest_obligatory: Optional[bool] = Field(None, alias="WasBusinessInterestObligatory")
+    was_business_interest_technical: Optional[bool] = Field(None, alias="WasBusinessInterestTechnical")
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:

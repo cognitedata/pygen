@@ -62,11 +62,11 @@ class FacilityOperators(DomainModel):
 
 class FacilityOperatorsApply(DomainModelApply):
     space: str = "IntegrationTestsImmutable"
-    effective_date_time: Optional[str] = None
-    facility_operator_id: Optional[str] = None
-    facility_operator_organisation_id: Optional[str] = None
-    remark: Optional[str] = None
-    termination_date_time: Optional[str] = None
+    effective_date_time: Optional[str] = Field(None, alias="EffectiveDateTime")
+    facility_operator_id: Optional[str] = Field(None, alias="FacilityOperatorID")
+    facility_operator_organisation_id: Optional[str] = Field(None, alias="FacilityOperatorOrganisationID")
+    remark: Optional[str] = Field(None, alias="Remark")
+    termination_date_time: Optional[str] = Field(None, alias="TerminationDateTime")
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:

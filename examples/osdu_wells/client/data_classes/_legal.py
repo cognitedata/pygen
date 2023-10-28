@@ -38,7 +38,7 @@ class Legal(DomainModel):
 class LegalApply(DomainModelApply):
     space: str = "IntegrationTestsImmutable"
     legaltags: Optional[list[str]] = None
-    other_relevant_data_countries: Optional[list[str]] = None
+    other_relevant_data_countries: Optional[list[str]] = Field(None, alias="otherRelevantDataCountries")
     status: Optional[str] = None
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:

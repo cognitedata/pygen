@@ -54,11 +54,11 @@ class Reviewers(DomainModel):
 
 class ReviewersApply(DomainModelApply):
     space: str = "IntegrationTestsImmutable"
-    data_governance_role_type_id: Optional[str] = None
-    name: Optional[str] = None
-    organisation_id: Optional[str] = None
-    role_type_id: Optional[str] = None
-    workflow_persona_type_id: Optional[str] = None
+    data_governance_role_type_id: Optional[str] = Field(None, alias="DataGovernanceRoleTypeID")
+    name: Optional[str] = Field(None, alias="Name")
+    organisation_id: Optional[str] = Field(None, alias="OrganisationID")
+    role_type_id: Optional[str] = Field(None, alias="RoleTypeID")
+    workflow_persona_type_id: Optional[str] = Field(None, alias="WorkflowPersonaTypeID")
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:

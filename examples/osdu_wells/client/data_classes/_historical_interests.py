@@ -44,9 +44,9 @@ class HistoricalInterests(DomainModel):
 
 class HistoricalInterestsApply(DomainModelApply):
     space: str = "IntegrationTestsImmutable"
-    effective_date_time: Optional[str] = None
-    interest_type_id: Optional[str] = None
-    termination_date_time: Optional[str] = None
+    effective_date_time: Optional[str] = Field(None, alias="EffectiveDateTime")
+    interest_type_id: Optional[str] = Field(None, alias="InterestTypeID")
+    termination_date_time: Optional[str] = Field(None, alias="TerminationDateTime")
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
         if self.external_id in cache:

@@ -64,13 +64,13 @@ class WorkItemApply(DomainModelApply):
     space: str = "tutorial_apm_simple"
     criticality: Optional[str] = None
     description: Optional[str] = None
-    is_completed: Optional[bool] = None
-    item_info: Optional[str] = None
-    item_name: Optional[str] = None
+    is_completed: Optional[bool] = Field(None, alias="isCompleted")
+    item_info: Optional[str] = Field(None, alias="itemInfo")
+    item_name: Optional[str] = Field(None, alias="itemName")
     linked_assets: Union[list[AssetApply], list[str], None] = Field(default=None, repr=False, alias="linkedAssets")
     method: Optional[str] = None
     title: Optional[str] = None
-    to_be_done: Optional[bool] = None
+    to_be_done: Optional[bool] = Field(None, alias="toBeDone")
     work_order: Union[WorkOrderApply, str, None] = Field(None, repr=False, alias="workOrder")
 
     def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
