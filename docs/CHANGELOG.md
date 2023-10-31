@@ -448,7 +448,7 @@ A complete rewrite of the package. It is now DMS based instead of graphql schema
 * `pygen` is now built on top of `cognit-sdk` and thus do not have its own custom implementation of `data modeling`
   client.
 
-**Caveat** Not a single line of code from the previous version is used in this version. Thus, no of the own functionality is
+**Caveat** Not a single line of code from the previous version is used in this version. Thus, no of the old functionality is
   available in this version. This is a complete rewrite.
 
 ## [0.9.1] - 09-06-23
