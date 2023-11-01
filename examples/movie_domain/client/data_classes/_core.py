@@ -51,11 +51,11 @@ class DomainModelApply(DomainModelCore, extra=Extra.forbid, populate_by_name=Tru
     external_id_factory: ClassVar[Optional[Callable[[type[DomainModelApply], dict], str]]] = None
     existing_version: Optional[int] = None
 
-    def to_instances_apply(self) -> dm.InstancesApply:
-        return self._to_instances_apply(set())
+    def to_instances_apply(self, write_view: dm.ViewId | None) -> dm.InstancesApply:
+        return self._to_instances_apply(set(), write_view)
 
     @abstractmethod
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(self, cache: set[str], write_view: dm.ViewId | None) -> dm.InstancesApply:
         raise NotImplementedError()
 
     @model_validator(mode="before")

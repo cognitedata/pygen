@@ -202,6 +202,7 @@ def load_data_classes_test_cases():
             write_list_name="SeriesApplyList",
             read_list_name="SeriesList",
             view_id=ViewSpaceExternalId(view.space, view.external_id),
+            view_version=view.version,
             variable="series",
             variable_list="series_list",
             view_name="Series",

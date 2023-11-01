@@ -94,6 +94,7 @@ def create_fields_test_cases():
         variable_list="roles",
         file_name="_roles",
         view_id=ViewSpaceExternalId("IntegrationTestsImmutable", "Role"),
+        view_version="2",
         view_name="Role",
     )
 
@@ -169,6 +170,7 @@ def create_fields_test_cases():
         variable="person",
         file_name="_persons",
         view_id=ViewSpaceExternalId("IntegrationTestsImmutable", "Person"),
+        view_version="2",
         variable_list="persons",
         view_name="Person",
     )

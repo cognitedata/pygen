@@ -337,6 +337,7 @@ class DataClass:
     variable_list: str
     file_name: str
     view_id: ViewSpaceExternalId
+    view_version: str
     fields: list[Field] = field(default_factory=list)
 
     @classmethod
@@ -358,6 +359,7 @@ class DataClass:
             variable_list=variable_list,
             file_name=file_name,
             view_id=ViewSpaceExternalId.from_(view),
+            view_version=view.version,
         )
 
     def update_fields(
@@ -423,6 +425,12 @@ class DataClass:
         return (field_ for field_ in self.fields if isinstance(field_, PrimitiveFieldCore))
 
     @property
+    def property_fields(self) -> Iterable[PrimitiveFieldCore | EdgeOneToOne]:
+        return (
+            field_ for field_ in self.primitive_core_fields if isinstance(field_, (PrimitiveFieldCore, EdgeOneToOne))
+        )
+
+    @property
     def text_fields(self) -> Iterable[PrimitiveFieldCore]:
         return (field_ for field_ in self.primitive_core_fields if field_.is_text_field)
 
@@ -452,6 +460,7 @@ class DataClass:
 
     @property
     def fields_by_container(self) -> dict[dm.ContainerId, list[PrimitiveFieldCore | EdgeOneToOne]]:
+        # Todo This should be deleted
         result: dict[dm.ContainerId, list[PrimitiveFieldCore | EdgeOneToOne]] = defaultdict(list)
         for field_ in self:
             if isinstance(field_, (PrimitiveFieldCore, EdgeOneToOne)):

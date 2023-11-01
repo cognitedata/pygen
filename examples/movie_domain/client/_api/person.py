@@ -78,9 +78,9 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
 
     def apply(self, person: PersonApply | Sequence[PersonApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(person, PersonApply):
-            instances = person.to_instances_apply()
+            instances = person.to_instances_apply(self._view_id)
         else:
-            instances = PersonApplyList(person).to_instances_apply()
+            instances = PersonApplyList(person).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
