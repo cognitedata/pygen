@@ -132,12 +132,12 @@ T_TypeNodeList = TypeVar("T_TypeNodeList", bound=TypeList, covariant=True)
 
 
 class TypeApplyList(TypeList[T_TypeApplyNode]):
-    def to_instances_apply(self) -> dm.InstancesApply:
+    def to_instances_apply(self, write_view: dm.ViewId | None) -> dm.InstancesApply:
         cache: set[str] = set()
         nodes: list[dm.NodeApply] = []
         edges: list[dm.EdgeApply] = []
         for node in self.data:
-            result = node._to_instances_apply(cache)
+            result = node._to_instances_apply(cache, write_view)
             nodes.extend(result.nodes)
             edges.extend(result.edges)
         return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))

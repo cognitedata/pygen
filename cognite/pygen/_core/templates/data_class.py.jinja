@@ -41,8 +41,7 @@ class {{ data_class.write_name }}(DomainModelApply):
     def _to_instances_apply(self, cache: set[str], write_view: dm.ViewId | None) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
-
-        {% if not data_class.has_only_one_to_many_edges %}
+{% if not data_class.has_only_one_to_many_edges %}
         properties = {}{% for field in data_class.property_fields %}
         if self.{{ field.name }} is not None:
             properties["{{ field.prop_name }}"] = {% if field.is_edge %}{
