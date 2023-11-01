@@ -28,6 +28,7 @@ class Legal(DomainModel):
 
     def as_apply(self) -> LegalApply:
         return LegalApply(
+            space=self.space,
             external_id=self.external_id,
             legaltags=self.legaltags,
             other_relevant_data_countries=self.other_relevant_data_countries,

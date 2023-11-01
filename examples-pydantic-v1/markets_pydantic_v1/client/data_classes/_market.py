@@ -25,6 +25,7 @@ class Market(DomainModel):
 
     def as_apply(self) -> MarketApply:
         return MarketApply(
+            space=self.space,
             external_id=self.external_id,
             name=self.name,
             timezone=self.timezone,

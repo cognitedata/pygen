@@ -29,6 +29,7 @@ class Role(DomainModel):
 
     def as_apply(self) -> RoleApply:
         return RoleApply(
+            space=self.space,
             external_id=self.external_id,
             movies=self.movies,
             nomination=self.nomination,

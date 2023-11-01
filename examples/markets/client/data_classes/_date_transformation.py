@@ -32,6 +32,7 @@ class DateTransformation(DomainModel):
 
     def as_apply(self) -> DateTransformationApply:
         return DateTransformationApply(
+            space=self.space,
             external_id=self.external_id,
             arguments=self.arguments,
             method=self.method,

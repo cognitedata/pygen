@@ -46,6 +46,7 @@ class WorkItem(DomainModel):
 
     def as_apply(self) -> WorkItemApply:
         return WorkItemApply(
+            space=self.space,
             external_id=self.external_id,
             criticality=self.criticality,
             description=self.description,

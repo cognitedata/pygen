@@ -73,6 +73,7 @@ class SpatialPoint(DomainModel):
 
     def as_apply(self) -> SpatialPointApply:
         return SpatialPointApply(
+            space=self.space,
             external_id=self.external_id,
             applied_operations=self.applied_operations,
             as_ingested_coordinates=self.as_ingested_coordinates,

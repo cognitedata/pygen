@@ -230,6 +230,7 @@ class WellboreTrajectoryData(DomainModel):
 
     def as_apply(self) -> WellboreTrajectoryDataApply:
         return WellboreTrajectoryDataApply(
+            space=self.space,
             external_id=self.external_id,
             acquisition_date=self.acquisition_date,
             acquisition_remark=self.acquisition_remark,

@@ -29,6 +29,7 @@ class Actor(DomainModel):
 
     def as_apply(self) -> ActorApply:
         return ActorApply(
+            space=self.space,
             external_id=self.external_id,
             movies=self.movies,
             nomination=self.nomination,

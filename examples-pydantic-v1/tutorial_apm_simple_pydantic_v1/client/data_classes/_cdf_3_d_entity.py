@@ -19,6 +19,7 @@ class CdfEntity(DomainModel):
 
     def as_apply(self) -> CdfEntityApply:
         return CdfEntityApply(
+            space=self.space,
             external_id=self.external_id,
             in_model_3_d=self.in_model_3_d,
         )

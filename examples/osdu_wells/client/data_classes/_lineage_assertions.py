@@ -33,6 +33,7 @@ class LineageAssertions(DomainModel):
 
     def as_apply(self) -> LineageAssertionsApply:
         return LineageAssertionsApply(
+            space=self.space,
             external_id=self.external_id,
             id=self.id,
             lineage_relationship_type=self.lineage_relationship_type,

@@ -32,6 +32,7 @@ class ValueTransformation(DomainModel):
 
     def as_apply(self) -> ValueTransformationApply:
         return ValueTransformationApply(
+            space=self.space,
             external_id=self.external_id,
             arguments=self.arguments,
             method=self.method,

@@ -39,6 +39,7 @@ class PygenProcess(DomainModel):
 
     def as_apply(self) -> PygenProcessApply:
         return PygenProcessApply(
+            space=self.space,
             external_id=self.external_id,
             bid=self.bid,
             date_transformations=self.date_transformations,

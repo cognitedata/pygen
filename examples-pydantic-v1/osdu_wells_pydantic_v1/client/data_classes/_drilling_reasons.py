@@ -37,6 +37,7 @@ class DrillingReasons(DomainModel):
 
     def as_apply(self) -> DrillingReasonsApply:
         return DrillingReasonsApply(
+            space=self.space,
             external_id=self.external_id,
             effective_date_time=self.effective_date_time,
             lahee_class_id=self.lahee_class_id,

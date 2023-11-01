@@ -33,6 +33,7 @@ class WellboreCosts(DomainModel):
 
     def as_apply(self) -> WellboreCostsApply:
         return WellboreCostsApply(
+            space=self.space,
             external_id=self.external_id,
             activity_type_id=self.activity_type_id,
             cost=self.cost,

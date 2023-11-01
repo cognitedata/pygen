@@ -32,6 +32,7 @@ class CogPool(DomainModel):
 
     def as_apply(self) -> CogPoolApply:
         return CogPoolApply(
+            space=self.space,
             external_id=self.external_id,
             max_price=self.max_price,
             min_price=self.min_price,

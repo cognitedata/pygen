@@ -57,6 +57,7 @@ class WellboreTrajectory(DomainModel):
 
     def as_apply(self) -> WellboreTrajectoryApply:
         return WellboreTrajectoryApply(
+            space=self.space,
             external_id=self.external_id,
             acl=self.acl,
             ancestry=self.ancestry,

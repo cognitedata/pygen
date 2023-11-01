@@ -48,6 +48,7 @@ class ScenarioInstance(DomainModel):
 
     def as_apply(self) -> ScenarioInstanceApply:
         return ScenarioInstanceApply(
+            space=self.space,
             external_id=self.external_id,
             aggregation=self.aggregation,
             country=self.country,

@@ -37,6 +37,7 @@ class FacilityEvents(DomainModel):
 
     def as_apply(self) -> FacilityEventsApply:
         return FacilityEventsApply(
+            space=self.space,
             external_id=self.external_id,
             effective_date_time=self.effective_date_time,
             facility_event_type_id=self.facility_event_type_id,

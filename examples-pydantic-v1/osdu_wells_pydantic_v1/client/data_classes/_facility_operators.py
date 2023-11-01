@@ -51,6 +51,7 @@ class FacilityOperators(DomainModel):
 
     def as_apply(self) -> FacilityOperatorsApply:
         return FacilityOperatorsApply(
+            space=self.space,
             external_id=self.external_id,
             effective_date_time=self.effective_date_time,
             facility_operator_id=self.facility_operator_id,

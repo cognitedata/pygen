@@ -66,6 +66,7 @@ class AsIngestedCoordinates(DomainModel):
 
     def as_apply(self) -> AsIngestedCoordinatesApply:
         return AsIngestedCoordinatesApply(
+            space=self.space,
             external_id=self.external_id,
             coordinate_reference_system_id=self.coordinate_reference_system_id,
             vertical_coordinate_reference_system_id=self.vertical_coordinate_reference_system_id,

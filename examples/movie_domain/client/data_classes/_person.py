@@ -30,6 +30,7 @@ class Person(DomainModel):
 
     def as_apply(self) -> PersonApply:
         return PersonApply(
+            space=self.space,
             external_id=self.external_id,
             birth_year=self.birth_year,
             name=self.name,

@@ -28,6 +28,7 @@ class Process(DomainModel):
 
     def as_apply(self) -> ProcessApply:
         return ProcessApply(
+            space=self.space,
             external_id=self.external_id,
             bid=self.bid,
             name=self.name,

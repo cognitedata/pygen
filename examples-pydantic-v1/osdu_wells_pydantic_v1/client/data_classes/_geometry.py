@@ -27,6 +27,7 @@ class Geometry(DomainModel):
 
     def as_apply(self) -> GeometryApply:
         return GeometryApply(
+            space=self.space,
             external_id=self.external_id,
             bbox=self.bbox,
             coordinates=self.coordinates,

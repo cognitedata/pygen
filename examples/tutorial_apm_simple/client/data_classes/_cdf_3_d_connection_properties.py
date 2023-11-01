@@ -29,6 +29,7 @@ class CdfConnectionProperties(DomainModel):
 
     def as_apply(self) -> CdfConnectionPropertiesApply:
         return CdfConnectionPropertiesApply(
+            space=self.space,
             external_id=self.external_id,
             revision_id=self.revision_id,
             revision_node_id=self.revision_node_id,

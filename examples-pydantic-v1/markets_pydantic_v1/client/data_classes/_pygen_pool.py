@@ -35,6 +35,7 @@ class PygenPool(DomainModel):
 
     def as_apply(self) -> PygenPoolApply:
         return PygenPoolApply(
+            space=self.space,
             external_id=self.external_id,
             day_of_week=self.day_of_week,
             name=self.name,
