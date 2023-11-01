@@ -365,8 +365,8 @@ def _create_filter(
         filters.append(
             dm.filters.Range(
                 view_id.as_property_ref("end_time"),
-                gte=min_end_time.isoformat() if min_end_time else None,
-                lte=max_end_time.isoformat() if max_end_time else None,
+                gte=min_end_time.isoformat(timespec="milliseconds") if min_end_time else None,
+                lte=max_end_time.isoformat(timespec="milliseconds") if max_end_time else None,
             )
         )
     if name and isinstance(name, str):
@@ -391,8 +391,8 @@ def _create_filter(
         filters.append(
             dm.filters.Range(
                 view_id.as_property_ref("start_time"),
-                gte=min_start_time.isoformat() if min_start_time else None,
-                lte=max_start_time.isoformat() if max_start_time else None,
+                gte=min_start_time.isoformat(timespec="milliseconds") if min_start_time else None,
+                lte=max_start_time.isoformat(timespec="milliseconds") if max_start_time else None,
             )
         )
     if external_id_prefix:

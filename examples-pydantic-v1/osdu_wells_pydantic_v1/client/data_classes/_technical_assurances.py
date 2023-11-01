@@ -103,7 +103,7 @@ class TechnicalAssurancesApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(acceptable_usage, DomainModelApply):
-                instances = acceptable_usage._to_instances_apply(cache)
+                instances = acceptable_usage._to_instances_apply(cache, write_view)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
@@ -114,7 +114,7 @@ class TechnicalAssurancesApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(reviewer, DomainModelApply):
-                instances = reviewer._to_instances_apply(cache)
+                instances = reviewer._to_instances_apply(cache, write_view)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
@@ -125,7 +125,7 @@ class TechnicalAssurancesApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(unacceptable_usage, DomainModelApply):
-                instances = unacceptable_usage._to_instances_apply(cache)
+                instances = unacceptable_usage._to_instances_apply(cache, write_view)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 

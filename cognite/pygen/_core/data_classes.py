@@ -633,7 +633,7 @@ class FilterCondition:
         filter_args: list[str] = []
         for keyword, arg in self.keyword_arguments.items():
             if arg.is_time:
-                filter_args.append(f"{keyword}={arg.name}.isoformat() if {arg.name} else None")
+                filter_args.append(f'{keyword}={arg.name}.isoformat(timespec="milliseconds") if {arg.name} else None')
             else:
                 filter_args.append(f"{keyword}={arg.name}")
         return filter_args

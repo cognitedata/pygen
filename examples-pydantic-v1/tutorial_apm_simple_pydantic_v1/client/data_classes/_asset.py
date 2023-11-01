@@ -187,7 +187,7 @@ class AssetApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(child, DomainModelApply):
-                instances = child._to_instances_apply(cache)
+                instances = child._to_instances_apply(cache, write_view)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
@@ -198,7 +198,7 @@ class AssetApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(in_model_3_d, DomainModelApply):
-                instances = in_model_3_d._to_instances_apply(cache)
+                instances = in_model_3_d._to_instances_apply(cache, write_view)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 

@@ -74,7 +74,7 @@ class {{ data_class.write_name }}(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance({{ field.variable }}, DomainModelApply):
-                instances = {{ field.variable }}._to_instances_apply(cache)
+                instances = {{ field.variable }}._to_instances_apply(cache, write_view)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 {% endfor %}{% for field in data_class.one_to_one_edges %}

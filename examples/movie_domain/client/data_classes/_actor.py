@@ -82,7 +82,7 @@ class ActorApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(movie, DomainModelApply):
-                instances = movie._to_instances_apply(cache)
+                instances = movie._to_instances_apply(cache, write_view)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
@@ -93,7 +93,7 @@ class ActorApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(nomination, DomainModelApply):
-                instances = nomination._to_instances_apply(cache)
+                instances = nomination._to_instances_apply(cache, write_view)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 

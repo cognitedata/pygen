@@ -317,8 +317,8 @@ def _create_filter(
         filters.append(
             dm.filters.Range(
                 view_id.as_property_ref("date"),
-                gte=min_date.isoformat() if min_date else None,
-                lte=max_date.isoformat() if max_date else None,
+                gte=min_date.isoformat(timespec="milliseconds") if min_date else None,
+                lte=max_date.isoformat(timespec="milliseconds") if max_date else None,
             )
         )
     if market and isinstance(market, str):

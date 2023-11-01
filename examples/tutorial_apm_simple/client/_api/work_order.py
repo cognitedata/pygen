@@ -728,8 +728,8 @@ def _create_filter(
         filters.append(
             dm.filters.Range(
                 view_id.as_property_ref("createdDate"),
-                gte=min_created_date.isoformat() if min_created_date else None,
-                lte=max_created_date.isoformat() if max_created_date else None,
+                gte=min_created_date.isoformat(timespec="milliseconds") if min_created_date else None,
+                lte=max_created_date.isoformat(timespec="milliseconds") if max_created_date else None,
             )
         )
     if description and isinstance(description, str):
@@ -742,8 +742,8 @@ def _create_filter(
         filters.append(
             dm.filters.Range(
                 view_id.as_property_ref("dueDate"),
-                gte=min_due_date.isoformat() if min_due_date else None,
-                lte=max_due_date.isoformat() if max_due_date else None,
+                gte=min_due_date.isoformat(timespec="milliseconds") if min_due_date else None,
+                lte=max_due_date.isoformat(timespec="milliseconds") if max_due_date else None,
             )
         )
     if min_duration_hours or max_duration_hours:
@@ -754,8 +754,8 @@ def _create_filter(
         filters.append(
             dm.filters.Range(
                 view_id.as_property_ref("endTime"),
-                gte=min_end_time.isoformat() if min_end_time else None,
-                lte=max_end_time.isoformat() if max_end_time else None,
+                gte=min_end_time.isoformat(timespec="milliseconds") if min_end_time else None,
+                lte=max_end_time.isoformat(timespec="milliseconds") if max_end_time else None,
             )
         )
     if is_active and isinstance(is_active, str):
@@ -776,8 +776,8 @@ def _create_filter(
         filters.append(
             dm.filters.Range(
                 view_id.as_property_ref("plannedStart"),
-                gte=min_planned_start.isoformat() if min_planned_start else None,
-                lte=max_planned_start.isoformat() if max_planned_start else None,
+                gte=min_planned_start.isoformat(timespec="milliseconds") if min_planned_start else None,
+                lte=max_planned_start.isoformat(timespec="milliseconds") if max_planned_start else None,
             )
         )
     if priority_description and isinstance(priority_description, str):
@@ -798,8 +798,8 @@ def _create_filter(
         filters.append(
             dm.filters.Range(
                 view_id.as_property_ref("startTime"),
-                gte=min_start_time.isoformat() if min_start_time else None,
-                lte=max_start_time.isoformat() if max_start_time else None,
+                gte=min_start_time.isoformat(timespec="milliseconds") if min_start_time else None,
+                lte=max_start_time.isoformat(timespec="milliseconds") if max_start_time else None,
             )
         )
     if status and isinstance(status, str):

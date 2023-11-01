@@ -220,7 +220,7 @@ class WorkOrderApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(linked_asset, DomainModelApply):
-                instances = linked_asset._to_instances_apply(cache)
+                instances = linked_asset._to_instances_apply(cache, write_view)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
@@ -231,7 +231,7 @@ class WorkOrderApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(work_item, DomainModelApply):
-                instances = work_item._to_instances_apply(cache)
+                instances = work_item._to_instances_apply(cache, write_view)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 

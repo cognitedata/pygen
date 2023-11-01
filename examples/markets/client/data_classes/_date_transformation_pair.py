@@ -53,7 +53,7 @@ class DateTransformationPairApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(end, DomainModelApply):
-                instances = end._to_instances_apply(cache)
+                instances = end._to_instances_apply(cache, write_view)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
@@ -64,7 +64,7 @@ class DateTransformationPairApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(start, DomainModelApply):
-                instances = start._to_instances_apply(cache)
+                instances = start._to_instances_apply(cache, write_view)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 

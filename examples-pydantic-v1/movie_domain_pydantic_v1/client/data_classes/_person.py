@@ -78,7 +78,7 @@ class PersonApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(role, DomainModelApply):
-                instances = role._to_instances_apply(cache)
+                instances = role._to_instances_apply(cache, write_view)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 

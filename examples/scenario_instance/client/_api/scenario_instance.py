@@ -748,8 +748,8 @@ def _create_filter(
         filters.append(
             dm.filters.Range(
                 view_id.as_property_ref("instance"),
-                gte=min_instance.isoformat() if min_instance else None,
-                lte=max_instance.isoformat() if max_instance else None,
+                gte=min_instance.isoformat(timespec="milliseconds") if min_instance else None,
+                lte=max_instance.isoformat(timespec="milliseconds") if max_instance else None,
             )
         )
     if market and isinstance(market, str):
@@ -774,8 +774,8 @@ def _create_filter(
         filters.append(
             dm.filters.Range(
                 view_id.as_property_ref("start"),
-                gte=min_start.isoformat() if min_start else None,
-                lte=max_start.isoformat() if max_start else None,
+                gte=min_start.isoformat(timespec="milliseconds") if min_start else None,
+                lte=max_start.isoformat(timespec="milliseconds") if max_start else None,
             )
         )
     if external_id_prefix:
