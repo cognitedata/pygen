@@ -61,7 +61,8 @@ class {{ data_class.write_name }}(DomainModelApply):
             )
             nodes = [this_node]
         else:
-            nodes = []{% else %}nodes = []{% endif %}
+            nodes = []{% else %}
+        nodes = []{% endif %}
 
         edges = []
         cache.add(self.external_id)
