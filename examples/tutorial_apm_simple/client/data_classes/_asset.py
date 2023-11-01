@@ -78,6 +78,7 @@ class Asset(DomainModel):
 
     def as_apply(self) -> AssetApply:
         return AssetApply(
+            space=self.space,
             external_id=self.external_id,
             area_id=self.area_id,
             category_id=self.category_id,

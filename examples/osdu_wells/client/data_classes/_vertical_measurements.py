@@ -86,6 +86,7 @@ class VerticalMeasurements(DomainModel):
 
     def as_apply(self) -> VerticalMeasurementsApply:
         return VerticalMeasurementsApply(
+            space=self.space,
             external_id=self.external_id,
             effective_date_time=self.effective_date_time,
             rig_id=self.rig_id,

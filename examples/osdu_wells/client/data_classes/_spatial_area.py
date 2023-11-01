@@ -73,6 +73,7 @@ class SpatialArea(DomainModel):
 
     def as_apply(self) -> SpatialAreaApply:
         return SpatialAreaApply(
+            space=self.space,
             external_id=self.external_id,
             applied_operations=self.applied_operations,
             as_ingested_coordinates=self.as_ingested_coordinates,

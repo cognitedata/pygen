@@ -32,6 +32,7 @@ class Meta(DomainModel):
 
     def as_apply(self) -> MetaApply:
         return MetaApply(
+            space=self.space,
             external_id=self.external_id,
             kind=self.kind,
             name=self.name,

@@ -29,6 +29,7 @@ class Director(DomainModel):
 
     def as_apply(self) -> DirectorApply:
         return DirectorApply(
+            space=self.space,
             external_id=self.external_id,
             movies=self.movies,
             nomination=self.nomination,

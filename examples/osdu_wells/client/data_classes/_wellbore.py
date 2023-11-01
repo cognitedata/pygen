@@ -50,6 +50,7 @@ class Wellbore(DomainModel):
 
     def as_apply(self) -> WellboreApply:
         return WellboreApply(
+            space=self.space,
             external_id=self.external_id,
             acl=self.acl,
             ancestry=self.ancestry,

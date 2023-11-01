@@ -37,6 +37,7 @@ class FacilityStates(DomainModel):
 
     def as_apply(self) -> FacilityStatesApply:
         return FacilityStatesApply(
+            space=self.space,
             external_id=self.external_id,
             effective_date_time=self.effective_date_time,
             facility_state_type_id=self.facility_state_type_id,
