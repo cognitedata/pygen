@@ -230,29 +230,7 @@ class {{ api_class.name }}(TypeAPI[{{ data_class.read_name }}, {{ data_class.wri
             filter_,
         ){% endif %}
 
-    def list(
-        self,{% for parm in list_method.parameters %}
-        {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
-        limit: int = DEFAULT_LIMIT_READ,
-        filter: dm.Filter | None = None,{% if data_class.has_one_to_many_edges %}
-        retrieve_edges: bool = True,{% endif %}
-    ) -> {{ data_class.read_list_name }}:
-        filter_ = _create_filter(
-            self._view_id,{% for parm in list_method.parameters %}
-            {{ parm.name }},{% endfor %}
-            filter,
-        )
-
-        {% if data_class.has_one_to_many_edges %}{{ data_class.variable_list }} = self._list(limit=limit, filter=filter_)
-
-        if retrieve_edges:{% for field in data_class.one_to_many_edges %}
-            if len(external_ids := {{ data_class.variable_list }}.as_external_ids()) > IN_FILTER_LIMIT:
-                {{ field.variable }}_edges = self.{{ field.edge_api_attribute }}.list(limit=-1)
-            else:
-                {{ field.variable }}_edges = self.{{ field.edge_api_attribute }}.list(external_ids, limit=-1)
-            self._set_{{ field.name }}({{ data_class.variable_list }}, {{ field.variable }}_edges){% endfor %}
-
-        return {{ data_class.variable_list }}{% else %}return self._list(limit=limit, filter=filter_){% endif %}
+{% include 'api_class_list_method.py.jinja' %}
 {% for field in data_class.one_to_many_edges %}
     @staticmethod
     def _set_{{ field.name }}({{ data_class.variable_list }}: Sequence[{{ data_class.read_name }}], {{ field.variable }}_edges: Sequence[dm.Edge]):
