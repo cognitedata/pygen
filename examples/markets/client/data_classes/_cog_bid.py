@@ -37,6 +37,7 @@ class CogBid(DomainModel):
 
     def as_apply(self) -> CogBidApply:
         return CogBidApply(
+            space=self.space,
             external_id=self.external_id,
             date=self.date,
             market=self.market,

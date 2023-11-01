@@ -37,6 +37,7 @@ class PygenBid(DomainModel):
 
     def as_apply(self) -> PygenBidApply:
         return PygenBidApply(
+            space=self.space,
             external_id=self.external_id,
             date=self.date,
             is_block=self.is_block,

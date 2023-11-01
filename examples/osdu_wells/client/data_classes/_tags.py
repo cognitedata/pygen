@@ -24,6 +24,7 @@ class Tags(DomainModel):
 
     def as_apply(self) -> TagsApply:
         return TagsApply(
+            space=self.space,
             external_id=self.external_id,
             name_of_key=self.name_of_key,
         )

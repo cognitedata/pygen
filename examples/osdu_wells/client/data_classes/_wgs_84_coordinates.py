@@ -37,6 +37,7 @@ class WgsCoordinates(DomainModel):
 
     def as_apply(self) -> WgsCoordinatesApply:
         return WgsCoordinatesApply(
+            space=self.space,
             external_id=self.external_id,
             bbox=self.bbox,
             features=self.features,

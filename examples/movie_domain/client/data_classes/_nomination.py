@@ -32,6 +32,7 @@ class Nomination(DomainModel):
 
     def as_apply(self) -> NominationApply:
         return NominationApply(
+            space=self.space,
             external_id=self.external_id,
             name=self.name,
             year=self.year,

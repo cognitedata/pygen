@@ -38,6 +38,7 @@ class Movie(DomainModel):
 
     def as_apply(self) -> MovieApply:
         return MovieApply(
+            space=self.space,
             external_id=self.external_id,
             actors=self.actors,
             directors=self.directors,

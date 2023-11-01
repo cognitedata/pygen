@@ -32,6 +32,7 @@ class BestLeadingActress(DomainModel):
 
     def as_apply(self) -> BestLeadingActressApply:
         return BestLeadingActressApply(
+            space=self.space,
             external_id=self.external_id,
             name=self.name,
             year=self.year,

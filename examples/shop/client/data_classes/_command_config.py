@@ -32,6 +32,7 @@ class CommandConfig(DomainModel):
 
     def as_apply(self) -> CommandConfigApply:
         return CommandConfigApply(
+            space=self.space,
             external_id=self.external_id,
             configs=self.configs,
             source=self.source,

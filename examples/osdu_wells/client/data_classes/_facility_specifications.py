@@ -61,6 +61,7 @@ class FacilitySpecifications(DomainModel):
 
     def as_apply(self) -> FacilitySpecificationsApply:
         return FacilitySpecificationsApply(
+            space=self.space,
             external_id=self.external_id,
             effective_date_time=self.effective_date_time,
             facility_specification_date_time=self.facility_specification_date_time,

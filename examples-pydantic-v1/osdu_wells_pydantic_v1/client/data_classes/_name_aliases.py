@@ -43,6 +43,7 @@ class NameAliases(DomainModel):
 
     def as_apply(self) -> NameAliasesApply:
         return NameAliasesApply(
+            space=self.space,
             external_id=self.external_id,
             alias_name=self.alias_name,
             alias_name_type_id=self.alias_name_type_id,

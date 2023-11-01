@@ -30,6 +30,7 @@ class Features(DomainModel):
 
     def as_apply(self) -> FeaturesApply:
         return FeaturesApply(
+            space=self.space,
             external_id=self.external_id,
             bbox=self.bbox,
             geometry=self.geometry,

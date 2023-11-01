@@ -102,6 +102,7 @@ class WorkOrder(DomainModel):
 
     def as_apply(self) -> WorkOrderApply:
         return WorkOrderApply(
+            space=self.space,
             external_id=self.external_id,
             actual_hours=self.actual_hours,
             created_date=self.created_date,

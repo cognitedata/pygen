@@ -32,6 +32,7 @@ class BestDirector(DomainModel):
 
     def as_apply(self) -> BestDirectorApply:
         return BestDirectorApply(
+            space=self.space,
             external_id=self.external_id,
             name=self.name,
             year=self.year,

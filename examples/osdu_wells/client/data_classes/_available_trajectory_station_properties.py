@@ -39,6 +39,7 @@ class AvailableTrajectoryStationProperties(DomainModel):
 
     def as_apply(self) -> AvailableTrajectoryStationPropertiesApply:
         return AvailableTrajectoryStationPropertiesApply(
+            space=self.space,
             external_id=self.external_id,
             name=self.name,
             station_property_unit_id=self.station_property_unit_id,

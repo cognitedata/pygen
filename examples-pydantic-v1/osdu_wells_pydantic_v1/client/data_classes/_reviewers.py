@@ -43,6 +43,7 @@ class Reviewers(DomainModel):
 
     def as_apply(self) -> ReviewersApply:
         return ReviewersApply(
+            space=self.space,
             external_id=self.external_id,
             data_governance_role_type_id=self.data_governance_role_type_id,
             name=self.name,

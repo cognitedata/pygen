@@ -23,6 +23,7 @@ class Ancestry(DomainModel):
 
     def as_apply(self) -> AncestryApply:
         return AncestryApply(
+            space=self.space,
             external_id=self.external_id,
             parents=self.parents,
         )

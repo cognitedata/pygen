@@ -25,6 +25,7 @@ class DateTransformationPair(DomainModel):
 
     def as_apply(self) -> DateTransformationPairApply:
         return DateTransformationPairApply(
+            space=self.space,
             external_id=self.external_id,
             end=self.end,
             start=self.start,

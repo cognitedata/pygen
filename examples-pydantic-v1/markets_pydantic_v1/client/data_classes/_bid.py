@@ -31,6 +31,7 @@ class Bid(DomainModel):
 
     def as_apply(self) -> BidApply:
         return BidApply(
+            space=self.space,
             external_id=self.external_id,
             date=self.date,
             market=self.market,

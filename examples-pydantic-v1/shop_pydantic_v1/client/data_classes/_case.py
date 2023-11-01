@@ -47,6 +47,7 @@ class Case(DomainModel):
 
     def as_apply(self) -> CaseApply:
         return CaseApply(
+            space=self.space,
             external_id=self.external_id,
             arguments=self.arguments,
             bid=self.bid,

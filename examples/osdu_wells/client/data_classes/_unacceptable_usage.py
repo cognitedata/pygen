@@ -51,6 +51,7 @@ class UnacceptableUsage(DomainModel):
 
     def as_apply(self) -> UnacceptableUsageApply:
         return UnacceptableUsageApply(
+            space=self.space,
             external_id=self.external_id,
             data_quality_id=self.data_quality_id,
             data_quality_rule_set_id=self.data_quality_rule_set_id,

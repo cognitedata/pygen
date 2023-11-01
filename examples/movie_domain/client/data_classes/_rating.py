@@ -25,6 +25,7 @@ class Rating(DomainModel):
 
     def as_apply(self) -> RatingApply:
         return RatingApply(
+            space=self.space,
             external_id=self.external_id,
             score=self.score,
             votes=self.votes,

@@ -160,6 +160,7 @@ class WellData(DomainModel):
 
     def as_apply(self) -> WellDataApply:
         return WellDataApply(
+            space=self.space,
             external_id=self.external_id,
             business_intention_id=self.business_intention_id,
             condition_id=self.condition_id,
