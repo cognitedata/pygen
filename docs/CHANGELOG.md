@@ -13,6 +13,10 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.27.2] - 01-11-23
+### Fixed
+* When calling `.apply` in the generated data classe, the default class `space` was always used. This is now fixed.
+
 ## [0.27.1] - 28-10-23
 ### Fixed
 * Pygen automatically converts `datetime` to `datetime.datetime` in the generated SDK to the timespec (milliseconds)
