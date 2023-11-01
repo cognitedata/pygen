@@ -47,6 +47,10 @@ pip install cognite-pygen
 ```bash
 pip install cognite-pygen[cli]
 ```
+If using zsh:
+```bash
+pip install 'cognite-pygen[cli]'
+```
 
 ## Usage
 
