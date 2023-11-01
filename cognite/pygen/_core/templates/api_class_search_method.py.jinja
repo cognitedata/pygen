@@ -1,0 +1,14 @@
+    def search(
+        self,
+        query: str,
+        properties: {{ data_class.text_field_names }} | Sequence[{{ data_class.text_field_names }}] | None = None,{% for parm in list_method.parameters %}
+        {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> {{ data_class.read_list_name }}:
+        filter_ = _create_filter(
+            self._view_id,{% for parm in list_method.parameters %}
+            {{ parm.name }},{% endfor %}
+            filter,
+        )
+        return self._search(self._view_id, query, {{ data_class.properties_dict_name }}, properties, filter_, limit)
