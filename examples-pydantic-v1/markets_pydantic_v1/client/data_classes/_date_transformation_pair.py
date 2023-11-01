@@ -37,7 +37,7 @@ class DateTransformationPairApply(DomainModelApply):
     end: Union[list[DateTransformationApply], list[str], None] = Field(default=None, repr=False)
     start: Union[list[DateTransformationApply], list[str], None] = Field(default=None, repr=False)
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(self, cache: set[str], write_view: dm.ViewId | None) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
 

@@ -35,9 +35,9 @@ class VerticalMeasurementsAPI(TypeAPI[VerticalMeasurements, VerticalMeasurements
         replace: bool = False,
     ) -> dm.InstancesApplyResult:
         if isinstance(vertical_measurement, VerticalMeasurementsApply):
-            instances = vertical_measurement.to_instances_apply()
+            instances = vertical_measurement.to_instances_apply(self._view_id)
         else:
-            instances = VerticalMeasurementsApplyList(vertical_measurement).to_instances_apply()
+            instances = VerticalMeasurementsApplyList(vertical_measurement).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

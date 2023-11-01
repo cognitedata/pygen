@@ -50,41 +50,31 @@ class CogPoolApply(DomainModelApply):
     time_unit: Optional[str] = Field(None, alias="timeUnit")
     timezone: Optional[str] = None
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(self, cache: set[str], write_view: dm.ViewId | None) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
 
-        sources = []
         properties = {}
         if self.max_price is not None:
             properties["maxPrice"] = self.max_price
         if self.min_price is not None:
             properties["minPrice"] = self.min_price
-        if self.time_unit is not None:
-            properties["timeUnit"] = self.time_unit
-        if properties:
-            source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("market", "CogPool"),
-                properties=properties,
-            )
-            sources.append(source)
-        properties = {}
         if self.name is not None:
             properties["name"] = self.name
+        if self.time_unit is not None:
+            properties["timeUnit"] = self.time_unit
         if self.timezone is not None:
             properties["timezone"] = self.timezone
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("market", "Market"),
+                source=write_view or dm.ViewId("market", "CogPool", "28af312f1d7093"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:

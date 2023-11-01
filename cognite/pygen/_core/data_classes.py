@@ -426,9 +426,7 @@ class DataClass:
 
     @property
     def property_fields(self) -> Iterable[PrimitiveFieldCore | EdgeOneToOne]:
-        return (
-            field_ for field_ in self.primitive_core_fields if isinstance(field_, (PrimitiveFieldCore, EdgeOneToOne))
-        )
+        return (field_ for field_ in self if isinstance(field_, (PrimitiveFieldCore, EdgeOneToOne)))
 
     @property
     def text_fields(self) -> Iterable[PrimitiveFieldCore]:

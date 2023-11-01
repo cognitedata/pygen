@@ -25,9 +25,9 @@ class CogBidAPI(TypeAPI[CogBid, CogBidApply, CogBidList]):
 
     def apply(self, cog_bid: CogBidApply | Sequence[CogBidApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(cog_bid, CogBidApply):
-            instances = cog_bid.to_instances_apply()
+            instances = cog_bid.to_instances_apply(self._view_id)
         else:
-            instances = CogBidApplyList(cog_bid).to_instances_apply()
+            instances = CogBidApplyList(cog_bid).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

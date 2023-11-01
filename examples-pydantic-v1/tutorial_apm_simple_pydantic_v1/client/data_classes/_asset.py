@@ -122,11 +122,10 @@ class AssetApply(DomainModelApply):
     trajectory: Optional[str] = None
     updated_date: Optional[datetime.datetime] = Field(None, alias="updatedDate")
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(self, cache: set[str], write_view: dm.ViewId | None) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
 
-        sources = []
         properties = {}
         if self.area_id is not None:
             properties["areaId"] = self.area_id
@@ -165,16 +164,14 @@ class AssetApply(DomainModelApply):
             properties["updatedDate"] = self.updated_date.isoformat(timespec="milliseconds")
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("tutorial_apm_simple", "Asset"),
+                source=write_view or dm.ViewId("tutorial_apm_simple", "Asset", "beb2bebdcbb4ad"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:
@@ -206,7 +203,7 @@ class AssetApply(DomainModelApply):
                 edges.extend(instances.edges)
 
         if isinstance(self.parent, DomainModelApply):
-            instances = self.parent._to_instances_apply(cache)
+            instances = self.parent._to_instances_apply(cache, write_view)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 

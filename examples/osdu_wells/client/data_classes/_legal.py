@@ -42,11 +42,10 @@ class LegalApply(DomainModelApply):
     other_relevant_data_countries: Optional[list[str]] = Field(None, alias="otherRelevantDataCountries")
     status: Optional[str] = None
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(self, cache: set[str], write_view: dm.ViewId | None) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
 
-        sources = []
         properties = {}
         if self.legaltags is not None:
             properties["legaltags"] = self.legaltags
@@ -56,16 +55,14 @@ class LegalApply(DomainModelApply):
             properties["status"] = self.status
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("IntegrationTestsImmutable", "Legal"),
+                source=write_view or dm.ViewId("IntegrationTestsImmutable", "Legal", "508188c6379675"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:

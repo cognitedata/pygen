@@ -45,11 +45,10 @@ class LineageAssertionsApply(DomainModelApply):
     id: Optional[str] = Field(None, alias="ID")
     lineage_relationship_type: Optional[str] = Field(None, alias="LineageRelationshipType")
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(self, cache: set[str], write_view: dm.ViewId | None) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
 
-        sources = []
         properties = {}
         if self.id is not None:
             properties["ID"] = self.id
@@ -57,16 +56,14 @@ class LineageAssertionsApply(DomainModelApply):
             properties["LineageRelationshipType"] = self.lineage_relationship_type
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("IntegrationTestsImmutable", "LineageAssertions"),
+                source=write_view or dm.ViewId("IntegrationTestsImmutable", "LineageAssertions", "ef344f6030d778"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:

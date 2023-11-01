@@ -44,11 +44,10 @@ class FeaturesApply(DomainModelApply):
     geometry: Union[GeometryApply, str, None] = Field(None, repr=False)
     type: Optional[str] = None
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(self, cache: set[str], write_view: dm.ViewId | None) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
 
-        sources = []
         properties = {}
         if self.bbox is not None:
             properties["bbox"] = self.bbox
@@ -61,16 +60,14 @@ class FeaturesApply(DomainModelApply):
             properties["type"] = self.type
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("IntegrationTestsImmutable", "Features"),
+                source=write_view or dm.ViewId("IntegrationTestsImmutable", "Features", "df91e0a3bad68c"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:
@@ -80,7 +77,7 @@ class FeaturesApply(DomainModelApply):
         cache.add(self.external_id)
 
         if isinstance(self.geometry, DomainModelApply):
-            instances = self.geometry._to_instances_apply(cache)
+            instances = self.geometry._to_instances_apply(cache, write_view)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 

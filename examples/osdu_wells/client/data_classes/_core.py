@@ -51,11 +51,11 @@ class DomainModelApply(DomainModelCore, extra=Extra.forbid, populate_by_name=Tru
     external_id_factory: ClassVar[Optional[Callable[[type[DomainModelApply], dict], str]]] = None
     existing_version: Optional[int] = None
 
-    def to_instances_apply(self) -> dm.InstancesApply:
-        return self._to_instances_apply(set())
+    def to_instances_apply(self, write_view: dm.ViewId | None = None) -> dm.InstancesApply:
+        return self._to_instances_apply(set(), write_view)
 
     @abstractmethod
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(self, cache: set[str], write_view: dm.ViewId | None) -> dm.InstancesApply:
         raise NotImplementedError()
 
     @model_validator(mode="before")
@@ -132,12 +132,12 @@ T_TypeNodeList = TypeVar("T_TypeNodeList", bound=TypeList, covariant=True)
 
 
 class TypeApplyList(TypeList[T_TypeApplyNode]):
-    def to_instances_apply(self) -> dm.InstancesApply:
+    def to_instances_apply(self, write_view: dm.ViewId | None = None) -> dm.InstancesApply:
         cache: set[str] = set()
         nodes: list[dm.NodeApply] = []
         edges: list[dm.EdgeApply] = []
         for node in self.data:
-            result = node._to_instances_apply(cache)
+            result = node._to_instances_apply(cache, write_view)
             nodes.extend(result.nodes)
             edges.extend(result.edges)
         return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))

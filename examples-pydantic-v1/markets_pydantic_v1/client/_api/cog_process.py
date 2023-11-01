@@ -33,9 +33,9 @@ class CogProcessAPI(TypeAPI[CogProcess, CogProcessApply, CogProcessList]):
         self, cog_proces: CogProcessApply | Sequence[CogProcessApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(cog_proces, CogProcessApply):
-            instances = cog_proces.to_instances_apply()
+            instances = cog_proces.to_instances_apply(self._view_id)
         else:
-            instances = CogProcessApplyList(cog_proces).to_instances_apply()
+            instances = CogProcessApplyList(cog_proces).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

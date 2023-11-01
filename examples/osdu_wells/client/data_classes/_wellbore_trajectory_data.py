@@ -358,11 +358,10 @@ class WellboreTrajectoryDataApply(DomainModelApply):
     )
     wellbore_id: Optional[str] = Field(None, alias="WellboreID")
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(self, cache: set[str], write_view: dm.ViewId | None) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
 
-        sources = []
         properties = {}
         if self.acquisition_date is not None:
             properties["AcquisitionDate"] = self.acquisition_date
@@ -481,16 +480,14 @@ class WellboreTrajectoryDataApply(DomainModelApply):
             properties["WellboreID"] = self.wellbore_id
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("IntegrationTestsImmutable", "WellboreTrajectoryData"),
+                source=write_view or dm.ViewId("IntegrationTestsImmutable", "WellboreTrajectoryData", "d35eace9691587"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:
@@ -566,17 +563,17 @@ class WellboreTrajectoryDataApply(DomainModelApply):
                 edges.extend(instances.edges)
 
         if isinstance(self.spatial_area, DomainModelApply):
-            instances = self.spatial_area._to_instances_apply(cache)
+            instances = self.spatial_area._to_instances_apply(cache, write_view)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 
         if isinstance(self.spatial_point, DomainModelApply):
-            instances = self.spatial_point._to_instances_apply(cache)
+            instances = self.spatial_point._to_instances_apply(cache, write_view)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 
         if isinstance(self.vertical_measurement, DomainModelApply):
-            instances = self.vertical_measurement._to_instances_apply(cache)
+            instances = self.vertical_measurement._to_instances_apply(cache, write_view)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 

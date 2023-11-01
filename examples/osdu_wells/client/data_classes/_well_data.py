@@ -262,11 +262,10 @@ class WellDataApply(DomainModelApply):
     was_business_interest_obligatory: Optional[bool] = Field(None, alias="WasBusinessInterestObligatory")
     was_business_interest_technical: Optional[bool] = Field(None, alias="WasBusinessInterestTechnical")
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(self, cache: set[str], write_view: dm.ViewId | None) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
 
-        sources = []
         properties = {}
         if self.business_intention_id is not None:
             properties["BusinessIntentionID"] = self.business_intention_id
@@ -335,16 +334,14 @@ class WellDataApply(DomainModelApply):
             properties["WasBusinessInterestTechnical"] = self.was_business_interest_technical
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("IntegrationTestsImmutable", "WellData"),
+                source=write_view or dm.ViewId("IntegrationTestsImmutable", "WellData", "ed82310421bd56"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:
@@ -453,7 +450,7 @@ class WellDataApply(DomainModelApply):
                 edges.extend(instances.edges)
 
         if isinstance(self.spatial_location, DomainModelApply):
-            instances = self.spatial_location._to_instances_apply(cache)
+            instances = self.spatial_location._to_instances_apply(cache, write_view)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 

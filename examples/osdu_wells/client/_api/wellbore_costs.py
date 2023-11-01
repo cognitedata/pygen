@@ -33,9 +33,9 @@ class WellboreCostsAPI(TypeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsL
         self, wellbore_cost: WellboreCostsApply | Sequence[WellboreCostsApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(wellbore_cost, WellboreCostsApply):
-            instances = wellbore_cost.to_instances_apply()
+            instances = wellbore_cost.to_instances_apply(self._view_id)
         else:
-            instances = WellboreCostsApplyList(wellbore_cost).to_instances_apply()
+            instances = WellboreCostsApplyList(wellbore_cost).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

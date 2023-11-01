@@ -31,9 +31,9 @@ class TagsAPI(TypeAPI[Tags, TagsApply, TagsList]):
 
     def apply(self, tag: TagsApply | Sequence[TagsApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(tag, TagsApply):
-            instances = tag.to_instances_apply()
+            instances = tag.to_instances_apply(self._view_id)
         else:
-            instances = TagsApplyList(tag).to_instances_apply()
+            instances = TagsApplyList(tag).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

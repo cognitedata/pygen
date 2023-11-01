@@ -33,9 +33,9 @@ class ValueTransformationAPI(TypeAPI[ValueTransformation, ValueTransformationApp
         self, value_transformation: ValueTransformationApply | Sequence[ValueTransformationApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(value_transformation, ValueTransformationApply):
-            instances = value_transformation.to_instances_apply()
+            instances = value_transformation.to_instances_apply(self._view_id)
         else:
-            instances = ValueTransformationApplyList(value_transformation).to_instances_apply()
+            instances = ValueTransformationApplyList(value_transformation).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

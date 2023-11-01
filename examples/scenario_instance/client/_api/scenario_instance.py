@@ -418,9 +418,9 @@ class ScenarioInstanceAPI(TypeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
         self, scenario_instance: ScenarioInstanceApply | Sequence[ScenarioInstanceApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(scenario_instance, ScenarioInstanceApply):
-            instances = scenario_instance.to_instances_apply()
+            instances = scenario_instance.to_instances_apply(self._view_id)
         else:
-            instances = ScenarioInstanceApplyList(scenario_instance).to_instances_apply()
+            instances = ScenarioInstanceApplyList(scenario_instance).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

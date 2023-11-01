@@ -71,9 +71,9 @@ class WellAPI(TypeAPI[Well, WellApply, WellList]):
 
     def apply(self, well: WellApply | Sequence[WellApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(well, WellApply):
-            instances = well.to_instances_apply()
+            instances = well.to_instances_apply(self._view_id)
         else:
-            instances = WellApplyList(well).to_instances_apply()
+            instances = WellApplyList(well).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

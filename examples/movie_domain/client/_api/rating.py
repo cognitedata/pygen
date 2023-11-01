@@ -677,9 +677,9 @@ class RatingAPI(TypeAPI[Rating, RatingApply, RatingList]):
 
     def apply(self, rating: RatingApply | Sequence[RatingApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(rating, RatingApply):
-            instances = rating.to_instances_apply()
+            instances = rating.to_instances_apply(self._view_id)
         else:
-            instances = RatingApplyList(rating).to_instances_apply()
+            instances = RatingApplyList(rating).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

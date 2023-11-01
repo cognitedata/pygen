@@ -199,9 +199,9 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
         self, technical_assurance: TechnicalAssurancesApply | Sequence[TechnicalAssurancesApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(technical_assurance, TechnicalAssurancesApply):
-            instances = technical_assurance.to_instances_apply()
+            instances = technical_assurance.to_instances_apply(self._view_id)
         else:
-            instances = TechnicalAssurancesApplyList(technical_assurance).to_instances_apply()
+            instances = TechnicalAssurancesApplyList(technical_assurance).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

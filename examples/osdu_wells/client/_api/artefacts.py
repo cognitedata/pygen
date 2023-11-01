@@ -33,9 +33,9 @@ class ArtefactsAPI(TypeAPI[Artefacts, ArtefactsApply, ArtefactsList]):
         self, artefact: ArtefactsApply | Sequence[ArtefactsApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(artefact, ArtefactsApply):
-            instances = artefact.to_instances_apply()
+            instances = artefact.to_instances_apply(self._view_id)
         else:
-            instances = ArtefactsApplyList(artefact).to_instances_apply()
+            instances = ArtefactsApplyList(artefact).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

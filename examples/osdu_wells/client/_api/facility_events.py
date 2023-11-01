@@ -33,9 +33,9 @@ class FacilityEventsAPI(TypeAPI[FacilityEvents, FacilityEventsApply, FacilityEve
         self, facility_event: FacilityEventsApply | Sequence[FacilityEventsApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(facility_event, FacilityEventsApply):
-            instances = facility_event.to_instances_apply()
+            instances = facility_event.to_instances_apply(self._view_id)
         else:
-            instances = FacilityEventsApplyList(facility_event).to_instances_apply()
+            instances = FacilityEventsApplyList(facility_event).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

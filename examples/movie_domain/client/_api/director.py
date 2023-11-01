@@ -119,9 +119,9 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
         self, director: DirectorApply | Sequence[DirectorApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(director, DirectorApply):
-            instances = director.to_instances_apply()
+            instances = director.to_instances_apply(self._view_id)
         else:
-            instances = DirectorApplyList(director).to_instances_apply()
+            instances = DirectorApplyList(director).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

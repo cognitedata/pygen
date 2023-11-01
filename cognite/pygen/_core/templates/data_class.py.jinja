@@ -79,7 +79,7 @@ class {{ data_class.write_name }}(DomainModelApply):
                 edges.extend(instances.edges)
 {% endfor %}{% for field in data_class.one_to_one_edges %}
         if isinstance(self.{{ field.name }}, DomainModelApply):
-            instances = self.{{ field.name }}._to_instances_apply(cache)
+            instances = self.{{ field.name }}._to_instances_apply(cache, write_view)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 {% endfor %}

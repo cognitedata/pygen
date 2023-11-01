@@ -31,9 +31,9 @@ class FeaturesAPI(TypeAPI[Features, FeaturesApply, FeaturesList]):
 
     def apply(self, feature: FeaturesApply | Sequence[FeaturesApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(feature, FeaturesApply):
-            instances = feature.to_instances_apply()
+            instances = feature.to_instances_apply(self._view_id)
         else:
-            instances = FeaturesApplyList(feature).to_instances_apply()
+            instances = FeaturesApplyList(feature).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

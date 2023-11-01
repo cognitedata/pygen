@@ -44,11 +44,11 @@ class AvailableTrajectoryStationPropertiesAPI(
         replace: bool = False,
     ) -> dm.InstancesApplyResult:
         if isinstance(available_trajectory_station_property, AvailableTrajectoryStationPropertiesApply):
-            instances = available_trajectory_station_property.to_instances_apply()
+            instances = available_trajectory_station_property.to_instances_apply(self._view_id)
         else:
             instances = AvailableTrajectoryStationPropertiesApplyList(
                 available_trajectory_station_property
-            ).to_instances_apply()
+            ).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

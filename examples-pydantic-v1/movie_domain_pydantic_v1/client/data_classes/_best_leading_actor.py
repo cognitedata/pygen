@@ -44,11 +44,10 @@ class BestLeadingActorApply(DomainModelApply):
     name: str
     year: int
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(self, cache: set[str], write_view: dm.ViewId | None) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
 
-        sources = []
         properties = {}
         if self.name is not None:
             properties["name"] = self.name
@@ -56,16 +55,14 @@ class BestLeadingActorApply(DomainModelApply):
             properties["year"] = self.year
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("IntegrationTestsImmutable", "Nomination"),
+                source=write_view or dm.ViewId("IntegrationTestsImmutable", "BestLeadingActor", "2"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:

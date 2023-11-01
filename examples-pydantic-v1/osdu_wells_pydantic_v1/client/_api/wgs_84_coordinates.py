@@ -89,9 +89,9 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
         self, wgs_84_coordinate: WgsCoordinatesApply | Sequence[WgsCoordinatesApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(wgs_84_coordinate, WgsCoordinatesApply):
-            instances = wgs_84_coordinate.to_instances_apply()
+            instances = wgs_84_coordinate.to_instances_apply(self._view_id)
         else:
-            instances = WgsCoordinatesApplyList(wgs_84_coordinate).to_instances_apply()
+            instances = WgsCoordinatesApplyList(wgs_84_coordinate).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

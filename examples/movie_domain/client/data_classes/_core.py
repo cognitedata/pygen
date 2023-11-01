@@ -51,7 +51,7 @@ class DomainModelApply(DomainModelCore, extra=Extra.forbid, populate_by_name=Tru
     external_id_factory: ClassVar[Optional[Callable[[type[DomainModelApply], dict], str]]] = None
     existing_version: Optional[int] = None
 
-    def to_instances_apply(self, write_view: dm.ViewId | None) -> dm.InstancesApply:
+    def to_instances_apply(self, write_view: dm.ViewId | None = None) -> dm.InstancesApply:
         return self._to_instances_apply(set(), write_view)
 
     @abstractmethod
@@ -132,7 +132,7 @@ T_TypeNodeList = TypeVar("T_TypeNodeList", bound=TypeList, covariant=True)
 
 
 class TypeApplyList(TypeList[T_TypeApplyNode]):
-    def to_instances_apply(self, write_view: dm.ViewId | None) -> dm.InstancesApply:
+    def to_instances_apply(self, write_view: dm.ViewId | None = None) -> dm.InstancesApply:
         cache: set[str] = set()
         nodes: list[dm.NodeApply] = []
         edges: list[dm.EdgeApply] = []

@@ -142,9 +142,9 @@ class DateTransformationPairAPI(
         replace: bool = False,
     ) -> dm.InstancesApplyResult:
         if isinstance(date_transformation_pair, DateTransformationPairApply):
-            instances = date_transformation_pair.to_instances_apply()
+            instances = date_transformation_pair.to_instances_apply(self._view_id)
         else:
-            instances = DateTransformationPairApplyList(date_transformation_pair).to_instances_apply()
+            instances = DateTransformationPairApplyList(date_transformation_pair).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

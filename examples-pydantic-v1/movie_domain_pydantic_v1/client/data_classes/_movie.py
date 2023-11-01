@@ -60,11 +60,10 @@ class MovieApply(DomainModelApply):
     run_time_minutes: Optional[float] = Field(None, alias="runTimeMinutes")
     title: str
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(self, cache: set[str], write_view: dm.ViewId | None) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
 
-        sources = []
         properties = {}
         if self.meta is not None:
             properties["meta"] = self.meta
@@ -81,16 +80,14 @@ class MovieApply(DomainModelApply):
             properties["title"] = self.title
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("IntegrationTestsImmutable", "Movie"),
+                source=write_view or dm.ViewId("IntegrationTestsImmutable", "Movie", "2"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:
@@ -122,7 +119,7 @@ class MovieApply(DomainModelApply):
                 edges.extend(instances.edges)
 
         if isinstance(self.rating, DomainModelApply):
-            instances = self.rating._to_instances_apply(cache)
+            instances = self.rating._to_instances_apply(cache, write_view)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 

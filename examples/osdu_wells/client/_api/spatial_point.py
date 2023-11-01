@@ -33,9 +33,9 @@ class SpatialPointAPI(TypeAPI[SpatialPoint, SpatialPointApply, SpatialPointList]
         self, spatial_point: SpatialPointApply | Sequence[SpatialPointApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(spatial_point, SpatialPointApply):
-            instances = spatial_point.to_instances_apply()
+            instances = spatial_point.to_instances_apply(self._view_id)
         else:
-            instances = SpatialPointApplyList(spatial_point).to_instances_apply()
+            instances = SpatialPointApplyList(spatial_point).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

@@ -31,9 +31,9 @@ class ProcessAPI(TypeAPI[Process, ProcessApply, ProcessList]):
 
     def apply(self, proces: ProcessApply | Sequence[ProcessApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(proces, ProcessApply):
-            instances = proces.to_instances_apply()
+            instances = proces.to_instances_apply(self._view_id)
         else:
-            instances = ProcessApplyList(proces).to_instances_apply()
+            instances = ProcessApplyList(proces).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

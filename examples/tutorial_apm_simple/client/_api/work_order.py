@@ -135,9 +135,9 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         self, work_order: WorkOrderApply | Sequence[WorkOrderApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(work_order, WorkOrderApply):
-            instances = work_order.to_instances_apply()
+            instances = work_order.to_instances_apply(self._view_id)
         else:
-            instances = WorkOrderApplyList(work_order).to_instances_apply()
+            instances = WorkOrderApplyList(work_order).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

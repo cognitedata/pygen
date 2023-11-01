@@ -33,9 +33,9 @@ class FacilityOperatorsAPI(TypeAPI[FacilityOperators, FacilityOperatorsApply, Fa
         self, facility_operator: FacilityOperatorsApply | Sequence[FacilityOperatorsApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(facility_operator, FacilityOperatorsApply):
-            instances = facility_operator.to_instances_apply()
+            instances = facility_operator.to_instances_apply(self._view_id)
         else:
-            instances = FacilityOperatorsApplyList(facility_operator).to_instances_apply()
+            instances = FacilityOperatorsApplyList(facility_operator).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

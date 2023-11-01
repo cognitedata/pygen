@@ -31,9 +31,9 @@ class CogPoolAPI(TypeAPI[CogPool, CogPoolApply, CogPoolList]):
 
     def apply(self, cog_pool: CogPoolApply | Sequence[CogPoolApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(cog_pool, CogPoolApply):
-            instances = cog_pool.to_instances_apply()
+            instances = cog_pool.to_instances_apply(self._view_id)
         else:
-            instances = CogPoolApplyList(cog_pool).to_instances_apply()
+            instances = CogPoolApplyList(cog_pool).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

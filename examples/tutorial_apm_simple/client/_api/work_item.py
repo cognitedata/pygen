@@ -82,9 +82,9 @@ class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
         self, work_item: WorkItemApply | Sequence[WorkItemApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(work_item, WorkItemApply):
-            instances = work_item.to_instances_apply()
+            instances = work_item.to_instances_apply(self._view_id)
         else:
-            instances = WorkItemApplyList(work_item).to_instances_apply()
+            instances = WorkItemApplyList(work_item).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

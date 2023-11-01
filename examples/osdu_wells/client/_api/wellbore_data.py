@@ -617,9 +617,9 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
         self, wellbore_datum: WellboreDataApply | Sequence[WellboreDataApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(wellbore_datum, WellboreDataApply):
-            instances = wellbore_datum.to_instances_apply()
+            instances = wellbore_datum.to_instances_apply(self._view_id)
         else:
-            instances = WellboreDataApplyList(wellbore_datum).to_instances_apply()
+            instances = WellboreDataApplyList(wellbore_datum).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

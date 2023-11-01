@@ -364,11 +364,10 @@ class WellboreDataApply(DomainModelApply):
     )
     wellbore_reason_id: Optional[str] = Field(None, alias="WellboreReasonID")
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(self, cache: set[str], write_view: dm.ViewId | None) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
 
-        sources = []
         properties = {}
         if self.business_intention_id is not None:
             properties["BusinessIntentionID"] = self.business_intention_id
@@ -475,16 +474,14 @@ class WellboreDataApply(DomainModelApply):
             properties["WellboreReasonID"] = self.wellbore_reason_id
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("IntegrationTestsImmutable", "WellboreData"),
+                source=write_view or dm.ViewId("IntegrationTestsImmutable", "WellboreData", "6349cf734b294e"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:
@@ -615,17 +612,17 @@ class WellboreDataApply(DomainModelApply):
                 edges.extend(instances.edges)
 
         if isinstance(self.geographic_bottom_hole_location, DomainModelApply):
-            instances = self.geographic_bottom_hole_location._to_instances_apply(cache)
+            instances = self.geographic_bottom_hole_location._to_instances_apply(cache, write_view)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 
         if isinstance(self.projected_bottom_hole_location, DomainModelApply):
-            instances = self.projected_bottom_hole_location._to_instances_apply(cache)
+            instances = self.projected_bottom_hole_location._to_instances_apply(cache, write_view)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 
         if isinstance(self.spatial_location, DomainModelApply):
-            instances = self.spatial_location._to_instances_apply(cache)
+            instances = self.spatial_location._to_instances_apply(cache, write_view)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 

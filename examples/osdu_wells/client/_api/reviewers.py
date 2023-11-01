@@ -33,9 +33,9 @@ class ReviewersAPI(TypeAPI[Reviewers, ReviewersApply, ReviewersList]):
         self, reviewer: ReviewersApply | Sequence[ReviewersApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(reviewer, ReviewersApply):
-            instances = reviewer.to_instances_apply()
+            instances = reviewer.to_instances_apply(self._view_id)
         else:
-            instances = ReviewersApplyList(reviewer).to_instances_apply()
+            instances = ReviewersApplyList(reviewer).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

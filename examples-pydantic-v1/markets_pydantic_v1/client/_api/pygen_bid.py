@@ -34,9 +34,9 @@ class PygenBidAPI(TypeAPI[PygenBid, PygenBidApply, PygenBidList]):
         self, pygen_bid: PygenBidApply | Sequence[PygenBidApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(pygen_bid, PygenBidApply):
-            instances = pygen_bid.to_instances_apply()
+            instances = pygen_bid.to_instances_apply(self._view_id)
         else:
-            instances = PygenBidApplyList(pygen_bid).to_instances_apply()
+            instances = PygenBidApplyList(pygen_bid).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

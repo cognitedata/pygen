@@ -33,9 +33,9 @@ class LineageAssertionsAPI(TypeAPI[LineageAssertions, LineageAssertionsApply, Li
         self, lineage_assertion: LineageAssertionsApply | Sequence[LineageAssertionsApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(lineage_assertion, LineageAssertionsApply):
-            instances = lineage_assertion.to_instances_apply()
+            instances = lineage_assertion.to_instances_apply(self._view_id)
         else:
-            instances = LineageAssertionsApplyList(lineage_assertion).to_instances_apply()
+            instances = LineageAssertionsApplyList(lineage_assertion).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

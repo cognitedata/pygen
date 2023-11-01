@@ -33,9 +33,9 @@ class HistoricalInterestsAPI(TypeAPI[HistoricalInterests, HistoricalInterestsApp
         self, historical_interest: HistoricalInterestsApply | Sequence[HistoricalInterestsApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(historical_interest, HistoricalInterestsApply):
-            instances = historical_interest.to_instances_apply()
+            instances = historical_interest.to_instances_apply(self._view_id)
         else:
-            instances = HistoricalInterestsApplyList(historical_interest).to_instances_apply()
+            instances = HistoricalInterestsApplyList(historical_interest).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

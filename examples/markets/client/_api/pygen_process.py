@@ -33,9 +33,9 @@ class PygenProcessAPI(TypeAPI[PygenProcess, PygenProcessApply, PygenProcessList]
         self, pygen_proces: PygenProcessApply | Sequence[PygenProcessApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(pygen_proces, PygenProcessApply):
-            instances = pygen_proces.to_instances_apply()
+            instances = pygen_proces.to_instances_apply(self._view_id)
         else:
-            instances = PygenProcessApplyList(pygen_proces).to_instances_apply()
+            instances = PygenProcessApplyList(pygen_proces).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

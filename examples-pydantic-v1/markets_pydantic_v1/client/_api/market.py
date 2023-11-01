@@ -31,9 +31,9 @@ class MarketAPI(TypeAPI[Market, MarketApply, MarketList]):
 
     def apply(self, market: MarketApply | Sequence[MarketApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(market, MarketApply):
-            instances = market.to_instances_apply()
+            instances = market.to_instances_apply(self._view_id)
         else:
-            instances = MarketApplyList(market).to_instances_apply()
+            instances = MarketApplyList(market).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

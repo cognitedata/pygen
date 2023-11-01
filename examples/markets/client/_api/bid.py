@@ -25,9 +25,9 @@ class BidAPI(TypeAPI[Bid, BidApply, BidList]):
 
     def apply(self, bid: BidApply | Sequence[BidApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(bid, BidApply):
-            instances = bid.to_instances_apply()
+            instances = bid.to_instances_apply(self._view_id)
         else:
-            instances = BidApplyList(bid).to_instances_apply()
+            instances = BidApplyList(bid).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

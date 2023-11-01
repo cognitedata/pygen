@@ -45,11 +45,10 @@ class ActorApply(DomainModelApply):
     person: Union[PersonApply, str, None] = Field(None, repr=False)
     won_oscar: Optional[bool] = Field(None, alias="wonOscar")
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(self, cache: set[str], write_view: dm.ViewId | None) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
 
-        sources = []
         properties = {}
         if self.person is not None:
             properties["person"] = {
@@ -60,16 +59,14 @@ class ActorApply(DomainModelApply):
             properties["wonOscar"] = self.won_oscar
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("IntegrationTestsImmutable", "Role"),
+                source=write_view or dm.ViewId("IntegrationTestsImmutable", "Actor", "2"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:
@@ -101,7 +98,7 @@ class ActorApply(DomainModelApply):
                 edges.extend(instances.edges)
 
         if isinstance(self.person, DomainModelApply):
-            instances = self.person._to_instances_apply(cache)
+            instances = self.person._to_instances_apply(cache, write_view)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 

@@ -80,9 +80,9 @@ class CdfEntityAPI(TypeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
         self, cdf_3_d_entity: CdfEntityApply | Sequence[CdfEntityApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(cdf_3_d_entity, CdfEntityApply):
-            instances = cdf_3_d_entity.to_instances_apply()
+            instances = cdf_3_d_entity.to_instances_apply(self._view_id)
         else:
-            instances = CdfEntityApplyList(cdf_3_d_entity).to_instances_apply()
+            instances = CdfEntityApplyList(cdf_3_d_entity).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

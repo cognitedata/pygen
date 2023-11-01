@@ -33,9 +33,9 @@ class BestLeadingActressAPI(TypeAPI[BestLeadingActress, BestLeadingActressApply,
         self, best_leading_actress: BestLeadingActressApply | Sequence[BestLeadingActressApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(best_leading_actress, BestLeadingActressApply):
-            instances = best_leading_actress.to_instances_apply()
+            instances = best_leading_actress.to_instances_apply(self._view_id)
         else:
-            instances = BestLeadingActressApplyList(best_leading_actress).to_instances_apply()
+            instances = BestLeadingActressApplyList(best_leading_actress).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

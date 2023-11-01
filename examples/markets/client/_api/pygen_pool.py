@@ -33,9 +33,9 @@ class PygenPoolAPI(TypeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
         self, pygen_pool: PygenPoolApply | Sequence[PygenPoolApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(pygen_pool, PygenPoolApply):
-            instances = pygen_pool.to_instances_apply()
+            instances = pygen_pool.to_instances_apply(self._view_id)
         else:
-            instances = PygenPoolApplyList(pygen_pool).to_instances_apply()
+            instances = PygenPoolApplyList(pygen_pool).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

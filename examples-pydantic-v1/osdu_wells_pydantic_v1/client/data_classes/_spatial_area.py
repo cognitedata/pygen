@@ -105,11 +105,10 @@ class SpatialAreaApply(DomainModelApply):
     spatial_parameter_type_id: Optional[str] = Field(None, alias="SpatialParameterTypeID")
     wgs_84_coordinates: Union[WgsCoordinatesApply, str, None] = Field(None, repr=False, alias="Wgs84Coordinates")
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(self, cache: set[str], write_view: dm.ViewId | None) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
 
-        sources = []
         properties = {}
         if self.applied_operations is not None:
             properties["AppliedOperations"] = self.applied_operations
@@ -145,16 +144,14 @@ class SpatialAreaApply(DomainModelApply):
             }
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("IntegrationTestsImmutable", "SpatialArea"),
+                source=write_view or dm.ViewId("IntegrationTestsImmutable", "SpatialArea", "312323f14f3d3f"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:
@@ -164,12 +161,12 @@ class SpatialAreaApply(DomainModelApply):
         cache.add(self.external_id)
 
         if isinstance(self.as_ingested_coordinates, DomainModelApply):
-            instances = self.as_ingested_coordinates._to_instances_apply(cache)
+            instances = self.as_ingested_coordinates._to_instances_apply(cache, write_view)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 
         if isinstance(self.wgs_84_coordinates, DomainModelApply):
-            instances = self.wgs_84_coordinates._to_instances_apply(cache)
+            instances = self.wgs_84_coordinates._to_instances_apply(cache, write_view)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 

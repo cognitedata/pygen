@@ -45,11 +45,10 @@ class BidApply(DomainModelApply):
     market: Union[MarketApply, str, None] = Field(None, repr=False)
     name: Optional[str] = None
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(self, cache: set[str], write_view: dm.ViewId | None) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
 
-        sources = []
         properties = {}
         if self.date is not None:
             properties["date"] = self.date.isoformat(timespec="milliseconds")
@@ -62,16 +61,14 @@ class BidApply(DomainModelApply):
             properties["name"] = self.name
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("market", "Bid"),
+                source=write_view or dm.ViewId("market", "Bid", "1add47c48cf88b"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:
@@ -81,7 +78,7 @@ class BidApply(DomainModelApply):
         cache.add(self.external_id)
 
         if isinstance(self.market, DomainModelApply):
-            instances = self.market._to_instances_apply(cache)
+            instances = self.market._to_instances_apply(cache, write_view)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 

@@ -33,9 +33,9 @@ class GeoContextsAPI(TypeAPI[GeoContexts, GeoContextsApply, GeoContextsList]):
         self, geo_context: GeoContextsApply | Sequence[GeoContextsApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(geo_context, GeoContextsApply):
-            instances = geo_context.to_instances_apply()
+            instances = geo_context.to_instances_apply(self._view_id)
         else:
-            instances = GeoContextsApplyList(geo_context).to_instances_apply()
+            instances = GeoContextsApplyList(geo_context).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

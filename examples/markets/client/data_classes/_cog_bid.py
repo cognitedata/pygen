@@ -57,11 +57,10 @@ class CogBidApply(DomainModelApply):
     price_area: Optional[str] = Field(None, alias="priceArea")
     quantity: Optional[int] = None
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(self, cache: set[str], write_view: dm.ViewId | None) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
 
-        sources = []
         properties = {}
         if self.date is not None:
             properties["date"] = self.date.isoformat(timespec="milliseconds")
@@ -72,13 +71,6 @@ class CogBidApply(DomainModelApply):
             }
         if self.name is not None:
             properties["name"] = self.name
-        if properties:
-            source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("market", "Bid"),
-                properties=properties,
-            )
-            sources.append(source)
-        properties = {}
         if self.price is not None:
             properties["price"] = self.price
         if self.price_area is not None:
@@ -87,16 +79,14 @@ class CogBidApply(DomainModelApply):
             properties["quantity"] = self.quantity
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("market", "CogBid"),
+                source=write_view or dm.ViewId("market", "CogBid", "3c04fa081c45d5"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:
@@ -106,7 +96,7 @@ class CogBidApply(DomainModelApply):
         cache.add(self.external_id)
 
         if isinstance(self.market, DomainModelApply):
-            instances = self.market._to_instances_apply(cache)
+            instances = self.market._to_instances_apply(cache, write_view)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 

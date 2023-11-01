@@ -89,9 +89,9 @@ class WellboreTrajectoryAPI(TypeAPI[WellboreTrajectory, WellboreTrajectoryApply,
         self, wellbore_trajectory: WellboreTrajectoryApply | Sequence[WellboreTrajectoryApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(wellbore_trajectory, WellboreTrajectoryApply):
-            instances = wellbore_trajectory.to_instances_apply()
+            instances = wellbore_trajectory.to_instances_apply(self._view_id)
         else:
-            instances = WellboreTrajectoryApplyList(wellbore_trajectory).to_instances_apply()
+            instances = WellboreTrajectoryApplyList(wellbore_trajectory).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

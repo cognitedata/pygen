@@ -72,11 +72,10 @@ class ScenarioInstanceApply(DomainModelApply):
     scenario: Optional[str] = None
     start: Optional[datetime.datetime] = None
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(self, cache: set[str], write_view: dm.ViewId | None) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
 
-        sources = []
         properties = {}
         if self.aggregation is not None:
             properties["aggregation"] = self.aggregation
@@ -96,16 +95,14 @@ class ScenarioInstanceApply(DomainModelApply):
             properties["start"] = self.start.isoformat(timespec="milliseconds")
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("IntegrationTestsImmutable", "ScenarioInstance"),
+                source=write_view or dm.ViewId("IntegrationTestsImmutable", "ScenarioInstance", "ee2b79fd98b5bb"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:

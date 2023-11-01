@@ -33,9 +33,9 @@ class NameAliasesAPI(TypeAPI[NameAliases, NameAliasesApply, NameAliasesList]):
         self, name_alias: NameAliasesApply | Sequence[NameAliasesApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(name_alias, NameAliasesApply):
-            instances = name_alias.to_instances_apply()
+            instances = name_alias.to_instances_apply(self._view_id)
         else:
-            instances = NameAliasesApplyList(name_alias).to_instances_apply()
+            instances = NameAliasesApplyList(name_alias).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

@@ -152,11 +152,10 @@ class WorkOrderApply(DomainModelApply):
     work_order_number: Optional[str] = Field(None, alias="workOrderNumber")
     work_package_number: Optional[str] = Field(None, alias="workPackageNumber")
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(self, cache: set[str], write_view: dm.ViewId | None) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
 
-        sources = []
         properties = {}
         if self.actual_hours is not None:
             properties["actualHours"] = self.actual_hours
@@ -198,16 +197,14 @@ class WorkOrderApply(DomainModelApply):
             properties["workPackageNumber"] = self.work_package_number
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("tutorial_apm_simple", "WorkOrder"),
+                source=write_view or dm.ViewId("tutorial_apm_simple", "WorkOrder", "6f36e59c3c4896"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:

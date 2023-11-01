@@ -55,7 +55,7 @@ class DomainModelApply(DomainModelCore{% if is_pydantic_v2 %}, extra=Extra.forbi
         extra = Extra.forbid
         allow_population_by_field_name = True{% endif %}
 
-    def to_instances_apply(self, write_view: dm.ViewId | None) -> dm.InstancesApply:
+    def to_instances_apply(self, write_view: dm.ViewId | None = None) -> dm.InstancesApply:
         return self._to_instances_apply(set(), write_view)
 
     @abstractmethod
@@ -141,7 +141,7 @@ T_TypeNodeList = TypeVar("T_TypeNodeList", bound=TypeList, covariant=True)
 
 
 class TypeApplyList(TypeList[T_TypeApplyNode]):
-    def to_instances_apply(self, write_view: dm.ViewId | None) -> dm.InstancesApply:
+    def to_instances_apply(self, write_view: dm.ViewId | None = None) -> dm.InstancesApply:
         cache: set[str] = set()
         nodes: list[dm.NodeApply] = []
         edges: list[dm.EdgeApply] = []

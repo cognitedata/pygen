@@ -122,11 +122,10 @@ class VerticalMeasurementsApply(DomainModelApply):
     vertical_reference_id: Optional[str] = Field(None, alias="VerticalReferenceID")
     wellbore_tvd_trajectory_id: Optional[str] = Field(None, alias="WellboreTVDTrajectoryID")
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(self, cache: set[str], write_view: dm.ViewId | None) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
 
-        sources = []
         properties = {}
         if self.effective_date_time is not None:
             properties["EffectiveDateTime"] = self.effective_date_time
@@ -158,16 +157,14 @@ class VerticalMeasurementsApply(DomainModelApply):
             properties["WellboreTVDTrajectoryID"] = self.wellbore_tvd_trajectory_id
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("IntegrationTestsImmutable", "VerticalMeasurements"),
+                source=write_view or dm.ViewId("IntegrationTestsImmutable", "VerticalMeasurements", "d8c3b28a0d0dfb"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:

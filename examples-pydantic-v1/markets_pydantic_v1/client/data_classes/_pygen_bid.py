@@ -57,46 +57,36 @@ class PygenBidApply(DomainModelApply):
     name: Optional[str] = None
     price_premium: Optional[float] = Field(None, alias="pricePremium")
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(self, cache: set[str], write_view: dm.ViewId | None) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
 
-        sources = []
         properties = {}
         if self.date is not None:
             properties["date"] = self.date.isoformat(timespec="milliseconds")
+        if self.is_block is not None:
+            properties["isBlock"] = self.is_block
         if self.market is not None:
             properties["market"] = {
                 "space": "market",
                 "externalId": self.market if isinstance(self.market, str) else self.market.external_id,
             }
-        if self.name is not None:
-            properties["name"] = self.name
-        if properties:
-            source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("market", "Bid"),
-                properties=properties,
-            )
-            sources.append(source)
-        properties = {}
-        if self.is_block is not None:
-            properties["isBlock"] = self.is_block
         if self.minimum_price is not None:
             properties["minimumPrice"] = self.minimum_price
+        if self.name is not None:
+            properties["name"] = self.name
         if self.price_premium is not None:
             properties["pricePremium"] = self.price_premium
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("market", "PygenBid"),
+                source=write_view or dm.ViewId("market", "PygenBid", "57f9da2a1acf7e"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:
@@ -106,7 +96,7 @@ class PygenBidApply(DomainModelApply):
         cache.add(self.external_id)
 
         if isinstance(self.market, DomainModelApply):
-            instances = self.market._to_instances_apply(cache)
+            instances = self.market._to_instances_apply(cache, write_view)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 

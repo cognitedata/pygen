@@ -534,9 +534,9 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
 
     def apply(self, asset: AssetApply | Sequence[AssetApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(asset, AssetApply):
-            instances = asset.to_instances_apply()
+            instances = asset.to_instances_apply(self._view_id)
         else:
-            instances = AssetApplyList(asset).to_instances_apply()
+            instances = AssetApplyList(asset).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

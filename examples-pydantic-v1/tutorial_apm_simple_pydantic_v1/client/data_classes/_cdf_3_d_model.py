@@ -40,26 +40,23 @@ class CdfModelApply(DomainModelApply):
     entities: Union[list[CdfEntityApply], list[str], None] = Field(default=None, repr=False)
     name: str
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(self, cache: set[str], write_view: dm.ViewId | None) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
 
-        sources = []
         properties = {}
         if self.name is not None:
             properties["name"] = self.name
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("cdf_3d_schema", "Cdf3dModel"),
+                source=write_view or dm.ViewId("cdf_3d_schema", "Cdf3dModel", "1"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:

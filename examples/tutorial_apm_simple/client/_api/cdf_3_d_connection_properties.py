@@ -38,9 +38,9 @@ class CdfConnectionPropertiesAPI(
         replace: bool = False,
     ) -> dm.InstancesApplyResult:
         if isinstance(cdf_3_d_connection_property, CdfConnectionPropertiesApply):
-            instances = cdf_3_d_connection_property.to_instances_apply()
+            instances = cdf_3_d_connection_property.to_instances_apply(self._view_id)
         else:
-            instances = CdfConnectionPropertiesApplyList(cdf_3_d_connection_property).to_instances_apply()
+            instances = CdfConnectionPropertiesApplyList(cdf_3_d_connection_property).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

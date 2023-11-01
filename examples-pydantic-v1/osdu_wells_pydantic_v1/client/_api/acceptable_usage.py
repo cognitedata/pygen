@@ -33,9 +33,9 @@ class AcceptableUsageAPI(TypeAPI[AcceptableUsage, AcceptableUsageApply, Acceptab
         self, acceptable_usage: AcceptableUsageApply | Sequence[AcceptableUsageApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(acceptable_usage, AcceptableUsageApply):
-            instances = acceptable_usage.to_instances_apply()
+            instances = acceptable_usage.to_instances_apply(self._view_id)
         else:
-            instances = AcceptableUsageApplyList(acceptable_usage).to_instances_apply()
+            instances = AcceptableUsageApplyList(acceptable_usage).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

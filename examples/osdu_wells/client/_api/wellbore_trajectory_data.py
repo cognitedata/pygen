@@ -382,9 +382,9 @@ class WellboreTrajectoryDataAPI(
         replace: bool = False,
     ) -> dm.InstancesApplyResult:
         if isinstance(wellbore_trajectory_datum, WellboreTrajectoryDataApply):
-            instances = wellbore_trajectory_datum.to_instances_apply()
+            instances = wellbore_trajectory_datum.to_instances_apply(self._view_id)
         else:
-            instances = WellboreTrajectoryDataApplyList(wellbore_trajectory_datum).to_instances_apply()
+            instances = WellboreTrajectoryDataApplyList(wellbore_trajectory_datum).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

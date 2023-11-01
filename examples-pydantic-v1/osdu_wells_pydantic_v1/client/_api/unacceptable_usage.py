@@ -33,9 +33,9 @@ class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
         self, unacceptable_usage: UnacceptableUsageApply | Sequence[UnacceptableUsageApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(unacceptable_usage, UnacceptableUsageApply):
-            instances = unacceptable_usage.to_instances_apply()
+            instances = unacceptable_usage.to_instances_apply(self._view_id)
         else:
-            instances = UnacceptableUsageApplyList(unacceptable_usage).to_instances_apply()
+            instances = UnacceptableUsageApplyList(unacceptable_usage).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

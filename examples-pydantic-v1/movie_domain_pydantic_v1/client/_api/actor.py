@@ -117,9 +117,9 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
 
     def apply(self, actor: ActorApply | Sequence[ActorApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(actor, ActorApply):
-            instances = actor.to_instances_apply()
+            instances = actor.to_instances_apply(self._view_id)
         else:
-            instances = ActorApplyList(actor).to_instances_apply()
+            instances = ActorApplyList(actor).to_instances_apply(self._view_id)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
