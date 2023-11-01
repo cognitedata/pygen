@@ -25,6 +25,7 @@ class Acl(DomainModel):
 
     def as_apply(self) -> AclApply:
         return AclApply(
+            space=self.space,
             external_id=self.external_id,
             owners=self.owners,
             viewers=self.viewers,

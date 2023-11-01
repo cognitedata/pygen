@@ -35,6 +35,7 @@ class Artefacts(DomainModel):
 
     def as_apply(self) -> ArtefactsApply:
         return ArtefactsApply(
+            space=self.space,
             external_id=self.external_id,
             resource_id=self.resource_id,
             resource_kind=self.resource_kind,

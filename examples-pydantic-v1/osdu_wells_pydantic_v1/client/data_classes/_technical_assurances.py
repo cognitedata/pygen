@@ -43,6 +43,7 @@ class TechnicalAssurances(DomainModel):
 
     def as_apply(self) -> TechnicalAssurancesApply:
         return TechnicalAssurancesApply(
+            space=self.space,
             external_id=self.external_id,
             acceptable_usage=self.acceptable_usage,
             comment=self.comment,

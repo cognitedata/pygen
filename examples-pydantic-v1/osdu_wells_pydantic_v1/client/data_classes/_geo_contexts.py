@@ -43,6 +43,7 @@ class GeoContexts(DomainModel):
 
     def as_apply(self) -> GeoContextsApply:
         return GeoContextsApply(
+            space=self.space,
             external_id=self.external_id,
             basin_id=self.basin_id,
             field_id=self.field_id,

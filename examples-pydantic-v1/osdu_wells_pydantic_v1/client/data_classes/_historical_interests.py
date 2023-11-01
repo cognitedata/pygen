@@ -35,6 +35,7 @@ class HistoricalInterests(DomainModel):
 
     def as_apply(self) -> HistoricalInterestsApply:
         return HistoricalInterestsApply(
+            space=self.space,
             external_id=self.external_id,
             effective_date_time=self.effective_date_time,
             interest_type_id=self.interest_type_id,

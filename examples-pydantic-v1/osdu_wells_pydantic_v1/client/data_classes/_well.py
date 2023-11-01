@@ -50,6 +50,7 @@ class Well(DomainModel):
 
     def as_apply(self) -> WellApply:
         return WellApply(
+            space=self.space,
             external_id=self.external_id,
             acl=self.acl,
             ancestry=self.ancestry,
