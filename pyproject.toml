@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cognite-pygen"
-version = "0.27.1"
+version = "0.27.2"
 description = "Cognite Python SDK Generator"
 readme = "README.md"
 authors = ["Cognite <support@cognite.com>"]
@@ -44,7 +44,7 @@ explicit_package_bases = true
 data_models = [
     ["IntegrationTestsImmutable", "Movie", "2"],
 ]
-tenant_id = "<cdf-project>"
+tenant_id = "<tenant-id>"
 client_id = "<client-id>"
 cdf_cluster = "<cdf-cluster>"
 cdf_project = "<cdf-project>"
