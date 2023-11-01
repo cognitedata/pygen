@@ -1,0 +1,7 @@
+    def delete(self, external_id: str | Sequence[str], space="{{ data_class.view_id.space }}") -> dm.InstancesDeleteResult:
+        if isinstance(external_id, str):
+            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
+        else:
+            return self._client.data_modeling.instances.delete(
+                nodes=[(space, id) for id in external_id],
+            )

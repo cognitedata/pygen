@@ -75,50 +75,11 @@ class {{ api_class.name }}(TypeAPI[{{ data_class.read_name }}, {{ data_class.wri
         self.{{ field.edge_api_attribute }} = {{ field.edge_api_class }}(client){% endfor %}{% for timeseries in data_class.single_timeseries_fields %}
         self.{{ timeseries.edge_api_attribute }} = {{ timeseries.edge_api_class }}API(client, view_id){% endfor %}
 
-    def apply(self, {{ data_class.variable }}: {{ data_class.write_name }} | Sequence[{{ data_class.write_name }}], replace: bool = False) -> dm.InstancesApplyResult:
-        if isinstance({{ data_class.variable }}, {{ data_class.write_name }}):
-            instances = {{ data_class.variable }}.to_instances_apply()
-        else:
-            instances = {{ data_class.write_list_name }}({{ data_class.variable }}).to_instances_apply()
-        return self._client.data_modeling.instances.apply(
-            nodes=instances.nodes,
-            edges=instances.edges,
-            auto_create_start_nodes=True,
-            auto_create_end_nodes=True,
-            replace=replace,
-        )
+{% include 'api_class_apply_method.py.jinja' %}
 
-    def delete(self, external_id: str | Sequence[str], space="{{ data_class.view_id.space }}") -> dm.InstancesDeleteResult:
-        if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
-        else:
-            return self._client.data_modeling.instances.delete(
-                nodes=[(space, id) for id in external_id],
-            )
+{% include 'api_class_delete_method.py.jinja' %}
 
-    @overload
-    def retrieve(self, external_id: str) -> {{ data_class.read_name }}:
-        ...
-
-    @overload
-    def retrieve(self, external_id: Sequence[str]) -> {{ data_class.read_list_name }}:
-        ...
-
-    def retrieve(self, external_id: str | Sequence[str]) -> {{ data_class.read_name }} | {{ data_class.read_list_name }}:
-        if isinstance(external_id, str):
-            {% if data_class.has_one_to_many_edges %}{{ data_class.variable }} = self._retrieve((self._sources.space, external_id))
-{% for field in data_class.one_to_many_edges %}
-            {{ field.variable }}_edges = self.{{ field.edge_api_attribute }}.retrieve(external_id)
-            {{ data_class.variable }}.{{ field.name }} = [edge.end_node.external_id for edge in {{ field.variable }}_edges]{% endfor %}
-
-            return {{ data_class.variable }}{% else %}return self._retrieve((self._sources.space, external_id)){% endif %}
-        else:
-            {% if data_class.has_one_to_many_edges %}{{ data_class.variable_list }} = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
-{% for field in data_class.one_to_many_edges %}
-            {{ field.variable }}_edges = self.{{ field.edge_api_attribute }}.retrieve(external_id)
-            self._set_{{ field.name }}({{ data_class.variable_list }}, {{ field.variable }}_edges){% endfor %}
-
-            return {{ data_class.variable_list }}{% else %}return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id]){% endif %}
+{% include 'api_class_retrieve_method.py.jinja' %}
 {% if data_class.has_text_field %}
 {% include 'api_class_search_method.py.jinja' %}{% endif %}
 {% if data_class.has_primitive_fields %}

@@ -1,0 +1,12 @@
+    def apply(self, {{ data_class.variable }}: {{ data_class.write_name }} | Sequence[{{ data_class.write_name }}], replace: bool = False) -> dm.InstancesApplyResult:
+        if isinstance({{ data_class.variable }}, {{ data_class.write_name }}):
+            instances = {{ data_class.variable }}.to_instances_apply()
+        else:
+            instances = {{ data_class.write_list_name }}({{ data_class.variable }}).to_instances_apply()
+        return self._client.data_modeling.instances.apply(
+            nodes=instances.nodes,
+            edges=instances.edges,
+            auto_create_start_nodes=True,
+            auto_create_end_nodes=True,
+            replace=replace,
+        )
