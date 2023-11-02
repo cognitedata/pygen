@@ -70,6 +70,7 @@ class BidAPI(TypeAPI[Bid, BidApply, BidList]):
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> BidList:
@@ -81,6 +82,7 @@ class BidAPI(TypeAPI[Bid, BidApply, BidList]):
             name,
             name_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._search(self._view_id, query, _BID_PROPERTIES_BY_FIELD, properties, filter_, limit)
@@ -102,6 +104,7 @@ class BidAPI(TypeAPI[Bid, BidApply, BidList]):
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
@@ -124,6 +127,7 @@ class BidAPI(TypeAPI[Bid, BidApply, BidList]):
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
@@ -145,6 +149,7 @@ class BidAPI(TypeAPI[Bid, BidApply, BidList]):
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
@@ -156,6 +161,7 @@ class BidAPI(TypeAPI[Bid, BidApply, BidList]):
             name,
             name_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._aggregate(
@@ -182,6 +188,7 @@ class BidAPI(TypeAPI[Bid, BidApply, BidList]):
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
@@ -193,6 +200,7 @@ class BidAPI(TypeAPI[Bid, BidApply, BidList]):
             name,
             name_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._histogram(
@@ -214,6 +222,7 @@ class BidAPI(TypeAPI[Bid, BidApply, BidList]):
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> BidList:
@@ -225,6 +234,7 @@ class BidAPI(TypeAPI[Bid, BidApply, BidList]):
             name,
             name_prefix,
             external_id_prefix,
+            space,
             filter,
         )
 
@@ -239,6 +249,7 @@ def _create_filter(
     name: str | list[str] | None = None,
     name_prefix: str | None = None,
     external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
@@ -278,6 +289,10 @@ def _create_filter(
         filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None

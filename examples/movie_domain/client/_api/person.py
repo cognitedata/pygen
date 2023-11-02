@@ -133,6 +133,7 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> PersonList:
@@ -143,6 +144,7 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
             name,
             name_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._search(self._view_id, query, _PERSON_PROPERTIES_BY_FIELD, properties, filter_, limit)
@@ -163,6 +165,7 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
@@ -184,6 +187,7 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
@@ -204,6 +208,7 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
@@ -214,6 +219,7 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
             name,
             name_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._aggregate(
@@ -239,6 +245,7 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
@@ -249,6 +256,7 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
             name,
             name_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._histogram(

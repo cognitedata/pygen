@@ -74,12 +74,14 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
         query: str,
         properties: CommandConfigTextFields | Sequence[CommandConfigTextFields] | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> CommandConfigList:
         filter_ = _create_filter(
             self._view_id,
             external_id_prefix,
+            space,
             filter,
         )
         return self._search(self._view_id, query, _COMMANDCONFIG_PROPERTIES_BY_FIELD, properties, filter_, limit)
@@ -96,6 +98,7 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
         query: str | None = None,
         search_properties: CommandConfigTextFields | Sequence[CommandConfigTextFields] | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
@@ -113,6 +116,7 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
         query: str | None = None,
         search_properties: CommandConfigTextFields | Sequence[CommandConfigTextFields] | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
@@ -129,12 +133,14 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
         query: str | None = None,
         search_property: CommandConfigTextFields | Sequence[CommandConfigTextFields] | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
         filter_ = _create_filter(
             self._view_id,
             external_id_prefix,
+            space,
             filter,
         )
         return self._aggregate(
@@ -156,12 +162,14 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
         query: str | None = None,
         search_property: CommandConfigTextFields | Sequence[CommandConfigTextFields] | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         filter_ = _create_filter(
             self._view_id,
             external_id_prefix,
+            space,
             filter,
         )
         return self._histogram(
@@ -178,12 +186,14 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
     def list(
         self,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> CommandConfigList:
         filter_ = _create_filter(
             self._view_id,
             external_id_prefix,
+            space,
             filter,
         )
 
@@ -193,11 +203,16 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
 def _create_filter(
     view_id: dm.ViewId,
     external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None

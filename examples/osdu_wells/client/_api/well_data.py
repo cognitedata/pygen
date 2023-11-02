@@ -602,6 +602,7 @@ class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
         was_business_interest_obligatory: bool | None = None,
         was_business_interest_technical: bool | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> WellDataList:
@@ -661,6 +662,7 @@ class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
             was_business_interest_obligatory,
             was_business_interest_technical,
             external_id_prefix,
+            space,
             filter,
         )
         return self._search(self._view_id, query, _WELLDATA_PROPERTIES_BY_FIELD, properties, filter_, limit)
@@ -730,6 +732,7 @@ class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
         was_business_interest_obligatory: bool | None = None,
         was_business_interest_technical: bool | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
@@ -800,6 +803,7 @@ class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
         was_business_interest_obligatory: bool | None = None,
         was_business_interest_technical: bool | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
@@ -869,6 +873,7 @@ class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
         was_business_interest_obligatory: bool | None = None,
         was_business_interest_technical: bool | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
@@ -928,6 +933,7 @@ class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
             was_business_interest_obligatory,
             was_business_interest_technical,
             external_id_prefix,
+            space,
             filter,
         )
         return self._aggregate(
@@ -1002,6 +1008,7 @@ class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
         was_business_interest_obligatory: bool | None = None,
         was_business_interest_technical: bool | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
@@ -1061,6 +1068,7 @@ class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
             was_business_interest_obligatory,
             was_business_interest_technical,
             external_id_prefix,
+            space,
             filter,
         )
         return self._histogram(
@@ -1130,6 +1138,7 @@ class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
         was_business_interest_obligatory: bool | None = None,
         was_business_interest_technical: bool | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
@@ -1190,6 +1199,7 @@ class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
             was_business_interest_obligatory,
             was_business_interest_technical,
             external_id_prefix,
+            space,
             filter,
         )
 
@@ -1402,6 +1412,7 @@ def _create_filter(
     was_business_interest_obligatory: bool | None = None,
     was_business_interest_technical: bool | None = None,
     external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
@@ -1683,6 +1694,10 @@ def _create_filter(
         )
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None
