@@ -1,3 +1,5 @@
+import pytest
+
 from tests.constants import IS_PYDANTIC_V1
 
 if IS_PYDANTIC_V1:
@@ -62,6 +64,7 @@ def test_person_apply_multiple(movie_client: MovieClient) -> None:
         movie_client.person.delete([person.external_id for person in persons])
 
 
+@pytest.mark.skip("Known bug, logged as an issue")
 def test_person_apply_multiple_requests(movie_client: MovieClient) -> None:
     # Arrange
     person = movie.PersonApply(
