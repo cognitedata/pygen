@@ -13,7 +13,11 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## [0.27.3] - 01-11-23
+## [0.28.0] - 02-11-23
+### Added
+* Support for `Support generic OIDC` in the `pygen` CLI.
+
+## [0.27.3] - 02-11-23
 ### Fixed
 * When calling `.apply` the view generating the data class is used to write instead of the container of the property.
   This caused some apply operations to not be retrievable again with the `list` method.
