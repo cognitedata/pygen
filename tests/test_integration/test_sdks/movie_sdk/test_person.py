@@ -153,3 +153,13 @@ def test_histogram_birth_year(movie_client: MovieClient) -> None:
     assert len(result.buckets) > 0
     assert result.buckets[0].count > 0
     assert result.buckets[0].start == 1900
+
+
+def test_list_filter_on_space(movie_client: MovieClient) -> None:
+    # Act
+    no_people = movie_client.person.list(space="Non-existing space")
+    some_people = movie_client.person.list(space="IntegrationTestsImmutable")
+
+    # Assert
+    assert len(no_people) == 0
+    assert len(some_people) > 0

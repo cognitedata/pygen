@@ -549,6 +549,7 @@ class WellboreTrajectoryDataAPI(
         wellbore_id: str | list[str] | None = None,
         wellbore_id_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> WellboreTrajectoryDataList:
@@ -635,6 +636,7 @@ class WellboreTrajectoryDataAPI(
             wellbore_id,
             wellbore_id_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._search(
@@ -733,6 +735,7 @@ class WellboreTrajectoryDataAPI(
         wellbore_id: str | list[str] | None = None,
         wellbore_id_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
@@ -830,6 +833,7 @@ class WellboreTrajectoryDataAPI(
         wellbore_id: str | list[str] | None = None,
         wellbore_id_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
@@ -926,6 +930,7 @@ class WellboreTrajectoryDataAPI(
         wellbore_id: str | list[str] | None = None,
         wellbore_id_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
@@ -1012,6 +1017,7 @@ class WellboreTrajectoryDataAPI(
             wellbore_id,
             wellbore_id_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._aggregate(
@@ -1113,6 +1119,7 @@ class WellboreTrajectoryDataAPI(
         wellbore_id: str | list[str] | None = None,
         wellbore_id_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
@@ -1199,6 +1206,7 @@ class WellboreTrajectoryDataAPI(
             wellbore_id,
             wellbore_id_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._histogram(
@@ -1295,6 +1303,7 @@ class WellboreTrajectoryDataAPI(
         wellbore_id: str | list[str] | None = None,
         wellbore_id_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
@@ -1382,6 +1391,7 @@ class WellboreTrajectoryDataAPI(
             wellbore_id,
             wellbore_id_prefix,
             external_id_prefix,
+            space,
             filter,
         )
 
@@ -1600,6 +1610,7 @@ def _create_filter(
     wellbore_id: str | list[str] | None = None,
     wellbore_id_prefix: str | None = None,
     external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
@@ -2001,6 +2012,10 @@ def _create_filter(
         filters.append(dm.filters.Prefix(view_id.as_property_ref("WellboreID"), value=wellbore_id_prefix))
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None

@@ -626,8 +626,8 @@ class FilterCondition:
 
     @property
     def arguments(self) -> str:
-        if self.prop_name == "externalId":
-            property_ref = '["node", "externalId"], '
+        if self.prop_name in {"externalId", "space"}:
+            property_ref = f'["node", "{self.prop_name}"], '
         else:
             property_ref = f'view_id.as_property_ref("{self.prop_name}"), '
 
@@ -699,6 +699,21 @@ _EXTERNAL_ID_FIELD = PrimitiveField(
     ),
     pydantic_field="Field",
 )
+_SPACE_FIELD = PrimitiveField(
+    name="space",
+    prop_name="space",
+    type_="str",
+    is_nullable=False,
+    default=None,
+    prop=dm.MappedProperty(
+        container_property_identifier="space",
+        type=dm.Text(),
+        nullable=False,
+        auto_increment=False,
+        container=dm.ContainerId("dummy", "dummy"),
+    ),
+    pydantic_field="Field",
+)
 
 
 @dataclass
@@ -711,7 +726,7 @@ class ListMethod:
         parameters_by_name: dict[str, FilterParameter] = {}
         list_filters: list[FilterCondition] = []
 
-        for field_ in itertools.chain(fields, (_EXTERNAL_ID_FIELD,)):
+        for field_ in itertools.chain(fields, (_EXTERNAL_ID_FIELD, _SPACE_FIELD)):
             # Only primitive and edge one-to-one fields supported for now
             if isinstance(field_, PrimitiveField):
                 for selected_filter in config.get(field_.prop.type, field_.prop_name):

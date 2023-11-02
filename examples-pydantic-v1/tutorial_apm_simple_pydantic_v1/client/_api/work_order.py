@@ -224,6 +224,7 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         work_package_number: str | list[str] | None = None,
         work_package_number_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> WorkOrderList:
@@ -264,6 +265,7 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
             work_package_number,
             work_package_number_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._search(self._view_id, query, _WORKORDER_PROPERTIES_BY_FIELD, properties, filter_, limit)
@@ -314,6 +316,7 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         work_package_number: str | list[str] | None = None,
         work_package_number_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
@@ -365,6 +368,7 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         work_package_number: str | list[str] | None = None,
         work_package_number_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
@@ -415,6 +419,7 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         work_package_number: str | list[str] | None = None,
         work_package_number_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
@@ -455,6 +460,7 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
             work_package_number,
             work_package_number_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._aggregate(
@@ -510,6 +516,7 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         work_package_number: str | list[str] | None = None,
         work_package_number_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
@@ -550,6 +557,7 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
             work_package_number,
             work_package_number_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._histogram(
@@ -600,6 +608,7 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         work_package_number: str | list[str] | None = None,
         work_package_number_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
@@ -641,6 +650,7 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
             work_package_number,
             work_package_number_prefix,
             external_id_prefix,
+            space,
             filter,
         )
 
@@ -720,6 +730,7 @@ def _create_filter(
     work_package_number: str | list[str] | None = None,
     work_package_number_prefix: str | None = None,
     external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
@@ -833,6 +844,10 @@ def _create_filter(
         )
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None
