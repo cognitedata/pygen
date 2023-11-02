@@ -85,7 +85,7 @@ if _has_typer:
                     token_url=token_url,
                     client_id=client_id,
                     client_secret=client_secret,
-                    scopes=scopes.split(" "),
+                    scopes=scopes.split(" ") if scopes else [],
                     audience=audience,
                 )
                 clientConfig = ClientConfig(
@@ -158,7 +158,7 @@ if _has_typer:
                     token_url=token_url,
                     client_id=client_id,
                     client_secret=client_secret,
-                    scopes=scopes.split(" "),
+                    scopes=scopes.split(" ") if scopes else [],
                     audience=audience,
                 )
                 clientConfig = ClientConfig(
