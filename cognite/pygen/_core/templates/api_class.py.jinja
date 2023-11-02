@@ -235,6 +235,7 @@ class {{ api_class.name }}(TypeAPI[{{ data_class.read_name }}, {{ data_class.wri
     def list(
         self,{% for parm in list_method.parameters %}
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,{% if data_class.has_one_to_many_edges %}
         retrieve_edges: bool = True,{% endif %}
@@ -242,6 +243,7 @@ class {{ api_class.name }}(TypeAPI[{{ data_class.read_name }}, {{ data_class.wri
         filter_ = _create_filter(
             self._view_id,{% for parm in list_method.parameters %}
             {{ parm.name }},{% endfor %}
+            space,
             filter,
         )
 
@@ -271,11 +273,16 @@ class {{ api_class.name }}(TypeAPI[{{ data_class.read_name }}, {{ data_class.wri
 def _create_filter(
     view_id: dm.ViewId,{% for parm in list_method.parameters %}
     {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
+    space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []{% for filter in list_method.filters %}
     if {{ filter.condition }}:
         filters.append({{ filter.filter_call }}({{ filter.arguments }})){% endfor %}
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None
