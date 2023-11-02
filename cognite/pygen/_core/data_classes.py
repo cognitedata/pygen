@@ -639,7 +639,7 @@ class FilterCondition:
         filter_args: list[str] = []
         for keyword, arg in self.keyword_arguments.items():
             if arg.is_time:
-                timespec = 'timespec="milliseconds"' if arg.is_timestamp == "datetime.datetime" else ""
+                timespec = 'timespec="milliseconds"' if arg.is_timestamp else ""
                 filter_args.append(f"{keyword}={arg.name}.isoformat({timespec}) if {arg.name} else None")
             else:
                 filter_args.append(f"{keyword}={arg.name}")

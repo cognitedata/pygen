@@ -311,8 +311,8 @@ def test_data_class_is_time(pygen_config: PygenConfig) -> None:
                 dm.filters.Range,
                 prop_name="end_time",
                 keyword_arguments={
-                    "lte": FilterParameter("max_end_time", "datetime.datetime"),
                     "gte": FilterParameter("min_end_time", "datetime.datetime"),
+                    "lte": FilterParameter("max_end_time", "datetime.datetime"),
                 },
             ),
             'view_id.as_property_ref("end_time"), '
