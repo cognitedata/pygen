@@ -282,12 +282,15 @@ def test_generate_data_class_file_persons(person_api_generator: APIGenerator, py
     assert actual == expected
 
 
-def test_create_view_data_class_actors(actor_api_generator: APIGenerator, pygen_config: PygenConfig):
+def test_create_view_data_class_actors(
+    actor_api_generator: APIGenerator, pygen_config: PygenConfig, code_formatter: CodeFormatter
+):
     # Arrange
     expected = MovieSDKFiles.actors_data.read_text()
 
     # Act
     actual = actor_api_generator.generate_data_class_file()
+    actual = code_formatter.format_code(actual)
 
     # Assert
     assert actual == expected

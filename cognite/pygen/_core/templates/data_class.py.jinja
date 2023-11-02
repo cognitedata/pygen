@@ -38,9 +38,10 @@ class {{ data_class.write_name }}(DomainModelApply):
     space: str = "{{ space }}"{% for field in data_class %}
     {{ field.name }}: {{ field.as_write_type_hint() }}{% endfor %}
 
-    def _to_instances_apply(self, cache: set[str], write_view: dm.ViewId | None) -> dm.InstancesApply:
+    def _to_instances_apply(self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
+        write_view = view_by_write_class and view_by_write_class.get(type(self))
 {% if not data_class.has_only_one_to_many_edges %}
         properties = {}{% for field in data_class.property_fields %}
         if self.{{ field.name }} is not None:
@@ -74,12 +75,12 @@ class {{ data_class.write_name }}(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance({{ field.variable }}, DomainModelApply):
-                instances = {{ field.variable }}._to_instances_apply(cache, write_view)
+                instances = {{ field.variable }}._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 {% endfor %}{% for field in data_class.one_to_one_edges %}
         if isinstance(self.{{ field.name }}, DomainModelApply):
-            instances = self.{{ field.name }}._to_instances_apply(cache, write_view)
+            instances = self.{{ field.name }}._to_instances_apply(cache, view_by_write_class)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 {% endfor %}

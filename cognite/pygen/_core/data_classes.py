@@ -531,9 +531,10 @@ class APIClass:
     name: str
     file_name: str
     view_id: ViewSpaceExternalId
+    data_class: DataClass
 
     @classmethod
-    def from_view(cls, view: dm.View, api_class: pygen_config.APIClassNaming) -> APIClass:
+    def from_view(cls, view: dm.View, api_class: pygen_config.APIClassNaming, data_class: DataClass) -> APIClass:
         raw_name = view.name or view.external_id
 
         raw_name = raw_name.replace(" ", "_")
@@ -543,6 +544,7 @@ class APIClass:
             name=f"{create_name(raw_name, api_class.name)}API",
             file_name=create_name(raw_name, api_class.file_name),
             view_id=ViewSpaceExternalId.from_(view),
+            data_class=data_class,
         )
 
 

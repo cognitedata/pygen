@@ -45,9 +45,12 @@ class ActorApply(DomainModelApply):
     person: Union[PersonApply, str, None] = Field(None, repr=False)
     won_oscar: Optional[bool] = Field(None, alias="wonOscar")
 
-    def _to_instances_apply(self, cache: set[str], write_view: dm.ViewId | None) -> dm.InstancesApply:
+    def _to_instances_apply(
+        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
+    ) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
+        write_view = view_by_write_class and view_by_write_class.get(type(self))
 
         properties = {}
         if self.person is not None:
@@ -82,7 +85,7 @@ class ActorApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(movie, DomainModelApply):
-                instances = movie._to_instances_apply(cache, write_view)
+                instances = movie._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
@@ -93,12 +96,12 @@ class ActorApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(nomination, DomainModelApply):
-                instances = nomination._to_instances_apply(cache, write_view)
+                instances = nomination._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
         if isinstance(self.person, DomainModelApply):
-            instances = self.person._to_instances_apply(cache, write_view)
+            instances = self.person._to_instances_apply(cache, view_by_write_class)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 
