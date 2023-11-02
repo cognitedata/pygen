@@ -14,6 +14,7 @@ from osdu_wells.client.data_classes import (
     GeographicBottomHoleLocationApplyList,
     GeographicBottomHoleLocationFields,
     GeographicBottomHoleLocationTextFields,
+    DomainModelApply,
 )
 from osdu_wells.client.data_classes._geographic_bottom_hole_location import (
     _GEOGRAPHICBOTTOMHOLELOCATION_PROPERTIES_BY_FIELD,
@@ -23,7 +24,8 @@ from osdu_wells.client.data_classes._geographic_bottom_hole_location import (
 class GeographicBottomHoleLocationAPI(
     TypeAPI[GeographicBottomHoleLocation, GeographicBottomHoleLocationApply, GeographicBottomHoleLocationList]
 ):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[GeographicBottomHoleLocationApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -32,6 +34,7 @@ class GeographicBottomHoleLocationAPI(
             class_list=GeographicBottomHoleLocationList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(
         self,
@@ -40,9 +43,11 @@ class GeographicBottomHoleLocationAPI(
         replace: bool = False,
     ) -> dm.InstancesApplyResult:
         if isinstance(geographic_bottom_hole_location, GeographicBottomHoleLocationApply):
-            instances = geographic_bottom_hole_location.to_instances_apply()
+            instances = geographic_bottom_hole_location.to_instances_apply(self._view_by_write_class)
         else:
-            instances = GeographicBottomHoleLocationApplyList(geographic_bottom_hole_location).to_instances_apply()
+            instances = GeographicBottomHoleLocationApplyList(geographic_bottom_hole_location).to_instances_apply(
+                self._view_by_write_class
+            )
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

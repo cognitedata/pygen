@@ -14,6 +14,7 @@ from movie_domain_pydantic_v1.client.data_classes import (
     DirectorList,
     DirectorApplyList,
     DirectorFields,
+    DomainModelApply,
 )
 from movie_domain_pydantic_v1.client.data_classes._director import _DIRECTOR_PROPERTIES_BY_FIELD
 
@@ -109,7 +110,8 @@ class DirectorNominationAPI:
 
 
 class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[DirectorApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -118,6 +120,7 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
             class_list=DirectorList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
         self.movies = DirectorMoviesAPI(client)
         self.nomination = DirectorNominationAPI(client)
 
@@ -125,9 +128,9 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
         self, director: DirectorApply | Sequence[DirectorApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(director, DirectorApply):
-            instances = director.to_instances_apply()
+            instances = director.to_instances_apply(self._view_by_write_class)
         else:
-            instances = DirectorApplyList(director).to_instances_apply()
+            instances = DirectorApplyList(director).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

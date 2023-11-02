@@ -15,6 +15,7 @@ from osdu_wells.client.data_classes import (
     WellDataApplyList,
     WellDataFields,
     WellDataTextFields,
+    DomainModelApply,
 )
 from osdu_wells.client.data_classes._well_data import _WELLDATA_PROPERTIES_BY_FIELD
 
@@ -443,7 +444,8 @@ class WellDataVerticalMeasurementsAPI:
 
 
 class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[WellDataApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -452,6 +454,7 @@ class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
             class_list=WellDataList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
         self.facility_events = WellDataFacilityEventsAPI(client)
         self.facility_operators = WellDataFacilityOperatorsAPI(client)
         self.facility_specifications = WellDataFacilitySpecificationsAPI(client)
@@ -466,9 +469,9 @@ class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
         self, well_datum: WellDataApply | Sequence[WellDataApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(well_datum, WellDataApply):
-            instances = well_datum.to_instances_apply()
+            instances = well_datum.to_instances_apply(self._view_by_write_class)
         else:
-            instances = WellDataApplyList(well_datum).to_instances_apply()
+            instances = WellDataApplyList(well_datum).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

@@ -14,12 +14,14 @@ from osdu_wells_pydantic_v1.client.data_classes import (
     HistoricalInterestsApplyList,
     HistoricalInterestsFields,
     HistoricalInterestsTextFields,
+    DomainModelApply,
 )
 from osdu_wells_pydantic_v1.client.data_classes._historical_interests import _HISTORICALINTERESTS_PROPERTIES_BY_FIELD
 
 
 class HistoricalInterestsAPI(TypeAPI[HistoricalInterests, HistoricalInterestsApply, HistoricalInterestsList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[HistoricalInterestsApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -28,14 +30,15 @@ class HistoricalInterestsAPI(TypeAPI[HistoricalInterests, HistoricalInterestsApp
             class_list=HistoricalInterestsList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(
         self, historical_interest: HistoricalInterestsApply | Sequence[HistoricalInterestsApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(historical_interest, HistoricalInterestsApply):
-            instances = historical_interest.to_instances_apply()
+            instances = historical_interest.to_instances_apply(self._view_by_write_class)
         else:
-            instances = HistoricalInterestsApplyList(historical_interest).to_instances_apply()
+            instances = HistoricalInterestsApplyList(historical_interest).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

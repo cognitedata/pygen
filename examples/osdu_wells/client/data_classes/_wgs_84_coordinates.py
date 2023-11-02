@@ -51,11 +51,13 @@ class WgsCoordinatesApply(DomainModelApply):
     features: Union[list[FeaturesApply], list[str], None] = Field(default=None, repr=False)
     type: Optional[str] = None
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(
+        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
+    ) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
+        write_view = view_by_write_class and view_by_write_class.get(type(self))
 
-        sources = []
         properties = {}
         if self.bbox is not None:
             properties["bbox"] = self.bbox
@@ -63,16 +65,14 @@ class WgsCoordinatesApply(DomainModelApply):
             properties["type"] = self.type
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("IntegrationTestsImmutable", "Wgs84Coordinates"),
+                source=write_view or dm.ViewId("IntegrationTestsImmutable", "Wgs84Coordinates", "d6030081373896"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:
@@ -88,7 +88,7 @@ class WgsCoordinatesApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(feature, DomainModelApply):
-                instances = feature._to_instances_apply(cache)
+                instances = feature._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 

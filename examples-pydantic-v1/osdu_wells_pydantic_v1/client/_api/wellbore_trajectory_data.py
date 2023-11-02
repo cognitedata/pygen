@@ -15,6 +15,7 @@ from osdu_wells_pydantic_v1.client.data_classes import (
     WellboreTrajectoryDataApplyList,
     WellboreTrajectoryDataFields,
     WellboreTrajectoryDataTextFields,
+    DomainModelApply,
 )
 from osdu_wells_pydantic_v1.client.data_classes._wellbore_trajectory_data import (
     _WELLBORETRAJECTORYDATA_PROPERTIES_BY_FIELD,
@@ -360,7 +361,8 @@ class WellboreTrajectoryDataTechnicalAssurancesAPI:
 class WellboreTrajectoryDataAPI(
     TypeAPI[WellboreTrajectoryData, WellboreTrajectoryDataApply, WellboreTrajectoryDataList]
 ):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[WellboreTrajectoryDataApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -369,6 +371,7 @@ class WellboreTrajectoryDataAPI(
             class_list=WellboreTrajectoryDataList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
         self.artefacts = WellboreTrajectoryDataArtefactsAPI(client)
         self.available_trajectory_station_properties = WellboreTrajectoryDataAvailableTrajectoryStationPropertiesAPI(
             client
@@ -384,9 +387,11 @@ class WellboreTrajectoryDataAPI(
         replace: bool = False,
     ) -> dm.InstancesApplyResult:
         if isinstance(wellbore_trajectory_datum, WellboreTrajectoryDataApply):
-            instances = wellbore_trajectory_datum.to_instances_apply()
+            instances = wellbore_trajectory_datum.to_instances_apply(self._view_by_write_class)
         else:
-            instances = WellboreTrajectoryDataApplyList(wellbore_trajectory_datum).to_instances_apply()
+            instances = WellboreTrajectoryDataApplyList(wellbore_trajectory_datum).to_instances_apply(
+                self._view_by_write_class
+            )
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

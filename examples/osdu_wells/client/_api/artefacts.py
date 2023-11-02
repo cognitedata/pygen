@@ -14,12 +14,14 @@ from osdu_wells.client.data_classes import (
     ArtefactsApplyList,
     ArtefactsFields,
     ArtefactsTextFields,
+    DomainModelApply,
 )
 from osdu_wells.client.data_classes._artefacts import _ARTEFACTS_PROPERTIES_BY_FIELD
 
 
 class ArtefactsAPI(TypeAPI[Artefacts, ArtefactsApply, ArtefactsList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[ArtefactsApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -28,14 +30,15 @@ class ArtefactsAPI(TypeAPI[Artefacts, ArtefactsApply, ArtefactsList]):
             class_list=ArtefactsList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(
         self, artefact: ArtefactsApply | Sequence[ArtefactsApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(artefact, ArtefactsApply):
-            instances = artefact.to_instances_apply()
+            instances = artefact.to_instances_apply(self._view_by_write_class)
         else:
-            instances = ArtefactsApplyList(artefact).to_instances_apply()
+            instances = ArtefactsApplyList(artefact).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

@@ -15,6 +15,7 @@ from osdu_wells.client.data_classes import (
     WellboreTrajectoryApplyList,
     WellboreTrajectoryFields,
     WellboreTrajectoryTextFields,
+    DomainModelApply,
 )
 from osdu_wells.client.data_classes._wellbore_trajectory import _WELLBORETRAJECTORY_PROPERTIES_BY_FIELD
 
@@ -74,7 +75,8 @@ class WellboreTrajectoryMetaAPI:
 
 
 class WellboreTrajectoryAPI(TypeAPI[WellboreTrajectory, WellboreTrajectoryApply, WellboreTrajectoryList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[WellboreTrajectoryApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -83,15 +85,16 @@ class WellboreTrajectoryAPI(TypeAPI[WellboreTrajectory, WellboreTrajectoryApply,
             class_list=WellboreTrajectoryList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
         self.meta = WellboreTrajectoryMetaAPI(client)
 
     def apply(
         self, wellbore_trajectory: WellboreTrajectoryApply | Sequence[WellboreTrajectoryApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(wellbore_trajectory, WellboreTrajectoryApply):
-            instances = wellbore_trajectory.to_instances_apply()
+            instances = wellbore_trajectory.to_instances_apply(self._view_by_write_class)
         else:
-            instances = WellboreTrajectoryApplyList(wellbore_trajectory).to_instances_apply()
+            instances = WellboreTrajectoryApplyList(wellbore_trajectory).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

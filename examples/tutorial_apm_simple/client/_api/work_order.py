@@ -16,6 +16,7 @@ from tutorial_apm_simple.client.data_classes import (
     WorkOrderApplyList,
     WorkOrderFields,
     WorkOrderTextFields,
+    DomainModelApply,
 )
 from tutorial_apm_simple.client.data_classes._work_order import _WORKORDER_PROPERTIES_BY_FIELD
 
@@ -119,7 +120,8 @@ class WorkOrderWorkItemsAPI:
 
 
 class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[WorkOrderApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -128,6 +130,7 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
             class_list=WorkOrderList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
         self.linked_assets = WorkOrderLinkedAssetsAPI(client)
         self.work_items = WorkOrderWorkItemsAPI(client)
 
@@ -135,9 +138,9 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         self, work_order: WorkOrderApply | Sequence[WorkOrderApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(work_order, WorkOrderApply):
-            instances = work_order.to_instances_apply()
+            instances = work_order.to_instances_apply(self._view_by_write_class)
         else:
-            instances = WorkOrderApplyList(work_order).to_instances_apply()
+            instances = WorkOrderApplyList(work_order).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

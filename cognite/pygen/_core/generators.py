@@ -253,7 +253,7 @@ class APIGenerator:
         )
         self.view_identifier = ViewSpaceExternalId.from_(view)
         self.data_class = DataClass.from_view(view, config.naming.data_class)
-        self.api_class = APIClass.from_view(view, config.naming.api_class)
+        self.api_class = APIClass.from_view(view, config.naming.api_class, self.data_class)
 
         # List method cannot be generated here, as we need all data class fields to bo updated first.
         self._config = config

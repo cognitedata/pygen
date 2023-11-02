@@ -14,12 +14,14 @@ from osdu_wells.client.data_classes import (
     VerticalMeasurementsApplyList,
     VerticalMeasurementsFields,
     VerticalMeasurementsTextFields,
+    DomainModelApply,
 )
 from osdu_wells.client.data_classes._vertical_measurements import _VERTICALMEASUREMENTS_PROPERTIES_BY_FIELD
 
 
 class VerticalMeasurementsAPI(TypeAPI[VerticalMeasurements, VerticalMeasurementsApply, VerticalMeasurementsList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[VerticalMeasurementsApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -28,6 +30,7 @@ class VerticalMeasurementsAPI(TypeAPI[VerticalMeasurements, VerticalMeasurements
             class_list=VerticalMeasurementsList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(
         self,
@@ -35,9 +38,11 @@ class VerticalMeasurementsAPI(TypeAPI[VerticalMeasurements, VerticalMeasurements
         replace: bool = False,
     ) -> dm.InstancesApplyResult:
         if isinstance(vertical_measurement, VerticalMeasurementsApply):
-            instances = vertical_measurement.to_instances_apply()
+            instances = vertical_measurement.to_instances_apply(self._view_by_write_class)
         else:
-            instances = VerticalMeasurementsApplyList(vertical_measurement).to_instances_apply()
+            instances = VerticalMeasurementsApplyList(vertical_measurement).to_instances_apply(
+                self._view_by_write_class
+            )
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

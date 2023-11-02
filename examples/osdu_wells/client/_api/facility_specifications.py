@@ -14,6 +14,7 @@ from osdu_wells.client.data_classes import (
     FacilitySpecificationsApplyList,
     FacilitySpecificationsFields,
     FacilitySpecificationsTextFields,
+    DomainModelApply,
 )
 from osdu_wells.client.data_classes._facility_specifications import _FACILITYSPECIFICATIONS_PROPERTIES_BY_FIELD
 
@@ -21,7 +22,8 @@ from osdu_wells.client.data_classes._facility_specifications import _FACILITYSPE
 class FacilitySpecificationsAPI(
     TypeAPI[FacilitySpecifications, FacilitySpecificationsApply, FacilitySpecificationsList]
 ):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[FacilitySpecificationsApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -30,6 +32,7 @@ class FacilitySpecificationsAPI(
             class_list=FacilitySpecificationsList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(
         self,
@@ -37,9 +40,11 @@ class FacilitySpecificationsAPI(
         replace: bool = False,
     ) -> dm.InstancesApplyResult:
         if isinstance(facility_specification, FacilitySpecificationsApply):
-            instances = facility_specification.to_instances_apply()
+            instances = facility_specification.to_instances_apply(self._view_by_write_class)
         else:
-            instances = FacilitySpecificationsApplyList(facility_specification).to_instances_apply()
+            instances = FacilitySpecificationsApplyList(facility_specification).to_instances_apply(
+                self._view_by_write_class
+            )
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

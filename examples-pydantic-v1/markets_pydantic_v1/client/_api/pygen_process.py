@@ -14,12 +14,14 @@ from markets_pydantic_v1.client.data_classes import (
     PygenProcessApplyList,
     PygenProcessFields,
     PygenProcessTextFields,
+    DomainModelApply,
 )
 from markets_pydantic_v1.client.data_classes._pygen_process import _PYGENPROCESS_PROPERTIES_BY_FIELD
 
 
 class PygenProcessAPI(TypeAPI[PygenProcess, PygenProcessApply, PygenProcessList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[PygenProcessApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -28,14 +30,15 @@ class PygenProcessAPI(TypeAPI[PygenProcess, PygenProcessApply, PygenProcessList]
             class_list=PygenProcessList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(
         self, pygen_proces: PygenProcessApply | Sequence[PygenProcessApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(pygen_proces, PygenProcessApply):
-            instances = pygen_proces.to_instances_apply()
+            instances = pygen_proces.to_instances_apply(self._view_by_write_class)
         else:
-            instances = PygenProcessApplyList(pygen_proces).to_instances_apply()
+            instances = PygenProcessApplyList(pygen_proces).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

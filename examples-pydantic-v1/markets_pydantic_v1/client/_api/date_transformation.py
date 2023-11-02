@@ -14,12 +14,14 @@ from markets_pydantic_v1.client.data_classes import (
     DateTransformationApplyList,
     DateTransformationFields,
     DateTransformationTextFields,
+    DomainModelApply,
 )
 from markets_pydantic_v1.client.data_classes._date_transformation import _DATETRANSFORMATION_PROPERTIES_BY_FIELD
 
 
 class DateTransformationAPI(TypeAPI[DateTransformation, DateTransformationApply, DateTransformationList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[DateTransformationApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -28,14 +30,15 @@ class DateTransformationAPI(TypeAPI[DateTransformation, DateTransformationApply,
             class_list=DateTransformationList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(
         self, date_transformation: DateTransformationApply | Sequence[DateTransformationApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(date_transformation, DateTransformationApply):
-            instances = date_transformation.to_instances_apply()
+            instances = date_transformation.to_instances_apply(self._view_by_write_class)
         else:
-            instances = DateTransformationApplyList(date_transformation).to_instances_apply()
+            instances = DateTransformationApplyList(date_transformation).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

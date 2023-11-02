@@ -15,6 +15,7 @@ from osdu_wells_pydantic_v1.client.data_classes import (
     TechnicalAssurancesApplyList,
     TechnicalAssurancesFields,
     TechnicalAssurancesTextFields,
+    DomainModelApply,
 )
 from osdu_wells_pydantic_v1.client.data_classes._technical_assurances import _TECHNICALASSURANCES_PROPERTIES_BY_FIELD
 
@@ -182,7 +183,8 @@ class TechnicalAssurancesUnacceptableUsageAPI:
 
 
 class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApply, TechnicalAssurancesList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[TechnicalAssurancesApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -191,6 +193,7 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
             class_list=TechnicalAssurancesList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
         self.acceptable_usage = TechnicalAssurancesAcceptableUsageAPI(client)
         self.reviewers = TechnicalAssurancesReviewersAPI(client)
         self.unacceptable_usage = TechnicalAssurancesUnacceptableUsageAPI(client)
@@ -199,9 +202,9 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
         self, technical_assurance: TechnicalAssurancesApply | Sequence[TechnicalAssurancesApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(technical_assurance, TechnicalAssurancesApply):
-            instances = technical_assurance.to_instances_apply()
+            instances = technical_assurance.to_instances_apply(self._view_by_write_class)
         else:
-            instances = TechnicalAssurancesApplyList(technical_assurance).to_instances_apply()
+            instances = TechnicalAssurancesApplyList(technical_assurance).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

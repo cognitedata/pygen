@@ -45,11 +45,13 @@ class WellboreCostsApply(DomainModelApply):
     activity_type_id: Optional[str] = Field(None, alias="ActivityTypeID")
     cost: Optional[float] = Field(None, alias="Cost")
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(
+        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
+    ) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
+        write_view = view_by_write_class and view_by_write_class.get(type(self))
 
-        sources = []
         properties = {}
         if self.activity_type_id is not None:
             properties["ActivityTypeID"] = self.activity_type_id
@@ -57,16 +59,14 @@ class WellboreCostsApply(DomainModelApply):
             properties["Cost"] = self.cost
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("IntegrationTestsImmutable", "WellboreCosts"),
+                source=write_view or dm.ViewId("IntegrationTestsImmutable", "WellboreCosts", "b4f71248f398a2"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:

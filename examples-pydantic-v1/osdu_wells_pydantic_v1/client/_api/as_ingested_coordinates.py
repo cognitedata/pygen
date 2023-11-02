@@ -15,6 +15,7 @@ from osdu_wells_pydantic_v1.client.data_classes import (
     AsIngestedCoordinatesApplyList,
     AsIngestedCoordinatesFields,
     AsIngestedCoordinatesTextFields,
+    DomainModelApply,
 )
 from osdu_wells_pydantic_v1.client.data_classes._as_ingested_coordinates import (
     _ASINGESTEDCOORDINATES_PROPERTIES_BY_FIELD,
@@ -76,7 +77,8 @@ class AsIngestedCoordinatesFeaturesAPI:
 
 
 class AsIngestedCoordinatesAPI(TypeAPI[AsIngestedCoordinates, AsIngestedCoordinatesApply, AsIngestedCoordinatesList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[AsIngestedCoordinatesApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -85,6 +87,7 @@ class AsIngestedCoordinatesAPI(TypeAPI[AsIngestedCoordinates, AsIngestedCoordina
             class_list=AsIngestedCoordinatesList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
         self.features = AsIngestedCoordinatesFeaturesAPI(client)
 
     def apply(
@@ -93,9 +96,11 @@ class AsIngestedCoordinatesAPI(TypeAPI[AsIngestedCoordinates, AsIngestedCoordina
         replace: bool = False,
     ) -> dm.InstancesApplyResult:
         if isinstance(as_ingested_coordinate, AsIngestedCoordinatesApply):
-            instances = as_ingested_coordinate.to_instances_apply()
+            instances = as_ingested_coordinate.to_instances_apply(self._view_by_write_class)
         else:
-            instances = AsIngestedCoordinatesApplyList(as_ingested_coordinate).to_instances_apply()
+            instances = AsIngestedCoordinatesApplyList(as_ingested_coordinate).to_instances_apply(
+                self._view_by_write_class
+            )
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

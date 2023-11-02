@@ -14,12 +14,14 @@ from osdu_wells.client.data_classes import (
     DrillingReasonsApplyList,
     DrillingReasonsFields,
     DrillingReasonsTextFields,
+    DomainModelApply,
 )
 from osdu_wells.client.data_classes._drilling_reasons import _DRILLINGREASONS_PROPERTIES_BY_FIELD
 
 
 class DrillingReasonsAPI(TypeAPI[DrillingReasons, DrillingReasonsApply, DrillingReasonsList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[DrillingReasonsApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -28,14 +30,15 @@ class DrillingReasonsAPI(TypeAPI[DrillingReasons, DrillingReasonsApply, Drilling
             class_list=DrillingReasonsList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(
         self, drilling_reason: DrillingReasonsApply | Sequence[DrillingReasonsApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(drilling_reason, DrillingReasonsApply):
-            instances = drilling_reason.to_instances_apply()
+            instances = drilling_reason.to_instances_apply(self._view_by_write_class)
         else:
-            instances = DrillingReasonsApplyList(drilling_reason).to_instances_apply()
+            instances = DrillingReasonsApplyList(drilling_reason).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

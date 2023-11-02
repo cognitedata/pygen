@@ -19,6 +19,7 @@ from movie_domain.client.data_classes import (
     RatingApplyList,
     RatingFields,
     RatingTextFields,
+    DomainModelApply,
 )
 from movie_domain.client.data_classes._rating import _RATING_PROPERTIES_BY_FIELD
 
@@ -663,7 +664,8 @@ def _retrieve_timeseries_external_ids_with_extra_votes(
 
 
 class RatingAPI(TypeAPI[Rating, RatingApply, RatingList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[RatingApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -672,14 +674,15 @@ class RatingAPI(TypeAPI[Rating, RatingApply, RatingList]):
             class_list=RatingList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
         self.score = RatingScoreAPI(client, view_id)
         self.votes = RatingVotesAPI(client, view_id)
 
     def apply(self, rating: RatingApply | Sequence[RatingApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(rating, RatingApply):
-            instances = rating.to_instances_apply()
+            instances = rating.to_instances_apply(self._view_by_write_class)
         else:
-            instances = RatingApplyList(rating).to_instances_apply()
+            instances = RatingApplyList(rating).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

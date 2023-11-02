@@ -14,12 +14,14 @@ from markets.client.data_classes import (
     ValueTransformationApplyList,
     ValueTransformationFields,
     ValueTransformationTextFields,
+    DomainModelApply,
 )
 from markets.client.data_classes._value_transformation import _VALUETRANSFORMATION_PROPERTIES_BY_FIELD
 
 
 class ValueTransformationAPI(TypeAPI[ValueTransformation, ValueTransformationApply, ValueTransformationList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[ValueTransformationApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -28,14 +30,15 @@ class ValueTransformationAPI(TypeAPI[ValueTransformation, ValueTransformationApp
             class_list=ValueTransformationList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(
         self, value_transformation: ValueTransformationApply | Sequence[ValueTransformationApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(value_transformation, ValueTransformationApply):
-            instances = value_transformation.to_instances_apply()
+            instances = value_transformation.to_instances_apply(self._view_by_write_class)
         else:
-            instances = ValueTransformationApplyList(value_transformation).to_instances_apply()
+            instances = ValueTransformationApplyList(value_transformation).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

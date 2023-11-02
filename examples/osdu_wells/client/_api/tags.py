@@ -7,12 +7,21 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
 from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
-from osdu_wells.client.data_classes import Tags, TagsApply, TagsList, TagsApplyList, TagsFields, TagsTextFields
+from osdu_wells.client.data_classes import (
+    Tags,
+    TagsApply,
+    TagsList,
+    TagsApplyList,
+    TagsFields,
+    TagsTextFields,
+    DomainModelApply,
+)
 from osdu_wells.client.data_classes._tags import _TAGS_PROPERTIES_BY_FIELD
 
 
 class TagsAPI(TypeAPI[Tags, TagsApply, TagsList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[TagsApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -21,12 +30,13 @@ class TagsAPI(TypeAPI[Tags, TagsApply, TagsList]):
             class_list=TagsList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(self, tag: TagsApply | Sequence[TagsApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(tag, TagsApply):
-            instances = tag.to_instances_apply()
+            instances = tag.to_instances_apply(self._view_by_write_class)
         else:
-            instances = TagsApplyList(tag).to_instances_apply()
+            instances = TagsApplyList(tag).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

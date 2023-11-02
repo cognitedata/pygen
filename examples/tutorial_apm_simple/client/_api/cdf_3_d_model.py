@@ -15,6 +15,7 @@ from tutorial_apm_simple.client.data_classes import (
     CdfModelApplyList,
     CdfModelFields,
     CdfModelTextFields,
+    DomainModelApply,
 )
 from tutorial_apm_simple.client.data_classes._cdf_3_d_model import _CDFMODEL_PROPERTIES_BY_FIELD
 
@@ -69,7 +70,8 @@ class CdfModelEntitiesAPI:
 
 
 class CdfModelAPI(TypeAPI[CdfModel, CdfModelApply, CdfModelList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[CdfModelApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -78,15 +80,16 @@ class CdfModelAPI(TypeAPI[CdfModel, CdfModelApply, CdfModelList]):
             class_list=CdfModelList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
         self.entities = CdfModelEntitiesAPI(client)
 
     def apply(
         self, cdf_3_d_model: CdfModelApply | Sequence[CdfModelApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(cdf_3_d_model, CdfModelApply):
-            instances = cdf_3_d_model.to_instances_apply()
+            instances = cdf_3_d_model.to_instances_apply(self._view_by_write_class)
         else:
-            instances = CdfModelApplyList(cdf_3_d_model).to_instances_apply()
+            instances = CdfModelApplyList(cdf_3_d_model).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

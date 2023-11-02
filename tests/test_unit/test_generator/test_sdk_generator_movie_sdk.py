@@ -94,6 +94,7 @@ def create_fields_test_cases():
         variable_list="roles",
         file_name="_roles",
         view_id=ViewSpaceExternalId("IntegrationTestsImmutable", "Role"),
+        view_version="2",
         view_name="Role",
     )
 
@@ -169,6 +170,7 @@ def create_fields_test_cases():
         variable="person",
         file_name="_persons",
         view_id=ViewSpaceExternalId("IntegrationTestsImmutable", "Person"),
+        view_version="2",
         variable_list="persons",
         view_name="Person",
     )
@@ -269,23 +271,29 @@ def actor_api_generator(multi_api_generator: MultiAPIGenerator, actor_view: dm.V
     return api_generator
 
 
-def test_generate_data_class_file_persons(person_api_generator: APIGenerator, pygen_config: PygenConfig):
+def test_generate_data_class_file_persons(
+    person_api_generator: APIGenerator, pygen_config: PygenConfig, code_formatter: CodeFormatter
+):
     # Arrange
     expected = MovieSDKFiles.persons_data.read_text()
 
     # Act
     actual = person_api_generator.generate_data_class_file()
+    actual = code_formatter.format_code(actual)
 
     # Assert
     assert actual == expected
 
 
-def test_create_view_data_class_actors(actor_api_generator: APIGenerator, pygen_config: PygenConfig):
+def test_create_view_data_class_actors(
+    actor_api_generator: APIGenerator, pygen_config: PygenConfig, code_formatter: CodeFormatter
+):
     # Arrange
     expected = MovieSDKFiles.actors_data.read_text()
 
     # Act
     actual = actor_api_generator.generate_data_class_file()
+    actual = code_formatter.format_code(actual)
 
     # Assert
     assert actual == expected

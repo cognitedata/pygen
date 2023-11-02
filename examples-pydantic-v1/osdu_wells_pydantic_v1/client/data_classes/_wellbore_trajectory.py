@@ -91,11 +91,13 @@ class WellboreTrajectoryApply(DomainModelApply):
     tags: Union[TagsApply, str, None] = Field(None, repr=False)
     version: Optional[int] = None
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(
+        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
+    ) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
+        write_view = view_by_write_class and view_by_write_class.get(type(self))
 
-        sources = []
         properties = {}
         if self.acl is not None:
             properties["acl"] = {
@@ -138,16 +140,14 @@ class WellboreTrajectoryApply(DomainModelApply):
             properties["version"] = self.version
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("IntegrationTestsImmutable", "WellboreTrajectory"),
+                source=write_view or dm.ViewId("IntegrationTestsImmutable", "WellboreTrajectory", "5c4afa33e6bd65"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:
@@ -163,32 +163,32 @@ class WellboreTrajectoryApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(meta, DomainModelApply):
-                instances = meta._to_instances_apply(cache)
+                instances = meta._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
         if isinstance(self.acl, DomainModelApply):
-            instances = self.acl._to_instances_apply(cache)
+            instances = self.acl._to_instances_apply(cache, view_by_write_class)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 
         if isinstance(self.ancestry, DomainModelApply):
-            instances = self.ancestry._to_instances_apply(cache)
+            instances = self.ancestry._to_instances_apply(cache, view_by_write_class)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 
         if isinstance(self.data, DomainModelApply):
-            instances = self.data._to_instances_apply(cache)
+            instances = self.data._to_instances_apply(cache, view_by_write_class)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 
         if isinstance(self.legal, DomainModelApply):
-            instances = self.legal._to_instances_apply(cache)
+            instances = self.legal._to_instances_apply(cache, view_by_write_class)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 
         if isinstance(self.tags, DomainModelApply):
-            instances = self.tags._to_instances_apply(cache)
+            instances = self.tags._to_instances_apply(cache, view_by_write_class)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 

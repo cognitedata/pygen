@@ -13,6 +13,13 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.27.3] - 01-11-23
+### Fixed
+* When calling `.apply` the view generating the data class is used to write instead of the container of the property.
+  This caused some apply operations to not be retrievable again with the `list` method.
+* When filtering in `.list`, `.search`, or `.timeseries` `pygen` ensures that the timespec (milliseconds) used
+  by the API is used.
+
 ## [0.27.2] - 01-11-23
 ### Fixed
 * When calling `.apply` in the generated data classe, the default class `space` was always used. This is now fixed.

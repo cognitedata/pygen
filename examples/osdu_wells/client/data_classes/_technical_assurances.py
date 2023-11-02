@@ -67,11 +67,13 @@ class TechnicalAssurancesApply(DomainModelApply):
         default=None, repr=False, alias="UnacceptableUsage"
     )
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(
+        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
+    ) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
+        write_view = view_by_write_class and view_by_write_class.get(type(self))
 
-        sources = []
         properties = {}
         if self.comment is not None:
             properties["Comment"] = self.comment
@@ -81,16 +83,14 @@ class TechnicalAssurancesApply(DomainModelApply):
             properties["TechnicalAssuranceTypeID"] = self.technical_assurance_type_id
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("IntegrationTestsImmutable", "TechnicalAssurances"),
+                source=write_view or dm.ViewId("IntegrationTestsImmutable", "TechnicalAssurances", "20cfc9c180f3df"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:
@@ -106,7 +106,7 @@ class TechnicalAssurancesApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(acceptable_usage, DomainModelApply):
-                instances = acceptable_usage._to_instances_apply(cache)
+                instances = acceptable_usage._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
@@ -117,7 +117,7 @@ class TechnicalAssurancesApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(reviewer, DomainModelApply):
-                instances = reviewer._to_instances_apply(cache)
+                instances = reviewer._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
@@ -128,7 +128,7 @@ class TechnicalAssurancesApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(unacceptable_usage, DomainModelApply):
-                instances = unacceptable_usage._to_instances_apply(cache)
+                instances = unacceptable_usage._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
