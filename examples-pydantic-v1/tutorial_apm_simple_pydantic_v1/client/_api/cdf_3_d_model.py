@@ -15,6 +15,7 @@ from tutorial_apm_simple_pydantic_v1.client.data_classes import (
     CdfModelApplyList,
     CdfModelFields,
     CdfModelTextFields,
+    DomainModelApply,
 )
 from tutorial_apm_simple_pydantic_v1.client.data_classes._cdf_3_d_model import _CDFMODEL_PROPERTIES_BY_FIELD
 
@@ -69,7 +70,8 @@ class CdfModelEntitiesAPI:
 
 
 class CdfModelAPI(TypeAPI[CdfModel, CdfModelApply, CdfModelList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[CdfModelApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -78,15 +80,16 @@ class CdfModelAPI(TypeAPI[CdfModel, CdfModelApply, CdfModelList]):
             class_list=CdfModelList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
         self.entities = CdfModelEntitiesAPI(client)
 
     def apply(
         self, cdf_3_d_model: CdfModelApply | Sequence[CdfModelApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(cdf_3_d_model, CdfModelApply):
-            instances = cdf_3_d_model.to_instances_apply()
+            instances = cdf_3_d_model.to_instances_apply(self._view_by_write_class)
         else:
-            instances = CdfModelApplyList(cdf_3_d_model).to_instances_apply()
+            instances = CdfModelApplyList(cdf_3_d_model).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
@@ -134,6 +137,7 @@ class CdfModelAPI(TypeAPI[CdfModel, CdfModelApply, CdfModelList]):
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> CdfModelList:
@@ -142,6 +146,7 @@ class CdfModelAPI(TypeAPI[CdfModel, CdfModelApply, CdfModelList]):
             name,
             name_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._search(self._view_id, query, _CDFMODEL_PROPERTIES_BY_FIELD, properties, filter_, limit)
@@ -160,6 +165,7 @@ class CdfModelAPI(TypeAPI[CdfModel, CdfModelApply, CdfModelList]):
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
@@ -179,6 +185,7 @@ class CdfModelAPI(TypeAPI[CdfModel, CdfModelApply, CdfModelList]):
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
@@ -197,6 +204,7 @@ class CdfModelAPI(TypeAPI[CdfModel, CdfModelApply, CdfModelList]):
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
@@ -205,6 +213,7 @@ class CdfModelAPI(TypeAPI[CdfModel, CdfModelApply, CdfModelList]):
             name,
             name_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._aggregate(
@@ -228,6 +237,7 @@ class CdfModelAPI(TypeAPI[CdfModel, CdfModelApply, CdfModelList]):
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
@@ -236,6 +246,7 @@ class CdfModelAPI(TypeAPI[CdfModel, CdfModelApply, CdfModelList]):
             name,
             name_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._histogram(
@@ -254,6 +265,7 @@ class CdfModelAPI(TypeAPI[CdfModel, CdfModelApply, CdfModelList]):
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
@@ -263,6 +275,7 @@ class CdfModelAPI(TypeAPI[CdfModel, CdfModelApply, CdfModelList]):
             name,
             name_prefix,
             external_id_prefix,
+            space,
             filter,
         )
 
@@ -294,6 +307,7 @@ def _create_filter(
     name: str | list[str] | None = None,
     name_prefix: str | None = None,
     external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
@@ -305,6 +319,10 @@ def _create_filter(
         filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None

@@ -25,6 +25,7 @@ class DateTransformationPair(DomainModel):
 
     def as_apply(self) -> DateTransformationPairApply:
         return DateTransformationPairApply(
+            space=self.space,
             external_id=self.external_id,
             end=self.end,
             start=self.start,
@@ -36,9 +37,12 @@ class DateTransformationPairApply(DomainModelApply):
     end: Union[list[DateTransformationApply], list[str], None] = Field(default=None, repr=False)
     start: Union[list[DateTransformationApply], list[str], None] = Field(default=None, repr=False)
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(
+        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
+    ) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
+        write_view = view_by_write_class and view_by_write_class.get(type(self))
 
         nodes = []
 
@@ -52,7 +56,7 @@ class DateTransformationPairApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(end, DomainModelApply):
-                instances = end._to_instances_apply(cache)
+                instances = end._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
@@ -63,7 +67,7 @@ class DateTransformationPairApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(start, DomainModelApply):
-                instances = start._to_instances_apply(cache)
+                instances = start._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 

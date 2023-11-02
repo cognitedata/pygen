@@ -30,6 +30,7 @@ class Person(DomainModel):
 
     def as_apply(self) -> PersonApply:
         return PersonApply(
+            space=self.space,
             external_id=self.external_id,
             birth_year=self.birth_year,
             name=self.name,
@@ -43,11 +44,13 @@ class PersonApply(DomainModelApply):
     name: str
     roles: Union[list[RoleApply], list[str], None] = Field(default=None, repr=False)
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(
+        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
+    ) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
+        write_view = view_by_write_class and view_by_write_class.get(type(self))
 
-        sources = []
         properties = {}
         if self.birth_year is not None:
             properties["birthYear"] = self.birth_year
@@ -55,16 +58,14 @@ class PersonApply(DomainModelApply):
             properties["name"] = self.name
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("IntegrationTestsImmutable", "Person"),
+                source=write_view or dm.ViewId("IntegrationTestsImmutable", "Person", "2"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:
@@ -80,7 +81,7 @@ class PersonApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(role, DomainModelApply):
-                instances = role._to_instances_apply(cache)
+                instances = role._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 

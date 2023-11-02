@@ -8,12 +8,21 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
 from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
-from shop_pydantic_v1.client.data_classes import Case, CaseApply, CaseList, CaseApplyList, CaseFields, CaseTextFields
+from shop_pydantic_v1.client.data_classes import (
+    Case,
+    CaseApply,
+    CaseList,
+    CaseApplyList,
+    CaseFields,
+    CaseTextFields,
+    DomainModelApply,
+)
 from shop_pydantic_v1.client.data_classes._case import _CASE_PROPERTIES_BY_FIELD
 
 
 class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[CaseApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -22,12 +31,13 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
             class_list=CaseList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(self, case: CaseApply | Sequence[CaseApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(case, CaseApply):
-            instances = case.to_instances_apply()
+            instances = case.to_instances_apply(self._view_by_write_class)
         else:
-            instances = CaseApplyList(case).to_instances_apply()
+            instances = CaseApplyList(case).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
@@ -76,6 +86,7 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
         min_start_time: datetime.datetime | None = None,
         max_start_time: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> CaseList:
@@ -95,6 +106,7 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
             min_start_time,
             max_start_time,
             external_id_prefix,
+            space,
             filter,
         )
         return self._search(self._view_id, query, _CASE_PROPERTIES_BY_FIELD, properties, filter_, limit)
@@ -124,6 +136,7 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
         min_start_time: datetime.datetime | None = None,
         max_start_time: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
@@ -154,6 +167,7 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
         min_start_time: datetime.datetime | None = None,
         max_start_time: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
@@ -183,6 +197,7 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
         min_start_time: datetime.datetime | None = None,
         max_start_time: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
@@ -202,6 +217,7 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
             min_start_time,
             max_start_time,
             external_id_prefix,
+            space,
             filter,
         )
         return self._aggregate(
@@ -236,6 +252,7 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
         min_start_time: datetime.datetime | None = None,
         max_start_time: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
@@ -255,6 +272,7 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
             min_start_time,
             max_start_time,
             external_id_prefix,
+            space,
             filter,
         )
         return self._histogram(
@@ -284,6 +302,7 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
         min_start_time: datetime.datetime | None = None,
         max_start_time: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> CaseList:
@@ -303,6 +322,7 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
             min_start_time,
             max_start_time,
             external_id_prefix,
+            space,
             filter,
         )
 
@@ -325,6 +345,7 @@ def _create_filter(
     min_start_time: datetime.datetime | None = None,
     max_start_time: datetime.datetime | None = None,
     external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
@@ -365,8 +386,8 @@ def _create_filter(
         filters.append(
             dm.filters.Range(
                 view_id.as_property_ref("end_time"),
-                gte=min_end_time.isoformat() if min_end_time else None,
-                lte=max_end_time.isoformat() if max_end_time else None,
+                gte=min_end_time.isoformat(timespec="milliseconds") if min_end_time else None,
+                lte=max_end_time.isoformat(timespec="milliseconds") if max_end_time else None,
             )
         )
     if name and isinstance(name, str):
@@ -391,12 +412,16 @@ def _create_filter(
         filters.append(
             dm.filters.Range(
                 view_id.as_property_ref("start_time"),
-                gte=min_start_time.isoformat() if min_start_time else None,
-                lte=max_start_time.isoformat() if max_start_time else None,
+                gte=min_start_time.isoformat(timespec="milliseconds") if min_start_time else None,
+                lte=max_start_time.isoformat(timespec="milliseconds") if max_start_time else None,
             )
         )
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None

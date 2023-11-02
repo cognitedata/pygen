@@ -48,6 +48,7 @@ class ScenarioInstance(DomainModel):
 
     def as_apply(self) -> ScenarioInstanceApply:
         return ScenarioInstanceApply(
+            space=self.space,
             external_id=self.external_id,
             aggregation=self.aggregation,
             country=self.country,
@@ -71,18 +72,20 @@ class ScenarioInstanceApply(DomainModelApply):
     scenario: Optional[str] = None
     start: Optional[datetime.datetime] = None
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(
+        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
+    ) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
+        write_view = view_by_write_class and view_by_write_class.get(type(self))
 
-        sources = []
         properties = {}
         if self.aggregation is not None:
             properties["aggregation"] = self.aggregation
         if self.country is not None:
             properties["country"] = self.country
         if self.instance is not None:
-            properties["instance"] = self.instance.isoformat(timespec="milliseconds")
+            properties["instance"] = self.instance.isoformat()
         if self.market is not None:
             properties["market"] = self.market
         if self.price_area is not None:
@@ -92,19 +95,17 @@ class ScenarioInstanceApply(DomainModelApply):
         if self.scenario is not None:
             properties["scenario"] = self.scenario
         if self.start is not None:
-            properties["start"] = self.start.isoformat(timespec="milliseconds")
+            properties["start"] = self.start.isoformat()
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("IntegrationTestsImmutable", "ScenarioInstance"),
+                source=write_view or dm.ViewId("IntegrationTestsImmutable", "ScenarioInstance", "ee2b79fd98b5bb"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:

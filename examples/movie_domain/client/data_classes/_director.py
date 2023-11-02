@@ -29,6 +29,7 @@ class Director(DomainModel):
 
     def as_apply(self) -> DirectorApply:
         return DirectorApply(
+            space=self.space,
             external_id=self.external_id,
             movies=self.movies,
             nomination=self.nomination,
@@ -44,11 +45,13 @@ class DirectorApply(DomainModelApply):
     person: Union[PersonApply, str, None] = Field(None, repr=False)
     won_oscar: Optional[bool] = Field(None, alias="wonOscar")
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(
+        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
+    ) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
+        write_view = view_by_write_class and view_by_write_class.get(type(self))
 
-        sources = []
         properties = {}
         if self.person is not None:
             properties["person"] = {
@@ -59,16 +62,14 @@ class DirectorApply(DomainModelApply):
             properties["wonOscar"] = self.won_oscar
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("IntegrationTestsImmutable", "Role"),
+                source=write_view or dm.ViewId("IntegrationTestsImmutable", "Director", "2"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:
@@ -84,7 +85,7 @@ class DirectorApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(movie, DomainModelApply):
-                instances = movie._to_instances_apply(cache)
+                instances = movie._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
@@ -95,12 +96,12 @@ class DirectorApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(nomination, DomainModelApply):
-                instances = nomination._to_instances_apply(cache)
+                instances = nomination._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
         if isinstance(self.person, DomainModelApply):
-            instances = self.person._to_instances_apply(cache)
+            instances = self.person._to_instances_apply(cache, view_by_write_class)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 

@@ -15,6 +15,7 @@ from osdu_wells.client.data_classes import (
     WellboreTrajectoryApplyList,
     WellboreTrajectoryFields,
     WellboreTrajectoryTextFields,
+    DomainModelApply,
 )
 from osdu_wells.client.data_classes._wellbore_trajectory import _WELLBORETRAJECTORY_PROPERTIES_BY_FIELD
 
@@ -74,7 +75,8 @@ class WellboreTrajectoryMetaAPI:
 
 
 class WellboreTrajectoryAPI(TypeAPI[WellboreTrajectory, WellboreTrajectoryApply, WellboreTrajectoryList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[WellboreTrajectoryApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -83,15 +85,16 @@ class WellboreTrajectoryAPI(TypeAPI[WellboreTrajectory, WellboreTrajectoryApply,
             class_list=WellboreTrajectoryList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
         self.meta = WellboreTrajectoryMetaAPI(client)
 
     def apply(
         self, wellbore_trajectory: WellboreTrajectoryApply | Sequence[WellboreTrajectoryApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(wellbore_trajectory, WellboreTrajectoryApply):
-            instances = wellbore_trajectory.to_instances_apply()
+            instances = wellbore_trajectory.to_instances_apply(self._view_by_write_class)
         else:
-            instances = WellboreTrajectoryApplyList(wellbore_trajectory).to_instances_apply()
+            instances = WellboreTrajectoryApplyList(wellbore_trajectory).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
@@ -156,6 +159,7 @@ class WellboreTrajectoryAPI(TypeAPI[WellboreTrajectory, WellboreTrajectoryApply,
         min_version: int | None = None,
         max_version: int | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> WellboreTrajectoryList:
@@ -181,6 +185,7 @@ class WellboreTrajectoryAPI(TypeAPI[WellboreTrajectory, WellboreTrajectoryApply,
             min_version,
             max_version,
             external_id_prefix,
+            space,
             filter,
         )
         return self._search(self._view_id, query, _WELLBORETRAJECTORY_PROPERTIES_BY_FIELD, properties, filter_, limit)
@@ -216,6 +221,7 @@ class WellboreTrajectoryAPI(TypeAPI[WellboreTrajectory, WellboreTrajectoryApply,
         min_version: int | None = None,
         max_version: int | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
@@ -252,6 +258,7 @@ class WellboreTrajectoryAPI(TypeAPI[WellboreTrajectory, WellboreTrajectoryApply,
         min_version: int | None = None,
         max_version: int | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
@@ -287,6 +294,7 @@ class WellboreTrajectoryAPI(TypeAPI[WellboreTrajectory, WellboreTrajectoryApply,
         min_version: int | None = None,
         max_version: int | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
@@ -312,6 +320,7 @@ class WellboreTrajectoryAPI(TypeAPI[WellboreTrajectory, WellboreTrajectoryApply,
             min_version,
             max_version,
             external_id_prefix,
+            space,
             filter,
         )
         return self._aggregate(
@@ -352,6 +361,7 @@ class WellboreTrajectoryAPI(TypeAPI[WellboreTrajectory, WellboreTrajectoryApply,
         min_version: int | None = None,
         max_version: int | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
@@ -377,6 +387,7 @@ class WellboreTrajectoryAPI(TypeAPI[WellboreTrajectory, WellboreTrajectoryApply,
             min_version,
             max_version,
             external_id_prefix,
+            space,
             filter,
         )
         return self._histogram(
@@ -412,6 +423,7 @@ class WellboreTrajectoryAPI(TypeAPI[WellboreTrajectory, WellboreTrajectoryApply,
         min_version: int | None = None,
         max_version: int | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
@@ -438,6 +450,7 @@ class WellboreTrajectoryAPI(TypeAPI[WellboreTrajectory, WellboreTrajectoryApply,
             min_version,
             max_version,
             external_id_prefix,
+            space,
             filter,
         )
 
@@ -486,6 +499,7 @@ def _create_filter(
     min_version: int | None = None,
     max_version: int | None = None,
     external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
@@ -646,6 +660,10 @@ def _create_filter(
         filters.append(dm.filters.Range(view_id.as_property_ref("version"), gte=min_version, lte=max_version))
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None

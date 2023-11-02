@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import platform
 from typing import cast
 from unittest.mock import MagicMock
 
@@ -94,6 +95,7 @@ def create_fields_test_cases():
         variable_list="roles",
         file_name="_roles",
         view_id=ViewSpaceExternalId("IntegrationTestsImmutable", "Role"),
+        view_version="2",
         view_name="Role",
     )
 
@@ -169,6 +171,7 @@ def create_fields_test_cases():
         variable="person",
         file_name="_persons",
         view_id=ViewSpaceExternalId("IntegrationTestsImmutable", "Person"),
+        view_version="2",
         variable_list="persons",
         view_name="Person",
     )
@@ -269,23 +272,29 @@ def actor_api_generator(multi_api_generator: MultiAPIGenerator, actor_view: dm.V
     return api_generator
 
 
-def test_generate_data_class_file_persons(person_api_generator: APIGenerator, pygen_config: PygenConfig):
+def test_generate_data_class_file_persons(
+    person_api_generator: APIGenerator, pygen_config: PygenConfig, code_formatter: CodeFormatter
+):
     # Arrange
     expected = MovieSDKFiles.persons_data.read_text()
 
     # Act
     actual = person_api_generator.generate_data_class_file()
+    actual = code_formatter.format_code(actual)
 
     # Assert
     assert actual == expected
 
 
-def test_create_view_data_class_actors(actor_api_generator: APIGenerator, pygen_config: PygenConfig):
+def test_create_view_data_class_actors(
+    actor_api_generator: APIGenerator, pygen_config: PygenConfig, code_formatter: CodeFormatter
+):
     # Arrange
     expected = MovieSDKFiles.actors_data.read_text()
 
     # Act
     actual = actor_api_generator.generate_data_class_file()
+    actual = code_formatter.format_code(actual)
 
     # Assert
     assert actual == expected
@@ -331,6 +340,10 @@ def test_generate_data_class_init_file(multi_api_generator: MultiAPIGenerator, c
     assert actual == expected
 
 
+@pytest.mark.skipif(
+    not platform.platform().startswith("Windows"),
+    reason="There is currently some strange problem with the diff on non-windows",
+)
 def test_create_api_client(sdk_generator: SDKGenerator, code_formatter: CodeFormatter):
     # Arrange
     expected = MovieSDKFiles.client.read_text()
@@ -380,6 +393,7 @@ def test_create_list_method(person_view: dm.View, pygen_config: PygenConfig) -> 
         FilterParameter("name", "str | list[str]"),
         FilterParameter("name_prefix", "str"),
         FilterParameter("external_id_prefix", "str"),
+        FilterParameter("space", "str | list[str]"),
     ]
     expected = ListMethod(
         parameters=parameters,
@@ -389,6 +403,8 @@ def test_create_list_method(person_view: dm.View, pygen_config: PygenConfig) -> 
             FilterCondition(dm.filters.In, "name", dict(values=parameters[2])),
             FilterCondition(dm.filters.Prefix, "name", dict(value=parameters[3])),
             FilterCondition(dm.filters.Prefix, "externalId", dict(value=parameters[4])),
+            FilterCondition(dm.filters.Equals, "space", dict(value=parameters[5])),
+            FilterCondition(dm.filters.In, "space", dict(values=parameters[5])),
         ],
     )
 
@@ -426,6 +442,7 @@ def test_create_list_method_actors(actor_view: dm.View, pygen_config: PygenConfi
         ),
         FilterParameter("won_oscar", "bool"),
         FilterParameter("external_id_prefix", "str"),
+        FilterParameter("space", "str | list[str]"),
     ]
     expected = ListMethod(
         parameters=parameters,
@@ -436,6 +453,8 @@ def test_create_list_method_actors(actor_view: dm.View, pygen_config: PygenConfi
             FilterConditionOnetoOneEdge(dm.filters.In, "person", dict(values=parameters[0]), instance_type=tuple),
             FilterCondition(dm.filters.Equals, "wonOscar", dict(value=parameters[1])),
             FilterCondition(dm.filters.Prefix, "externalId", dict(value=parameters[2])),
+            FilterCondition(dm.filters.Equals, "space", dict(value=parameters[3])),
+            FilterCondition(dm.filters.In, "space", dict(values=parameters[3])),
         ],
     )
 

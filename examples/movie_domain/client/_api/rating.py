@@ -19,6 +19,7 @@ from movie_domain.client.data_classes import (
     RatingApplyList,
     RatingFields,
     RatingTextFields,
+    DomainModelApply,
 )
 from movie_domain.client.data_classes._rating import _RATING_PROPERTIES_BY_FIELD
 
@@ -256,12 +257,14 @@ class RatingScoreAPI:
     def __call__(
         self,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> RatingScoreQuery:
         filter_ = _create_filter(
             self._view_id,
             external_id_prefix,
+            space,
             filter,
         )
 
@@ -275,12 +278,14 @@ class RatingScoreAPI:
     def list(
         self,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> TimeSeriesList:
         filter_ = _create_filter(
             self._view_id,
             external_id_prefix,
+            space,
             filter,
         )
         external_ids = _retrieve_timeseries_external_ids_with_extra_score(self._client, self._view_id, filter_, limit)
@@ -574,12 +579,14 @@ class RatingVotesAPI:
     def __call__(
         self,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> RatingVotesQuery:
         filter_ = _create_filter(
             self._view_id,
             external_id_prefix,
+            space,
             filter,
         )
 
@@ -593,12 +600,14 @@ class RatingVotesAPI:
     def list(
         self,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> TimeSeriesList:
         filter_ = _create_filter(
             self._view_id,
             external_id_prefix,
+            space,
             filter,
         )
         external_ids = _retrieve_timeseries_external_ids_with_extra_votes(self._client, self._view_id, filter_, limit)
@@ -663,7 +672,8 @@ def _retrieve_timeseries_external_ids_with_extra_votes(
 
 
 class RatingAPI(TypeAPI[Rating, RatingApply, RatingList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[RatingApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -672,14 +682,15 @@ class RatingAPI(TypeAPI[Rating, RatingApply, RatingList]):
             class_list=RatingList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
         self.score = RatingScoreAPI(client, view_id)
         self.votes = RatingVotesAPI(client, view_id)
 
     def apply(self, rating: RatingApply | Sequence[RatingApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(rating, RatingApply):
-            instances = rating.to_instances_apply()
+            instances = rating.to_instances_apply(self._view_by_write_class)
         else:
-            instances = RatingApplyList(rating).to_instances_apply()
+            instances = RatingApplyList(rating).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
@@ -715,12 +726,14 @@ class RatingAPI(TypeAPI[Rating, RatingApply, RatingList]):
         query: str,
         properties: RatingTextFields | Sequence[RatingTextFields] | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> RatingList:
         filter_ = _create_filter(
             self._view_id,
             external_id_prefix,
+            space,
             filter,
         )
         return self._search(self._view_id, query, _RATING_PROPERTIES_BY_FIELD, properties, filter_, limit)
@@ -737,6 +750,7 @@ class RatingAPI(TypeAPI[Rating, RatingApply, RatingList]):
         query: str | None = None,
         search_properties: RatingTextFields | Sequence[RatingTextFields] | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
@@ -754,6 +768,7 @@ class RatingAPI(TypeAPI[Rating, RatingApply, RatingList]):
         query: str | None = None,
         search_properties: RatingTextFields | Sequence[RatingTextFields] | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
@@ -770,12 +785,14 @@ class RatingAPI(TypeAPI[Rating, RatingApply, RatingList]):
         query: str | None = None,
         search_property: RatingTextFields | Sequence[RatingTextFields] | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
         filter_ = _create_filter(
             self._view_id,
             external_id_prefix,
+            space,
             filter,
         )
         return self._aggregate(
@@ -797,12 +814,14 @@ class RatingAPI(TypeAPI[Rating, RatingApply, RatingList]):
         query: str | None = None,
         search_property: RatingTextFields | Sequence[RatingTextFields] | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         filter_ = _create_filter(
             self._view_id,
             external_id_prefix,
+            space,
             filter,
         )
         return self._histogram(
@@ -819,12 +838,14 @@ class RatingAPI(TypeAPI[Rating, RatingApply, RatingList]):
     def list(
         self,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> RatingList:
         filter_ = _create_filter(
             self._view_id,
             external_id_prefix,
+            space,
             filter,
         )
 
@@ -834,11 +855,16 @@ class RatingAPI(TypeAPI[Rating, RatingApply, RatingList]):
 def _create_filter(
     view_id: dm.ViewId,
     external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None

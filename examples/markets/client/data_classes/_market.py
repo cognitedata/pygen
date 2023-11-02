@@ -25,6 +25,7 @@ class Market(DomainModel):
 
     def as_apply(self) -> MarketApply:
         return MarketApply(
+            space=self.space,
             external_id=self.external_id,
             name=self.name,
             timezone=self.timezone,
@@ -36,11 +37,13 @@ class MarketApply(DomainModelApply):
     name: Optional[str] = None
     timezone: Optional[str] = None
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(
+        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
+    ) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
+        write_view = view_by_write_class and view_by_write_class.get(type(self))
 
-        sources = []
         properties = {}
         if self.name is not None:
             properties["name"] = self.name
@@ -48,16 +51,14 @@ class MarketApply(DomainModelApply):
             properties["timezone"] = self.timezone
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("market", "Market"),
+                source=write_view or dm.ViewId("market", "Market", "a5067899750188"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:

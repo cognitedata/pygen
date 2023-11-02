@@ -65,7 +65,8 @@ class CdfEntityInModelAPI:
 
 
 class CdfEntityAPI(TypeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[CdfEntityApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -74,15 +75,16 @@ class CdfEntityAPI(TypeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
             class_list=CdfEntityList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
         self.in_model_3_d = CdfEntityInModelAPI(client)
 
     def apply(
         self, cdf_3_d_entity: CdfEntityApply | Sequence[CdfEntityApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(cdf_3_d_entity, CdfEntityApply):
-            instances = cdf_3_d_entity.to_instances_apply()
+            instances = cdf_3_d_entity.to_instances_apply(self._view_by_write_class)
         else:
-            instances = CdfEntityApplyList(cdf_3_d_entity).to_instances_apply()
+            instances = CdfEntityApplyList(cdf_3_d_entity).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
@@ -126,6 +128,7 @@ class CdfEntityAPI(TypeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
     def list(
         self,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
@@ -133,6 +136,7 @@ class CdfEntityAPI(TypeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
         filter_ = _create_filter(
             self._view_id,
             external_id_prefix,
+            space,
             filter,
         )
 
@@ -162,11 +166,16 @@ class CdfEntityAPI(TypeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
 def _create_filter(
     view_id: dm.ViewId,
     external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None

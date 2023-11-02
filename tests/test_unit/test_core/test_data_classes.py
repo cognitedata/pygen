@@ -11,6 +11,8 @@ from cognite.pygen._core.data_classes import (
     DataClass,
     EdgeOneToOne,
     Field,
+    FilterCondition,
+    FilterParameter,
     PrimitiveField,
     PrimitiveListField,
     ViewSpaceExternalId,
@@ -202,6 +204,7 @@ def load_data_classes_test_cases():
             write_list_name="SeriesApplyList",
             read_list_name="SeriesList",
             view_id=ViewSpaceExternalId(view.space, view.external_id),
+            view_version=view.version,
             variable="series",
             variable_list="series_list",
             view_name="Series",
@@ -298,3 +301,29 @@ def test_data_class_is_time(pygen_config: PygenConfig) -> None:
 
     # Assert
     assert data_class.has_single_timeseries_fields is True
+
+
+@pytest.mark.parametrize(
+    "filter_condition, expected_args",
+    [
+        (
+            FilterCondition(
+                dm.filters.Range,
+                prop_name="end_time",
+                keyword_arguments={
+                    "gte": FilterParameter("min_end_time", "datetime.datetime"),
+                    "lte": FilterParameter("max_end_time", "datetime.datetime"),
+                },
+            ),
+            'view_id.as_property_ref("end_time"), '
+            'gte=min_end_time.isoformat(timespec="milliseconds") if min_end_time else None, '
+            'lte=max_end_time.isoformat(timespec="milliseconds") if max_end_time else None',
+        )
+    ],
+)
+def test_filter_condition(filter_condition: FilterCondition, expected_args: str) -> None:
+    # Act
+    actual = filter_condition.arguments
+
+    # Assert
+    assert actual == expected_args

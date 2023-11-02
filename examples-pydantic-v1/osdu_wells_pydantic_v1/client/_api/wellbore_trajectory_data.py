@@ -15,6 +15,7 @@ from osdu_wells_pydantic_v1.client.data_classes import (
     WellboreTrajectoryDataApplyList,
     WellboreTrajectoryDataFields,
     WellboreTrajectoryDataTextFields,
+    DomainModelApply,
 )
 from osdu_wells_pydantic_v1.client.data_classes._wellbore_trajectory_data import (
     _WELLBORETRAJECTORYDATA_PROPERTIES_BY_FIELD,
@@ -360,7 +361,8 @@ class WellboreTrajectoryDataTechnicalAssurancesAPI:
 class WellboreTrajectoryDataAPI(
     TypeAPI[WellboreTrajectoryData, WellboreTrajectoryDataApply, WellboreTrajectoryDataList]
 ):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[WellboreTrajectoryDataApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -369,6 +371,7 @@ class WellboreTrajectoryDataAPI(
             class_list=WellboreTrajectoryDataList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
         self.artefacts = WellboreTrajectoryDataArtefactsAPI(client)
         self.available_trajectory_station_properties = WellboreTrajectoryDataAvailableTrajectoryStationPropertiesAPI(
             client
@@ -384,9 +387,11 @@ class WellboreTrajectoryDataAPI(
         replace: bool = False,
     ) -> dm.InstancesApplyResult:
         if isinstance(wellbore_trajectory_datum, WellboreTrajectoryDataApply):
-            instances = wellbore_trajectory_datum.to_instances_apply()
+            instances = wellbore_trajectory_datum.to_instances_apply(self._view_by_write_class)
         else:
-            instances = WellboreTrajectoryDataApplyList(wellbore_trajectory_datum).to_instances_apply()
+            instances = WellboreTrajectoryDataApplyList(wellbore_trajectory_datum).to_instances_apply(
+                self._view_by_write_class
+            )
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
@@ -544,6 +549,7 @@ class WellboreTrajectoryDataAPI(
         wellbore_id: str | list[str] | None = None,
         wellbore_id_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> WellboreTrajectoryDataList:
@@ -630,6 +636,7 @@ class WellboreTrajectoryDataAPI(
             wellbore_id,
             wellbore_id_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._search(
@@ -728,6 +735,7 @@ class WellboreTrajectoryDataAPI(
         wellbore_id: str | list[str] | None = None,
         wellbore_id_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
@@ -825,6 +833,7 @@ class WellboreTrajectoryDataAPI(
         wellbore_id: str | list[str] | None = None,
         wellbore_id_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
@@ -921,6 +930,7 @@ class WellboreTrajectoryDataAPI(
         wellbore_id: str | list[str] | None = None,
         wellbore_id_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
@@ -1007,6 +1017,7 @@ class WellboreTrajectoryDataAPI(
             wellbore_id,
             wellbore_id_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._aggregate(
@@ -1108,6 +1119,7 @@ class WellboreTrajectoryDataAPI(
         wellbore_id: str | list[str] | None = None,
         wellbore_id_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
@@ -1194,6 +1206,7 @@ class WellboreTrajectoryDataAPI(
             wellbore_id,
             wellbore_id_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._histogram(
@@ -1290,6 +1303,7 @@ class WellboreTrajectoryDataAPI(
         wellbore_id: str | list[str] | None = None,
         wellbore_id_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
@@ -1377,6 +1391,7 @@ class WellboreTrajectoryDataAPI(
             wellbore_id,
             wellbore_id_prefix,
             external_id_prefix,
+            space,
             filter,
         )
 
@@ -1595,6 +1610,7 @@ def _create_filter(
     wellbore_id: str | list[str] | None = None,
     wellbore_id_prefix: str | None = None,
     external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
@@ -1996,6 +2012,10 @@ def _create_filter(
         filters.append(dm.filters.Prefix(view_id.as_property_ref("WellboreID"), value=wellbore_id_prefix))
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None

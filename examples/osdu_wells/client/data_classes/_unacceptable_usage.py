@@ -51,6 +51,7 @@ class UnacceptableUsage(DomainModel):
 
     def as_apply(self) -> UnacceptableUsageApply:
         return UnacceptableUsageApply(
+            space=self.space,
             external_id=self.external_id,
             data_quality_id=self.data_quality_id,
             data_quality_rule_set_id=self.data_quality_rule_set_id,
@@ -68,11 +69,13 @@ class UnacceptableUsageApply(DomainModelApply):
     workflow_persona_type_id: Optional[str] = Field(None, alias="WorkflowPersonaTypeID")
     workflow_usage_type_id: Optional[str] = Field(None, alias="WorkflowUsageTypeID")
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(
+        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
+    ) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
+        write_view = view_by_write_class and view_by_write_class.get(type(self))
 
-        sources = []
         properties = {}
         if self.data_quality_id is not None:
             properties["DataQualityID"] = self.data_quality_id
@@ -86,16 +89,14 @@ class UnacceptableUsageApply(DomainModelApply):
             properties["WorkflowUsageTypeID"] = self.workflow_usage_type_id
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("IntegrationTestsImmutable", "UnacceptableUsage"),
+                source=write_view or dm.ViewId("IntegrationTestsImmutable", "UnacceptableUsage", "24f60e09e7bb1b"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:

@@ -15,6 +15,7 @@ from movie_domain.client.data_classes import (
     PersonApplyList,
     PersonFields,
     PersonTextFields,
+    DomainModelApply,
 )
 from movie_domain.client.data_classes._person import _PERSON_PROPERTIES_BY_FIELD
 
@@ -65,7 +66,8 @@ class PersonRolesAPI:
 
 
 class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[PersonApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -74,13 +76,14 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
             class_list=PersonList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
         self.roles = PersonRolesAPI(client)
 
     def apply(self, person: PersonApply | Sequence[PersonApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(person, PersonApply):
-            instances = person.to_instances_apply()
+            instances = person.to_instances_apply(self._view_by_write_class)
         else:
-            instances = PersonApplyList(person).to_instances_apply()
+            instances = PersonApplyList(person).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
@@ -130,6 +133,7 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> PersonList:
@@ -140,6 +144,7 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
             name,
             name_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._search(self._view_id, query, _PERSON_PROPERTIES_BY_FIELD, properties, filter_, limit)
@@ -160,6 +165,7 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
@@ -181,6 +187,7 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
@@ -201,6 +208,7 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
@@ -211,6 +219,7 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
             name,
             name_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._aggregate(
@@ -236,6 +245,7 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
@@ -246,6 +256,7 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
             name,
             name_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._histogram(
@@ -266,6 +277,7 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
@@ -277,6 +289,7 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
             name,
             name_prefix,
             external_id_prefix,
+            space,
             filter,
         )
 
@@ -310,6 +323,7 @@ def _create_filter(
     name: str | list[str] | None = None,
     name_prefix: str | None = None,
     external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
@@ -323,6 +337,10 @@ def _create_filter(
         filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None

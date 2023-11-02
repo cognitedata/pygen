@@ -7,12 +7,21 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
 from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
-from osdu_wells.client.data_classes import Legal, LegalApply, LegalList, LegalApplyList, LegalFields, LegalTextFields
+from osdu_wells.client.data_classes import (
+    Legal,
+    LegalApply,
+    LegalList,
+    LegalApplyList,
+    LegalFields,
+    LegalTextFields,
+    DomainModelApply,
+)
 from osdu_wells.client.data_classes._legal import _LEGAL_PROPERTIES_BY_FIELD
 
 
 class LegalAPI(TypeAPI[Legal, LegalApply, LegalList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[LegalApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -21,12 +30,13 @@ class LegalAPI(TypeAPI[Legal, LegalApply, LegalList]):
             class_list=LegalList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(self, legal: LegalApply | Sequence[LegalApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(legal, LegalApply):
-            instances = legal.to_instances_apply()
+            instances = legal.to_instances_apply(self._view_by_write_class)
         else:
-            instances = LegalApplyList(legal).to_instances_apply()
+            instances = LegalApplyList(legal).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
@@ -64,6 +74,7 @@ class LegalAPI(TypeAPI[Legal, LegalApply, LegalList]):
         status: str | list[str] | None = None,
         status_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> LegalList:
@@ -72,6 +83,7 @@ class LegalAPI(TypeAPI[Legal, LegalApply, LegalList]):
             status,
             status_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._search(self._view_id, query, _LEGAL_PROPERTIES_BY_FIELD, properties, filter_, limit)
@@ -90,6 +102,7 @@ class LegalAPI(TypeAPI[Legal, LegalApply, LegalList]):
         status: str | list[str] | None = None,
         status_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
@@ -109,6 +122,7 @@ class LegalAPI(TypeAPI[Legal, LegalApply, LegalList]):
         status: str | list[str] | None = None,
         status_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
@@ -127,6 +141,7 @@ class LegalAPI(TypeAPI[Legal, LegalApply, LegalList]):
         status: str | list[str] | None = None,
         status_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
@@ -135,6 +150,7 @@ class LegalAPI(TypeAPI[Legal, LegalApply, LegalList]):
             status,
             status_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._aggregate(
@@ -158,6 +174,7 @@ class LegalAPI(TypeAPI[Legal, LegalApply, LegalList]):
         status: str | list[str] | None = None,
         status_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
@@ -166,6 +183,7 @@ class LegalAPI(TypeAPI[Legal, LegalApply, LegalList]):
             status,
             status_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._histogram(
@@ -184,6 +202,7 @@ class LegalAPI(TypeAPI[Legal, LegalApply, LegalList]):
         status: str | list[str] | None = None,
         status_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> LegalList:
@@ -192,6 +211,7 @@ class LegalAPI(TypeAPI[Legal, LegalApply, LegalList]):
             status,
             status_prefix,
             external_id_prefix,
+            space,
             filter,
         )
 
@@ -203,6 +223,7 @@ def _create_filter(
     status: str | list[str] | None = None,
     status_prefix: str | None = None,
     external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
@@ -214,6 +235,10 @@ def _create_filter(
         filters.append(dm.filters.Prefix(view_id.as_property_ref("status"), value=status_prefix))
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None

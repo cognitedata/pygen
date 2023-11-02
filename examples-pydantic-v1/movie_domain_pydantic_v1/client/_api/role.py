@@ -8,7 +8,14 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
 from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
-from movie_domain_pydantic_v1.client.data_classes import Role, RoleApply, RoleList, RoleApplyList, RoleFields
+from movie_domain_pydantic_v1.client.data_classes import (
+    Role,
+    RoleApply,
+    RoleList,
+    RoleApplyList,
+    RoleFields,
+    DomainModelApply,
+)
 from movie_domain_pydantic_v1.client.data_classes._role import _ROLE_PROPERTIES_BY_FIELD
 
 
@@ -103,7 +110,8 @@ class RoleNominationAPI:
 
 
 class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[RoleApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -112,14 +120,15 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
             class_list=RoleList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
         self.movies = RoleMoviesAPI(client)
         self.nomination = RoleNominationAPI(client)
 
     def apply(self, role: RoleApply | Sequence[RoleApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(role, RoleApply):
-            instances = role.to_instances_apply()
+            instances = role.to_instances_apply(self._view_by_write_class)
         else:
-            instances = RoleApplyList(role).to_instances_apply()
+            instances = RoleApplyList(role).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
@@ -176,6 +185,7 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
         person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         won_oscar: bool | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
@@ -193,6 +203,7 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
         person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         won_oscar: bool | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
@@ -209,6 +220,7 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
         person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         won_oscar: bool | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
@@ -217,6 +229,7 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
             person,
             won_oscar,
             external_id_prefix,
+            space,
             filter,
         )
         return self._aggregate(
@@ -238,6 +251,7 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
         person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         won_oscar: bool | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
@@ -246,6 +260,7 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
             person,
             won_oscar,
             external_id_prefix,
+            space,
             filter,
         )
         return self._histogram(
@@ -264,6 +279,7 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
         person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         won_oscar: bool | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
@@ -273,6 +289,7 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
             person,
             won_oscar,
             external_id_prefix,
+            space,
             filter,
         )
 
@@ -320,6 +337,7 @@ def _create_filter(
     person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
     won_oscar: bool | None = None,
     external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
@@ -350,6 +368,10 @@ def _create_filter(
         filters.append(dm.filters.Equals(view_id.as_property_ref("wonOscar"), value=won_oscar))
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None

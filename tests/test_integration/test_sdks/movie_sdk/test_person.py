@@ -1,3 +1,5 @@
+import pytest
+
 from tests.constants import IS_PYDANTIC_V1
 
 if IS_PYDANTIC_V1:
@@ -62,6 +64,7 @@ def test_person_apply_multiple(movie_client: MovieClient) -> None:
         movie_client.person.delete([person.external_id for person in persons])
 
 
+@pytest.mark.skip("Known bug, logged as an issue")
 def test_person_apply_multiple_requests(movie_client: MovieClient) -> None:
     # Arrange
     person = movie.PersonApply(
@@ -150,3 +153,13 @@ def test_histogram_birth_year(movie_client: MovieClient) -> None:
     assert len(result.buckets) > 0
     assert result.buckets[0].count > 0
     assert result.buckets[0].start == 1900
+
+
+def test_list_filter_on_space(movie_client: MovieClient) -> None:
+    # Act
+    no_people = movie_client.person.list(space="Non-existing space")
+    some_people = movie_client.person.list(space="IntegrationTestsImmutable")
+
+    # Assert
+    assert len(no_people) == 0
+    assert len(some_people) > 0

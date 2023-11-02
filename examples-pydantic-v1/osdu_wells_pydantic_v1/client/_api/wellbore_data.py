@@ -15,6 +15,7 @@ from osdu_wells_pydantic_v1.client.data_classes import (
     WellboreDataApplyList,
     WellboreDataFields,
     WellboreDataTextFields,
+    DomainModelApply,
 )
 from osdu_wells_pydantic_v1.client.data_classes._wellbore_data import _WELLBOREDATA_PROPERTIES_BY_FIELD
 
@@ -592,7 +593,8 @@ class WellboreDataWellboreCostsAPI:
 
 
 class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[WellboreDataApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -601,6 +603,7 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
             class_list=WellboreDataList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
         self.drilling_reasons = WellboreDataDrillingReasonsAPI(client)
         self.facility_events = WellboreDataFacilityEventsAPI(client)
         self.facility_operators = WellboreDataFacilityOperatorsAPI(client)
@@ -617,9 +620,9 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
         self, wellbore_datum: WellboreDataApply | Sequence[WellboreDataApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(wellbore_datum, WellboreDataApply):
-            instances = wellbore_datum.to_instances_apply()
+            instances = wellbore_datum.to_instances_apply(self._view_by_write_class)
         else:
-            instances = WellboreDataApplyList(wellbore_datum).to_instances_apply()
+            instances = WellboreDataApplyList(wellbore_datum).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
@@ -786,6 +789,7 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
         wellbore_reason_id: str | list[str] | None = None,
         wellbore_reason_id_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> WellboreDataList:
@@ -871,6 +875,7 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
             wellbore_reason_id,
             wellbore_reason_id_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._search(self._view_id, query, _WELLBOREDATA_PROPERTIES_BY_FIELD, properties, filter_, limit)
@@ -966,6 +971,7 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
         wellbore_reason_id: str | list[str] | None = None,
         wellbore_reason_id_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
@@ -1062,6 +1068,7 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
         wellbore_reason_id: str | list[str] | None = None,
         wellbore_reason_id_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
@@ -1157,6 +1164,7 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
         wellbore_reason_id: str | list[str] | None = None,
         wellbore_reason_id_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
@@ -1242,6 +1250,7 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
             wellbore_reason_id,
             wellbore_reason_id_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._aggregate(
@@ -1342,6 +1351,7 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
         wellbore_reason_id: str | list[str] | None = None,
         wellbore_reason_id_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
@@ -1427,6 +1437,7 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
             wellbore_reason_id,
             wellbore_reason_id_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._histogram(
@@ -1522,6 +1533,7 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
         wellbore_reason_id: str | list[str] | None = None,
         wellbore_reason_id_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
@@ -1608,6 +1620,7 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
             wellbore_reason_id,
             wellbore_reason_id_prefix,
             external_id_prefix,
+            space,
             filter,
         )
 
@@ -1888,6 +1901,7 @@ def _create_filter(
     wellbore_reason_id: str | list[str] | None = None,
     wellbore_reason_id_prefix: str | None = None,
     external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
@@ -2347,6 +2361,10 @@ def _create_filter(
         filters.append(dm.filters.Prefix(view_id.as_property_ref("WellboreReasonID"), value=wellbore_reason_id_prefix))
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None

@@ -230,6 +230,7 @@ class WellboreTrajectoryData(DomainModel):
 
     def as_apply(self) -> WellboreTrajectoryDataApply:
         return WellboreTrajectoryDataApply(
+            space=self.space,
             external_id=self.external_id,
             acquisition_date=self.acquisition_date,
             acquisition_remark=self.acquisition_remark,
@@ -357,11 +358,13 @@ class WellboreTrajectoryDataApply(DomainModelApply):
     )
     wellbore_id: Optional[str] = Field(None, alias="WellboreID")
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(
+        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
+    ) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
+        write_view = view_by_write_class and view_by_write_class.get(type(self))
 
-        sources = []
         properties = {}
         if self.acquisition_date is not None:
             properties["AcquisitionDate"] = self.acquisition_date
@@ -480,16 +483,14 @@ class WellboreTrajectoryDataApply(DomainModelApply):
             properties["WellboreID"] = self.wellbore_id
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("IntegrationTestsImmutable", "WellboreTrajectoryData"),
+                source=write_view or dm.ViewId("IntegrationTestsImmutable", "WellboreTrajectoryData", "d35eace9691587"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:
@@ -505,7 +506,7 @@ class WellboreTrajectoryDataApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(artefact, DomainModelApply):
-                instances = artefact._to_instances_apply(cache)
+                instances = artefact._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
@@ -516,7 +517,7 @@ class WellboreTrajectoryDataApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(available_trajectory_station_property, DomainModelApply):
-                instances = available_trajectory_station_property._to_instances_apply(cache)
+                instances = available_trajectory_station_property._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
@@ -527,7 +528,7 @@ class WellboreTrajectoryDataApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(geo_context, DomainModelApply):
-                instances = geo_context._to_instances_apply(cache)
+                instances = geo_context._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
@@ -538,7 +539,7 @@ class WellboreTrajectoryDataApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(lineage_assertion, DomainModelApply):
-                instances = lineage_assertion._to_instances_apply(cache)
+                instances = lineage_assertion._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
@@ -549,7 +550,7 @@ class WellboreTrajectoryDataApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(name_alias, DomainModelApply):
-                instances = name_alias._to_instances_apply(cache)
+                instances = name_alias._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
@@ -560,22 +561,22 @@ class WellboreTrajectoryDataApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(technical_assurance, DomainModelApply):
-                instances = technical_assurance._to_instances_apply(cache)
+                instances = technical_assurance._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
         if isinstance(self.spatial_area, DomainModelApply):
-            instances = self.spatial_area._to_instances_apply(cache)
+            instances = self.spatial_area._to_instances_apply(cache, view_by_write_class)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 
         if isinstance(self.spatial_point, DomainModelApply):
-            instances = self.spatial_point._to_instances_apply(cache)
+            instances = self.spatial_point._to_instances_apply(cache, view_by_write_class)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 
         if isinstance(self.vertical_measurement, DomainModelApply):
-            instances = self.vertical_measurement._to_instances_apply(cache)
+            instances = self.vertical_measurement._to_instances_apply(cache, view_by_write_class)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 

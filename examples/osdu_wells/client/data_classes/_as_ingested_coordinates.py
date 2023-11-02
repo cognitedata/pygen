@@ -66,6 +66,7 @@ class AsIngestedCoordinates(DomainModel):
 
     def as_apply(self) -> AsIngestedCoordinatesApply:
         return AsIngestedCoordinatesApply(
+            space=self.space,
             external_id=self.external_id,
             coordinate_reference_system_id=self.coordinate_reference_system_id,
             vertical_coordinate_reference_system_id=self.vertical_coordinate_reference_system_id,
@@ -91,11 +92,13 @@ class AsIngestedCoordinatesApply(DomainModelApply):
     persistable_reference_vertical_crs: Optional[str] = Field(None, alias="persistableReferenceVerticalCrs")
     type: Optional[str] = None
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(
+        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
+    ) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
+        write_view = view_by_write_class and view_by_write_class.get(type(self))
 
-        sources = []
         properties = {}
         if self.coordinate_reference_system_id is not None:
             properties["CoordinateReferenceSystemID"] = self.coordinate_reference_system_id
@@ -115,16 +118,14 @@ class AsIngestedCoordinatesApply(DomainModelApply):
             properties["type"] = self.type
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("IntegrationTestsImmutable", "AsIngestedCoordinates"),
+                source=write_view or dm.ViewId("IntegrationTestsImmutable", "AsIngestedCoordinates", "da1e4eb90494da"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:
@@ -140,7 +141,7 @@ class AsIngestedCoordinatesApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(feature, DomainModelApply):
-                instances = feature._to_instances_apply(cache)
+                instances = feature._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 

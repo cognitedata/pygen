@@ -27,6 +27,7 @@ class Geometry(DomainModel):
 
     def as_apply(self) -> GeometryApply:
         return GeometryApply(
+            space=self.space,
             external_id=self.external_id,
             bbox=self.bbox,
             coordinates=self.coordinates,
@@ -40,11 +41,13 @@ class GeometryApply(DomainModelApply):
     coordinates: Optional[list[float]] = None
     type: Optional[str] = None
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(
+        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
+    ) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
+        write_view = view_by_write_class and view_by_write_class.get(type(self))
 
-        sources = []
         properties = {}
         if self.bbox is not None:
             properties["bbox"] = self.bbox
@@ -54,16 +57,14 @@ class GeometryApply(DomainModelApply):
             properties["type"] = self.type
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("IntegrationTestsImmutable", "Geometry"),
+                source=write_view or dm.ViewId("IntegrationTestsImmutable", "Geometry", "fc702ec6877c79"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:

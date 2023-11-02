@@ -14,6 +14,7 @@ from movie_domain_pydantic_v1.client.data_classes import (
     DirectorList,
     DirectorApplyList,
     DirectorFields,
+    DomainModelApply,
 )
 from movie_domain_pydantic_v1.client.data_classes._director import _DIRECTOR_PROPERTIES_BY_FIELD
 
@@ -109,7 +110,8 @@ class DirectorNominationAPI:
 
 
 class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[DirectorApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -118,6 +120,7 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
             class_list=DirectorList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
         self.movies = DirectorMoviesAPI(client)
         self.nomination = DirectorNominationAPI(client)
 
@@ -125,9 +128,9 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
         self, director: DirectorApply | Sequence[DirectorApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(director, DirectorApply):
-            instances = director.to_instances_apply()
+            instances = director.to_instances_apply(self._view_by_write_class)
         else:
-            instances = DirectorApplyList(director).to_instances_apply()
+            instances = DirectorApplyList(director).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
@@ -184,6 +187,7 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
         person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         won_oscar: bool | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
@@ -201,6 +205,7 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
         person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         won_oscar: bool | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
@@ -217,6 +222,7 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
         person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         won_oscar: bool | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
@@ -225,6 +231,7 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
             person,
             won_oscar,
             external_id_prefix,
+            space,
             filter,
         )
         return self._aggregate(
@@ -246,6 +253,7 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
         person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         won_oscar: bool | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
@@ -254,6 +262,7 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
             person,
             won_oscar,
             external_id_prefix,
+            space,
             filter,
         )
         return self._histogram(
@@ -272,6 +281,7 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
         person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         won_oscar: bool | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
@@ -281,6 +291,7 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
             person,
             won_oscar,
             external_id_prefix,
+            space,
             filter,
         )
 
@@ -328,6 +339,7 @@ def _create_filter(
     person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
     won_oscar: bool | None = None,
     external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
@@ -358,6 +370,10 @@ def _create_filter(
         filters.append(dm.filters.Equals(view_id.as_property_ref("wonOscar"), value=won_oscar))
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None

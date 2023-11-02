@@ -13,6 +13,7 @@ from tutorial_apm_simple.client.data_classes import (
     CdfConnectionPropertiesList,
     CdfConnectionPropertiesApplyList,
     CdfConnectionPropertiesFields,
+    DomainModelApply,
 )
 from tutorial_apm_simple.client.data_classes._cdf_3_d_connection_properties import (
     _CDFCONNECTIONPROPERTIES_PROPERTIES_BY_FIELD,
@@ -22,7 +23,8 @@ from tutorial_apm_simple.client.data_classes._cdf_3_d_connection_properties impo
 class CdfConnectionPropertiesAPI(
     TypeAPI[CdfConnectionProperties, CdfConnectionPropertiesApply, CdfConnectionPropertiesList]
 ):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[CdfConnectionPropertiesApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -31,6 +33,7 @@ class CdfConnectionPropertiesAPI(
             class_list=CdfConnectionPropertiesList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(
         self,
@@ -38,9 +41,11 @@ class CdfConnectionPropertiesAPI(
         replace: bool = False,
     ) -> dm.InstancesApplyResult:
         if isinstance(cdf_3_d_connection_property, CdfConnectionPropertiesApply):
-            instances = cdf_3_d_connection_property.to_instances_apply()
+            instances = cdf_3_d_connection_property.to_instances_apply(self._view_by_write_class)
         else:
-            instances = CdfConnectionPropertiesApplyList(cdf_3_d_connection_property).to_instances_apply()
+            instances = CdfConnectionPropertiesApplyList(cdf_3_d_connection_property).to_instances_apply(
+                self._view_by_write_class
+            )
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
@@ -85,6 +90,7 @@ class CdfConnectionPropertiesAPI(
         min_revision_node_id: int | None = None,
         max_revision_node_id: int | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
@@ -104,6 +110,7 @@ class CdfConnectionPropertiesAPI(
         min_revision_node_id: int | None = None,
         max_revision_node_id: int | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
@@ -122,6 +129,7 @@ class CdfConnectionPropertiesAPI(
         min_revision_node_id: int | None = None,
         max_revision_node_id: int | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
@@ -132,6 +140,7 @@ class CdfConnectionPropertiesAPI(
             min_revision_node_id,
             max_revision_node_id,
             external_id_prefix,
+            space,
             filter,
         )
         return self._aggregate(
@@ -155,6 +164,7 @@ class CdfConnectionPropertiesAPI(
         min_revision_node_id: int | None = None,
         max_revision_node_id: int | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
@@ -165,6 +175,7 @@ class CdfConnectionPropertiesAPI(
             min_revision_node_id,
             max_revision_node_id,
             external_id_prefix,
+            space,
             filter,
         )
         return self._histogram(
@@ -185,6 +196,7 @@ class CdfConnectionPropertiesAPI(
         min_revision_node_id: int | None = None,
         max_revision_node_id: int | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> CdfConnectionPropertiesList:
@@ -195,6 +207,7 @@ class CdfConnectionPropertiesAPI(
             min_revision_node_id,
             max_revision_node_id,
             external_id_prefix,
+            space,
             filter,
         )
 
@@ -208,6 +221,7 @@ def _create_filter(
     min_revision_node_id: int | None = None,
     max_revision_node_id: int | None = None,
     external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
@@ -223,6 +237,10 @@ def _create_filter(
         )
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None

@@ -35,6 +35,7 @@ class Artefacts(DomainModel):
 
     def as_apply(self) -> ArtefactsApply:
         return ArtefactsApply(
+            space=self.space,
             external_id=self.external_id,
             resource_id=self.resource_id,
             resource_kind=self.resource_kind,
@@ -48,11 +49,13 @@ class ArtefactsApply(DomainModelApply):
     resource_kind: Optional[str] = Field(None, alias="ResourceKind")
     role_id: Optional[str] = Field(None, alias="RoleID")
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(
+        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
+    ) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
+        write_view = view_by_write_class and view_by_write_class.get(type(self))
 
-        sources = []
         properties = {}
         if self.resource_id is not None:
             properties["ResourceID"] = self.resource_id
@@ -62,16 +65,14 @@ class ArtefactsApply(DomainModelApply):
             properties["RoleID"] = self.role_id
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("IntegrationTestsImmutable", "Artefacts"),
+                source=write_view or dm.ViewId("IntegrationTestsImmutable", "Artefacts", "7a44a1f4dac367"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:

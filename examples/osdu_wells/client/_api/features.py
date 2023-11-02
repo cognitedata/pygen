@@ -14,12 +14,14 @@ from osdu_wells.client.data_classes import (
     FeaturesApplyList,
     FeaturesFields,
     FeaturesTextFields,
+    DomainModelApply,
 )
 from osdu_wells.client.data_classes._features import _FEATURES_PROPERTIES_BY_FIELD
 
 
 class FeaturesAPI(TypeAPI[Features, FeaturesApply, FeaturesList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[FeaturesApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -28,12 +30,13 @@ class FeaturesAPI(TypeAPI[Features, FeaturesApply, FeaturesList]):
             class_list=FeaturesList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(self, feature: FeaturesApply | Sequence[FeaturesApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(feature, FeaturesApply):
-            instances = feature.to_instances_apply()
+            instances = feature.to_instances_apply(self._view_by_write_class)
         else:
-            instances = FeaturesApplyList(feature).to_instances_apply()
+            instances = FeaturesApplyList(feature).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
@@ -72,6 +75,7 @@ class FeaturesAPI(TypeAPI[Features, FeaturesApply, FeaturesList]):
         type: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> FeaturesList:
@@ -81,6 +85,7 @@ class FeaturesAPI(TypeAPI[Features, FeaturesApply, FeaturesList]):
             type,
             type_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._search(self._view_id, query, _FEATURES_PROPERTIES_BY_FIELD, properties, filter_, limit)
@@ -100,6 +105,7 @@ class FeaturesAPI(TypeAPI[Features, FeaturesApply, FeaturesList]):
         type: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
@@ -120,6 +126,7 @@ class FeaturesAPI(TypeAPI[Features, FeaturesApply, FeaturesList]):
         type: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
@@ -139,6 +146,7 @@ class FeaturesAPI(TypeAPI[Features, FeaturesApply, FeaturesList]):
         type: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
@@ -148,6 +156,7 @@ class FeaturesAPI(TypeAPI[Features, FeaturesApply, FeaturesList]):
             type,
             type_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._aggregate(
@@ -172,6 +181,7 @@ class FeaturesAPI(TypeAPI[Features, FeaturesApply, FeaturesList]):
         type: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
@@ -181,6 +191,7 @@ class FeaturesAPI(TypeAPI[Features, FeaturesApply, FeaturesList]):
             type,
             type_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._histogram(
@@ -200,6 +211,7 @@ class FeaturesAPI(TypeAPI[Features, FeaturesApply, FeaturesList]):
         type: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> FeaturesList:
@@ -209,6 +221,7 @@ class FeaturesAPI(TypeAPI[Features, FeaturesApply, FeaturesList]):
             type,
             type_prefix,
             external_id_prefix,
+            space,
             filter,
         )
 
@@ -221,6 +234,7 @@ def _create_filter(
     type: str | list[str] | None = None,
     type_prefix: str | None = None,
     external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
@@ -259,6 +273,10 @@ def _create_filter(
         filters.append(dm.filters.Prefix(view_id.as_property_ref("type"), value=type_prefix))
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None

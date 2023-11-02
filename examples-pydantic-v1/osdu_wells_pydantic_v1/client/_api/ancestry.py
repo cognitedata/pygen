@@ -14,12 +14,14 @@ from osdu_wells_pydantic_v1.client.data_classes import (
     AncestryApplyList,
     AncestryFields,
     AncestryTextFields,
+    DomainModelApply,
 )
 from osdu_wells_pydantic_v1.client.data_classes._ancestry import _ANCESTRY_PROPERTIES_BY_FIELD
 
 
 class AncestryAPI(TypeAPI[Ancestry, AncestryApply, AncestryList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[AncestryApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -28,14 +30,15 @@ class AncestryAPI(TypeAPI[Ancestry, AncestryApply, AncestryList]):
             class_list=AncestryList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(
         self, ancestry: AncestryApply | Sequence[AncestryApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(ancestry, AncestryApply):
-            instances = ancestry.to_instances_apply()
+            instances = ancestry.to_instances_apply(self._view_by_write_class)
         else:
-            instances = AncestryApplyList(ancestry).to_instances_apply()
+            instances = AncestryApplyList(ancestry).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
@@ -71,12 +74,14 @@ class AncestryAPI(TypeAPI[Ancestry, AncestryApply, AncestryList]):
         query: str,
         properties: AncestryTextFields | Sequence[AncestryTextFields] | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> AncestryList:
         filter_ = _create_filter(
             self._view_id,
             external_id_prefix,
+            space,
             filter,
         )
         return self._search(self._view_id, query, _ANCESTRY_PROPERTIES_BY_FIELD, properties, filter_, limit)
@@ -93,6 +98,7 @@ class AncestryAPI(TypeAPI[Ancestry, AncestryApply, AncestryList]):
         query: str | None = None,
         search_properties: AncestryTextFields | Sequence[AncestryTextFields] | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
@@ -110,6 +116,7 @@ class AncestryAPI(TypeAPI[Ancestry, AncestryApply, AncestryList]):
         query: str | None = None,
         search_properties: AncestryTextFields | Sequence[AncestryTextFields] | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
@@ -126,12 +133,14 @@ class AncestryAPI(TypeAPI[Ancestry, AncestryApply, AncestryList]):
         query: str | None = None,
         search_property: AncestryTextFields | Sequence[AncestryTextFields] | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
         filter_ = _create_filter(
             self._view_id,
             external_id_prefix,
+            space,
             filter,
         )
         return self._aggregate(
@@ -153,12 +162,14 @@ class AncestryAPI(TypeAPI[Ancestry, AncestryApply, AncestryList]):
         query: str | None = None,
         search_property: AncestryTextFields | Sequence[AncestryTextFields] | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
         filter_ = _create_filter(
             self._view_id,
             external_id_prefix,
+            space,
             filter,
         )
         return self._histogram(
@@ -175,12 +186,14 @@ class AncestryAPI(TypeAPI[Ancestry, AncestryApply, AncestryList]):
     def list(
         self,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> AncestryList:
         filter_ = _create_filter(
             self._view_id,
             external_id_prefix,
+            space,
             filter,
         )
 
@@ -190,11 +203,16 @@ class AncestryAPI(TypeAPI[Ancestry, AncestryApply, AncestryList]):
 def _create_filter(
     view_id: dm.ViewId,
     external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None

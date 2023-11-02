@@ -15,6 +15,7 @@ from osdu_wells_pydantic_v1.client.data_classes import (
     TechnicalAssurancesApplyList,
     TechnicalAssurancesFields,
     TechnicalAssurancesTextFields,
+    DomainModelApply,
 )
 from osdu_wells_pydantic_v1.client.data_classes._technical_assurances import _TECHNICALASSURANCES_PROPERTIES_BY_FIELD
 
@@ -182,7 +183,8 @@ class TechnicalAssurancesUnacceptableUsageAPI:
 
 
 class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApply, TechnicalAssurancesList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[TechnicalAssurancesApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -191,6 +193,7 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
             class_list=TechnicalAssurancesList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
         self.acceptable_usage = TechnicalAssurancesAcceptableUsageAPI(client)
         self.reviewers = TechnicalAssurancesReviewersAPI(client)
         self.unacceptable_usage = TechnicalAssurancesUnacceptableUsageAPI(client)
@@ -199,9 +202,9 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
         self, technical_assurance: TechnicalAssurancesApply | Sequence[TechnicalAssurancesApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(technical_assurance, TechnicalAssurancesApply):
-            instances = technical_assurance.to_instances_apply()
+            instances = technical_assurance.to_instances_apply(self._view_by_write_class)
         else:
-            instances = TechnicalAssurancesApplyList(technical_assurance).to_instances_apply()
+            instances = TechnicalAssurancesApplyList(technical_assurance).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
@@ -261,6 +264,7 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
         technical_assurance_type_id: str | list[str] | None = None,
         technical_assurance_type_id_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> TechnicalAssurancesList:
@@ -273,6 +277,7 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
             technical_assurance_type_id,
             technical_assurance_type_id_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._search(self._view_id, query, _TECHNICALASSURANCES_PROPERTIES_BY_FIELD, properties, filter_, limit)
@@ -295,6 +300,7 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
         technical_assurance_type_id: str | list[str] | None = None,
         technical_assurance_type_id_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
@@ -318,6 +324,7 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
         technical_assurance_type_id: str | list[str] | None = None,
         technical_assurance_type_id_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
@@ -340,6 +347,7 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
         technical_assurance_type_id: str | list[str] | None = None,
         technical_assurance_type_id_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
@@ -352,6 +360,7 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
             technical_assurance_type_id,
             technical_assurance_type_id_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._aggregate(
@@ -379,6 +388,7 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
         technical_assurance_type_id: str | list[str] | None = None,
         technical_assurance_type_id_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
@@ -391,6 +401,7 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
             technical_assurance_type_id,
             technical_assurance_type_id_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._histogram(
@@ -413,6 +424,7 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
         technical_assurance_type_id: str | list[str] | None = None,
         technical_assurance_type_id_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
@@ -426,6 +438,7 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
             technical_assurance_type_id,
             technical_assurance_type_id_prefix,
             external_id_prefix,
+            space,
             filter,
         )
 
@@ -501,6 +514,7 @@ def _create_filter(
     technical_assurance_type_id: str | list[str] | None = None,
     technical_assurance_type_id_prefix: str | None = None,
     external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
@@ -532,6 +546,10 @@ def _create_filter(
         )
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None

@@ -222,6 +222,7 @@ class WellboreData(DomainModel):
 
     def as_apply(self) -> WellboreDataApply:
         return WellboreDataApply(
+            space=self.space,
             external_id=self.external_id,
             business_intention_id=self.business_intention_id,
             condition_id=self.condition_id,
@@ -363,11 +364,13 @@ class WellboreDataApply(DomainModelApply):
     )
     wellbore_reason_id: Optional[str] = Field(None, alias="WellboreReasonID")
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(
+        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
+    ) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
+        write_view = view_by_write_class and view_by_write_class.get(type(self))
 
-        sources = []
         properties = {}
         if self.business_intention_id is not None:
             properties["BusinessIntentionID"] = self.business_intention_id
@@ -474,16 +477,14 @@ class WellboreDataApply(DomainModelApply):
             properties["WellboreReasonID"] = self.wellbore_reason_id
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("IntegrationTestsImmutable", "WellboreData"),
+                source=write_view or dm.ViewId("IntegrationTestsImmutable", "WellboreData", "6349cf734b294e"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:
@@ -499,7 +500,7 @@ class WellboreDataApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(drilling_reason, DomainModelApply):
-                instances = drilling_reason._to_instances_apply(cache)
+                instances = drilling_reason._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
@@ -510,7 +511,7 @@ class WellboreDataApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(facility_event, DomainModelApply):
-                instances = facility_event._to_instances_apply(cache)
+                instances = facility_event._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
@@ -521,7 +522,7 @@ class WellboreDataApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(facility_operator, DomainModelApply):
-                instances = facility_operator._to_instances_apply(cache)
+                instances = facility_operator._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
@@ -532,7 +533,7 @@ class WellboreDataApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(facility_specification, DomainModelApply):
-                instances = facility_specification._to_instances_apply(cache)
+                instances = facility_specification._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
@@ -543,7 +544,7 @@ class WellboreDataApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(facility_state, DomainModelApply):
-                instances = facility_state._to_instances_apply(cache)
+                instances = facility_state._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
@@ -554,7 +555,7 @@ class WellboreDataApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(geo_context, DomainModelApply):
-                instances = geo_context._to_instances_apply(cache)
+                instances = geo_context._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
@@ -565,7 +566,7 @@ class WellboreDataApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(historical_interest, DomainModelApply):
-                instances = historical_interest._to_instances_apply(cache)
+                instances = historical_interest._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
@@ -576,7 +577,7 @@ class WellboreDataApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(name_alias, DomainModelApply):
-                instances = name_alias._to_instances_apply(cache)
+                instances = name_alias._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
@@ -587,7 +588,7 @@ class WellboreDataApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(technical_assurance, DomainModelApply):
-                instances = technical_assurance._to_instances_apply(cache)
+                instances = technical_assurance._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
@@ -598,7 +599,7 @@ class WellboreDataApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(vertical_measurement, DomainModelApply):
-                instances = vertical_measurement._to_instances_apply(cache)
+                instances = vertical_measurement._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
@@ -609,22 +610,22 @@ class WellboreDataApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(wellbore_cost, DomainModelApply):
-                instances = wellbore_cost._to_instances_apply(cache)
+                instances = wellbore_cost._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
         if isinstance(self.geographic_bottom_hole_location, DomainModelApply):
-            instances = self.geographic_bottom_hole_location._to_instances_apply(cache)
+            instances = self.geographic_bottom_hole_location._to_instances_apply(cache, view_by_write_class)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 
         if isinstance(self.projected_bottom_hole_location, DomainModelApply):
-            instances = self.projected_bottom_hole_location._to_instances_apply(cache)
+            instances = self.projected_bottom_hole_location._to_instances_apply(cache, view_by_write_class)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 
         if isinstance(self.spatial_location, DomainModelApply):
-            instances = self.spatial_location._to_instances_apply(cache)
+            instances = self.spatial_location._to_instances_apply(cache, view_by_write_class)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 

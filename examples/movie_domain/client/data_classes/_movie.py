@@ -38,6 +38,7 @@ class Movie(DomainModel):
 
     def as_apply(self) -> MovieApply:
         return MovieApply(
+            space=self.space,
             external_id=self.external_id,
             actors=self.actors,
             directors=self.directors,
@@ -59,11 +60,13 @@ class MovieApply(DomainModelApply):
     run_time_minutes: Optional[float] = Field(None, alias="runTimeMinutes")
     title: str
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(
+        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
+    ) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
+        write_view = view_by_write_class and view_by_write_class.get(type(self))
 
-        sources = []
         properties = {}
         if self.meta is not None:
             properties["meta"] = self.meta
@@ -80,16 +83,14 @@ class MovieApply(DomainModelApply):
             properties["title"] = self.title
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("IntegrationTestsImmutable", "Movie"),
+                source=write_view or dm.ViewId("IntegrationTestsImmutable", "Movie", "2"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:
@@ -105,7 +106,7 @@ class MovieApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(actor, DomainModelApply):
-                instances = actor._to_instances_apply(cache)
+                instances = actor._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
@@ -116,12 +117,12 @@ class MovieApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(director, DomainModelApply):
-                instances = director._to_instances_apply(cache)
+                instances = director._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
         if isinstance(self.rating, DomainModelApply):
-            instances = self.rating._to_instances_apply(cache)
+            instances = self.rating._to_instances_apply(cache, view_by_write_class)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 

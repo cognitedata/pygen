@@ -14,12 +14,14 @@ from osdu_wells.client.data_classes import (
     FacilityStatesApplyList,
     FacilityStatesFields,
     FacilityStatesTextFields,
+    DomainModelApply,
 )
 from osdu_wells.client.data_classes._facility_states import _FACILITYSTATES_PROPERTIES_BY_FIELD
 
 
 class FacilityStatesAPI(TypeAPI[FacilityStates, FacilityStatesApply, FacilityStatesList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[FacilityStatesApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -28,14 +30,15 @@ class FacilityStatesAPI(TypeAPI[FacilityStates, FacilityStatesApply, FacilitySta
             class_list=FacilityStatesList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(
         self, facility_state: FacilityStatesApply | Sequence[FacilityStatesApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(facility_state, FacilityStatesApply):
-            instances = facility_state.to_instances_apply()
+            instances = facility_state.to_instances_apply(self._view_by_write_class)
         else:
-            instances = FacilityStatesApplyList(facility_state).to_instances_apply()
+            instances = FacilityStatesApplyList(facility_state).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
@@ -79,6 +82,7 @@ class FacilityStatesAPI(TypeAPI[FacilityStates, FacilityStatesApply, FacilitySta
         termination_date_time: str | list[str] | None = None,
         termination_date_time_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> FacilityStatesList:
@@ -93,6 +97,7 @@ class FacilityStatesAPI(TypeAPI[FacilityStates, FacilityStatesApply, FacilitySta
             termination_date_time,
             termination_date_time_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._search(self._view_id, query, _FACILITYSTATES_PROPERTIES_BY_FIELD, properties, filter_, limit)
@@ -117,6 +122,7 @@ class FacilityStatesAPI(TypeAPI[FacilityStates, FacilityStatesApply, FacilitySta
         termination_date_time: str | list[str] | None = None,
         termination_date_time_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
@@ -142,6 +148,7 @@ class FacilityStatesAPI(TypeAPI[FacilityStates, FacilityStatesApply, FacilitySta
         termination_date_time: str | list[str] | None = None,
         termination_date_time_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
@@ -166,6 +173,7 @@ class FacilityStatesAPI(TypeAPI[FacilityStates, FacilityStatesApply, FacilitySta
         termination_date_time: str | list[str] | None = None,
         termination_date_time_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
@@ -180,6 +188,7 @@ class FacilityStatesAPI(TypeAPI[FacilityStates, FacilityStatesApply, FacilitySta
             termination_date_time,
             termination_date_time_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._aggregate(
@@ -209,6 +218,7 @@ class FacilityStatesAPI(TypeAPI[FacilityStates, FacilityStatesApply, FacilitySta
         termination_date_time: str | list[str] | None = None,
         termination_date_time_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
@@ -223,6 +233,7 @@ class FacilityStatesAPI(TypeAPI[FacilityStates, FacilityStatesApply, FacilitySta
             termination_date_time,
             termination_date_time_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._histogram(
@@ -247,6 +258,7 @@ class FacilityStatesAPI(TypeAPI[FacilityStates, FacilityStatesApply, FacilitySta
         termination_date_time: str | list[str] | None = None,
         termination_date_time_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> FacilityStatesList:
@@ -261,6 +273,7 @@ class FacilityStatesAPI(TypeAPI[FacilityStates, FacilityStatesApply, FacilitySta
             termination_date_time,
             termination_date_time_prefix,
             external_id_prefix,
+            space,
             filter,
         )
 
@@ -278,6 +291,7 @@ def _create_filter(
     termination_date_time: str | list[str] | None = None,
     termination_date_time_prefix: str | None = None,
     external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
@@ -313,6 +327,10 @@ def _create_filter(
         )
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None

@@ -1,7 +1,8 @@
 from pathlib import Path
-from typing import Annotated, cast
+from typing import Annotated, Optional, cast
 
-from cognite.client import CogniteClient
+from cognite.client import ClientConfig, CogniteClient
+from cognite.client.credentials import OAuthClientCredentials
 from cognite.client.exceptions import CogniteAPIError
 
 from cognite import pygen
@@ -45,8 +46,14 @@ if _has_typer:
             ),
             version: str = typer.Option(default=loaded_settings.version.default, help=loaded_settings.version.help),
             tenant_id: str = typer.Option(
-                default=loaded_settings.tenant_id.default, help=loaded_settings.tenant_id.help
+                default=loaded_settings.tenant_id.default,
+                help=loaded_settings.tenant_id.help,
             ),
+            token_url: str = typer.Option(
+                default=loaded_settings.token_url.default, help=loaded_settings.token_url.help
+            ),
+            scopes: str = typer.Option(default=loaded_settings.scopes.default, help=loaded_settings.scopes.help),
+            audience: str = typer.Option(default=loaded_settings.audience.default, help=loaded_settings.audience.help),
             client_id: str = typer.Option(
                 default=loaded_settings.client_id.default, help=loaded_settings.client_id.help
             ),
@@ -73,9 +80,25 @@ if _has_typer:
                 loaded_settings.skip_formatting.default, help=loaded_settings.skip_formatting.help
             ),
         ):
-            client = CogniteClient.default_oauth_client_credentials(
-                cdf_project, cdf_cluster, tenant_id, client_id, client_secret
-            )
+            if token_url:
+                oauth_provider = OAuthClientCredentials(
+                    token_url=token_url,
+                    client_id=client_id,
+                    client_secret=client_secret,
+                    scopes=scopes.split(" ") if scopes else [],
+                    audience=audience,
+                )
+                clientConfig = ClientConfig(
+                    client_name="pygen",
+                    project=cdf_project,
+                    credentials=oauth_provider,
+                    base_url=cdf_cluster,
+                )
+                client = CogniteClient(clientConfig)
+            else:
+                client = CogniteClient.default_oauth_client_credentials(
+                    cdf_project, cdf_cluster, tenant_id, client_id, client_secret
+                )
             data_models: list[tuple[str, str, str]]
             if settings and settings.data_models:
                 data_models = settings.data_models
@@ -110,11 +133,14 @@ if _has_typer:
             space: Annotated[str, typer.Option(..., help=default_settings.space.help)],
             external_id: Annotated[str, typer.Option(..., help=default_settings.external_id.help)],
             version: Annotated[str, typer.Option(..., help=default_settings.version.help)],
-            tenant_id: Annotated[str, typer.Option(..., help=default_settings.tenant_id.help)],
             client_id: Annotated[str, typer.Option(..., help=default_settings.client_id.help)],
-            client_secret: Annotated[str, typer.Option(..., help="Azure Client Secret for connecting to CDF")],
+            client_secret: Annotated[str, typer.Option(..., help="Client Secret for connecting to CDF")],
             cdf_cluster: Annotated[str, typer.Option(..., help=default_settings.cdf_cluster.help)],
             cdf_project: Annotated[str, typer.Option(..., help=default_settings.cdf_project.help)],
+            tenant_id: Annotated[Optional[str], typer.Option(..., help=default_settings.tenant_id.help)] = None,
+            token_url: Annotated[Optional[str], typer.Option(..., help=default_settings.token_url.help)] = None,
+            scopes: Annotated[Optional[str], typer.Option(..., help=default_settings.scopes.help)] = None,
+            audience: Annotated[Optional[str], typer.Option(..., help=default_settings.audience.help)] = None,
             output_dir: Path = typer.Option(Path.cwd(), help=default_settings.output_dir.help),
             top_level_package: str = typer.Option(
                 default_settings.top_level_package.default, help=default_settings.top_level_package.help
@@ -127,9 +153,27 @@ if _has_typer:
                 default_settings.skip_formatting.default, help=default_settings.skip_formatting.help
             ),
         ):
-            client = CogniteClient.default_oauth_client_credentials(
-                cdf_project, cdf_cluster, tenant_id, client_id, client_secret
-            )
+            if token_url:
+                oauth_provider = OAuthClientCredentials(
+                    token_url=token_url,
+                    client_id=client_id,
+                    client_secret=client_secret,
+                    scopes=scopes.split(" ") if scopes else [],
+                    audience=audience,
+                )
+                clientConfig = ClientConfig(
+                    client_name="pygen",
+                    project=cdf_project,
+                    credentials=oauth_provider,
+                    base_url=cdf_cluster,
+                )
+                client = CogniteClient(clientConfig)
+            elif tenant_id:
+                client = CogniteClient.default_oauth_client_credentials(
+                    cdf_project, cdf_cluster, tenant_id, client_id, client_secret
+                )
+            else:
+                print("Either tenant-id or token-url is required parameters")
             try:
                 generate_sdk(
                     (space, external_id, version),

@@ -124,7 +124,8 @@ class DateTransformationPairStartAPI:
 class DateTransformationPairAPI(
     TypeAPI[DateTransformationPair, DateTransformationPairApply, DateTransformationPairList]
 ):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[DateTransformationPairApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -133,6 +134,7 @@ class DateTransformationPairAPI(
             class_list=DateTransformationPairList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
         self.end = DateTransformationPairEndAPI(client)
         self.start = DateTransformationPairStartAPI(client)
 
@@ -142,9 +144,11 @@ class DateTransformationPairAPI(
         replace: bool = False,
     ) -> dm.InstancesApplyResult:
         if isinstance(date_transformation_pair, DateTransformationPairApply):
-            instances = date_transformation_pair.to_instances_apply()
+            instances = date_transformation_pair.to_instances_apply(self._view_by_write_class)
         else:
-            instances = DateTransformationPairApplyList(date_transformation_pair).to_instances_apply()
+            instances = DateTransformationPairApplyList(date_transformation_pair).to_instances_apply(
+                self._view_by_write_class
+            )
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
@@ -192,6 +196,7 @@ class DateTransformationPairAPI(
     def list(
         self,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
@@ -199,6 +204,7 @@ class DateTransformationPairAPI(
         filter_ = _create_filter(
             self._view_id,
             external_id_prefix,
+            space,
             filter,
         )
 
@@ -244,11 +250,16 @@ class DateTransformationPairAPI(
 def _create_filter(
     view_id: dm.ViewId,
     external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None

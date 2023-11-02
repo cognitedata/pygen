@@ -102,6 +102,7 @@ class WorkOrder(DomainModel):
 
     def as_apply(self) -> WorkOrderApply:
         return WorkOrderApply(
+            space=self.space,
             external_id=self.external_id,
             actual_hours=self.actual_hours,
             created_date=self.created_date,
@@ -151,24 +152,26 @@ class WorkOrderApply(DomainModelApply):
     work_order_number: Optional[str] = Field(None, alias="workOrderNumber")
     work_package_number: Optional[str] = Field(None, alias="workPackageNumber")
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(
+        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
+    ) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
+        write_view = view_by_write_class and view_by_write_class.get(type(self))
 
-        sources = []
         properties = {}
         if self.actual_hours is not None:
             properties["actualHours"] = self.actual_hours
         if self.created_date is not None:
-            properties["createdDate"] = self.created_date.isoformat(timespec="milliseconds")
+            properties["createdDate"] = self.created_date.isoformat()
         if self.description is not None:
             properties["description"] = self.description
         if self.due_date is not None:
-            properties["dueDate"] = self.due_date.isoformat(timespec="milliseconds")
+            properties["dueDate"] = self.due_date.isoformat()
         if self.duration_hours is not None:
             properties["durationHours"] = self.duration_hours
         if self.end_time is not None:
-            properties["endTime"] = self.end_time.isoformat(timespec="milliseconds")
+            properties["endTime"] = self.end_time.isoformat()
         if self.is_active is not None:
             properties["isActive"] = self.is_active
         if self.is_cancelled is not None:
@@ -180,13 +183,13 @@ class WorkOrderApply(DomainModelApply):
         if self.percentage_progress is not None:
             properties["percentageProgress"] = self.percentage_progress
         if self.planned_start is not None:
-            properties["plannedStart"] = self.planned_start.isoformat(timespec="milliseconds")
+            properties["plannedStart"] = self.planned_start.isoformat()
         if self.priority_description is not None:
             properties["priorityDescription"] = self.priority_description
         if self.program_number is not None:
             properties["programNumber"] = self.program_number
         if self.start_time is not None:
-            properties["startTime"] = self.start_time.isoformat(timespec="milliseconds")
+            properties["startTime"] = self.start_time.isoformat()
         if self.status is not None:
             properties["status"] = self.status
         if self.title is not None:
@@ -197,16 +200,14 @@ class WorkOrderApply(DomainModelApply):
             properties["workPackageNumber"] = self.work_package_number
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("tutorial_apm_simple", "WorkOrder"),
+                source=write_view or dm.ViewId("tutorial_apm_simple", "WorkOrder", "6f36e59c3c4896"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:
@@ -222,7 +223,7 @@ class WorkOrderApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(linked_asset, DomainModelApply):
-                instances = linked_asset._to_instances_apply(cache)
+                instances = linked_asset._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
@@ -233,7 +234,7 @@ class WorkOrderApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(work_item, DomainModelApply):
-                instances = work_item._to_instances_apply(cache)
+                instances = work_item._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 

@@ -25,6 +25,7 @@ class Acl(DomainModel):
 
     def as_apply(self) -> AclApply:
         return AclApply(
+            space=self.space,
             external_id=self.external_id,
             owners=self.owners,
             viewers=self.viewers,
@@ -36,11 +37,13 @@ class AclApply(DomainModelApply):
     owners: Optional[list[str]] = None
     viewers: Optional[list[str]] = None
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(
+        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
+    ) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
+        write_view = view_by_write_class and view_by_write_class.get(type(self))
 
-        sources = []
         properties = {}
         if self.owners is not None:
             properties["owners"] = self.owners
@@ -48,16 +51,14 @@ class AclApply(DomainModelApply):
             properties["viewers"] = self.viewers
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("IntegrationTestsImmutable", "Acl"),
+                source=write_view or dm.ViewId("IntegrationTestsImmutable", "Acl", "1c4f4a5942a9a8"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:

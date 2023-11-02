@@ -14,12 +14,14 @@ from osdu_wells_pydantic_v1.client.data_classes import (
     WellboreCostsApplyList,
     WellboreCostsFields,
     WellboreCostsTextFields,
+    DomainModelApply,
 )
 from osdu_wells_pydantic_v1.client.data_classes._wellbore_costs import _WELLBORECOSTS_PROPERTIES_BY_FIELD
 
 
 class WellboreCostsAPI(TypeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[WellboreCostsApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -28,14 +30,15 @@ class WellboreCostsAPI(TypeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsL
             class_list=WellboreCostsList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(
         self, wellbore_cost: WellboreCostsApply | Sequence[WellboreCostsApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(wellbore_cost, WellboreCostsApply):
-            instances = wellbore_cost.to_instances_apply()
+            instances = wellbore_cost.to_instances_apply(self._view_by_write_class)
         else:
-            instances = WellboreCostsApplyList(wellbore_cost).to_instances_apply()
+            instances = WellboreCostsApplyList(wellbore_cost).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
@@ -75,6 +78,7 @@ class WellboreCostsAPI(TypeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsL
         min_cost: float | None = None,
         max_cost: float | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> WellboreCostsList:
@@ -85,6 +89,7 @@ class WellboreCostsAPI(TypeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsL
             min_cost,
             max_cost,
             external_id_prefix,
+            space,
             filter,
         )
         return self._search(self._view_id, query, _WELLBORECOSTS_PROPERTIES_BY_FIELD, properties, filter_, limit)
@@ -105,6 +110,7 @@ class WellboreCostsAPI(TypeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsL
         min_cost: float | None = None,
         max_cost: float | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
@@ -126,6 +132,7 @@ class WellboreCostsAPI(TypeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsL
         min_cost: float | None = None,
         max_cost: float | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
@@ -146,6 +153,7 @@ class WellboreCostsAPI(TypeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsL
         min_cost: float | None = None,
         max_cost: float | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
@@ -156,6 +164,7 @@ class WellboreCostsAPI(TypeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsL
             min_cost,
             max_cost,
             external_id_prefix,
+            space,
             filter,
         )
         return self._aggregate(
@@ -181,6 +190,7 @@ class WellboreCostsAPI(TypeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsL
         min_cost: float | None = None,
         max_cost: float | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
@@ -191,6 +201,7 @@ class WellboreCostsAPI(TypeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsL
             min_cost,
             max_cost,
             external_id_prefix,
+            space,
             filter,
         )
         return self._histogram(
@@ -211,6 +222,7 @@ class WellboreCostsAPI(TypeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsL
         min_cost: float | None = None,
         max_cost: float | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> WellboreCostsList:
@@ -221,6 +233,7 @@ class WellboreCostsAPI(TypeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsL
             min_cost,
             max_cost,
             external_id_prefix,
+            space,
             filter,
         )
 
@@ -234,6 +247,7 @@ def _create_filter(
     min_cost: float | None = None,
     max_cost: float | None = None,
     external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
@@ -247,6 +261,10 @@ def _create_filter(
         filters.append(dm.filters.Range(view_id.as_property_ref("Cost"), gte=min_cost, lte=max_cost))
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None

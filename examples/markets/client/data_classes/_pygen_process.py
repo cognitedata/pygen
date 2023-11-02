@@ -39,6 +39,7 @@ class PygenProcess(DomainModel):
 
     def as_apply(self) -> PygenProcessApply:
         return PygenProcessApply(
+            space=self.space,
             external_id=self.external_id,
             bid=self.bid,
             date_transformations=self.date_transformations,
@@ -56,26 +57,19 @@ class PygenProcessApply(DomainModelApply):
     name: Optional[str] = None
     transformation: Union[ValueTransformationApply, str, None] = Field(None, repr=False)
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(
+        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
+    ) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
+        write_view = view_by_write_class and view_by_write_class.get(type(self))
 
-        sources = []
         properties = {}
         if self.bid is not None:
             properties["bid"] = {
                 "space": "market",
                 "externalId": self.bid if isinstance(self.bid, str) else self.bid.external_id,
             }
-        if self.name is not None:
-            properties["name"] = self.name
-        if properties:
-            source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("market", "Process"),
-                properties=properties,
-            )
-            sources.append(source)
-        properties = {}
         if self.date_transformations is not None:
             properties["dateTransformations"] = {
                 "space": "market",
@@ -83,6 +77,8 @@ class PygenProcessApply(DomainModelApply):
                 if isinstance(self.date_transformations, str)
                 else self.date_transformations.external_id,
             }
+        if self.name is not None:
+            properties["name"] = self.name
         if self.transformation is not None:
             properties["transformation"] = {
                 "space": "market",
@@ -92,16 +88,14 @@ class PygenProcessApply(DomainModelApply):
             }
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("market", "PygenProcess"),
+                source=write_view or dm.ViewId("market", "PygenProcess", "477b68a858c7a8"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:
@@ -111,17 +105,17 @@ class PygenProcessApply(DomainModelApply):
         cache.add(self.external_id)
 
         if isinstance(self.bid, DomainModelApply):
-            instances = self.bid._to_instances_apply(cache)
+            instances = self.bid._to_instances_apply(cache, view_by_write_class)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 
         if isinstance(self.date_transformations, DomainModelApply):
-            instances = self.date_transformations._to_instances_apply(cache)
+            instances = self.date_transformations._to_instances_apply(cache, view_by_write_class)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 
         if isinstance(self.transformation, DomainModelApply):
-            instances = self.transformation._to_instances_apply(cache)
+            instances = self.transformation._to_instances_apply(cache, view_by_write_class)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 

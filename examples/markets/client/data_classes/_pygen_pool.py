@@ -35,6 +35,7 @@ class PygenPool(DomainModel):
 
     def as_apply(self) -> PygenPoolApply:
         return PygenPoolApply(
+            space=self.space,
             external_id=self.external_id,
             day_of_week=self.day_of_week,
             name=self.name,
@@ -48,37 +49,30 @@ class PygenPoolApply(DomainModelApply):
     name: Optional[str] = None
     timezone: Optional[str] = None
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(
+        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
+    ) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
+        write_view = view_by_write_class and view_by_write_class.get(type(self))
 
-        sources = []
         properties = {}
         if self.day_of_week is not None:
             properties["dayOfWeek"] = self.day_of_week
-        if properties:
-            source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("market", "PygenPool"),
-                properties=properties,
-            )
-            sources.append(source)
-        properties = {}
         if self.name is not None:
             properties["name"] = self.name
         if self.timezone is not None:
             properties["timezone"] = self.timezone
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("market", "Market"),
+                source=write_view or dm.ViewId("market", "PygenPool", "23c71ba66bad9d"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:

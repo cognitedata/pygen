@@ -7,6 +7,7 @@ from cognite.client.credentials import OAuthClientCredentials
 
 from ._api.case import CaseAPI
 from ._api.command_config import CommandConfigAPI
+from . import data_classes
 
 
 class ShopClient:
@@ -14,8 +15,8 @@ class ShopClient:
     ShopClient
 
     Generated with:
-        pygen = 0.27.1
-        cognite-sdk = 6.37.0
+        pygen = 0.29.0
+        cognite-sdk = 6.39.0
         pydantic = 2.4.2
 
     Data Model:
@@ -31,10 +32,13 @@ class ShopClient:
             client = CogniteClient(config_or_client)
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
-        self.case = CaseAPI(client, dm.ViewId("IntegrationTestsImmutable", "Case", "366b75cc4e699f"))
-        self.command_config = CommandConfigAPI(
-            client, dm.ViewId("IntegrationTestsImmutable", "Command_Config", "4727b5ad34b608")
-        )
+        view_by_write_class = {
+            data_classes.CaseApply: dm.ViewId("IntegrationTestsImmutable", "Case", "366b75cc4e699f"),
+            data_classes.CommandConfigApply: dm.ViewId("IntegrationTestsImmutable", "Command_Config", "4727b5ad34b608"),
+        }
+
+        self.case = CaseAPI(client, view_by_write_class)
+        self.command_config = CommandConfigAPI(client, view_by_write_class)
 
     @classmethod
     def azure_project(

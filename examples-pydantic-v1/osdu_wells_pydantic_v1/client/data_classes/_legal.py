@@ -28,6 +28,7 @@ class Legal(DomainModel):
 
     def as_apply(self) -> LegalApply:
         return LegalApply(
+            space=self.space,
             external_id=self.external_id,
             legaltags=self.legaltags,
             other_relevant_data_countries=self.other_relevant_data_countries,
@@ -41,11 +42,13 @@ class LegalApply(DomainModelApply):
     other_relevant_data_countries: Optional[list[str]] = Field(None, alias="otherRelevantDataCountries")
     status: Optional[str] = None
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(
+        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
+    ) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
+        write_view = view_by_write_class and view_by_write_class.get(type(self))
 
-        sources = []
         properties = {}
         if self.legaltags is not None:
             properties["legaltags"] = self.legaltags
@@ -55,16 +58,14 @@ class LegalApply(DomainModelApply):
             properties["status"] = self.status
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("IntegrationTestsImmutable", "Legal"),
+                source=write_view or dm.ViewId("IntegrationTestsImmutable", "Legal", "508188c6379675"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:

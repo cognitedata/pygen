@@ -28,6 +28,7 @@ class Process(DomainModel):
 
     def as_apply(self) -> ProcessApply:
         return ProcessApply(
+            space=self.space,
             external_id=self.external_id,
             bid=self.bid,
             name=self.name,
@@ -39,11 +40,13 @@ class ProcessApply(DomainModelApply):
     bid: Union[BidApply, str, None] = Field(None, repr=False)
     name: Optional[str] = None
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(
+        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
+    ) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
+        write_view = view_by_write_class and view_by_write_class.get(type(self))
 
-        sources = []
         properties = {}
         if self.bid is not None:
             properties["bid"] = {
@@ -54,16 +57,14 @@ class ProcessApply(DomainModelApply):
             properties["name"] = self.name
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("market", "Process"),
+                source=write_view or dm.ViewId("market", "Process", "98a2becd0f63ee"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:
@@ -73,7 +74,7 @@ class ProcessApply(DomainModelApply):
         cache.add(self.external_id)
 
         if isinstance(self.bid, DomainModelApply):
-            instances = self.bid._to_instances_apply(cache)
+            instances = self.bid._to_instances_apply(cache, view_by_write_class)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 

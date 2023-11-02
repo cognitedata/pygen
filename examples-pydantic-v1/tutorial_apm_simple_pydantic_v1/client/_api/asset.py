@@ -20,6 +20,7 @@ from tutorial_apm_simple_pydantic_v1.client.data_classes import (
     AssetApplyList,
     AssetFields,
     AssetTextFields,
+    DomainModelApply,
 )
 from tutorial_apm_simple_pydantic_v1.client.data_classes._asset import _ASSET_PROPERTIES_BY_FIELD
 
@@ -287,6 +288,7 @@ class AssetPressureAPI:
         min_updated_date: datetime.datetime | None = None,
         max_updated_date: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> AssetPressureQuery:
@@ -310,6 +312,7 @@ class AssetPressureAPI:
             min_updated_date,
             max_updated_date,
             external_id_prefix,
+            space,
             filter,
         )
 
@@ -340,6 +343,7 @@ class AssetPressureAPI:
         min_updated_date: datetime.datetime | None = None,
         max_updated_date: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> TimeSeriesList:
@@ -363,6 +367,7 @@ class AssetPressureAPI:
             min_updated_date,
             max_updated_date,
             external_id_prefix,
+            space,
             filter,
         )
         external_ids = _retrieve_timeseries_external_ids_with_extra_pressure(
@@ -519,7 +524,8 @@ class AssetInModelAPI:
 
 
 class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[AssetApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -528,15 +534,16 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
             class_list=AssetList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
         self.children = AssetChildrenAPI(client)
         self.in_model_3_d = AssetInModelAPI(client)
         self.pressure = AssetPressureAPI(client, view_id)
 
     def apply(self, asset: AssetApply | Sequence[AssetApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(asset, AssetApply):
-            instances = asset.to_instances_apply()
+            instances = asset.to_instances_apply(self._view_by_write_class)
         else:
-            instances = AssetApplyList(asset).to_instances_apply()
+            instances = AssetApplyList(asset).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
@@ -603,6 +610,7 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
         min_updated_date: datetime.datetime | None = None,
         max_updated_date: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> AssetList:
@@ -626,6 +634,7 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
             min_updated_date,
             max_updated_date,
             external_id_prefix,
+            space,
             filter,
         )
         return self._search(self._view_id, query, _ASSET_PROPERTIES_BY_FIELD, properties, filter_, limit)
@@ -659,6 +668,7 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
         min_updated_date: datetime.datetime | None = None,
         max_updated_date: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
@@ -693,6 +703,7 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
         min_updated_date: datetime.datetime | None = None,
         max_updated_date: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
@@ -726,6 +737,7 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
         min_updated_date: datetime.datetime | None = None,
         max_updated_date: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
@@ -749,6 +761,7 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
             min_updated_date,
             max_updated_date,
             external_id_prefix,
+            space,
             filter,
         )
         return self._aggregate(
@@ -787,6 +800,7 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
         min_updated_date: datetime.datetime | None = None,
         max_updated_date: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
@@ -810,6 +824,7 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
             min_updated_date,
             max_updated_date,
             external_id_prefix,
+            space,
             filter,
         )
         return self._histogram(
@@ -843,6 +858,7 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
         min_updated_date: datetime.datetime | None = None,
         max_updated_date: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
@@ -867,6 +883,7 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
             min_updated_date,
             max_updated_date,
             external_id_prefix,
+            space,
             filter,
         )
 
@@ -929,6 +946,7 @@ def _create_filter(
     min_updated_date: datetime.datetime | None = None,
     max_updated_date: datetime.datetime | None = None,
     external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
@@ -942,8 +960,8 @@ def _create_filter(
         filters.append(
             dm.filters.Range(
                 view_id.as_property_ref("createdDate"),
-                gte=min_created_date.isoformat() if min_created_date else None,
-                lte=max_created_date.isoformat() if max_created_date else None,
+                gte=min_created_date.isoformat(timespec="milliseconds") if min_created_date else None,
+                lte=max_created_date.isoformat(timespec="milliseconds") if max_created_date else None,
             )
         )
     if description and isinstance(description, str):
@@ -995,12 +1013,16 @@ def _create_filter(
         filters.append(
             dm.filters.Range(
                 view_id.as_property_ref("updatedDate"),
-                gte=min_updated_date.isoformat() if min_updated_date else None,
-                lte=max_updated_date.isoformat() if max_updated_date else None,
+                gte=min_updated_date.isoformat(timespec="milliseconds") if min_updated_date else None,
+                lte=max_updated_date.isoformat(timespec="milliseconds") if max_updated_date else None,
             )
         )
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None

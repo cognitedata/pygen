@@ -14,12 +14,14 @@ from markets.client.data_classes import (
     PygenProcessApplyList,
     PygenProcessFields,
     PygenProcessTextFields,
+    DomainModelApply,
 )
 from markets.client.data_classes._pygen_process import _PYGENPROCESS_PROPERTIES_BY_FIELD
 
 
 class PygenProcessAPI(TypeAPI[PygenProcess, PygenProcessApply, PygenProcessList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[PygenProcessApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -28,14 +30,15 @@ class PygenProcessAPI(TypeAPI[PygenProcess, PygenProcessApply, PygenProcessList]
             class_list=PygenProcessList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(
         self, pygen_proces: PygenProcessApply | Sequence[PygenProcessApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(pygen_proces, PygenProcessApply):
-            instances = pygen_proces.to_instances_apply()
+            instances = pygen_proces.to_instances_apply(self._view_by_write_class)
         else:
-            instances = PygenProcessApplyList(pygen_proces).to_instances_apply()
+            instances = PygenProcessApplyList(pygen_proces).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
@@ -76,6 +79,7 @@ class PygenProcessAPI(TypeAPI[PygenProcess, PygenProcessApply, PygenProcessList]
         name_prefix: str | None = None,
         transformation: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> PygenProcessList:
@@ -87,6 +91,7 @@ class PygenProcessAPI(TypeAPI[PygenProcess, PygenProcessApply, PygenProcessList]
             name_prefix,
             transformation,
             external_id_prefix,
+            space,
             filter,
         )
         return self._search(self._view_id, query, _PYGENPROCESS_PROPERTIES_BY_FIELD, properties, filter_, limit)
@@ -108,6 +113,7 @@ class PygenProcessAPI(TypeAPI[PygenProcess, PygenProcessApply, PygenProcessList]
         name_prefix: str | None = None,
         transformation: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
@@ -130,6 +136,7 @@ class PygenProcessAPI(TypeAPI[PygenProcess, PygenProcessApply, PygenProcessList]
         name_prefix: str | None = None,
         transformation: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
@@ -151,6 +158,7 @@ class PygenProcessAPI(TypeAPI[PygenProcess, PygenProcessApply, PygenProcessList]
         name_prefix: str | None = None,
         transformation: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
@@ -162,6 +170,7 @@ class PygenProcessAPI(TypeAPI[PygenProcess, PygenProcessApply, PygenProcessList]
             name_prefix,
             transformation,
             external_id_prefix,
+            space,
             filter,
         )
         return self._aggregate(
@@ -188,6 +197,7 @@ class PygenProcessAPI(TypeAPI[PygenProcess, PygenProcessApply, PygenProcessList]
         name_prefix: str | None = None,
         transformation: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
@@ -199,6 +209,7 @@ class PygenProcessAPI(TypeAPI[PygenProcess, PygenProcessApply, PygenProcessList]
             name_prefix,
             transformation,
             external_id_prefix,
+            space,
             filter,
         )
         return self._histogram(
@@ -220,6 +231,7 @@ class PygenProcessAPI(TypeAPI[PygenProcess, PygenProcessApply, PygenProcessList]
         name_prefix: str | None = None,
         transformation: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> PygenProcessList:
@@ -231,6 +243,7 @@ class PygenProcessAPI(TypeAPI[PygenProcess, PygenProcessApply, PygenProcessList]
             name_prefix,
             transformation,
             external_id_prefix,
+            space,
             filter,
         )
 
@@ -245,6 +258,7 @@ def _create_filter(
     name_prefix: str | None = None,
     transformation: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
     external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
@@ -327,6 +341,10 @@ def _create_filter(
         )
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None

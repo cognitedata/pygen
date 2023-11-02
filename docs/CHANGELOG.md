@@ -13,6 +13,27 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.20.0] - 02-11-23
+### Added
+* Support for filtering on `space` in all filter methods.
+### Fixed
+* THe fix for filtering on `datetime` in `0.27.3` did not work as intended. This is now fixed.
+
+## [0.28.0] - 02-11-23
+### Added
+* Support for `Support generic OIDC` in the `pygen` CLI.
+
+## [0.27.3] - 02-11-23
+### Fixed
+* When calling `.apply` the view generating the data class is used to write instead of the container of the property.
+  This caused some apply operations to not be retrievable again with the `list` method.
+* When filtering in `.list`, `.search`, or `.timeseries` `pygen` ensures that the timespec (milliseconds) used
+  by the API is used.
+
+## [0.27.2] - 01-11-23
+### Fixed
+* When calling `.apply` in the generated data classe, the default class `space` was always used. This is now fixed.
+
 ## [0.27.1] - 28-10-23
 ### Fixed
 * Pygen automatically converts `datetime` to `datetime.datetime` in the generated SDK to the timespec (milliseconds)

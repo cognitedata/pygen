@@ -29,6 +29,7 @@ class CdfConnectionProperties(DomainModel):
 
     def as_apply(self) -> CdfConnectionPropertiesApply:
         return CdfConnectionPropertiesApply(
+            space=self.space,
             external_id=self.external_id,
             revision_id=self.revision_id,
             revision_node_id=self.revision_node_id,
@@ -40,11 +41,13 @@ class CdfConnectionPropertiesApply(DomainModelApply):
     revision_id: int = Field(alias="revisionId")
     revision_node_id: int = Field(alias="revisionNodeId")
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(
+        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
+    ) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
+        write_view = view_by_write_class and view_by_write_class.get(type(self))
 
-        sources = []
         properties = {}
         if self.revision_id is not None:
             properties["revisionId"] = self.revision_id
@@ -52,16 +55,14 @@ class CdfConnectionPropertiesApply(DomainModelApply):
             properties["revisionNodeId"] = self.revision_node_id
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("cdf_3d_schema", "Cdf3dConnectionProperties"),
+                source=write_view or dm.ViewId("cdf_3d_schema", "Cdf3dConnectionProperties", "1"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:

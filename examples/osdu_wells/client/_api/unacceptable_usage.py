@@ -14,12 +14,14 @@ from osdu_wells.client.data_classes import (
     UnacceptableUsageApplyList,
     UnacceptableUsageFields,
     UnacceptableUsageTextFields,
+    DomainModelApply,
 )
 from osdu_wells.client.data_classes._unacceptable_usage import _UNACCEPTABLEUSAGE_PROPERTIES_BY_FIELD
 
 
 class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, UnacceptableUsageList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[UnacceptableUsageApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -28,14 +30,15 @@ class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
             class_list=UnacceptableUsageList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(
         self, unacceptable_usage: UnacceptableUsageApply | Sequence[UnacceptableUsageApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(unacceptable_usage, UnacceptableUsageApply):
-            instances = unacceptable_usage.to_instances_apply()
+            instances = unacceptable_usage.to_instances_apply(self._view_by_write_class)
         else:
-            instances = UnacceptableUsageApplyList(unacceptable_usage).to_instances_apply()
+            instances = UnacceptableUsageApplyList(unacceptable_usage).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
@@ -81,6 +84,7 @@ class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
         workflow_usage_type_id: str | list[str] | None = None,
         workflow_usage_type_id_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> UnacceptableUsageList:
@@ -97,6 +101,7 @@ class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
             workflow_usage_type_id,
             workflow_usage_type_id_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._search(self._view_id, query, _UNACCEPTABLEUSAGE_PROPERTIES_BY_FIELD, properties, filter_, limit)
@@ -123,6 +128,7 @@ class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
         workflow_usage_type_id: str | list[str] | None = None,
         workflow_usage_type_id_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue]:
@@ -150,6 +156,7 @@ class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
         workflow_usage_type_id: str | list[str] | None = None,
         workflow_usage_type_id_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> InstanceAggregationResultList:
@@ -176,6 +183,7 @@ class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
         workflow_usage_type_id: str | list[str] | None = None,
         workflow_usage_type_id_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
@@ -192,6 +200,7 @@ class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
             workflow_usage_type_id,
             workflow_usage_type_id_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._aggregate(
@@ -223,6 +232,7 @@ class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
         workflow_usage_type_id: str | list[str] | None = None,
         workflow_usage_type_id_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
@@ -239,6 +249,7 @@ class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
             workflow_usage_type_id,
             workflow_usage_type_id_prefix,
             external_id_prefix,
+            space,
             filter,
         )
         return self._histogram(
@@ -265,6 +276,7 @@ class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
         workflow_usage_type_id: str | list[str] | None = None,
         workflow_usage_type_id_prefix: str | None = None,
         external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> UnacceptableUsageList:
@@ -281,6 +293,7 @@ class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
             workflow_usage_type_id,
             workflow_usage_type_id_prefix,
             external_id_prefix,
+            space,
             filter,
         )
 
@@ -300,6 +313,7 @@ def _create_filter(
     workflow_usage_type_id: str | list[str] | None = None,
     workflow_usage_type_id_prefix: str | None = None,
     external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
@@ -353,6 +367,10 @@ def _create_filter(
         )
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters) if filters else None
