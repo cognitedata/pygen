@@ -341,7 +341,8 @@ def test_generate_data_class_init_file(multi_api_generator: MultiAPIGenerator, c
 
 
 @pytest.mark.skipif(
-    platform.platform() != "Windows", reason="There is currently some strange problem with the diff on non-windows"
+    not platform.platform().startswith("Windows"),
+    reason="There is currently some strange problem with the diff on non-windows",
 )
 def test_create_api_client(sdk_generator: SDKGenerator, code_formatter: CodeFormatter):
     # Arrange

@@ -18,7 +18,8 @@ def sdk_generator(apm_data_model: dm.DataModel[dm.View]) -> SDKGenerator:
 
 
 @pytest.mark.skipif(
-    platform.platform() != "Windows", reason="There is currently some strange problem with the diff on non-windows"
+    not platform.platform().startswith("Windows"),
+    reason="There is currently some strange problem with the diff on non-windows",
 )
 def test_generate_sdk(sdk_generator: SDKGenerator, code_formatter: CodeFormatter) -> None:
     # Act
