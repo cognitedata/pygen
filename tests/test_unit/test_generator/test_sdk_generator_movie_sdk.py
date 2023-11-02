@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from sys import platform
+import platform
 from typing import cast
 from unittest.mock import MagicMock
 
