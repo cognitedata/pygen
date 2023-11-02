@@ -404,6 +404,7 @@ def test_create_list_method(person_view: dm.View, pygen_config: PygenConfig) -> 
             FilterCondition(dm.filters.Prefix, "name", dict(value=parameters[3])),
             FilterCondition(dm.filters.Prefix, "externalId", dict(value=parameters[4])),
             FilterCondition(dm.filters.Equals, "space", dict(value=parameters[5])),
+            FilterCondition(dm.filters.In, "space", dict(values=parameters[5])),
         ],
     )
 
