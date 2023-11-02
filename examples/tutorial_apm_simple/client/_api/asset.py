@@ -960,8 +960,8 @@ def _create_filter(
         filters.append(
             dm.filters.Range(
                 view_id.as_property_ref("createdDate"),
-                gte=min_created_date.isoformat() if min_created_date else None,
-                lte=max_created_date.isoformat() if max_created_date else None,
+                gte=min_created_date.isoformat(timespec="milliseconds") if min_created_date else None,
+                lte=max_created_date.isoformat(timespec="milliseconds") if max_created_date else None,
             )
         )
     if description and isinstance(description, str):
@@ -1013,8 +1013,8 @@ def _create_filter(
         filters.append(
             dm.filters.Range(
                 view_id.as_property_ref("updatedDate"),
-                gte=min_updated_date.isoformat() if min_updated_date else None,
-                lte=max_updated_date.isoformat() if max_updated_date else None,
+                gte=min_updated_date.isoformat(timespec="milliseconds") if min_updated_date else None,
+                lte=max_updated_date.isoformat(timespec="milliseconds") if max_updated_date else None,
             )
         )
     if external_id_prefix:
