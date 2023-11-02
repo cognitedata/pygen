@@ -25,7 +25,7 @@ class {{ multi_api_class.name }}:
             data_classes.{{ sub.data_class.write_name }}: dm.ViewId("{{ view.space }}", "{{ view.external_id }}", "{{ view.version }}"),{% endfor %}
         {% raw %}}{% endraw %}
         {% for sub, view in zip(multi_api_class.sub_apis, views) %}
-        self.{{ sub.client_attribute }} = {{ api_class.name }}(client, view_by_write_class){% endfor %}
+        self.{{ sub.client_attribute }} = {{ sub.name }}(client, view_by_write_class){% endfor %}
 
 {% endfor %}{% endif %}
 class {{ client_name }}:
