@@ -15,12 +15,14 @@ from markets.client.data_classes import (
     PygenBidApplyList,
     PygenBidFields,
     PygenBidTextFields,
+    DomainModelApply,
 )
 from markets.client.data_classes._pygen_bid import _PYGENBID_PROPERTIES_BY_FIELD
 
 
 class PygenBidAPI(TypeAPI[PygenBid, PygenBidApply, PygenBidList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[PygenBidApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -29,14 +31,15 @@ class PygenBidAPI(TypeAPI[PygenBid, PygenBidApply, PygenBidList]):
             class_list=PygenBidList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(
         self, pygen_bid: PygenBidApply | Sequence[PygenBidApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(pygen_bid, PygenBidApply):
-            instances = pygen_bid.to_instances_apply()
+            instances = pygen_bid.to_instances_apply(self._view_by_write_class)
         else:
-            instances = PygenBidApplyList(pygen_bid).to_instances_apply()
+            instances = PygenBidApplyList(pygen_bid).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

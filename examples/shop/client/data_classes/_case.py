@@ -75,11 +75,13 @@ class CaseApply(DomainModelApply):
     scenario: Optional[str] = None
     start_time: datetime.datetime
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(
+        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
+    ) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
+        write_view = view_by_write_class and view_by_write_class.get(type(self))
 
-        sources = []
         properties = {}
         if self.arguments is not None:
             properties["arguments"] = self.arguments
@@ -95,7 +97,7 @@ class CaseApply(DomainModelApply):
         if self.cut_files is not None:
             properties["cut_files"] = self.cut_files
         if self.end_time is not None:
-            properties["end_time"] = self.end_time.isoformat(timespec="milliseconds")
+            properties["end_time"] = self.end_time.isoformat()
         if self.name is not None:
             properties["name"] = self.name
         if self.run_status is not None:
@@ -103,19 +105,17 @@ class CaseApply(DomainModelApply):
         if self.scenario is not None:
             properties["scenario"] = self.scenario
         if self.start_time is not None:
-            properties["start_time"] = self.start_time.isoformat(timespec="milliseconds")
+            properties["start_time"] = self.start_time.isoformat()
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("IntegrationTestsImmutable", "Case"),
+                source=write_view or dm.ViewId("IntegrationTestsImmutable", "Case", "366b75cc4e699f"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:
@@ -125,7 +125,7 @@ class CaseApply(DomainModelApply):
         cache.add(self.external_id)
 
         if isinstance(self.commands, DomainModelApply):
-            instances = self.commands._to_instances_apply(cache)
+            instances = self.commands._to_instances_apply(cache, view_by_write_class)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 

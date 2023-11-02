@@ -8,12 +8,21 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
 from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
-from markets_pydantic_v1.client.data_classes import Bid, BidApply, BidList, BidApplyList, BidFields, BidTextFields
+from markets_pydantic_v1.client.data_classes import (
+    Bid,
+    BidApply,
+    BidList,
+    BidApplyList,
+    BidFields,
+    BidTextFields,
+    DomainModelApply,
+)
 from markets_pydantic_v1.client.data_classes._bid import _BID_PROPERTIES_BY_FIELD
 
 
 class BidAPI(TypeAPI[Bid, BidApply, BidList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[BidApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -22,12 +31,13 @@ class BidAPI(TypeAPI[Bid, BidApply, BidList]):
             class_list=BidList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(self, bid: BidApply | Sequence[BidApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(bid, BidApply):
-            instances = bid.to_instances_apply()
+            instances = bid.to_instances_apply(self._view_by_write_class)
         else:
-            instances = BidApplyList(bid).to_instances_apply()
+            instances = BidApplyList(bid).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

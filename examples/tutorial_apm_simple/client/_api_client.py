@@ -11,6 +11,7 @@ from ._api.cdf_3_d_entity import CdfEntityAPI
 from ._api.cdf_3_d_model import CdfModelAPI
 from ._api.work_item import WorkItemAPI
 from ._api.work_order import WorkOrderAPI
+from . import data_classes
 
 
 class ApmSimpleClient:
@@ -18,7 +19,7 @@ class ApmSimpleClient:
     ApmSimpleClient
 
     Generated with:
-        pygen = 0.27.2
+        pygen = 0.27.3
         cognite-sdk = 6.37.0
         pydantic = 2.4.2
 
@@ -35,14 +36,21 @@ class ApmSimpleClient:
             client = CogniteClient(config_or_client)
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
-        self.asset = AssetAPI(client, dm.ViewId("tutorial_apm_simple", "Asset", "beb2bebdcbb4ad"))
-        self.cdf_3_d_connection_properties = CdfConnectionPropertiesAPI(
-            client, dm.ViewId("cdf_3d_schema", "Cdf3dConnectionProperties", "1")
-        )
-        self.cdf_3_d_entity = CdfEntityAPI(client, dm.ViewId("cdf_3d_schema", "Cdf3dEntity", "1"))
-        self.cdf_3_d_model = CdfModelAPI(client, dm.ViewId("cdf_3d_schema", "Cdf3dModel", "1"))
-        self.work_item = WorkItemAPI(client, dm.ViewId("tutorial_apm_simple", "WorkItem", "18ac48abbe96aa"))
-        self.work_order = WorkOrderAPI(client, dm.ViewId("tutorial_apm_simple", "WorkOrder", "6f36e59c3c4896"))
+        view_by_write_class = {
+            data_classes.AssetApply: dm.ViewId("tutorial_apm_simple", "Asset", "beb2bebdcbb4ad"),
+            data_classes.CdfConnectionPropertiesApply: dm.ViewId("cdf_3d_schema", "Cdf3dConnectionProperties", "1"),
+            data_classes.CdfEntityApply: dm.ViewId("cdf_3d_schema", "Cdf3dEntity", "1"),
+            data_classes.CdfModelApply: dm.ViewId("cdf_3d_schema", "Cdf3dModel", "1"),
+            data_classes.WorkItemApply: dm.ViewId("tutorial_apm_simple", "WorkItem", "18ac48abbe96aa"),
+            data_classes.WorkOrderApply: dm.ViewId("tutorial_apm_simple", "WorkOrder", "6f36e59c3c4896"),
+        }
+
+        self.asset = AssetAPI(client, view_by_write_class)
+        self.cdf_3_d_connection_properties = CdfConnectionPropertiesAPI(client, view_by_write_class)
+        self.cdf_3_d_entity = CdfEntityAPI(client, view_by_write_class)
+        self.cdf_3_d_model = CdfModelAPI(client, view_by_write_class)
+        self.work_item = WorkItemAPI(client, view_by_write_class)
+        self.work_order = WorkOrderAPI(client, view_by_write_class)
 
     @classmethod
     def azure_project(

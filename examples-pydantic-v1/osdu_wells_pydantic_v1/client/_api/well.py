@@ -15,6 +15,7 @@ from osdu_wells_pydantic_v1.client.data_classes import (
     WellApplyList,
     WellFields,
     WellTextFields,
+    DomainModelApply,
 )
 from osdu_wells_pydantic_v1.client.data_classes._well import _WELL_PROPERTIES_BY_FIELD
 
@@ -65,7 +66,8 @@ class WellMetaAPI:
 
 
 class WellAPI(TypeAPI[Well, WellApply, WellList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[WellApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -74,13 +76,14 @@ class WellAPI(TypeAPI[Well, WellApply, WellList]):
             class_list=WellList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
         self.meta = WellMetaAPI(client)
 
     def apply(self, well: WellApply | Sequence[WellApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(well, WellApply):
-            instances = well.to_instances_apply()
+            instances = well.to_instances_apply(self._view_by_write_class)
         else:
-            instances = WellApplyList(well).to_instances_apply()
+            instances = WellApplyList(well).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

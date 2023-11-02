@@ -14,12 +14,14 @@ from movie_domain.client.data_classes import (
     BestLeadingActorApplyList,
     BestLeadingActorFields,
     BestLeadingActorTextFields,
+    DomainModelApply,
 )
 from movie_domain.client.data_classes._best_leading_actor import _BESTLEADINGACTOR_PROPERTIES_BY_FIELD
 
 
 class BestLeadingActorAPI(TypeAPI[BestLeadingActor, BestLeadingActorApply, BestLeadingActorList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[BestLeadingActorApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -28,14 +30,15 @@ class BestLeadingActorAPI(TypeAPI[BestLeadingActor, BestLeadingActorApply, BestL
             class_list=BestLeadingActorList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(
         self, best_leading_actor: BestLeadingActorApply | Sequence[BestLeadingActorApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(best_leading_actor, BestLeadingActorApply):
-            instances = best_leading_actor.to_instances_apply()
+            instances = best_leading_actor.to_instances_apply(self._view_by_write_class)
         else:
-            instances = BestLeadingActorApplyList(best_leading_actor).to_instances_apply()
+            instances = BestLeadingActorApplyList(best_leading_actor).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

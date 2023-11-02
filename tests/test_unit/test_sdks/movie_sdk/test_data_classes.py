@@ -69,7 +69,7 @@ def person_apply_to_instances_test_cases():
                     "person:christoph_waltz",
                     sources=[
                         dm.NodeOrEdgeData(
-                            source=dm.ContainerId("IntegrationTestsImmutable", "Person"),
+                            source=dm.ViewId("IntegrationTestsImmutable", "Person", "2"),
                             properties={"name": "Christoph Waltz", "birthYear": 1956},
                         )
                     ],
@@ -125,7 +125,12 @@ def person_apply_to_instances_test_cases():
             "externalId": "person:quentin_tarantino",
             "sources": [
                 {
-                    "source": {"space": "IntegrationTestsImmutable", "externalId": "Person", "type": "container"},
+                    "source": {
+                        "space": "IntegrationTestsImmutable",
+                        "externalId": "Person",
+                        "type": "view",
+                        "version": "2",
+                    },
                     "properties": {"name": "Quentin Tarantino", "birthYear": 1963},
                 }
             ],
@@ -136,7 +141,12 @@ def person_apply_to_instances_test_cases():
             "externalId": "actor:quentin_tarantino",
             "sources": [
                 {
-                    "source": {"space": "IntegrationTestsImmutable", "externalId": "Role", "type": "container"},
+                    "source": {
+                        "space": "IntegrationTestsImmutable",
+                        "externalId": "Role",
+                        "type": "view",
+                        "version": "2",
+                    },
                     "properties": {
                         "person": {"externalId": "person:quentin_tarantino", "space": "IntegrationTestsImmutable"},
                         "wonOscar": False,
@@ -150,7 +160,12 @@ def person_apply_to_instances_test_cases():
             "externalId": "movie:pulp_fiction",
             "sources": [
                 {
-                    "source": {"space": "IntegrationTestsImmutable", "externalId": "Movie", "type": "container"},
+                    "source": {
+                        "space": "IntegrationTestsImmutable",
+                        "externalId": "Movie",
+                        "type": "view",
+                        "version": "2",
+                    },
                     "properties": {
                         "meta": {"imdb": {"rating": 8.9, "votes": 1780000}},
                         "rating": {"externalId": "rating:pulp_fiction", "space": "IntegrationTestsImmutable"},
@@ -167,7 +182,12 @@ def person_apply_to_instances_test_cases():
             "externalId": "rating:pulp_fiction",
             "sources": [
                 {
-                    "source": {"space": "IntegrationTestsImmutable", "externalId": "Rating", "type": "container"},
+                    "source": {
+                        "space": "IntegrationTestsImmutable",
+                        "externalId": "Rating",
+                        "type": "view",
+                        "version": "2",
+                    },
                     "properties": {"score": "rating:pulp_fiction", "votes": "vote_count:pulp_fiction"},
                 }
             ],
@@ -178,7 +198,12 @@ def person_apply_to_instances_test_cases():
             "externalId": "director:quentin_tarantino",
             "sources": [
                 {
-                    "source": {"space": "IntegrationTestsImmutable", "externalId": "Role", "type": "container"},
+                    "source": {
+                        "space": "IntegrationTestsImmutable",
+                        "externalId": "Role",
+                        "type": "view",
+                        "version": "2",
+                    },
                     "properties": {
                         "person": {"externalId": "person:quentin_tarantino", "space": "IntegrationTestsImmutable"},
                         "wonOscar": True,
@@ -192,7 +217,12 @@ def person_apply_to_instances_test_cases():
             "externalId": "director:quentin_tarantino:pulp_fiction",
             "sources": [
                 {
-                    "source": {"space": "IntegrationTestsImmutable", "externalId": "Nomination", "type": "container"},
+                    "source": {
+                        "space": "IntegrationTestsImmutable",
+                        "externalId": "Nomination",
+                        "type": "view",
+                        "version": "2",
+                    },
                     "properties": {"name": "Best Director", "year": 1995},
                 }
             ],

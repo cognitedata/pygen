@@ -262,11 +262,13 @@ class WellDataApply(DomainModelApply):
     was_business_interest_obligatory: Optional[bool] = Field(None, alias="WasBusinessInterestObligatory")
     was_business_interest_technical: Optional[bool] = Field(None, alias="WasBusinessInterestTechnical")
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(
+        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
+    ) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
+        write_view = view_by_write_class and view_by_write_class.get(type(self))
 
-        sources = []
         properties = {}
         if self.business_intention_id is not None:
             properties["BusinessIntentionID"] = self.business_intention_id
@@ -335,16 +337,14 @@ class WellDataApply(DomainModelApply):
             properties["WasBusinessInterestTechnical"] = self.was_business_interest_technical
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("IntegrationTestsImmutable", "WellData"),
+                source=write_view or dm.ViewId("IntegrationTestsImmutable", "WellData", "ed82310421bd56"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:
@@ -360,7 +360,7 @@ class WellDataApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(facility_event, DomainModelApply):
-                instances = facility_event._to_instances_apply(cache)
+                instances = facility_event._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
@@ -371,7 +371,7 @@ class WellDataApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(facility_operator, DomainModelApply):
-                instances = facility_operator._to_instances_apply(cache)
+                instances = facility_operator._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
@@ -382,7 +382,7 @@ class WellDataApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(facility_specification, DomainModelApply):
-                instances = facility_specification._to_instances_apply(cache)
+                instances = facility_specification._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
@@ -393,7 +393,7 @@ class WellDataApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(facility_state, DomainModelApply):
-                instances = facility_state._to_instances_apply(cache)
+                instances = facility_state._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
@@ -404,7 +404,7 @@ class WellDataApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(geo_context, DomainModelApply):
-                instances = geo_context._to_instances_apply(cache)
+                instances = geo_context._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
@@ -415,7 +415,7 @@ class WellDataApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(historical_interest, DomainModelApply):
-                instances = historical_interest._to_instances_apply(cache)
+                instances = historical_interest._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
@@ -426,7 +426,7 @@ class WellDataApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(name_alias, DomainModelApply):
-                instances = name_alias._to_instances_apply(cache)
+                instances = name_alias._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
@@ -437,7 +437,7 @@ class WellDataApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(technical_assurance, DomainModelApply):
-                instances = technical_assurance._to_instances_apply(cache)
+                instances = technical_assurance._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
@@ -448,12 +448,12 @@ class WellDataApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(vertical_measurement, DomainModelApply):
-                instances = vertical_measurement._to_instances_apply(cache)
+                instances = vertical_measurement._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
         if isinstance(self.spatial_location, DomainModelApply):
-            instances = self.spatial_location._to_instances_apply(cache)
+            instances = self.spatial_location._to_instances_apply(cache, view_by_write_class)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 

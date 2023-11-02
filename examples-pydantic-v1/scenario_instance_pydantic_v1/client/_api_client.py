@@ -6,6 +6,7 @@ from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
 from cognite.client.credentials import OAuthClientCredentials
 
 from ._api.scenario_instance import ScenarioInstanceAPI
+from . import data_classes
 
 
 class ScenarioInstanceClient:
@@ -13,7 +14,7 @@ class ScenarioInstanceClient:
     ScenarioInstanceClient
 
     Generated with:
-        pygen = 0.27.2
+        pygen = 0.27.3
         cognite-sdk = 6.37.0
         pydantic = 1.10.7
 
@@ -30,9 +31,13 @@ class ScenarioInstanceClient:
             client = CogniteClient(config_or_client)
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
-        self.scenario_instance = ScenarioInstanceAPI(
-            client, dm.ViewId("IntegrationTestsImmutable", "ScenarioInstance", "ee2b79fd98b5bb")
-        )
+        view_by_write_class = {
+            data_classes.ScenarioInstanceApply: dm.ViewId(
+                "IntegrationTestsImmutable", "ScenarioInstance", "ee2b79fd98b5bb"
+            ),
+        }
+
+        self.scenario_instance = ScenarioInstanceAPI(client, view_by_write_class)
 
     @classmethod
     def azure_project(

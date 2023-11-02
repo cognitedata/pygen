@@ -43,6 +43,7 @@ from ._api.wellbore_trajectory import WellboreTrajectoryAPI
 from ._api.wellbore_trajectory_data import WellboreTrajectoryDataAPI
 from ._api.well_data import WellDataAPI
 from ._api.wgs_84_coordinates import WgsCoordinatesAPI
+from . import data_classes
 
 
 class OSDUClient:
@@ -50,7 +51,7 @@ class OSDUClient:
     OSDUClient
 
     Generated with:
-        pygen = 0.27.2
+        pygen = 0.27.3
         cognite-sdk = 6.37.0
         pydantic = 2.4.2
 
@@ -67,96 +68,127 @@ class OSDUClient:
             client = CogniteClient(config_or_client)
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
-        self.acceptable_usage = AcceptableUsageAPI(
-            client, dm.ViewId("IntegrationTestsImmutable", "AcceptableUsage", "d7e8986cd55d22")
-        )
-        self.acl = AclAPI(client, dm.ViewId("IntegrationTestsImmutable", "Acl", "1c4f4a5942a9a8"))
-        self.ancestry = AncestryAPI(client, dm.ViewId("IntegrationTestsImmutable", "Ancestry", "624b46e28cdd69"))
-        self.artefacts = ArtefactsAPI(client, dm.ViewId("IntegrationTestsImmutable", "Artefacts", "7a44a1f4dac367"))
-        self.as_ingested_coordinates = AsIngestedCoordinatesAPI(
-            client, dm.ViewId("IntegrationTestsImmutable", "AsIngestedCoordinates", "da1e4eb90494da")
-        )
+        view_by_write_class = {
+            data_classes.AcceptableUsageApply: dm.ViewId(
+                "IntegrationTestsImmutable", "AcceptableUsage", "d7e8986cd55d22"
+            ),
+            data_classes.AclApply: dm.ViewId("IntegrationTestsImmutable", "Acl", "1c4f4a5942a9a8"),
+            data_classes.AncestryApply: dm.ViewId("IntegrationTestsImmutable", "Ancestry", "624b46e28cdd69"),
+            data_classes.ArtefactsApply: dm.ViewId("IntegrationTestsImmutable", "Artefacts", "7a44a1f4dac367"),
+            data_classes.AsIngestedCoordinatesApply: dm.ViewId(
+                "IntegrationTestsImmutable", "AsIngestedCoordinates", "da1e4eb90494da"
+            ),
+            data_classes.AvailableTrajectoryStationPropertiesApply: dm.ViewId(
+                "IntegrationTestsImmutable", "AvailableTrajectoryStationProperties", "e1c516b799081a"
+            ),
+            data_classes.DrillingReasonsApply: dm.ViewId(
+                "IntegrationTestsImmutable", "DrillingReasons", "220055a8165644"
+            ),
+            data_classes.FacilityEventsApply: dm.ViewId(
+                "IntegrationTestsImmutable", "FacilityEvents", "1b7526673ad990"
+            ),
+            data_classes.FacilityOperatorsApply: dm.ViewId(
+                "IntegrationTestsImmutable", "FacilityOperators", "935498861713d0"
+            ),
+            data_classes.FacilitySpecificationsApply: dm.ViewId(
+                "IntegrationTestsImmutable", "FacilitySpecifications", "1b7ddbd5d36655"
+            ),
+            data_classes.FacilityStatesApply: dm.ViewId(
+                "IntegrationTestsImmutable", "FacilityStates", "a12316ff3d8033"
+            ),
+            data_classes.FeaturesApply: dm.ViewId("IntegrationTestsImmutable", "Features", "df91e0a3bad68c"),
+            data_classes.GeoContextsApply: dm.ViewId("IntegrationTestsImmutable", "GeoContexts", "cec36d5139aade"),
+            data_classes.GeographicBottomHoleLocationApply: dm.ViewId(
+                "IntegrationTestsImmutable", "GeographicBottomHoleLocation", "a82995ae29bc5c"
+            ),
+            data_classes.GeometryApply: dm.ViewId("IntegrationTestsImmutable", "Geometry", "fc702ec6877c79"),
+            data_classes.HistoricalInterestsApply: dm.ViewId(
+                "IntegrationTestsImmutable", "HistoricalInterests", "7399eff7364ba6"
+            ),
+            data_classes.LegalApply: dm.ViewId("IntegrationTestsImmutable", "Legal", "508188c6379675"),
+            data_classes.LineageAssertionsApply: dm.ViewId(
+                "IntegrationTestsImmutable", "LineageAssertions", "ef344f6030d778"
+            ),
+            data_classes.MetaApply: dm.ViewId("IntegrationTestsImmutable", "Meta", "bf181692a967b6"),
+            data_classes.NameAliasesApply: dm.ViewId("IntegrationTestsImmutable", "NameAliases", "b0ef9b17280885"),
+            data_classes.ProjectedBottomHoleLocationApply: dm.ViewId(
+                "IntegrationTestsImmutable", "ProjectedBottomHoleLocation", "447a307957e5b7"
+            ),
+            data_classes.ReviewersApply: dm.ViewId("IntegrationTestsImmutable", "Reviewers", "a7b641adc001b9"),
+            data_classes.SpatialAreaApply: dm.ViewId("IntegrationTestsImmutable", "SpatialArea", "312323f14f3d3f"),
+            data_classes.SpatialLocationApply: dm.ViewId(
+                "IntegrationTestsImmutable", "SpatialLocation", "697432f011ef60"
+            ),
+            data_classes.SpatialPointApply: dm.ViewId("IntegrationTestsImmutable", "SpatialPoint", "7af8800660eef4"),
+            data_classes.TagsApply: dm.ViewId("IntegrationTestsImmutable", "Tags", "77ace80e524925"),
+            data_classes.TechnicalAssurancesApply: dm.ViewId(
+                "IntegrationTestsImmutable", "TechnicalAssurances", "20cfc9c180f3df"
+            ),
+            data_classes.UnacceptableUsageApply: dm.ViewId(
+                "IntegrationTestsImmutable", "UnacceptableUsage", "24f60e09e7bb1b"
+            ),
+            data_classes.VerticalMeasurementApply: dm.ViewId(
+                "IntegrationTestsImmutable", "VerticalMeasurement", "fd63ec6e91292f"
+            ),
+            data_classes.VerticalMeasurementsApply: dm.ViewId(
+                "IntegrationTestsImmutable", "VerticalMeasurements", "d8c3b28a0d0dfb"
+            ),
+            data_classes.WellApply: dm.ViewId("IntegrationTestsImmutable", "Well", "952d7e55cdf2cc"),
+            data_classes.WellboreApply: dm.ViewId("IntegrationTestsImmutable", "Wellbore", "7a44cf38aa4fe7"),
+            data_classes.WellboreCostsApply: dm.ViewId("IntegrationTestsImmutable", "WellboreCosts", "b4f71248f398a2"),
+            data_classes.WellboreDataApply: dm.ViewId("IntegrationTestsImmutable", "WellboreData", "6349cf734b294e"),
+            data_classes.WellboreTrajectoryApply: dm.ViewId(
+                "IntegrationTestsImmutable", "WellboreTrajectory", "5c4afa33e6bd65"
+            ),
+            data_classes.WellboreTrajectoryDataApply: dm.ViewId(
+                "IntegrationTestsImmutable", "WellboreTrajectoryData", "d35eace9691587"
+            ),
+            data_classes.WellDataApply: dm.ViewId("IntegrationTestsImmutable", "WellData", "ed82310421bd56"),
+            data_classes.WgsCoordinatesApply: dm.ViewId(
+                "IntegrationTestsImmutable", "Wgs84Coordinates", "d6030081373896"
+            ),
+        }
+
+        self.acceptable_usage = AcceptableUsageAPI(client, view_by_write_class)
+        self.acl = AclAPI(client, view_by_write_class)
+        self.ancestry = AncestryAPI(client, view_by_write_class)
+        self.artefacts = ArtefactsAPI(client, view_by_write_class)
+        self.as_ingested_coordinates = AsIngestedCoordinatesAPI(client, view_by_write_class)
         self.available_trajectory_station_properties = AvailableTrajectoryStationPropertiesAPI(
-            client, dm.ViewId("IntegrationTestsImmutable", "AvailableTrajectoryStationProperties", "e1c516b799081a")
+            client, view_by_write_class
         )
-        self.drilling_reasons = DrillingReasonsAPI(
-            client, dm.ViewId("IntegrationTestsImmutable", "DrillingReasons", "220055a8165644")
-        )
-        self.facility_events = FacilityEventsAPI(
-            client, dm.ViewId("IntegrationTestsImmutable", "FacilityEvents", "1b7526673ad990")
-        )
-        self.facility_operators = FacilityOperatorsAPI(
-            client, dm.ViewId("IntegrationTestsImmutable", "FacilityOperators", "935498861713d0")
-        )
-        self.facility_specifications = FacilitySpecificationsAPI(
-            client, dm.ViewId("IntegrationTestsImmutable", "FacilitySpecifications", "1b7ddbd5d36655")
-        )
-        self.facility_states = FacilityStatesAPI(
-            client, dm.ViewId("IntegrationTestsImmutable", "FacilityStates", "a12316ff3d8033")
-        )
-        self.features = FeaturesAPI(client, dm.ViewId("IntegrationTestsImmutable", "Features", "df91e0a3bad68c"))
-        self.geo_contexts = GeoContextsAPI(
-            client, dm.ViewId("IntegrationTestsImmutable", "GeoContexts", "cec36d5139aade")
-        )
-        self.geographic_bottom_hole_location = GeographicBottomHoleLocationAPI(
-            client, dm.ViewId("IntegrationTestsImmutable", "GeographicBottomHoleLocation", "a82995ae29bc5c")
-        )
-        self.geometry = GeometryAPI(client, dm.ViewId("IntegrationTestsImmutable", "Geometry", "fc702ec6877c79"))
-        self.historical_interests = HistoricalInterestsAPI(
-            client, dm.ViewId("IntegrationTestsImmutable", "HistoricalInterests", "7399eff7364ba6")
-        )
-        self.legal = LegalAPI(client, dm.ViewId("IntegrationTestsImmutable", "Legal", "508188c6379675"))
-        self.lineage_assertions = LineageAssertionsAPI(
-            client, dm.ViewId("IntegrationTestsImmutable", "LineageAssertions", "ef344f6030d778")
-        )
-        self.meta = MetaAPI(client, dm.ViewId("IntegrationTestsImmutable", "Meta", "bf181692a967b6"))
-        self.name_aliases = NameAliasesAPI(
-            client, dm.ViewId("IntegrationTestsImmutable", "NameAliases", "b0ef9b17280885")
-        )
-        self.projected_bottom_hole_location = ProjectedBottomHoleLocationAPI(
-            client, dm.ViewId("IntegrationTestsImmutable", "ProjectedBottomHoleLocation", "447a307957e5b7")
-        )
-        self.reviewers = ReviewersAPI(client, dm.ViewId("IntegrationTestsImmutable", "Reviewers", "a7b641adc001b9"))
-        self.spatial_area = SpatialAreaAPI(
-            client, dm.ViewId("IntegrationTestsImmutable", "SpatialArea", "312323f14f3d3f")
-        )
-        self.spatial_location = SpatialLocationAPI(
-            client, dm.ViewId("IntegrationTestsImmutable", "SpatialLocation", "697432f011ef60")
-        )
-        self.spatial_point = SpatialPointAPI(
-            client, dm.ViewId("IntegrationTestsImmutable", "SpatialPoint", "7af8800660eef4")
-        )
-        self.tags = TagsAPI(client, dm.ViewId("IntegrationTestsImmutable", "Tags", "77ace80e524925"))
-        self.technical_assurances = TechnicalAssurancesAPI(
-            client, dm.ViewId("IntegrationTestsImmutable", "TechnicalAssurances", "20cfc9c180f3df")
-        )
-        self.unacceptable_usage = UnacceptableUsageAPI(
-            client, dm.ViewId("IntegrationTestsImmutable", "UnacceptableUsage", "24f60e09e7bb1b")
-        )
-        self.vertical_measurement = VerticalMeasurementAPI(
-            client, dm.ViewId("IntegrationTestsImmutable", "VerticalMeasurement", "fd63ec6e91292f")
-        )
-        self.vertical_measurements = VerticalMeasurementsAPI(
-            client, dm.ViewId("IntegrationTestsImmutable", "VerticalMeasurements", "d8c3b28a0d0dfb")
-        )
-        self.well = WellAPI(client, dm.ViewId("IntegrationTestsImmutable", "Well", "952d7e55cdf2cc"))
-        self.wellbore = WellboreAPI(client, dm.ViewId("IntegrationTestsImmutable", "Wellbore", "7a44cf38aa4fe7"))
-        self.wellbore_costs = WellboreCostsAPI(
-            client, dm.ViewId("IntegrationTestsImmutable", "WellboreCosts", "b4f71248f398a2")
-        )
-        self.wellbore_data = WellboreDataAPI(
-            client, dm.ViewId("IntegrationTestsImmutable", "WellboreData", "6349cf734b294e")
-        )
-        self.wellbore_trajectory = WellboreTrajectoryAPI(
-            client, dm.ViewId("IntegrationTestsImmutable", "WellboreTrajectory", "5c4afa33e6bd65")
-        )
-        self.wellbore_trajectory_data = WellboreTrajectoryDataAPI(
-            client, dm.ViewId("IntegrationTestsImmutable", "WellboreTrajectoryData", "d35eace9691587")
-        )
-        self.well_data = WellDataAPI(client, dm.ViewId("IntegrationTestsImmutable", "WellData", "ed82310421bd56"))
-        self.wgs_84_coordinates = WgsCoordinatesAPI(
-            client, dm.ViewId("IntegrationTestsImmutable", "Wgs84Coordinates", "d6030081373896")
-        )
+        self.drilling_reasons = DrillingReasonsAPI(client, view_by_write_class)
+        self.facility_events = FacilityEventsAPI(client, view_by_write_class)
+        self.facility_operators = FacilityOperatorsAPI(client, view_by_write_class)
+        self.facility_specifications = FacilitySpecificationsAPI(client, view_by_write_class)
+        self.facility_states = FacilityStatesAPI(client, view_by_write_class)
+        self.features = FeaturesAPI(client, view_by_write_class)
+        self.geo_contexts = GeoContextsAPI(client, view_by_write_class)
+        self.geographic_bottom_hole_location = GeographicBottomHoleLocationAPI(client, view_by_write_class)
+        self.geometry = GeometryAPI(client, view_by_write_class)
+        self.historical_interests = HistoricalInterestsAPI(client, view_by_write_class)
+        self.legal = LegalAPI(client, view_by_write_class)
+        self.lineage_assertions = LineageAssertionsAPI(client, view_by_write_class)
+        self.meta = MetaAPI(client, view_by_write_class)
+        self.name_aliases = NameAliasesAPI(client, view_by_write_class)
+        self.projected_bottom_hole_location = ProjectedBottomHoleLocationAPI(client, view_by_write_class)
+        self.reviewers = ReviewersAPI(client, view_by_write_class)
+        self.spatial_area = SpatialAreaAPI(client, view_by_write_class)
+        self.spatial_location = SpatialLocationAPI(client, view_by_write_class)
+        self.spatial_point = SpatialPointAPI(client, view_by_write_class)
+        self.tags = TagsAPI(client, view_by_write_class)
+        self.technical_assurances = TechnicalAssurancesAPI(client, view_by_write_class)
+        self.unacceptable_usage = UnacceptableUsageAPI(client, view_by_write_class)
+        self.vertical_measurement = VerticalMeasurementAPI(client, view_by_write_class)
+        self.vertical_measurements = VerticalMeasurementsAPI(client, view_by_write_class)
+        self.well = WellAPI(client, view_by_write_class)
+        self.wellbore = WellboreAPI(client, view_by_write_class)
+        self.wellbore_costs = WellboreCostsAPI(client, view_by_write_class)
+        self.wellbore_data = WellboreDataAPI(client, view_by_write_class)
+        self.wellbore_trajectory = WellboreTrajectoryAPI(client, view_by_write_class)
+        self.wellbore_trajectory_data = WellboreTrajectoryDataAPI(client, view_by_write_class)
+        self.well_data = WellDataAPI(client, view_by_write_class)
+        self.wgs_84_coordinates = WgsCoordinatesAPI(client, view_by_write_class)
 
     @classmethod
     def azure_project(

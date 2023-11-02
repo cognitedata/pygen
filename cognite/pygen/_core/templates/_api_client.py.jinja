@@ -6,6 +6,7 @@ from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
 from cognite.client.credentials import OAuthClientCredentials
 {% for class_ in api_classes %}
 from ._api.{{ class_.file_name }} import {{ class_.name }}{% endfor %}
+from . import data_classes
 
 {% if not is_single_model %}{% for multi_api_class, views in zip(multi_api_classes, view_sets) %}
 class {{ multi_api_class.name }}:
@@ -19,8 +20,12 @@ class {{ multi_api_class.name }}:
 
     """
 
-    def __init__(self, client: CogniteClient):{% for sub, view in zip(multi_api_class.sub_apis, views) %}
-        self.{{ sub.client_attribute }} = {{ sub.name }}(client, dm.ViewId("{{ view.space }}", "{{ view.external_id }}", "{{ view.version }}")){% endfor %}
+    def __init__(self, client: CogniteClient):
+        view_by_write_class = {% raw %}{{% endraw %}{% for sub, view in zip(multi_api_class.sub_apis, views) %}
+            data_classes.{{ sub.data_class.write_name }}: dm.ViewId("{{ view.space }}", "{{ view.external_id }}", "{{ view.version }}"),{% endfor %}
+        {% raw %}}{% endraw %}
+        {% for sub, view in zip(multi_api_class.sub_apis, views) %}
+        self.{{ sub.client_attribute }} = {{ sub.name }}(client, view_by_write_class){% endfor %}
 
 {% endfor %}{% endif %}
 class {{ client_name }}:
@@ -44,8 +49,12 @@ class {{ client_name }}:
         elif isinstance(config_or_client, ClientConfig):
             client = CogniteClient(config_or_client)
         else:
-            raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}"){% if is_single_model %}{% for api_class, view in zip(api_classes, views) %}
-        self.{{ api_class.client_attribute }} = {{ api_class.name }}(client, dm.ViewId("{{ view.space }}", "{{ view.external_id }}", "{{ view.version }}")){% endfor %}{% else %}{% for multi_api_class in multi_api_classes %}
+            raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}"){% if is_single_model %}
+        view_by_write_class = {% raw %}{{% endraw %}{% for api_class, view in zip(api_classes, views) %}
+            data_classes.{{ api_class.data_class.write_name }}: dm.ViewId("{{ view.space }}", "{{ view.external_id }}", "{{ view.version }}"),{% endfor %}
+        {% raw %}}{% endraw %}
+        {% for api_class, view in zip(api_classes, views) %}
+        self.{{ api_class.client_attribute }} = {{ api_class.name }}(client, view_by_write_class){% endfor %}{% else %}{% for multi_api_class in multi_api_classes %}
         self.{{ multi_api_class.client_attribute }} = {{ multi_api_class.name }}(client){% endfor %}{% endif %}
 
     @classmethod

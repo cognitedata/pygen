@@ -14,12 +14,14 @@ from markets.client.data_classes import (
     PygenPoolApplyList,
     PygenPoolFields,
     PygenPoolTextFields,
+    DomainModelApply,
 )
 from markets.client.data_classes._pygen_pool import _PYGENPOOL_PROPERTIES_BY_FIELD
 
 
 class PygenPoolAPI(TypeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[PygenPoolApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -28,14 +30,15 @@ class PygenPoolAPI(TypeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
             class_list=PygenPoolList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(
         self, pygen_pool: PygenPoolApply | Sequence[PygenPoolApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(pygen_pool, PygenPoolApply):
-            instances = pygen_pool.to_instances_apply()
+            instances = pygen_pool.to_instances_apply(self._view_by_write_class)
         else:
-            instances = PygenPoolApplyList(pygen_pool).to_instances_apply()
+            instances = PygenPoolApplyList(pygen_pool).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

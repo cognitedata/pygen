@@ -38,33 +38,32 @@ class {{ data_class.write_name }}(DomainModelApply):
     space: str = "{{ space }}"{% for field in data_class %}
     {{ field.name }}: {{ field.as_write_type_hint() }}{% endfor %}
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
-
-        {% if not data_class.has_only_one_to_many_edges %}sources = []{% for container, container_fields in data_class.fields_by_container.items() %}
-        properties = {}{% for field in container_fields %}
+        write_view = view_by_write_class and view_by_write_class.get(type(self))
+{% if not data_class.has_only_one_to_many_edges %}
+        properties = {}{% for field in data_class.property_fields %}
         if self.{{ field.name }} is not None:
             properties["{{ field.prop_name }}"] = {% if field.is_edge %}{
-                "space": "{{ field.prop.source.space }}",
+                "space": "{{ field.data_class.view_id.space }}",
                 "externalId": self.{{ field.name }} if isinstance(self.{{ field.name }}, str) else self.{{ field.name }}.external_id,
-            }{% else %}self.{{ field.name }}{% if field.is_time_field %}.isoformat(timespec="milliseconds"){% endif %}{% endif %}{% endfor %}
+            }{% else %}self.{{ field.name }}{% if field.is_time_field %}.isoformat({% if field.is_timestamp %}timespec="milliseconds"{% endif %}){% endif %}{% endif %}{% endfor %}
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("{{ container.space }}", "{{ container.external_id }}"),
+                source=write_view or dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_version }}"),
                 properties=properties,
             )
-            sources.append(source){% endfor %}
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:
-            nodes = []{% else %}nodes = []{% endif %}
+            nodes = []{% else %}
+        nodes = []{% endif %}
 
         edges = []
         cache.add(self.external_id)
@@ -76,12 +75,12 @@ class {{ data_class.write_name }}(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance({{ field.variable }}, DomainModelApply):
-                instances = {{ field.variable }}._to_instances_apply(cache)
+                instances = {{ field.variable }}._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 {% endfor %}{% for field in data_class.one_to_one_edges %}
         if isinstance(self.{{ field.name }}, DomainModelApply):
-            instances = self.{{ field.name }}._to_instances_apply(cache)
+            instances = self.{{ field.name }}._to_instances_apply(cache, view_by_write_class)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 {% endfor %}

@@ -14,12 +14,14 @@ from shop.client.data_classes import (
     CommandConfigApplyList,
     CommandConfigFields,
     CommandConfigTextFields,
+    DomainModelApply,
 )
 from shop.client.data_classes._command_config import _COMMANDCONFIG_PROPERTIES_BY_FIELD
 
 
 class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[CommandConfigApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -28,14 +30,15 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
             class_list=CommandConfigList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(
         self, command_config: CommandConfigApply | Sequence[CommandConfigApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(command_config, CommandConfigApply):
-            instances = command_config.to_instances_apply()
+            instances = command_config.to_instances_apply(self._view_by_write_class)
         else:
-            instances = CommandConfigApplyList(command_config).to_instances_apply()
+            instances = CommandConfigApplyList(command_config).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

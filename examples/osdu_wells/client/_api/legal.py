@@ -7,12 +7,21 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
 from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
-from osdu_wells.client.data_classes import Legal, LegalApply, LegalList, LegalApplyList, LegalFields, LegalTextFields
+from osdu_wells.client.data_classes import (
+    Legal,
+    LegalApply,
+    LegalList,
+    LegalApplyList,
+    LegalFields,
+    LegalTextFields,
+    DomainModelApply,
+)
 from osdu_wells.client.data_classes._legal import _LEGAL_PROPERTIES_BY_FIELD
 
 
 class LegalAPI(TypeAPI[Legal, LegalApply, LegalList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[LegalApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -21,12 +30,13 @@ class LegalAPI(TypeAPI[Legal, LegalApply, LegalList]):
             class_list=LegalList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(self, legal: LegalApply | Sequence[LegalApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(legal, LegalApply):
-            instances = legal.to_instances_apply()
+            instances = legal.to_instances_apply(self._view_by_write_class)
         else:
-            instances = LegalApplyList(legal).to_instances_apply()
+            instances = LegalApplyList(legal).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

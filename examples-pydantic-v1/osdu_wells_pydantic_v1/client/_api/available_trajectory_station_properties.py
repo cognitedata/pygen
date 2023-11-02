@@ -14,6 +14,7 @@ from osdu_wells_pydantic_v1.client.data_classes import (
     AvailableTrajectoryStationPropertiesApplyList,
     AvailableTrajectoryStationPropertiesFields,
     AvailableTrajectoryStationPropertiesTextFields,
+    DomainModelApply,
 )
 from osdu_wells_pydantic_v1.client.data_classes._available_trajectory_station_properties import (
     _AVAILABLETRAJECTORYSTATIONPROPERTIES_PROPERTIES_BY_FIELD,
@@ -27,7 +28,8 @@ class AvailableTrajectoryStationPropertiesAPI(
         AvailableTrajectoryStationPropertiesList,
     ]
 ):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[AvailableTrajectoryStationPropertiesApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -36,6 +38,7 @@ class AvailableTrajectoryStationPropertiesAPI(
             class_list=AvailableTrajectoryStationPropertiesList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(
         self,
@@ -44,11 +47,11 @@ class AvailableTrajectoryStationPropertiesAPI(
         replace: bool = False,
     ) -> dm.InstancesApplyResult:
         if isinstance(available_trajectory_station_property, AvailableTrajectoryStationPropertiesApply):
-            instances = available_trajectory_station_property.to_instances_apply()
+            instances = available_trajectory_station_property.to_instances_apply(self._view_by_write_class)
         else:
             instances = AvailableTrajectoryStationPropertiesApplyList(
                 available_trajectory_station_property
-            ).to_instances_apply()
+            ).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

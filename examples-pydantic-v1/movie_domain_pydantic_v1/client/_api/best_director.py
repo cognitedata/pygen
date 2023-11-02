@@ -14,12 +14,14 @@ from movie_domain_pydantic_v1.client.data_classes import (
     BestDirectorApplyList,
     BestDirectorFields,
     BestDirectorTextFields,
+    DomainModelApply,
 )
 from movie_domain_pydantic_v1.client.data_classes._best_director import _BESTDIRECTOR_PROPERTIES_BY_FIELD
 
 
 class BestDirectorAPI(TypeAPI[BestDirector, BestDirectorApply, BestDirectorList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[BestDirectorApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -28,14 +30,15 @@ class BestDirectorAPI(TypeAPI[BestDirector, BestDirectorApply, BestDirectorList]
             class_list=BestDirectorList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(
         self, best_director: BestDirectorApply | Sequence[BestDirectorApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(best_director, BestDirectorApply):
-            instances = best_director.to_instances_apply()
+            instances = best_director.to_instances_apply(self._view_by_write_class)
         else:
-            instances = BestDirectorApplyList(best_director).to_instances_apply()
+            instances = BestDirectorApplyList(best_director).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

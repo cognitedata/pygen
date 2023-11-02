@@ -14,12 +14,14 @@ from osdu_wells_pydantic_v1.client.data_classes import (
     UnacceptableUsageApplyList,
     UnacceptableUsageFields,
     UnacceptableUsageTextFields,
+    DomainModelApply,
 )
 from osdu_wells_pydantic_v1.client.data_classes._unacceptable_usage import _UNACCEPTABLEUSAGE_PROPERTIES_BY_FIELD
 
 
 class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, UnacceptableUsageList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[UnacceptableUsageApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -28,14 +30,15 @@ class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
             class_list=UnacceptableUsageList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(
         self, unacceptable_usage: UnacceptableUsageApply | Sequence[UnacceptableUsageApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(unacceptable_usage, UnacceptableUsageApply):
-            instances = unacceptable_usage.to_instances_apply()
+            instances = unacceptable_usage.to_instances_apply(self._view_by_write_class)
         else:
-            instances = UnacceptableUsageApplyList(unacceptable_usage).to_instances_apply()
+            instances = UnacceptableUsageApplyList(unacceptable_usage).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

@@ -14,12 +14,14 @@ from osdu_wells_pydantic_v1.client.data_classes import (
     MetaApplyList,
     MetaFields,
     MetaTextFields,
+    DomainModelApply,
 )
 from osdu_wells_pydantic_v1.client.data_classes._meta import _META_PROPERTIES_BY_FIELD
 
 
 class MetaAPI(TypeAPI[Meta, MetaApply, MetaList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[MetaApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -28,12 +30,13 @@ class MetaAPI(TypeAPI[Meta, MetaApply, MetaList]):
             class_list=MetaList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(self, meta: MetaApply | Sequence[MetaApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(meta, MetaApply):
-            instances = meta.to_instances_apply()
+            instances = meta.to_instances_apply(self._view_by_write_class)
         else:
-            instances = MetaApplyList(meta).to_instances_apply()
+            instances = MetaApplyList(meta).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

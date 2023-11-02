@@ -20,6 +20,7 @@ from tutorial_apm_simple_pydantic_v1.client.data_classes import (
     AssetApplyList,
     AssetFields,
     AssetTextFields,
+    DomainModelApply,
 )
 from tutorial_apm_simple_pydantic_v1.client.data_classes._asset import _ASSET_PROPERTIES_BY_FIELD
 
@@ -519,7 +520,8 @@ class AssetInModelAPI:
 
 
 class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[AssetApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -528,15 +530,16 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
             class_list=AssetList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
         self.children = AssetChildrenAPI(client)
         self.in_model_3_d = AssetInModelAPI(client)
         self.pressure = AssetPressureAPI(client, view_id)
 
     def apply(self, asset: AssetApply | Sequence[AssetApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(asset, AssetApply):
-            instances = asset.to_instances_apply()
+            instances = asset.to_instances_apply(self._view_by_write_class)
         else:
-            instances = AssetApplyList(asset).to_instances_apply()
+            instances = AssetApplyList(asset).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

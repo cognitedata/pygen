@@ -15,12 +15,14 @@ from markets_pydantic_v1.client.data_classes import (
     CogBidApplyList,
     CogBidFields,
     CogBidTextFields,
+    DomainModelApply,
 )
 from markets_pydantic_v1.client.data_classes._cog_bid import _COGBID_PROPERTIES_BY_FIELD
 
 
 class CogBidAPI(TypeAPI[CogBid, CogBidApply, CogBidList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[CogBidApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -29,12 +31,13 @@ class CogBidAPI(TypeAPI[CogBid, CogBidApply, CogBidList]):
             class_list=CogBidList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(self, cog_bid: CogBidApply | Sequence[CogBidApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(cog_bid, CogBidApply):
-            instances = cog_bid.to_instances_apply()
+            instances = cog_bid.to_instances_apply(self._view_by_write_class)
         else:
-            instances = CogBidApplyList(cog_bid).to_instances_apply()
+            instances = CogBidApplyList(cog_bid).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

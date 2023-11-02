@@ -7,12 +7,21 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
 from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
-from markets.client.data_classes import Market, MarketApply, MarketList, MarketApplyList, MarketFields, MarketTextFields
+from markets.client.data_classes import (
+    Market,
+    MarketApply,
+    MarketList,
+    MarketApplyList,
+    MarketFields,
+    MarketTextFields,
+    DomainModelApply,
+)
 from markets.client.data_classes._market import _MARKET_PROPERTIES_BY_FIELD
 
 
 class MarketAPI(TypeAPI[Market, MarketApply, MarketList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[MarketApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -21,12 +30,13 @@ class MarketAPI(TypeAPI[Market, MarketApply, MarketList]):
             class_list=MarketList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(self, market: MarketApply | Sequence[MarketApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(market, MarketApply):
-            instances = market.to_instances_apply()
+            instances = market.to_instances_apply(self._view_by_write_class)
         else:
-            instances = MarketApplyList(market).to_instances_apply()
+            instances = MarketApplyList(market).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

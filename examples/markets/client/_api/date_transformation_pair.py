@@ -124,7 +124,8 @@ class DateTransformationPairStartAPI:
 class DateTransformationPairAPI(
     TypeAPI[DateTransformationPair, DateTransformationPairApply, DateTransformationPairList]
 ):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[DateTransformationPairApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -133,6 +134,7 @@ class DateTransformationPairAPI(
             class_list=DateTransformationPairList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
         self.end = DateTransformationPairEndAPI(client)
         self.start = DateTransformationPairStartAPI(client)
 
@@ -142,9 +144,11 @@ class DateTransformationPairAPI(
         replace: bool = False,
     ) -> dm.InstancesApplyResult:
         if isinstance(date_transformation_pair, DateTransformationPairApply):
-            instances = date_transformation_pair.to_instances_apply()
+            instances = date_transformation_pair.to_instances_apply(self._view_by_write_class)
         else:
-            instances = DateTransformationPairApplyList(date_transformation_pair).to_instances_apply()
+            instances = DateTransformationPairApplyList(date_transformation_pair).to_instances_apply(
+                self._view_by_write_class
+            )
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

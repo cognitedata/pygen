@@ -74,11 +74,13 @@ class WorkItemApply(DomainModelApply):
     to_be_done: Optional[bool] = Field(None, alias="toBeDone")
     work_order: Union[WorkOrderApply, str, None] = Field(None, repr=False, alias="workOrder")
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(
+        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
+    ) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
+        write_view = view_by_write_class and view_by_write_class.get(type(self))
 
-        sources = []
         properties = {}
         if self.criticality is not None:
             properties["criticality"] = self.criticality
@@ -103,16 +105,14 @@ class WorkItemApply(DomainModelApply):
             }
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("tutorial_apm_simple", "WorkItem"),
+                source=write_view or dm.ViewId("tutorial_apm_simple", "WorkItem", "18ac48abbe96aa"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:
@@ -128,12 +128,12 @@ class WorkItemApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(linked_asset, DomainModelApply):
-                instances = linked_asset._to_instances_apply(cache)
+                instances = linked_asset._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
         if isinstance(self.work_order, DomainModelApply):
-            instances = self.work_order._to_instances_apply(cache)
+            instances = self.work_order._to_instances_apply(cache, view_by_write_class)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 

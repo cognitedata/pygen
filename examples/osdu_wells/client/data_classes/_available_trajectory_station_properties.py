@@ -53,11 +53,13 @@ class AvailableTrajectoryStationPropertiesApply(DomainModelApply):
     station_property_unit_id: Optional[str] = Field(None, alias="StationPropertyUnitID")
     trajectory_station_property_type_id: Optional[str] = Field(None, alias="TrajectoryStationPropertyTypeID")
 
-    def _to_instances_apply(self, cache: set[str]) -> dm.InstancesApply:
+    def _to_instances_apply(
+        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
+    ) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
+        write_view = view_by_write_class and view_by_write_class.get(type(self))
 
-        sources = []
         properties = {}
         if self.name is not None:
             properties["Name"] = self.name
@@ -67,16 +69,15 @@ class AvailableTrajectoryStationPropertiesApply(DomainModelApply):
             properties["TrajectoryStationPropertyTypeID"] = self.trajectory_station_property_type_id
         if properties:
             source = dm.NodeOrEdgeData(
-                source=dm.ContainerId("IntegrationTestsImmutable", "AvailableTrajectoryStationProperties"),
+                source=write_view
+                or dm.ViewId("IntegrationTestsImmutable", "AvailableTrajectoryStationProperties", "e1c516b799081a"),
                 properties=properties,
             )
-            sources.append(source)
-        if sources:
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=sources,
+                sources=[source],
             )
             nodes = [this_node]
         else:
