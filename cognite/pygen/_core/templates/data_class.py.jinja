@@ -48,7 +48,7 @@ class {{ data_class.write_name }}(DomainModelApply):
             properties["{{ field.prop_name }}"] = {% if field.is_edge %}{
                 "space": "{{ field.data_class.view_id.space }}",
                 "externalId": self.{{ field.name }} if isinstance(self.{{ field.name }}, str) else self.{{ field.name }}.external_id,
-            }{% else %}self.{{ field.name }}{% if field.is_time_field %}.isoformat(timespec="milliseconds"){% endif %}{% endif %}{% endfor %}
+            }{% else %}self.{{ field.name }}{% if field.is_time_field %}.isoformat({% if field.is_timestamp %}timespec="milliseconds"{% endif %}){% endif %}{% endif %}{% endfor %}
         if properties:
             source = dm.NodeOrEdgeData(
                 source=write_view or dm.ViewId("{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_version }}"),

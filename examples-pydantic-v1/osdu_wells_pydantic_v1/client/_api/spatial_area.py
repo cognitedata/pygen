@@ -14,12 +14,14 @@ from osdu_wells_pydantic_v1.client.data_classes import (
     SpatialAreaApplyList,
     SpatialAreaFields,
     SpatialAreaTextFields,
+    DomainModelApply,
 )
 from osdu_wells_pydantic_v1.client.data_classes._spatial_area import _SPATIALAREA_PROPERTIES_BY_FIELD
 
 
 class SpatialAreaAPI(TypeAPI[SpatialArea, SpatialAreaApply, SpatialAreaList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[SpatialAreaApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -28,14 +30,15 @@ class SpatialAreaAPI(TypeAPI[SpatialArea, SpatialAreaApply, SpatialAreaList]):
             class_list=SpatialAreaList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(
         self, spatial_area: SpatialAreaApply | Sequence[SpatialAreaApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(spatial_area, SpatialAreaApply):
-            instances = spatial_area.to_instances_apply(self._view_id)
+            instances = spatial_area.to_instances_apply(self._view_by_write_class)
         else:
-            instances = SpatialAreaApplyList(spatial_area).to_instances_apply(self._view_id)
+            instances = SpatialAreaApplyList(spatial_area).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

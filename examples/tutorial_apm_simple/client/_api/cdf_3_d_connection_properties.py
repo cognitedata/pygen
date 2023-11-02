@@ -13,6 +13,7 @@ from tutorial_apm_simple.client.data_classes import (
     CdfConnectionPropertiesList,
     CdfConnectionPropertiesApplyList,
     CdfConnectionPropertiesFields,
+    DomainModelApply,
 )
 from tutorial_apm_simple.client.data_classes._cdf_3_d_connection_properties import (
     _CDFCONNECTIONPROPERTIES_PROPERTIES_BY_FIELD,
@@ -22,7 +23,8 @@ from tutorial_apm_simple.client.data_classes._cdf_3_d_connection_properties impo
 class CdfConnectionPropertiesAPI(
     TypeAPI[CdfConnectionProperties, CdfConnectionPropertiesApply, CdfConnectionPropertiesList]
 ):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[CdfConnectionPropertiesApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -31,6 +33,7 @@ class CdfConnectionPropertiesAPI(
             class_list=CdfConnectionPropertiesList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(
         self,
@@ -38,9 +41,11 @@ class CdfConnectionPropertiesAPI(
         replace: bool = False,
     ) -> dm.InstancesApplyResult:
         if isinstance(cdf_3_d_connection_property, CdfConnectionPropertiesApply):
-            instances = cdf_3_d_connection_property.to_instances_apply(self._view_id)
+            instances = cdf_3_d_connection_property.to_instances_apply(self._view_by_write_class)
         else:
-            instances = CdfConnectionPropertiesApplyList(cdf_3_d_connection_property).to_instances_apply(self._view_id)
+            instances = CdfConnectionPropertiesApplyList(cdf_3_d_connection_property).to_instances_apply(
+                self._view_by_write_class
+            )
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

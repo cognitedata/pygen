@@ -72,9 +72,12 @@ class ScenarioInstanceApply(DomainModelApply):
     scenario: Optional[str] = None
     start: Optional[datetime.datetime] = None
 
-    def _to_instances_apply(self, cache: set[str], write_view: dm.ViewId | None) -> dm.InstancesApply:
+    def _to_instances_apply(
+        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
+    ) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
+        write_view = view_by_write_class and view_by_write_class.get(type(self))
 
         properties = {}
         if self.aggregation is not None:
@@ -82,7 +85,7 @@ class ScenarioInstanceApply(DomainModelApply):
         if self.country is not None:
             properties["country"] = self.country
         if self.instance is not None:
-            properties["instance"] = self.instance.isoformat(timespec="milliseconds")
+            properties["instance"] = self.instance.isoformat()
         if self.market is not None:
             properties["market"] = self.market
         if self.price_area is not None:
@@ -92,7 +95,7 @@ class ScenarioInstanceApply(DomainModelApply):
         if self.scenario is not None:
             properties["scenario"] = self.scenario
         if self.start is not None:
-            properties["start"] = self.start.isoformat(timespec="milliseconds")
+            properties["start"] = self.start.isoformat()
         if properties:
             source = dm.NodeOrEdgeData(
                 source=write_view or dm.ViewId("IntegrationTestsImmutable", "ScenarioInstance", "ee2b79fd98b5bb"),

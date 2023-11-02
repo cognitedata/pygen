@@ -14,12 +14,14 @@ from osdu_wells.client.data_classes import (
     FeaturesApplyList,
     FeaturesFields,
     FeaturesTextFields,
+    DomainModelApply,
 )
 from osdu_wells.client.data_classes._features import _FEATURES_PROPERTIES_BY_FIELD
 
 
 class FeaturesAPI(TypeAPI[Features, FeaturesApply, FeaturesList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[FeaturesApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -28,12 +30,13 @@ class FeaturesAPI(TypeAPI[Features, FeaturesApply, FeaturesList]):
             class_list=FeaturesList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(self, feature: FeaturesApply | Sequence[FeaturesApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(feature, FeaturesApply):
-            instances = feature.to_instances_apply(self._view_id)
+            instances = feature.to_instances_apply(self._view_by_write_class)
         else:
-            instances = FeaturesApplyList(feature).to_instances_apply(self._view_id)
+            instances = FeaturesApplyList(feature).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

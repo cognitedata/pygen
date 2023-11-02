@@ -14,12 +14,14 @@ from osdu_wells_pydantic_v1.client.data_classes import (
     SpatialLocationApplyList,
     SpatialLocationFields,
     SpatialLocationTextFields,
+    DomainModelApply,
 )
 from osdu_wells_pydantic_v1.client.data_classes._spatial_location import _SPATIALLOCATION_PROPERTIES_BY_FIELD
 
 
 class SpatialLocationAPI(TypeAPI[SpatialLocation, SpatialLocationApply, SpatialLocationList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[SpatialLocationApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -28,14 +30,15 @@ class SpatialLocationAPI(TypeAPI[SpatialLocation, SpatialLocationApply, SpatialL
             class_list=SpatialLocationList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(
         self, spatial_location: SpatialLocationApply | Sequence[SpatialLocationApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(spatial_location, SpatialLocationApply):
-            instances = spatial_location.to_instances_apply(self._view_id)
+            instances = spatial_location.to_instances_apply(self._view_by_write_class)
         else:
-            instances = SpatialLocationApplyList(spatial_location).to_instances_apply(self._view_id)
+            instances = SpatialLocationApplyList(spatial_location).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

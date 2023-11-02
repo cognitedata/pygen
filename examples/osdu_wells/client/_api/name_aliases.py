@@ -14,12 +14,14 @@ from osdu_wells.client.data_classes import (
     NameAliasesApplyList,
     NameAliasesFields,
     NameAliasesTextFields,
+    DomainModelApply,
 )
 from osdu_wells.client.data_classes._name_aliases import _NAMEALIASES_PROPERTIES_BY_FIELD
 
 
 class NameAliasesAPI(TypeAPI[NameAliases, NameAliasesApply, NameAliasesList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[NameAliasesApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -28,14 +30,15 @@ class NameAliasesAPI(TypeAPI[NameAliases, NameAliasesApply, NameAliasesList]):
             class_list=NameAliasesList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(
         self, name_alias: NameAliasesApply | Sequence[NameAliasesApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(name_alias, NameAliasesApply):
-            instances = name_alias.to_instances_apply(self._view_id)
+            instances = name_alias.to_instances_apply(self._view_by_write_class)
         else:
-            instances = NameAliasesApplyList(name_alias).to_instances_apply(self._view_id)
+            instances = NameAliasesApplyList(name_alias).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

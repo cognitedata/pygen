@@ -34,9 +34,12 @@ class TagsApply(DomainModelApply):
     space: str = "IntegrationTestsImmutable"
     name_of_key: Optional[str] = Field(None, alias="NameOfKey")
 
-    def _to_instances_apply(self, cache: set[str], write_view: dm.ViewId | None) -> dm.InstancesApply:
+    def _to_instances_apply(
+        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
+    ) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
+        write_view = view_by_write_class and view_by_write_class.get(type(self))
 
         properties = {}
         if self.name_of_key is not None:

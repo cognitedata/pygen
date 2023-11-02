@@ -14,12 +14,14 @@ from osdu_wells.client.data_classes import (
     GeometryApplyList,
     GeometryFields,
     GeometryTextFields,
+    DomainModelApply,
 )
 from osdu_wells.client.data_classes._geometry import _GEOMETRY_PROPERTIES_BY_FIELD
 
 
 class GeometryAPI(TypeAPI[Geometry, GeometryApply, GeometryList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[GeometryApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -28,14 +30,15 @@ class GeometryAPI(TypeAPI[Geometry, GeometryApply, GeometryList]):
             class_list=GeometryList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(
         self, geometry: GeometryApply | Sequence[GeometryApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(geometry, GeometryApply):
-            instances = geometry.to_instances_apply(self._view_id)
+            instances = geometry.to_instances_apply(self._view_by_write_class)
         else:
-            instances = GeometryApplyList(geometry).to_instances_apply(self._view_id)
+            instances = GeometryApplyList(geometry).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

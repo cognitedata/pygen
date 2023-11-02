@@ -19,6 +19,7 @@ from scenario_instance.client.data_classes import (
     ScenarioInstanceApplyList,
     ScenarioInstanceFields,
     ScenarioInstanceTextFields,
+    DomainModelApply,
 )
 from scenario_instance.client.data_classes._scenario_instance import _SCENARIOINSTANCE_PROPERTIES_BY_FIELD
 
@@ -403,7 +404,8 @@ def _retrieve_timeseries_external_ids_with_extra_price_forecast(
 
 
 class ScenarioInstanceAPI(TypeAPI[ScenarioInstance, ScenarioInstanceApply, ScenarioInstanceList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[ScenarioInstanceApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -412,15 +414,16 @@ class ScenarioInstanceAPI(TypeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
             class_list=ScenarioInstanceList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
         self.price_forecast = ScenarioInstancePriceForecastAPI(client, view_id)
 
     def apply(
         self, scenario_instance: ScenarioInstanceApply | Sequence[ScenarioInstanceApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(scenario_instance, ScenarioInstanceApply):
-            instances = scenario_instance.to_instances_apply(self._view_id)
+            instances = scenario_instance.to_instances_apply(self._view_by_write_class)
         else:
-            instances = ScenarioInstanceApplyList(scenario_instance).to_instances_apply(self._view_id)
+            instances = ScenarioInstanceApplyList(scenario_instance).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
@@ -748,8 +751,8 @@ def _create_filter(
         filters.append(
             dm.filters.Range(
                 view_id.as_property_ref("instance"),
-                gte=min_instance.isoformat(timespec="milliseconds") if min_instance else None,
-                lte=max_instance.isoformat(timespec="milliseconds") if max_instance else None,
+                gte=min_instance.isoformat() if min_instance else None,
+                lte=max_instance.isoformat() if max_instance else None,
             )
         )
     if market and isinstance(market, str):
@@ -774,8 +777,8 @@ def _create_filter(
         filters.append(
             dm.filters.Range(
                 view_id.as_property_ref("start"),
-                gte=min_start.isoformat(timespec="milliseconds") if min_start else None,
-                lte=max_start.isoformat(timespec="milliseconds") if max_start else None,
+                gte=min_start.isoformat() if min_start else None,
+                lte=max_start.isoformat() if max_start else None,
             )
         )
     if external_id_prefix:

@@ -602,6 +602,10 @@ class FilterParameter:
     def is_time(self) -> bool:
         return self.type_ in ("datetime.datetime", "datetime.date")
 
+    @property
+    def is_timestamp(self) -> bool:
+        return self.type_ in ("datetime.datetime",)
+
 
 @dataclass
 class FilterCondition:
@@ -635,7 +639,8 @@ class FilterCondition:
         filter_args: list[str] = []
         for keyword, arg in self.keyword_arguments.items():
             if arg.is_time:
-                filter_args.append(f'{keyword}={arg.name}.isoformat(timespec="milliseconds") if {arg.name} else None')
+                timespec = 'timespec="milliseconds"' if arg.is_timestamp == "datetime.datetime" else ""
+                filter_args.append(f"{keyword}={arg.name}.isoformat({timespec}) if {arg.name} else None")
             else:
                 filter_args.append(f"{keyword}={arg.name}")
         return filter_args

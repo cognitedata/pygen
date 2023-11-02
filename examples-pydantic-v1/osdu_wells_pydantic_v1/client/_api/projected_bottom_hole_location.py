@@ -14,6 +14,7 @@ from osdu_wells_pydantic_v1.client.data_classes import (
     ProjectedBottomHoleLocationApplyList,
     ProjectedBottomHoleLocationFields,
     ProjectedBottomHoleLocationTextFields,
+    DomainModelApply,
 )
 from osdu_wells_pydantic_v1.client.data_classes._projected_bottom_hole_location import (
     _PROJECTEDBOTTOMHOLELOCATION_PROPERTIES_BY_FIELD,
@@ -23,7 +24,8 @@ from osdu_wells_pydantic_v1.client.data_classes._projected_bottom_hole_location 
 class ProjectedBottomHoleLocationAPI(
     TypeAPI[ProjectedBottomHoleLocation, ProjectedBottomHoleLocationApply, ProjectedBottomHoleLocationList]
 ):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[ProjectedBottomHoleLocationApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -32,6 +34,7 @@ class ProjectedBottomHoleLocationAPI(
             class_list=ProjectedBottomHoleLocationList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(
         self,
@@ -39,10 +42,10 @@ class ProjectedBottomHoleLocationAPI(
         replace: bool = False,
     ) -> dm.InstancesApplyResult:
         if isinstance(projected_bottom_hole_location, ProjectedBottomHoleLocationApply):
-            instances = projected_bottom_hole_location.to_instances_apply(self._view_id)
+            instances = projected_bottom_hole_location.to_instances_apply(self._view_by_write_class)
         else:
             instances = ProjectedBottomHoleLocationApplyList(projected_bottom_hole_location).to_instances_apply(
-                self._view_id
+                self._view_by_write_class
             )
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,

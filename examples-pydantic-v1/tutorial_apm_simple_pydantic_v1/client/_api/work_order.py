@@ -16,6 +16,7 @@ from tutorial_apm_simple_pydantic_v1.client.data_classes import (
     WorkOrderApplyList,
     WorkOrderFields,
     WorkOrderTextFields,
+    DomainModelApply,
 )
 from tutorial_apm_simple_pydantic_v1.client.data_classes._work_order import _WORKORDER_PROPERTIES_BY_FIELD
 
@@ -119,7 +120,8 @@ class WorkOrderWorkItemsAPI:
 
 
 class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[WorkOrderApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -128,6 +130,7 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
             class_list=WorkOrderList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
         self.linked_assets = WorkOrderLinkedAssetsAPI(client)
         self.work_items = WorkOrderWorkItemsAPI(client)
 
@@ -135,9 +138,9 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         self, work_order: WorkOrderApply | Sequence[WorkOrderApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(work_order, WorkOrderApply):
-            instances = work_order.to_instances_apply(self._view_id)
+            instances = work_order.to_instances_apply(self._view_by_write_class)
         else:
-            instances = WorkOrderApplyList(work_order).to_instances_apply(self._view_id)
+            instances = WorkOrderApplyList(work_order).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
@@ -728,8 +731,8 @@ def _create_filter(
         filters.append(
             dm.filters.Range(
                 view_id.as_property_ref("createdDate"),
-                gte=min_created_date.isoformat(timespec="milliseconds") if min_created_date else None,
-                lte=max_created_date.isoformat(timespec="milliseconds") if max_created_date else None,
+                gte=min_created_date.isoformat() if min_created_date else None,
+                lte=max_created_date.isoformat() if max_created_date else None,
             )
         )
     if description and isinstance(description, str):
@@ -742,8 +745,8 @@ def _create_filter(
         filters.append(
             dm.filters.Range(
                 view_id.as_property_ref("dueDate"),
-                gte=min_due_date.isoformat(timespec="milliseconds") if min_due_date else None,
-                lte=max_due_date.isoformat(timespec="milliseconds") if max_due_date else None,
+                gte=min_due_date.isoformat() if min_due_date else None,
+                lte=max_due_date.isoformat() if max_due_date else None,
             )
         )
     if min_duration_hours or max_duration_hours:
@@ -754,8 +757,8 @@ def _create_filter(
         filters.append(
             dm.filters.Range(
                 view_id.as_property_ref("endTime"),
-                gte=min_end_time.isoformat(timespec="milliseconds") if min_end_time else None,
-                lte=max_end_time.isoformat(timespec="milliseconds") if max_end_time else None,
+                gte=min_end_time.isoformat() if min_end_time else None,
+                lte=max_end_time.isoformat() if max_end_time else None,
             )
         )
     if is_active and isinstance(is_active, str):
@@ -776,8 +779,8 @@ def _create_filter(
         filters.append(
             dm.filters.Range(
                 view_id.as_property_ref("plannedStart"),
-                gte=min_planned_start.isoformat(timespec="milliseconds") if min_planned_start else None,
-                lte=max_planned_start.isoformat(timespec="milliseconds") if max_planned_start else None,
+                gte=min_planned_start.isoformat() if min_planned_start else None,
+                lte=max_planned_start.isoformat() if max_planned_start else None,
             )
         )
     if priority_description and isinstance(priority_description, str):
@@ -798,8 +801,8 @@ def _create_filter(
         filters.append(
             dm.filters.Range(
                 view_id.as_property_ref("startTime"),
-                gte=min_start_time.isoformat(timespec="milliseconds") if min_start_time else None,
-                lte=max_start_time.isoformat(timespec="milliseconds") if max_start_time else None,
+                gte=min_start_time.isoformat() if min_start_time else None,
+                lte=max_start_time.isoformat() if max_start_time else None,
             )
         )
     if status and isinstance(status, str):

@@ -15,6 +15,7 @@ from movie_domain.client.data_classes import (
     PersonApplyList,
     PersonFields,
     PersonTextFields,
+    DomainModelApply,
 )
 from movie_domain.client.data_classes._person import _PERSON_PROPERTIES_BY_FIELD
 
@@ -65,7 +66,8 @@ class PersonRolesAPI:
 
 
 class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[PersonApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -74,13 +76,14 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
             class_list=PersonList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
         self.roles = PersonRolesAPI(client)
 
     def apply(self, person: PersonApply | Sequence[PersonApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(person, PersonApply):
-            instances = person.to_instances_apply(self._view_id)
+            instances = person.to_instances_apply(self._view_by_write_class)
         else:
-            instances = PersonApplyList(person).to_instances_apply(self._view_id)
+            instances = PersonApplyList(person).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

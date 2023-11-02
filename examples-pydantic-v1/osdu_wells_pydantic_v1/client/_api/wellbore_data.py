@@ -15,6 +15,7 @@ from osdu_wells_pydantic_v1.client.data_classes import (
     WellboreDataApplyList,
     WellboreDataFields,
     WellboreDataTextFields,
+    DomainModelApply,
 )
 from osdu_wells_pydantic_v1.client.data_classes._wellbore_data import _WELLBOREDATA_PROPERTIES_BY_FIELD
 
@@ -592,7 +593,8 @@ class WellboreDataWellboreCostsAPI:
 
 
 class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[WellboreDataApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -601,6 +603,7 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
             class_list=WellboreDataList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
         self.drilling_reasons = WellboreDataDrillingReasonsAPI(client)
         self.facility_events = WellboreDataFacilityEventsAPI(client)
         self.facility_operators = WellboreDataFacilityOperatorsAPI(client)
@@ -617,9 +620,9 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
         self, wellbore_datum: WellboreDataApply | Sequence[WellboreDataApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(wellbore_datum, WellboreDataApply):
-            instances = wellbore_datum.to_instances_apply(self._view_id)
+            instances = wellbore_datum.to_instances_apply(self._view_by_write_class)
         else:
-            instances = WellboreDataApplyList(wellbore_datum).to_instances_apply(self._view_id)
+            instances = WellboreDataApplyList(wellbore_datum).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

@@ -20,6 +20,7 @@ from tutorial_apm_simple.client.data_classes import (
     AssetApplyList,
     AssetFields,
     AssetTextFields,
+    DomainModelApply,
 )
 from tutorial_apm_simple.client.data_classes._asset import _ASSET_PROPERTIES_BY_FIELD
 
@@ -519,7 +520,8 @@ class AssetInModelAPI:
 
 
 class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[AssetApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -528,15 +530,16 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
             class_list=AssetList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
         self.children = AssetChildrenAPI(client)
         self.in_model_3_d = AssetInModelAPI(client)
         self.pressure = AssetPressureAPI(client, view_id)
 
     def apply(self, asset: AssetApply | Sequence[AssetApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(asset, AssetApply):
-            instances = asset.to_instances_apply(self._view_id)
+            instances = asset.to_instances_apply(self._view_by_write_class)
         else:
-            instances = AssetApplyList(asset).to_instances_apply(self._view_id)
+            instances = AssetApplyList(asset).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
@@ -942,8 +945,8 @@ def _create_filter(
         filters.append(
             dm.filters.Range(
                 view_id.as_property_ref("createdDate"),
-                gte=min_created_date.isoformat(timespec="milliseconds") if min_created_date else None,
-                lte=max_created_date.isoformat(timespec="milliseconds") if max_created_date else None,
+                gte=min_created_date.isoformat() if min_created_date else None,
+                lte=max_created_date.isoformat() if max_created_date else None,
             )
         )
     if description and isinstance(description, str):
@@ -995,8 +998,8 @@ def _create_filter(
         filters.append(
             dm.filters.Range(
                 view_id.as_property_ref("updatedDate"),
-                gte=min_updated_date.isoformat(timespec="milliseconds") if min_updated_date else None,
-                lte=max_updated_date.isoformat(timespec="milliseconds") if max_updated_date else None,
+                gte=min_updated_date.isoformat() if min_updated_date else None,
+                lte=max_updated_date.isoformat() if max_updated_date else None,
             )
         )
     if external_id_prefix:

@@ -8,7 +8,14 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
 from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
-from movie_domain_pydantic_v1.client.data_classes import Actor, ActorApply, ActorList, ActorApplyList, ActorFields
+from movie_domain_pydantic_v1.client.data_classes import (
+    Actor,
+    ActorApply,
+    ActorList,
+    ActorApplyList,
+    ActorFields,
+    DomainModelApply,
+)
 from movie_domain_pydantic_v1.client.data_classes._actor import _ACTOR_PROPERTIES_BY_FIELD
 
 
@@ -103,7 +110,8 @@ class ActorNominationAPI:
 
 
 class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[ActorApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -112,14 +120,15 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
             class_list=ActorList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
         self.movies = ActorMoviesAPI(client)
         self.nomination = ActorNominationAPI(client)
 
     def apply(self, actor: ActorApply | Sequence[ActorApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(actor, ActorApply):
-            instances = actor.to_instances_apply(self._view_id)
+            instances = actor.to_instances_apply(self._view_by_write_class)
         else:
-            instances = ActorApplyList(actor).to_instances_apply(self._view_id)
+            instances = ActorApplyList(actor).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

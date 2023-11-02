@@ -14,12 +14,14 @@ from osdu_wells.client.data_classes import (
     AncestryApplyList,
     AncestryFields,
     AncestryTextFields,
+    DomainModelApply,
 )
 from osdu_wells.client.data_classes._ancestry import _ANCESTRY_PROPERTIES_BY_FIELD
 
 
 class AncestryAPI(TypeAPI[Ancestry, AncestryApply, AncestryList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[AncestryApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -28,14 +30,15 @@ class AncestryAPI(TypeAPI[Ancestry, AncestryApply, AncestryList]):
             class_list=AncestryList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(
         self, ancestry: AncestryApply | Sequence[AncestryApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(ancestry, AncestryApply):
-            instances = ancestry.to_instances_apply(self._view_id)
+            instances = ancestry.to_instances_apply(self._view_by_write_class)
         else:
-            instances = AncestryApplyList(ancestry).to_instances_apply(self._view_id)
+            instances = AncestryApplyList(ancestry).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

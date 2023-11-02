@@ -15,6 +15,7 @@ from ._api.nomination import NominationAPI
 from ._api.person import PersonAPI
 from ._api.rating import RatingAPI
 from ._api.role import RoleAPI
+from . import data_classes
 
 
 class MovieClient:
@@ -39,20 +40,29 @@ class MovieClient:
             client = CogniteClient(config_or_client)
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
-        self.actor = ActorAPI(client, dm.ViewId("IntegrationTestsImmutable", "Actor", "2"))
-        self.best_director = BestDirectorAPI(client, dm.ViewId("IntegrationTestsImmutable", "BestDirector", "2"))
-        self.best_leading_actor = BestLeadingActorAPI(
-            client, dm.ViewId("IntegrationTestsImmutable", "BestLeadingActor", "2")
-        )
-        self.best_leading_actress = BestLeadingActressAPI(
-            client, dm.ViewId("IntegrationTestsImmutable", "BestLeadingActress", "2")
-        )
-        self.director = DirectorAPI(client, dm.ViewId("IntegrationTestsImmutable", "Director", "2"))
-        self.movie = MovieAPI(client, dm.ViewId("IntegrationTestsImmutable", "Movie", "2"))
-        self.nomination = NominationAPI(client, dm.ViewId("IntegrationTestsImmutable", "Nomination", "2"))
-        self.person = PersonAPI(client, dm.ViewId("IntegrationTestsImmutable", "Person", "2"))
-        self.rating = RatingAPI(client, dm.ViewId("IntegrationTestsImmutable", "Rating", "2"))
-        self.role = RoleAPI(client, dm.ViewId("IntegrationTestsImmutable", "Role", "2"))
+        view_by_write_class = {
+            data_classes.ActorApply: dm.ViewId("IntegrationTestsImmutable", "Actor", "2"),
+            data_classes.BestDirectorApply: dm.ViewId("IntegrationTestsImmutable", "BestDirector", "2"),
+            data_classes.BestLeadingActorApply: dm.ViewId("IntegrationTestsImmutable", "BestLeadingActor", "2"),
+            data_classes.BestLeadingActressApply: dm.ViewId("IntegrationTestsImmutable", "BestLeadingActress", "2"),
+            data_classes.DirectorApply: dm.ViewId("IntegrationTestsImmutable", "Director", "2"),
+            data_classes.MovieApply: dm.ViewId("IntegrationTestsImmutable", "Movie", "2"),
+            data_classes.NominationApply: dm.ViewId("IntegrationTestsImmutable", "Nomination", "2"),
+            data_classes.PersonApply: dm.ViewId("IntegrationTestsImmutable", "Person", "2"),
+            data_classes.RatingApply: dm.ViewId("IntegrationTestsImmutable", "Rating", "2"),
+            data_classes.RoleApply: dm.ViewId("IntegrationTestsImmutable", "Role", "2"),
+        }
+
+        self.actor = ActorAPI(client, view_by_write_class)
+        self.best_director = BestDirectorAPI(client, view_by_write_class)
+        self.best_leading_actor = BestLeadingActorAPI(client, view_by_write_class)
+        self.best_leading_actress = BestLeadingActressAPI(client, view_by_write_class)
+        self.director = DirectorAPI(client, view_by_write_class)
+        self.movie = MovieAPI(client, view_by_write_class)
+        self.nomination = NominationAPI(client, view_by_write_class)
+        self.person = PersonAPI(client, view_by_write_class)
+        self.rating = RatingAPI(client, view_by_write_class)
+        self.role = RoleAPI(client, view_by_write_class)
 
     @classmethod
     def azure_project(

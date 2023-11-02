@@ -14,12 +14,14 @@ from osdu_wells.client.data_classes import (
     SpatialPointApplyList,
     SpatialPointFields,
     SpatialPointTextFields,
+    DomainModelApply,
 )
 from osdu_wells.client.data_classes._spatial_point import _SPATIALPOINT_PROPERTIES_BY_FIELD
 
 
 class SpatialPointAPI(TypeAPI[SpatialPoint, SpatialPointApply, SpatialPointList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[SpatialPointApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -28,14 +30,15 @@ class SpatialPointAPI(TypeAPI[SpatialPoint, SpatialPointApply, SpatialPointList]
             class_list=SpatialPointList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(
         self, spatial_point: SpatialPointApply | Sequence[SpatialPointApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(spatial_point, SpatialPointApply):
-            instances = spatial_point.to_instances_apply(self._view_id)
+            instances = spatial_point.to_instances_apply(self._view_by_write_class)
         else:
-            instances = SpatialPointApplyList(spatial_point).to_instances_apply(self._view_id)
+            instances = SpatialPointApplyList(spatial_point).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

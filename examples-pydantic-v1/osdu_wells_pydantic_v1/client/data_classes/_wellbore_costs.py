@@ -45,9 +45,12 @@ class WellboreCostsApply(DomainModelApply):
     activity_type_id: Optional[str] = Field(None, alias="ActivityTypeID")
     cost: Optional[float] = Field(None, alias="Cost")
 
-    def _to_instances_apply(self, cache: set[str], write_view: dm.ViewId | None) -> dm.InstancesApply:
+    def _to_instances_apply(
+        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
+    ) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
+        write_view = view_by_write_class and view_by_write_class.get(type(self))
 
         properties = {}
         if self.activity_type_id is not None:

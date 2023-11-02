@@ -14,12 +14,14 @@ from osdu_wells.client.data_classes import (
     AcceptableUsageApplyList,
     AcceptableUsageFields,
     AcceptableUsageTextFields,
+    DomainModelApply,
 )
 from osdu_wells.client.data_classes._acceptable_usage import _ACCEPTABLEUSAGE_PROPERTIES_BY_FIELD
 
 
 class AcceptableUsageAPI(TypeAPI[AcceptableUsage, AcceptableUsageApply, AcceptableUsageList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[AcceptableUsageApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -28,14 +30,15 @@ class AcceptableUsageAPI(TypeAPI[AcceptableUsage, AcceptableUsageApply, Acceptab
             class_list=AcceptableUsageList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(
         self, acceptable_usage: AcceptableUsageApply | Sequence[AcceptableUsageApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(acceptable_usage, AcceptableUsageApply):
-            instances = acceptable_usage.to_instances_apply(self._view_id)
+            instances = acceptable_usage.to_instances_apply(self._view_by_write_class)
         else:
-            instances = AcceptableUsageApplyList(acceptable_usage).to_instances_apply(self._view_id)
+            instances = AcceptableUsageApplyList(acceptable_usage).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

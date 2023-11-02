@@ -8,12 +8,21 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
 from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
-from markets.client.data_classes import CogBid, CogBidApply, CogBidList, CogBidApplyList, CogBidFields, CogBidTextFields
+from markets.client.data_classes import (
+    CogBid,
+    CogBidApply,
+    CogBidList,
+    CogBidApplyList,
+    CogBidFields,
+    CogBidTextFields,
+    DomainModelApply,
+)
 from markets.client.data_classes._cog_bid import _COGBID_PROPERTIES_BY_FIELD
 
 
 class CogBidAPI(TypeAPI[CogBid, CogBidApply, CogBidList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[CogBidApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -22,12 +31,13 @@ class CogBidAPI(TypeAPI[CogBid, CogBidApply, CogBidList]):
             class_list=CogBidList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(self, cog_bid: CogBidApply | Sequence[CogBidApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(cog_bid, CogBidApply):
-            instances = cog_bid.to_instances_apply(self._view_id)
+            instances = cog_bid.to_instances_apply(self._view_by_write_class)
         else:
-            instances = CogBidApplyList(cog_bid).to_instances_apply(self._view_id)
+            instances = CogBidApplyList(cog_bid).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
@@ -310,8 +320,8 @@ def _create_filter(
         filters.append(
             dm.filters.Range(
                 view_id.as_property_ref("date"),
-                gte=min_date.isoformat(timespec="milliseconds") if min_date else None,
-                lte=max_date.isoformat(timespec="milliseconds") if max_date else None,
+                gte=min_date.isoformat() if min_date else None,
+                lte=max_date.isoformat() if max_date else None,
             )
         )
     if market and isinstance(market, str):

@@ -14,12 +14,14 @@ from osdu_wells.client.data_classes import (
     GeoContextsApplyList,
     GeoContextsFields,
     GeoContextsTextFields,
+    DomainModelApply,
 )
 from osdu_wells.client.data_classes._geo_contexts import _GEOCONTEXTS_PROPERTIES_BY_FIELD
 
 
 class GeoContextsAPI(TypeAPI[GeoContexts, GeoContextsApply, GeoContextsList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[GeoContextsApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -28,14 +30,15 @@ class GeoContextsAPI(TypeAPI[GeoContexts, GeoContextsApply, GeoContextsList]):
             class_list=GeoContextsList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(
         self, geo_context: GeoContextsApply | Sequence[GeoContextsApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(geo_context, GeoContextsApply):
-            instances = geo_context.to_instances_apply(self._view_id)
+            instances = geo_context.to_instances_apply(self._view_by_write_class)
         else:
-            instances = GeoContextsApplyList(geo_context).to_instances_apply(self._view_id)
+            instances = GeoContextsApplyList(geo_context).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

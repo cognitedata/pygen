@@ -57,13 +57,16 @@ class CogBidApply(DomainModelApply):
     price_area: Optional[str] = Field(None, alias="priceArea")
     quantity: Optional[int] = None
 
-    def _to_instances_apply(self, cache: set[str], write_view: dm.ViewId | None) -> dm.InstancesApply:
+    def _to_instances_apply(
+        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
+    ) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
+        write_view = view_by_write_class and view_by_write_class.get(type(self))
 
         properties = {}
         if self.date is not None:
-            properties["date"] = self.date.isoformat(timespec="milliseconds")
+            properties["date"] = self.date.isoformat()
         if self.market is not None:
             properties["market"] = {
                 "space": "market",
@@ -96,7 +99,7 @@ class CogBidApply(DomainModelApply):
         cache.add(self.external_id)
 
         if isinstance(self.market, DomainModelApply):
-            instances = self.market._to_instances_apply(cache, write_view)
+            instances = self.market._to_instances_apply(cache, view_by_write_class)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 

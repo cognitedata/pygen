@@ -14,12 +14,14 @@ from osdu_wells.client.data_classes import (
     ReviewersApplyList,
     ReviewersFields,
     ReviewersTextFields,
+    DomainModelApply,
 )
 from osdu_wells.client.data_classes._reviewers import _REVIEWERS_PROPERTIES_BY_FIELD
 
 
 class ReviewersAPI(TypeAPI[Reviewers, ReviewersApply, ReviewersList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[ReviewersApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -28,14 +30,15 @@ class ReviewersAPI(TypeAPI[Reviewers, ReviewersApply, ReviewersList]):
             class_list=ReviewersList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(
         self, reviewer: ReviewersApply | Sequence[ReviewersApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(reviewer, ReviewersApply):
-            instances = reviewer.to_instances_apply(self._view_id)
+            instances = reviewer.to_instances_apply(self._view_by_write_class)
         else:
-            instances = ReviewersApplyList(reviewer).to_instances_apply(self._view_id)
+            instances = ReviewersApplyList(reviewer).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

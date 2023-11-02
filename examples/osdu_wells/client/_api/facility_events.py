@@ -14,12 +14,14 @@ from osdu_wells.client.data_classes import (
     FacilityEventsApplyList,
     FacilityEventsFields,
     FacilityEventsTextFields,
+    DomainModelApply,
 )
 from osdu_wells.client.data_classes._facility_events import _FACILITYEVENTS_PROPERTIES_BY_FIELD
 
 
 class FacilityEventsAPI(TypeAPI[FacilityEvents, FacilityEventsApply, FacilityEventsList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[FacilityEventsApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -28,14 +30,15 @@ class FacilityEventsAPI(TypeAPI[FacilityEvents, FacilityEventsApply, FacilityEve
             class_list=FacilityEventsList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(
         self, facility_event: FacilityEventsApply | Sequence[FacilityEventsApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(facility_event, FacilityEventsApply):
-            instances = facility_event.to_instances_apply(self._view_id)
+            instances = facility_event.to_instances_apply(self._view_by_write_class)
         else:
-            instances = FacilityEventsApplyList(facility_event).to_instances_apply(self._view_id)
+            instances = FacilityEventsApplyList(facility_event).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

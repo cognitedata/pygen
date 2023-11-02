@@ -92,9 +92,12 @@ class AsIngestedCoordinatesApply(DomainModelApply):
     persistable_reference_vertical_crs: Optional[str] = Field(None, alias="persistableReferenceVerticalCrs")
     type: Optional[str] = None
 
-    def _to_instances_apply(self, cache: set[str], write_view: dm.ViewId | None) -> dm.InstancesApply:
+    def _to_instances_apply(
+        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
+    ) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
+        write_view = view_by_write_class and view_by_write_class.get(type(self))
 
         properties = {}
         if self.coordinate_reference_system_id is not None:
@@ -138,7 +141,7 @@ class AsIngestedCoordinatesApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(feature, DomainModelApply):
-                instances = feature._to_instances_apply(cache, write_view)
+                instances = feature._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 

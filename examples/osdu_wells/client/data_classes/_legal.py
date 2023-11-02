@@ -42,9 +42,12 @@ class LegalApply(DomainModelApply):
     other_relevant_data_countries: Optional[list[str]] = Field(None, alias="otherRelevantDataCountries")
     status: Optional[str] = None
 
-    def _to_instances_apply(self, cache: set[str], write_view: dm.ViewId | None) -> dm.InstancesApply:
+    def _to_instances_apply(
+        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
+    ) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
+        write_view = view_by_write_class and view_by_write_class.get(type(self))
 
         properties = {}
         if self.legaltags is not None:

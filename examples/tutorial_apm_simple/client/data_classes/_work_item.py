@@ -74,9 +74,12 @@ class WorkItemApply(DomainModelApply):
     to_be_done: Optional[bool] = Field(None, alias="toBeDone")
     work_order: Union[WorkOrderApply, str, None] = Field(None, repr=False, alias="workOrder")
 
-    def _to_instances_apply(self, cache: set[str], write_view: dm.ViewId | None) -> dm.InstancesApply:
+    def _to_instances_apply(
+        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
+    ) -> dm.InstancesApply:
         if self.external_id in cache:
             return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
+        write_view = view_by_write_class and view_by_write_class.get(type(self))
 
         properties = {}
         if self.criticality is not None:
@@ -125,12 +128,12 @@ class WorkItemApply(DomainModelApply):
                 cache.add(edge.external_id)
 
             if isinstance(linked_asset, DomainModelApply):
-                instances = linked_asset._to_instances_apply(cache, write_view)
+                instances = linked_asset._to_instances_apply(cache, view_by_write_class)
                 nodes.extend(instances.nodes)
                 edges.extend(instances.edges)
 
         if isinstance(self.work_order, DomainModelApply):
-            instances = self.work_order._to_instances_apply(cache, write_view)
+            instances = self.work_order._to_instances_apply(cache, view_by_write_class)
             nodes.extend(instances.nodes)
             edges.extend(instances.edges)
 

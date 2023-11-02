@@ -15,6 +15,7 @@ from tutorial_apm_simple_pydantic_v1.client.data_classes import (
     WorkItemApplyList,
     WorkItemFields,
     WorkItemTextFields,
+    DomainModelApply,
 )
 from tutorial_apm_simple_pydantic_v1.client.data_classes._work_item import _WORKITEM_PROPERTIES_BY_FIELD
 
@@ -67,7 +68,8 @@ class WorkItemLinkedAssetsAPI:
 
 
 class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[WorkItemApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -76,15 +78,16 @@ class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
             class_list=WorkItemList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
         self.linked_assets = WorkItemLinkedAssetsAPI(client)
 
     def apply(
         self, work_item: WorkItemApply | Sequence[WorkItemApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(work_item, WorkItemApply):
-            instances = work_item.to_instances_apply(self._view_id)
+            instances = work_item.to_instances_apply(self._view_by_write_class)
         else:
-            instances = WorkItemApplyList(work_item).to_instances_apply(self._view_id)
+            instances = WorkItemApplyList(work_item).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

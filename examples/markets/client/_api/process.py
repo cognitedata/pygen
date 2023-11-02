@@ -14,12 +14,14 @@ from markets.client.data_classes import (
     ProcessApplyList,
     ProcessFields,
     ProcessTextFields,
+    DomainModelApply,
 )
 from markets.client.data_classes._process import _PROCESS_PROPERTIES_BY_FIELD
 
 
 class ProcessAPI(TypeAPI[Process, ProcessApply, ProcessList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[ProcessApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -28,12 +30,13 @@ class ProcessAPI(TypeAPI[Process, ProcessApply, ProcessList]):
             class_list=ProcessList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(self, proces: ProcessApply | Sequence[ProcessApply], replace: bool = False) -> dm.InstancesApplyResult:
         if isinstance(proces, ProcessApply):
-            instances = proces.to_instances_apply(self._view_id)
+            instances = proces.to_instances_apply(self._view_by_write_class)
         else:
-            instances = ProcessApplyList(proces).to_instances_apply(self._view_id)
+            instances = ProcessApplyList(proces).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

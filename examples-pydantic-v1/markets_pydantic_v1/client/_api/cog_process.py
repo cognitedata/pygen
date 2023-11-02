@@ -14,12 +14,14 @@ from markets_pydantic_v1.client.data_classes import (
     CogProcessApplyList,
     CogProcessFields,
     CogProcessTextFields,
+    DomainModelApply,
 )
 from markets_pydantic_v1.client.data_classes._cog_process import _COGPROCESS_PROPERTIES_BY_FIELD
 
 
 class CogProcessAPI(TypeAPI[CogProcess, CogProcessApply, CogProcessList]):
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[CogProcessApply]
         super().__init__(
             client=client,
             sources=view_id,
@@ -28,14 +30,15 @@ class CogProcessAPI(TypeAPI[CogProcess, CogProcessApply, CogProcessList]):
             class_list=CogProcessList,
         )
         self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
 
     def apply(
         self, cog_proces: CogProcessApply | Sequence[CogProcessApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
         if isinstance(cog_proces, CogProcessApply):
-            instances = cog_proces.to_instances_apply(self._view_id)
+            instances = cog_proces.to_instances_apply(self._view_by_write_class)
         else:
-            instances = CogProcessApplyList(cog_proces).to_instances_apply(self._view_id)
+            instances = CogProcessApplyList(cog_proces).to_instances_apply(self._view_by_write_class)
         return self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
