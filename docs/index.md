@@ -75,7 +75,7 @@ pygen generate --space movies \
     --cdf-project <cdf-project>
 ```
 
-If you are not using Microft Entra ID (Azure AD) you need to specify the parameter --token-url, --scopes and --audience instead of --tenant-id.
+If you are not using Microsoft Entra ID (Azure AD) you need to specify the parameter --token-url, --scopes and --audience instead of --tenant-id.
 
 ## Dependencies
 
