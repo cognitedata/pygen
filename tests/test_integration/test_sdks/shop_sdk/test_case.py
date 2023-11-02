@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from tests.constants import IS_PYDANTIC_V1
 
@@ -81,3 +81,14 @@ def test_case_apply_with_empty_datetime(shop_client: ShopClient):
     finally:
         if result is not None:
             shop_client.case.delete([n.external_id for n in result.nodes])
+
+
+def test_case_list_datetime(shop_client: ShopClient) -> None:
+    # Arrange
+    to_time = datetime.now() - timedelta(days=60)
+
+    # Act
+    cases = shop_client.case.list(max_start_time=to_time)
+
+    # Assert
+    assert len(cases) == 0
