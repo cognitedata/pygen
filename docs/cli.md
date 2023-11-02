@@ -2,16 +2,34 @@
 
 Given a Data Model with external id `Movie` in the space `movies` in CDF, the following command will generate a Python SDK
 
-```bash
-pygen generate --space movies \
-    --external-id Movie \
-    --version 1 \
-    --tenant-id <tenant-id> \
-    --client-id <client-id> \
-    --client-secret <client-secret> \
-    --cdf-cluster <cdf-cluster> \
-    --cdf-procect <cdf-project>
-```
+
+=== "Microsoft Entra ID (Azure AD)"
+
+    ```bash
+    pygen generate --space movies \
+        --external-id Movie \
+        --version 1 \
+        --tenant-id <tenant-id> \
+        --client-id <client-id> \
+        --client-secret <client-secret> \
+        --cdf-cluster <cdf-cluster> \
+        --cdf-project <cdf-project>
+    ```
+
+=== "Generic OIDC authentication"
+
+    ```bash
+    pygen generate --space movies \
+        --external-id Movie \
+        --version 1 \
+        --token-url <token-url> \
+        --scopes <scopes> \
+        --audience <audience> \
+        --client-id <client-id> \
+        --client-secret <client-secret> \
+        --cdf-cluster <cdf-cluster> \
+        --cdf-project <cdf-project>
+    ```
 
 In addition, the following options are available and recommended to be used:
 
