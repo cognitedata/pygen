@@ -393,6 +393,7 @@ def test_create_list_method(person_view: dm.View, pygen_config: PygenConfig) -> 
         FilterParameter("name", "str | list[str]"),
         FilterParameter("name_prefix", "str"),
         FilterParameter("external_id_prefix", "str"),
+        FilterParameter("space", "str | list[str]"),
     ]
     expected = ListMethod(
         parameters=parameters,
@@ -402,6 +403,8 @@ def test_create_list_method(person_view: dm.View, pygen_config: PygenConfig) -> 
             FilterCondition(dm.filters.In, "name", dict(values=parameters[2])),
             FilterCondition(dm.filters.Prefix, "name", dict(value=parameters[3])),
             FilterCondition(dm.filters.Prefix, "externalId", dict(value=parameters[4])),
+            FilterCondition(dm.filters.Equals, "space", dict(value=parameters[5])),
+            FilterCondition(dm.filters.In, "space", dict(values=parameters[5])),
         ],
     )
 
@@ -439,6 +442,7 @@ def test_create_list_method_actors(actor_view: dm.View, pygen_config: PygenConfi
         ),
         FilterParameter("won_oscar", "bool"),
         FilterParameter("external_id_prefix", "str"),
+        FilterParameter("space", "str | list[str]"),
     ]
     expected = ListMethod(
         parameters=parameters,
@@ -449,6 +453,8 @@ def test_create_list_method_actors(actor_view: dm.View, pygen_config: PygenConfi
             FilterConditionOnetoOneEdge(dm.filters.In, "person", dict(values=parameters[0]), instance_type=tuple),
             FilterCondition(dm.filters.Equals, "wonOscar", dict(value=parameters[1])),
             FilterCondition(dm.filters.Prefix, "externalId", dict(value=parameters[2])),
+            FilterCondition(dm.filters.Equals, "space", dict(value=parameters[3])),
+            FilterCondition(dm.filters.In, "space", dict(values=parameters[3])),
         ],
     )
 

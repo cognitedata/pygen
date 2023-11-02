@@ -13,6 +13,12 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.20.0] - 02-11-23
+### Added
+* Support for filtering on `space` in all filter methods.
+### Fixed
+* THe fix for filtering on `datetime` in `0.27.3` did not work as intended. This is now fixed.
+
 ## [0.28.0] - 02-11-23
 ### Added
 * Support for `Support generic OIDC` in the `pygen` CLI.

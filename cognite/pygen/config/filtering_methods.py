@@ -53,7 +53,7 @@ class Filtering:
     string: tuple[type[dm.Filter], ...] = (dm.filters.Equals, dm.filters.In, dm.filters.Prefix)
     edge_one_to_one: tuple[type[dm.Filter], ...] = (dm.filters.Equals, dm.filters.In)
     by_name: dict[str, tuple[type[dm.Filter], ...]] = dataclass_field(
-        default_factory=lambda: {"externalId": (dm.filters.Prefix,)}
+        default_factory=lambda: {"externalId": (dm.filters.Prefix,), "space": (dm.filters.Equals, dm.filters.In)}
     )
 
     def get(self, type_: dm.PropertyType, prop_name: str | None = None) -> tuple[type[dm.Filter], ...]:
