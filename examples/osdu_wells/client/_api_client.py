@@ -51,7 +51,7 @@ class OSDUClient:
     OSDUClient
 
     Generated with:
-        pygen = 0.28.0
+        pygen = 0.29.0
         cognite-sdk = 6.39.0
         pydantic = 2.4.2
 
