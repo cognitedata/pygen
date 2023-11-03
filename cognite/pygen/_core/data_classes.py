@@ -12,7 +12,7 @@ from cognite.client.data_classes.data_modeling.data_types import ListablePropert
 from typing_extensions import Self
 
 from cognite.pygen import config as pygen_config
-from cognite.pygen.utils.text import create_name
+from cognite.pygen.utils.text import create_name, to_words
 
 _PRIMITIVE_TYPES = (dm.Text, dm.Boolean, dm.Float32, dm.Float64, dm.Int32, dm.Int64, dm.Timestamp, dm.Date, dm.Json)
 _EXTERNAL_TYPES = (dm.TimeSeriesReference, dm.FileReference, dm.SequenceReference)
@@ -333,6 +333,8 @@ class DataClass:
     write_name: str
     read_list_name: str
     write_list_name: str
+    doc_name: str
+    doc_name_plural: str
     variable: str
     variable_list: str
     file_name: str
@@ -346,6 +348,8 @@ class DataClass:
         class_name = create_name(view_name, data_class.name)
         variable_name = create_name(view_name, data_class.variable)
         variable_list = create_name(view_name, data_class.variable_list)
+        doc_name = to_words(view_name, singularize=True)
+        doc_name_plural = to_words(view_name, pluralize=True)
         if variable_name == variable_list:
             variable_list = f"{variable_list}_list"
         file_name = f"_{create_name(view_name, data_class.file)}"
@@ -355,6 +359,8 @@ class DataClass:
             write_name=f"{class_name}Apply",
             read_list_name=f"{class_name}List",
             write_list_name=f"{class_name}ApplyList",
+            doc_name=doc_name,
+            doc_name_plural=doc_name_plural,
             variable=variable_name,
             variable_list=variable_list,
             file_name=file_name,

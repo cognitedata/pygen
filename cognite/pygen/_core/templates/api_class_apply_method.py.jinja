@@ -1,4 +1,23 @@
     def apply(self, {{ data_class.variable }}: {{ data_class.write_name }} | Sequence[{{ data_class.write_name }}], replace: bool = False) -> dm.InstancesApplyResult:
+         """`Add or update (upsert) {{data_class.doc_name_plural}}. <https://developer.cognite.com/api#tag/Instances/operation/applyNodeAndEdges>`_
+
+        Args:
+            {{ data_class.variable }} : Nodes to apply
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)? Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create new {{ data_class.variable }} without data:
+
+                >>> from cognite.client import CogniteClient
+                >>> from cognite.client.data_classes.data_modeling import EdgeApply, NodeOrEdgeData, NodeApply
+                >>> c = CogniteClient()
+                >>> nodes = [NodeApply("mySpace", "myNodeId")]
+                >>> res = c.data_modeling.instances.apply(nodes)
+
+        """
         if isinstance({{ data_class.variable }}, {{ data_class.write_name }}):
             instances = {{ data_class.variable }}.to_instances_apply(self._view_by_write_class)
         else:
