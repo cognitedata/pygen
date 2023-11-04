@@ -30,6 +30,7 @@ class ExampleSDK:
     client_name: str
     _top_level_package: str
     download_only: bool = False  # Used to example SDK that only trigger validation error.
+    has_container_file: bool = False  # Used to example SDK that has container file.
     manual_files: list[Path] = field(default_factory=list, init=False)
 
     @property
@@ -38,6 +39,16 @@ class ExampleSDK:
             DMS_DATA_MODELS / f"{model_id.space}-{model_id.external_id}-{model_id.version}.yaml"
             for model_id in self.data_models
         ]
+
+    def load_containers(self) -> dm.ContainerApplyList:
+        if self.has_container_file:
+            containers = []
+            for dms_file in self.dms_files:
+                container_file = dms_file.parent / f"{dms_file.stem}-containers.yaml"
+                loaded = dm.ContainerApplyList._load(safe_load(container_file.read_text()))
+                containers.extend(loaded)
+            return dm.ContainerApplyList(containers)
+        raise ValueError(f"Expected {self.client_dir} to have containers.yaml")
 
     @property
     def top_level_package(self) -> str:
@@ -55,11 +66,14 @@ class ExampleSDK:
     def client_dir(self) -> Path:
         return EXAMPLES_DIR / self.top_level_package.replace(".", "/")
 
-    def load_data_models(self) -> list[dm.DataModel[dm.View]]:
+    def load_data_models(self) -> dm.DataModelList[dm.DataModel[dm.View]]:
         models = []
         for dms_file in self.dms_files:
-            models.append(dm.DataModel.load(safe_load(dms_file.read_text())[0]))
-        return models
+            raw = safe_load(dms_file.read_text())
+            if isinstance(raw, list):
+                raw = raw[0]
+            models.append(dm.DataModel.load(raw))
+        return dm.DataModelList(models)
 
     def load_data_model(self) -> dm.DataModel[dm.View]:
         models = self.load_data_models()
@@ -115,6 +129,22 @@ SCENARIO_INSTANCE_SDK = ExampleSDK(
     _top_level_package="scenario_instance.client",
     client_name="ScenarioInstanceClient",
 )
+
+APM_APP_DATA_SOURCE = ExampleSDK(
+    data_models=[DataModelId("APM_AppData_4", "APM_AppData_4", "7")],
+    _top_level_package="apm_domain.client",
+    client_name="ApmClient",
+    download_only=True,
+    has_container_file=True,
+)
+
+APM_APP_DATA_SINK = ExampleSDK(
+    data_models=[DataModelId("apm", "ApmAppData", "v3")],
+    _top_level_package="sysdm_domain.client",
+    client_name="SysDMClient",
+    download_only=True,
+)
+
 
 # The following files are manually controlled and should not be overwritten by the generator by default.
 

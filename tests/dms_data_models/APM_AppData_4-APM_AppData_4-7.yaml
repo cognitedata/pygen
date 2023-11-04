@@ -1,0 +1,1385 @@
+createdTime: 1695041525375
+description: ''
+externalId: APM_AppData_4
+isGlobal: false
+lastUpdatedTime: 1695041525375
+name: APM_AppData_4
+space: APM_AppData_4
+version: '7'
+views:
+- createdTime: 1695041524103
+  externalId: APM_User
+  isGlobal: false
+  lastUpdatedTime: 1695041524103
+  name: APM_User
+  properties:
+    email:
+      autoIncrement: false
+      container:
+        externalId: APM_User
+        space: APM_AppData_4
+      containerPropertyIdentifier: email
+      defaultValue: null
+      description: null
+      name: email
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    lastSeen:
+      autoIncrement: false
+      container:
+        externalId: APM_User
+        space: APM_AppData_4
+      containerPropertyIdentifier: lastSeen
+      defaultValue: null
+      description: null
+      name: lastSeen
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: timestamp
+    name:
+      autoIncrement: false
+      container:
+        externalId: APM_User
+        space: APM_AppData_4
+      containerPropertyIdentifier: name
+      defaultValue: null
+      description: null
+      name: name
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    preferences:
+      autoIncrement: false
+      container:
+        externalId: APM_User
+        space: APM_AppData_4
+      containerPropertyIdentifier: preferences
+      defaultValue: null
+      description: null
+      name: preferences
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: json
+  space: APM_AppData_4
+  usedFor: node
+  version: '7'
+  writable: true
+- createdTime: 1695041524103
+  externalId: APM_Measurement
+  isGlobal: false
+  lastUpdatedTime: 1695041524103
+  name: APM_Measurement
+  properties:
+    createdByExternalId:
+      autoIncrement: false
+      container:
+        externalId: APM_Measurement
+        space: APM_AppData_4
+      containerPropertyIdentifier: createdByExternalId
+      defaultValue: null
+      description: System data
+      name: createdByExternalId
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    max:
+      autoIncrement: false
+      container:
+        externalId: APM_Measurement
+        space: APM_AppData_4
+      containerPropertyIdentifier: max
+      defaultValue: null
+      description: null
+      name: max
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: float64
+    measuredAt:
+      autoIncrement: false
+      container:
+        externalId: APM_Measurement
+        space: APM_AppData_4
+      containerPropertyIdentifier: measuredAt
+      defaultValue: null
+      description: Data
+      name: measuredAt
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: timestamp
+    min:
+      autoIncrement: false
+      container:
+        externalId: APM_Measurement
+        space: APM_AppData_4
+      containerPropertyIdentifier: min
+      defaultValue: null
+      description: Configuration
+      name: min
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: float64
+    numericReading:
+      autoIncrement: false
+      container:
+        externalId: APM_Measurement
+        space: APM_AppData_4
+      containerPropertyIdentifier: numericReading
+      defaultValue: null
+      description: null
+      name: numericReading
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: float64
+    operationExternalId:
+      autoIncrement: false
+      container:
+        externalId: APM_Measurement
+        space: APM_AppData_4
+      containerPropertyIdentifier: operationExternalId
+      defaultValue: null
+      description: Contextualisation
+      name: operationExternalId
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    options:
+      autoIncrement: false
+      container:
+        externalId: APM_Measurement
+        space: APM_AppData_4
+      containerPropertyIdentifier: options
+      defaultValue: null
+      description: null
+      name: options
+      nullable: true
+      source: null
+      type:
+        list: true
+        type: json
+    order:
+      autoIncrement: false
+      container:
+        externalId: APM_Measurement
+        space: APM_AppData_4
+      containerPropertyIdentifier: order
+      defaultValue: null
+      description: null
+      name: order
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: int32
+    stringReading:
+      autoIncrement: false
+      container:
+        externalId: APM_Measurement
+        space: APM_AppData_4
+      containerPropertyIdentifier: stringReading
+      defaultValue: null
+      description: null
+      name: stringReading
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    timeSeries:
+      autoIncrement: false
+      container:
+        externalId: APM_Measurement
+        space: APM_AppData_4
+      containerPropertyIdentifier: timeSeries
+      defaultValue: null
+      description: null
+      name: timeSeries
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: timeseries
+    timeseriesExternalId:
+      autoIncrement: false
+      container:
+        externalId: APM_Measurement
+        space: APM_AppData_4
+      containerPropertyIdentifier: timeseriesExternalId
+      defaultValue: null
+      description: null
+      name: timeseriesExternalId
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    type:
+      autoIncrement: false
+      container:
+        externalId: APM_Measurement
+        space: APM_AppData_4
+      containerPropertyIdentifier: type
+      defaultValue: null
+      description: Basic information
+      name: type
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    updatedByExternalId:
+      autoIncrement: false
+      container:
+        externalId: APM_Measurement
+        space: APM_AppData_4
+      containerPropertyIdentifier: updatedByExternalId
+      defaultValue: null
+      description: null
+      name: updatedByExternalId
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+  space: APM_AppData_4
+  usedFor: node
+  version: '7'
+  writable: true
+- createdTime: 1695041524103
+  externalId: APM_Schedule
+  isGlobal: false
+  lastUpdatedTime: 1695041524103
+  name: APM_Schedule
+  properties:
+    byDay:
+      autoIncrement: false
+      container:
+        externalId: APM_Schedule
+        space: APM_AppData_4
+      containerPropertyIdentifier: byDay
+      defaultValue: null
+      description: null
+      name: byDay
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: true
+        type: text
+    endTime:
+      autoIncrement: false
+      container:
+        externalId: APM_Schedule
+        space: APM_AppData_4
+      containerPropertyIdentifier: endTime
+      defaultValue: null
+      description: null
+      name: endTime
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: int32
+    executedAt:
+      autoIncrement: false
+      container:
+        externalId: APM_Schedule
+        space: APM_AppData_4
+      containerPropertyIdentifier: executedAt
+      defaultValue: null
+      description: null
+      name: executedAt
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: timestamp
+    freq:
+      autoIncrement: false
+      container:
+        externalId: APM_Schedule
+        space: APM_AppData_4
+      containerPropertyIdentifier: freq
+      defaultValue: null
+      description: iCalendar RRULE props
+      name: freq
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    interval:
+      autoIncrement: false
+      container:
+        externalId: APM_Schedule
+        space: APM_AppData_4
+      containerPropertyIdentifier: interval
+      defaultValue: null
+      description: null
+      name: interval
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    startDate:
+      autoIncrement: false
+      container:
+        externalId: APM_Schedule
+        space: APM_AppData_4
+      containerPropertyIdentifier: startDate
+      defaultValue: null
+      description: null
+      name: startDate
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: timestamp
+    startTime:
+      autoIncrement: false
+      container:
+        externalId: APM_Schedule
+        space: APM_AppData_4
+      containerPropertyIdentifier: startTime
+      defaultValue: null
+      description: Schedule information
+      name: startTime
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: int32
+    status:
+      autoIncrement: false
+      container:
+        externalId: APM_Schedule
+        space: APM_AppData_4
+      containerPropertyIdentifier: status
+      defaultValue: null
+      description: Basic information
+      name: status
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    templateItemExternalId:
+      autoIncrement: false
+      container:
+        externalId: APM_Schedule
+        space: APM_AppData_4
+      containerPropertyIdentifier: templateItemExternalId
+      defaultValue: null
+      description: Contextualisation
+      name: templateItemExternalId
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    timezone:
+      autoIncrement: false
+      container:
+        externalId: APM_Schedule
+        space: APM_AppData_4
+      containerPropertyIdentifier: timezone
+      defaultValue: null
+      description: null
+      name: timezone
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    until:
+      autoIncrement: false
+      container:
+        externalId: APM_Schedule
+        space: APM_AppData_4
+      containerPropertyIdentifier: until
+      defaultValue: null
+      description: null
+      name: until
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: timestamp
+  space: APM_AppData_4
+  usedFor: node
+  version: '7'
+  writable: true
+- createdTime: 1695041524103
+  externalId: APM_Checklist
+  isGlobal: false
+  lastUpdatedTime: 1695041524103
+  name: APM_Checklist
+  properties:
+    assignedTo:
+      autoIncrement: false
+      container:
+        externalId: APM_Checklist
+        space: APM_AppData_4
+      containerPropertyIdentifier: assignedTo
+      defaultValue: null
+      description: null
+      name: assignedTo
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: true
+        type: text
+    checklistItems:
+      description: Contextualisation
+      direction: outwards
+      edgeSource: null
+      name: checklistItems
+      source:
+        externalId: APM_ChecklistItem
+        space: APM_AppData_4
+        type: view
+        version: '7'
+      type:
+        externalId: APM_Checklist.checklistItems
+        space: APM_AppData_4
+    createdByExternalId:
+      autoIncrement: false
+      container:
+        externalId: APM_Checklist
+        space: APM_AppData_4
+      containerPropertyIdentifier: createdByExternalId
+      defaultValue: null
+      description: null
+      name: createdByExternalId
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    description:
+      autoIncrement: false
+      container:
+        externalId: APM_Checklist
+        space: APM_AppData_4
+      containerPropertyIdentifier: description
+      defaultValue: null
+      description: null
+      name: description
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    endTime:
+      autoIncrement: false
+      container:
+        externalId: APM_Checklist
+        space: APM_AppData_4
+      containerPropertyIdentifier: endTime
+      defaultValue: null
+      description: null
+      name: endTime
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: timestamp
+    isArchived:
+      autoIncrement: false
+      container:
+        externalId: APM_Checklist
+        space: APM_AppData_4
+      containerPropertyIdentifier: isArchived
+      defaultValue: null
+      description: System data
+      name: isArchived
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: boolean
+    rootLocationExternalId:
+      autoIncrement: false
+      container:
+        externalId: APM_Checklist
+        space: APM_AppData_4
+      containerPropertyIdentifier: rootLocationExternalId
+      defaultValue: null
+      description: null
+      name: rootLocationExternalId
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    sourceId:
+      autoIncrement: false
+      container:
+        externalId: APM_Checklist
+        space: APM_AppData_4
+      containerPropertyIdentifier: sourceId
+      defaultValue: null
+      description: Basic information
+      name: sourceId
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    startTime:
+      autoIncrement: false
+      container:
+        externalId: APM_Checklist
+        space: APM_AppData_4
+      containerPropertyIdentifier: startTime
+      defaultValue: null
+      description: Scheduling information
+      name: startTime
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: timestamp
+    status:
+      autoIncrement: false
+      container:
+        externalId: APM_Checklist
+        space: APM_AppData_4
+      containerPropertyIdentifier: status
+      defaultValue: null
+      description: null
+      name: status
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    title:
+      autoIncrement: false
+      container:
+        externalId: APM_Checklist
+        space: APM_AppData_4
+      containerPropertyIdentifier: title
+      defaultValue: null
+      description: null
+      name: title
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    type:
+      autoIncrement: false
+      container:
+        externalId: APM_Checklist
+        space: APM_AppData_4
+      containerPropertyIdentifier: type
+      defaultValue: null
+      description: null
+      name: type
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    updatedByExternalId:
+      autoIncrement: false
+      container:
+        externalId: APM_Checklist
+        space: APM_AppData_4
+      containerPropertyIdentifier: updatedByExternalId
+      defaultValue: null
+      description: null
+      name: updatedByExternalId
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+  space: APM_AppData_4
+  usedFor: node
+  version: '7'
+  writable: true
+- createdTime: 1695041524103
+  externalId: APM_ChecklistItem
+  isGlobal: false
+  lastUpdatedTime: 1695041524103
+  name: APM_ChecklistItem
+  properties:
+    assetExternalId:
+      autoIncrement: false
+      container:
+        externalId: APM_ChecklistItem
+        space: APM_AppData_4
+      containerPropertyIdentifier: assetExternalId
+      defaultValue: null
+      description: null
+      name: assetExternalId
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    checklistExternalId:
+      autoIncrement: false
+      container:
+        externalId: APM_ChecklistItem
+        space: APM_AppData_4
+      containerPropertyIdentifier: checklistExternalId
+      defaultValue: null
+      description: Contextualisation
+      name: checklistExternalId
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    createdByExternalId:
+      autoIncrement: false
+      container:
+        externalId: APM_ChecklistItem
+        space: APM_AppData_4
+      containerPropertyIdentifier: createdByExternalId
+      defaultValue: null
+      description: System data
+      name: createdByExternalId
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    description:
+      autoIncrement: false
+      container:
+        externalId: APM_ChecklistItem
+        space: APM_AppData_4
+      containerPropertyIdentifier: description
+      defaultValue: null
+      description: null
+      name: description
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    endTime:
+      autoIncrement: false
+      container:
+        externalId: APM_ChecklistItem
+        space: APM_AppData_4
+      containerPropertyIdentifier: endTime
+      defaultValue: null
+      description: null
+      name: endTime
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: timestamp
+    fileExternalIds:
+      autoIncrement: false
+      container:
+        externalId: APM_ChecklistItem
+        space: APM_AppData_4
+      containerPropertyIdentifier: fileExternalIds
+      defaultValue: null
+      description: null
+      name: fileExternalIds
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: true
+        type: text
+    labels:
+      autoIncrement: false
+      container:
+        externalId: APM_ChecklistItem
+        space: APM_AppData_4
+      containerPropertyIdentifier: labels
+      defaultValue: null
+      description: null
+      name: labels
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: true
+        type: text
+    note:
+      autoIncrement: false
+      container:
+        externalId: APM_ChecklistItem
+        space: APM_AppData_4
+      containerPropertyIdentifier: note
+      defaultValue: null
+      description: null
+      name: note
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    observations:
+      description: null
+      direction: outwards
+      edgeSource: null
+      name: observations
+      source:
+        externalId: APM_Observation
+        space: APM_AppData_4
+        type: view
+        version: '7'
+      type:
+        externalId: APM_ChecklistItem.observations
+        space: APM_AppData_4
+    order:
+      autoIncrement: false
+      container:
+        externalId: APM_ChecklistItem
+        space: APM_AppData_4
+      containerPropertyIdentifier: order
+      defaultValue: null
+      description: null
+      name: order
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: int32
+    sourceId:
+      autoIncrement: false
+      container:
+        externalId: APM_ChecklistItem
+        space: APM_AppData_4
+      containerPropertyIdentifier: sourceId
+      defaultValue: null
+      description: Basic information
+      name: sourceId
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    startTime:
+      autoIncrement: false
+      container:
+        externalId: APM_ChecklistItem
+        space: APM_AppData_4
+      containerPropertyIdentifier: startTime
+      defaultValue: null
+      description: Scheduling information
+      name: startTime
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: timestamp
+    status:
+      autoIncrement: false
+      container:
+        externalId: APM_ChecklistItem
+        space: APM_AppData_4
+      containerPropertyIdentifier: status
+      defaultValue: null
+      description: null
+      name: status
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    title:
+      autoIncrement: false
+      container:
+        externalId: APM_ChecklistItem
+        space: APM_AppData_4
+      containerPropertyIdentifier: title
+      defaultValue: null
+      description: null
+      name: title
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    updatedByExternalId:
+      autoIncrement: false
+      container:
+        externalId: APM_ChecklistItem
+        space: APM_AppData_4
+      containerPropertyIdentifier: updatedByExternalId
+      defaultValue: null
+      description: null
+      name: updatedByExternalId
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+  space: APM_AppData_4
+  usedFor: node
+  version: '7'
+  writable: true
+- createdTime: 1695041524103
+  externalId: APM_Observation
+  isGlobal: false
+  lastUpdatedTime: 1695041524103
+  name: APM_Observation
+  properties:
+    assetExternalId:
+      autoIncrement: false
+      container:
+        externalId: APM_Observation
+        space: APM_AppData_4
+      containerPropertyIdentifier: assetExternalId
+      defaultValue: null
+      description: Contextualization
+      name: assetExternalId
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    createdByExternalId:
+      autoIncrement: false
+      container:
+        externalId: APM_Observation
+        space: APM_AppData_4
+      containerPropertyIdentifier: createdByExternalId
+      defaultValue: null
+      description: null
+      name: createdByExternalId
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    description:
+      autoIncrement: false
+      container:
+        externalId: APM_Observation
+        space: APM_AppData_4
+      containerPropertyIdentifier: description
+      defaultValue: null
+      description: Observation data
+      name: description
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    fileExternalIds:
+      autoIncrement: false
+      container:
+        externalId: APM_Observation
+        space: APM_AppData_4
+      containerPropertyIdentifier: fileExternalIds
+      defaultValue: null
+      description: null
+      name: fileExternalIds
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: true
+        type: text
+    files:
+      autoIncrement: false
+      container:
+        externalId: APM_Observation
+        space: APM_AppData_4
+      containerPropertyIdentifier: files
+      defaultValue: null
+      description: null
+      name: files
+      nullable: true
+      source: null
+      type:
+        list: true
+        type: file
+    isArchived:
+      autoIncrement: false
+      container:
+        externalId: APM_Observation
+        space: APM_AppData_4
+      containerPropertyIdentifier: isArchived
+      defaultValue: null
+      description: System data
+      name: isArchived
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: boolean
+    measurements:
+      description: null
+      direction: outwards
+      edgeSource: null
+      name: measurements
+      source:
+        externalId: APM_Measurement
+        space: APM_AppData_4
+        type: view
+        version: '7'
+      type:
+        externalId: APM_Observation.measurements
+        space: APM_AppData_4
+    position:
+      autoIncrement: false
+      container:
+        externalId: APM_Observation
+        space: APM_AppData_4
+      containerPropertyIdentifier: position
+      defaultValue: null
+      description: null
+      name: position
+      nullable: true
+      type:
+        source:
+          externalId: Vec3f
+          space: APM_AppData_4
+          version: '7'
+        type: direct
+    priority:
+      autoIncrement: false
+      container:
+        externalId: APM_Observation
+        space: APM_AppData_4
+      containerPropertyIdentifier: priority
+      defaultValue: null
+      description: null
+      name: priority
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    sourceId:
+      autoIncrement: false
+      container:
+        externalId: APM_Observation
+        space: APM_AppData_4
+      containerPropertyIdentifier: sourceId
+      defaultValue: null
+      description: Basic information
+      name: sourceId
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    status:
+      autoIncrement: false
+      container:
+        externalId: APM_Observation
+        space: APM_AppData_4
+      containerPropertyIdentifier: status
+      defaultValue: null
+      description: null
+      name: status
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    troubleshooting:
+      autoIncrement: false
+      container:
+        externalId: APM_Observation
+        space: APM_AppData_4
+      containerPropertyIdentifier: troubleshooting
+      defaultValue: null
+      description: null
+      name: troubleshooting
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    type:
+      autoIncrement: false
+      container:
+        externalId: APM_Observation
+        space: APM_AppData_4
+      containerPropertyIdentifier: type
+      defaultValue: null
+      description: null
+      name: type
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    updatedByExternalId:
+      autoIncrement: false
+      container:
+        externalId: APM_Observation
+        space: APM_AppData_4
+      containerPropertyIdentifier: updatedByExternalId
+      defaultValue: null
+      description: null
+      name: updatedByExternalId
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+  space: APM_AppData_4
+  usedFor: node
+  version: '7'
+  writable: true
+- createdTime: 1695041524103
+  externalId: APM_Template
+  isGlobal: false
+  lastUpdatedTime: 1695041524103
+  name: APM_Template
+  properties:
+    assignedTo:
+      autoIncrement: false
+      container:
+        externalId: APM_Template
+        space: APM_AppData_4
+      containerPropertyIdentifier: assignedTo
+      defaultValue: null
+      description: null
+      name: assignedTo
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: true
+        type: text
+    createdByExternalId:
+      autoIncrement: false
+      container:
+        externalId: APM_Template
+        space: APM_AppData_4
+      containerPropertyIdentifier: createdByExternalId
+      defaultValue: null
+      description: null
+      name: createdByExternalId
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    isArchived:
+      autoIncrement: false
+      container:
+        externalId: APM_Template
+        space: APM_AppData_4
+      containerPropertyIdentifier: isArchived
+      defaultValue: null
+      description: System data
+      name: isArchived
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: boolean
+    rootLocationExternalId:
+      autoIncrement: false
+      container:
+        externalId: APM_Template
+        space: APM_AppData_4
+      containerPropertyIdentifier: rootLocationExternalId
+      defaultValue: null
+      description: Contextualisation
+      name: rootLocationExternalId
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    status:
+      autoIncrement: false
+      container:
+        externalId: APM_Template
+        space: APM_AppData_4
+      containerPropertyIdentifier: status
+      defaultValue: null
+      description: null
+      name: status
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    templateItems:
+      description: null
+      direction: outwards
+      edgeSource: null
+      name: templateItems
+      source:
+        externalId: APM_TemplateItem
+        space: APM_AppData_4
+        type: view
+        version: '7'
+      type:
+        externalId: APM_Template.templateItems
+        space: APM_AppData_4
+    title:
+      autoIncrement: false
+      container:
+        externalId: APM_Template
+        space: APM_AppData_4
+      containerPropertyIdentifier: title
+      defaultValue: null
+      description: Basic information
+      name: title
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    updatedByExternalId:
+      autoIncrement: false
+      container:
+        externalId: APM_Template
+        space: APM_AppData_4
+      containerPropertyIdentifier: updatedByExternalId
+      defaultValue: null
+      description: null
+      name: updatedByExternalId
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+  space: APM_AppData_4
+  usedFor: node
+  version: '7'
+  writable: true
+- createdTime: 1695041524103
+  externalId: APM_TemplateItem
+  isGlobal: false
+  lastUpdatedTime: 1695041524103
+  name: APM_TemplateItem
+  properties:
+    assetExternalId:
+      autoIncrement: false
+      container:
+        externalId: APM_TemplateItem
+        space: APM_AppData_4
+      containerPropertyIdentifier: assetExternalId
+      defaultValue: null
+      description: null
+      name: assetExternalId
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    createdByExternalId:
+      autoIncrement: false
+      container:
+        externalId: APM_TemplateItem
+        space: APM_AppData_4
+      containerPropertyIdentifier: createdByExternalId
+      defaultValue: null
+      description: System data
+      name: createdByExternalId
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    labels:
+      autoIncrement: false
+      container:
+        externalId: APM_TemplateItem
+        space: APM_AppData_4
+      containerPropertyIdentifier: labels
+      defaultValue: null
+      description: null
+      name: labels
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: true
+        type: text
+    order:
+      autoIncrement: false
+      container:
+        externalId: APM_TemplateItem
+        space: APM_AppData_4
+      containerPropertyIdentifier: order
+      defaultValue: null
+      description: null
+      name: order
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: int32
+    templateExternalId:
+      autoIncrement: false
+      container:
+        externalId: APM_TemplateItem
+        space: APM_AppData_4
+      containerPropertyIdentifier: templateExternalId
+      defaultValue: null
+      description: Contextualisation
+      name: templateExternalId
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    title:
+      autoIncrement: false
+      container:
+        externalId: APM_TemplateItem
+        space: APM_AppData_4
+      containerPropertyIdentifier: title
+      defaultValue: null
+      description: Basic information
+      name: title
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    updatedByExternalId:
+      autoIncrement: false
+      container:
+        externalId: APM_TemplateItem
+        space: APM_AppData_4
+      containerPropertyIdentifier: updatedByExternalId
+      defaultValue: null
+      description: null
+      name: updatedByExternalId
+      nullable: true
+      source: null
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+  space: APM_AppData_4
+  usedFor: node
+  version: '7'
+  writable: true
+- createdTime: 1695041524103
+  externalId: Vec3f
+  isGlobal: false
+  lastUpdatedTime: 1695041524103
+  name: Vec3f
+  properties:
+    x:
+      autoIncrement: false
+      container:
+        externalId: Vec3f
+        space: APM_AppData_4
+      containerPropertyIdentifier: x
+      defaultValue: null
+      description: null
+      name: x
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: float64
+    y:
+      autoIncrement: false
+      container:
+        externalId: Vec3f
+        space: APM_AppData_4
+      containerPropertyIdentifier: y
+      defaultValue: null
+      description: null
+      name: y
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: float64
+    z:
+      autoIncrement: false
+      container:
+        externalId: Vec3f
+        space: APM_AppData_4
+      containerPropertyIdentifier: z
+      defaultValue: null
+      description: null
+      name: z
+      nullable: true
+      source: null
+      type:
+        list: false
+        type: float64
+  space: APM_AppData_4
+  usedFor: node
+  version: '7'
+  writable: true

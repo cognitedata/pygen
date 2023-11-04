@@ -7,12 +7,12 @@ import re
 import toml
 import typer
 from cognite.client._version import __version__ as cognite_sdk_version
-from cognite.client.data_classes.data_modeling import DataModel
+from cognite.client.data_classes.data_modeling import DataModel, SpaceApply
 from pydantic.version import VERSION as PYDANTIC_VERSION
 from yaml import safe_dump, safe_load
 
 from cognite.pygen._generator import SDKGenerator, write_sdk_to_disk
-from cognite.pygen.utils.cdf import load_cognite_client_from_toml
+from cognite.pygen.utils.cdf import _user_options, load_cognite_client_from_toml
 from tests.constants import EXAMPLE_SDKS, EXAMPLES_DIR, REPO_ROOT
 
 app = typer.Typer(
@@ -73,6 +73,24 @@ def download():
                 raise ValueError(f"Failed to retrieve {datamodel_id}")
             dms_file.write_text(safe_dump(dms_model.dump(), sort_keys=True))
             typer.echo(f"Downloaded {dms_file.relative_to(REPO_ROOT)}")
+
+
+@app.command("deploy", help="Deploy all example SDKs to CDF")
+def deploy():
+    client = load_cognite_client_from_toml("config.toml")
+    index = _user_options([", ".join(map(str, example.data_models)) for example in EXAMPLE_SDKS])
+    example_sdk = EXAMPLE_SDKS[index]
+    data_models = example_sdk.load_data_models()
+    spaces = list({model.space for model in data_models})
+    client.data_modeling.spaces.apply([SpaceApply(space) for space in spaces])
+    if example_sdk.has_container_file:
+        containers = example_sdk.load_containers()
+        new_containers = client.data_modeling.containers.apply(containers)
+        for container in new_containers:
+            typer.echo(f"Created container {container.name} in space {container.space}")
+
+    new_model = client.data_modeling.data_models.apply(data_models.as_apply())
+    typer.echo(f"Created data model {new_model.name} in space {new_model.space}")
 
 
 @app.command("list", help="List all example files which are expected to be changed manually")

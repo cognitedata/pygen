@@ -1,0 +1,714 @@
+- externalId: APM_User
+  name: APM_User
+  properties:
+    email:
+      autoIncrement: false
+      name: email
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    lastSeen:
+      autoIncrement: false
+      name: lastSeen
+      nullable: true
+      type:
+        list: false
+        type: timestamp
+    name:
+      autoIncrement: false
+      name: name
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    preferences:
+      autoIncrement: false
+      name: preferences
+      nullable: true
+      type:
+        list: false
+        type: json
+  space: APM_AppData_4
+  usedFor: node
+- externalId: APM_Template
+  name: APM_Template
+  properties:
+    assignedTo:
+      autoIncrement: false
+      name: assignedTo
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: true
+        type: text
+    createdByExternalId:
+      autoIncrement: false
+      name: createdByExternalId
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    isArchived:
+      autoIncrement: false
+      description: System data
+      name: isArchived
+      nullable: true
+      type:
+        list: false
+        type: boolean
+    rootLocationExternalId:
+      autoIncrement: false
+      description: Contextualisation
+      name: rootLocationExternalId
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    status:
+      autoIncrement: false
+      name: status
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    title:
+      autoIncrement: false
+      description: Basic information
+      name: title
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    updatedByExternalId:
+      autoIncrement: false
+      name: updatedByExternalId
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+  space: APM_AppData_4
+  usedFor: node
+- externalId: APM_TemplateItem
+  name: APM_TemplateItem
+  properties:
+    assetExternalId:
+      autoIncrement: false
+      name: assetExternalId
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    createdByExternalId:
+      autoIncrement: false
+      description: System data
+      name: createdByExternalId
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    labels:
+      autoIncrement: false
+      name: labels
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: true
+        type: text
+    order:
+      autoIncrement: false
+      name: order
+      nullable: true
+      type:
+        list: false
+        type: int32
+    templateExternalId:
+      autoIncrement: false
+      description: Contextualisation
+      name: templateExternalId
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    title:
+      autoIncrement: false
+      description: Basic information
+      name: title
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    updatedByExternalId:
+      autoIncrement: false
+      name: updatedByExternalId
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+  space: APM_AppData_4
+  usedFor: node
+- externalId: APM_Schedule
+  name: APM_Schedule
+  properties:
+    byDay:
+      autoIncrement: false
+      name: byDay
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: true
+        type: text
+    endTime:
+      autoIncrement: false
+      name: endTime
+      nullable: true
+      type:
+        list: false
+        type: int32
+    executedAt:
+      autoIncrement: false
+      name: executedAt
+      nullable: true
+      type:
+        list: false
+        type: timestamp
+    freq:
+      autoIncrement: false
+      description: iCalendar RRULE props
+      name: freq
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    interval:
+      autoIncrement: false
+      name: interval
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    startDate:
+      autoIncrement: false
+      name: startDate
+      nullable: true
+      type:
+        list: false
+        type: timestamp
+    startTime:
+      autoIncrement: false
+      description: Schedule information
+      name: startTime
+      nullable: true
+      type:
+        list: false
+        type: int32
+    status:
+      autoIncrement: false
+      description: Basic information
+      name: status
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    templateItemExternalId:
+      autoIncrement: false
+      description: Contextualisation
+      name: templateItemExternalId
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    timezone:
+      autoIncrement: false
+      name: timezone
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    until:
+      autoIncrement: false
+      name: until
+      nullable: true
+      type:
+        list: false
+        type: timestamp
+  space: APM_AppData_4
+  usedFor: node
+- externalId: APM_Checklist
+  name: APM_Checklist
+  properties:
+    assignedTo:
+      autoIncrement: false
+      name: assignedTo
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: true
+        type: text
+    createdByExternalId:
+      autoIncrement: false
+      name: createdByExternalId
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    description:
+      autoIncrement: false
+      name: description
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    endTime:
+      autoIncrement: false
+      name: endTime
+      nullable: true
+      type:
+        list: false
+        type: timestamp
+    isArchived:
+      autoIncrement: false
+      description: System data
+      name: isArchived
+      nullable: true
+      type:
+        list: false
+        type: boolean
+    rootLocationExternalId:
+      autoIncrement: false
+      name: rootLocationExternalId
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    sourceId:
+      autoIncrement: false
+      description: Basic information
+      name: sourceId
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    startTime:
+      autoIncrement: false
+      description: Scheduling information
+      name: startTime
+      nullable: true
+      type:
+        list: false
+        type: timestamp
+    status:
+      autoIncrement: false
+      name: status
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    title:
+      autoIncrement: false
+      name: title
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    type:
+      autoIncrement: false
+      name: type
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    updatedByExternalId:
+      autoIncrement: false
+      name: updatedByExternalId
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+  space: APM_AppData_4
+  usedFor: node
+- externalId: APM_Observation
+  name: APM_Observation
+  properties:
+    assetExternalId:
+      autoIncrement: false
+      description: Contextualization
+      name: assetExternalId
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    createdByExternalId:
+      autoIncrement: false
+      name: createdByExternalId
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    description:
+      autoIncrement: false
+      description: Observation data
+      name: description
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    fileExternalIds:
+      autoIncrement: false
+      name: fileExternalIds
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: true
+        type: text
+    files:
+      autoIncrement: false
+      name: files
+      nullable: true
+      type:
+        list: true
+        type: file
+    isArchived:
+      autoIncrement: false
+      description: System data
+      name: isArchived
+      nullable: true
+      type:
+        list: false
+        type: boolean
+    position:
+      autoIncrement: false
+      name: position
+      nullable: true
+      type:
+        type: direct
+    priority:
+      autoIncrement: false
+      name: priority
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    sourceId:
+      autoIncrement: false
+      description: Basic information
+      name: sourceId
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    status:
+      autoIncrement: false
+      name: status
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    troubleshooting:
+      autoIncrement: false
+      name: troubleshooting
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    type:
+      autoIncrement: false
+      name: type
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    updatedByExternalId:
+      autoIncrement: false
+      name: updatedByExternalId
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+  space: APM_AppData_4
+  usedFor: node
+- externalId: APM_Measurement
+  name: APM_Measurement
+  properties:
+    createdByExternalId:
+      autoIncrement: false
+      description: System data
+      name: createdByExternalId
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    max:
+      autoIncrement: false
+      name: max
+      nullable: true
+      type:
+        list: false
+        type: float64
+    measuredAt:
+      autoIncrement: false
+      description: Data
+      name: measuredAt
+      nullable: true
+      type:
+        list: false
+        type: timestamp
+    min:
+      autoIncrement: false
+      description: Configuration
+      name: min
+      nullable: true
+      type:
+        list: false
+        type: float64
+    numericReading:
+      autoIncrement: false
+      name: numericReading
+      nullable: true
+      type:
+        list: false
+        type: float64
+    operationExternalId:
+      autoIncrement: false
+      description: Contextualisation
+      name: operationExternalId
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    options:
+      autoIncrement: false
+      name: options
+      nullable: true
+      type:
+        list: true
+        type: json
+    order:
+      autoIncrement: false
+      name: order
+      nullable: true
+      type:
+        list: false
+        type: int32
+    stringReading:
+      autoIncrement: false
+      name: stringReading
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    timeSeries:
+      autoIncrement: false
+      name: timeSeries
+      nullable: true
+      type:
+        list: false
+        type: timeseries
+    timeseriesExternalId:
+      autoIncrement: false
+      name: timeseriesExternalId
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    type:
+      autoIncrement: false
+      description: Basic information
+      name: type
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    updatedByExternalId:
+      autoIncrement: false
+      name: updatedByExternalId
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+  space: APM_AppData_4
+  usedFor: node
+- externalId: APM_ChecklistItem
+  name: APM_ChecklistItem
+  properties:
+    assetExternalId:
+      autoIncrement: false
+      name: assetExternalId
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    checklistExternalId:
+      autoIncrement: false
+      description: Contextualisation
+      name: checklistExternalId
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    createdByExternalId:
+      autoIncrement: false
+      description: System data
+      name: createdByExternalId
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    description:
+      autoIncrement: false
+      name: description
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    endTime:
+      autoIncrement: false
+      name: endTime
+      nullable: true
+      type:
+        list: false
+        type: timestamp
+    fileExternalIds:
+      autoIncrement: false
+      name: fileExternalIds
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: true
+        type: text
+    labels:
+      autoIncrement: false
+      name: labels
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: true
+        type: text
+    note:
+      autoIncrement: false
+      name: note
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    order:
+      autoIncrement: false
+      name: order
+      nullable: true
+      type:
+        list: false
+        type: int32
+    sourceId:
+      autoIncrement: false
+      description: Basic information
+      name: sourceId
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    startTime:
+      autoIncrement: false
+      description: Scheduling information
+      name: startTime
+      nullable: true
+      type:
+        list: false
+        type: timestamp
+    status:
+      autoIncrement: false
+      name: status
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    title:
+      autoIncrement: false
+      name: title
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+    updatedByExternalId:
+      autoIncrement: false
+      name: updatedByExternalId
+      nullable: true
+      type:
+        collation: ucs_basic
+        list: false
+        type: text
+  space: APM_AppData_4
+  usedFor: node
+- externalId: Vec3f
+  name: Vec3f
+  properties:
+    x:
+      autoIncrement: false
+      name: x
+      nullable: true
+      type:
+        list: false
+        type: float64
+    y:
+      autoIncrement: false
+      name: y
+      nullable: true
+      type:
+        list: false
+        type: float64
+    z:
+      autoIncrement: false
+      name: z
+      nullable: true
+      type:
+        list: false
+        type: float64
+  space: APM_AppData_4
+  usedFor: node
