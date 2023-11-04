@@ -61,9 +61,42 @@ class AssetPressureQuery:
         *,
         aggregates: Aggregate | list[Aggregate] | None = None,
         granularity: str | None = None,
+        target_unit: str | None = None,
+        target_unit_system: str | None = None,
         limit: int | None = None,
         include_outside_points: bool = False,
     ) -> DatapointsList:
+        """`Retrieve datapoints for the `asset.pressure` timeseries.
+
+        **Performance guide**:
+            In order to retrieve millions of datapoints as efficiently as possible, here are a few guidelines:
+
+            1. For best speed, and significantly lower memory usage, consider using ``retrieve_arrays(...)`` which uses ``numpy.ndarrays`` for data storage.
+            2. Only unlimited queries with (``limit=None``) are fetched in parallel so specifying a large finite ``limit`` like 1 million, comes with severe performance penalty as data is fetched serially.
+            3. Try to avoid specifying `start` and `end` to be very far from the actual data: If you have data from 2000 to 2015, don't set start=0 (1970).
+
+        Args:
+            start: Inclusive start. Default: 1970-01-01 UTC.
+            end: Exclusive end. Default: "now"
+            aggregates: Single aggregate or list of aggregates to retrieve. Default: None (raw datapoints returned)
+            granularity The granularity to fetch aggregates at. e.g. '15s', '2h', '10d'. Default: None.
+            target_unit: The unit_external_id of the data points returned. If the time series does not have a unit_external_id that can be converted to the target_unit, an error will be returned. Cannot be used with target_unit_system.
+            target_unit_system: The unit system of the data points returned. Cannot be used with target_unit.
+            limit (int | None): Maximum number of datapoints to return for each time series. Default: None (no limit)
+            include_outside_points (bool): Whether to include outside points. Not allowed when fetching aggregates. Default: False
+
+        Returns:
+            A ``DatapointsList`` with the requested datapoints.
+
+        Examples:
+
+            In this example,
+            we are using the time-ago format to get raw data for the 'my_pressure' from 2 weeks ago up until now::
+
+                >>> from tutorial_apm_simple_pydantic_v1.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> asset_datapoints = client.asset.pressure(external_id="my_pressure").retrieve(start="2w-ago)
+        """
         external_ids = self._retrieve_timeseries_external_ids_with_extra()
         if external_ids:
             return self._client.time_series.data.retrieve(
@@ -72,6 +105,8 @@ class AssetPressureQuery:
                 end=end,
                 aggregates=aggregates,
                 granularity=granularity,
+                target_unit=target_unit,
+                target_unit_system=target_unit_system,
                 limit=limit,
                 include_outside_points=include_outside_points,
             )
@@ -85,9 +120,42 @@ class AssetPressureQuery:
         *,
         aggregates: Aggregate | list[Aggregate] | None = None,
         granularity: str | None = None,
+        target_unit: str | None = None,
+        target_unit_system: str | None = None,
         limit: int | None = None,
         include_outside_points: bool = False,
     ) -> DatapointsArrayList:
+        """`Retrieve numpy arrays for the `asset.pressure` timeseries.
+
+        **Performance guide**:
+            In order to retrieve millions of datapoints as efficiently as possible, here are a few guidelines:
+
+            1. For best speed, and significantly lower memory usage, consider using ``retrieve_arrays(...)`` which uses ``numpy.ndarrays`` for data storage.
+            2. Only unlimited queries with (``limit=None``) are fetched in parallel so specifying a large finite ``limit`` like 1 million, comes with severe performance penalty as data is fetched serially.
+            3. Try to avoid specifying `start` and `end` to be very far from the actual data: If you have data from 2000 to 2015, don't set start=0 (1970).
+
+        Args:
+            start: Inclusive start. Default: 1970-01-01 UTC.
+            end: Exclusive end. Default: "now"
+            aggregates: Single aggregate or list of aggregates to retrieve. Default: None (raw datapoints returned)
+            granularity The granularity to fetch aggregates at. e.g. '15s', '2h', '10d'. Default: None.
+            target_unit: The unit_external_id of the data points returned. If the time series does not have a unit_external_id that can be converted to the target_unit, an error will be returned. Cannot be used with target_unit_system.
+            target_unit_system: The unit system of the data points returned. Cannot be used with target_unit.
+            limit (int | None): Maximum number of datapoints to return for each time series. Default: None (no limit)
+            include_outside_points (bool): Whether to include outside points. Not allowed when fetching aggregates. Default: False
+
+        Returns:
+            A ``DatapointsArrayList`` with the requested datapoints.
+
+        Examples:
+
+            In this example,
+            we are using the time-ago format to get raw data for the 'my_pressure' from 2 weeks ago up until now::
+
+                >>> from tutorial_apm_simple_pydantic_v1.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> asset_datapoints = client.asset.pressure(external_id="my_pressure").retrieve_array(start="2w-ago)
+        """
         external_ids = self._retrieve_timeseries_external_ids_with_extra()
         if external_ids:
             return self._client.time_series.data.retrieve_arrays(
@@ -96,6 +164,8 @@ class AssetPressureQuery:
                 end=end,
                 aggregates=aggregates,
                 granularity=granularity,
+                target_unit=target_unit,
+                target_unit_system=target_unit_system,
                 limit=limit,
                 include_outside_points=include_outside_points,
             )
@@ -109,6 +179,8 @@ class AssetPressureQuery:
         *,
         aggregates: Aggregate | list[Aggregate] | None = None,
         granularity: str | None = None,
+        target_unit: str | None = None,
+        target_unit_system: str | None = None,
         limit: int | None = None,
         include_outside_points: bool = False,
         uniform_index: bool = False,
@@ -116,6 +188,42 @@ class AssetPressureQuery:
         include_granularity_name: bool = False,
         column_names: ColumnNames | list[ColumnNames] = "pressure",
     ) -> pd.DataFrame:
+        """`Retrieve DataFrames for the `asset.pressure` timeseries.
+
+        **Performance guide**:
+            In order to retrieve millions of datapoints as efficiently as possible, here are a few guidelines:
+
+            1. For best speed, and significantly lower memory usage, consider using ``retrieve_arrays(...)`` which uses ``numpy.ndarrays`` for data storage.
+            2. Only unlimited queries with (``limit=None``) are fetched in parallel so specifying a large finite ``limit`` like 1 million, comes with severe performance penalty as data is fetched serially.
+            3. Try to avoid specifying `start` and `end` to be very far from the actual data: If you have data from 2000 to 2015, don't set start=0 (1970).
+
+        Args:
+            start: Inclusive start. Default: 1970-01-01 UTC.
+            end: Exclusive end. Default: "now"
+            aggregates: Single aggregate or list of aggregates to retrieve. Default: None (raw datapoints returned)
+            granularity The granularity to fetch aggregates at. e.g. '15s', '2h', '10d'. Default: None.
+            target_unit: The unit_external_id of the data points returned. If the time series does not have a unit_external_id that can be converted to the target_unit, an error will be returned. Cannot be used with target_unit_system.
+            target_unit_system: The unit system of the data points returned. Cannot be used with target_unit.
+            limit: Maximum number of datapoints to return for each time series. Default: None (no limit)
+            include_outside_points: Whether to include outside points. Not allowed when fetching aggregates. Default: False
+            uniform_index: If only querying aggregates AND a single granularity is used AND no limit is used, specifying `uniform_index=True` will return a dataframe with an equidistant datetime index from the earliest `start` to the latest `end` (missing values will be NaNs). If these requirements are not met, a ValueError is raised. Default: False
+            include_aggregate_name: Include 'aggregate' in the column name, e.g. `my-ts|average`. Ignored for raw time series. Default: True
+            include_granularity_name: Include 'granularity' in the column name, e.g. `my-ts|12h`. Added after 'aggregate' when present. Ignored for raw time series. Default: False
+            column_names: Which property to use for column names. Defauts to pressure
+
+
+        Returns:
+            A ``DataFrame`` with the requested datapoints.
+
+        Examples:
+
+            In this example,
+            we are using the time-ago format to get raw data for the 'my_pressure' from 2 weeks ago up until now::
+
+                >>> from tutorial_apm_simple_pydantic_v1.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> asset_datapoints = client.asset.pressure(external_id="my_pressure").retrieve_dataframe(start="2w-ago)
+        """
         external_ids = self._retrieve_timeseries_external_ids_with_extra(column_names)
         if external_ids:
             df = self._client.time_series.data.retrieve_dataframe(
@@ -124,6 +232,8 @@ class AssetPressureQuery:
                 end=end,
                 aggregates=aggregates,
                 granularity=granularity,
+                target_unit=target_unit,
+                target_unit_system=target_unit_system,
                 limit=limit,
                 include_outside_points=include_outside_points,
                 uniform_index=uniform_index,
@@ -153,6 +263,49 @@ class AssetPressureQuery:
         include_granularity_name: bool = False,
         column_names: ColumnNames | list[ColumnNames] = "pressure",
     ) -> pd.DataFrame:
+        """Retrieve DataFrames for the `asset.pressure` timeseries in Timezone.
+
+        **Performance guide**:
+            In order to retrieve millions of datapoints as efficiently as possible, here are a few guidelines:
+
+            1. For best speed, and significantly lower memory usage, consider using ``retrieve_arrays(...)`` which uses ``numpy.ndarrays`` for data storage.
+            2. Only unlimited queries with (``limit=None``) are fetched in parallel so specifying a large finite ``limit`` like 1 million, comes with severe performance penalty as data is fetched serially.
+            3. Try to avoid specifying `start` and `end` to be very far from the actual data: If you have data from 2000 to 2015, don't set start=0 (1970).
+
+        Args:
+            start: Inclusive start.
+            end: Exclusive end
+            aggregates: Single aggregate or list of aggregates to retrieve. Default: None (raw datapoints returned)
+            granularity The granularity to fetch aggregates at. e.g. '15s', '2h', '10d'. Default: None.
+            target_unit: The unit_external_id of the data points returned. If the time series does not have a unit_external_id that can be converted to the target_unit, an error will be returned. Cannot be used with target_unit_system.
+            target_unit_system: The unit system of the data points returned. Cannot be used with target_unit.
+            limit: Maximum number of datapoints to return for each time series. Default: None (no limit)
+            include_outside_points: Whether to include outside points. Not allowed when fetching aggregates. Default: False
+            uniform_index: If only querying aggregates AND a single granularity is used AND no limit is used, specifying `uniform_index=True` will return a dataframe with an equidistant datetime index from the earliest `start` to the latest `end` (missing values will be NaNs). If these requirements are not met, a ValueError is raised. Default: False
+            include_aggregate_name: Include 'aggregate' in the column name, e.g. `my-ts|average`. Ignored for raw time series. Default: True
+            include_granularity_name: Include 'granularity' in the column name, e.g. `my-ts|12h`. Added after 'aggregate' when present. Ignored for raw time series. Default: False
+            column_names: Which property to use for column names. Defauts to pressure
+
+
+        Returns:
+            A ``DataFrame`` with the requested datapoints.
+
+        Examples:
+
+            In this example,
+            get weekly aggregates for the 'my_pressure' for the first month of 2023 in Oslo time:
+
+                >>> from tutorial_apm_simple_pydantic_v1.client import ApmSimpleClient
+                >>> from datetime import datetime, timezone
+                >>> client = ApmSimpleClient()
+                >>> asset_datapoints = client.asset.pressure(
+                ...     external_id="my_pressure").retrieve_dataframe_in_timezone(
+                ...         datetime(2023, 1, 1, tzinfo=ZoneInfo("Europe/Oslo")),
+                ...         datetime(2023, 1, 2, tzinfo=ZoneInfo("Europe/Oslo")),
+                ...         aggregates="average",
+                ...         granularity="1week",
+                ...     )
+        """
         external_ids = self._retrieve_timeseries_external_ids_with_extra(column_names)
         if external_ids:
             df = self._client.time_series.data.retrieve_dataframe_in_tz(
@@ -161,6 +314,8 @@ class AssetPressureQuery:
                 end=end,
                 aggregates=aggregates,
                 granularity=granularity,
+                target_unit=target_unit,
+                target_unit_system=target_unit_system,
                 uniform_index=uniform_index,
                 include_aggregate_name=include_aggregate_name,
                 include_granularity_name=include_granularity_name,
@@ -188,48 +343,6 @@ class AssetPressureQuery:
             )
         else:
             return None
-
-    def plot(
-        self,
-        start: int | str | datetime.datetime | None = None,
-        end: int | str | datetime.datetime | None = None,
-        *,
-        aggregates: Aggregate | Sequence[Aggregate] | None = None,
-        granularity: str | None = None,
-        uniform_index: bool = False,
-        include_aggregate_name: bool = True,
-        include_granularity_name: bool = False,
-        column_names: ColumnNames | list[ColumnNames] = "pressure",
-        warning: bool = True,
-        **kwargs,
-    ) -> None:
-        if warning:
-            warnings.warn(
-                "This methods if an experiment and might be removed in the future without notice.", stacklevel=2
-            )
-        if all(isinstance(time, datetime.datetime) and time.tzinfo is not None for time in [start, end]):
-            df = self.retrieve_dataframe_in_tz(
-                start=start,
-                end=end,
-                aggregates=aggregates,
-                granularity=granularity,
-                uniform_index=uniform_index,
-                include_aggregate_name=include_aggregate_name,
-                include_granularity_name=include_granularity_name,
-                column_names=column_names,
-            )
-        else:
-            df = self.retrieve_dataframe(
-                start=start,
-                end=end,
-                aggregates=aggregates,
-                granularity=granularity,
-                uniform_index=uniform_index,
-                include_aggregate_name=include_aggregate_name,
-                include_granularity_name=include_granularity_name,
-                column_names=column_names,
-            )
-        df.plot(**kwargs)
 
     def _retrieve_timeseries_external_ids_with_extra(
         self, extra_properties: ColumnNames | list[ColumnNames] = "pressure"
@@ -292,6 +405,44 @@ class AssetPressureAPI:
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> AssetPressureQuery:
+        """Query timeseries `asset.pressure`
+
+        Args:
+            min_area_id: The minimum value of the area id to filter on.
+            max_area_id: The maximum value of the area id to filter on.
+            min_category_id: The minimum value of the category id to filter on.
+            max_category_id: The maximum value of the category id to filter on.
+            min_created_date: The minimum value of the created date to filter on.
+            max_created_date: The maximum value of the created date to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            is_active: The is active to filter on.
+            is_critical_line: The is critical line to filter on.
+            parent: The parent to filter on.
+            source_db: The source db to filter on.
+            source_db_prefix: The prefix of the source db to filter on.
+            tag: The tag to filter on.
+            tag_prefix: The prefix of the tag to filter on.
+            min_updated_date: The minimum value of the updated date to filter on.
+            max_updated_date: The maximum value of the updated date to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of assets to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            A query object that can be used to retrieve datapoins for the  asset.pressure timeseries
+            selected in this method.
+
+        Examples:
+
+            Retrieve all data for 5 asset.pressure timeseries:
+
+                >>> from tutorial_apm_simple_pydantic_v1.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> assets = client.asset.pressure(limit=5).retrieve()
+
+        """
         filter_ = _create_filter(
             self._view_id,
             min_area_id,
@@ -347,6 +498,43 @@ class AssetPressureAPI:
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> TimeSeriesList:
+        """List timeseries `asset.pressure`
+
+        Args:
+            min_area_id: The minimum value of the area id to filter on.
+            max_area_id: The maximum value of the area id to filter on.
+            min_category_id: The minimum value of the category id to filter on.
+            max_category_id: The maximum value of the category id to filter on.
+            min_created_date: The minimum value of the created date to filter on.
+            max_created_date: The maximum value of the created date to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            is_active: The is active to filter on.
+            is_critical_line: The is critical line to filter on.
+            parent: The parent to filter on.
+            source_db: The source db to filter on.
+            source_db_prefix: The prefix of the source db to filter on.
+            tag: The tag to filter on.
+            tag_prefix: The prefix of the tag to filter on.
+            min_updated_date: The minimum value of the updated date to filter on.
+            max_updated_date: The maximum value of the updated date to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of assets to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of Timeseries asset.pressure.
+
+        Examples:
+
+            List asset.pressure and limit to 5:
+
+                >>> from tutorial_apm_simple_pydantic_v1.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> assets = client.asset.pressure.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             min_area_id,
@@ -438,6 +626,24 @@ class AssetChildrenAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="tutorial_apm_simple") -> dm.EdgeList:
+        """Retrieve one or more children edges by id(s) of a asset.
+
+        Args:
+            external_id: External id or list of external ids source asset.
+            space: The space where all the child edges are located.
+
+        Returns:
+            The requested child edges.
+
+        Examples:
+
+            Retrieve children edge by id:
+
+                >>> from tutorial_apm_simple_pydantic_v1.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> asset = client.asset.children.retrieve("my_children")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -460,6 +666,26 @@ class AssetChildrenAPI:
     def list(
         self, asset_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="tutorial_apm_simple"
     ) -> dm.EdgeList:
+        """List children edges of a asset.
+
+        Args:
+            asset_id: Id of the source asset.
+            limit: Maximum number of child edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the child edges are located.
+
+        Returns:
+            The requested child edges.
+
+        Examples:
+
+            List 5 children edges connected to "my_asset":
+
+                >>> from tutorial_apm_simple_pydantic_v1.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> asset = client.asset.children.list("my_asset", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -483,6 +709,24 @@ class AssetInModelAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="cdf_3d_schema") -> dm.EdgeList:
+        """Retrieve one or more in_model_3_d edges by id(s) of a asset.
+
+        Args:
+            external_id: External id or list of external ids source asset.
+            space: The space where all the in model 3 d edges are located.
+
+        Returns:
+            The requested in model 3 d edges.
+
+        Examples:
+
+            Retrieve in_model_3_d edge by id:
+
+                >>> from tutorial_apm_simple_pydantic_v1.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> asset = client.asset.in_model_3_d.retrieve("my_in_model_3_d")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -505,6 +749,26 @@ class AssetInModelAPI:
     def list(
         self, asset_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="cdf_3d_schema"
     ) -> dm.EdgeList:
+        """List in_model_3_d edges of a asset.
+
+        Args:
+            asset_id: Id of the source asset.
+            limit: Maximum number of in model 3 d edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the in model 3 d edges are located.
+
+        Returns:
+            The requested in model 3 d edges.
+
+        Examples:
+
+            List 5 in_model_3_d edges connected to "my_asset":
+
+                >>> from tutorial_apm_simple_pydantic_v1.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> asset = client.asset.in_model_3_d.list("my_asset", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -540,6 +804,30 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
         self.pressure = AssetPressureAPI(client, view_id)
 
     def apply(self, asset: AssetApply | Sequence[AssetApply], replace: bool = False) -> dm.InstancesApplyResult:
+        """Add or update (upsert) assets.
+
+        Note: This method iterates through all nodes linked to asset and create them including the edges
+        between the nodes. For example, if any of `children` or `in_model_3_d` are set, then these
+        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+
+        Args:
+            asset: Asset or sequence of assets to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new asset:
+
+                >>> from tutorial_apm_simple_pydantic_v1.client import ApmSimpleClient
+                >>> from tutorial_apm_simple_pydantic_v1.client.data_classes import AssetApply
+                >>> client = ApmSimpleClient()
+                >>> asset = AssetApply(external_id="my_asset", ...)
+                >>> result = client.asset.apply(asset)
+
+        """
         if isinstance(asset, AssetApply):
             instances = asset.to_instances_apply(self._view_by_write_class)
         else:
@@ -552,7 +840,24 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="tutorial_apm_simple") -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space: str = "tutorial_apm_simple") -> dm.InstancesDeleteResult:
+        """Delete one or more asset.
+
+        Args:
+            external_id: External id of the asset to delete.
+            space: The space where all the asset are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete asset by id:
+
+                >>> from tutorial_apm_simple_pydantic_v1.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> client.asset.delete("my_asset")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -568,9 +873,27 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
     def retrieve(self, external_id: Sequence[str]) -> AssetList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> Asset | AssetList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "tutorial_apm_simple") -> Asset | AssetList:
+        """Retrieve one or more assets by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the assets.
+            space: The space where all the assets are located.
+
+        Returns:
+            The requested assets.
+
+        Examples:
+
+            Retrieve asset by id:
+
+                >>> from tutorial_apm_simple_pydantic_v1.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> asset = client.asset.retrieve("my_asset")
+
+        """
         if isinstance(external_id, str):
-            asset = self._retrieve((self._sources.space, external_id))
+            asset = self._retrieve((space, external_id))
 
             child_edges = self.children.retrieve(external_id)
             asset.children = [edge.end_node.external_id for edge in child_edges]
@@ -579,7 +902,7 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
 
             return asset
         else:
-            assets = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            assets = self._retrieve([(space, ext_id) for ext_id in external_id])
 
             child_edges = self.children.retrieve(external_id)
             self._set_children(assets, child_edges)
@@ -614,6 +937,46 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> AssetList:
+        """Search assets
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            min_area_id: The minimum value of the area id to filter on.
+            max_area_id: The maximum value of the area id to filter on.
+            min_category_id: The minimum value of the category id to filter on.
+            max_category_id: The maximum value of the category id to filter on.
+            min_created_date: The minimum value of the created date to filter on.
+            max_created_date: The maximum value of the created date to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            is_active: The is active to filter on.
+            is_critical_line: The is critical line to filter on.
+            parent: The parent to filter on.
+            source_db: The source db to filter on.
+            source_db_prefix: The prefix of the source db to filter on.
+            tag: The tag to filter on.
+            tag_prefix: The prefix of the tag to filter on.
+            min_updated_date: The minimum value of the updated date to filter on.
+            max_updated_date: The maximum value of the updated date to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of assets to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `children` or `in_model_3_d` external ids for the assets. Defaults to True.
+
+        Returns:
+            Search results assets matching the query.
+
+        Examples:
+
+           Search for 'my_asset' in all text properties:
+
+                >>> from tutorial_apm_simple_pydantic_v1.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> assets = client.asset.search('my_asset')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             min_area_id,
@@ -741,6 +1104,50 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across assets
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            min_area_id: The minimum value of the area id to filter on.
+            max_area_id: The maximum value of the area id to filter on.
+            min_category_id: The minimum value of the category id to filter on.
+            max_category_id: The maximum value of the category id to filter on.
+            min_created_date: The minimum value of the created date to filter on.
+            max_created_date: The maximum value of the created date to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            is_active: The is active to filter on.
+            is_critical_line: The is critical line to filter on.
+            parent: The parent to filter on.
+            source_db: The source db to filter on.
+            source_db_prefix: The prefix of the source db to filter on.
+            tag: The tag to filter on.
+            tag_prefix: The prefix of the tag to filter on.
+            min_updated_date: The minimum value of the updated date to filter on.
+            max_updated_date: The maximum value of the updated date to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of assets to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `children` or `in_model_3_d` external ids for the assets. Defaults to True.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count assets in space `my_space`:
+
+                >>> from tutorial_apm_simple_pydantic_v1.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> result = client.asset.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             min_area_id,
@@ -804,6 +1211,40 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for assets
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            min_area_id: The minimum value of the area id to filter on.
+            max_area_id: The maximum value of the area id to filter on.
+            min_category_id: The minimum value of the category id to filter on.
+            max_category_id: The maximum value of the category id to filter on.
+            min_created_date: The minimum value of the created date to filter on.
+            max_created_date: The maximum value of the created date to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            is_active: The is active to filter on.
+            is_critical_line: The is critical line to filter on.
+            parent: The parent to filter on.
+            source_db: The source db to filter on.
+            source_db_prefix: The prefix of the source db to filter on.
+            tag: The tag to filter on.
+            tag_prefix: The prefix of the tag to filter on.
+            min_updated_date: The minimum value of the updated date to filter on.
+            max_updated_date: The maximum value of the updated date to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of assets to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `children` or `in_model_3_d` external ids for the assets. Defaults to True.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             min_area_id,
@@ -863,6 +1304,44 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> AssetList:
+        """List/filter assets
+
+        Args:
+            min_area_id: The minimum value of the area id to filter on.
+            max_area_id: The maximum value of the area id to filter on.
+            min_category_id: The minimum value of the category id to filter on.
+            max_category_id: The maximum value of the category id to filter on.
+            min_created_date: The minimum value of the created date to filter on.
+            max_created_date: The maximum value of the created date to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            is_active: The is active to filter on.
+            is_critical_line: The is critical line to filter on.
+            parent: The parent to filter on.
+            source_db: The source db to filter on.
+            source_db_prefix: The prefix of the source db to filter on.
+            tag: The tag to filter on.
+            tag_prefix: The prefix of the tag to filter on.
+            min_updated_date: The minimum value of the updated date to filter on.
+            max_updated_date: The maximum value of the updated date to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of assets to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `children` or `in_model_3_d` external ids for the assets. Defaults to True.
+
+        Returns:
+            List of requested assets
+
+        Examples:
+
+            List assets and limit to 5:
+
+                >>> from tutorial_apm_simple_pydantic_v1.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> assets = client.asset.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             min_area_id,

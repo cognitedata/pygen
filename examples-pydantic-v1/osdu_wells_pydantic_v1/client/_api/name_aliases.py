@@ -35,6 +35,26 @@ class NameAliasesAPI(TypeAPI[NameAliases, NameAliasesApply, NameAliasesList]):
     def apply(
         self, name_alias: NameAliasesApply | Sequence[NameAliasesApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) name aliases.
+
+        Args:
+            name_alias: Name alias or sequence of name aliases to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new name_alias:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> from osdu_wells_pydantic_v1.client.data_classes import NameAliasesApply
+                >>> client = OSDUClient()
+                >>> name_alias = NameAliasesApply(external_id="my_name_alias", ...)
+                >>> result = client.name_aliases.apply(name_alias)
+
+        """
         if isinstance(name_alias, NameAliasesApply):
             instances = name_alias.to_instances_apply(self._view_by_write_class)
         else:
@@ -47,7 +67,26 @@ class NameAliasesAPI(TypeAPI[NameAliases, NameAliasesApply, NameAliasesList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more name alias.
+
+        Args:
+            external_id: External id of the name alias to delete.
+            space: The space where all the name alias are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete name_alias by id:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> client.name_aliases.delete("my_name_alias")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -63,11 +102,31 @@ class NameAliasesAPI(TypeAPI[NameAliases, NameAliasesApply, NameAliasesList]):
     def retrieve(self, external_id: Sequence[str]) -> NameAliasesList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> NameAliases | NameAliasesList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> NameAliases | NameAliasesList:
+        """Retrieve one or more name aliases by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the name aliases.
+            space: The space where all the name aliases are located.
+
+        Returns:
+            The requested name aliases.
+
+        Examples:
+
+            Retrieve name_alias by id:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> name_alias = client.name_aliases.retrieve("my_name_alias")
+
+        """
         if isinstance(external_id, str):
-            return self._retrieve((self._sources.space, external_id))
+            return self._retrieve((space, external_id))
         else:
-            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(space, ext_id) for ext_id in external_id])
 
     def search(
         self,
@@ -88,6 +147,38 @@ class NameAliasesAPI(TypeAPI[NameAliases, NameAliasesApply, NameAliasesList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> NameAliasesList:
+        """Search name aliases
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            alias_name: The alias name to filter on.
+            alias_name_prefix: The prefix of the alias name to filter on.
+            alias_name_type_id: The alias name type id to filter on.
+            alias_name_type_id_prefix: The prefix of the alias name type id to filter on.
+            definition_organisation_id: The definition organisation id to filter on.
+            definition_organisation_id_prefix: The prefix of the definition organisation id to filter on.
+            effective_date_time: The effective date time to filter on.
+            effective_date_time_prefix: The prefix of the effective date time to filter on.
+            termination_date_time: The termination date time to filter on.
+            termination_date_time_prefix: The prefix of the termination date time to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of name aliases to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results name aliases matching the query.
+
+        Examples:
+
+           Search for 'my_name_alias' in all text properties:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> name_aliases = client.name_aliases.search('my_name_alias')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             alias_name,
@@ -187,6 +278,42 @@ class NameAliasesAPI(TypeAPI[NameAliases, NameAliasesApply, NameAliasesList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across name aliases
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            alias_name: The alias name to filter on.
+            alias_name_prefix: The prefix of the alias name to filter on.
+            alias_name_type_id: The alias name type id to filter on.
+            alias_name_type_id_prefix: The prefix of the alias name type id to filter on.
+            definition_organisation_id: The definition organisation id to filter on.
+            definition_organisation_id_prefix: The prefix of the definition organisation id to filter on.
+            effective_date_time: The effective date time to filter on.
+            effective_date_time_prefix: The prefix of the effective date time to filter on.
+            termination_date_time: The termination date time to filter on.
+            termination_date_time_prefix: The prefix of the termination date time to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of name aliases to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count name aliases in space `my_space`:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> result = client.name_aliases.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             alias_name,
@@ -236,6 +363,32 @@ class NameAliasesAPI(TypeAPI[NameAliases, NameAliasesApply, NameAliasesList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for name aliases
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            alias_name: The alias name to filter on.
+            alias_name_prefix: The prefix of the alias name to filter on.
+            alias_name_type_id: The alias name type id to filter on.
+            alias_name_type_id_prefix: The prefix of the alias name type id to filter on.
+            definition_organisation_id: The definition organisation id to filter on.
+            definition_organisation_id_prefix: The prefix of the definition organisation id to filter on.
+            effective_date_time: The effective date time to filter on.
+            effective_date_time_prefix: The prefix of the effective date time to filter on.
+            termination_date_time: The termination date time to filter on.
+            termination_date_time_prefix: The prefix of the termination date time to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of name aliases to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             alias_name,
@@ -280,6 +433,36 @@ class NameAliasesAPI(TypeAPI[NameAliases, NameAliasesApply, NameAliasesList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> NameAliasesList:
+        """List/filter name aliases
+
+        Args:
+            alias_name: The alias name to filter on.
+            alias_name_prefix: The prefix of the alias name to filter on.
+            alias_name_type_id: The alias name type id to filter on.
+            alias_name_type_id_prefix: The prefix of the alias name type id to filter on.
+            definition_organisation_id: The definition organisation id to filter on.
+            definition_organisation_id_prefix: The prefix of the definition organisation id to filter on.
+            effective_date_time: The effective date time to filter on.
+            effective_date_time_prefix: The prefix of the effective date time to filter on.
+            termination_date_time: The termination date time to filter on.
+            termination_date_time_prefix: The prefix of the termination date time to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of name aliases to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested name aliases
+
+        Examples:
+
+            List name aliases and limit to 5:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> name_aliases = client.name_aliases.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             alias_name,

@@ -22,11 +22,27 @@ _PROCESS_PROPERTIES_BY_FIELD = {
 
 
 class Process(DomainModel):
+    """This represent a read version of proces.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the proces.
+        bid: The bid field.
+        name: The name field.
+        created_time: The created time of the proces node.
+        last_updated_time: The last updated time of the proces node.
+        deleted_time: If present, the deleted time of the proces node.
+        version: The version of the proces node.
+    """
+
     space: str = "market"
     bid: Optional[str] = None
     name: Optional[str] = None
 
     def as_apply(self) -> ProcessApply:
+        """Convert this read version of proces to a write version."""
         return ProcessApply(
             space=self.space,
             external_id=self.external_id,
@@ -36,6 +52,21 @@ class Process(DomainModel):
 
 
 class ProcessApply(DomainModelApply):
+    """This represent a write version of proces.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the proces.
+        bid: The bid field.
+        name: The name field.
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "market"
     bid: Union[BidApply, str, None] = Field(None, repr=False)
     name: Optional[str] = None
@@ -82,11 +113,16 @@ class ProcessApply(DomainModelApply):
 
 
 class ProcessList(TypeList[Process]):
+    """List of process in read version."""
+
     _NODE = Process
 
     def as_apply(self) -> ProcessApplyList:
+        """Convert this read version of proces to a write version."""
         return ProcessApplyList([node.as_apply() for node in self.data])
 
 
 class ProcessApplyList(TypeApplyList[ProcessApply]):
+    """List of process in write version."""
+
     _NODE = ProcessApply

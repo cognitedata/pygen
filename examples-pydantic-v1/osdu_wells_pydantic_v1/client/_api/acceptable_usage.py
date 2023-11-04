@@ -35,6 +35,26 @@ class AcceptableUsageAPI(TypeAPI[AcceptableUsage, AcceptableUsageApply, Acceptab
     def apply(
         self, acceptable_usage: AcceptableUsageApply | Sequence[AcceptableUsageApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) acceptable usages.
+
+        Args:
+            acceptable_usage: Acceptable usage or sequence of acceptable usages to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new acceptable_usage:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> from osdu_wells_pydantic_v1.client.data_classes import AcceptableUsageApply
+                >>> client = OSDUClient()
+                >>> acceptable_usage = AcceptableUsageApply(external_id="my_acceptable_usage", ...)
+                >>> result = client.acceptable_usage.apply(acceptable_usage)
+
+        """
         if isinstance(acceptable_usage, AcceptableUsageApply):
             instances = acceptable_usage.to_instances_apply(self._view_by_write_class)
         else:
@@ -47,7 +67,26 @@ class AcceptableUsageAPI(TypeAPI[AcceptableUsage, AcceptableUsageApply, Acceptab
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more acceptable usage.
+
+        Args:
+            external_id: External id of the acceptable usage to delete.
+            space: The space where all the acceptable usage are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete acceptable_usage by id:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> client.acceptable_usage.delete("my_acceptable_usage")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -63,11 +102,31 @@ class AcceptableUsageAPI(TypeAPI[AcceptableUsage, AcceptableUsageApply, Acceptab
     def retrieve(self, external_id: Sequence[str]) -> AcceptableUsageList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> AcceptableUsage | AcceptableUsageList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> AcceptableUsage | AcceptableUsageList:
+        """Retrieve one or more acceptable usages by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the acceptable usages.
+            space: The space where all the acceptable usages are located.
+
+        Returns:
+            The requested acceptable usages.
+
+        Examples:
+
+            Retrieve acceptable_usage by id:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> acceptable_usage = client.acceptable_usage.retrieve("my_acceptable_usage")
+
+        """
         if isinstance(external_id, str):
-            return self._retrieve((self._sources.space, external_id))
+            return self._retrieve((space, external_id))
         else:
-            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(space, ext_id) for ext_id in external_id])
 
     def search(
         self,
@@ -88,6 +147,38 @@ class AcceptableUsageAPI(TypeAPI[AcceptableUsage, AcceptableUsageApply, Acceptab
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> AcceptableUsageList:
+        """Search acceptable usages
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            data_quality_id: The data quality id to filter on.
+            data_quality_id_prefix: The prefix of the data quality id to filter on.
+            data_quality_rule_set_id: The data quality rule set id to filter on.
+            data_quality_rule_set_id_prefix: The prefix of the data quality rule set id to filter on.
+            value_chain_status_type_id: The value chain status type id to filter on.
+            value_chain_status_type_id_prefix: The prefix of the value chain status type id to filter on.
+            workflow_persona_type_id: The workflow persona type id to filter on.
+            workflow_persona_type_id_prefix: The prefix of the workflow persona type id to filter on.
+            workflow_usage_type_id: The workflow usage type id to filter on.
+            workflow_usage_type_id_prefix: The prefix of the workflow usage type id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of acceptable usages to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results acceptable usages matching the query.
+
+        Examples:
+
+           Search for 'my_acceptable_usage' in all text properties:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> acceptable_usages = client.acceptable_usage.search('my_acceptable_usage')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             data_quality_id,
@@ -187,6 +278,42 @@ class AcceptableUsageAPI(TypeAPI[AcceptableUsage, AcceptableUsageApply, Acceptab
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across acceptable usages
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            data_quality_id: The data quality id to filter on.
+            data_quality_id_prefix: The prefix of the data quality id to filter on.
+            data_quality_rule_set_id: The data quality rule set id to filter on.
+            data_quality_rule_set_id_prefix: The prefix of the data quality rule set id to filter on.
+            value_chain_status_type_id: The value chain status type id to filter on.
+            value_chain_status_type_id_prefix: The prefix of the value chain status type id to filter on.
+            workflow_persona_type_id: The workflow persona type id to filter on.
+            workflow_persona_type_id_prefix: The prefix of the workflow persona type id to filter on.
+            workflow_usage_type_id: The workflow usage type id to filter on.
+            workflow_usage_type_id_prefix: The prefix of the workflow usage type id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of acceptable usages to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count acceptable usages in space `my_space`:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> result = client.acceptable_usage.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             data_quality_id,
@@ -236,6 +363,32 @@ class AcceptableUsageAPI(TypeAPI[AcceptableUsage, AcceptableUsageApply, Acceptab
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for acceptable usages
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            data_quality_id: The data quality id to filter on.
+            data_quality_id_prefix: The prefix of the data quality id to filter on.
+            data_quality_rule_set_id: The data quality rule set id to filter on.
+            data_quality_rule_set_id_prefix: The prefix of the data quality rule set id to filter on.
+            value_chain_status_type_id: The value chain status type id to filter on.
+            value_chain_status_type_id_prefix: The prefix of the value chain status type id to filter on.
+            workflow_persona_type_id: The workflow persona type id to filter on.
+            workflow_persona_type_id_prefix: The prefix of the workflow persona type id to filter on.
+            workflow_usage_type_id: The workflow usage type id to filter on.
+            workflow_usage_type_id_prefix: The prefix of the workflow usage type id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of acceptable usages to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             data_quality_id,
@@ -280,6 +433,36 @@ class AcceptableUsageAPI(TypeAPI[AcceptableUsage, AcceptableUsageApply, Acceptab
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> AcceptableUsageList:
+        """List/filter acceptable usages
+
+        Args:
+            data_quality_id: The data quality id to filter on.
+            data_quality_id_prefix: The prefix of the data quality id to filter on.
+            data_quality_rule_set_id: The data quality rule set id to filter on.
+            data_quality_rule_set_id_prefix: The prefix of the data quality rule set id to filter on.
+            value_chain_status_type_id: The value chain status type id to filter on.
+            value_chain_status_type_id_prefix: The prefix of the value chain status type id to filter on.
+            workflow_persona_type_id: The workflow persona type id to filter on.
+            workflow_persona_type_id_prefix: The prefix of the workflow persona type id to filter on.
+            workflow_usage_type_id: The workflow usage type id to filter on.
+            workflow_usage_type_id_prefix: The prefix of the workflow usage type id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of acceptable usages to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested acceptable usages
+
+        Examples:
+
+            List acceptable usages and limit to 5:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> acceptable_usages = client.acceptable_usage.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             data_quality_id,

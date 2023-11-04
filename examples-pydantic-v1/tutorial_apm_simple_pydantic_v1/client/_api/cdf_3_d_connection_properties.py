@@ -40,6 +40,26 @@ class CdfConnectionPropertiesAPI(
         cdf_3_d_connection_property: CdfConnectionPropertiesApply | Sequence[CdfConnectionPropertiesApply],
         replace: bool = False,
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) cdf 3 d connection properties.
+
+        Args:
+            cdf_3_d_connection_property: Cdf 3 d connection property or sequence of cdf 3 d connection properties to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new cdf_3_d_connection_property:
+
+                >>> from tutorial_apm_simple_pydantic_v1.client import ApmSimpleClient
+                >>> from tutorial_apm_simple_pydantic_v1.client.data_classes import CdfConnectionPropertiesApply
+                >>> client = ApmSimpleClient()
+                >>> cdf_3_d_connection_property = CdfConnectionPropertiesApply(external_id="my_cdf_3_d_connection_property", ...)
+                >>> result = client.cdf_3_d_connection_properties.apply(cdf_3_d_connection_property)
+
+        """
         if isinstance(cdf_3_d_connection_property, CdfConnectionPropertiesApply):
             instances = cdf_3_d_connection_property.to_instances_apply(self._view_by_write_class)
         else:
@@ -54,7 +74,24 @@ class CdfConnectionPropertiesAPI(
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="cdf_3d_schema") -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space: str = "cdf_3d_schema") -> dm.InstancesDeleteResult:
+        """Delete one or more cdf 3 d connection property.
+
+        Args:
+            external_id: External id of the cdf 3 d connection property to delete.
+            space: The space where all the cdf 3 d connection property are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete cdf_3_d_connection_property by id:
+
+                >>> from tutorial_apm_simple_pydantic_v1.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> client.cdf_3_d_connection_properties.delete("my_cdf_3_d_connection_property")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -70,11 +107,31 @@ class CdfConnectionPropertiesAPI(
     def retrieve(self, external_id: Sequence[str]) -> CdfConnectionPropertiesList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> CdfConnectionProperties | CdfConnectionPropertiesList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "cdf_3d_schema"
+    ) -> CdfConnectionProperties | CdfConnectionPropertiesList:
+        """Retrieve one or more cdf 3 d connection properties by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the cdf 3 d connection properties.
+            space: The space where all the cdf 3 d connection properties are located.
+
+        Returns:
+            The requested cdf 3 d connection properties.
+
+        Examples:
+
+            Retrieve cdf_3_d_connection_property by id:
+
+                >>> from tutorial_apm_simple_pydantic_v1.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> cdf_3_d_connection_property = client.cdf_3_d_connection_properties.retrieve("my_cdf_3_d_connection_property")
+
+        """
         if isinstance(external_id, str):
-            return self._retrieve((self._sources.space, external_id))
+            return self._retrieve((space, external_id))
         else:
-            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(space, ext_id) for ext_id in external_id])
 
     @overload
     def aggregate(
@@ -133,6 +190,34 @@ class CdfConnectionPropertiesAPI(
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across cdf 3 d connection properties
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            min_revision_id: The minimum value of the revision id to filter on.
+            max_revision_id: The maximum value of the revision id to filter on.
+            min_revision_node_id: The minimum value of the revision node id to filter on.
+            max_revision_node_id: The maximum value of the revision node id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of cdf 3 d connection properties to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count cdf 3 d connection properties in space `my_space`:
+
+                >>> from tutorial_apm_simple_pydantic_v1.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> result = client.cdf_3_d_connection_properties.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             min_revision_id,
@@ -168,6 +253,24 @@ class CdfConnectionPropertiesAPI(
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for cdf 3 d connection properties
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            min_revision_id: The minimum value of the revision id to filter on.
+            max_revision_id: The maximum value of the revision id to filter on.
+            min_revision_node_id: The minimum value of the revision node id to filter on.
+            max_revision_node_id: The maximum value of the revision node id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of cdf 3 d connection properties to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             min_revision_id,
@@ -200,6 +303,30 @@ class CdfConnectionPropertiesAPI(
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> CdfConnectionPropertiesList:
+        """List/filter cdf 3 d connection properties
+
+        Args:
+            min_revision_id: The minimum value of the revision id to filter on.
+            max_revision_id: The maximum value of the revision id to filter on.
+            min_revision_node_id: The minimum value of the revision node id to filter on.
+            max_revision_node_id: The maximum value of the revision node id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of cdf 3 d connection properties to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested cdf 3 d connection properties
+
+        Examples:
+
+            List cdf 3 d connection properties and limit to 5:
+
+                >>> from tutorial_apm_simple_pydantic_v1.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> cdf_3_d_connection_properties = client.cdf_3_d_connection_properties.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             min_revision_id,

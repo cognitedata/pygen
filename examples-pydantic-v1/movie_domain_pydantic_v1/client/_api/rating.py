@@ -47,9 +47,42 @@ class RatingScoreQuery:
         *,
         aggregates: Aggregate | list[Aggregate] | None = None,
         granularity: str | None = None,
+        target_unit: str | None = None,
+        target_unit_system: str | None = None,
         limit: int | None = None,
         include_outside_points: bool = False,
     ) -> DatapointsList:
+        """`Retrieve datapoints for the `rating.score` timeseries.
+
+        **Performance guide**:
+            In order to retrieve millions of datapoints as efficiently as possible, here are a few guidelines:
+
+            1. For best speed, and significantly lower memory usage, consider using ``retrieve_arrays(...)`` which uses ``numpy.ndarrays`` for data storage.
+            2. Only unlimited queries with (``limit=None``) are fetched in parallel so specifying a large finite ``limit`` like 1 million, comes with severe performance penalty as data is fetched serially.
+            3. Try to avoid specifying `start` and `end` to be very far from the actual data: If you have data from 2000 to 2015, don't set start=0 (1970).
+
+        Args:
+            start: Inclusive start. Default: 1970-01-01 UTC.
+            end: Exclusive end. Default: "now"
+            aggregates: Single aggregate or list of aggregates to retrieve. Default: None (raw datapoints returned)
+            granularity The granularity to fetch aggregates at. e.g. '15s', '2h', '10d'. Default: None.
+            target_unit: The unit_external_id of the data points returned. If the time series does not have a unit_external_id that can be converted to the target_unit, an error will be returned. Cannot be used with target_unit_system.
+            target_unit_system: The unit system of the data points returned. Cannot be used with target_unit.
+            limit (int | None): Maximum number of datapoints to return for each time series. Default: None (no limit)
+            include_outside_points (bool): Whether to include outside points. Not allowed when fetching aggregates. Default: False
+
+        Returns:
+            A ``DatapointsList`` with the requested datapoints.
+
+        Examples:
+
+            In this example,
+            we are using the time-ago format to get raw data for the 'my_score' from 2 weeks ago up until now::
+
+                >>> from movie_domain_pydantic_v1.client import MovieClient
+                >>> client = MovieClient()
+                >>> rating_datapoints = client.rating.score(external_id="my_score").retrieve(start="2w-ago)
+        """
         external_ids = self._retrieve_timeseries_external_ids_with_extra()
         if external_ids:
             return self._client.time_series.data.retrieve(
@@ -58,6 +91,8 @@ class RatingScoreQuery:
                 end=end,
                 aggregates=aggregates,
                 granularity=granularity,
+                target_unit=target_unit,
+                target_unit_system=target_unit_system,
                 limit=limit,
                 include_outside_points=include_outside_points,
             )
@@ -71,9 +106,42 @@ class RatingScoreQuery:
         *,
         aggregates: Aggregate | list[Aggregate] | None = None,
         granularity: str | None = None,
+        target_unit: str | None = None,
+        target_unit_system: str | None = None,
         limit: int | None = None,
         include_outside_points: bool = False,
     ) -> DatapointsArrayList:
+        """`Retrieve numpy arrays for the `rating.score` timeseries.
+
+        **Performance guide**:
+            In order to retrieve millions of datapoints as efficiently as possible, here are a few guidelines:
+
+            1. For best speed, and significantly lower memory usage, consider using ``retrieve_arrays(...)`` which uses ``numpy.ndarrays`` for data storage.
+            2. Only unlimited queries with (``limit=None``) are fetched in parallel so specifying a large finite ``limit`` like 1 million, comes with severe performance penalty as data is fetched serially.
+            3. Try to avoid specifying `start` and `end` to be very far from the actual data: If you have data from 2000 to 2015, don't set start=0 (1970).
+
+        Args:
+            start: Inclusive start. Default: 1970-01-01 UTC.
+            end: Exclusive end. Default: "now"
+            aggregates: Single aggregate or list of aggregates to retrieve. Default: None (raw datapoints returned)
+            granularity The granularity to fetch aggregates at. e.g. '15s', '2h', '10d'. Default: None.
+            target_unit: The unit_external_id of the data points returned. If the time series does not have a unit_external_id that can be converted to the target_unit, an error will be returned. Cannot be used with target_unit_system.
+            target_unit_system: The unit system of the data points returned. Cannot be used with target_unit.
+            limit (int | None): Maximum number of datapoints to return for each time series. Default: None (no limit)
+            include_outside_points (bool): Whether to include outside points. Not allowed when fetching aggregates. Default: False
+
+        Returns:
+            A ``DatapointsArrayList`` with the requested datapoints.
+
+        Examples:
+
+            In this example,
+            we are using the time-ago format to get raw data for the 'my_score' from 2 weeks ago up until now::
+
+                >>> from movie_domain_pydantic_v1.client import MovieClient
+                >>> client = MovieClient()
+                >>> rating_datapoints = client.rating.score(external_id="my_score").retrieve_array(start="2w-ago)
+        """
         external_ids = self._retrieve_timeseries_external_ids_with_extra()
         if external_ids:
             return self._client.time_series.data.retrieve_arrays(
@@ -82,6 +150,8 @@ class RatingScoreQuery:
                 end=end,
                 aggregates=aggregates,
                 granularity=granularity,
+                target_unit=target_unit,
+                target_unit_system=target_unit_system,
                 limit=limit,
                 include_outside_points=include_outside_points,
             )
@@ -95,6 +165,8 @@ class RatingScoreQuery:
         *,
         aggregates: Aggregate | list[Aggregate] | None = None,
         granularity: str | None = None,
+        target_unit: str | None = None,
+        target_unit_system: str | None = None,
         limit: int | None = None,
         include_outside_points: bool = False,
         uniform_index: bool = False,
@@ -102,6 +174,42 @@ class RatingScoreQuery:
         include_granularity_name: bool = False,
         column_names: ColumnNames | list[ColumnNames] = "score",
     ) -> pd.DataFrame:
+        """`Retrieve DataFrames for the `rating.score` timeseries.
+
+        **Performance guide**:
+            In order to retrieve millions of datapoints as efficiently as possible, here are a few guidelines:
+
+            1. For best speed, and significantly lower memory usage, consider using ``retrieve_arrays(...)`` which uses ``numpy.ndarrays`` for data storage.
+            2. Only unlimited queries with (``limit=None``) are fetched in parallel so specifying a large finite ``limit`` like 1 million, comes with severe performance penalty as data is fetched serially.
+            3. Try to avoid specifying `start` and `end` to be very far from the actual data: If you have data from 2000 to 2015, don't set start=0 (1970).
+
+        Args:
+            start: Inclusive start. Default: 1970-01-01 UTC.
+            end: Exclusive end. Default: "now"
+            aggregates: Single aggregate or list of aggregates to retrieve. Default: None (raw datapoints returned)
+            granularity The granularity to fetch aggregates at. e.g. '15s', '2h', '10d'. Default: None.
+            target_unit: The unit_external_id of the data points returned. If the time series does not have a unit_external_id that can be converted to the target_unit, an error will be returned. Cannot be used with target_unit_system.
+            target_unit_system: The unit system of the data points returned. Cannot be used with target_unit.
+            limit: Maximum number of datapoints to return for each time series. Default: None (no limit)
+            include_outside_points: Whether to include outside points. Not allowed when fetching aggregates. Default: False
+            uniform_index: If only querying aggregates AND a single granularity is used AND no limit is used, specifying `uniform_index=True` will return a dataframe with an equidistant datetime index from the earliest `start` to the latest `end` (missing values will be NaNs). If these requirements are not met, a ValueError is raised. Default: False
+            include_aggregate_name: Include 'aggregate' in the column name, e.g. `my-ts|average`. Ignored for raw time series. Default: True
+            include_granularity_name: Include 'granularity' in the column name, e.g. `my-ts|12h`. Added after 'aggregate' when present. Ignored for raw time series. Default: False
+            column_names: Which property to use for column names. Defauts to score
+
+
+        Returns:
+            A ``DataFrame`` with the requested datapoints.
+
+        Examples:
+
+            In this example,
+            we are using the time-ago format to get raw data for the 'my_score' from 2 weeks ago up until now::
+
+                >>> from movie_domain_pydantic_v1.client import MovieClient
+                >>> client = MovieClient()
+                >>> rating_datapoints = client.rating.score(external_id="my_score").retrieve_dataframe(start="2w-ago)
+        """
         external_ids = self._retrieve_timeseries_external_ids_with_extra(column_names)
         if external_ids:
             df = self._client.time_series.data.retrieve_dataframe(
@@ -110,6 +218,8 @@ class RatingScoreQuery:
                 end=end,
                 aggregates=aggregates,
                 granularity=granularity,
+                target_unit=target_unit,
+                target_unit_system=target_unit_system,
                 limit=limit,
                 include_outside_points=include_outside_points,
                 uniform_index=uniform_index,
@@ -139,6 +249,49 @@ class RatingScoreQuery:
         include_granularity_name: bool = False,
         column_names: ColumnNames | list[ColumnNames] = "score",
     ) -> pd.DataFrame:
+        """Retrieve DataFrames for the `rating.score` timeseries in Timezone.
+
+        **Performance guide**:
+            In order to retrieve millions of datapoints as efficiently as possible, here are a few guidelines:
+
+            1. For best speed, and significantly lower memory usage, consider using ``retrieve_arrays(...)`` which uses ``numpy.ndarrays`` for data storage.
+            2. Only unlimited queries with (``limit=None``) are fetched in parallel so specifying a large finite ``limit`` like 1 million, comes with severe performance penalty as data is fetched serially.
+            3. Try to avoid specifying `start` and `end` to be very far from the actual data: If you have data from 2000 to 2015, don't set start=0 (1970).
+
+        Args:
+            start: Inclusive start.
+            end: Exclusive end
+            aggregates: Single aggregate or list of aggregates to retrieve. Default: None (raw datapoints returned)
+            granularity The granularity to fetch aggregates at. e.g. '15s', '2h', '10d'. Default: None.
+            target_unit: The unit_external_id of the data points returned. If the time series does not have a unit_external_id that can be converted to the target_unit, an error will be returned. Cannot be used with target_unit_system.
+            target_unit_system: The unit system of the data points returned. Cannot be used with target_unit.
+            limit: Maximum number of datapoints to return for each time series. Default: None (no limit)
+            include_outside_points: Whether to include outside points. Not allowed when fetching aggregates. Default: False
+            uniform_index: If only querying aggregates AND a single granularity is used AND no limit is used, specifying `uniform_index=True` will return a dataframe with an equidistant datetime index from the earliest `start` to the latest `end` (missing values will be NaNs). If these requirements are not met, a ValueError is raised. Default: False
+            include_aggregate_name: Include 'aggregate' in the column name, e.g. `my-ts|average`. Ignored for raw time series. Default: True
+            include_granularity_name: Include 'granularity' in the column name, e.g. `my-ts|12h`. Added after 'aggregate' when present. Ignored for raw time series. Default: False
+            column_names: Which property to use for column names. Defauts to score
+
+
+        Returns:
+            A ``DataFrame`` with the requested datapoints.
+
+        Examples:
+
+            In this example,
+            get weekly aggregates for the 'my_score' for the first month of 2023 in Oslo time:
+
+                >>> from movie_domain_pydantic_v1.client import MovieClient
+                >>> from datetime import datetime, timezone
+                >>> client = MovieClient()
+                >>> rating_datapoints = client.rating.score(
+                ...     external_id="my_score").retrieve_dataframe_in_timezone(
+                ...         datetime(2023, 1, 1, tzinfo=ZoneInfo("Europe/Oslo")),
+                ...         datetime(2023, 1, 2, tzinfo=ZoneInfo("Europe/Oslo")),
+                ...         aggregates="average",
+                ...         granularity="1week",
+                ...     )
+        """
         external_ids = self._retrieve_timeseries_external_ids_with_extra(column_names)
         if external_ids:
             df = self._client.time_series.data.retrieve_dataframe_in_tz(
@@ -147,6 +300,8 @@ class RatingScoreQuery:
                 end=end,
                 aggregates=aggregates,
                 granularity=granularity,
+                target_unit=target_unit,
+                target_unit_system=target_unit_system,
                 uniform_index=uniform_index,
                 include_aggregate_name=include_aggregate_name,
                 include_granularity_name=include_granularity_name,
@@ -174,48 +329,6 @@ class RatingScoreQuery:
             )
         else:
             return None
-
-    def plot(
-        self,
-        start: int | str | datetime.datetime | None = None,
-        end: int | str | datetime.datetime | None = None,
-        *,
-        aggregates: Aggregate | Sequence[Aggregate] | None = None,
-        granularity: str | None = None,
-        uniform_index: bool = False,
-        include_aggregate_name: bool = True,
-        include_granularity_name: bool = False,
-        column_names: ColumnNames | list[ColumnNames] = "score",
-        warning: bool = True,
-        **kwargs,
-    ) -> None:
-        if warning:
-            warnings.warn(
-                "This methods if an experiment and might be removed in the future without notice.", stacklevel=2
-            )
-        if all(isinstance(time, datetime.datetime) and time.tzinfo is not None for time in [start, end]):
-            df = self.retrieve_dataframe_in_tz(
-                start=start,
-                end=end,
-                aggregates=aggregates,
-                granularity=granularity,
-                uniform_index=uniform_index,
-                include_aggregate_name=include_aggregate_name,
-                include_granularity_name=include_granularity_name,
-                column_names=column_names,
-            )
-        else:
-            df = self.retrieve_dataframe(
-                start=start,
-                end=end,
-                aggregates=aggregates,
-                granularity=granularity,
-                uniform_index=uniform_index,
-                include_aggregate_name=include_aggregate_name,
-                include_granularity_name=include_granularity_name,
-                column_names=column_names,
-            )
-        df.plot(**kwargs)
 
     def _retrieve_timeseries_external_ids_with_extra(
         self, extra_properties: ColumnNames | list[ColumnNames] = "score"
@@ -261,6 +374,27 @@ class RatingScoreAPI:
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> RatingScoreQuery:
+        """Query timeseries `rating.score`
+
+        Args:
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of ratings to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            A query object that can be used to retrieve datapoins for the  rating.score timeseries
+            selected in this method.
+
+        Examples:
+
+            Retrieve all data for 5 rating.score timeseries:
+
+                >>> from movie_domain_pydantic_v1.client import MovieClient
+                >>> client = MovieClient()
+                >>> ratings = client.rating.score(limit=5).retrieve()
+
+        """
         filter_ = _create_filter(
             self._view_id,
             external_id_prefix,
@@ -282,6 +416,26 @@ class RatingScoreAPI:
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> TimeSeriesList:
+        """List timeseries `rating.score`
+
+        Args:
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of ratings to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of Timeseries rating.score.
+
+        Examples:
+
+            List rating.score and limit to 5:
+
+                >>> from movie_domain_pydantic_v1.client import MovieClient
+                >>> client = MovieClient()
+                >>> ratings = client.rating.score.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             external_id_prefix,
@@ -369,9 +523,42 @@ class RatingVotesQuery:
         *,
         aggregates: Aggregate | list[Aggregate] | None = None,
         granularity: str | None = None,
+        target_unit: str | None = None,
+        target_unit_system: str | None = None,
         limit: int | None = None,
         include_outside_points: bool = False,
     ) -> DatapointsList:
+        """`Retrieve datapoints for the `rating.votes` timeseries.
+
+        **Performance guide**:
+            In order to retrieve millions of datapoints as efficiently as possible, here are a few guidelines:
+
+            1. For best speed, and significantly lower memory usage, consider using ``retrieve_arrays(...)`` which uses ``numpy.ndarrays`` for data storage.
+            2. Only unlimited queries with (``limit=None``) are fetched in parallel so specifying a large finite ``limit`` like 1 million, comes with severe performance penalty as data is fetched serially.
+            3. Try to avoid specifying `start` and `end` to be very far from the actual data: If you have data from 2000 to 2015, don't set start=0 (1970).
+
+        Args:
+            start: Inclusive start. Default: 1970-01-01 UTC.
+            end: Exclusive end. Default: "now"
+            aggregates: Single aggregate or list of aggregates to retrieve. Default: None (raw datapoints returned)
+            granularity The granularity to fetch aggregates at. e.g. '15s', '2h', '10d'. Default: None.
+            target_unit: The unit_external_id of the data points returned. If the time series does not have a unit_external_id that can be converted to the target_unit, an error will be returned. Cannot be used with target_unit_system.
+            target_unit_system: The unit system of the data points returned. Cannot be used with target_unit.
+            limit (int | None): Maximum number of datapoints to return for each time series. Default: None (no limit)
+            include_outside_points (bool): Whether to include outside points. Not allowed when fetching aggregates. Default: False
+
+        Returns:
+            A ``DatapointsList`` with the requested datapoints.
+
+        Examples:
+
+            In this example,
+            we are using the time-ago format to get raw data for the 'my_votes' from 2 weeks ago up until now::
+
+                >>> from movie_domain_pydantic_v1.client import MovieClient
+                >>> client = MovieClient()
+                >>> rating_datapoints = client.rating.votes(external_id="my_votes").retrieve(start="2w-ago)
+        """
         external_ids = self._retrieve_timeseries_external_ids_with_extra()
         if external_ids:
             return self._client.time_series.data.retrieve(
@@ -380,6 +567,8 @@ class RatingVotesQuery:
                 end=end,
                 aggregates=aggregates,
                 granularity=granularity,
+                target_unit=target_unit,
+                target_unit_system=target_unit_system,
                 limit=limit,
                 include_outside_points=include_outside_points,
             )
@@ -393,9 +582,42 @@ class RatingVotesQuery:
         *,
         aggregates: Aggregate | list[Aggregate] | None = None,
         granularity: str | None = None,
+        target_unit: str | None = None,
+        target_unit_system: str | None = None,
         limit: int | None = None,
         include_outside_points: bool = False,
     ) -> DatapointsArrayList:
+        """`Retrieve numpy arrays for the `rating.votes` timeseries.
+
+        **Performance guide**:
+            In order to retrieve millions of datapoints as efficiently as possible, here are a few guidelines:
+
+            1. For best speed, and significantly lower memory usage, consider using ``retrieve_arrays(...)`` which uses ``numpy.ndarrays`` for data storage.
+            2. Only unlimited queries with (``limit=None``) are fetched in parallel so specifying a large finite ``limit`` like 1 million, comes with severe performance penalty as data is fetched serially.
+            3. Try to avoid specifying `start` and `end` to be very far from the actual data: If you have data from 2000 to 2015, don't set start=0 (1970).
+
+        Args:
+            start: Inclusive start. Default: 1970-01-01 UTC.
+            end: Exclusive end. Default: "now"
+            aggregates: Single aggregate or list of aggregates to retrieve. Default: None (raw datapoints returned)
+            granularity The granularity to fetch aggregates at. e.g. '15s', '2h', '10d'. Default: None.
+            target_unit: The unit_external_id of the data points returned. If the time series does not have a unit_external_id that can be converted to the target_unit, an error will be returned. Cannot be used with target_unit_system.
+            target_unit_system: The unit system of the data points returned. Cannot be used with target_unit.
+            limit (int | None): Maximum number of datapoints to return for each time series. Default: None (no limit)
+            include_outside_points (bool): Whether to include outside points. Not allowed when fetching aggregates. Default: False
+
+        Returns:
+            A ``DatapointsArrayList`` with the requested datapoints.
+
+        Examples:
+
+            In this example,
+            we are using the time-ago format to get raw data for the 'my_votes' from 2 weeks ago up until now::
+
+                >>> from movie_domain_pydantic_v1.client import MovieClient
+                >>> client = MovieClient()
+                >>> rating_datapoints = client.rating.votes(external_id="my_votes").retrieve_array(start="2w-ago)
+        """
         external_ids = self._retrieve_timeseries_external_ids_with_extra()
         if external_ids:
             return self._client.time_series.data.retrieve_arrays(
@@ -404,6 +626,8 @@ class RatingVotesQuery:
                 end=end,
                 aggregates=aggregates,
                 granularity=granularity,
+                target_unit=target_unit,
+                target_unit_system=target_unit_system,
                 limit=limit,
                 include_outside_points=include_outside_points,
             )
@@ -417,6 +641,8 @@ class RatingVotesQuery:
         *,
         aggregates: Aggregate | list[Aggregate] | None = None,
         granularity: str | None = None,
+        target_unit: str | None = None,
+        target_unit_system: str | None = None,
         limit: int | None = None,
         include_outside_points: bool = False,
         uniform_index: bool = False,
@@ -424,6 +650,42 @@ class RatingVotesQuery:
         include_granularity_name: bool = False,
         column_names: ColumnNames | list[ColumnNames] = "votes",
     ) -> pd.DataFrame:
+        """`Retrieve DataFrames for the `rating.votes` timeseries.
+
+        **Performance guide**:
+            In order to retrieve millions of datapoints as efficiently as possible, here are a few guidelines:
+
+            1. For best speed, and significantly lower memory usage, consider using ``retrieve_arrays(...)`` which uses ``numpy.ndarrays`` for data storage.
+            2. Only unlimited queries with (``limit=None``) are fetched in parallel so specifying a large finite ``limit`` like 1 million, comes with severe performance penalty as data is fetched serially.
+            3. Try to avoid specifying `start` and `end` to be very far from the actual data: If you have data from 2000 to 2015, don't set start=0 (1970).
+
+        Args:
+            start: Inclusive start. Default: 1970-01-01 UTC.
+            end: Exclusive end. Default: "now"
+            aggregates: Single aggregate or list of aggregates to retrieve. Default: None (raw datapoints returned)
+            granularity The granularity to fetch aggregates at. e.g. '15s', '2h', '10d'. Default: None.
+            target_unit: The unit_external_id of the data points returned. If the time series does not have a unit_external_id that can be converted to the target_unit, an error will be returned. Cannot be used with target_unit_system.
+            target_unit_system: The unit system of the data points returned. Cannot be used with target_unit.
+            limit: Maximum number of datapoints to return for each time series. Default: None (no limit)
+            include_outside_points: Whether to include outside points. Not allowed when fetching aggregates. Default: False
+            uniform_index: If only querying aggregates AND a single granularity is used AND no limit is used, specifying `uniform_index=True` will return a dataframe with an equidistant datetime index from the earliest `start` to the latest `end` (missing values will be NaNs). If these requirements are not met, a ValueError is raised. Default: False
+            include_aggregate_name: Include 'aggregate' in the column name, e.g. `my-ts|average`. Ignored for raw time series. Default: True
+            include_granularity_name: Include 'granularity' in the column name, e.g. `my-ts|12h`. Added after 'aggregate' when present. Ignored for raw time series. Default: False
+            column_names: Which property to use for column names. Defauts to votes
+
+
+        Returns:
+            A ``DataFrame`` with the requested datapoints.
+
+        Examples:
+
+            In this example,
+            we are using the time-ago format to get raw data for the 'my_votes' from 2 weeks ago up until now::
+
+                >>> from movie_domain_pydantic_v1.client import MovieClient
+                >>> client = MovieClient()
+                >>> rating_datapoints = client.rating.votes(external_id="my_votes").retrieve_dataframe(start="2w-ago)
+        """
         external_ids = self._retrieve_timeseries_external_ids_with_extra(column_names)
         if external_ids:
             df = self._client.time_series.data.retrieve_dataframe(
@@ -432,6 +694,8 @@ class RatingVotesQuery:
                 end=end,
                 aggregates=aggregates,
                 granularity=granularity,
+                target_unit=target_unit,
+                target_unit_system=target_unit_system,
                 limit=limit,
                 include_outside_points=include_outside_points,
                 uniform_index=uniform_index,
@@ -461,6 +725,49 @@ class RatingVotesQuery:
         include_granularity_name: bool = False,
         column_names: ColumnNames | list[ColumnNames] = "votes",
     ) -> pd.DataFrame:
+        """Retrieve DataFrames for the `rating.votes` timeseries in Timezone.
+
+        **Performance guide**:
+            In order to retrieve millions of datapoints as efficiently as possible, here are a few guidelines:
+
+            1. For best speed, and significantly lower memory usage, consider using ``retrieve_arrays(...)`` which uses ``numpy.ndarrays`` for data storage.
+            2. Only unlimited queries with (``limit=None``) are fetched in parallel so specifying a large finite ``limit`` like 1 million, comes with severe performance penalty as data is fetched serially.
+            3. Try to avoid specifying `start` and `end` to be very far from the actual data: If you have data from 2000 to 2015, don't set start=0 (1970).
+
+        Args:
+            start: Inclusive start.
+            end: Exclusive end
+            aggregates: Single aggregate or list of aggregates to retrieve. Default: None (raw datapoints returned)
+            granularity The granularity to fetch aggregates at. e.g. '15s', '2h', '10d'. Default: None.
+            target_unit: The unit_external_id of the data points returned. If the time series does not have a unit_external_id that can be converted to the target_unit, an error will be returned. Cannot be used with target_unit_system.
+            target_unit_system: The unit system of the data points returned. Cannot be used with target_unit.
+            limit: Maximum number of datapoints to return for each time series. Default: None (no limit)
+            include_outside_points: Whether to include outside points. Not allowed when fetching aggregates. Default: False
+            uniform_index: If only querying aggregates AND a single granularity is used AND no limit is used, specifying `uniform_index=True` will return a dataframe with an equidistant datetime index from the earliest `start` to the latest `end` (missing values will be NaNs). If these requirements are not met, a ValueError is raised. Default: False
+            include_aggregate_name: Include 'aggregate' in the column name, e.g. `my-ts|average`. Ignored for raw time series. Default: True
+            include_granularity_name: Include 'granularity' in the column name, e.g. `my-ts|12h`. Added after 'aggregate' when present. Ignored for raw time series. Default: False
+            column_names: Which property to use for column names. Defauts to votes
+
+
+        Returns:
+            A ``DataFrame`` with the requested datapoints.
+
+        Examples:
+
+            In this example,
+            get weekly aggregates for the 'my_votes' for the first month of 2023 in Oslo time:
+
+                >>> from movie_domain_pydantic_v1.client import MovieClient
+                >>> from datetime import datetime, timezone
+                >>> client = MovieClient()
+                >>> rating_datapoints = client.rating.votes(
+                ...     external_id="my_votes").retrieve_dataframe_in_timezone(
+                ...         datetime(2023, 1, 1, tzinfo=ZoneInfo("Europe/Oslo")),
+                ...         datetime(2023, 1, 2, tzinfo=ZoneInfo("Europe/Oslo")),
+                ...         aggregates="average",
+                ...         granularity="1week",
+                ...     )
+        """
         external_ids = self._retrieve_timeseries_external_ids_with_extra(column_names)
         if external_ids:
             df = self._client.time_series.data.retrieve_dataframe_in_tz(
@@ -469,6 +776,8 @@ class RatingVotesQuery:
                 end=end,
                 aggregates=aggregates,
                 granularity=granularity,
+                target_unit=target_unit,
+                target_unit_system=target_unit_system,
                 uniform_index=uniform_index,
                 include_aggregate_name=include_aggregate_name,
                 include_granularity_name=include_granularity_name,
@@ -496,48 +805,6 @@ class RatingVotesQuery:
             )
         else:
             return None
-
-    def plot(
-        self,
-        start: int | str | datetime.datetime | None = None,
-        end: int | str | datetime.datetime | None = None,
-        *,
-        aggregates: Aggregate | Sequence[Aggregate] | None = None,
-        granularity: str | None = None,
-        uniform_index: bool = False,
-        include_aggregate_name: bool = True,
-        include_granularity_name: bool = False,
-        column_names: ColumnNames | list[ColumnNames] = "votes",
-        warning: bool = True,
-        **kwargs,
-    ) -> None:
-        if warning:
-            warnings.warn(
-                "This methods if an experiment and might be removed in the future without notice.", stacklevel=2
-            )
-        if all(isinstance(time, datetime.datetime) and time.tzinfo is not None for time in [start, end]):
-            df = self.retrieve_dataframe_in_tz(
-                start=start,
-                end=end,
-                aggregates=aggregates,
-                granularity=granularity,
-                uniform_index=uniform_index,
-                include_aggregate_name=include_aggregate_name,
-                include_granularity_name=include_granularity_name,
-                column_names=column_names,
-            )
-        else:
-            df = self.retrieve_dataframe(
-                start=start,
-                end=end,
-                aggregates=aggregates,
-                granularity=granularity,
-                uniform_index=uniform_index,
-                include_aggregate_name=include_aggregate_name,
-                include_granularity_name=include_granularity_name,
-                column_names=column_names,
-            )
-        df.plot(**kwargs)
 
     def _retrieve_timeseries_external_ids_with_extra(
         self, extra_properties: ColumnNames | list[ColumnNames] = "votes"
@@ -583,6 +850,27 @@ class RatingVotesAPI:
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> RatingVotesQuery:
+        """Query timeseries `rating.votes`
+
+        Args:
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of ratings to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            A query object that can be used to retrieve datapoins for the  rating.votes timeseries
+            selected in this method.
+
+        Examples:
+
+            Retrieve all data for 5 rating.votes timeseries:
+
+                >>> from movie_domain_pydantic_v1.client import MovieClient
+                >>> client = MovieClient()
+                >>> ratings = client.rating.votes(limit=5).retrieve()
+
+        """
         filter_ = _create_filter(
             self._view_id,
             external_id_prefix,
@@ -604,6 +892,26 @@ class RatingVotesAPI:
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> TimeSeriesList:
+        """List timeseries `rating.votes`
+
+        Args:
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of ratings to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of Timeseries rating.votes.
+
+        Examples:
+
+            List rating.votes and limit to 5:
+
+                >>> from movie_domain_pydantic_v1.client import MovieClient
+                >>> client = MovieClient()
+                >>> ratings = client.rating.votes.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             external_id_prefix,
@@ -687,6 +995,26 @@ class RatingAPI(TypeAPI[Rating, RatingApply, RatingList]):
         self.votes = RatingVotesAPI(client, view_id)
 
     def apply(self, rating: RatingApply | Sequence[RatingApply], replace: bool = False) -> dm.InstancesApplyResult:
+        """Add or update (upsert) ratings.
+
+        Args:
+            rating: Rating or sequence of ratings to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new rating:
+
+                >>> from movie_domain_pydantic_v1.client import MovieClient
+                >>> from movie_domain_pydantic_v1.client.data_classes import RatingApply
+                >>> client = MovieClient()
+                >>> rating = RatingApply(external_id="my_rating", ...)
+                >>> result = client.rating.apply(rating)
+
+        """
         if isinstance(rating, RatingApply):
             instances = rating.to_instances_apply(self._view_by_write_class)
         else:
@@ -699,7 +1027,26 @@ class RatingAPI(TypeAPI[Rating, RatingApply, RatingList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more rating.
+
+        Args:
+            external_id: External id of the rating to delete.
+            space: The space where all the rating are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete rating by id:
+
+                >>> from movie_domain_pydantic_v1.client import MovieClient
+                >>> client = MovieClient()
+                >>> client.rating.delete("my_rating")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -715,11 +1062,31 @@ class RatingAPI(TypeAPI[Rating, RatingApply, RatingList]):
     def retrieve(self, external_id: Sequence[str]) -> RatingList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> Rating | RatingList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> Rating | RatingList:
+        """Retrieve one or more ratings by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the ratings.
+            space: The space where all the ratings are located.
+
+        Returns:
+            The requested ratings.
+
+        Examples:
+
+            Retrieve rating by id:
+
+                >>> from movie_domain_pydantic_v1.client import MovieClient
+                >>> client = MovieClient()
+                >>> rating = client.rating.retrieve("my_rating")
+
+        """
         if isinstance(external_id, str):
-            return self._retrieve((self._sources.space, external_id))
+            return self._retrieve((space, external_id))
         else:
-            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(space, ext_id) for ext_id in external_id])
 
     def search(
         self,
@@ -730,6 +1097,28 @@ class RatingAPI(TypeAPI[Rating, RatingApply, RatingList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> RatingList:
+        """Search ratings
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of ratings to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results ratings matching the query.
+
+        Examples:
+
+           Search for 'my_rating' in all text properties:
+
+                >>> from movie_domain_pydantic_v1.client import MovieClient
+                >>> client = MovieClient()
+                >>> ratings = client.rating.search('my_rating')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             external_id_prefix,
@@ -789,6 +1178,32 @@ class RatingAPI(TypeAPI[Rating, RatingApply, RatingList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across ratings
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of ratings to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count ratings in space `my_space`:
+
+                >>> from movie_domain_pydantic_v1.client import MovieClient
+                >>> client = MovieClient()
+                >>> result = client.rating.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             external_id_prefix,
@@ -818,6 +1233,22 @@ class RatingAPI(TypeAPI[Rating, RatingApply, RatingList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for ratings
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of ratings to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             external_id_prefix,
@@ -842,6 +1273,26 @@ class RatingAPI(TypeAPI[Rating, RatingApply, RatingList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> RatingList:
+        """List/filter ratings
+
+        Args:
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of ratings to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested ratings
+
+        Examples:
+
+            List ratings and limit to 5:
+
+                >>> from movie_domain_pydantic_v1.client import MovieClient
+                >>> client = MovieClient()
+                >>> ratings = client.rating.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             external_id_prefix,

@@ -35,6 +35,26 @@ class CogProcessAPI(TypeAPI[CogProcess, CogProcessApply, CogProcessList]):
     def apply(
         self, cog_proces: CogProcessApply | Sequence[CogProcessApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) cog process.
+
+        Args:
+            cog_proces: Cog proces or sequence of cog process to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new cog_proces:
+
+                >>> from markets_pydantic_v1.client import MarketClient
+                >>> from markets_pydantic_v1.client.data_classes import CogProcessApply
+                >>> client = MarketClient()
+                >>> cog_proces = CogProcessApply(external_id="my_cog_proces", ...)
+                >>> result = client.cog_process.apply(cog_proces)
+
+        """
         if isinstance(cog_proces, CogProcessApply):
             instances = cog_proces.to_instances_apply(self._view_by_write_class)
         else:
@@ -47,7 +67,24 @@ class CogProcessAPI(TypeAPI[CogProcess, CogProcessApply, CogProcessList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="market") -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space: str = "market") -> dm.InstancesDeleteResult:
+        """Delete one or more cog proces.
+
+        Args:
+            external_id: External id of the cog proces to delete.
+            space: The space where all the cog proces are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete cog_proces by id:
+
+                >>> from markets_pydantic_v1.client import MarketClient
+                >>> client = MarketClient()
+                >>> client.cog_process.delete("my_cog_proces")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -63,11 +100,29 @@ class CogProcessAPI(TypeAPI[CogProcess, CogProcessApply, CogProcessList]):
     def retrieve(self, external_id: Sequence[str]) -> CogProcessList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> CogProcess | CogProcessList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "market") -> CogProcess | CogProcessList:
+        """Retrieve one or more cog process by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the cog process.
+            space: The space where all the cog process are located.
+
+        Returns:
+            The requested cog process.
+
+        Examples:
+
+            Retrieve cog_proces by id:
+
+                >>> from markets_pydantic_v1.client import MarketClient
+                >>> client = MarketClient()
+                >>> cog_proces = client.cog_process.retrieve("my_cog_proces")
+
+        """
         if isinstance(external_id, str):
-            return self._retrieve((self._sources.space, external_id))
+            return self._retrieve((space, external_id))
         else:
-            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(space, ext_id) for ext_id in external_id])
 
     def search(
         self,
@@ -83,6 +138,33 @@ class CogProcessAPI(TypeAPI[CogProcess, CogProcessApply, CogProcessList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> CogProcessList:
+        """Search cog process
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            bid: The bid to filter on.
+            date_transformations: The date transformation to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            transformation: The transformation to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of cog process to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results cog process matching the query.
+
+        Examples:
+
+           Search for 'my_cog_proces' in all text properties:
+
+                >>> from markets_pydantic_v1.client import MarketClient
+                >>> client = MarketClient()
+                >>> cog_process = client.cog_process.search('my_cog_proces')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             bid,
@@ -162,6 +244,37 @@ class CogProcessAPI(TypeAPI[CogProcess, CogProcessApply, CogProcessList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across cog process
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            bid: The bid to filter on.
+            date_transformations: The date transformation to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            transformation: The transformation to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of cog process to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count cog process in space `my_space`:
+
+                >>> from markets_pydantic_v1.client import MarketClient
+                >>> client = MarketClient()
+                >>> result = client.cog_process.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             bid,
@@ -201,6 +314,27 @@ class CogProcessAPI(TypeAPI[CogProcess, CogProcessApply, CogProcessList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for cog process
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            bid: The bid to filter on.
+            date_transformations: The date transformation to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            transformation: The transformation to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of cog process to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             bid,
@@ -235,6 +369,31 @@ class CogProcessAPI(TypeAPI[CogProcess, CogProcessApply, CogProcessList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> CogProcessList:
+        """List/filter cog process
+
+        Args:
+            bid: The bid to filter on.
+            date_transformations: The date transformation to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            transformation: The transformation to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of cog process to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested cog process
+
+        Examples:
+
+            List cog process and limit to 5:
+
+                >>> from markets_pydantic_v1.client import MarketClient
+                >>> client = MarketClient()
+                >>> cog_process = client.cog_process.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             bid,

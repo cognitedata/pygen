@@ -35,6 +35,26 @@ class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
     def apply(
         self, unacceptable_usage: UnacceptableUsageApply | Sequence[UnacceptableUsageApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) unacceptable usages.
+
+        Args:
+            unacceptable_usage: Unacceptable usage or sequence of unacceptable usages to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new unacceptable_usage:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> from osdu_wells_pydantic_v1.client.data_classes import UnacceptableUsageApply
+                >>> client = OSDUClient()
+                >>> unacceptable_usage = UnacceptableUsageApply(external_id="my_unacceptable_usage", ...)
+                >>> result = client.unacceptable_usage.apply(unacceptable_usage)
+
+        """
         if isinstance(unacceptable_usage, UnacceptableUsageApply):
             instances = unacceptable_usage.to_instances_apply(self._view_by_write_class)
         else:
@@ -47,7 +67,26 @@ class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more unacceptable usage.
+
+        Args:
+            external_id: External id of the unacceptable usage to delete.
+            space: The space where all the unacceptable usage are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete unacceptable_usage by id:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> client.unacceptable_usage.delete("my_unacceptable_usage")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -63,11 +102,31 @@ class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
     def retrieve(self, external_id: Sequence[str]) -> UnacceptableUsageList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> UnacceptableUsage | UnacceptableUsageList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> UnacceptableUsage | UnacceptableUsageList:
+        """Retrieve one or more unacceptable usages by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the unacceptable usages.
+            space: The space where all the unacceptable usages are located.
+
+        Returns:
+            The requested unacceptable usages.
+
+        Examples:
+
+            Retrieve unacceptable_usage by id:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> unacceptable_usage = client.unacceptable_usage.retrieve("my_unacceptable_usage")
+
+        """
         if isinstance(external_id, str):
-            return self._retrieve((self._sources.space, external_id))
+            return self._retrieve((space, external_id))
         else:
-            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(space, ext_id) for ext_id in external_id])
 
     def search(
         self,
@@ -88,6 +147,38 @@ class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> UnacceptableUsageList:
+        """Search unacceptable usages
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            data_quality_id: The data quality id to filter on.
+            data_quality_id_prefix: The prefix of the data quality id to filter on.
+            data_quality_rule_set_id: The data quality rule set id to filter on.
+            data_quality_rule_set_id_prefix: The prefix of the data quality rule set id to filter on.
+            value_chain_status_type_id: The value chain status type id to filter on.
+            value_chain_status_type_id_prefix: The prefix of the value chain status type id to filter on.
+            workflow_persona_type_id: The workflow persona type id to filter on.
+            workflow_persona_type_id_prefix: The prefix of the workflow persona type id to filter on.
+            workflow_usage_type_id: The workflow usage type id to filter on.
+            workflow_usage_type_id_prefix: The prefix of the workflow usage type id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of unacceptable usages to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results unacceptable usages matching the query.
+
+        Examples:
+
+           Search for 'my_unacceptable_usage' in all text properties:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> unacceptable_usages = client.unacceptable_usage.search('my_unacceptable_usage')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             data_quality_id,
@@ -187,6 +278,42 @@ class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across unacceptable usages
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            data_quality_id: The data quality id to filter on.
+            data_quality_id_prefix: The prefix of the data quality id to filter on.
+            data_quality_rule_set_id: The data quality rule set id to filter on.
+            data_quality_rule_set_id_prefix: The prefix of the data quality rule set id to filter on.
+            value_chain_status_type_id: The value chain status type id to filter on.
+            value_chain_status_type_id_prefix: The prefix of the value chain status type id to filter on.
+            workflow_persona_type_id: The workflow persona type id to filter on.
+            workflow_persona_type_id_prefix: The prefix of the workflow persona type id to filter on.
+            workflow_usage_type_id: The workflow usage type id to filter on.
+            workflow_usage_type_id_prefix: The prefix of the workflow usage type id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of unacceptable usages to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count unacceptable usages in space `my_space`:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> result = client.unacceptable_usage.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             data_quality_id,
@@ -236,6 +363,32 @@ class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for unacceptable usages
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            data_quality_id: The data quality id to filter on.
+            data_quality_id_prefix: The prefix of the data quality id to filter on.
+            data_quality_rule_set_id: The data quality rule set id to filter on.
+            data_quality_rule_set_id_prefix: The prefix of the data quality rule set id to filter on.
+            value_chain_status_type_id: The value chain status type id to filter on.
+            value_chain_status_type_id_prefix: The prefix of the value chain status type id to filter on.
+            workflow_persona_type_id: The workflow persona type id to filter on.
+            workflow_persona_type_id_prefix: The prefix of the workflow persona type id to filter on.
+            workflow_usage_type_id: The workflow usage type id to filter on.
+            workflow_usage_type_id_prefix: The prefix of the workflow usage type id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of unacceptable usages to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             data_quality_id,
@@ -280,6 +433,36 @@ class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> UnacceptableUsageList:
+        """List/filter unacceptable usages
+
+        Args:
+            data_quality_id: The data quality id to filter on.
+            data_quality_id_prefix: The prefix of the data quality id to filter on.
+            data_quality_rule_set_id: The data quality rule set id to filter on.
+            data_quality_rule_set_id_prefix: The prefix of the data quality rule set id to filter on.
+            value_chain_status_type_id: The value chain status type id to filter on.
+            value_chain_status_type_id_prefix: The prefix of the value chain status type id to filter on.
+            workflow_persona_type_id: The workflow persona type id to filter on.
+            workflow_persona_type_id_prefix: The prefix of the workflow persona type id to filter on.
+            workflow_usage_type_id: The workflow usage type id to filter on.
+            workflow_usage_type_id_prefix: The prefix of the workflow usage type id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of unacceptable usages to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested unacceptable usages
+
+        Examples:
+
+            List unacceptable usages and limit to 5:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> unacceptable_usages = client.unacceptable_usage.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             data_quality_id,

@@ -27,6 +27,26 @@ _MOVIE_PROPERTIES_BY_FIELD = {
 
 
 class Movie(DomainModel):
+    """This represent a read version of movie.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the movie.
+        actors: The actor field.
+        directors: The director field.
+        meta: The meta field.
+        rating: The rating field.
+        release_year: The release year field.
+        run_time_minutes: The run time minute field.
+        title: The title field.
+        created_time: The created time of the movie node.
+        last_updated_time: The last updated time of the movie node.
+        deleted_time: If present, the deleted time of the movie node.
+        version: The version of the movie node.
+    """
+
     space: str = "IntegrationTestsImmutable"
     actors: Optional[list[str]] = None
     directors: Optional[list[str]] = None
@@ -37,6 +57,7 @@ class Movie(DomainModel):
     title: Optional[str] = None
 
     def as_apply(self) -> MovieApply:
+        """Convert this read version of movie to a write version."""
         return MovieApply(
             space=self.space,
             external_id=self.external_id,
@@ -51,6 +72,26 @@ class Movie(DomainModel):
 
 
 class MovieApply(DomainModelApply):
+    """This represent a write version of movie.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the movie.
+        actors: The actor field.
+        directors: The director field.
+        meta: The meta field.
+        rating: The rating field.
+        release_year: The release year field.
+        run_time_minutes: The run time minute field.
+        title: The title field.
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "IntegrationTestsImmutable"
     actors: Union[list[ActorApply], list[str], None] = Field(default=None, repr=False)
     directors: Union[list[DirectorApply], list[str], None] = Field(default=None, repr=False)
@@ -162,11 +203,16 @@ class MovieApply(DomainModelApply):
 
 
 class MovieList(TypeList[Movie]):
+    """List of movies in read version."""
+
     _NODE = Movie
 
     def as_apply(self) -> MovieApplyList:
+        """Convert this read version of movie to a write version."""
         return MovieApplyList([node.as_apply() for node in self.data])
 
 
 class MovieApplyList(TypeApplyList[MovieApply]):
+    """List of movies in write version."""
+
     _NODE = MovieApply

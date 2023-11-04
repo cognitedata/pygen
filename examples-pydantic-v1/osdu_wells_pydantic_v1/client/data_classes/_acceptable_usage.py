@@ -42,6 +42,24 @@ _ACCEPTABLEUSAGE_PROPERTIES_BY_FIELD = {
 
 
 class AcceptableUsage(DomainModel):
+    """This represent a read version of acceptable usage.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the acceptable usage.
+        data_quality_id: The data quality id field.
+        data_quality_rule_set_id: The data quality rule set id field.
+        value_chain_status_type_id: The value chain status type id field.
+        workflow_persona_type_id: The workflow persona type id field.
+        workflow_usage_type_id: The workflow usage type id field.
+        created_time: The created time of the acceptable usage node.
+        last_updated_time: The last updated time of the acceptable usage node.
+        deleted_time: If present, the deleted time of the acceptable usage node.
+        version: The version of the acceptable usage node.
+    """
+
     space: str = "IntegrationTestsImmutable"
     data_quality_id: Optional[str] = Field(None, alias="DataQualityID")
     data_quality_rule_set_id: Optional[str] = Field(None, alias="DataQualityRuleSetID")
@@ -50,6 +68,7 @@ class AcceptableUsage(DomainModel):
     workflow_usage_type_id: Optional[str] = Field(None, alias="WorkflowUsageTypeID")
 
     def as_apply(self) -> AcceptableUsageApply:
+        """Convert this read version of acceptable usage to a write version."""
         return AcceptableUsageApply(
             space=self.space,
             external_id=self.external_id,
@@ -62,6 +81,24 @@ class AcceptableUsage(DomainModel):
 
 
 class AcceptableUsageApply(DomainModelApply):
+    """This represent a write version of acceptable usage.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the acceptable usage.
+        data_quality_id: The data quality id field.
+        data_quality_rule_set_id: The data quality rule set id field.
+        value_chain_status_type_id: The value chain status type id field.
+        workflow_persona_type_id: The workflow persona type id field.
+        workflow_usage_type_id: The workflow usage type id field.
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "IntegrationTestsImmutable"
     data_quality_id: Optional[str] = Field(None, alias="DataQualityID")
     data_quality_rule_set_id: Optional[str] = Field(None, alias="DataQualityRuleSetID")
@@ -109,11 +146,16 @@ class AcceptableUsageApply(DomainModelApply):
 
 
 class AcceptableUsageList(TypeList[AcceptableUsage]):
+    """List of acceptable usages in read version."""
+
     _NODE = AcceptableUsage
 
     def as_apply(self) -> AcceptableUsageApplyList:
+        """Convert this read version of acceptable usage to a write version."""
         return AcceptableUsageApplyList([node.as_apply() for node in self.data])
 
 
 class AcceptableUsageApplyList(TypeApplyList[AcceptableUsageApply]):
+    """List of acceptable usages in write version."""
+
     _NODE = AcceptableUsageApply

@@ -34,6 +34,24 @@ _NAMEALIASES_PROPERTIES_BY_FIELD = {
 
 
 class NameAliases(DomainModel):
+    """This represent a read version of name alias.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the name alias.
+        alias_name: The alias name field.
+        alias_name_type_id: The alias name type id field.
+        definition_organisation_id: The definition organisation id field.
+        effective_date_time: The effective date time field.
+        termination_date_time: The termination date time field.
+        created_time: The created time of the name alias node.
+        last_updated_time: The last updated time of the name alias node.
+        deleted_time: If present, the deleted time of the name alias node.
+        version: The version of the name alias node.
+    """
+
     space: str = "IntegrationTestsImmutable"
     alias_name: Optional[str] = Field(None, alias="AliasName")
     alias_name_type_id: Optional[str] = Field(None, alias="AliasNameTypeID")
@@ -42,6 +60,7 @@ class NameAliases(DomainModel):
     termination_date_time: Optional[str] = Field(None, alias="TerminationDateTime")
 
     def as_apply(self) -> NameAliasesApply:
+        """Convert this read version of name alias to a write version."""
         return NameAliasesApply(
             space=self.space,
             external_id=self.external_id,
@@ -54,6 +73,24 @@ class NameAliases(DomainModel):
 
 
 class NameAliasesApply(DomainModelApply):
+    """This represent a write version of name alias.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the name alias.
+        alias_name: The alias name field.
+        alias_name_type_id: The alias name type id field.
+        definition_organisation_id: The definition organisation id field.
+        effective_date_time: The effective date time field.
+        termination_date_time: The termination date time field.
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "IntegrationTestsImmutable"
     alias_name: Optional[str] = Field(None, alias="AliasName")
     alias_name_type_id: Optional[str] = Field(None, alias="AliasNameTypeID")
@@ -101,11 +138,16 @@ class NameAliasesApply(DomainModelApply):
 
 
 class NameAliasesList(TypeList[NameAliases]):
+    """List of name aliases in read version."""
+
     _NODE = NameAliases
 
     def as_apply(self) -> NameAliasesApplyList:
+        """Convert this read version of name alias to a write version."""
         return NameAliasesApplyList([node.as_apply() for node in self.data])
 
 
 class NameAliasesApplyList(TypeApplyList[NameAliasesApply]):
+    """List of name aliases in write version."""
+
     _NODE = NameAliasesApply

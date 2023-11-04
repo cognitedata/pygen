@@ -31,6 +31,23 @@ _PYGENPROCESS_PROPERTIES_BY_FIELD = {
 
 
 class PygenProcess(DomainModel):
+    """This represent a read version of pygen proces.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the pygen proces.
+        bid: The bid field.
+        date_transformations: The date transformation field.
+        name: The name field.
+        transformation: The transformation field.
+        created_time: The created time of the pygen proces node.
+        last_updated_time: The last updated time of the pygen proces node.
+        deleted_time: If present, the deleted time of the pygen proces node.
+        version: The version of the pygen proces node.
+    """
+
     space: str = "market"
     bid: Optional[str] = None
     date_transformations: Optional[str] = Field(None, alias="dateTransformations")
@@ -38,6 +55,7 @@ class PygenProcess(DomainModel):
     transformation: Optional[str] = None
 
     def as_apply(self) -> PygenProcessApply:
+        """Convert this read version of pygen proces to a write version."""
         return PygenProcessApply(
             space=self.space,
             external_id=self.external_id,
@@ -49,6 +67,23 @@ class PygenProcess(DomainModel):
 
 
 class PygenProcessApply(DomainModelApply):
+    """This represent a write version of pygen proces.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the pygen proces.
+        bid: The bid field.
+        date_transformations: The date transformation field.
+        name: The name field.
+        transformation: The transformation field.
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "market"
     bid: Union[BidApply, str, None] = Field(None, repr=False)
     date_transformations: Union[DateTransformationPairApply, str, None] = Field(
@@ -123,11 +158,16 @@ class PygenProcessApply(DomainModelApply):
 
 
 class PygenProcessList(TypeList[PygenProcess]):
+    """List of pygen process in read version."""
+
     _NODE = PygenProcess
 
     def as_apply(self) -> PygenProcessApplyList:
+        """Convert this read version of pygen proces to a write version."""
         return PygenProcessApplyList([node.as_apply() for node in self.data])
 
 
 class PygenProcessApplyList(TypeApplyList[PygenProcessApply]):
+    """List of pygen process in write version."""
+
     _NODE = PygenProcessApply

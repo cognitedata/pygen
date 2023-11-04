@@ -35,6 +35,26 @@ class BestLeadingActressAPI(TypeAPI[BestLeadingActress, BestLeadingActressApply,
     def apply(
         self, best_leading_actress: BestLeadingActressApply | Sequence[BestLeadingActressApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) best leading actresses.
+
+        Args:
+            best_leading_actress: Best leading actress or sequence of best leading actresses to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new best_leading_actress:
+
+                >>> from movie_domain_pydantic_v1.client import MovieClient
+                >>> from movie_domain_pydantic_v1.client.data_classes import BestLeadingActressApply
+                >>> client = MovieClient()
+                >>> best_leading_actress = BestLeadingActressApply(external_id="my_best_leading_actress", ...)
+                >>> result = client.best_leading_actress.apply(best_leading_actress)
+
+        """
         if isinstance(best_leading_actress, BestLeadingActressApply):
             instances = best_leading_actress.to_instances_apply(self._view_by_write_class)
         else:
@@ -47,7 +67,26 @@ class BestLeadingActressAPI(TypeAPI[BestLeadingActress, BestLeadingActressApply,
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more best leading actress.
+
+        Args:
+            external_id: External id of the best leading actress to delete.
+            space: The space where all the best leading actress are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete best_leading_actress by id:
+
+                >>> from movie_domain_pydantic_v1.client import MovieClient
+                >>> client = MovieClient()
+                >>> client.best_leading_actress.delete("my_best_leading_actress")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -63,11 +102,31 @@ class BestLeadingActressAPI(TypeAPI[BestLeadingActress, BestLeadingActressApply,
     def retrieve(self, external_id: Sequence[str]) -> BestLeadingActressList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> BestLeadingActress | BestLeadingActressList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> BestLeadingActress | BestLeadingActressList:
+        """Retrieve one or more best leading actresses by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the best leading actresses.
+            space: The space where all the best leading actresses are located.
+
+        Returns:
+            The requested best leading actresses.
+
+        Examples:
+
+            Retrieve best_leading_actress by id:
+
+                >>> from movie_domain_pydantic_v1.client import MovieClient
+                >>> client = MovieClient()
+                >>> best_leading_actress = client.best_leading_actress.retrieve("my_best_leading_actress")
+
+        """
         if isinstance(external_id, str):
-            return self._retrieve((self._sources.space, external_id))
+            return self._retrieve((space, external_id))
         else:
-            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(space, ext_id) for ext_id in external_id])
 
     def search(
         self,
@@ -82,6 +141,32 @@ class BestLeadingActressAPI(TypeAPI[BestLeadingActress, BestLeadingActressApply,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> BestLeadingActressList:
+        """Search best leading actresses
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            min_year: The minimum value of the year to filter on.
+            max_year: The maximum value of the year to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of best leading actresses to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results best leading actresses matching the query.
+
+        Examples:
+
+           Search for 'my_best_leading_actress' in all text properties:
+
+                >>> from movie_domain_pydantic_v1.client import MovieClient
+                >>> client = MovieClient()
+                >>> best_leading_actresses = client.best_leading_actress.search('my_best_leading_actress')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             name,
@@ -157,6 +242,36 @@ class BestLeadingActressAPI(TypeAPI[BestLeadingActress, BestLeadingActressApply,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across best leading actresses
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            min_year: The minimum value of the year to filter on.
+            max_year: The maximum value of the year to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of best leading actresses to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count best leading actresses in space `my_space`:
+
+                >>> from movie_domain_pydantic_v1.client import MovieClient
+                >>> client = MovieClient()
+                >>> result = client.best_leading_actress.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             name,
@@ -194,6 +309,26 @@ class BestLeadingActressAPI(TypeAPI[BestLeadingActress, BestLeadingActressApply,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for best leading actresses
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            min_year: The minimum value of the year to filter on.
+            max_year: The maximum value of the year to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of best leading actresses to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             name,
@@ -226,6 +361,30 @@ class BestLeadingActressAPI(TypeAPI[BestLeadingActress, BestLeadingActressApply,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> BestLeadingActressList:
+        """List/filter best leading actresses
+
+        Args:
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            min_year: The minimum value of the year to filter on.
+            max_year: The maximum value of the year to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of best leading actresses to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested best leading actresses
+
+        Examples:
+
+            List best leading actresses and limit to 5:
+
+                >>> from movie_domain_pydantic_v1.client import MovieClient
+                >>> client = MovieClient()
+                >>> best_leading_actresses = client.best_leading_actress.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             name,

@@ -21,6 +21,23 @@ _ACTOR_PROPERTIES_BY_FIELD = {
 
 
 class Actor(DomainModel):
+    """This represent a read version of actor.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the actor.
+        movies: The movie field.
+        nomination: The nomination field.
+        person: The person field.
+        won_oscar: The won oscar field.
+        created_time: The created time of the actor node.
+        last_updated_time: The last updated time of the actor node.
+        deleted_time: If present, the deleted time of the actor node.
+        version: The version of the actor node.
+    """
+
     space: str = "IntegrationTestsImmutable"
     movies: Optional[list[str]] = None
     nomination: Optional[list[str]] = None
@@ -28,6 +45,7 @@ class Actor(DomainModel):
     won_oscar: Optional[bool] = Field(None, alias="wonOscar")
 
     def as_apply(self) -> ActorApply:
+        """Convert this read version of actor to a write version."""
         return ActorApply(
             space=self.space,
             external_id=self.external_id,
@@ -39,6 +57,23 @@ class Actor(DomainModel):
 
 
 class ActorApply(DomainModelApply):
+    """This represent a write version of actor.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the actor.
+        movies: The movie field.
+        nomination: The nomination field.
+        person: The person field.
+        won_oscar: The won oscar field.
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "IntegrationTestsImmutable"
     movies: Union[list[MovieApply], list[str], None] = Field(default=None, repr=False)
     nomination: Union[list[NominationApply], list[str], None] = Field(default=None, repr=False)
@@ -141,11 +176,16 @@ class ActorApply(DomainModelApply):
 
 
 class ActorList(TypeList[Actor]):
+    """List of actors in read version."""
+
     _NODE = Actor
 
     def as_apply(self) -> ActorApplyList:
+        """Convert this read version of actor to a write version."""
         return ActorApplyList([node.as_apply() for node in self.data])
 
 
 class ActorApplyList(TypeApplyList[ActorApply]):
+    """List of actors in write version."""
+
     _NODE = ActorApply

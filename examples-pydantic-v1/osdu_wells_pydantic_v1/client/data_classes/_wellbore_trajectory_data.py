@@ -168,6 +168,75 @@ _WELLBORETRAJECTORYDATA_PROPERTIES_BY_FIELD = {
 
 
 class WellboreTrajectoryData(DomainModel):
+    """This represent a read version of wellbore trajectory datum.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the wellbore trajectory datum.
+        acquisition_date: The acquisition date field.
+        acquisition_remark: The acquisition remark field.
+        active_indicator: The active indicator field.
+        applied_operations: The applied operation field.
+        applied_operations_date_time: The applied operations date time field.
+        applied_operations_remarks: The applied operations remark field.
+        applied_operations_user: The applied operations user field.
+        artefacts: The artefact field.
+        author_i_ds: The author i d field.
+        available_trajectory_station_properties: The available trajectory station property field.
+        azimuth_reference_type: The azimuth reference type field.
+        base_depth_measured_depth: The base depth measured depth field.
+        business_activities: The business activity field.
+        calculation_method_type: The calculation method type field.
+        company_id: The company id field.
+        creation_date_time: The creation date time field.
+        ddms_datasets: The ddms dataset field.
+        datasets: The dataset field.
+        description: The description field.
+        end_date_time: The end date time field.
+        existence_kind: The existence kind field.
+        extrapolated_measured_depth: The extrapolated measured depth field.
+        extrapolated_measured_depth_remark: The extrapolated measured depth remark field.
+        geo_contexts: The geo context field.
+        geographic_crsid: The geographic crsid field.
+        is_discoverable: The is discoverable field.
+        is_extended_load: The is extended load field.
+        lineage_assertions: The lineage assertion field.
+        name: The name field.
+        name_aliases: The name alias field.
+        projected_crsid: The projected crsid field.
+        resource_curation_status: The resource curation status field.
+        resource_home_region_id: The resource home region id field.
+        resource_host_region_i_ds: The resource host region i d field.
+        resource_lifecycle_status: The resource lifecycle status field.
+        resource_security_classification: The resource security classification field.
+        service_company_id: The service company id field.
+        source: The source field.
+        spatial_area: The spatial area field.
+        spatial_point: The spatial point field.
+        start_date_time: The start date time field.
+        submitter_name: The submitter name field.
+        surface_grid_convergence: The surface grid convergence field.
+        surface_scale_factor: The surface scale factor field.
+        survey_reference_identifier: The survey reference identifier field.
+        survey_tool_type_id: The survey tool type id field.
+        survey_type: The survey type field.
+        survey_version: The survey version field.
+        tags: The tag field.
+        technical_assurances: The technical assurance field.
+        tie_measured_depth: The tie measured depth field.
+        tie_true_vertical_depth: The tie true vertical depth field.
+        top_depth_measured_depth: The top depth measured depth field.
+        tortuosity: The tortuosity field.
+        vertical_measurement: The vertical measurement field.
+        wellbore_id: The wellbore id field.
+        created_time: The created time of the wellbore trajectory datum node.
+        last_updated_time: The last updated time of the wellbore trajectory datum node.
+        deleted_time: If present, the deleted time of the wellbore trajectory datum node.
+        version: The version of the wellbore trajectory datum node.
+    """
+
     space: str = "IntegrationTestsImmutable"
     acquisition_date: Optional[str] = Field(None, alias="AcquisitionDate")
     acquisition_remark: Optional[str] = Field(None, alias="AcquisitionRemark")
@@ -229,6 +298,7 @@ class WellboreTrajectoryData(DomainModel):
     wellbore_id: Optional[str] = Field(None, alias="WellboreID")
 
     def as_apply(self) -> WellboreTrajectoryDataApply:
+        """Convert this read version of wellbore trajectory datum to a write version."""
         return WellboreTrajectoryDataApply(
             space=self.space,
             external_id=self.external_id,
@@ -292,6 +362,75 @@ class WellboreTrajectoryData(DomainModel):
 
 
 class WellboreTrajectoryDataApply(DomainModelApply):
+    """This represent a write version of wellbore trajectory datum.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the wellbore trajectory datum.
+        acquisition_date: The acquisition date field.
+        acquisition_remark: The acquisition remark field.
+        active_indicator: The active indicator field.
+        applied_operations: The applied operation field.
+        applied_operations_date_time: The applied operations date time field.
+        applied_operations_remarks: The applied operations remark field.
+        applied_operations_user: The applied operations user field.
+        artefacts: The artefact field.
+        author_i_ds: The author i d field.
+        available_trajectory_station_properties: The available trajectory station property field.
+        azimuth_reference_type: The azimuth reference type field.
+        base_depth_measured_depth: The base depth measured depth field.
+        business_activities: The business activity field.
+        calculation_method_type: The calculation method type field.
+        company_id: The company id field.
+        creation_date_time: The creation date time field.
+        ddms_datasets: The ddms dataset field.
+        datasets: The dataset field.
+        description: The description field.
+        end_date_time: The end date time field.
+        existence_kind: The existence kind field.
+        extrapolated_measured_depth: The extrapolated measured depth field.
+        extrapolated_measured_depth_remark: The extrapolated measured depth remark field.
+        geo_contexts: The geo context field.
+        geographic_crsid: The geographic crsid field.
+        is_discoverable: The is discoverable field.
+        is_extended_load: The is extended load field.
+        lineage_assertions: The lineage assertion field.
+        name: The name field.
+        name_aliases: The name alias field.
+        projected_crsid: The projected crsid field.
+        resource_curation_status: The resource curation status field.
+        resource_home_region_id: The resource home region id field.
+        resource_host_region_i_ds: The resource host region i d field.
+        resource_lifecycle_status: The resource lifecycle status field.
+        resource_security_classification: The resource security classification field.
+        service_company_id: The service company id field.
+        source: The source field.
+        spatial_area: The spatial area field.
+        spatial_point: The spatial point field.
+        start_date_time: The start date time field.
+        submitter_name: The submitter name field.
+        surface_grid_convergence: The surface grid convergence field.
+        surface_scale_factor: The surface scale factor field.
+        survey_reference_identifier: The survey reference identifier field.
+        survey_tool_type_id: The survey tool type id field.
+        survey_type: The survey type field.
+        survey_version: The survey version field.
+        tags: The tag field.
+        technical_assurances: The technical assurance field.
+        tie_measured_depth: The tie measured depth field.
+        tie_true_vertical_depth: The tie true vertical depth field.
+        top_depth_measured_depth: The top depth measured depth field.
+        tortuosity: The tortuosity field.
+        vertical_measurement: The vertical measurement field.
+        wellbore_id: The wellbore id field.
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "IntegrationTestsImmutable"
     acquisition_date: Optional[str] = Field(None, alias="AcquisitionDate")
     acquisition_remark: Optional[str] = Field(None, alias="AcquisitionRemark")
@@ -688,11 +827,16 @@ class WellboreTrajectoryDataApply(DomainModelApply):
 
 
 class WellboreTrajectoryDataList(TypeList[WellboreTrajectoryData]):
+    """List of wellbore trajectory data in read version."""
+
     _NODE = WellboreTrajectoryData
 
     def as_apply(self) -> WellboreTrajectoryDataApplyList:
+        """Convert this read version of wellbore trajectory datum to a write version."""
         return WellboreTrajectoryDataApplyList([node.as_apply() for node in self.data])
 
 
 class WellboreTrajectoryDataApplyList(TypeApplyList[WellboreTrajectoryDataApply]):
+    """List of wellbore trajectory data in write version."""
+
     _NODE = WellboreTrajectoryDataApply

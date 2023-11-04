@@ -21,6 +21,23 @@ _ROLE_PROPERTIES_BY_FIELD = {
 
 
 class Role(DomainModel):
+    """This represent a read version of role.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the role.
+        movies: The movie field.
+        nomination: The nomination field.
+        person: The person field.
+        won_oscar: The won oscar field.
+        created_time: The created time of the role node.
+        last_updated_time: The last updated time of the role node.
+        deleted_time: If present, the deleted time of the role node.
+        version: The version of the role node.
+    """
+
     space: str = "IntegrationTestsImmutable"
     movies: Optional[list[str]] = None
     nomination: Optional[list[str]] = None
@@ -28,6 +45,7 @@ class Role(DomainModel):
     won_oscar: Optional[bool] = Field(None, alias="wonOscar")
 
     def as_apply(self) -> RoleApply:
+        """Convert this read version of role to a write version."""
         return RoleApply(
             space=self.space,
             external_id=self.external_id,
@@ -39,6 +57,23 @@ class Role(DomainModel):
 
 
 class RoleApply(DomainModelApply):
+    """This represent a write version of role.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the role.
+        movies: The movie field.
+        nomination: The nomination field.
+        person: The person field.
+        won_oscar: The won oscar field.
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "IntegrationTestsImmutable"
     movies: Union[list[MovieApply], list[str], None] = Field(default=None, repr=False)
     nomination: Union[list[NominationApply], list[str], None] = Field(default=None, repr=False)
@@ -141,11 +176,16 @@ class RoleApply(DomainModelApply):
 
 
 class RoleList(TypeList[Role]):
+    """List of roles in read version."""
+
     _NODE = Role
 
     def as_apply(self) -> RoleApplyList:
+        """Convert this read version of role to a write version."""
         return RoleApplyList([node.as_apply() for node in self.data])
 
 
 class RoleApplyList(TypeApplyList[RoleApply]):
+    """List of roles in write version."""
+
     _NODE = RoleApply

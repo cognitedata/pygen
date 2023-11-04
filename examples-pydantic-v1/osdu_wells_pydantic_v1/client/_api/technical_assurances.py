@@ -25,6 +25,24 @@ class TechnicalAssurancesAcceptableUsageAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more acceptable_usage edges by id(s) of a technical assurance.
+
+        Args:
+            external_id: External id or list of external ids source technical assurance.
+            space: The space where all the acceptable usage edges are located.
+
+        Returns:
+            The requested acceptable usage edges.
+
+        Examples:
+
+            Retrieve acceptable_usage edge by id:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> technical_assurance = client.technical_assurances.acceptable_usage.retrieve("my_acceptable_usage")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -54,6 +72,26 @@ class TechnicalAssurancesAcceptableUsageAPI:
         limit=DEFAULT_LIMIT_READ,
         space="IntegrationTestsImmutable",
     ) -> dm.EdgeList:
+        """List acceptable_usage edges of a technical assurance.
+
+        Args:
+            technical_assurance_id: Id of the source technical assurance.
+            limit: Maximum number of acceptable usage edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the acceptable usage edges are located.
+
+        Returns:
+            The requested acceptable usage edges.
+
+        Examples:
+
+            List 5 acceptable_usage edges connected to "my_technical_assurance":
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> technical_assurance = client.technical_assurances.acceptable_usage.list("my_technical_assurance", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -79,6 +117,24 @@ class TechnicalAssurancesReviewersAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more reviewers edges by id(s) of a technical assurance.
+
+        Args:
+            external_id: External id or list of external ids source technical assurance.
+            space: The space where all the reviewer edges are located.
+
+        Returns:
+            The requested reviewer edges.
+
+        Examples:
+
+            Retrieve reviewers edge by id:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> technical_assurance = client.technical_assurances.reviewers.retrieve("my_reviewers")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -108,6 +164,26 @@ class TechnicalAssurancesReviewersAPI:
         limit=DEFAULT_LIMIT_READ,
         space="IntegrationTestsImmutable",
     ) -> dm.EdgeList:
+        """List reviewers edges of a technical assurance.
+
+        Args:
+            technical_assurance_id: Id of the source technical assurance.
+            limit: Maximum number of reviewer edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the reviewer edges are located.
+
+        Returns:
+            The requested reviewer edges.
+
+        Examples:
+
+            List 5 reviewers edges connected to "my_technical_assurance":
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> technical_assurance = client.technical_assurances.reviewers.list("my_technical_assurance", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -133,6 +209,24 @@ class TechnicalAssurancesUnacceptableUsageAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more unacceptable_usage edges by id(s) of a technical assurance.
+
+        Args:
+            external_id: External id or list of external ids source technical assurance.
+            space: The space where all the unacceptable usage edges are located.
+
+        Returns:
+            The requested unacceptable usage edges.
+
+        Examples:
+
+            Retrieve unacceptable_usage edge by id:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> technical_assurance = client.technical_assurances.unacceptable_usage.retrieve("my_unacceptable_usage")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -162,6 +256,26 @@ class TechnicalAssurancesUnacceptableUsageAPI:
         limit=DEFAULT_LIMIT_READ,
         space="IntegrationTestsImmutable",
     ) -> dm.EdgeList:
+        """List unacceptable_usage edges of a technical assurance.
+
+        Args:
+            technical_assurance_id: Id of the source technical assurance.
+            limit: Maximum number of unacceptable usage edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the unacceptable usage edges are located.
+
+        Returns:
+            The requested unacceptable usage edges.
+
+        Examples:
+
+            List 5 unacceptable_usage edges connected to "my_technical_assurance":
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> technical_assurance = client.technical_assurances.unacceptable_usage.list("my_technical_assurance", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -201,6 +315,30 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
     def apply(
         self, technical_assurance: TechnicalAssurancesApply | Sequence[TechnicalAssurancesApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) technical assurances.
+
+        Note: This method iterates through all nodes linked to technical_assurance and create them including the edges
+        between the nodes. For example, if any of `acceptable_usage`, `reviewers` or `unacceptable_usage` are set, then these
+        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+
+        Args:
+            technical_assurance: Technical assurance or sequence of technical assurances to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new technical_assurance:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> from osdu_wells_pydantic_v1.client.data_classes import TechnicalAssurancesApply
+                >>> client = OSDUClient()
+                >>> technical_assurance = TechnicalAssurancesApply(external_id="my_technical_assurance", ...)
+                >>> result = client.technical_assurances.apply(technical_assurance)
+
+        """
         if isinstance(technical_assurance, TechnicalAssurancesApply):
             instances = technical_assurance.to_instances_apply(self._view_by_write_class)
         else:
@@ -213,7 +351,26 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more technical assurance.
+
+        Args:
+            external_id: External id of the technical assurance to delete.
+            space: The space where all the technical assurance are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete technical_assurance by id:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> client.technical_assurances.delete("my_technical_assurance")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -229,9 +386,29 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
     def retrieve(self, external_id: Sequence[str]) -> TechnicalAssurancesList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> TechnicalAssurances | TechnicalAssurancesList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> TechnicalAssurances | TechnicalAssurancesList:
+        """Retrieve one or more technical assurances by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the technical assurances.
+            space: The space where all the technical assurances are located.
+
+        Returns:
+            The requested technical assurances.
+
+        Examples:
+
+            Retrieve technical_assurance by id:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> technical_assurance = client.technical_assurances.retrieve("my_technical_assurance")
+
+        """
         if isinstance(external_id, str):
-            technical_assurance = self._retrieve((self._sources.space, external_id))
+            technical_assurance = self._retrieve((space, external_id))
 
             acceptable_usage_edges = self.acceptable_usage.retrieve(external_id)
             technical_assurance.acceptable_usage = [edge.end_node.external_id for edge in acceptable_usage_edges]
@@ -242,7 +419,7 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
 
             return technical_assurance
         else:
-            technical_assurances = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            technical_assurances = self._retrieve([(space, ext_id) for ext_id in external_id])
 
             acceptable_usage_edges = self.acceptable_usage.retrieve(external_id)
             self._set_acceptable_usage(technical_assurances, acceptable_usage_edges)
@@ -268,6 +445,35 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> TechnicalAssurancesList:
+        """Search technical assurances
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            comment: The comment to filter on.
+            comment_prefix: The prefix of the comment to filter on.
+            effective_date: The effective date to filter on.
+            effective_date_prefix: The prefix of the effective date to filter on.
+            technical_assurance_type_id: The technical assurance type id to filter on.
+            technical_assurance_type_id_prefix: The prefix of the technical assurance type id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of technical assurances to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `acceptable_usage`, `reviewers` or `unacceptable_usage` external ids for the technical assurances. Defaults to True.
+
+        Returns:
+            Search results technical assurances matching the query.
+
+        Examples:
+
+           Search for 'my_technical_assurance' in all text properties:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> technical_assurances = client.technical_assurances.search('my_technical_assurance')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             comment,
@@ -351,6 +557,39 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across technical assurances
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            comment: The comment to filter on.
+            comment_prefix: The prefix of the comment to filter on.
+            effective_date: The effective date to filter on.
+            effective_date_prefix: The prefix of the effective date to filter on.
+            technical_assurance_type_id: The technical assurance type id to filter on.
+            technical_assurance_type_id_prefix: The prefix of the technical assurance type id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of technical assurances to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `acceptable_usage`, `reviewers` or `unacceptable_usage` external ids for the technical assurances. Defaults to True.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count technical assurances in space `my_space`:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> result = client.technical_assurances.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             comment,
@@ -392,6 +631,29 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for technical assurances
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            comment: The comment to filter on.
+            comment_prefix: The prefix of the comment to filter on.
+            effective_date: The effective date to filter on.
+            effective_date_prefix: The prefix of the effective date to filter on.
+            technical_assurance_type_id: The technical assurance type id to filter on.
+            technical_assurance_type_id_prefix: The prefix of the technical assurance type id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of technical assurances to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `acceptable_usage`, `reviewers` or `unacceptable_usage` external ids for the technical assurances. Defaults to True.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             comment,
@@ -429,6 +691,33 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> TechnicalAssurancesList:
+        """List/filter technical assurances
+
+        Args:
+            comment: The comment to filter on.
+            comment_prefix: The prefix of the comment to filter on.
+            effective_date: The effective date to filter on.
+            effective_date_prefix: The prefix of the effective date to filter on.
+            technical_assurance_type_id: The technical assurance type id to filter on.
+            technical_assurance_type_id_prefix: The prefix of the technical assurance type id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of technical assurances to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `acceptable_usage`, `reviewers` or `unacceptable_usage` external ids for the technical assurances. Defaults to True.
+
+        Returns:
+            List of requested technical assurances
+
+        Examples:
+
+            List technical assurances and limit to 5:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> technical_assurances = client.technical_assurances.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             comment,

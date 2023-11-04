@@ -26,11 +26,27 @@ _BESTLEADINGACTOR_PROPERTIES_BY_FIELD = {
 
 
 class BestLeadingActor(DomainModel):
+    """This represent a read version of best leading actor.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the best leading actor.
+        name: The name field.
+        year: The year field.
+        created_time: The created time of the best leading actor node.
+        last_updated_time: The last updated time of the best leading actor node.
+        deleted_time: If present, the deleted time of the best leading actor node.
+        version: The version of the best leading actor node.
+    """
+
     space: str = "IntegrationTestsImmutable"
     name: Optional[str] = None
     year: Optional[int] = None
 
     def as_apply(self) -> BestLeadingActorApply:
+        """Convert this read version of best leading actor to a write version."""
         return BestLeadingActorApply(
             space=self.space,
             external_id=self.external_id,
@@ -40,6 +56,21 @@ class BestLeadingActor(DomainModel):
 
 
 class BestLeadingActorApply(DomainModelApply):
+    """This represent a write version of best leading actor.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the best leading actor.
+        name: The name field.
+        year: The year field.
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "IntegrationTestsImmutable"
     name: str
     year: int
@@ -78,11 +109,16 @@ class BestLeadingActorApply(DomainModelApply):
 
 
 class BestLeadingActorList(TypeList[BestLeadingActor]):
+    """List of best leading actors in read version."""
+
     _NODE = BestLeadingActor
 
     def as_apply(self) -> BestLeadingActorApplyList:
+        """Convert this read version of best leading actor to a write version."""
         return BestLeadingActorApplyList([node.as_apply() for node in self.data])
 
 
 class BestLeadingActorApplyList(TypeApplyList[BestLeadingActorApply]):
+    """List of best leading actors in write version."""
+
     _NODE = BestLeadingActorApply

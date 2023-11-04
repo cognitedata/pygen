@@ -115,6 +115,58 @@ _WELLDATA_PROPERTIES_BY_FIELD = {
 
 
 class WellData(DomainModel):
+    """This represent a read version of well datum.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the well datum.
+        business_intention_id: The business intention id field.
+        condition_id: The condition id field.
+        current_operator_id: The current operator id field.
+        data_source_organisation_id: The data source organisation id field.
+        default_vertical_crsid: The default vertical crsid field.
+        default_vertical_measurement_id: The default vertical measurement id field.
+        existence_kind: The existence kind field.
+        facility_description: The facility description field.
+        facility_events: The facility event field.
+        facility_id: The facility id field.
+        facility_name: The facility name field.
+        facility_operators: The facility operator field.
+        facility_specifications: The facility specification field.
+        facility_states: The facility state field.
+        facility_type_id: The facility type id field.
+        geo_contexts: The geo context field.
+        historical_interests: The historical interest field.
+        initial_operator_id: The initial operator id field.
+        interest_type_id: The interest type id field.
+        name_aliases: The name alias field.
+        operating_environment_id: The operating environment id field.
+        outcome_id: The outcome id field.
+        resource_curation_status: The resource curation status field.
+        resource_home_region_id: The resource home region id field.
+        resource_host_region_i_ds: The resource host region i d field.
+        resource_lifecycle_status: The resource lifecycle status field.
+        resource_security_classification: The resource security classification field.
+        role_id: The role id field.
+        source: The source field.
+        spatial_location: The spatial location field.
+        status_summary_id: The status summary id field.
+        technical_assurance_type_id: The technical assurance type id field.
+        technical_assurances: The technical assurance field.
+        version_creation_reason: The version creation reason field.
+        vertical_measurements: The vertical measurement field.
+        was_business_interest_financial_non_operated: The was business interest financial non operated field.
+        was_business_interest_financial_operated: The was business interest financial operated field.
+        was_business_interest_obligatory: The was business interest obligatory field.
+        was_business_interest_technical: The was business interest technical field.
+        created_time: The created time of the well datum node.
+        last_updated_time: The last updated time of the well datum node.
+        deleted_time: If present, the deleted time of the well datum node.
+        version: The version of the well datum node.
+    """
+
     space: str = "IntegrationTestsImmutable"
     business_intention_id: Optional[str] = Field(None, alias="BusinessIntentionID")
     condition_id: Optional[str] = Field(None, alias="ConditionID")
@@ -159,6 +211,7 @@ class WellData(DomainModel):
     was_business_interest_technical: Optional[bool] = Field(None, alias="WasBusinessInterestTechnical")
 
     def as_apply(self) -> WellDataApply:
+        """Convert this read version of well datum to a write version."""
         return WellDataApply(
             space=self.space,
             external_id=self.external_id,
@@ -205,6 +258,58 @@ class WellData(DomainModel):
 
 
 class WellDataApply(DomainModelApply):
+    """This represent a write version of well datum.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the well datum.
+        business_intention_id: The business intention id field.
+        condition_id: The condition id field.
+        current_operator_id: The current operator id field.
+        data_source_organisation_id: The data source organisation id field.
+        default_vertical_crsid: The default vertical crsid field.
+        default_vertical_measurement_id: The default vertical measurement id field.
+        existence_kind: The existence kind field.
+        facility_description: The facility description field.
+        facility_events: The facility event field.
+        facility_id: The facility id field.
+        facility_name: The facility name field.
+        facility_operators: The facility operator field.
+        facility_specifications: The facility specification field.
+        facility_states: The facility state field.
+        facility_type_id: The facility type id field.
+        geo_contexts: The geo context field.
+        historical_interests: The historical interest field.
+        initial_operator_id: The initial operator id field.
+        interest_type_id: The interest type id field.
+        name_aliases: The name alias field.
+        operating_environment_id: The operating environment id field.
+        outcome_id: The outcome id field.
+        resource_curation_status: The resource curation status field.
+        resource_home_region_id: The resource home region id field.
+        resource_host_region_i_ds: The resource host region i d field.
+        resource_lifecycle_status: The resource lifecycle status field.
+        resource_security_classification: The resource security classification field.
+        role_id: The role id field.
+        source: The source field.
+        spatial_location: The spatial location field.
+        status_summary_id: The status summary id field.
+        technical_assurance_type_id: The technical assurance type id field.
+        technical_assurances: The technical assurance field.
+        version_creation_reason: The version creation reason field.
+        vertical_measurements: The vertical measurement field.
+        was_business_interest_financial_non_operated: The was business interest financial non operated field.
+        was_business_interest_financial_operated: The was business interest financial operated field.
+        was_business_interest_obligatory: The was business interest obligatory field.
+        was_business_interest_technical: The was business interest technical field.
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "IntegrationTestsImmutable"
     business_intention_id: Optional[str] = Field(None, alias="BusinessIntentionID")
     condition_id: Optional[str] = Field(None, alias="ConditionID")
@@ -613,11 +718,16 @@ class WellDataApply(DomainModelApply):
 
 
 class WellDataList(TypeList[WellData]):
+    """List of well data in read version."""
+
     _NODE = WellData
 
     def as_apply(self) -> WellDataApplyList:
+        """Convert this read version of well datum to a write version."""
         return WellDataApplyList([node.as_apply() for node in self.data])
 
 
 class WellDataApplyList(TypeApplyList[WellDataApply]):
+    """List of well data in write version."""
+
     _NODE = WellDataApply

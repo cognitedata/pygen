@@ -29,6 +29,23 @@ _DRILLINGREASONS_PROPERTIES_BY_FIELD = {
 
 
 class DrillingReasons(DomainModel):
+    """This represent a read version of drilling reason.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the drilling reason.
+        effective_date_time: The effective date time field.
+        lahee_class_id: The lahee class id field.
+        remark: The remark field.
+        termination_date_time: The termination date time field.
+        created_time: The created time of the drilling reason node.
+        last_updated_time: The last updated time of the drilling reason node.
+        deleted_time: If present, the deleted time of the drilling reason node.
+        version: The version of the drilling reason node.
+    """
+
     space: str = "IntegrationTestsImmutable"
     effective_date_time: Optional[str] = Field(None, alias="EffectiveDateTime")
     lahee_class_id: Optional[str] = Field(None, alias="LaheeClassID")
@@ -36,6 +53,7 @@ class DrillingReasons(DomainModel):
     termination_date_time: Optional[str] = Field(None, alias="TerminationDateTime")
 
     def as_apply(self) -> DrillingReasonsApply:
+        """Convert this read version of drilling reason to a write version."""
         return DrillingReasonsApply(
             space=self.space,
             external_id=self.external_id,
@@ -47,6 +65,23 @@ class DrillingReasons(DomainModel):
 
 
 class DrillingReasonsApply(DomainModelApply):
+    """This represent a write version of drilling reason.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the drilling reason.
+        effective_date_time: The effective date time field.
+        lahee_class_id: The lahee class id field.
+        remark: The remark field.
+        termination_date_time: The termination date time field.
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "IntegrationTestsImmutable"
     effective_date_time: Optional[str] = Field(None, alias="EffectiveDateTime")
     lahee_class_id: Optional[str] = Field(None, alias="LaheeClassID")
@@ -91,11 +126,16 @@ class DrillingReasonsApply(DomainModelApply):
 
 
 class DrillingReasonsList(TypeList[DrillingReasons]):
+    """List of drilling reasons in read version."""
+
     _NODE = DrillingReasons
 
     def as_apply(self) -> DrillingReasonsApplyList:
+        """Convert this read version of drilling reason to a write version."""
         return DrillingReasonsApplyList([node.as_apply() for node in self.data])
 
 
 class DrillingReasonsApplyList(TypeApplyList[DrillingReasonsApply]):
+    """List of drilling reasons in write version."""
+
     _NODE = DrillingReasonsApply
