@@ -144,6 +144,38 @@ class PygenBidAPI(TypeAPI[PygenBid, PygenBidApply, PygenBidList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> PygenBidList:
+        """Search pygen bids
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            min_date: The minimum value of the date to filter on.
+            max_date: The maximum value of the date to filter on.
+            is_block: The is block to filter on.
+            market: The market to filter on.
+            min_minimum_price: The minimum value of the minimum price to filter on.
+            max_minimum_price: The maximum value of the minimum price to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            min_price_premium: The minimum value of the price premium to filter on.
+            max_price_premium: The maximum value of the price premium to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of pygen bids to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results pygen bids matching the query.
+
+        Examples:
+
+           Search for 'my_pygen_bid' in all text properties:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> pygen_bids = client.pygen_bid.search('my_pygen_bid')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             min_date,
@@ -336,6 +368,36 @@ class PygenBidAPI(TypeAPI[PygenBid, PygenBidApply, PygenBidList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> PygenBidList:
+        """List/filter pygen bids
+
+        Args:
+            min_date: The minimum value of the date to filter on.
+            max_date: The maximum value of the date to filter on.
+            is_block: The is block to filter on.
+            market: The market to filter on.
+            min_minimum_price: The minimum value of the minimum price to filter on.
+            max_minimum_price: The maximum value of the minimum price to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            min_price_premium: The minimum value of the price premium to filter on.
+            max_price_premium: The maximum value of the price premium to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of pygen bids to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested pygen bids
+
+        Examples:
+
+            List pygen bids and limit to 5:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> pygen_bids = client.pygen_bid.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             min_date,

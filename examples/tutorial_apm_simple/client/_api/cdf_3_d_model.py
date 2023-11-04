@@ -200,6 +200,31 @@ class CdfModelAPI(TypeAPI[CdfModel, CdfModelApply, CdfModelList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> CdfModelList:
+        """Search cdf 3 d models
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of cdf 3 d models to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `entities` external ids for the cdf 3 d models. Defaults to True.
+
+        Returns:
+            Search results cdf 3 d models matching the query.
+
+        Examples:
+
+           Search for 'my_cdf_3_d_model' in all text properties:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> cdf_3_d_models = client.cdf_3_d_model.search('my_cdf_3_d_model')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             name,
@@ -329,6 +354,29 @@ class CdfModelAPI(TypeAPI[CdfModel, CdfModelApply, CdfModelList]):
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> CdfModelList:
+        """List/filter cdf 3 d models
+
+        Args:
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of cdf 3 d models to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `entities` external ids for the cdf 3 d models. Defaults to True.
+
+        Returns:
+            List of requested cdf 3 d models
+
+        Examples:
+
+            List cdf 3 d models and limit to 5:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> cdf_3_d_models = client.cdf_3_d_model.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             name,

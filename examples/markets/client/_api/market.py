@@ -135,6 +135,32 @@ class MarketAPI(TypeAPI[Market, MarketApply, MarketList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> MarketList:
+        """Search markets
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            timezone: The timezone to filter on.
+            timezone_prefix: The prefix of the timezone to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of markets to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results markets matching the query.
+
+        Examples:
+
+           Search for 'my_market' in all text properties:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> markets = client.market.search('my_market')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             name,
@@ -279,6 +305,30 @@ class MarketAPI(TypeAPI[Market, MarketApply, MarketList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> MarketList:
+        """List/filter markets
+
+        Args:
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            timezone: The timezone to filter on.
+            timezone_prefix: The prefix of the timezone to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of markets to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested markets
+
+        Examples:
+
+            List markets and limit to 5:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> markets = client.market.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             name,

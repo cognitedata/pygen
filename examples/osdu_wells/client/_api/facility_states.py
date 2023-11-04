@@ -145,6 +145,36 @@ class FacilityStatesAPI(TypeAPI[FacilityStates, FacilityStatesApply, FacilitySta
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> FacilityStatesList:
+        """Search facility states
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            effective_date_time: The effective date time to filter on.
+            effective_date_time_prefix: The prefix of the effective date time to filter on.
+            facility_state_type_id: The facility state type id to filter on.
+            facility_state_type_id_prefix: The prefix of the facility state type id to filter on.
+            remark: The remark to filter on.
+            remark_prefix: The prefix of the remark to filter on.
+            termination_date_time: The termination date time to filter on.
+            termination_date_time_prefix: The prefix of the termination date time to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of facility states to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results facility states matching the query.
+
+        Examples:
+
+           Search for 'my_facility_state' in all text properties:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> facility_states = client.facility_states.search('my_facility_state')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             effective_date_time,
@@ -321,6 +351,34 @@ class FacilityStatesAPI(TypeAPI[FacilityStates, FacilityStatesApply, FacilitySta
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> FacilityStatesList:
+        """List/filter facility states
+
+        Args:
+            effective_date_time: The effective date time to filter on.
+            effective_date_time_prefix: The prefix of the effective date time to filter on.
+            facility_state_type_id: The facility state type id to filter on.
+            facility_state_type_id_prefix: The prefix of the facility state type id to filter on.
+            remark: The remark to filter on.
+            remark_prefix: The prefix of the remark to filter on.
+            termination_date_time: The termination date time to filter on.
+            termination_date_time_prefix: The prefix of the termination date time to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of facility states to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested facility states
+
+        Examples:
+
+            List facility states and limit to 5:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> facility_states = client.facility_states.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             effective_date_time,

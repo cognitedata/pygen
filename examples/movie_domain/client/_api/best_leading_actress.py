@@ -141,6 +141,32 @@ class BestLeadingActressAPI(TypeAPI[BestLeadingActress, BestLeadingActressApply,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> BestLeadingActressList:
+        """Search best leading actresses
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            min_year: The minimum value of the year to filter on.
+            max_year: The maximum value of the year to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of best leading actresses to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results best leading actresses matching the query.
+
+        Examples:
+
+           Search for 'my_best_leading_actress' in all text properties:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> best_leading_actresses = client.best_leading_actress.search('my_best_leading_actress')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             name,
@@ -285,6 +311,30 @@ class BestLeadingActressAPI(TypeAPI[BestLeadingActress, BestLeadingActressApply,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> BestLeadingActressList:
+        """List/filter best leading actresses
+
+        Args:
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            min_year: The minimum value of the year to filter on.
+            max_year: The maximum value of the year to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of best leading actresses to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested best leading actresses
+
+        Examples:
+
+            List best leading actresses and limit to 5:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> best_leading_actresses = client.best_leading_actress.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             name,

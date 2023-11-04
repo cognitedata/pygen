@@ -225,6 +225,43 @@ class AsIngestedCoordinatesAPI(TypeAPI[AsIngestedCoordinates, AsIngestedCoordina
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> AsIngestedCoordinatesList:
+        """Search as ingested coordinates
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            coordinate_reference_system_id: The coordinate reference system id to filter on.
+            coordinate_reference_system_id_prefix: The prefix of the coordinate reference system id to filter on.
+            vertical_coordinate_reference_system_id: The vertical coordinate reference system id to filter on.
+            vertical_coordinate_reference_system_id_prefix: The prefix of the vertical coordinate reference system id to filter on.
+            vertical_unit_id: The vertical unit id to filter on.
+            vertical_unit_id_prefix: The prefix of the vertical unit id to filter on.
+            persistable_reference_crs: The persistable reference cr to filter on.
+            persistable_reference_crs_prefix: The prefix of the persistable reference cr to filter on.
+            persistable_reference_unit_z: The persistable reference unit z to filter on.
+            persistable_reference_unit_z_prefix: The prefix of the persistable reference unit z to filter on.
+            persistable_reference_vertical_crs: The persistable reference vertical cr to filter on.
+            persistable_reference_vertical_crs_prefix: The prefix of the persistable reference vertical cr to filter on.
+            type: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of as ingested coordinates to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `features` external ids for the as ingested coordinates. Defaults to True.
+
+        Returns:
+            Search results as ingested coordinates matching the query.
+
+        Examples:
+
+           Search for 'my_as_ingested_coordinate' in all text properties:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> as_ingested_coordinates = client.as_ingested_coordinates.search('my_as_ingested_coordinate')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             coordinate_reference_system_id,
@@ -452,6 +489,41 @@ class AsIngestedCoordinatesAPI(TypeAPI[AsIngestedCoordinates, AsIngestedCoordina
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> AsIngestedCoordinatesList:
+        """List/filter as ingested coordinates
+
+        Args:
+            coordinate_reference_system_id: The coordinate reference system id to filter on.
+            coordinate_reference_system_id_prefix: The prefix of the coordinate reference system id to filter on.
+            vertical_coordinate_reference_system_id: The vertical coordinate reference system id to filter on.
+            vertical_coordinate_reference_system_id_prefix: The prefix of the vertical coordinate reference system id to filter on.
+            vertical_unit_id: The vertical unit id to filter on.
+            vertical_unit_id_prefix: The prefix of the vertical unit id to filter on.
+            persistable_reference_crs: The persistable reference cr to filter on.
+            persistable_reference_crs_prefix: The prefix of the persistable reference cr to filter on.
+            persistable_reference_unit_z: The persistable reference unit z to filter on.
+            persistable_reference_unit_z_prefix: The prefix of the persistable reference unit z to filter on.
+            persistable_reference_vertical_crs: The persistable reference vertical cr to filter on.
+            persistable_reference_vertical_crs_prefix: The prefix of the persistable reference vertical cr to filter on.
+            type: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of as ingested coordinates to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `features` external ids for the as ingested coordinates. Defaults to True.
+
+        Returns:
+            List of requested as ingested coordinates
+
+        Examples:
+
+            List as ingested coordinates and limit to 5:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> as_ingested_coordinates = client.as_ingested_coordinates.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             coordinate_reference_system_id,

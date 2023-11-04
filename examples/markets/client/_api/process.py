@@ -134,6 +134,31 @@ class ProcessAPI(TypeAPI[Process, ProcessApply, ProcessList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> ProcessList:
+        """Search process
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            bid: The bid to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of process to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results process matching the query.
+
+        Examples:
+
+           Search for 'my_proces' in all text properties:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> process = client.process.search('my_proces')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             bid,
@@ -270,6 +295,29 @@ class ProcessAPI(TypeAPI[Process, ProcessApply, ProcessList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> ProcessList:
+        """List/filter process
+
+        Args:
+            bid: The bid to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of process to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested process
+
+        Examples:
+
+            List process and limit to 5:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> process = client.process.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             bid,

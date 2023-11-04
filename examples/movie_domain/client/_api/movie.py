@@ -251,6 +251,36 @@ class MovieAPI(TypeAPI[Movie, MovieApply, MovieList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> MovieList:
+        """Search movies
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            rating: The rating to filter on.
+            min_release_year: The minimum value of the release year to filter on.
+            max_release_year: The maximum value of the release year to filter on.
+            min_run_time_minutes: The minimum value of the run time minute to filter on.
+            max_run_time_minutes: The maximum value of the run time minute to filter on.
+            title: The title to filter on.
+            title_prefix: The prefix of the title to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of movies to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `actors` or `directors` external ids for the movies. Defaults to True.
+
+        Returns:
+            Search results movies matching the query.
+
+        Examples:
+
+           Search for 'my_movie' in all text properties:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> movies = client.movie.search('my_movie')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             rating,
@@ -420,6 +450,34 @@ class MovieAPI(TypeAPI[Movie, MovieApply, MovieList]):
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> MovieList:
+        """List/filter movies
+
+        Args:
+            rating: The rating to filter on.
+            min_release_year: The minimum value of the release year to filter on.
+            max_release_year: The maximum value of the release year to filter on.
+            min_run_time_minutes: The minimum value of the run time minute to filter on.
+            max_run_time_minutes: The maximum value of the run time minute to filter on.
+            title: The title to filter on.
+            title_prefix: The prefix of the title to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of movies to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `actors` or `directors` external ids for the movies. Defaults to True.
+
+        Returns:
+            List of requested movies
+
+        Examples:
+
+            List movies and limit to 5:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> movies = client.movie.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             rating,

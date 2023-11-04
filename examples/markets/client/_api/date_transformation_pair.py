@@ -262,6 +262,27 @@ class DateTransformationPairAPI(
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> DateTransformationPairList:
+        """List/filter date transformation pairs
+
+        Args:
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of date transformation pairs to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `end` or `start` external ids for the date transformation pairs. Defaults to True.
+
+        Returns:
+            List of requested date transformation pairs
+
+        Examples:
+
+            List date transformation pairs and limit to 5:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> date_transformation_pairs = client.date_transformation_pair.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             external_id_prefix,

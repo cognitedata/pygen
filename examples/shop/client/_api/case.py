@@ -147,6 +147,41 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> CaseList:
+        """Search cases
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            arguments: The argument to filter on.
+            arguments_prefix: The prefix of the argument to filter on.
+            commands: The command to filter on.
+            min_end_time: The minimum value of the end time to filter on.
+            max_end_time: The maximum value of the end time to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            run_status: The run status to filter on.
+            run_status_prefix: The prefix of the run status to filter on.
+            scenario: The scenario to filter on.
+            scenario_prefix: The prefix of the scenario to filter on.
+            min_start_time: The minimum value of the start time to filter on.
+            max_start_time: The maximum value of the start time to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of cases to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results cases matching the query.
+
+        Examples:
+
+           Search for 'my_case' in all text properties:
+
+                >>> from shop.client import ShopClient
+                >>> client = ShopClient()
+                >>> cases = client.case.search('my_case')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             arguments,
@@ -363,6 +398,39 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> CaseList:
+        """List/filter cases
+
+        Args:
+            arguments: The argument to filter on.
+            arguments_prefix: The prefix of the argument to filter on.
+            commands: The command to filter on.
+            min_end_time: The minimum value of the end time to filter on.
+            max_end_time: The maximum value of the end time to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            run_status: The run status to filter on.
+            run_status_prefix: The prefix of the run status to filter on.
+            scenario: The scenario to filter on.
+            scenario_prefix: The prefix of the scenario to filter on.
+            min_start_time: The minimum value of the start time to filter on.
+            max_start_time: The maximum value of the start time to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of cases to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested cases
+
+        Examples:
+
+            List cases and limit to 5:
+
+                >>> from shop.client import ShopClient
+                >>> client = ShopClient()
+                >>> cases = client.case.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             arguments,

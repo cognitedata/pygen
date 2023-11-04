@@ -147,6 +147,38 @@ class ReviewersAPI(TypeAPI[Reviewers, ReviewersApply, ReviewersList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> ReviewersList:
+        """Search reviewers
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            data_governance_role_type_id: The data governance role type id to filter on.
+            data_governance_role_type_id_prefix: The prefix of the data governance role type id to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            organisation_id: The organisation id to filter on.
+            organisation_id_prefix: The prefix of the organisation id to filter on.
+            role_type_id: The role type id to filter on.
+            role_type_id_prefix: The prefix of the role type id to filter on.
+            workflow_persona_type_id: The workflow persona type id to filter on.
+            workflow_persona_type_id_prefix: The prefix of the workflow persona type id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of reviewers to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results reviewers matching the query.
+
+        Examples:
+
+           Search for 'my_reviewer' in all text properties:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> reviewers = client.reviewers.search('my_reviewer')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             data_governance_role_type_id,
@@ -339,6 +371,36 @@ class ReviewersAPI(TypeAPI[Reviewers, ReviewersApply, ReviewersList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> ReviewersList:
+        """List/filter reviewers
+
+        Args:
+            data_governance_role_type_id: The data governance role type id to filter on.
+            data_governance_role_type_id_prefix: The prefix of the data governance role type id to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            organisation_id: The organisation id to filter on.
+            organisation_id_prefix: The prefix of the organisation id to filter on.
+            role_type_id: The role type id to filter on.
+            role_type_id_prefix: The prefix of the role type id to filter on.
+            workflow_persona_type_id: The workflow persona type id to filter on.
+            workflow_persona_type_id_prefix: The prefix of the workflow persona type id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of reviewers to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested reviewers
+
+        Examples:
+
+            List reviewers and limit to 5:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> reviewers = client.reviewers.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             data_governance_role_type_id,

@@ -669,6 +669,82 @@ class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> WellDataList:
+        """Search well data
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            business_intention_id: The business intention id to filter on.
+            business_intention_id_prefix: The prefix of the business intention id to filter on.
+            condition_id: The condition id to filter on.
+            condition_id_prefix: The prefix of the condition id to filter on.
+            current_operator_id: The current operator id to filter on.
+            current_operator_id_prefix: The prefix of the current operator id to filter on.
+            data_source_organisation_id: The data source organisation id to filter on.
+            data_source_organisation_id_prefix: The prefix of the data source organisation id to filter on.
+            default_vertical_crsid: The default vertical crsid to filter on.
+            default_vertical_crsid_prefix: The prefix of the default vertical crsid to filter on.
+            default_vertical_measurement_id: The default vertical measurement id to filter on.
+            default_vertical_measurement_id_prefix: The prefix of the default vertical measurement id to filter on.
+            existence_kind: The existence kind to filter on.
+            existence_kind_prefix: The prefix of the existence kind to filter on.
+            facility_description: The facility description to filter on.
+            facility_description_prefix: The prefix of the facility description to filter on.
+            facility_id: The facility id to filter on.
+            facility_id_prefix: The prefix of the facility id to filter on.
+            facility_name: The facility name to filter on.
+            facility_name_prefix: The prefix of the facility name to filter on.
+            facility_type_id: The facility type id to filter on.
+            facility_type_id_prefix: The prefix of the facility type id to filter on.
+            initial_operator_id: The initial operator id to filter on.
+            initial_operator_id_prefix: The prefix of the initial operator id to filter on.
+            interest_type_id: The interest type id to filter on.
+            interest_type_id_prefix: The prefix of the interest type id to filter on.
+            operating_environment_id: The operating environment id to filter on.
+            operating_environment_id_prefix: The prefix of the operating environment id to filter on.
+            outcome_id: The outcome id to filter on.
+            outcome_id_prefix: The prefix of the outcome id to filter on.
+            resource_curation_status: The resource curation status to filter on.
+            resource_curation_status_prefix: The prefix of the resource curation status to filter on.
+            resource_home_region_id: The resource home region id to filter on.
+            resource_home_region_id_prefix: The prefix of the resource home region id to filter on.
+            resource_lifecycle_status: The resource lifecycle status to filter on.
+            resource_lifecycle_status_prefix: The prefix of the resource lifecycle status to filter on.
+            resource_security_classification: The resource security classification to filter on.
+            resource_security_classification_prefix: The prefix of the resource security classification to filter on.
+            role_id: The role id to filter on.
+            role_id_prefix: The prefix of the role id to filter on.
+            source: The source to filter on.
+            source_prefix: The prefix of the source to filter on.
+            spatial_location: The spatial location to filter on.
+            status_summary_id: The status summary id to filter on.
+            status_summary_id_prefix: The prefix of the status summary id to filter on.
+            technical_assurance_type_id: The technical assurance type id to filter on.
+            technical_assurance_type_id_prefix: The prefix of the technical assurance type id to filter on.
+            version_creation_reason: The version creation reason to filter on.
+            version_creation_reason_prefix: The prefix of the version creation reason to filter on.
+            was_business_interest_financial_non_operated: The was business interest financial non operated to filter on.
+            was_business_interest_financial_operated: The was business interest financial operated to filter on.
+            was_business_interest_obligatory: The was business interest obligatory to filter on.
+            was_business_interest_technical: The was business interest technical to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of well data to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `facility_events`, `facility_operators`, `facility_specifications`, `facility_states`, `geo_contexts`, `historical_interests`, `name_aliases`, `technical_assurances` or `vertical_measurements` external ids for the well data. Defaults to True.
+
+        Returns:
+            Search results well data matching the query.
+
+        Examples:
+
+           Search for 'my_well_datum' in all text properties:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> well_data = client.well_data.search('my_well_datum')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             business_intention_id,
@@ -1206,6 +1282,80 @@ class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> WellDataList:
+        """List/filter well data
+
+        Args:
+            business_intention_id: The business intention id to filter on.
+            business_intention_id_prefix: The prefix of the business intention id to filter on.
+            condition_id: The condition id to filter on.
+            condition_id_prefix: The prefix of the condition id to filter on.
+            current_operator_id: The current operator id to filter on.
+            current_operator_id_prefix: The prefix of the current operator id to filter on.
+            data_source_organisation_id: The data source organisation id to filter on.
+            data_source_organisation_id_prefix: The prefix of the data source organisation id to filter on.
+            default_vertical_crsid: The default vertical crsid to filter on.
+            default_vertical_crsid_prefix: The prefix of the default vertical crsid to filter on.
+            default_vertical_measurement_id: The default vertical measurement id to filter on.
+            default_vertical_measurement_id_prefix: The prefix of the default vertical measurement id to filter on.
+            existence_kind: The existence kind to filter on.
+            existence_kind_prefix: The prefix of the existence kind to filter on.
+            facility_description: The facility description to filter on.
+            facility_description_prefix: The prefix of the facility description to filter on.
+            facility_id: The facility id to filter on.
+            facility_id_prefix: The prefix of the facility id to filter on.
+            facility_name: The facility name to filter on.
+            facility_name_prefix: The prefix of the facility name to filter on.
+            facility_type_id: The facility type id to filter on.
+            facility_type_id_prefix: The prefix of the facility type id to filter on.
+            initial_operator_id: The initial operator id to filter on.
+            initial_operator_id_prefix: The prefix of the initial operator id to filter on.
+            interest_type_id: The interest type id to filter on.
+            interest_type_id_prefix: The prefix of the interest type id to filter on.
+            operating_environment_id: The operating environment id to filter on.
+            operating_environment_id_prefix: The prefix of the operating environment id to filter on.
+            outcome_id: The outcome id to filter on.
+            outcome_id_prefix: The prefix of the outcome id to filter on.
+            resource_curation_status: The resource curation status to filter on.
+            resource_curation_status_prefix: The prefix of the resource curation status to filter on.
+            resource_home_region_id: The resource home region id to filter on.
+            resource_home_region_id_prefix: The prefix of the resource home region id to filter on.
+            resource_lifecycle_status: The resource lifecycle status to filter on.
+            resource_lifecycle_status_prefix: The prefix of the resource lifecycle status to filter on.
+            resource_security_classification: The resource security classification to filter on.
+            resource_security_classification_prefix: The prefix of the resource security classification to filter on.
+            role_id: The role id to filter on.
+            role_id_prefix: The prefix of the role id to filter on.
+            source: The source to filter on.
+            source_prefix: The prefix of the source to filter on.
+            spatial_location: The spatial location to filter on.
+            status_summary_id: The status summary id to filter on.
+            status_summary_id_prefix: The prefix of the status summary id to filter on.
+            technical_assurance_type_id: The technical assurance type id to filter on.
+            technical_assurance_type_id_prefix: The prefix of the technical assurance type id to filter on.
+            version_creation_reason: The version creation reason to filter on.
+            version_creation_reason_prefix: The prefix of the version creation reason to filter on.
+            was_business_interest_financial_non_operated: The was business interest financial non operated to filter on.
+            was_business_interest_financial_operated: The was business interest financial operated to filter on.
+            was_business_interest_obligatory: The was business interest obligatory to filter on.
+            was_business_interest_technical: The was business interest technical to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of well data to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `facility_events`, `facility_operators`, `facility_specifications`, `facility_states`, `geo_contexts`, `historical_interests`, `name_aliases`, `technical_assurances` or `vertical_measurements` external ids for the well data. Defaults to True.
+
+        Returns:
+            List of requested well data
+
+        Examples:
+
+            List well data and limit to 5:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> well_data = client.well_data.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             business_intention_id,

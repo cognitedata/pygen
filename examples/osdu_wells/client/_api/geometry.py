@@ -139,6 +139,30 @@ class GeometryAPI(TypeAPI[Geometry, GeometryApply, GeometryList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> GeometryList:
+        """Search geometries
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            type: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of geometries to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results geometries matching the query.
+
+        Examples:
+
+           Search for 'my_geometry' in all text properties:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> geometries = client.geometry.search('my_geometry')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             type,
@@ -267,6 +291,28 @@ class GeometryAPI(TypeAPI[Geometry, GeometryApply, GeometryList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> GeometryList:
+        """List/filter geometries
+
+        Args:
+            type: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of geometries to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested geometries
+
+        Examples:
+
+            List geometries and limit to 5:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> geometries = client.geometry.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             type,

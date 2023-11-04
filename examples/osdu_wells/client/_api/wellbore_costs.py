@@ -141,6 +141,32 @@ class WellboreCostsAPI(TypeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsL
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> WellboreCostsList:
+        """Search wellbore costs
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            activity_type_id: The activity type id to filter on.
+            activity_type_id_prefix: The prefix of the activity type id to filter on.
+            min_cost: The minimum value of the cost to filter on.
+            max_cost: The maximum value of the cost to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of wellbore costs to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results wellbore costs matching the query.
+
+        Examples:
+
+           Search for 'my_wellbore_cost' in all text properties:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_costs = client.wellbore_costs.search('my_wellbore_cost')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             activity_type_id,
@@ -285,6 +311,30 @@ class WellboreCostsAPI(TypeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsL
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> WellboreCostsList:
+        """List/filter wellbore costs
+
+        Args:
+            activity_type_id: The activity type id to filter on.
+            activity_type_id_prefix: The prefix of the activity type id to filter on.
+            min_cost: The minimum value of the cost to filter on.
+            max_cost: The maximum value of the cost to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of wellbore costs to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested wellbore costs
+
+        Examples:
+
+            List wellbore costs and limit to 5:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_costs = client.wellbore_costs.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             activity_type_id,

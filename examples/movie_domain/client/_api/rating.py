@@ -789,6 +789,28 @@ class RatingAPI(TypeAPI[Rating, RatingApply, RatingList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> RatingList:
+        """Search ratings
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of ratings to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results ratings matching the query.
+
+        Examples:
+
+           Search for 'my_rating' in all text properties:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> ratings = client.rating.search('my_rating')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             external_id_prefix,
@@ -901,6 +923,26 @@ class RatingAPI(TypeAPI[Rating, RatingApply, RatingList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> RatingList:
+        """List/filter ratings
+
+        Args:
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of ratings to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested ratings
+
+        Examples:
+
+            List ratings and limit to 5:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> ratings = client.rating.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             external_id_prefix,

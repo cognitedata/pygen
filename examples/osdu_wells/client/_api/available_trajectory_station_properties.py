@@ -158,6 +158,34 @@ class AvailableTrajectoryStationPropertiesAPI(
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> AvailableTrajectoryStationPropertiesList:
+        """Search available trajectory station properties
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            station_property_unit_id: The station property unit id to filter on.
+            station_property_unit_id_prefix: The prefix of the station property unit id to filter on.
+            trajectory_station_property_type_id: The trajectory station property type id to filter on.
+            trajectory_station_property_type_id_prefix: The prefix of the trajectory station property type id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of available trajectory station properties to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results available trajectory station properties matching the query.
+
+        Examples:
+
+           Search for 'my_available_trajectory_station_property' in all text properties:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> available_trajectory_station_properties = client.available_trajectory_station_properties.search('my_available_trajectory_station_property')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             name,
@@ -337,6 +365,32 @@ class AvailableTrajectoryStationPropertiesAPI(
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> AvailableTrajectoryStationPropertiesList:
+        """List/filter available trajectory station properties
+
+        Args:
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            station_property_unit_id: The station property unit id to filter on.
+            station_property_unit_id_prefix: The prefix of the station property unit id to filter on.
+            trajectory_station_property_type_id: The trajectory station property type id to filter on.
+            trajectory_station_property_type_id_prefix: The prefix of the trajectory station property type id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of available trajectory station properties to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested available trajectory station properties
+
+        Examples:
+
+            List available trajectory station properties and limit to 5:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> available_trajectory_station_properties = client.available_trajectory_station_properties.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             name,

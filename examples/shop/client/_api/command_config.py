@@ -137,6 +137,28 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> CommandConfigList:
+        """Search command configs
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of command configs to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results command configs matching the query.
+
+        Examples:
+
+           Search for 'my_command_config' in all text properties:
+
+                >>> from shop.client import ShopClient
+                >>> client = ShopClient()
+                >>> command_configs = client.command_config.search('my_command_config')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             external_id_prefix,
@@ -249,6 +271,26 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> CommandConfigList:
+        """List/filter command configs
+
+        Args:
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of command configs to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested command configs
+
+        Examples:
+
+            List command configs and limit to 5:
+
+                >>> from shop.client import ShopClient
+                >>> client = ShopClient()
+                >>> command_configs = client.command_config.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             external_id_prefix,

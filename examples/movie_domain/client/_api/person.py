@@ -200,6 +200,33 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> PersonList:
+        """Search persons
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            min_birth_year: The minimum value of the birth year to filter on.
+            max_birth_year: The maximum value of the birth year to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of persons to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `roles` external ids for the persons. Defaults to True.
+
+        Returns:
+            Search results persons matching the query.
+
+        Examples:
+
+           Search for 'my_person' in all text properties:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> persons = client.person.search('my_person')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             min_birth_year,
@@ -345,6 +372,31 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> PersonList:
+        """List/filter persons
+
+        Args:
+            min_birth_year: The minimum value of the birth year to filter on.
+            max_birth_year: The maximum value of the birth year to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of persons to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `roles` external ids for the persons. Defaults to True.
+
+        Returns:
+            List of requested persons
+
+        Examples:
+
+            List persons and limit to 5:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> persons = client.person.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             min_birth_year,

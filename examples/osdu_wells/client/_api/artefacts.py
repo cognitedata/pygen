@@ -143,6 +143,34 @@ class ArtefactsAPI(TypeAPI[Artefacts, ArtefactsApply, ArtefactsList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> ArtefactsList:
+        """Search artefacts
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            resource_id: The resource id to filter on.
+            resource_id_prefix: The prefix of the resource id to filter on.
+            resource_kind: The resource kind to filter on.
+            resource_kind_prefix: The prefix of the resource kind to filter on.
+            role_id: The role id to filter on.
+            role_id_prefix: The prefix of the role id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of artefacts to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results artefacts matching the query.
+
+        Examples:
+
+           Search for 'my_artefact' in all text properties:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> artefacts = client.artefacts.search('my_artefact')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             resource_id,
@@ -303,6 +331,32 @@ class ArtefactsAPI(TypeAPI[Artefacts, ArtefactsApply, ArtefactsList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> ArtefactsList:
+        """List/filter artefacts
+
+        Args:
+            resource_id: The resource id to filter on.
+            resource_id_prefix: The prefix of the resource id to filter on.
+            resource_kind: The resource kind to filter on.
+            resource_kind_prefix: The prefix of the resource kind to filter on.
+            role_id: The role id to filter on.
+            role_id_prefix: The prefix of the role id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of artefacts to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested artefacts
+
+        Examples:
+
+            List artefacts and limit to 5:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> artefacts = client.artefacts.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             resource_id,

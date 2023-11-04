@@ -147,6 +147,38 @@ class FacilityOperatorsAPI(TypeAPI[FacilityOperators, FacilityOperatorsApply, Fa
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> FacilityOperatorsList:
+        """Search facility operators
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            effective_date_time: The effective date time to filter on.
+            effective_date_time_prefix: The prefix of the effective date time to filter on.
+            facility_operator_id: The facility operator id to filter on.
+            facility_operator_id_prefix: The prefix of the facility operator id to filter on.
+            facility_operator_organisation_id: The facility operator organisation id to filter on.
+            facility_operator_organisation_id_prefix: The prefix of the facility operator organisation id to filter on.
+            remark: The remark to filter on.
+            remark_prefix: The prefix of the remark to filter on.
+            termination_date_time: The termination date time to filter on.
+            termination_date_time_prefix: The prefix of the termination date time to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of facility operators to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results facility operators matching the query.
+
+        Examples:
+
+           Search for 'my_facility_operator' in all text properties:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> facility_operators = client.facility_operators.search('my_facility_operator')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             effective_date_time,
@@ -339,6 +371,36 @@ class FacilityOperatorsAPI(TypeAPI[FacilityOperators, FacilityOperatorsApply, Fa
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> FacilityOperatorsList:
+        """List/filter facility operators
+
+        Args:
+            effective_date_time: The effective date time to filter on.
+            effective_date_time_prefix: The prefix of the effective date time to filter on.
+            facility_operator_id: The facility operator id to filter on.
+            facility_operator_id_prefix: The prefix of the facility operator id to filter on.
+            facility_operator_organisation_id: The facility operator organisation id to filter on.
+            facility_operator_organisation_id_prefix: The prefix of the facility operator organisation id to filter on.
+            remark: The remark to filter on.
+            remark_prefix: The prefix of the remark to filter on.
+            termination_date_time: The termination date time to filter on.
+            termination_date_time_prefix: The prefix of the termination date time to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of facility operators to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested facility operators
+
+        Examples:
+
+            List facility operators and limit to 5:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> facility_operators = client.facility_operators.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             effective_date_time,

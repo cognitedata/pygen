@@ -141,6 +141,32 @@ class NominationAPI(TypeAPI[Nomination, NominationApply, NominationList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> NominationList:
+        """Search nominations
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            min_year: The minimum value of the year to filter on.
+            max_year: The maximum value of the year to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of nominations to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results nominations matching the query.
+
+        Examples:
+
+           Search for 'my_nomination' in all text properties:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> nominations = client.nomination.search('my_nomination')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             name,
@@ -285,6 +311,30 @@ class NominationAPI(TypeAPI[Nomination, NominationApply, NominationList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> NominationList:
+        """List/filter nominations
+
+        Args:
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            min_year: The minimum value of the year to filter on.
+            max_year: The maximum value of the year to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of nominations to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested nominations
+
+        Examples:
+
+            List nominations and limit to 5:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> nominations = client.nomination.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             name,

@@ -129,6 +129,33 @@ class BidAPI(TypeAPI[Bid, BidApply, BidList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> BidList:
+        """Search bids
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            min_date: The minimum value of the date to filter on.
+            max_date: The maximum value of the date to filter on.
+            market: The market to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of bids to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results bids matching the query.
+
+        Examples:
+
+           Search for 'my_bid' in all text properties:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> bids = client.bid.search('my_bid')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             min_date,
@@ -281,6 +308,31 @@ class BidAPI(TypeAPI[Bid, BidApply, BidList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> BidList:
+        """List/filter bids
+
+        Args:
+            min_date: The minimum value of the date to filter on.
+            max_date: The maximum value of the date to filter on.
+            market: The market to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of bids to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested bids
+
+        Examples:
+
+            List bids and limit to 5:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> bids = client.bid.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             min_date,

@@ -137,6 +137,30 @@ class ValueTransformationAPI(TypeAPI[ValueTransformation, ValueTransformationApp
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> ValueTransformationList:
+        """Search value transformations
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            method: The method to filter on.
+            method_prefix: The prefix of the method to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of value transformations to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results value transformations matching the query.
+
+        Examples:
+
+           Search for 'my_value_transformation' in all text properties:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> value_transformations = client.value_transformation.search('my_value_transformation')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             method,
@@ -265,6 +289,28 @@ class ValueTransformationAPI(TypeAPI[ValueTransformation, ValueTransformationApp
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> ValueTransformationList:
+        """List/filter value transformations
+
+        Args:
+            method: The method to filter on.
+            method_prefix: The prefix of the method to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of value transformations to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested value transformations
+
+        Examples:
+
+            List value transformations and limit to 5:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> value_transformations = client.value_transformation.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             method,

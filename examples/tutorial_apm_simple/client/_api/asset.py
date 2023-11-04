@@ -673,6 +673,46 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> AssetList:
+        """Search assets
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            min_area_id: The minimum value of the area id to filter on.
+            max_area_id: The maximum value of the area id to filter on.
+            min_category_id: The minimum value of the category id to filter on.
+            max_category_id: The maximum value of the category id to filter on.
+            min_created_date: The minimum value of the created date to filter on.
+            max_created_date: The maximum value of the created date to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            is_active: The is active to filter on.
+            is_critical_line: The is critical line to filter on.
+            parent: The parent to filter on.
+            source_db: The source db to filter on.
+            source_db_prefix: The prefix of the source db to filter on.
+            tag: The tag to filter on.
+            tag_prefix: The prefix of the tag to filter on.
+            min_updated_date: The minimum value of the updated date to filter on.
+            max_updated_date: The maximum value of the updated date to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of assets to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `children` or `in_model_3_d` external ids for the assets. Defaults to True.
+
+        Returns:
+            Search results assets matching the query.
+
+        Examples:
+
+           Search for 'my_asset' in all text properties:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> assets = client.asset.search('my_asset')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             min_area_id,
@@ -922,6 +962,44 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> AssetList:
+        """List/filter assets
+
+        Args:
+            min_area_id: The minimum value of the area id to filter on.
+            max_area_id: The maximum value of the area id to filter on.
+            min_category_id: The minimum value of the category id to filter on.
+            max_category_id: The maximum value of the category id to filter on.
+            min_created_date: The minimum value of the created date to filter on.
+            max_created_date: The maximum value of the created date to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            is_active: The is active to filter on.
+            is_critical_line: The is critical line to filter on.
+            parent: The parent to filter on.
+            source_db: The source db to filter on.
+            source_db_prefix: The prefix of the source db to filter on.
+            tag: The tag to filter on.
+            tag_prefix: The prefix of the tag to filter on.
+            min_updated_date: The minimum value of the updated date to filter on.
+            max_updated_date: The maximum value of the updated date to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of assets to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `children` or `in_model_3_d` external ids for the assets. Defaults to True.
+
+        Returns:
+            List of requested assets
+
+        Examples:
+
+            List assets and limit to 5:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> assets = client.asset.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             min_area_id,

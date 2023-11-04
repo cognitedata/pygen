@@ -187,6 +187,27 @@ class CdfEntityAPI(TypeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> CdfEntityList:
+        """List/filter cdf 3 d entities
+
+        Args:
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of cdf 3 d entities to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `in_model_3_d` external ids for the cdf 3 d entities. Defaults to True.
+
+        Returns:
+            List of requested cdf 3 d entities
+
+        Examples:
+
+            List cdf 3 d entities and limit to 5:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> cdf_3_d_entities = client.cdf_3_d_entity.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             external_id_prefix,

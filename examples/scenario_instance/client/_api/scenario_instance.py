@@ -540,6 +540,42 @@ class ScenarioInstanceAPI(TypeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> ScenarioInstanceList:
+        """Search scenario instances
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            aggregation: The aggregation to filter on.
+            aggregation_prefix: The prefix of the aggregation to filter on.
+            country: The country to filter on.
+            country_prefix: The prefix of the country to filter on.
+            min_instance: The minimum value of the instance to filter on.
+            max_instance: The maximum value of the instance to filter on.
+            market: The market to filter on.
+            market_prefix: The prefix of the market to filter on.
+            price_area: The price area to filter on.
+            price_area_prefix: The prefix of the price area to filter on.
+            scenario: The scenario to filter on.
+            scenario_prefix: The prefix of the scenario to filter on.
+            min_start: The minimum value of the start to filter on.
+            max_start: The maximum value of the start to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of scenario instances to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results scenario instances matching the query.
+
+        Examples:
+
+           Search for 'my_scenario_instance' in all text properties:
+
+                >>> from scenario_instance.client import ScenarioInstanceClient
+                >>> client = ScenarioInstanceClient()
+                >>> scenario_instances = client.scenario_instance.search('my_scenario_instance')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             aggregation,
@@ -764,6 +800,40 @@ class ScenarioInstanceAPI(TypeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> ScenarioInstanceList:
+        """List/filter scenario instances
+
+        Args:
+            aggregation: The aggregation to filter on.
+            aggregation_prefix: The prefix of the aggregation to filter on.
+            country: The country to filter on.
+            country_prefix: The prefix of the country to filter on.
+            min_instance: The minimum value of the instance to filter on.
+            max_instance: The maximum value of the instance to filter on.
+            market: The market to filter on.
+            market_prefix: The prefix of the market to filter on.
+            price_area: The price area to filter on.
+            price_area_prefix: The prefix of the price area to filter on.
+            scenario: The scenario to filter on.
+            scenario_prefix: The prefix of the scenario to filter on.
+            min_start: The minimum value of the start to filter on.
+            max_start: The maximum value of the start to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of scenario instances to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested scenario instances
+
+        Examples:
+
+            List scenario instances and limit to 5:
+
+                >>> from scenario_instance.client import ScenarioInstanceClient
+                >>> client = ScenarioInstanceClient()
+                >>> scenario_instances = client.scenario_instance.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             aggregation,

@@ -153,6 +153,44 @@ class SpatialPointAPI(TypeAPI[SpatialPoint, SpatialPointApply, SpatialPointList]
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> SpatialPointList:
+        """Search spatial points
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            as_ingested_coordinates: The as ingested coordinate to filter on.
+            coordinate_quality_check_date_time: The coordinate quality check date time to filter on.
+            coordinate_quality_check_date_time_prefix: The prefix of the coordinate quality check date time to filter on.
+            coordinate_quality_check_performed_by: The coordinate quality check performed by to filter on.
+            coordinate_quality_check_performed_by_prefix: The prefix of the coordinate quality check performed by to filter on.
+            qualitative_spatial_accuracy_type_id: The qualitative spatial accuracy type id to filter on.
+            qualitative_spatial_accuracy_type_id_prefix: The prefix of the qualitative spatial accuracy type id to filter on.
+            quantitative_accuracy_band_id: The quantitative accuracy band id to filter on.
+            quantitative_accuracy_band_id_prefix: The prefix of the quantitative accuracy band id to filter on.
+            spatial_geometry_type_id: The spatial geometry type id to filter on.
+            spatial_geometry_type_id_prefix: The prefix of the spatial geometry type id to filter on.
+            spatial_location_coordinates_date: The spatial location coordinates date to filter on.
+            spatial_location_coordinates_date_prefix: The prefix of the spatial location coordinates date to filter on.
+            spatial_parameter_type_id: The spatial parameter type id to filter on.
+            spatial_parameter_type_id_prefix: The prefix of the spatial parameter type id to filter on.
+            wgs_84_coordinates: The wgs 84 coordinate to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of spatial points to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results spatial points matching the query.
+
+        Examples:
+
+           Search for 'my_spatial_point' in all text properties:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> spatial_points = client.spatial_point.search('my_spatial_point')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             as_ingested_coordinates,
@@ -393,6 +431,42 @@ class SpatialPointAPI(TypeAPI[SpatialPoint, SpatialPointApply, SpatialPointList]
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> SpatialPointList:
+        """List/filter spatial points
+
+        Args:
+            as_ingested_coordinates: The as ingested coordinate to filter on.
+            coordinate_quality_check_date_time: The coordinate quality check date time to filter on.
+            coordinate_quality_check_date_time_prefix: The prefix of the coordinate quality check date time to filter on.
+            coordinate_quality_check_performed_by: The coordinate quality check performed by to filter on.
+            coordinate_quality_check_performed_by_prefix: The prefix of the coordinate quality check performed by to filter on.
+            qualitative_spatial_accuracy_type_id: The qualitative spatial accuracy type id to filter on.
+            qualitative_spatial_accuracy_type_id_prefix: The prefix of the qualitative spatial accuracy type id to filter on.
+            quantitative_accuracy_band_id: The quantitative accuracy band id to filter on.
+            quantitative_accuracy_band_id_prefix: The prefix of the quantitative accuracy band id to filter on.
+            spatial_geometry_type_id: The spatial geometry type id to filter on.
+            spatial_geometry_type_id_prefix: The prefix of the spatial geometry type id to filter on.
+            spatial_location_coordinates_date: The spatial location coordinates date to filter on.
+            spatial_location_coordinates_date_prefix: The prefix of the spatial location coordinates date to filter on.
+            spatial_parameter_type_id: The spatial parameter type id to filter on.
+            spatial_parameter_type_id_prefix: The prefix of the spatial parameter type id to filter on.
+            wgs_84_coordinates: The wgs 84 coordinate to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of spatial points to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested spatial points
+
+        Examples:
+
+            List spatial points and limit to 5:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> spatial_points = client.spatial_point.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             as_ingested_coordinates,

@@ -158,6 +158,43 @@ class FacilitySpecificationsAPI(
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> FacilitySpecificationsList:
+        """Search facility specifications
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            effective_date_time: The effective date time to filter on.
+            effective_date_time_prefix: The prefix of the effective date time to filter on.
+            facility_specification_date_time: The facility specification date time to filter on.
+            facility_specification_date_time_prefix: The prefix of the facility specification date time to filter on.
+            facility_specification_indicator: The facility specification indicator to filter on.
+            min_facility_specification_quantity: The minimum value of the facility specification quantity to filter on.
+            max_facility_specification_quantity: The maximum value of the facility specification quantity to filter on.
+            facility_specification_text: The facility specification text to filter on.
+            facility_specification_text_prefix: The prefix of the facility specification text to filter on.
+            parameter_type_id: The parameter type id to filter on.
+            parameter_type_id_prefix: The prefix of the parameter type id to filter on.
+            termination_date_time: The termination date time to filter on.
+            termination_date_time_prefix: The prefix of the termination date time to filter on.
+            unit_of_measure_id: The unit of measure id to filter on.
+            unit_of_measure_id_prefix: The prefix of the unit of measure id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of facility specifications to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results facility specifications matching the query.
+
+        Examples:
+
+           Search for 'my_facility_specification' in all text properties:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> facility_specifications = client.facility_specifications.search('my_facility_specification')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             effective_date_time,
@@ -392,6 +429,41 @@ class FacilitySpecificationsAPI(
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> FacilitySpecificationsList:
+        """List/filter facility specifications
+
+        Args:
+            effective_date_time: The effective date time to filter on.
+            effective_date_time_prefix: The prefix of the effective date time to filter on.
+            facility_specification_date_time: The facility specification date time to filter on.
+            facility_specification_date_time_prefix: The prefix of the facility specification date time to filter on.
+            facility_specification_indicator: The facility specification indicator to filter on.
+            min_facility_specification_quantity: The minimum value of the facility specification quantity to filter on.
+            max_facility_specification_quantity: The maximum value of the facility specification quantity to filter on.
+            facility_specification_text: The facility specification text to filter on.
+            facility_specification_text_prefix: The prefix of the facility specification text to filter on.
+            parameter_type_id: The parameter type id to filter on.
+            parameter_type_id_prefix: The prefix of the parameter type id to filter on.
+            termination_date_time: The termination date time to filter on.
+            termination_date_time_prefix: The prefix of the termination date time to filter on.
+            unit_of_measure_id: The unit of measure id to filter on.
+            unit_of_measure_id_prefix: The prefix of the unit of measure id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of facility specifications to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested facility specifications
+
+        Examples:
+
+            List facility specifications and limit to 5:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> facility_specifications = client.facility_specifications.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             effective_date_time,

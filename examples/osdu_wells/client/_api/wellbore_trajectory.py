@@ -226,6 +226,48 @@ class WellboreTrajectoryAPI(TypeAPI[WellboreTrajectory, WellboreTrajectoryApply,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> WellboreTrajectoryList:
+        """Search wellbore trajectories
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            acl: The acl to filter on.
+            ancestry: The ancestry to filter on.
+            create_time: The create time to filter on.
+            create_time_prefix: The prefix of the create time to filter on.
+            create_user: The create user to filter on.
+            create_user_prefix: The prefix of the create user to filter on.
+            data: The datum to filter on.
+            id: The id to filter on.
+            id_prefix: The prefix of the id to filter on.
+            kind: The kind to filter on.
+            kind_prefix: The prefix of the kind to filter on.
+            legal: The legal to filter on.
+            modify_time: The modify time to filter on.
+            modify_time_prefix: The prefix of the modify time to filter on.
+            modify_user: The modify user to filter on.
+            modify_user_prefix: The prefix of the modify user to filter on.
+            tags: The tag to filter on.
+            min_version: The minimum value of the version to filter on.
+            max_version: The maximum value of the version to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of wellbore trajectories to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `meta` external ids for the wellbore trajectories. Defaults to True.
+
+        Returns:
+            Search results wellbore trajectories matching the query.
+
+        Examples:
+
+           Search for 'my_wellbore_trajectory' in all text properties:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_trajectories = client.wellbore_trajectory.search('my_wellbore_trajectory')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             acl,
@@ -491,6 +533,46 @@ class WellboreTrajectoryAPI(TypeAPI[WellboreTrajectory, WellboreTrajectoryApply,
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> WellboreTrajectoryList:
+        """List/filter wellbore trajectories
+
+        Args:
+            acl: The acl to filter on.
+            ancestry: The ancestry to filter on.
+            create_time: The create time to filter on.
+            create_time_prefix: The prefix of the create time to filter on.
+            create_user: The create user to filter on.
+            create_user_prefix: The prefix of the create user to filter on.
+            data: The datum to filter on.
+            id: The id to filter on.
+            id_prefix: The prefix of the id to filter on.
+            kind: The kind to filter on.
+            kind_prefix: The prefix of the kind to filter on.
+            legal: The legal to filter on.
+            modify_time: The modify time to filter on.
+            modify_time_prefix: The prefix of the modify time to filter on.
+            modify_user: The modify user to filter on.
+            modify_user_prefix: The prefix of the modify user to filter on.
+            tags: The tag to filter on.
+            min_version: The minimum value of the version to filter on.
+            max_version: The maximum value of the version to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of wellbore trajectories to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `meta` external ids for the wellbore trajectories. Defaults to True.
+
+        Returns:
+            List of requested wellbore trajectories
+
+        Examples:
+
+            List wellbore trajectories and limit to 5:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_trajectories = client.wellbore_trajectory.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             acl,

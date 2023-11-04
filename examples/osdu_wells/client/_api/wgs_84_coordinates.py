@@ -209,6 +209,31 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> WgsCoordinatesList:
+        """Search wgs 84 coordinates
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            type: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of wgs 84 coordinates to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `features` external ids for the wgs 84 coordinates. Defaults to True.
+
+        Returns:
+            Search results wgs 84 coordinates matching the query.
+
+        Examples:
+
+           Search for 'my_wgs_84_coordinate' in all text properties:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wgs_84_coordinates = client.wgs_84_coordinates.search('my_wgs_84_coordinate')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             type,
@@ -338,6 +363,29 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> WgsCoordinatesList:
+        """List/filter wgs 84 coordinates
+
+        Args:
+            type: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of wgs 84 coordinates to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `features` external ids for the wgs 84 coordinates. Defaults to True.
+
+        Returns:
+            List of requested wgs 84 coordinates
+
+        Examples:
+
+            List wgs 84 coordinates and limit to 5:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wgs_84_coordinates = client.wgs_84_coordinates.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             type,

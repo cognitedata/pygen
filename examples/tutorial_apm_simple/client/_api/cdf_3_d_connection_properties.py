@@ -257,6 +257,30 @@ class CdfConnectionPropertiesAPI(
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> CdfConnectionPropertiesList:
+        """List/filter cdf 3 d connection properties
+
+        Args:
+            min_revision_id: The minimum value of the revision id to filter on.
+            max_revision_id: The maximum value of the revision id to filter on.
+            min_revision_node_id: The minimum value of the revision node id to filter on.
+            max_revision_node_id: The maximum value of the revision node id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of cdf 3 d connection properties to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested cdf 3 d connection properties
+
+        Examples:
+
+            List cdf 3 d connection properties and limit to 5:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> cdf_3_d_connection_properties = client.cdf_3_d_connection_properties.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             min_revision_id,

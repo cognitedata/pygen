@@ -147,6 +147,38 @@ class AcceptableUsageAPI(TypeAPI[AcceptableUsage, AcceptableUsageApply, Acceptab
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> AcceptableUsageList:
+        """Search acceptable usages
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            data_quality_id: The data quality id to filter on.
+            data_quality_id_prefix: The prefix of the data quality id to filter on.
+            data_quality_rule_set_id: The data quality rule set id to filter on.
+            data_quality_rule_set_id_prefix: The prefix of the data quality rule set id to filter on.
+            value_chain_status_type_id: The value chain status type id to filter on.
+            value_chain_status_type_id_prefix: The prefix of the value chain status type id to filter on.
+            workflow_persona_type_id: The workflow persona type id to filter on.
+            workflow_persona_type_id_prefix: The prefix of the workflow persona type id to filter on.
+            workflow_usage_type_id: The workflow usage type id to filter on.
+            workflow_usage_type_id_prefix: The prefix of the workflow usage type id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of acceptable usages to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results acceptable usages matching the query.
+
+        Examples:
+
+           Search for 'my_acceptable_usage' in all text properties:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> acceptable_usages = client.acceptable_usage.search('my_acceptable_usage')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             data_quality_id,
@@ -339,6 +371,36 @@ class AcceptableUsageAPI(TypeAPI[AcceptableUsage, AcceptableUsageApply, Acceptab
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> AcceptableUsageList:
+        """List/filter acceptable usages
+
+        Args:
+            data_quality_id: The data quality id to filter on.
+            data_quality_id_prefix: The prefix of the data quality id to filter on.
+            data_quality_rule_set_id: The data quality rule set id to filter on.
+            data_quality_rule_set_id_prefix: The prefix of the data quality rule set id to filter on.
+            value_chain_status_type_id: The value chain status type id to filter on.
+            value_chain_status_type_id_prefix: The prefix of the value chain status type id to filter on.
+            workflow_persona_type_id: The workflow persona type id to filter on.
+            workflow_persona_type_id_prefix: The prefix of the workflow persona type id to filter on.
+            workflow_usage_type_id: The workflow usage type id to filter on.
+            workflow_usage_type_id_prefix: The prefix of the workflow usage type id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of acceptable usages to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested acceptable usages
+
+        Examples:
+
+            List acceptable usages and limit to 5:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> acceptable_usages = client.acceptable_usage.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             data_quality_id,

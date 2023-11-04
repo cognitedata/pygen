@@ -211,6 +211,44 @@ class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> WorkItemList:
+        """Search work items
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            criticality: The criticality to filter on.
+            criticality_prefix: The prefix of the criticality to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            is_completed: The is completed to filter on.
+            item_info: The item info to filter on.
+            item_info_prefix: The prefix of the item info to filter on.
+            item_name: The item name to filter on.
+            item_name_prefix: The prefix of the item name to filter on.
+            method: The method to filter on.
+            method_prefix: The prefix of the method to filter on.
+            title: The title to filter on.
+            title_prefix: The prefix of the title to filter on.
+            to_be_done: The to be done to filter on.
+            work_order: The work order to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of work items to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `linked_assets` external ids for the work items. Defaults to True.
+
+        Returns:
+            Search results work items matching the query.
+
+        Examples:
+
+           Search for 'my_work_item' in all text properties:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> work_items = client.work_item.search('my_work_item')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             criticality,
@@ -444,6 +482,42 @@ class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> WorkItemList:
+        """List/filter work items
+
+        Args:
+            criticality: The criticality to filter on.
+            criticality_prefix: The prefix of the criticality to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            is_completed: The is completed to filter on.
+            item_info: The item info to filter on.
+            item_info_prefix: The prefix of the item info to filter on.
+            item_name: The item name to filter on.
+            item_name_prefix: The prefix of the item name to filter on.
+            method: The method to filter on.
+            method_prefix: The prefix of the method to filter on.
+            title: The title to filter on.
+            title_prefix: The prefix of the title to filter on.
+            to_be_done: The to be done to filter on.
+            work_order: The work order to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of work items to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `linked_assets` external ids for the work items. Defaults to True.
+
+        Returns:
+            List of requested work items
+
+        Examples:
+
+            List work items and limit to 5:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> work_items = client.work_item.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             criticality,

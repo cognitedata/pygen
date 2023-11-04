@@ -147,6 +147,38 @@ class NameAliasesAPI(TypeAPI[NameAliases, NameAliasesApply, NameAliasesList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> NameAliasesList:
+        """Search name aliases
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            alias_name: The alias name to filter on.
+            alias_name_prefix: The prefix of the alias name to filter on.
+            alias_name_type_id: The alias name type id to filter on.
+            alias_name_type_id_prefix: The prefix of the alias name type id to filter on.
+            definition_organisation_id: The definition organisation id to filter on.
+            definition_organisation_id_prefix: The prefix of the definition organisation id to filter on.
+            effective_date_time: The effective date time to filter on.
+            effective_date_time_prefix: The prefix of the effective date time to filter on.
+            termination_date_time: The termination date time to filter on.
+            termination_date_time_prefix: The prefix of the termination date time to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of name aliases to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results name aliases matching the query.
+
+        Examples:
+
+           Search for 'my_name_alias' in all text properties:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> name_aliases = client.name_aliases.search('my_name_alias')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             alias_name,
@@ -339,6 +371,36 @@ class NameAliasesAPI(TypeAPI[NameAliases, NameAliasesApply, NameAliasesList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> NameAliasesList:
+        """List/filter name aliases
+
+        Args:
+            alias_name: The alias name to filter on.
+            alias_name_prefix: The prefix of the alias name to filter on.
+            alias_name_type_id: The alias name type id to filter on.
+            alias_name_type_id_prefix: The prefix of the alias name type id to filter on.
+            definition_organisation_id: The definition organisation id to filter on.
+            definition_organisation_id_prefix: The prefix of the definition organisation id to filter on.
+            effective_date_time: The effective date time to filter on.
+            effective_date_time_prefix: The prefix of the effective date time to filter on.
+            termination_date_time: The termination date time to filter on.
+            termination_date_time_prefix: The prefix of the termination date time to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of name aliases to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested name aliases
+
+        Examples:
+
+            List name aliases and limit to 5:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> name_aliases = client.name_aliases.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             alias_name,

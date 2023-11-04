@@ -349,6 +349,29 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> DirectorList:
+        """List/filter directors
+
+        Args:
+            person: The person to filter on.
+            won_oscar: The won oscar to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of directors to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `movies` or `nomination` external ids for the directors. Defaults to True.
+
+        Returns:
+            List of requested directors
+
+        Examples:
+
+            List directors and limit to 5:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> directors = client.director.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             person,

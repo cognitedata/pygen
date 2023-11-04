@@ -135,6 +135,30 @@ class TagsAPI(TypeAPI[Tags, TagsApply, TagsList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> TagsList:
+        """Search tags
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            name_of_key: The name of key to filter on.
+            name_of_key_prefix: The prefix of the name of key to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of tags to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results tags matching the query.
+
+        Examples:
+
+           Search for 'my_tag' in all text properties:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> tags = client.tags.search('my_tag')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             name_of_key,
@@ -263,6 +287,28 @@ class TagsAPI(TypeAPI[Tags, TagsApply, TagsList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> TagsList:
+        """List/filter tags
+
+        Args:
+            name_of_key: The name of key to filter on.
+            name_of_key_prefix: The prefix of the name of key to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of tags to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested tags
+
+        Examples:
+
+            List tags and limit to 5:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> tags = client.tags.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             name_of_key,

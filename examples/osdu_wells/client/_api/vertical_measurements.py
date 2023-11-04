@@ -169,6 +169,56 @@ class VerticalMeasurementsAPI(TypeAPI[VerticalMeasurements, VerticalMeasurements
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> VerticalMeasurementsList:
+        """Search vertical measurements
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            effective_date_time: The effective date time to filter on.
+            effective_date_time_prefix: The prefix of the effective date time to filter on.
+            rig_id: The rig id to filter on.
+            rig_id_prefix: The prefix of the rig id to filter on.
+            termination_date_time: The termination date time to filter on.
+            termination_date_time_prefix: The prefix of the termination date time to filter on.
+            vertical_crsid: The vertical crsid to filter on.
+            vertical_crsid_prefix: The prefix of the vertical crsid to filter on.
+            min_vertical_measurement: The minimum value of the vertical measurement to filter on.
+            max_vertical_measurement: The maximum value of the vertical measurement to filter on.
+            vertical_measurement_description: The vertical measurement description to filter on.
+            vertical_measurement_description_prefix: The prefix of the vertical measurement description to filter on.
+            vertical_measurement_id: The vertical measurement id to filter on.
+            vertical_measurement_id_prefix: The prefix of the vertical measurement id to filter on.
+            vertical_measurement_path_id: The vertical measurement path id to filter on.
+            vertical_measurement_path_id_prefix: The prefix of the vertical measurement path id to filter on.
+            vertical_measurement_source_id: The vertical measurement source id to filter on.
+            vertical_measurement_source_id_prefix: The prefix of the vertical measurement source id to filter on.
+            vertical_measurement_type_id: The vertical measurement type id to filter on.
+            vertical_measurement_type_id_prefix: The prefix of the vertical measurement type id to filter on.
+            vertical_measurement_unit_of_measure_id: The vertical measurement unit of measure id to filter on.
+            vertical_measurement_unit_of_measure_id_prefix: The prefix of the vertical measurement unit of measure id to filter on.
+            vertical_reference_entity_id: The vertical reference entity id to filter on.
+            vertical_reference_entity_id_prefix: The prefix of the vertical reference entity id to filter on.
+            vertical_reference_id: The vertical reference id to filter on.
+            vertical_reference_id_prefix: The prefix of the vertical reference id to filter on.
+            wellbore_tvd_trajectory_id: The wellbore tvd trajectory id to filter on.
+            wellbore_tvd_trajectory_id_prefix: The prefix of the wellbore tvd trajectory id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of vertical measurements to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results vertical measurements matching the query.
+
+        Examples:
+
+           Search for 'my_vertical_measurement' in all text properties:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> vertical_measurements = client.vertical_measurements.search('my_vertical_measurement')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             effective_date_time,
@@ -505,6 +555,54 @@ class VerticalMeasurementsAPI(TypeAPI[VerticalMeasurements, VerticalMeasurements
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> VerticalMeasurementsList:
+        """List/filter vertical measurements
+
+        Args:
+            effective_date_time: The effective date time to filter on.
+            effective_date_time_prefix: The prefix of the effective date time to filter on.
+            rig_id: The rig id to filter on.
+            rig_id_prefix: The prefix of the rig id to filter on.
+            termination_date_time: The termination date time to filter on.
+            termination_date_time_prefix: The prefix of the termination date time to filter on.
+            vertical_crsid: The vertical crsid to filter on.
+            vertical_crsid_prefix: The prefix of the vertical crsid to filter on.
+            min_vertical_measurement: The minimum value of the vertical measurement to filter on.
+            max_vertical_measurement: The maximum value of the vertical measurement to filter on.
+            vertical_measurement_description: The vertical measurement description to filter on.
+            vertical_measurement_description_prefix: The prefix of the vertical measurement description to filter on.
+            vertical_measurement_id: The vertical measurement id to filter on.
+            vertical_measurement_id_prefix: The prefix of the vertical measurement id to filter on.
+            vertical_measurement_path_id: The vertical measurement path id to filter on.
+            vertical_measurement_path_id_prefix: The prefix of the vertical measurement path id to filter on.
+            vertical_measurement_source_id: The vertical measurement source id to filter on.
+            vertical_measurement_source_id_prefix: The prefix of the vertical measurement source id to filter on.
+            vertical_measurement_type_id: The vertical measurement type id to filter on.
+            vertical_measurement_type_id_prefix: The prefix of the vertical measurement type id to filter on.
+            vertical_measurement_unit_of_measure_id: The vertical measurement unit of measure id to filter on.
+            vertical_measurement_unit_of_measure_id_prefix: The prefix of the vertical measurement unit of measure id to filter on.
+            vertical_reference_entity_id: The vertical reference entity id to filter on.
+            vertical_reference_entity_id_prefix: The prefix of the vertical reference entity id to filter on.
+            vertical_reference_id: The vertical reference id to filter on.
+            vertical_reference_id_prefix: The prefix of the vertical reference id to filter on.
+            wellbore_tvd_trajectory_id: The wellbore tvd trajectory id to filter on.
+            wellbore_tvd_trajectory_id_prefix: The prefix of the wellbore tvd trajectory id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of vertical measurements to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested vertical measurements
+
+        Examples:
+
+            List vertical measurements and limit to 5:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> vertical_measurements = client.vertical_measurements.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             effective_date_time,

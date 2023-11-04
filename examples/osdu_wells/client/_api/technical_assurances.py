@@ -331,6 +331,35 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> TechnicalAssurancesList:
+        """Search technical assurances
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            comment: The comment to filter on.
+            comment_prefix: The prefix of the comment to filter on.
+            effective_date: The effective date to filter on.
+            effective_date_prefix: The prefix of the effective date to filter on.
+            technical_assurance_type_id: The technical assurance type id to filter on.
+            technical_assurance_type_id_prefix: The prefix of the technical assurance type id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of technical assurances to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `acceptable_usage`, `reviewers` or `unacceptable_usage` external ids for the technical assurances. Defaults to True.
+
+        Returns:
+            Search results technical assurances matching the query.
+
+        Examples:
+
+           Search for 'my_technical_assurance' in all text properties:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> technical_assurances = client.technical_assurances.search('my_technical_assurance')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             comment,
@@ -492,6 +521,33 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> TechnicalAssurancesList:
+        """List/filter technical assurances
+
+        Args:
+            comment: The comment to filter on.
+            comment_prefix: The prefix of the comment to filter on.
+            effective_date: The effective date to filter on.
+            effective_date_prefix: The prefix of the effective date to filter on.
+            technical_assurance_type_id: The technical assurance type id to filter on.
+            technical_assurance_type_id_prefix: The prefix of the technical assurance type id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of technical assurances to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `acceptable_usage`, `reviewers` or `unacceptable_usage` external ids for the technical assurances. Defaults to True.
+
+        Returns:
+            List of requested technical assurances
+
+        Examples:
+
+            List technical assurances and limit to 5:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> technical_assurances = client.technical_assurances.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             comment,

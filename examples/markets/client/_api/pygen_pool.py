@@ -139,6 +139,34 @@ class PygenPoolAPI(TypeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> PygenPoolList:
+        """Search pygen pools
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            min_day_of_week: The minimum value of the day of week to filter on.
+            max_day_of_week: The maximum value of the day of week to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            timezone: The timezone to filter on.
+            timezone_prefix: The prefix of the timezone to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of pygen pools to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results pygen pools matching the query.
+
+        Examples:
+
+           Search for 'my_pygen_pool' in all text properties:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> pygen_pools = client.pygen_pool.search('my_pygen_pool')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             min_day_of_week,
@@ -299,6 +327,32 @@ class PygenPoolAPI(TypeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> PygenPoolList:
+        """List/filter pygen pools
+
+        Args:
+            min_day_of_week: The minimum value of the day of week to filter on.
+            max_day_of_week: The maximum value of the day of week to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            timezone: The timezone to filter on.
+            timezone_prefix: The prefix of the timezone to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of pygen pools to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested pygen pools
+
+        Examples:
+
+            List pygen pools and limit to 5:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> pygen_pools = client.pygen_pool.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             min_day_of_week,

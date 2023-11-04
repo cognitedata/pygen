@@ -289,6 +289,63 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> WorkOrderList:
+        """Search work orders
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            min_actual_hours: The minimum value of the actual hour to filter on.
+            max_actual_hours: The maximum value of the actual hour to filter on.
+            min_created_date: The minimum value of the created date to filter on.
+            max_created_date: The maximum value of the created date to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            min_due_date: The minimum value of the due date to filter on.
+            max_due_date: The maximum value of the due date to filter on.
+            min_duration_hours: The minimum value of the duration hour to filter on.
+            max_duration_hours: The maximum value of the duration hour to filter on.
+            min_end_time: The minimum value of the end time to filter on.
+            max_end_time: The maximum value of the end time to filter on.
+            is_active: The is active to filter on.
+            is_cancelled: The is cancelled to filter on.
+            is_completed: The is completed to filter on.
+            is_safety_critical: The is safety critical to filter on.
+            min_percentage_progress: The minimum value of the percentage progres to filter on.
+            max_percentage_progress: The maximum value of the percentage progres to filter on.
+            min_planned_start: The minimum value of the planned start to filter on.
+            max_planned_start: The maximum value of the planned start to filter on.
+            priority_description: The priority description to filter on.
+            priority_description_prefix: The prefix of the priority description to filter on.
+            program_number: The program number to filter on.
+            program_number_prefix: The prefix of the program number to filter on.
+            min_start_time: The minimum value of the start time to filter on.
+            max_start_time: The maximum value of the start time to filter on.
+            status: The status to filter on.
+            status_prefix: The prefix of the status to filter on.
+            title: The title to filter on.
+            title_prefix: The prefix of the title to filter on.
+            work_order_number: The work order number to filter on.
+            work_order_number_prefix: The prefix of the work order number to filter on.
+            work_package_number: The work package number to filter on.
+            work_package_number_prefix: The prefix of the work package number to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of work orders to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `linked_assets` or `work_items` external ids for the work orders. Defaults to True.
+
+        Returns:
+            Search results work orders matching the query.
+
+        Examples:
+
+           Search for 'my_work_order' in all text properties:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> work_orders = client.work_order.search('my_work_order')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             min_actual_hours,
@@ -674,6 +731,61 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> WorkOrderList:
+        """List/filter work orders
+
+        Args:
+            min_actual_hours: The minimum value of the actual hour to filter on.
+            max_actual_hours: The maximum value of the actual hour to filter on.
+            min_created_date: The minimum value of the created date to filter on.
+            max_created_date: The maximum value of the created date to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            min_due_date: The minimum value of the due date to filter on.
+            max_due_date: The maximum value of the due date to filter on.
+            min_duration_hours: The minimum value of the duration hour to filter on.
+            max_duration_hours: The maximum value of the duration hour to filter on.
+            min_end_time: The minimum value of the end time to filter on.
+            max_end_time: The maximum value of the end time to filter on.
+            is_active: The is active to filter on.
+            is_cancelled: The is cancelled to filter on.
+            is_completed: The is completed to filter on.
+            is_safety_critical: The is safety critical to filter on.
+            min_percentage_progress: The minimum value of the percentage progres to filter on.
+            max_percentage_progress: The maximum value of the percentage progres to filter on.
+            min_planned_start: The minimum value of the planned start to filter on.
+            max_planned_start: The maximum value of the planned start to filter on.
+            priority_description: The priority description to filter on.
+            priority_description_prefix: The prefix of the priority description to filter on.
+            program_number: The program number to filter on.
+            program_number_prefix: The prefix of the program number to filter on.
+            min_start_time: The minimum value of the start time to filter on.
+            max_start_time: The maximum value of the start time to filter on.
+            status: The status to filter on.
+            status_prefix: The prefix of the status to filter on.
+            title: The title to filter on.
+            title_prefix: The prefix of the title to filter on.
+            work_order_number: The work order number to filter on.
+            work_order_number_prefix: The prefix of the work order number to filter on.
+            work_package_number: The work package number to filter on.
+            work_package_number_prefix: The prefix of the work package number to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of work orders to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `linked_assets` or `work_items` external ids for the work orders. Defaults to True.
+
+        Returns:
+            List of requested work orders
+
+        Examples:
+
+            List work orders and limit to 5:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> work_orders = client.work_order.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             min_actual_hours,

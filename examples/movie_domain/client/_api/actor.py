@@ -338,6 +338,29 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> ActorList:
+        """List/filter actors
+
+        Args:
+            person: The person to filter on.
+            won_oscar: The won oscar to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of actors to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `movies` or `nomination` external ids for the actors. Defaults to True.
+
+        Returns:
+            List of requested actors
+
+        Examples:
+
+            List actors and limit to 5:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> actors = client.actor.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             person,

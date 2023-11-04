@@ -338,6 +338,29 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> RoleList:
+        """List/filter roles
+
+        Args:
+            person: The person to filter on.
+            won_oscar: The won oscar to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of roles to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `movies` or `nomination` external ids for the roles. Defaults to True.
+
+        Returns:
+            List of requested roles
+
+        Examples:
+
+            List roles and limit to 5:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> roles = client.role.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             person,
