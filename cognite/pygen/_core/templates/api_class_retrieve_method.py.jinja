@@ -7,14 +7,14 @@
         ...
 
     def retrieve(self, external_id: str | Sequence[str], space: str ="{{ data_class.view_id.space }}") -> {{ data_class.read_name }} | {{ data_class.read_list_name }}:
-        """Retrieve one or more {{data_class.doc_name_plural}} by id(s).
+        """Retrieve one or more {{data_class.doc_list_name}} by id(s).
 
         Args:
-            external_id: External id or list of external ids of the {{ data_class.doc_name_plural }}.
-            space: The space where all the {{ data_class.doc_name_plural }} are located.
+            external_id: External id or list of external ids of the {{ data_class.doc_list_name }}.
+            space: The space where all the {{ data_class.doc_list_name }} are located.
 
         Returns:
-            The requested {{ data_class.doc_name_plural }}.
+            The requested {{ data_class.doc_list_name }}.
 
         Examples:
 

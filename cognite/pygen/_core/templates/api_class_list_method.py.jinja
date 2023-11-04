@@ -5,20 +5,20 @@
         filter: dm.Filter | None = None,{% if data_class.has_one_to_many_edges %}
         retrieve_edges: bool = True,{% endif %}
     ) -> {{ data_class.read_list_name }}:
-        """List/filter {{ data_class.doc_name_plural }}
+        """List/filter {{ data_class.doc_list_name }}
 
         Args:{% for parm in list_method.parameters %}
             {{ parm.name }}: {{ parm.description }}{% endfor %}
-            limit: Maximum number of {{ data_class.doc_name_plural }} to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            limit: Maximum number of {{ data_class.doc_list_name }} to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above. {% if data_class.has_one_to_many_edges %}
-            retrieve_edges: Whether to retrieve {{ data_class.one_to_many_edges_docs }} external ids for the {{ data_class.doc_name_plural }}. Defaults to True.{% endif %}
+            retrieve_edges: Whether to retrieve {{ data_class.one_to_many_edges_docs }} external ids for the {{ data_class.doc_list_name }}. Defaults to True.{% endif %}
 
         Returns:
-            List of requested {{ data_class.doc_name_plural}}
+            List of requested {{ data_class.doc_list_name}}
 
         Examples:
 
-            List {{ data_class.doc_name_plural }} and limit to 5:
+            List {{ data_class.doc_list_name }} and limit to 5:
 
                 >>> from {{ top_level_package }} import {{ client_name }}
                 >>> client = {{ client_name }}()

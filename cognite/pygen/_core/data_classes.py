@@ -46,6 +46,7 @@ class Field(ABC):
 
     Args:
         name: The name of the field. This is used in the generated Python code.
+        doc_name: The name of the field in the documentation.
         prop_name: The name of the property in the data model. This is used when reading and writing to CDF.
         pydantic_field: The name to use for the import 'from pydantic import Field'. This is used in the edge case
                         when the name 'Field' name clashes with the data model class name.
@@ -171,6 +172,18 @@ class Field(ABC):
     def is_text_field(self) -> bool:
         raise NotImplementedError()
 
+    @property
+    @abstractmethod
+    def description(self) -> str | None:
+        raise NotImplementedError
+
+    @property
+    def argument_documentation(self) -> str:
+        if self.description:
+            return self.description
+        else:
+            return f"The {self.doc_name} field."
+
 
 @dataclass(frozen=True)
 class PrimitiveFieldCore(Field, ABC):
@@ -189,6 +202,10 @@ class PrimitiveFieldCore(Field, ABC):
     @property
     def is_text_field(self) -> bool:
         return self.type_ == "str"
+
+    @property
+    def description(self) -> str | None:
+        return self.prop.description
 
 
 @dataclass(frozen=True)
@@ -306,6 +323,10 @@ class EdgeOneToOne(EdgeField):
         else:
             return f"{left_side} {self.pydantic_field}(None, repr=False)"
 
+    @property
+    def description(self) -> str | None:
+        return self.prop.description
+
 
 @dataclass(frozen=True)
 class EdgeOneToMany(EdgeField):
@@ -317,6 +338,10 @@ class EdgeOneToMany(EdgeField):
     edge_api_class: str
     edge_api_attribute: str
     prop: dm.SingleHopConnectionDefinition
+
+    @property
+    def description(self) -> str | None:
+        return self.prop.description
 
     def as_read_type_hint(self) -> str:
         if self.need_alias:
@@ -345,7 +370,7 @@ class DataClass:
     read_list_name: str
     write_list_name: str
     doc_name: str
-    doc_name_plural: str
+    doc_list_name: str
     variable: str
     variable_list: str
     file_name: str
@@ -360,7 +385,7 @@ class DataClass:
         variable_name = create_name(view_name, data_class.variable)
         variable_list = create_name(view_name, data_class.variable_list)
         doc_name = to_words(view_name, singularize=True)
-        doc_name_plural = to_words(view_name, pluralize=True)
+        doc_list_name = to_words(view_name, pluralize=True)
         if variable_name == variable_list:
             variable_list = f"{variable_list}_list"
         file_name = f"_{create_name(view_name, data_class.file)}"
@@ -371,7 +396,7 @@ class DataClass:
             read_list_name=f"{class_name}List",
             write_list_name=f"{class_name}ApplyList",
             doc_name=doc_name,
-            doc_name_plural=doc_name_plural,
+            doc_list_name=doc_list_name,
             variable=variable_name,
             variable_list=variable_list,
             file_name=file_name,
