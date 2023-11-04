@@ -24,6 +24,24 @@ class {{ field.edge_api_class }}:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="{{ field.prop.type.space }}") -> dm.EdgeList:
+        """Retrieve one or more {{field.edge_api_attribute}} edges by id(s) of {{ data_class.doc_name }}.
+
+        Args:
+            external_id: External id or list of external ids of the {{ field.doc_name }} edges.
+            space: The space where all the {{ field.doc_name }} edges are located.
+
+        Returns:
+            The requested {{ field.doc_name }} edges.
+
+        Examples:
+
+            Retrieve {{ field.name }} edge by id:
+
+                >>> from {{ top_level_package }} import {{ client_name }}
+                >>> client = {{ client_name }}()
+                >>> {{ data_class.variable }} = client.{{ api_class.client_attribute }}.{{ field.edge_api_attribute }}.retrieve("my_{{ field.name }}")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -44,6 +62,26 @@ class {{ field.edge_api_class }}:
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_{{ data_class.variable_list }}))
 
     def list(self, {{ data_class.variable }}_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="{{ field.prop.type.space }}") -> dm.EdgeList:
+        """List {{field.edge_api_attribute}} edges of {{ data_class.doc_name }}.
+
+        Args:
+            {{ data_class.variable }}_id: Id of the source {{ data_class.name }}.
+            limit: Maximum number of {{ field.doc_name }} edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the {{ field.doc_name }} edges are located.
+
+        Returns:
+            The requested {{ field.doc_name }} edges.
+
+        Examples:
+
+            List 5 {{field.edge_api_attribute}} edges connected to "my_{{ data_class.variable }}":
+
+                >>> from {{ top_level_package }} import {{ client_name }}
+                >>> client = {{ client_name }}()
+                >>> {{ data_class.variable }} = client.{{ api_class.client_attribute }}.{{ field.edge_api_attribute }}.list("my_{{ data_class.variable }}", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
