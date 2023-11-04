@@ -730,7 +730,7 @@ class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of well data to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
             retrieve_edges: Whether to retrieve `facility_events`, `facility_operators`, `facility_specifications`, `facility_states`, `geo_contexts`, `historical_interests`, `name_aliases`, `technical_assurances` or `vertical_measurements` external ids for the well data. Defaults to True.
 
         Returns:
@@ -1016,6 +1016,86 @@ class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across well data
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            business_intention_id: The business intention id to filter on.
+            business_intention_id_prefix: The prefix of the business intention id to filter on.
+            condition_id: The condition id to filter on.
+            condition_id_prefix: The prefix of the condition id to filter on.
+            current_operator_id: The current operator id to filter on.
+            current_operator_id_prefix: The prefix of the current operator id to filter on.
+            data_source_organisation_id: The data source organisation id to filter on.
+            data_source_organisation_id_prefix: The prefix of the data source organisation id to filter on.
+            default_vertical_crsid: The default vertical crsid to filter on.
+            default_vertical_crsid_prefix: The prefix of the default vertical crsid to filter on.
+            default_vertical_measurement_id: The default vertical measurement id to filter on.
+            default_vertical_measurement_id_prefix: The prefix of the default vertical measurement id to filter on.
+            existence_kind: The existence kind to filter on.
+            existence_kind_prefix: The prefix of the existence kind to filter on.
+            facility_description: The facility description to filter on.
+            facility_description_prefix: The prefix of the facility description to filter on.
+            facility_id: The facility id to filter on.
+            facility_id_prefix: The prefix of the facility id to filter on.
+            facility_name: The facility name to filter on.
+            facility_name_prefix: The prefix of the facility name to filter on.
+            facility_type_id: The facility type id to filter on.
+            facility_type_id_prefix: The prefix of the facility type id to filter on.
+            initial_operator_id: The initial operator id to filter on.
+            initial_operator_id_prefix: The prefix of the initial operator id to filter on.
+            interest_type_id: The interest type id to filter on.
+            interest_type_id_prefix: The prefix of the interest type id to filter on.
+            operating_environment_id: The operating environment id to filter on.
+            operating_environment_id_prefix: The prefix of the operating environment id to filter on.
+            outcome_id: The outcome id to filter on.
+            outcome_id_prefix: The prefix of the outcome id to filter on.
+            resource_curation_status: The resource curation status to filter on.
+            resource_curation_status_prefix: The prefix of the resource curation status to filter on.
+            resource_home_region_id: The resource home region id to filter on.
+            resource_home_region_id_prefix: The prefix of the resource home region id to filter on.
+            resource_lifecycle_status: The resource lifecycle status to filter on.
+            resource_lifecycle_status_prefix: The prefix of the resource lifecycle status to filter on.
+            resource_security_classification: The resource security classification to filter on.
+            resource_security_classification_prefix: The prefix of the resource security classification to filter on.
+            role_id: The role id to filter on.
+            role_id_prefix: The prefix of the role id to filter on.
+            source: The source to filter on.
+            source_prefix: The prefix of the source to filter on.
+            spatial_location: The spatial location to filter on.
+            status_summary_id: The status summary id to filter on.
+            status_summary_id_prefix: The prefix of the status summary id to filter on.
+            technical_assurance_type_id: The technical assurance type id to filter on.
+            technical_assurance_type_id_prefix: The prefix of the technical assurance type id to filter on.
+            version_creation_reason: The version creation reason to filter on.
+            version_creation_reason_prefix: The prefix of the version creation reason to filter on.
+            was_business_interest_financial_non_operated: The was business interest financial non operated to filter on.
+            was_business_interest_financial_operated: The was business interest financial operated to filter on.
+            was_business_interest_obligatory: The was business interest obligatory to filter on.
+            was_business_interest_technical: The was business interest technical to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of well data to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `facility_events`, `facility_operators`, `facility_specifications`, `facility_states`, `geo_contexts`, `historical_interests`, `name_aliases`, `technical_assurances` or `vertical_measurements` external ids for the well data. Defaults to True.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count well data in space `my_space`:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> result = client.well_data.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             business_intention_id,
@@ -1151,6 +1231,76 @@ class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for well data
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            business_intention_id: The business intention id to filter on.
+            business_intention_id_prefix: The prefix of the business intention id to filter on.
+            condition_id: The condition id to filter on.
+            condition_id_prefix: The prefix of the condition id to filter on.
+            current_operator_id: The current operator id to filter on.
+            current_operator_id_prefix: The prefix of the current operator id to filter on.
+            data_source_organisation_id: The data source organisation id to filter on.
+            data_source_organisation_id_prefix: The prefix of the data source organisation id to filter on.
+            default_vertical_crsid: The default vertical crsid to filter on.
+            default_vertical_crsid_prefix: The prefix of the default vertical crsid to filter on.
+            default_vertical_measurement_id: The default vertical measurement id to filter on.
+            default_vertical_measurement_id_prefix: The prefix of the default vertical measurement id to filter on.
+            existence_kind: The existence kind to filter on.
+            existence_kind_prefix: The prefix of the existence kind to filter on.
+            facility_description: The facility description to filter on.
+            facility_description_prefix: The prefix of the facility description to filter on.
+            facility_id: The facility id to filter on.
+            facility_id_prefix: The prefix of the facility id to filter on.
+            facility_name: The facility name to filter on.
+            facility_name_prefix: The prefix of the facility name to filter on.
+            facility_type_id: The facility type id to filter on.
+            facility_type_id_prefix: The prefix of the facility type id to filter on.
+            initial_operator_id: The initial operator id to filter on.
+            initial_operator_id_prefix: The prefix of the initial operator id to filter on.
+            interest_type_id: The interest type id to filter on.
+            interest_type_id_prefix: The prefix of the interest type id to filter on.
+            operating_environment_id: The operating environment id to filter on.
+            operating_environment_id_prefix: The prefix of the operating environment id to filter on.
+            outcome_id: The outcome id to filter on.
+            outcome_id_prefix: The prefix of the outcome id to filter on.
+            resource_curation_status: The resource curation status to filter on.
+            resource_curation_status_prefix: The prefix of the resource curation status to filter on.
+            resource_home_region_id: The resource home region id to filter on.
+            resource_home_region_id_prefix: The prefix of the resource home region id to filter on.
+            resource_lifecycle_status: The resource lifecycle status to filter on.
+            resource_lifecycle_status_prefix: The prefix of the resource lifecycle status to filter on.
+            resource_security_classification: The resource security classification to filter on.
+            resource_security_classification_prefix: The prefix of the resource security classification to filter on.
+            role_id: The role id to filter on.
+            role_id_prefix: The prefix of the role id to filter on.
+            source: The source to filter on.
+            source_prefix: The prefix of the source to filter on.
+            spatial_location: The spatial location to filter on.
+            status_summary_id: The status summary id to filter on.
+            status_summary_id_prefix: The prefix of the status summary id to filter on.
+            technical_assurance_type_id: The technical assurance type id to filter on.
+            technical_assurance_type_id_prefix: The prefix of the technical assurance type id to filter on.
+            version_creation_reason: The version creation reason to filter on.
+            version_creation_reason_prefix: The prefix of the version creation reason to filter on.
+            was_business_interest_financial_non_operated: The was business interest financial non operated to filter on.
+            was_business_interest_financial_operated: The was business interest financial operated to filter on.
+            was_business_interest_obligatory: The was business interest obligatory to filter on.
+            was_business_interest_technical: The was business interest technical to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of well data to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `facility_events`, `facility_operators`, `facility_specifications`, `facility_states`, `geo_contexts`, `historical_interests`, `name_aliases`, `technical_assurances` or `vertical_measurements` external ids for the well data. Defaults to True.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             business_intention_id,
@@ -1341,7 +1491,7 @@ class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of well data to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
             retrieve_edges: Whether to retrieve `facility_events`, `facility_operators`, `facility_specifications`, `facility_states`, `geo_contexts`, `historical_interests`, `name_aliases`, `technical_assurances` or `vertical_measurements` external ids for the well data. Defaults to True.
 
         Returns:

@@ -157,7 +157,7 @@ class HistoricalInterestsAPI(TypeAPI[HistoricalInterests, HistoricalInterestsApp
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of historical interests to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             Search results historical interests matching the query.
@@ -254,6 +254,38 @@ class HistoricalInterestsAPI(TypeAPI[HistoricalInterests, HistoricalInterestsApp
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across historical interests
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            effective_date_time: The effective date time to filter on.
+            effective_date_time_prefix: The prefix of the effective date time to filter on.
+            interest_type_id: The interest type id to filter on.
+            interest_type_id_prefix: The prefix of the interest type id to filter on.
+            termination_date_time: The termination date time to filter on.
+            termination_date_time_prefix: The prefix of the termination date time to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of historical interests to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count historical interests in space `my_space`:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> result = client.historical_interests.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             effective_date_time,
@@ -295,6 +327,28 @@ class HistoricalInterestsAPI(TypeAPI[HistoricalInterests, HistoricalInterestsApp
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for historical interests
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            effective_date_time: The effective date time to filter on.
+            effective_date_time_prefix: The prefix of the effective date time to filter on.
+            interest_type_id: The interest type id to filter on.
+            interest_type_id_prefix: The prefix of the interest type id to filter on.
+            termination_date_time: The termination date time to filter on.
+            termination_date_time_prefix: The prefix of the termination date time to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of historical interests to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             effective_date_time,
@@ -343,7 +397,7 @@ class HistoricalInterestsAPI(TypeAPI[HistoricalInterests, HistoricalInterestsApp
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of historical interests to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             List of requested historical interests

@@ -943,7 +943,7 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of wellbore data to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
             retrieve_edges: Whether to retrieve `drilling_reasons`, `facility_events`, `facility_operators`, `facility_specifications`, `facility_states`, `geo_contexts`, `historical_interests`, `name_aliases`, `technical_assurances`, `vertical_measurements` or `wellbore_costs` external ids for the wellbore data. Defaults to True.
 
         Returns:
@@ -1333,6 +1333,112 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across wellbore data
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            business_intention_id: The business intention id to filter on.
+            business_intention_id_prefix: The prefix of the business intention id to filter on.
+            condition_id: The condition id to filter on.
+            condition_id_prefix: The prefix of the condition id to filter on.
+            current_operator_id: The current operator id to filter on.
+            current_operator_id_prefix: The prefix of the current operator id to filter on.
+            data_source_organisation_id: The data source organisation id to filter on.
+            data_source_organisation_id_prefix: The prefix of the data source organisation id to filter on.
+            default_vertical_measurement_id: The default vertical measurement id to filter on.
+            default_vertical_measurement_id_prefix: The prefix of the default vertical measurement id to filter on.
+            definitive_trajectory_id: The definitive trajectory id to filter on.
+            definitive_trajectory_id_prefix: The prefix of the definitive trajectory id to filter on.
+            existence_kind: The existence kind to filter on.
+            existence_kind_prefix: The prefix of the existence kind to filter on.
+            facility_description: The facility description to filter on.
+            facility_description_prefix: The prefix of the facility description to filter on.
+            facility_id: The facility id to filter on.
+            facility_id_prefix: The prefix of the facility id to filter on.
+            facility_name: The facility name to filter on.
+            facility_name_prefix: The prefix of the facility name to filter on.
+            facility_type_id: The facility type id to filter on.
+            facility_type_id_prefix: The prefix of the facility type id to filter on.
+            fluid_direction_id: The fluid direction id to filter on.
+            fluid_direction_id_prefix: The prefix of the fluid direction id to filter on.
+            formation_name_at_total_depth: The formation name at total depth to filter on.
+            formation_name_at_total_depth_prefix: The prefix of the formation name at total depth to filter on.
+            geographic_bottom_hole_location: The geographic bottom hole location to filter on.
+            initial_operator_id: The initial operator id to filter on.
+            initial_operator_id_prefix: The prefix of the initial operator id to filter on.
+            interest_type_id: The interest type id to filter on.
+            interest_type_id_prefix: The prefix of the interest type id to filter on.
+            kick_off_wellbore: The kick off wellbore to filter on.
+            kick_off_wellbore_prefix: The prefix of the kick off wellbore to filter on.
+            operating_environment_id: The operating environment id to filter on.
+            operating_environment_id_prefix: The prefix of the operating environment id to filter on.
+            outcome_id: The outcome id to filter on.
+            outcome_id_prefix: The prefix of the outcome id to filter on.
+            primary_product_type_id: The primary product type id to filter on.
+            primary_product_type_id_prefix: The prefix of the primary product type id to filter on.
+            projected_bottom_hole_location: The projected bottom hole location to filter on.
+            resource_curation_status: The resource curation status to filter on.
+            resource_curation_status_prefix: The prefix of the resource curation status to filter on.
+            resource_home_region_id: The resource home region id to filter on.
+            resource_home_region_id_prefix: The prefix of the resource home region id to filter on.
+            resource_lifecycle_status: The resource lifecycle status to filter on.
+            resource_lifecycle_status_prefix: The prefix of the resource lifecycle status to filter on.
+            resource_security_classification: The resource security classification to filter on.
+            resource_security_classification_prefix: The prefix of the resource security classification to filter on.
+            role_id: The role id to filter on.
+            role_id_prefix: The prefix of the role id to filter on.
+            secondary_product_type_id: The secondary product type id to filter on.
+            secondary_product_type_id_prefix: The prefix of the secondary product type id to filter on.
+            min_sequence_number: The minimum value of the sequence number to filter on.
+            max_sequence_number: The maximum value of the sequence number to filter on.
+            show_product_type_id: The show product type id to filter on.
+            show_product_type_id_prefix: The prefix of the show product type id to filter on.
+            source: The source to filter on.
+            source_prefix: The prefix of the source to filter on.
+            spatial_location: The spatial location to filter on.
+            status_summary_id: The status summary id to filter on.
+            status_summary_id_prefix: The prefix of the status summary id to filter on.
+            target_formation: The target formation to filter on.
+            target_formation_prefix: The prefix of the target formation to filter on.
+            technical_assurance_type_id: The technical assurance type id to filter on.
+            technical_assurance_type_id_prefix: The prefix of the technical assurance type id to filter on.
+            tertiary_product_type_id: The tertiary product type id to filter on.
+            tertiary_product_type_id_prefix: The prefix of the tertiary product type id to filter on.
+            trajectory_type_id: The trajectory type id to filter on.
+            trajectory_type_id_prefix: The prefix of the trajectory type id to filter on.
+            version_creation_reason: The version creation reason to filter on.
+            version_creation_reason_prefix: The prefix of the version creation reason to filter on.
+            was_business_interest_financial_non_operated: The was business interest financial non operated to filter on.
+            was_business_interest_financial_operated: The was business interest financial operated to filter on.
+            was_business_interest_obligatory: The was business interest obligatory to filter on.
+            was_business_interest_technical: The was business interest technical to filter on.
+            well_id: The well id to filter on.
+            well_id_prefix: The prefix of the well id to filter on.
+            wellbore_reason_id: The wellbore reason id to filter on.
+            wellbore_reason_id_prefix: The prefix of the wellbore reason id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of wellbore data to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `drilling_reasons`, `facility_events`, `facility_operators`, `facility_specifications`, `facility_states`, `geo_contexts`, `historical_interests`, `name_aliases`, `technical_assurances`, `vertical_measurements` or `wellbore_costs` external ids for the wellbore data. Defaults to True.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count wellbore data in space `my_space`:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> result = client.wellbore_data.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             business_intention_id,
@@ -1520,6 +1626,102 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for wellbore data
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            business_intention_id: The business intention id to filter on.
+            business_intention_id_prefix: The prefix of the business intention id to filter on.
+            condition_id: The condition id to filter on.
+            condition_id_prefix: The prefix of the condition id to filter on.
+            current_operator_id: The current operator id to filter on.
+            current_operator_id_prefix: The prefix of the current operator id to filter on.
+            data_source_organisation_id: The data source organisation id to filter on.
+            data_source_organisation_id_prefix: The prefix of the data source organisation id to filter on.
+            default_vertical_measurement_id: The default vertical measurement id to filter on.
+            default_vertical_measurement_id_prefix: The prefix of the default vertical measurement id to filter on.
+            definitive_trajectory_id: The definitive trajectory id to filter on.
+            definitive_trajectory_id_prefix: The prefix of the definitive trajectory id to filter on.
+            existence_kind: The existence kind to filter on.
+            existence_kind_prefix: The prefix of the existence kind to filter on.
+            facility_description: The facility description to filter on.
+            facility_description_prefix: The prefix of the facility description to filter on.
+            facility_id: The facility id to filter on.
+            facility_id_prefix: The prefix of the facility id to filter on.
+            facility_name: The facility name to filter on.
+            facility_name_prefix: The prefix of the facility name to filter on.
+            facility_type_id: The facility type id to filter on.
+            facility_type_id_prefix: The prefix of the facility type id to filter on.
+            fluid_direction_id: The fluid direction id to filter on.
+            fluid_direction_id_prefix: The prefix of the fluid direction id to filter on.
+            formation_name_at_total_depth: The formation name at total depth to filter on.
+            formation_name_at_total_depth_prefix: The prefix of the formation name at total depth to filter on.
+            geographic_bottom_hole_location: The geographic bottom hole location to filter on.
+            initial_operator_id: The initial operator id to filter on.
+            initial_operator_id_prefix: The prefix of the initial operator id to filter on.
+            interest_type_id: The interest type id to filter on.
+            interest_type_id_prefix: The prefix of the interest type id to filter on.
+            kick_off_wellbore: The kick off wellbore to filter on.
+            kick_off_wellbore_prefix: The prefix of the kick off wellbore to filter on.
+            operating_environment_id: The operating environment id to filter on.
+            operating_environment_id_prefix: The prefix of the operating environment id to filter on.
+            outcome_id: The outcome id to filter on.
+            outcome_id_prefix: The prefix of the outcome id to filter on.
+            primary_product_type_id: The primary product type id to filter on.
+            primary_product_type_id_prefix: The prefix of the primary product type id to filter on.
+            projected_bottom_hole_location: The projected bottom hole location to filter on.
+            resource_curation_status: The resource curation status to filter on.
+            resource_curation_status_prefix: The prefix of the resource curation status to filter on.
+            resource_home_region_id: The resource home region id to filter on.
+            resource_home_region_id_prefix: The prefix of the resource home region id to filter on.
+            resource_lifecycle_status: The resource lifecycle status to filter on.
+            resource_lifecycle_status_prefix: The prefix of the resource lifecycle status to filter on.
+            resource_security_classification: The resource security classification to filter on.
+            resource_security_classification_prefix: The prefix of the resource security classification to filter on.
+            role_id: The role id to filter on.
+            role_id_prefix: The prefix of the role id to filter on.
+            secondary_product_type_id: The secondary product type id to filter on.
+            secondary_product_type_id_prefix: The prefix of the secondary product type id to filter on.
+            min_sequence_number: The minimum value of the sequence number to filter on.
+            max_sequence_number: The maximum value of the sequence number to filter on.
+            show_product_type_id: The show product type id to filter on.
+            show_product_type_id_prefix: The prefix of the show product type id to filter on.
+            source: The source to filter on.
+            source_prefix: The prefix of the source to filter on.
+            spatial_location: The spatial location to filter on.
+            status_summary_id: The status summary id to filter on.
+            status_summary_id_prefix: The prefix of the status summary id to filter on.
+            target_formation: The target formation to filter on.
+            target_formation_prefix: The prefix of the target formation to filter on.
+            technical_assurance_type_id: The technical assurance type id to filter on.
+            technical_assurance_type_id_prefix: The prefix of the technical assurance type id to filter on.
+            tertiary_product_type_id: The tertiary product type id to filter on.
+            tertiary_product_type_id_prefix: The prefix of the tertiary product type id to filter on.
+            trajectory_type_id: The trajectory type id to filter on.
+            trajectory_type_id_prefix: The prefix of the trajectory type id to filter on.
+            version_creation_reason: The version creation reason to filter on.
+            version_creation_reason_prefix: The prefix of the version creation reason to filter on.
+            was_business_interest_financial_non_operated: The was business interest financial non operated to filter on.
+            was_business_interest_financial_operated: The was business interest financial operated to filter on.
+            was_business_interest_obligatory: The was business interest obligatory to filter on.
+            was_business_interest_technical: The was business interest technical to filter on.
+            well_id: The well id to filter on.
+            well_id_prefix: The prefix of the well id to filter on.
+            wellbore_reason_id: The wellbore reason id to filter on.
+            wellbore_reason_id_prefix: The prefix of the wellbore reason id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of wellbore data to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `drilling_reasons`, `facility_events`, `facility_operators`, `facility_specifications`, `facility_states`, `geo_contexts`, `historical_interests`, `name_aliases`, `technical_assurances`, `vertical_measurements` or `wellbore_costs` external ids for the wellbore data. Defaults to True.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             business_intention_id,
@@ -1788,7 +1990,7 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of wellbore data to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
             retrieve_edges: Whether to retrieve `drilling_reasons`, `facility_events`, `facility_operators`, `facility_specifications`, `facility_states`, `geo_contexts`, `historical_interests`, `name_aliases`, `technical_assurances`, `vertical_measurements` or `wellbore_costs` external ids for the wellbore data. Defaults to True.
 
         Returns:

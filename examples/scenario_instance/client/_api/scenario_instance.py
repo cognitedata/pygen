@@ -562,7 +562,7 @@ class ScenarioInstanceAPI(TypeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of scenario instances to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             Search results scenario instances matching the query.
@@ -691,6 +691,46 @@ class ScenarioInstanceAPI(TypeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across scenario instances
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            aggregation: The aggregation to filter on.
+            aggregation_prefix: The prefix of the aggregation to filter on.
+            country: The country to filter on.
+            country_prefix: The prefix of the country to filter on.
+            min_instance: The minimum value of the instance to filter on.
+            max_instance: The maximum value of the instance to filter on.
+            market: The market to filter on.
+            market_prefix: The prefix of the market to filter on.
+            price_area: The price area to filter on.
+            price_area_prefix: The prefix of the price area to filter on.
+            scenario: The scenario to filter on.
+            scenario_prefix: The prefix of the scenario to filter on.
+            min_start: The minimum value of the start to filter on.
+            max_start: The maximum value of the start to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of scenario instances to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count scenario instances in space `my_space`:
+
+                >>> from scenario_instance.client import ScenarioInstanceClient
+                >>> client = ScenarioInstanceClient()
+                >>> result = client.scenario_instance.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             aggregation,
@@ -748,6 +788,36 @@ class ScenarioInstanceAPI(TypeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for scenario instances
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            aggregation: The aggregation to filter on.
+            aggregation_prefix: The prefix of the aggregation to filter on.
+            country: The country to filter on.
+            country_prefix: The prefix of the country to filter on.
+            min_instance: The minimum value of the instance to filter on.
+            max_instance: The maximum value of the instance to filter on.
+            market: The market to filter on.
+            market_prefix: The prefix of the market to filter on.
+            price_area: The price area to filter on.
+            price_area_prefix: The prefix of the price area to filter on.
+            scenario: The scenario to filter on.
+            scenario_prefix: The prefix of the scenario to filter on.
+            min_start: The minimum value of the start to filter on.
+            max_start: The maximum value of the start to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of scenario instances to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             aggregation,
@@ -820,7 +890,7 @@ class ScenarioInstanceAPI(TypeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of scenario instances to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             List of requested scenario instances

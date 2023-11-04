@@ -153,7 +153,7 @@ class WellboreCostsAPI(TypeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsL
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of wellbore costs to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             Search results wellbore costs matching the query.
@@ -242,6 +242,36 @@ class WellboreCostsAPI(TypeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsL
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across wellbore costs
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            activity_type_id: The activity type id to filter on.
+            activity_type_id_prefix: The prefix of the activity type id to filter on.
+            min_cost: The minimum value of the cost to filter on.
+            max_cost: The maximum value of the cost to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of wellbore costs to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count wellbore costs in space `my_space`:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> result = client.wellbore_costs.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             activity_type_id,
@@ -279,6 +309,26 @@ class WellboreCostsAPI(TypeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsL
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for wellbore costs
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            activity_type_id: The activity type id to filter on.
+            activity_type_id_prefix: The prefix of the activity type id to filter on.
+            min_cost: The minimum value of the cost to filter on.
+            max_cost: The maximum value of the cost to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of wellbore costs to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             activity_type_id,
@@ -321,7 +371,7 @@ class WellboreCostsAPI(TypeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsL
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of wellbore costs to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             List of requested wellbore costs

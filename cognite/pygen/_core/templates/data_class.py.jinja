@@ -23,6 +23,10 @@ __all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data
 
 
 class {{ data_class.read_name }}(DomainModel):
+    """This represent a read version of {{ data_class.doc_name }}.
+
+    It is used to when data is retrieved from CDF.
+    """
     space: str = "{{ space }}"{% for field in data_class %}
     {{ field.name }}: {{ field.as_read_type_hint() }}{% endfor %}
 
@@ -35,6 +39,10 @@ class {{ data_class.read_name }}(DomainModel):
 
 
 class {{ data_class.write_name }}(DomainModelApply):
+    """This represent a write version of {{ data_class.doc_name }}.
+
+    It is used to when data is sent to CDF.
+    """
     space: str = "{{ space }}"{% for field in data_class %}
     {{ field.name }}: {{ field.as_write_type_hint() }}{% endfor %}
 

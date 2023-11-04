@@ -234,7 +234,7 @@ class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of work items to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
             retrieve_edges: Whether to retrieve `linked_assets` external ids for the work items. Defaults to True.
 
         Returns:
@@ -368,6 +368,48 @@ class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across work items
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            criticality: The criticality to filter on.
+            criticality_prefix: The prefix of the criticality to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            is_completed: The is completed to filter on.
+            item_info: The item info to filter on.
+            item_info_prefix: The prefix of the item info to filter on.
+            item_name: The item name to filter on.
+            item_name_prefix: The prefix of the item name to filter on.
+            method: The method to filter on.
+            method_prefix: The prefix of the method to filter on.
+            title: The title to filter on.
+            title_prefix: The prefix of the title to filter on.
+            to_be_done: The to be done to filter on.
+            work_order: The work order to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of work items to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `linked_assets` external ids for the work items. Defaults to True.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count work items in space `my_space`:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> result = client.work_item.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             criticality,
@@ -427,6 +469,38 @@ class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for work items
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            criticality: The criticality to filter on.
+            criticality_prefix: The prefix of the criticality to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            is_completed: The is completed to filter on.
+            item_info: The item info to filter on.
+            item_info_prefix: The prefix of the item info to filter on.
+            item_name: The item name to filter on.
+            item_name_prefix: The prefix of the item name to filter on.
+            method: The method to filter on.
+            method_prefix: The prefix of the method to filter on.
+            title: The title to filter on.
+            title_prefix: The prefix of the title to filter on.
+            to_be_done: The to be done to filter on.
+            work_order: The work order to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of work items to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `linked_assets` external ids for the work items. Defaults to True.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             criticality,
@@ -503,7 +577,7 @@ class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of work items to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
             retrieve_edges: Whether to retrieve `linked_assets` external ids for the work items. Defaults to True.
 
         Returns:

@@ -331,7 +331,7 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of work orders to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
             retrieve_edges: Whether to retrieve `linked_assets` or `work_items` external ids for the work orders. Defaults to True.
 
         Returns:
@@ -541,6 +541,67 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across work orders
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            min_actual_hours: The minimum value of the actual hour to filter on.
+            max_actual_hours: The maximum value of the actual hour to filter on.
+            min_created_date: The minimum value of the created date to filter on.
+            max_created_date: The maximum value of the created date to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            min_due_date: The minimum value of the due date to filter on.
+            max_due_date: The maximum value of the due date to filter on.
+            min_duration_hours: The minimum value of the duration hour to filter on.
+            max_duration_hours: The maximum value of the duration hour to filter on.
+            min_end_time: The minimum value of the end time to filter on.
+            max_end_time: The maximum value of the end time to filter on.
+            is_active: The is active to filter on.
+            is_cancelled: The is cancelled to filter on.
+            is_completed: The is completed to filter on.
+            is_safety_critical: The is safety critical to filter on.
+            min_percentage_progress: The minimum value of the percentage progres to filter on.
+            max_percentage_progress: The maximum value of the percentage progres to filter on.
+            min_planned_start: The minimum value of the planned start to filter on.
+            max_planned_start: The maximum value of the planned start to filter on.
+            priority_description: The priority description to filter on.
+            priority_description_prefix: The prefix of the priority description to filter on.
+            program_number: The program number to filter on.
+            program_number_prefix: The prefix of the program number to filter on.
+            min_start_time: The minimum value of the start time to filter on.
+            max_start_time: The maximum value of the start time to filter on.
+            status: The status to filter on.
+            status_prefix: The prefix of the status to filter on.
+            title: The title to filter on.
+            title_prefix: The prefix of the title to filter on.
+            work_order_number: The work order number to filter on.
+            work_order_number_prefix: The prefix of the work order number to filter on.
+            work_package_number: The work package number to filter on.
+            work_package_number_prefix: The prefix of the work package number to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of work orders to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `linked_assets` or `work_items` external ids for the work orders. Defaults to True.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count work orders in space `my_space`:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> result = client.work_order.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             min_actual_hours,
@@ -638,6 +699,57 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for work orders
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            min_actual_hours: The minimum value of the actual hour to filter on.
+            max_actual_hours: The maximum value of the actual hour to filter on.
+            min_created_date: The minimum value of the created date to filter on.
+            max_created_date: The maximum value of the created date to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            min_due_date: The minimum value of the due date to filter on.
+            max_due_date: The maximum value of the due date to filter on.
+            min_duration_hours: The minimum value of the duration hour to filter on.
+            max_duration_hours: The maximum value of the duration hour to filter on.
+            min_end_time: The minimum value of the end time to filter on.
+            max_end_time: The maximum value of the end time to filter on.
+            is_active: The is active to filter on.
+            is_cancelled: The is cancelled to filter on.
+            is_completed: The is completed to filter on.
+            is_safety_critical: The is safety critical to filter on.
+            min_percentage_progress: The minimum value of the percentage progres to filter on.
+            max_percentage_progress: The maximum value of the percentage progres to filter on.
+            min_planned_start: The minimum value of the planned start to filter on.
+            max_planned_start: The maximum value of the planned start to filter on.
+            priority_description: The priority description to filter on.
+            priority_description_prefix: The prefix of the priority description to filter on.
+            program_number: The program number to filter on.
+            program_number_prefix: The prefix of the program number to filter on.
+            min_start_time: The minimum value of the start time to filter on.
+            max_start_time: The maximum value of the start time to filter on.
+            status: The status to filter on.
+            status_prefix: The prefix of the status to filter on.
+            title: The title to filter on.
+            title_prefix: The prefix of the title to filter on.
+            work_order_number: The work order number to filter on.
+            work_order_number_prefix: The prefix of the work order number to filter on.
+            work_package_number: The work package number to filter on.
+            work_package_number_prefix: The prefix of the work package number to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of work orders to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `linked_assets` or `work_items` external ids for the work orders. Defaults to True.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             min_actual_hours,
@@ -771,7 +883,7 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of work orders to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
             retrieve_edges: Whether to retrieve `linked_assets` or `work_items` external ids for the work orders. Defaults to True.
 
         Returns:

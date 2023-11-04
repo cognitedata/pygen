@@ -169,7 +169,7 @@ class GeoContextsAPI(TypeAPI[GeoContexts, GeoContextsApply, GeoContextsList]):
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of geo contexts to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             Search results geo contexts matching the query.
@@ -290,6 +290,44 @@ class GeoContextsAPI(TypeAPI[GeoContexts, GeoContextsApply, GeoContextsList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across geo contexts
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            basin_id: The basin id to filter on.
+            basin_id_prefix: The prefix of the basin id to filter on.
+            field_id: The field id to filter on.
+            field_id_prefix: The prefix of the field id to filter on.
+            geo_political_entity_id: The geo political entity id to filter on.
+            geo_political_entity_id_prefix: The prefix of the geo political entity id to filter on.
+            geo_type_id: The geo type id to filter on.
+            geo_type_id_prefix: The prefix of the geo type id to filter on.
+            play_id: The play id to filter on.
+            play_id_prefix: The prefix of the play id to filter on.
+            prospect_id: The prospect id to filter on.
+            prospect_id_prefix: The prefix of the prospect id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of geo contexts to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count geo contexts in space `my_space`:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> result = client.geo_contexts.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             basin_id,
@@ -343,6 +381,34 @@ class GeoContextsAPI(TypeAPI[GeoContexts, GeoContextsApply, GeoContextsList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for geo contexts
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            basin_id: The basin id to filter on.
+            basin_id_prefix: The prefix of the basin id to filter on.
+            field_id: The field id to filter on.
+            field_id_prefix: The prefix of the field id to filter on.
+            geo_political_entity_id: The geo political entity id to filter on.
+            geo_political_entity_id_prefix: The prefix of the geo political entity id to filter on.
+            geo_type_id: The geo type id to filter on.
+            geo_type_id_prefix: The prefix of the geo type id to filter on.
+            play_id: The play id to filter on.
+            play_id_prefix: The prefix of the play id to filter on.
+            prospect_id: The prospect id to filter on.
+            prospect_id_prefix: The prefix of the prospect id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of geo contexts to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             basin_id,
@@ -409,7 +475,7 @@ class GeoContextsAPI(TypeAPI[GeoContexts, GeoContextsApply, GeoContextsList]):
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of geo contexts to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             List of requested geo contexts

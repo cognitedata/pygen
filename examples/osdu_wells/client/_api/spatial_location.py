@@ -177,7 +177,7 @@ class SpatialLocationAPI(TypeAPI[SpatialLocation, SpatialLocationApply, SpatialL
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of spatial locations to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             Search results spatial locations matching the query.
@@ -314,6 +314,48 @@ class SpatialLocationAPI(TypeAPI[SpatialLocation, SpatialLocationApply, SpatialL
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across spatial locations
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            as_ingested_coordinates: The as ingested coordinate to filter on.
+            coordinate_quality_check_date_time: The coordinate quality check date time to filter on.
+            coordinate_quality_check_date_time_prefix: The prefix of the coordinate quality check date time to filter on.
+            coordinate_quality_check_performed_by: The coordinate quality check performed by to filter on.
+            coordinate_quality_check_performed_by_prefix: The prefix of the coordinate quality check performed by to filter on.
+            qualitative_spatial_accuracy_type_id: The qualitative spatial accuracy type id to filter on.
+            qualitative_spatial_accuracy_type_id_prefix: The prefix of the qualitative spatial accuracy type id to filter on.
+            quantitative_accuracy_band_id: The quantitative accuracy band id to filter on.
+            quantitative_accuracy_band_id_prefix: The prefix of the quantitative accuracy band id to filter on.
+            spatial_geometry_type_id: The spatial geometry type id to filter on.
+            spatial_geometry_type_id_prefix: The prefix of the spatial geometry type id to filter on.
+            spatial_location_coordinates_date: The spatial location coordinates date to filter on.
+            spatial_location_coordinates_date_prefix: The prefix of the spatial location coordinates date to filter on.
+            spatial_parameter_type_id: The spatial parameter type id to filter on.
+            spatial_parameter_type_id_prefix: The prefix of the spatial parameter type id to filter on.
+            wgs_84_coordinates: The wgs 84 coordinate to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of spatial locations to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count spatial locations in space `my_space`:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> result = client.spatial_location.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             as_ingested_coordinates,
@@ -375,6 +417,38 @@ class SpatialLocationAPI(TypeAPI[SpatialLocation, SpatialLocationApply, SpatialL
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for spatial locations
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            as_ingested_coordinates: The as ingested coordinate to filter on.
+            coordinate_quality_check_date_time: The coordinate quality check date time to filter on.
+            coordinate_quality_check_date_time_prefix: The prefix of the coordinate quality check date time to filter on.
+            coordinate_quality_check_performed_by: The coordinate quality check performed by to filter on.
+            coordinate_quality_check_performed_by_prefix: The prefix of the coordinate quality check performed by to filter on.
+            qualitative_spatial_accuracy_type_id: The qualitative spatial accuracy type id to filter on.
+            qualitative_spatial_accuracy_type_id_prefix: The prefix of the qualitative spatial accuracy type id to filter on.
+            quantitative_accuracy_band_id: The quantitative accuracy band id to filter on.
+            quantitative_accuracy_band_id_prefix: The prefix of the quantitative accuracy band id to filter on.
+            spatial_geometry_type_id: The spatial geometry type id to filter on.
+            spatial_geometry_type_id_prefix: The prefix of the spatial geometry type id to filter on.
+            spatial_location_coordinates_date: The spatial location coordinates date to filter on.
+            spatial_location_coordinates_date_prefix: The prefix of the spatial location coordinates date to filter on.
+            spatial_parameter_type_id: The spatial parameter type id to filter on.
+            spatial_parameter_type_id_prefix: The prefix of the spatial parameter type id to filter on.
+            wgs_84_coordinates: The wgs 84 coordinate to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of spatial locations to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             as_ingested_coordinates,
@@ -453,7 +527,7 @@ class SpatialLocationAPI(TypeAPI[SpatialLocation, SpatialLocationApply, SpatialL
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of spatial locations to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             List of requested spatial locations

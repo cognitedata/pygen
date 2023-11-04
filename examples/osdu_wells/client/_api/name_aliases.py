@@ -165,7 +165,7 @@ class NameAliasesAPI(TypeAPI[NameAliases, NameAliasesApply, NameAliasesList]):
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of name aliases to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             Search results name aliases matching the query.
@@ -278,6 +278,42 @@ class NameAliasesAPI(TypeAPI[NameAliases, NameAliasesApply, NameAliasesList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across name aliases
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            alias_name: The alias name to filter on.
+            alias_name_prefix: The prefix of the alias name to filter on.
+            alias_name_type_id: The alias name type id to filter on.
+            alias_name_type_id_prefix: The prefix of the alias name type id to filter on.
+            definition_organisation_id: The definition organisation id to filter on.
+            definition_organisation_id_prefix: The prefix of the definition organisation id to filter on.
+            effective_date_time: The effective date time to filter on.
+            effective_date_time_prefix: The prefix of the effective date time to filter on.
+            termination_date_time: The termination date time to filter on.
+            termination_date_time_prefix: The prefix of the termination date time to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of name aliases to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count name aliases in space `my_space`:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> result = client.name_aliases.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             alias_name,
@@ -327,6 +363,32 @@ class NameAliasesAPI(TypeAPI[NameAliases, NameAliasesApply, NameAliasesList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for name aliases
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            alias_name: The alias name to filter on.
+            alias_name_prefix: The prefix of the alias name to filter on.
+            alias_name_type_id: The alias name type id to filter on.
+            alias_name_type_id_prefix: The prefix of the alias name type id to filter on.
+            definition_organisation_id: The definition organisation id to filter on.
+            definition_organisation_id_prefix: The prefix of the definition organisation id to filter on.
+            effective_date_time: The effective date time to filter on.
+            effective_date_time_prefix: The prefix of the effective date time to filter on.
+            termination_date_time: The termination date time to filter on.
+            termination_date_time_prefix: The prefix of the termination date time to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of name aliases to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             alias_name,
@@ -387,7 +449,7 @@ class NameAliasesAPI(TypeAPI[NameAliases, NameAliasesApply, NameAliasesList]):
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of name aliases to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             List of requested name aliases

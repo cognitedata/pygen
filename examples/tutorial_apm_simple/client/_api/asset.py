@@ -698,7 +698,7 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of assets to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
             retrieve_edges: Whether to retrieve `children` or `in_model_3_d` external ids for the assets. Defaults to True.
 
         Returns:
@@ -840,6 +840,50 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across assets
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            min_area_id: The minimum value of the area id to filter on.
+            max_area_id: The maximum value of the area id to filter on.
+            min_category_id: The minimum value of the category id to filter on.
+            max_category_id: The maximum value of the category id to filter on.
+            min_created_date: The minimum value of the created date to filter on.
+            max_created_date: The maximum value of the created date to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            is_active: The is active to filter on.
+            is_critical_line: The is critical line to filter on.
+            parent: The parent to filter on.
+            source_db: The source db to filter on.
+            source_db_prefix: The prefix of the source db to filter on.
+            tag: The tag to filter on.
+            tag_prefix: The prefix of the tag to filter on.
+            min_updated_date: The minimum value of the updated date to filter on.
+            max_updated_date: The maximum value of the updated date to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of assets to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `children` or `in_model_3_d` external ids for the assets. Defaults to True.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count assets in space `my_space`:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> result = client.asset.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             min_area_id,
@@ -903,6 +947,40 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for assets
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            min_area_id: The minimum value of the area id to filter on.
+            max_area_id: The maximum value of the area id to filter on.
+            min_category_id: The minimum value of the category id to filter on.
+            max_category_id: The maximum value of the category id to filter on.
+            min_created_date: The minimum value of the created date to filter on.
+            max_created_date: The maximum value of the created date to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            is_active: The is active to filter on.
+            is_critical_line: The is critical line to filter on.
+            parent: The parent to filter on.
+            source_db: The source db to filter on.
+            source_db_prefix: The prefix of the source db to filter on.
+            tag: The tag to filter on.
+            tag_prefix: The prefix of the tag to filter on.
+            min_updated_date: The minimum value of the updated date to filter on.
+            max_updated_date: The maximum value of the updated date to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of assets to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `children` or `in_model_3_d` external ids for the assets. Defaults to True.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             min_area_id,
@@ -985,7 +1063,7 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of assets to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
             retrieve_edges: Whether to retrieve `children` or `in_model_3_d` external ids for the assets. Defaults to True.
 
         Returns:

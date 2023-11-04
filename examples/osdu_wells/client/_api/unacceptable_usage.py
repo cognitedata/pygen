@@ -165,7 +165,7 @@ class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of unacceptable usages to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             Search results unacceptable usages matching the query.
@@ -278,6 +278,42 @@ class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across unacceptable usages
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            data_quality_id: The data quality id to filter on.
+            data_quality_id_prefix: The prefix of the data quality id to filter on.
+            data_quality_rule_set_id: The data quality rule set id to filter on.
+            data_quality_rule_set_id_prefix: The prefix of the data quality rule set id to filter on.
+            value_chain_status_type_id: The value chain status type id to filter on.
+            value_chain_status_type_id_prefix: The prefix of the value chain status type id to filter on.
+            workflow_persona_type_id: The workflow persona type id to filter on.
+            workflow_persona_type_id_prefix: The prefix of the workflow persona type id to filter on.
+            workflow_usage_type_id: The workflow usage type id to filter on.
+            workflow_usage_type_id_prefix: The prefix of the workflow usage type id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of unacceptable usages to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count unacceptable usages in space `my_space`:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> result = client.unacceptable_usage.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             data_quality_id,
@@ -327,6 +363,32 @@ class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for unacceptable usages
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            data_quality_id: The data quality id to filter on.
+            data_quality_id_prefix: The prefix of the data quality id to filter on.
+            data_quality_rule_set_id: The data quality rule set id to filter on.
+            data_quality_rule_set_id_prefix: The prefix of the data quality rule set id to filter on.
+            value_chain_status_type_id: The value chain status type id to filter on.
+            value_chain_status_type_id_prefix: The prefix of the value chain status type id to filter on.
+            workflow_persona_type_id: The workflow persona type id to filter on.
+            workflow_persona_type_id_prefix: The prefix of the workflow persona type id to filter on.
+            workflow_usage_type_id: The workflow usage type id to filter on.
+            workflow_usage_type_id_prefix: The prefix of the workflow usage type id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of unacceptable usages to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             data_quality_id,
@@ -387,7 +449,7 @@ class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of unacceptable usages to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             List of requested unacceptable usages

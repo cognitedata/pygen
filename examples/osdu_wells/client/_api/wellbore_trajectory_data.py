@@ -702,7 +702,7 @@ class WellboreTrajectoryDataAPI(
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of wellbore trajectory data to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
             retrieve_edges: Whether to retrieve `artefacts`, `available_trajectory_station_properties`, `geo_contexts`, `lineage_assertions`, `name_aliases` or `technical_assurances` external ids for the wellbore trajectory data. Defaults to True.
 
         Returns:
@@ -1098,6 +1098,113 @@ class WellboreTrajectoryDataAPI(
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across wellbore trajectory data
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            acquisition_date: The acquisition date to filter on.
+            acquisition_date_prefix: The prefix of the acquisition date to filter on.
+            acquisition_remark: The acquisition remark to filter on.
+            acquisition_remark_prefix: The prefix of the acquisition remark to filter on.
+            active_indicator: The active indicator to filter on.
+            applied_operations_date_time: The applied operations date time to filter on.
+            applied_operations_date_time_prefix: The prefix of the applied operations date time to filter on.
+            applied_operations_remarks: The applied operations remark to filter on.
+            applied_operations_remarks_prefix: The prefix of the applied operations remark to filter on.
+            applied_operations_user: The applied operations user to filter on.
+            applied_operations_user_prefix: The prefix of the applied operations user to filter on.
+            azimuth_reference_type: The azimuth reference type to filter on.
+            azimuth_reference_type_prefix: The prefix of the azimuth reference type to filter on.
+            min_base_depth_measured_depth: The minimum value of the base depth measured depth to filter on.
+            max_base_depth_measured_depth: The maximum value of the base depth measured depth to filter on.
+            calculation_method_type: The calculation method type to filter on.
+            calculation_method_type_prefix: The prefix of the calculation method type to filter on.
+            company_id: The company id to filter on.
+            company_id_prefix: The prefix of the company id to filter on.
+            creation_date_time: The creation date time to filter on.
+            creation_date_time_prefix: The prefix of the creation date time to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            end_date_time: The end date time to filter on.
+            end_date_time_prefix: The prefix of the end date time to filter on.
+            existence_kind: The existence kind to filter on.
+            existence_kind_prefix: The prefix of the existence kind to filter on.
+            min_extrapolated_measured_depth: The minimum value of the extrapolated measured depth to filter on.
+            max_extrapolated_measured_depth: The maximum value of the extrapolated measured depth to filter on.
+            extrapolated_measured_depth_remark: The extrapolated measured depth remark to filter on.
+            extrapolated_measured_depth_remark_prefix: The prefix of the extrapolated measured depth remark to filter on.
+            geographic_crsid: The geographic crsid to filter on.
+            geographic_crsid_prefix: The prefix of the geographic crsid to filter on.
+            is_discoverable: The is discoverable to filter on.
+            is_extended_load: The is extended load to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            projected_crsid: The projected crsid to filter on.
+            projected_crsid_prefix: The prefix of the projected crsid to filter on.
+            resource_curation_status: The resource curation status to filter on.
+            resource_curation_status_prefix: The prefix of the resource curation status to filter on.
+            resource_home_region_id: The resource home region id to filter on.
+            resource_home_region_id_prefix: The prefix of the resource home region id to filter on.
+            resource_lifecycle_status: The resource lifecycle status to filter on.
+            resource_lifecycle_status_prefix: The prefix of the resource lifecycle status to filter on.
+            resource_security_classification: The resource security classification to filter on.
+            resource_security_classification_prefix: The prefix of the resource security classification to filter on.
+            service_company_id: The service company id to filter on.
+            service_company_id_prefix: The prefix of the service company id to filter on.
+            source: The source to filter on.
+            source_prefix: The prefix of the source to filter on.
+            spatial_area: The spatial area to filter on.
+            spatial_point: The spatial point to filter on.
+            start_date_time: The start date time to filter on.
+            start_date_time_prefix: The prefix of the start date time to filter on.
+            submitter_name: The submitter name to filter on.
+            submitter_name_prefix: The prefix of the submitter name to filter on.
+            min_surface_grid_convergence: The minimum value of the surface grid convergence to filter on.
+            max_surface_grid_convergence: The maximum value of the surface grid convergence to filter on.
+            min_surface_scale_factor: The minimum value of the surface scale factor to filter on.
+            max_surface_scale_factor: The maximum value of the surface scale factor to filter on.
+            survey_reference_identifier: The survey reference identifier to filter on.
+            survey_reference_identifier_prefix: The prefix of the survey reference identifier to filter on.
+            survey_tool_type_id: The survey tool type id to filter on.
+            survey_tool_type_id_prefix: The prefix of the survey tool type id to filter on.
+            survey_type: The survey type to filter on.
+            survey_type_prefix: The prefix of the survey type to filter on.
+            survey_version: The survey version to filter on.
+            survey_version_prefix: The prefix of the survey version to filter on.
+            min_tie_measured_depth: The minimum value of the tie measured depth to filter on.
+            max_tie_measured_depth: The maximum value of the tie measured depth to filter on.
+            min_tie_true_vertical_depth: The minimum value of the tie true vertical depth to filter on.
+            max_tie_true_vertical_depth: The maximum value of the tie true vertical depth to filter on.
+            min_top_depth_measured_depth: The minimum value of the top depth measured depth to filter on.
+            max_top_depth_measured_depth: The maximum value of the top depth measured depth to filter on.
+            min_tortuosity: The minimum value of the tortuosity to filter on.
+            max_tortuosity: The maximum value of the tortuosity to filter on.
+            vertical_measurement: The vertical measurement to filter on.
+            wellbore_id: The wellbore id to filter on.
+            wellbore_id_prefix: The prefix of the wellbore id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of wellbore trajectory data to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `artefacts`, `available_trajectory_station_properties`, `geo_contexts`, `lineage_assertions`, `name_aliases` or `technical_assurances` external ids for the wellbore trajectory data. Defaults to True.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count wellbore trajectory data in space `my_space`:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> result = client.wellbore_trajectory_data.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             acquisition_date,
@@ -1287,6 +1394,103 @@ class WellboreTrajectoryDataAPI(
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for wellbore trajectory data
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            acquisition_date: The acquisition date to filter on.
+            acquisition_date_prefix: The prefix of the acquisition date to filter on.
+            acquisition_remark: The acquisition remark to filter on.
+            acquisition_remark_prefix: The prefix of the acquisition remark to filter on.
+            active_indicator: The active indicator to filter on.
+            applied_operations_date_time: The applied operations date time to filter on.
+            applied_operations_date_time_prefix: The prefix of the applied operations date time to filter on.
+            applied_operations_remarks: The applied operations remark to filter on.
+            applied_operations_remarks_prefix: The prefix of the applied operations remark to filter on.
+            applied_operations_user: The applied operations user to filter on.
+            applied_operations_user_prefix: The prefix of the applied operations user to filter on.
+            azimuth_reference_type: The azimuth reference type to filter on.
+            azimuth_reference_type_prefix: The prefix of the azimuth reference type to filter on.
+            min_base_depth_measured_depth: The minimum value of the base depth measured depth to filter on.
+            max_base_depth_measured_depth: The maximum value of the base depth measured depth to filter on.
+            calculation_method_type: The calculation method type to filter on.
+            calculation_method_type_prefix: The prefix of the calculation method type to filter on.
+            company_id: The company id to filter on.
+            company_id_prefix: The prefix of the company id to filter on.
+            creation_date_time: The creation date time to filter on.
+            creation_date_time_prefix: The prefix of the creation date time to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            end_date_time: The end date time to filter on.
+            end_date_time_prefix: The prefix of the end date time to filter on.
+            existence_kind: The existence kind to filter on.
+            existence_kind_prefix: The prefix of the existence kind to filter on.
+            min_extrapolated_measured_depth: The minimum value of the extrapolated measured depth to filter on.
+            max_extrapolated_measured_depth: The maximum value of the extrapolated measured depth to filter on.
+            extrapolated_measured_depth_remark: The extrapolated measured depth remark to filter on.
+            extrapolated_measured_depth_remark_prefix: The prefix of the extrapolated measured depth remark to filter on.
+            geographic_crsid: The geographic crsid to filter on.
+            geographic_crsid_prefix: The prefix of the geographic crsid to filter on.
+            is_discoverable: The is discoverable to filter on.
+            is_extended_load: The is extended load to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            projected_crsid: The projected crsid to filter on.
+            projected_crsid_prefix: The prefix of the projected crsid to filter on.
+            resource_curation_status: The resource curation status to filter on.
+            resource_curation_status_prefix: The prefix of the resource curation status to filter on.
+            resource_home_region_id: The resource home region id to filter on.
+            resource_home_region_id_prefix: The prefix of the resource home region id to filter on.
+            resource_lifecycle_status: The resource lifecycle status to filter on.
+            resource_lifecycle_status_prefix: The prefix of the resource lifecycle status to filter on.
+            resource_security_classification: The resource security classification to filter on.
+            resource_security_classification_prefix: The prefix of the resource security classification to filter on.
+            service_company_id: The service company id to filter on.
+            service_company_id_prefix: The prefix of the service company id to filter on.
+            source: The source to filter on.
+            source_prefix: The prefix of the source to filter on.
+            spatial_area: The spatial area to filter on.
+            spatial_point: The spatial point to filter on.
+            start_date_time: The start date time to filter on.
+            start_date_time_prefix: The prefix of the start date time to filter on.
+            submitter_name: The submitter name to filter on.
+            submitter_name_prefix: The prefix of the submitter name to filter on.
+            min_surface_grid_convergence: The minimum value of the surface grid convergence to filter on.
+            max_surface_grid_convergence: The maximum value of the surface grid convergence to filter on.
+            min_surface_scale_factor: The minimum value of the surface scale factor to filter on.
+            max_surface_scale_factor: The maximum value of the surface scale factor to filter on.
+            survey_reference_identifier: The survey reference identifier to filter on.
+            survey_reference_identifier_prefix: The prefix of the survey reference identifier to filter on.
+            survey_tool_type_id: The survey tool type id to filter on.
+            survey_tool_type_id_prefix: The prefix of the survey tool type id to filter on.
+            survey_type: The survey type to filter on.
+            survey_type_prefix: The prefix of the survey type to filter on.
+            survey_version: The survey version to filter on.
+            survey_version_prefix: The prefix of the survey version to filter on.
+            min_tie_measured_depth: The minimum value of the tie measured depth to filter on.
+            max_tie_measured_depth: The maximum value of the tie measured depth to filter on.
+            min_tie_true_vertical_depth: The minimum value of the tie true vertical depth to filter on.
+            max_tie_true_vertical_depth: The maximum value of the tie true vertical depth to filter on.
+            min_top_depth_measured_depth: The minimum value of the top depth measured depth to filter on.
+            max_top_depth_measured_depth: The maximum value of the top depth measured depth to filter on.
+            min_tortuosity: The minimum value of the tortuosity to filter on.
+            max_tortuosity: The maximum value of the tortuosity to filter on.
+            vertical_measurement: The vertical measurement to filter on.
+            wellbore_id: The wellbore id to filter on.
+            wellbore_id_prefix: The prefix of the wellbore id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of wellbore trajectory data to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `artefacts`, `available_trajectory_station_properties`, `geo_contexts`, `lineage_assertions`, `name_aliases` or `technical_assurances` external ids for the wellbore trajectory data. Defaults to True.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             acquisition_date,
@@ -1558,7 +1762,7 @@ class WellboreTrajectoryDataAPI(
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of wellbore trajectory data to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
             retrieve_edges: Whether to retrieve `artefacts`, `available_trajectory_station_properties`, `geo_contexts`, `lineage_assertions`, `name_aliases` or `technical_assurances` external ids for the wellbore trajectory data. Defaults to True.
 
         Returns:

@@ -266,7 +266,7 @@ class MovieAPI(TypeAPI[Movie, MovieApply, MovieList]):
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of movies to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
             retrieve_edges: Whether to retrieve `actors` or `directors` external ids for the movies. Defaults to True.
 
         Returns:
@@ -368,6 +368,40 @@ class MovieAPI(TypeAPI[Movie, MovieApply, MovieList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across movies
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            rating: The rating to filter on.
+            min_release_year: The minimum value of the release year to filter on.
+            max_release_year: The maximum value of the release year to filter on.
+            min_run_time_minutes: The minimum value of the run time minute to filter on.
+            max_run_time_minutes: The maximum value of the run time minute to filter on.
+            title: The title to filter on.
+            title_prefix: The prefix of the title to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of movies to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `actors` or `directors` external ids for the movies. Defaults to True.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count movies in space `my_space`:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> result = client.movie.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             rating,
@@ -411,6 +445,30 @@ class MovieAPI(TypeAPI[Movie, MovieApply, MovieList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for movies
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            rating: The rating to filter on.
+            min_release_year: The minimum value of the release year to filter on.
+            max_release_year: The maximum value of the release year to filter on.
+            min_run_time_minutes: The minimum value of the run time minute to filter on.
+            max_run_time_minutes: The maximum value of the run time minute to filter on.
+            title: The title to filter on.
+            title_prefix: The prefix of the title to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of movies to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `actors` or `directors` external ids for the movies. Defaults to True.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             rating,
@@ -463,7 +521,7 @@ class MovieAPI(TypeAPI[Movie, MovieApply, MovieList]):
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of movies to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
             retrieve_edges: Whether to retrieve `actors` or `directors` external ids for the movies. Defaults to True.
 
         Returns:

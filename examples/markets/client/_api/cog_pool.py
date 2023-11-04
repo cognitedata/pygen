@@ -159,7 +159,7 @@ class CogPoolAPI(TypeAPI[CogPool, CogPoolApply, CogPoolList]):
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of cog pools to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             Search results cog pools matching the query.
@@ -272,6 +272,42 @@ class CogPoolAPI(TypeAPI[CogPool, CogPoolApply, CogPoolList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across cog pools
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            min_max_price: The minimum value of the max price to filter on.
+            max_max_price: The maximum value of the max price to filter on.
+            min_min_price: The minimum value of the min price to filter on.
+            max_min_price: The maximum value of the min price to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            time_unit: The time unit to filter on.
+            time_unit_prefix: The prefix of the time unit to filter on.
+            timezone: The timezone to filter on.
+            timezone_prefix: The prefix of the timezone to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of cog pools to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count cog pools in space `my_space`:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> result = client.cog_pool.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             min_max_price,
@@ -321,6 +357,32 @@ class CogPoolAPI(TypeAPI[CogPool, CogPoolApply, CogPoolList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for cog pools
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            min_max_price: The minimum value of the max price to filter on.
+            max_max_price: The maximum value of the max price to filter on.
+            min_min_price: The minimum value of the min price to filter on.
+            max_min_price: The maximum value of the min price to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            time_unit: The time unit to filter on.
+            time_unit_prefix: The prefix of the time unit to filter on.
+            timezone: The timezone to filter on.
+            timezone_prefix: The prefix of the timezone to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of cog pools to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             min_max_price,
@@ -381,7 +443,7 @@ class CogPoolAPI(TypeAPI[CogPool, CogPoolApply, CogPoolList]):
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of cog pools to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficent, you can write your own filtering which will be ANDed with the filter above.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             List of requested cog pools
