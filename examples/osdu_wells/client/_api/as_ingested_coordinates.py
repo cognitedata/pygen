@@ -25,6 +25,24 @@ class AsIngestedCoordinatesFeaturesAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more features edges by id(s) of a as ingested coordinate.
+
+        Args:
+            external_id: External id or list of external ids source as ingested coordinate.
+            space: The space where all the feature edges are located.
+
+        Returns:
+            The requested feature edges.
+
+        Examples:
+
+            Retrieve features edge by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> as_ingested_coordinate = client.as_ingested_coordinates.features.retrieve("my_features")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -54,6 +72,26 @@ class AsIngestedCoordinatesFeaturesAPI:
         limit=DEFAULT_LIMIT_READ,
         space="IntegrationTestsImmutable",
     ) -> dm.EdgeList:
+        """List features edges of a as ingested coordinate.
+
+        Args:
+            as_ingested_coordinate_id: Id of the source as ingested coordinate.
+            limit: Maximum number of feature edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the feature edges are located.
+
+        Returns:
+            The requested feature edges.
+
+        Examples:
+
+            List 5 features edges connected to "my_as_ingested_coordinate":
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> as_ingested_coordinate = client.as_ingested_coordinates.features.list("my_as_ingested_coordinate", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(

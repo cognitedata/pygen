@@ -20,6 +20,24 @@ class DateTransformationPairEndAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="market") -> dm.EdgeList:
+        """Retrieve one or more end edges by id(s) of a date transformation pair.
+
+        Args:
+            external_id: External id or list of external ids source date transformation pair.
+            space: The space where all the end edges are located.
+
+        Returns:
+            The requested end edges.
+
+        Examples:
+
+            Retrieve end edge by id:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> date_transformation_pair = client.date_transformation_pair.end.retrieve("my_end")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -46,6 +64,26 @@ class DateTransformationPairEndAPI:
     def list(
         self, date_transformation_pair_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="market"
     ) -> dm.EdgeList:
+        """List end edges of a date transformation pair.
+
+        Args:
+            date_transformation_pair_id: Id of the source date transformation pair.
+            limit: Maximum number of end edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the end edges are located.
+
+        Returns:
+            The requested end edges.
+
+        Examples:
+
+            List 5 end edges connected to "my_date_transformation_pair":
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> date_transformation_pair = client.date_transformation_pair.end.list("my_date_transformation_pair", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -73,6 +111,24 @@ class DateTransformationPairStartAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="market") -> dm.EdgeList:
+        """Retrieve one or more start edges by id(s) of a date transformation pair.
+
+        Args:
+            external_id: External id or list of external ids source date transformation pair.
+            space: The space where all the start edges are located.
+
+        Returns:
+            The requested start edges.
+
+        Examples:
+
+            Retrieve start edge by id:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> date_transformation_pair = client.date_transformation_pair.start.retrieve("my_start")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -99,6 +155,26 @@ class DateTransformationPairStartAPI:
     def list(
         self, date_transformation_pair_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="market"
     ) -> dm.EdgeList:
+        """List start edges of a date transformation pair.
+
+        Args:
+            date_transformation_pair_id: Id of the source date transformation pair.
+            limit: Maximum number of start edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the start edges are located.
+
+        Returns:
+            The requested start edges.
+
+        Examples:
+
+            List 5 start edges connected to "my_date_transformation_pair":
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> date_transformation_pair = client.date_transformation_pair.start.list("my_date_transformation_pair", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(

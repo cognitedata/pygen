@@ -626,6 +626,24 @@ class AssetChildrenAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="tutorial_apm_simple") -> dm.EdgeList:
+        """Retrieve one or more children edges by id(s) of a asset.
+
+        Args:
+            external_id: External id or list of external ids source asset.
+            space: The space where all the child edges are located.
+
+        Returns:
+            The requested child edges.
+
+        Examples:
+
+            Retrieve children edge by id:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> asset = client.asset.children.retrieve("my_children")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -648,6 +666,26 @@ class AssetChildrenAPI:
     def list(
         self, asset_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="tutorial_apm_simple"
     ) -> dm.EdgeList:
+        """List children edges of a asset.
+
+        Args:
+            asset_id: Id of the source asset.
+            limit: Maximum number of child edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the child edges are located.
+
+        Returns:
+            The requested child edges.
+
+        Examples:
+
+            List 5 children edges connected to "my_asset":
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> asset = client.asset.children.list("my_asset", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -671,6 +709,24 @@ class AssetInModelAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="cdf_3d_schema") -> dm.EdgeList:
+        """Retrieve one or more in_model_3_d edges by id(s) of a asset.
+
+        Args:
+            external_id: External id or list of external ids source asset.
+            space: The space where all the in model 3 d edges are located.
+
+        Returns:
+            The requested in model 3 d edges.
+
+        Examples:
+
+            Retrieve in_model_3_d edge by id:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> asset = client.asset.in_model_3_d.retrieve("my_in_model_3_d")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -693,6 +749,26 @@ class AssetInModelAPI:
     def list(
         self, asset_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="cdf_3d_schema"
     ) -> dm.EdgeList:
+        """List in_model_3_d edges of a asset.
+
+        Args:
+            asset_id: Id of the source asset.
+            limit: Maximum number of in model 3 d edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the in model 3 d edges are located.
+
+        Returns:
+            The requested in model 3 d edges.
+
+        Examples:
+
+            List 5 in_model_3_d edges connected to "my_asset":
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> asset = client.asset.in_model_3_d.list("my_asset", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(

@@ -25,6 +25,24 @@ class WgsCoordinatesFeaturesAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more features edges by id(s) of a wgs 84 coordinate.
+
+        Args:
+            external_id: External id or list of external ids source wgs 84 coordinate.
+            space: The space where all the feature edges are located.
+
+        Returns:
+            The requested feature edges.
+
+        Examples:
+
+            Retrieve features edge by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wgs_84_coordinate = client.wgs_84_coordinates.features.retrieve("my_features")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -54,6 +72,26 @@ class WgsCoordinatesFeaturesAPI:
         limit=DEFAULT_LIMIT_READ,
         space="IntegrationTestsImmutable",
     ) -> dm.EdgeList:
+        """List features edges of a wgs 84 coordinate.
+
+        Args:
+            wgs_84_coordinate_id: Id of the source wgs 84 coordinate.
+            limit: Maximum number of feature edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the feature edges are located.
+
+        Returns:
+            The requested feature edges.
+
+        Examples:
+
+            List 5 features edges connected to "my_wgs_84_coordinate":
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wgs_84_coordinate = client.wgs_84_coordinates.features.list("my_wgs_84_coordinate", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(

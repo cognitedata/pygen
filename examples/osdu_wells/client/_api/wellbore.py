@@ -25,6 +25,24 @@ class WellboreMetaAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more meta edges by id(s) of a wellbore.
+
+        Args:
+            external_id: External id or list of external ids source wellbore.
+            space: The space where all the meta edges are located.
+
+        Returns:
+            The requested meta edges.
+
+        Examples:
+
+            Retrieve meta edge by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore = client.wellbore.meta.retrieve("my_meta")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -47,6 +65,26 @@ class WellboreMetaAPI:
     def list(
         self, wellbore_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="IntegrationTestsImmutable"
     ) -> dm.EdgeList:
+        """List meta edges of a wellbore.
+
+        Args:
+            wellbore_id: Id of the source wellbore.
+            limit: Maximum number of meta edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the meta edges are located.
+
+        Returns:
+            The requested meta edges.
+
+        Examples:
+
+            List 5 meta edges connected to "my_wellbore":
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore = client.wellbore.meta.list("my_wellbore", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(

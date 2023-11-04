@@ -25,6 +25,24 @@ class MovieActorsAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more actors edges by id(s) of a movie.
+
+        Args:
+            external_id: External id or list of external ids source movie.
+            space: The space where all the actor edges are located.
+
+        Returns:
+            The requested actor edges.
+
+        Examples:
+
+            Retrieve actors edge by id:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> movie = client.movie.actors.retrieve("my_actors")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -47,6 +65,26 @@ class MovieActorsAPI:
     def list(
         self, movie_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="IntegrationTestsImmutable"
     ) -> dm.EdgeList:
+        """List actors edges of a movie.
+
+        Args:
+            movie_id: Id of the source movie.
+            limit: Maximum number of actor edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the actor edges are located.
+
+        Returns:
+            The requested actor edges.
+
+        Examples:
+
+            List 5 actors edges connected to "my_movie":
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> movie = client.movie.actors.list("my_movie", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -70,6 +108,24 @@ class MovieDirectorsAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more directors edges by id(s) of a movie.
+
+        Args:
+            external_id: External id or list of external ids source movie.
+            space: The space where all the director edges are located.
+
+        Returns:
+            The requested director edges.
+
+        Examples:
+
+            Retrieve directors edge by id:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> movie = client.movie.directors.retrieve("my_directors")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -92,6 +148,26 @@ class MovieDirectorsAPI:
     def list(
         self, movie_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="IntegrationTestsImmutable"
     ) -> dm.EdgeList:
+        """List directors edges of a movie.
+
+        Args:
+            movie_id: Id of the source movie.
+            limit: Maximum number of director edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the director edges are located.
+
+        Returns:
+            The requested director edges.
+
+        Examples:
+
+            List 5 directors edges connected to "my_movie":
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> movie = client.movie.directors.list("my_movie", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(

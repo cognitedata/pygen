@@ -25,6 +25,24 @@ class PersonRolesAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more roles edges by id(s) of a person.
+
+        Args:
+            external_id: External id or list of external ids source person.
+            space: The space where all the role edges are located.
+
+        Returns:
+            The requested role edges.
+
+        Examples:
+
+            Retrieve roles edge by id:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> person = client.person.roles.retrieve("my_roles")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -47,6 +65,26 @@ class PersonRolesAPI:
     def list(
         self, person_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="IntegrationTestsImmutable"
     ) -> dm.EdgeList:
+        """List roles edges of a person.
+
+        Args:
+            person_id: Id of the source person.
+            limit: Maximum number of role edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the role edges are located.
+
+        Returns:
+            The requested role edges.
+
+        Examples:
+
+            List 5 roles edges connected to "my_person":
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> person = client.person.roles.list("my_person", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(

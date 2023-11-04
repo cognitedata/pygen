@@ -25,6 +25,24 @@ class TechnicalAssurancesAcceptableUsageAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more acceptable_usage edges by id(s) of a technical assurance.
+
+        Args:
+            external_id: External id or list of external ids source technical assurance.
+            space: The space where all the acceptable usage edges are located.
+
+        Returns:
+            The requested acceptable usage edges.
+
+        Examples:
+
+            Retrieve acceptable_usage edge by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> technical_assurance = client.technical_assurances.acceptable_usage.retrieve("my_acceptable_usage")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -54,6 +72,26 @@ class TechnicalAssurancesAcceptableUsageAPI:
         limit=DEFAULT_LIMIT_READ,
         space="IntegrationTestsImmutable",
     ) -> dm.EdgeList:
+        """List acceptable_usage edges of a technical assurance.
+
+        Args:
+            technical_assurance_id: Id of the source technical assurance.
+            limit: Maximum number of acceptable usage edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the acceptable usage edges are located.
+
+        Returns:
+            The requested acceptable usage edges.
+
+        Examples:
+
+            List 5 acceptable_usage edges connected to "my_technical_assurance":
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> technical_assurance = client.technical_assurances.acceptable_usage.list("my_technical_assurance", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -79,6 +117,24 @@ class TechnicalAssurancesReviewersAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more reviewers edges by id(s) of a technical assurance.
+
+        Args:
+            external_id: External id or list of external ids source technical assurance.
+            space: The space where all the reviewer edges are located.
+
+        Returns:
+            The requested reviewer edges.
+
+        Examples:
+
+            Retrieve reviewers edge by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> technical_assurance = client.technical_assurances.reviewers.retrieve("my_reviewers")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -108,6 +164,26 @@ class TechnicalAssurancesReviewersAPI:
         limit=DEFAULT_LIMIT_READ,
         space="IntegrationTestsImmutable",
     ) -> dm.EdgeList:
+        """List reviewers edges of a technical assurance.
+
+        Args:
+            technical_assurance_id: Id of the source technical assurance.
+            limit: Maximum number of reviewer edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the reviewer edges are located.
+
+        Returns:
+            The requested reviewer edges.
+
+        Examples:
+
+            List 5 reviewers edges connected to "my_technical_assurance":
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> technical_assurance = client.technical_assurances.reviewers.list("my_technical_assurance", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -133,6 +209,24 @@ class TechnicalAssurancesUnacceptableUsageAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more unacceptable_usage edges by id(s) of a technical assurance.
+
+        Args:
+            external_id: External id or list of external ids source technical assurance.
+            space: The space where all the unacceptable usage edges are located.
+
+        Returns:
+            The requested unacceptable usage edges.
+
+        Examples:
+
+            Retrieve unacceptable_usage edge by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> technical_assurance = client.technical_assurances.unacceptable_usage.retrieve("my_unacceptable_usage")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -162,6 +256,26 @@ class TechnicalAssurancesUnacceptableUsageAPI:
         limit=DEFAULT_LIMIT_READ,
         space="IntegrationTestsImmutable",
     ) -> dm.EdgeList:
+        """List unacceptable_usage edges of a technical assurance.
+
+        Args:
+            technical_assurance_id: Id of the source technical assurance.
+            limit: Maximum number of unacceptable usage edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the unacceptable usage edges are located.
+
+        Returns:
+            The requested unacceptable usage edges.
+
+        Examples:
+
+            List 5 unacceptable_usage edges connected to "my_technical_assurance":
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> technical_assurance = client.technical_assurances.unacceptable_usage.list("my_technical_assurance", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(

@@ -25,6 +25,24 @@ class WorkItemLinkedAssetsAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="tutorial_apm_simple") -> dm.EdgeList:
+        """Retrieve one or more linked_assets edges by id(s) of a work item.
+
+        Args:
+            external_id: External id or list of external ids source work item.
+            space: The space where all the linked asset edges are located.
+
+        Returns:
+            The requested linked asset edges.
+
+        Examples:
+
+            Retrieve linked_assets edge by id:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> work_item = client.work_item.linked_assets.retrieve("my_linked_assets")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -49,6 +67,26 @@ class WorkItemLinkedAssetsAPI:
     def list(
         self, work_item_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="tutorial_apm_simple"
     ) -> dm.EdgeList:
+        """List linked_assets edges of a work item.
+
+        Args:
+            work_item_id: Id of the source work item.
+            limit: Maximum number of linked asset edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the linked asset edges are located.
+
+        Returns:
+            The requested linked asset edges.
+
+        Examples:
+
+            List 5 linked_assets edges connected to "my_work_item":
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> work_item = client.work_item.linked_assets.list("my_work_item", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(

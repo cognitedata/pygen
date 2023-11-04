@@ -24,10 +24,10 @@ class {{ field.edge_api_class }}:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="{{ field.prop.type.space }}") -> dm.EdgeList:
-        """Retrieve one or more {{field.edge_api_attribute}} edges by id(s) of {{ data_class.doc_name }}.
+        """Retrieve one or more {{field.edge_api_attribute}} edges by id(s) of a {{ data_class.doc_name }}.
 
         Args:
-            external_id: External id or list of external ids of the {{ field.doc_name }} edges.
+            external_id: External id or list of external ids source {{ data_class.doc_name }}.
             space: The space where all the {{ field.doc_name }} edges are located.
 
         Returns:
@@ -62,10 +62,10 @@ class {{ field.edge_api_class }}:
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_{{ data_class.variable_list }}))
 
     def list(self, {{ data_class.variable }}_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="{{ field.prop.type.space }}") -> dm.EdgeList:
-        """List {{field.edge_api_attribute}} edges of {{ data_class.doc_name }}.
+        """List {{field.edge_api_attribute}} edges of a {{ data_class.doc_name }}.
 
         Args:
-            {{ data_class.variable }}_id: Id of the source {{ data_class.name }}.
+            {{ data_class.variable }}_id: Id of the source {{ data_class.doc_name }}.
             limit: Maximum number of {{ field.doc_name }} edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
             space: The space where all the {{ field.doc_name }} edges are located.

@@ -25,6 +25,24 @@ class WellboreTrajectoryDataArtefactsAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more artefacts edges by id(s) of a wellbore trajectory datum.
+
+        Args:
+            external_id: External id or list of external ids source wellbore trajectory datum.
+            space: The space where all the artefact edges are located.
+
+        Returns:
+            The requested artefact edges.
+
+        Examples:
+
+            Retrieve artefacts edge by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_trajectory_datum = client.wellbore_trajectory_data.artefacts.retrieve("my_artefacts")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -54,6 +72,26 @@ class WellboreTrajectoryDataArtefactsAPI:
         limit=DEFAULT_LIMIT_READ,
         space="IntegrationTestsImmutable",
     ) -> dm.EdgeList:
+        """List artefacts edges of a wellbore trajectory datum.
+
+        Args:
+            wellbore_trajectory_datum_id: Id of the source wellbore trajectory datum.
+            limit: Maximum number of artefact edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the artefact edges are located.
+
+        Returns:
+            The requested artefact edges.
+
+        Examples:
+
+            List 5 artefacts edges connected to "my_wellbore_trajectory_datum":
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_trajectory_datum = client.wellbore_trajectory_data.artefacts.list("my_wellbore_trajectory_datum", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -81,6 +119,24 @@ class WellboreTrajectoryDataAvailableTrajectoryStationPropertiesAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more available_trajectory_station_properties edges by id(s) of a wellbore trajectory datum.
+
+        Args:
+            external_id: External id or list of external ids source wellbore trajectory datum.
+            space: The space where all the available trajectory station property edges are located.
+
+        Returns:
+            The requested available trajectory station property edges.
+
+        Examples:
+
+            Retrieve available_trajectory_station_properties edge by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_trajectory_datum = client.wellbore_trajectory_data.available_trajectory_station_properties.retrieve("my_available_trajectory_station_properties")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -110,6 +166,26 @@ class WellboreTrajectoryDataAvailableTrajectoryStationPropertiesAPI:
         limit=DEFAULT_LIMIT_READ,
         space="IntegrationTestsImmutable",
     ) -> dm.EdgeList:
+        """List available_trajectory_station_properties edges of a wellbore trajectory datum.
+
+        Args:
+            wellbore_trajectory_datum_id: Id of the source wellbore trajectory datum.
+            limit: Maximum number of available trajectory station property edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the available trajectory station property edges are located.
+
+        Returns:
+            The requested available trajectory station property edges.
+
+        Examples:
+
+            List 5 available_trajectory_station_properties edges connected to "my_wellbore_trajectory_datum":
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_trajectory_datum = client.wellbore_trajectory_data.available_trajectory_station_properties.list("my_wellbore_trajectory_datum", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -137,6 +213,24 @@ class WellboreTrajectoryDataGeoContextsAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more geo_contexts edges by id(s) of a wellbore trajectory datum.
+
+        Args:
+            external_id: External id or list of external ids source wellbore trajectory datum.
+            space: The space where all the geo context edges are located.
+
+        Returns:
+            The requested geo context edges.
+
+        Examples:
+
+            Retrieve geo_contexts edge by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_trajectory_datum = client.wellbore_trajectory_data.geo_contexts.retrieve("my_geo_contexts")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -166,6 +260,26 @@ class WellboreTrajectoryDataGeoContextsAPI:
         limit=DEFAULT_LIMIT_READ,
         space="IntegrationTestsImmutable",
     ) -> dm.EdgeList:
+        """List geo_contexts edges of a wellbore trajectory datum.
+
+        Args:
+            wellbore_trajectory_datum_id: Id of the source wellbore trajectory datum.
+            limit: Maximum number of geo context edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the geo context edges are located.
+
+        Returns:
+            The requested geo context edges.
+
+        Examples:
+
+            List 5 geo_contexts edges connected to "my_wellbore_trajectory_datum":
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_trajectory_datum = client.wellbore_trajectory_data.geo_contexts.list("my_wellbore_trajectory_datum", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -193,6 +307,24 @@ class WellboreTrajectoryDataLineageAssertionsAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more lineage_assertions edges by id(s) of a wellbore trajectory datum.
+
+        Args:
+            external_id: External id or list of external ids source wellbore trajectory datum.
+            space: The space where all the lineage assertion edges are located.
+
+        Returns:
+            The requested lineage assertion edges.
+
+        Examples:
+
+            Retrieve lineage_assertions edge by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_trajectory_datum = client.wellbore_trajectory_data.lineage_assertions.retrieve("my_lineage_assertions")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -222,6 +354,26 @@ class WellboreTrajectoryDataLineageAssertionsAPI:
         limit=DEFAULT_LIMIT_READ,
         space="IntegrationTestsImmutable",
     ) -> dm.EdgeList:
+        """List lineage_assertions edges of a wellbore trajectory datum.
+
+        Args:
+            wellbore_trajectory_datum_id: Id of the source wellbore trajectory datum.
+            limit: Maximum number of lineage assertion edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the lineage assertion edges are located.
+
+        Returns:
+            The requested lineage assertion edges.
+
+        Examples:
+
+            List 5 lineage_assertions edges connected to "my_wellbore_trajectory_datum":
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_trajectory_datum = client.wellbore_trajectory_data.lineage_assertions.list("my_wellbore_trajectory_datum", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -249,6 +401,24 @@ class WellboreTrajectoryDataNameAliasesAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more name_aliases edges by id(s) of a wellbore trajectory datum.
+
+        Args:
+            external_id: External id or list of external ids source wellbore trajectory datum.
+            space: The space where all the name alias edges are located.
+
+        Returns:
+            The requested name alias edges.
+
+        Examples:
+
+            Retrieve name_aliases edge by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_trajectory_datum = client.wellbore_trajectory_data.name_aliases.retrieve("my_name_aliases")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -278,6 +448,26 @@ class WellboreTrajectoryDataNameAliasesAPI:
         limit=DEFAULT_LIMIT_READ,
         space="IntegrationTestsImmutable",
     ) -> dm.EdgeList:
+        """List name_aliases edges of a wellbore trajectory datum.
+
+        Args:
+            wellbore_trajectory_datum_id: Id of the source wellbore trajectory datum.
+            limit: Maximum number of name alias edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the name alias edges are located.
+
+        Returns:
+            The requested name alias edges.
+
+        Examples:
+
+            List 5 name_aliases edges connected to "my_wellbore_trajectory_datum":
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_trajectory_datum = client.wellbore_trajectory_data.name_aliases.list("my_wellbore_trajectory_datum", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -305,6 +495,24 @@ class WellboreTrajectoryDataTechnicalAssurancesAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more technical_assurances edges by id(s) of a wellbore trajectory datum.
+
+        Args:
+            external_id: External id or list of external ids source wellbore trajectory datum.
+            space: The space where all the technical assurance edges are located.
+
+        Returns:
+            The requested technical assurance edges.
+
+        Examples:
+
+            Retrieve technical_assurances edge by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_trajectory_datum = client.wellbore_trajectory_data.technical_assurances.retrieve("my_technical_assurances")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -334,6 +542,26 @@ class WellboreTrajectoryDataTechnicalAssurancesAPI:
         limit=DEFAULT_LIMIT_READ,
         space="IntegrationTestsImmutable",
     ) -> dm.EdgeList:
+        """List technical_assurances edges of a wellbore trajectory datum.
+
+        Args:
+            wellbore_trajectory_datum_id: Id of the source wellbore trajectory datum.
+            limit: Maximum number of technical assurance edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the technical assurance edges are located.
+
+        Returns:
+            The requested technical assurance edges.
+
+        Examples:
+
+            List 5 technical_assurances edges connected to "my_wellbore_trajectory_datum":
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_trajectory_datum = client.wellbore_trajectory_data.technical_assurances.list("my_wellbore_trajectory_datum", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(

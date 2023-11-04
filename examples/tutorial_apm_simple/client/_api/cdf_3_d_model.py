@@ -25,6 +25,24 @@ class CdfModelEntitiesAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="cdf_3d_schema") -> dm.EdgeList:
+        """Retrieve one or more entities edges by id(s) of a cdf 3 d model.
+
+        Args:
+            external_id: External id or list of external ids source cdf 3 d model.
+            space: The space where all the entity edges are located.
+
+        Returns:
+            The requested entity edges.
+
+        Examples:
+
+            Retrieve entities edge by id:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> cdf_3_d_model = client.cdf_3_d_model.entities.retrieve("my_entities")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -51,6 +69,26 @@ class CdfModelEntitiesAPI:
     def list(
         self, cdf_3_d_model_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="cdf_3d_schema"
     ) -> dm.EdgeList:
+        """List entities edges of a cdf 3 d model.
+
+        Args:
+            cdf_3_d_model_id: Id of the source cdf 3 d model.
+            limit: Maximum number of entity edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the entity edges are located.
+
+        Returns:
+            The requested entity edges.
+
+        Examples:
+
+            List 5 entities edges connected to "my_cdf_3_d_model":
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> cdf_3_d_model = client.cdf_3_d_model.entities.list("my_cdf_3_d_model", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(

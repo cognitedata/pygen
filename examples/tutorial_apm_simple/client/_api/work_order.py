@@ -26,6 +26,24 @@ class WorkOrderLinkedAssetsAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="tutorial_apm_simple") -> dm.EdgeList:
+        """Retrieve one or more linked_assets edges by id(s) of a work order.
+
+        Args:
+            external_id: External id or list of external ids source work order.
+            space: The space where all the linked asset edges are located.
+
+        Returns:
+            The requested linked asset edges.
+
+        Examples:
+
+            Retrieve linked_assets edge by id:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> work_order = client.work_order.linked_assets.retrieve("my_linked_assets")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -52,6 +70,26 @@ class WorkOrderLinkedAssetsAPI:
     def list(
         self, work_order_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="tutorial_apm_simple"
     ) -> dm.EdgeList:
+        """List linked_assets edges of a work order.
+
+        Args:
+            work_order_id: Id of the source work order.
+            limit: Maximum number of linked asset edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the linked asset edges are located.
+
+        Returns:
+            The requested linked asset edges.
+
+        Examples:
+
+            List 5 linked_assets edges connected to "my_work_order":
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> work_order = client.work_order.linked_assets.list("my_work_order", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -75,6 +113,24 @@ class WorkOrderWorkItemsAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="tutorial_apm_simple") -> dm.EdgeList:
+        """Retrieve one or more work_items edges by id(s) of a work order.
+
+        Args:
+            external_id: External id or list of external ids source work order.
+            space: The space where all the work item edges are located.
+
+        Returns:
+            The requested work item edges.
+
+        Examples:
+
+            Retrieve work_items edge by id:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> work_order = client.work_order.work_items.retrieve("my_work_items")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -101,6 +157,26 @@ class WorkOrderWorkItemsAPI:
     def list(
         self, work_order_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="tutorial_apm_simple"
     ) -> dm.EdgeList:
+        """List work_items edges of a work order.
+
+        Args:
+            work_order_id: Id of the source work order.
+            limit: Maximum number of work item edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the work item edges are located.
+
+        Returns:
+            The requested work item edges.
+
+        Examples:
+
+            List 5 work_items edges connected to "my_work_order":
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> work_order = client.work_order.work_items.list("my_work_order", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
