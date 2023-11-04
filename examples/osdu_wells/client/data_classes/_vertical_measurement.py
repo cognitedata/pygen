@@ -62,6 +62,31 @@ _VERTICALMEASUREMENT_PROPERTIES_BY_FIELD = {
 
 
 class VerticalMeasurement(DomainModel):
+    """This represent a read version of vertical measurement.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the vertical measurement.
+        effective_date_time: The effective date time field.
+        termination_date_time: The termination date time field.
+        vertical_crsid: The vertical crsid field.
+        vertical_measurement: The vertical measurement field.
+        vertical_measurement_description: The vertical measurement description field.
+        vertical_measurement_path_id: The vertical measurement path id field.
+        vertical_measurement_source_id: The vertical measurement source id field.
+        vertical_measurement_type_id: The vertical measurement type id field.
+        vertical_measurement_unit_of_measure_id: The vertical measurement unit of measure id field.
+        vertical_reference_entity_id: The vertical reference entity id field.
+        vertical_reference_id: The vertical reference id field.
+        wellbore_tvd_trajectory_id: The wellbore tvd trajectory id field.
+        created_time: The created time of the vertical measurement node.
+        last_updated_time: The last updated time of the vertical measurement node.
+        deleted_time: If present, the deleted time of the vertical measurement node.
+        version: The version of the vertical measurement node.
+    """
+
     space: str = "IntegrationTestsImmutable"
     effective_date_time: Optional[str] = Field(None, alias="EffectiveDateTime")
     termination_date_time: Optional[str] = Field(None, alias="TerminationDateTime")
@@ -77,6 +102,7 @@ class VerticalMeasurement(DomainModel):
     wellbore_tvd_trajectory_id: Optional[str] = Field(None, alias="WellboreTVDTrajectoryID")
 
     def as_apply(self) -> VerticalMeasurementApply:
+        """Convert this read version of vertical measurement to a write version."""
         return VerticalMeasurementApply(
             space=self.space,
             external_id=self.external_id,
@@ -96,6 +122,31 @@ class VerticalMeasurement(DomainModel):
 
 
 class VerticalMeasurementApply(DomainModelApply):
+    """This represent a write version of vertical measurement.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the vertical measurement.
+        effective_date_time: The effective date time field.
+        termination_date_time: The termination date time field.
+        vertical_crsid: The vertical crsid field.
+        vertical_measurement: The vertical measurement field.
+        vertical_measurement_description: The vertical measurement description field.
+        vertical_measurement_path_id: The vertical measurement path id field.
+        vertical_measurement_source_id: The vertical measurement source id field.
+        vertical_measurement_type_id: The vertical measurement type id field.
+        vertical_measurement_unit_of_measure_id: The vertical measurement unit of measure id field.
+        vertical_reference_entity_id: The vertical reference entity id field.
+        vertical_reference_id: The vertical reference id field.
+        wellbore_tvd_trajectory_id: The wellbore tvd trajectory id field.
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "IntegrationTestsImmutable"
     effective_date_time: Optional[str] = Field(None, alias="EffectiveDateTime")
     termination_date_time: Optional[str] = Field(None, alias="TerminationDateTime")
@@ -164,11 +215,16 @@ class VerticalMeasurementApply(DomainModelApply):
 
 
 class VerticalMeasurementList(TypeList[VerticalMeasurement]):
+    """List of vertical measurements in read version."""
+
     _NODE = VerticalMeasurement
 
     def as_apply(self) -> VerticalMeasurementApplyList:
+        """Convert this read version of vertical measurement to a write version."""
         return VerticalMeasurementApplyList([node.as_apply() for node in self.data])
 
 
 class VerticalMeasurementApplyList(TypeApplyList[VerticalMeasurementApply]):
+    """List of vertical measurements in write version."""
+
     _NODE = VerticalMeasurementApply

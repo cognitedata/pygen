@@ -27,6 +27,25 @@ _PYGENBID_PROPERTIES_BY_FIELD = {
 
 
 class PygenBid(DomainModel):
+    """This represent a read version of pygen bid.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the pygen bid.
+        date: The date field.
+        is_block: The is block field.
+        market: The market field.
+        minimum_price: The minimum price field.
+        name: The name field.
+        price_premium: The price premium field.
+        created_time: The created time of the pygen bid node.
+        last_updated_time: The last updated time of the pygen bid node.
+        deleted_time: If present, the deleted time of the pygen bid node.
+        version: The version of the pygen bid node.
+    """
+
     space: str = "market"
     date: Optional[datetime.date] = None
     is_block: Optional[bool] = Field(None, alias="isBlock")
@@ -36,6 +55,7 @@ class PygenBid(DomainModel):
     price_premium: Optional[float] = Field(None, alias="pricePremium")
 
     def as_apply(self) -> PygenBidApply:
+        """Convert this read version of pygen bid to a write version."""
         return PygenBidApply(
             space=self.space,
             external_id=self.external_id,
@@ -49,6 +69,25 @@ class PygenBid(DomainModel):
 
 
 class PygenBidApply(DomainModelApply):
+    """This represent a write version of pygen bid.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the pygen bid.
+        date: The date field.
+        is_block: The is block field.
+        market: The market field.
+        minimum_price: The minimum price field.
+        name: The name field.
+        price_premium: The price premium field.
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "market"
     date: Optional[datetime.date] = None
     is_block: Optional[bool] = Field(None, alias="isBlock")
@@ -107,11 +146,16 @@ class PygenBidApply(DomainModelApply):
 
 
 class PygenBidList(TypeList[PygenBid]):
+    """List of pygen bids in read version."""
+
     _NODE = PygenBid
 
     def as_apply(self) -> PygenBidApplyList:
+        """Convert this read version of pygen bid to a write version."""
         return PygenBidApplyList([node.as_apply() for node in self.data])
 
 
 class PygenBidApplyList(TypeApplyList[PygenBidApply]):
+    """List of pygen bids in write version."""
+
     _NODE = PygenBidApply

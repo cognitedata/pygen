@@ -19,11 +19,27 @@ _RATING_PROPERTIES_BY_FIELD = {
 
 
 class Rating(DomainModel):
+    """This represent a read version of rating.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the rating.
+        score: The score field.
+        votes: The vote field.
+        created_time: The created time of the rating node.
+        last_updated_time: The last updated time of the rating node.
+        deleted_time: If present, the deleted time of the rating node.
+        version: The version of the rating node.
+    """
+
     space: str = "IntegrationTestsImmutable"
     score: Optional[str] = None
     votes: Optional[str] = None
 
     def as_apply(self) -> RatingApply:
+        """Convert this read version of rating to a write version."""
         return RatingApply(
             space=self.space,
             external_id=self.external_id,
@@ -33,6 +49,21 @@ class Rating(DomainModel):
 
 
 class RatingApply(DomainModelApply):
+    """This represent a write version of rating.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the rating.
+        score: The score field.
+        votes: The vote field.
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "IntegrationTestsImmutable"
     score: Optional[str] = None
     votes: Optional[str] = None
@@ -71,11 +102,16 @@ class RatingApply(DomainModelApply):
 
 
 class RatingList(TypeList[Rating]):
+    """List of ratings in read version."""
+
     _NODE = Rating
 
     def as_apply(self) -> RatingApplyList:
+        """Convert this read version of rating to a write version."""
         return RatingApplyList([node.as_apply() for node in self.data])
 
 
 class RatingApplyList(TypeApplyList[RatingApply]):
+    """List of ratings in write version."""
+
     _NODE = RatingApply

@@ -28,12 +28,29 @@ _ARTEFACTS_PROPERTIES_BY_FIELD = {
 
 
 class Artefacts(DomainModel):
+    """This represent a read version of artefact.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the artefact.
+        resource_id: The resource id field.
+        resource_kind: The resource kind field.
+        role_id: The role id field.
+        created_time: The created time of the artefact node.
+        last_updated_time: The last updated time of the artefact node.
+        deleted_time: If present, the deleted time of the artefact node.
+        version: The version of the artefact node.
+    """
+
     space: str = "IntegrationTestsImmutable"
     resource_id: Optional[str] = Field(None, alias="ResourceID")
     resource_kind: Optional[str] = Field(None, alias="ResourceKind")
     role_id: Optional[str] = Field(None, alias="RoleID")
 
     def as_apply(self) -> ArtefactsApply:
+        """Convert this read version of artefact to a write version."""
         return ArtefactsApply(
             space=self.space,
             external_id=self.external_id,
@@ -44,6 +61,22 @@ class Artefacts(DomainModel):
 
 
 class ArtefactsApply(DomainModelApply):
+    """This represent a write version of artefact.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the artefact.
+        resource_id: The resource id field.
+        resource_kind: The resource kind field.
+        role_id: The role id field.
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "IntegrationTestsImmutable"
     resource_id: Optional[str] = Field(None, alias="ResourceID")
     resource_kind: Optional[str] = Field(None, alias="ResourceKind")
@@ -85,11 +118,16 @@ class ArtefactsApply(DomainModelApply):
 
 
 class ArtefactsList(TypeList[Artefacts]):
+    """List of artefacts in read version."""
+
     _NODE = Artefacts
 
     def as_apply(self) -> ArtefactsApplyList:
+        """Convert this read version of artefact to a write version."""
         return ArtefactsApplyList([node.as_apply() for node in self.data])
 
 
 class ArtefactsApplyList(TypeApplyList[ArtefactsApply]):
+    """List of artefacts in write version."""
+
     _NODE = ArtefactsApply

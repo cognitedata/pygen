@@ -27,11 +27,27 @@ _LINEAGEASSERTIONS_PROPERTIES_BY_FIELD = {
 
 
 class LineageAssertions(DomainModel):
+    """This represent a read version of lineage assertion.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the lineage assertion.
+        id: The id field.
+        lineage_relationship_type: The lineage relationship type field.
+        created_time: The created time of the lineage assertion node.
+        last_updated_time: The last updated time of the lineage assertion node.
+        deleted_time: If present, the deleted time of the lineage assertion node.
+        version: The version of the lineage assertion node.
+    """
+
     space: str = "IntegrationTestsImmutable"
     id: Optional[str] = Field(None, alias="ID")
     lineage_relationship_type: Optional[str] = Field(None, alias="LineageRelationshipType")
 
     def as_apply(self) -> LineageAssertionsApply:
+        """Convert this read version of lineage assertion to a write version."""
         return LineageAssertionsApply(
             space=self.space,
             external_id=self.external_id,
@@ -41,6 +57,21 @@ class LineageAssertions(DomainModel):
 
 
 class LineageAssertionsApply(DomainModelApply):
+    """This represent a write version of lineage assertion.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the lineage assertion.
+        id: The id field.
+        lineage_relationship_type: The lineage relationship type field.
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "IntegrationTestsImmutable"
     id: Optional[str] = Field(None, alias="ID")
     lineage_relationship_type: Optional[str] = Field(None, alias="LineageRelationshipType")
@@ -79,11 +110,16 @@ class LineageAssertionsApply(DomainModelApply):
 
 
 class LineageAssertionsList(TypeList[LineageAssertions]):
+    """List of lineage assertions in read version."""
+
     _NODE = LineageAssertions
 
     def as_apply(self) -> LineageAssertionsApplyList:
+        """Convert this read version of lineage assertion to a write version."""
         return LineageAssertionsApplyList([node.as_apply() for node in self.data])
 
 
 class LineageAssertionsApplyList(TypeApplyList[LineageAssertionsApply]):
+    """List of lineage assertions in write version."""
+
     _NODE = LineageAssertionsApply

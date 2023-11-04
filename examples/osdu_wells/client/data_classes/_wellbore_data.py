@@ -161,6 +161,74 @@ _WELLBOREDATA_PROPERTIES_BY_FIELD = {
 
 
 class WellboreData(DomainModel):
+    """This represent a read version of wellbore datum.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the wellbore datum.
+        business_intention_id: The business intention id field.
+        condition_id: The condition id field.
+        current_operator_id: The current operator id field.
+        data_source_organisation_id: The data source organisation id field.
+        default_vertical_measurement_id: The default vertical measurement id field.
+        definitive_trajectory_id: The definitive trajectory id field.
+        drilling_reasons: The drilling reason field.
+        existence_kind: The existence kind field.
+        facility_description: The facility description field.
+        facility_events: The facility event field.
+        facility_id: The facility id field.
+        facility_name: The facility name field.
+        facility_operators: The facility operator field.
+        facility_specifications: The facility specification field.
+        facility_states: The facility state field.
+        facility_type_id: The facility type id field.
+        fluid_direction_id: The fluid direction id field.
+        formation_name_at_total_depth: The formation name at total depth field.
+        geo_contexts: The geo context field.
+        geographic_bottom_hole_location: The geographic bottom hole location field.
+        historical_interests: The historical interest field.
+        initial_operator_id: The initial operator id field.
+        interest_type_id: The interest type id field.
+        kick_off_wellbore: The kick off wellbore field.
+        name_aliases: The name alias field.
+        operating_environment_id: The operating environment id field.
+        outcome_id: The outcome id field.
+        primary_product_type_id: The primary product type id field.
+        projected_bottom_hole_location: The projected bottom hole location field.
+        resource_curation_status: The resource curation status field.
+        resource_home_region_id: The resource home region id field.
+        resource_host_region_i_ds: The resource host region i d field.
+        resource_lifecycle_status: The resource lifecycle status field.
+        resource_security_classification: The resource security classification field.
+        role_id: The role id field.
+        secondary_product_type_id: The secondary product type id field.
+        sequence_number: The sequence number field.
+        show_product_type_id: The show product type id field.
+        source: The source field.
+        spatial_location: The spatial location field.
+        status_summary_id: The status summary id field.
+        target_formation: The target formation field.
+        technical_assurance_type_id: The technical assurance type id field.
+        technical_assurances: The technical assurance field.
+        tertiary_product_type_id: The tertiary product type id field.
+        trajectory_type_id: The trajectory type id field.
+        version_creation_reason: The version creation reason field.
+        vertical_measurements: The vertical measurement field.
+        was_business_interest_financial_non_operated: The was business interest financial non operated field.
+        was_business_interest_financial_operated: The was business interest financial operated field.
+        was_business_interest_obligatory: The was business interest obligatory field.
+        was_business_interest_technical: The was business interest technical field.
+        well_id: The well id field.
+        wellbore_costs: The wellbore cost field.
+        wellbore_reason_id: The wellbore reason id field.
+        created_time: The created time of the wellbore datum node.
+        last_updated_time: The last updated time of the wellbore datum node.
+        deleted_time: If present, the deleted time of the wellbore datum node.
+        version: The version of the wellbore datum node.
+    """
+
     space: str = "IntegrationTestsImmutable"
     business_intention_id: Optional[str] = Field(None, alias="BusinessIntentionID")
     condition_id: Optional[str] = Field(None, alias="ConditionID")
@@ -221,6 +289,7 @@ class WellboreData(DomainModel):
     wellbore_reason_id: Optional[str] = Field(None, alias="WellboreReasonID")
 
     def as_apply(self) -> WellboreDataApply:
+        """Convert this read version of wellbore datum to a write version."""
         return WellboreDataApply(
             space=self.space,
             external_id=self.external_id,
@@ -283,6 +352,74 @@ class WellboreData(DomainModel):
 
 
 class WellboreDataApply(DomainModelApply):
+    """This represent a write version of wellbore datum.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the wellbore datum.
+        business_intention_id: The business intention id field.
+        condition_id: The condition id field.
+        current_operator_id: The current operator id field.
+        data_source_organisation_id: The data source organisation id field.
+        default_vertical_measurement_id: The default vertical measurement id field.
+        definitive_trajectory_id: The definitive trajectory id field.
+        drilling_reasons: The drilling reason field.
+        existence_kind: The existence kind field.
+        facility_description: The facility description field.
+        facility_events: The facility event field.
+        facility_id: The facility id field.
+        facility_name: The facility name field.
+        facility_operators: The facility operator field.
+        facility_specifications: The facility specification field.
+        facility_states: The facility state field.
+        facility_type_id: The facility type id field.
+        fluid_direction_id: The fluid direction id field.
+        formation_name_at_total_depth: The formation name at total depth field.
+        geo_contexts: The geo context field.
+        geographic_bottom_hole_location: The geographic bottom hole location field.
+        historical_interests: The historical interest field.
+        initial_operator_id: The initial operator id field.
+        interest_type_id: The interest type id field.
+        kick_off_wellbore: The kick off wellbore field.
+        name_aliases: The name alias field.
+        operating_environment_id: The operating environment id field.
+        outcome_id: The outcome id field.
+        primary_product_type_id: The primary product type id field.
+        projected_bottom_hole_location: The projected bottom hole location field.
+        resource_curation_status: The resource curation status field.
+        resource_home_region_id: The resource home region id field.
+        resource_host_region_i_ds: The resource host region i d field.
+        resource_lifecycle_status: The resource lifecycle status field.
+        resource_security_classification: The resource security classification field.
+        role_id: The role id field.
+        secondary_product_type_id: The secondary product type id field.
+        sequence_number: The sequence number field.
+        show_product_type_id: The show product type id field.
+        source: The source field.
+        spatial_location: The spatial location field.
+        status_summary_id: The status summary id field.
+        target_formation: The target formation field.
+        technical_assurance_type_id: The technical assurance type id field.
+        technical_assurances: The technical assurance field.
+        tertiary_product_type_id: The tertiary product type id field.
+        trajectory_type_id: The trajectory type id field.
+        version_creation_reason: The version creation reason field.
+        vertical_measurements: The vertical measurement field.
+        was_business_interest_financial_non_operated: The was business interest financial non operated field.
+        was_business_interest_financial_operated: The was business interest financial operated field.
+        was_business_interest_obligatory: The was business interest obligatory field.
+        was_business_interest_technical: The was business interest technical field.
+        well_id: The well id field.
+        wellbore_costs: The wellbore cost field.
+        wellbore_reason_id: The wellbore reason id field.
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "IntegrationTestsImmutable"
     business_intention_id: Optional[str] = Field(None, alias="BusinessIntentionID")
     condition_id: Optional[str] = Field(None, alias="ConditionID")
@@ -817,11 +954,16 @@ class WellboreDataApply(DomainModelApply):
 
 
 class WellboreDataList(TypeList[WellboreData]):
+    """List of wellbore data in read version."""
+
     _NODE = WellboreData
 
     def as_apply(self) -> WellboreDataApplyList:
+        """Convert this read version of wellbore datum to a write version."""
         return WellboreDataApplyList([node.as_apply() for node in self.data])
 
 
 class WellboreDataApplyList(TypeApplyList[WellboreDataApply]):
+    """List of wellbore data in write version."""
+
     _NODE = WellboreDataApply

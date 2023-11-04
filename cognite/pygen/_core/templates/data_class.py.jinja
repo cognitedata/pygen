@@ -31,9 +31,9 @@ class {{ data_class.read_name }}(DomainModel):
         space: The space where the node is located.
         external_id: The external id of the {{ data_class.doc_name }}.{% for field in data_class %}
         {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
-        created_time: The created time of the {{ data_class.doc_name }}.
-        last_updated_time: The last updated time of the {{ data_class.doc_name }}.
-        deleted_time: If present, the deleted time of the {{ data_class.doc_name }}.
+        created_time: The created time of the {{ data_class.doc_name }} node.
+        last_updated_time: The last updated time of the {{ data_class.doc_name }} node.
+        deleted_time: If present, the deleted time of the {{ data_class.doc_name }} node.
         version: The version of the {{ data_class.doc_name }} node.
     """
     space: str = "{{ space }}"{% for field in data_class %}

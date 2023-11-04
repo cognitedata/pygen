@@ -53,6 +53,28 @@ _ASINGESTEDCOORDINATES_PROPERTIES_BY_FIELD = {
 
 
 class AsIngestedCoordinates(DomainModel):
+    """This represent a read version of as ingested coordinate.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the as ingested coordinate.
+        coordinate_reference_system_id: The coordinate reference system id field.
+        vertical_coordinate_reference_system_id: The vertical coordinate reference system id field.
+        vertical_unit_id: The vertical unit id field.
+        bbox: The bbox field.
+        features: The feature field.
+        persistable_reference_crs: The persistable reference cr field.
+        persistable_reference_unit_z: The persistable reference unit z field.
+        persistable_reference_vertical_crs: The persistable reference vertical cr field.
+        type: The type field.
+        created_time: The created time of the as ingested coordinate node.
+        last_updated_time: The last updated time of the as ingested coordinate node.
+        deleted_time: If present, the deleted time of the as ingested coordinate node.
+        version: The version of the as ingested coordinate node.
+    """
+
     space: str = "IntegrationTestsImmutable"
     coordinate_reference_system_id: Optional[str] = Field(None, alias="CoordinateReferenceSystemID")
     vertical_coordinate_reference_system_id: Optional[str] = Field(None, alias="VerticalCoordinateReferenceSystemID")
@@ -65,6 +87,7 @@ class AsIngestedCoordinates(DomainModel):
     type: Optional[str] = None
 
     def as_apply(self) -> AsIngestedCoordinatesApply:
+        """Convert this read version of as ingested coordinate to a write version."""
         return AsIngestedCoordinatesApply(
             space=self.space,
             external_id=self.external_id,
@@ -81,6 +104,28 @@ class AsIngestedCoordinates(DomainModel):
 
 
 class AsIngestedCoordinatesApply(DomainModelApply):
+    """This represent a write version of as ingested coordinate.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the as ingested coordinate.
+        coordinate_reference_system_id: The coordinate reference system id field.
+        vertical_coordinate_reference_system_id: The vertical coordinate reference system id field.
+        vertical_unit_id: The vertical unit id field.
+        bbox: The bbox field.
+        features: The feature field.
+        persistable_reference_crs: The persistable reference cr field.
+        persistable_reference_unit_z: The persistable reference unit z field.
+        persistable_reference_vertical_crs: The persistable reference vertical cr field.
+        type: The type field.
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "IntegrationTestsImmutable"
     coordinate_reference_system_id: Optional[str] = Field(None, alias="CoordinateReferenceSystemID")
     vertical_coordinate_reference_system_id: Optional[str] = Field(None, alias="VerticalCoordinateReferenceSystemID")
@@ -165,11 +210,16 @@ class AsIngestedCoordinatesApply(DomainModelApply):
 
 
 class AsIngestedCoordinatesList(TypeList[AsIngestedCoordinates]):
+    """List of as ingested coordinates in read version."""
+
     _NODE = AsIngestedCoordinates
 
     def as_apply(self) -> AsIngestedCoordinatesApplyList:
+        """Convert this read version of as ingested coordinate to a write version."""
         return AsIngestedCoordinatesApplyList([node.as_apply() for node in self.data])
 
 
 class AsIngestedCoordinatesApplyList(TypeApplyList[AsIngestedCoordinatesApply]):
+    """List of as ingested coordinates in write version."""
+
     _NODE = AsIngestedCoordinatesApply
