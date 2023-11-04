@@ -42,7 +42,7 @@ class AcceptableUsageAPI(TypeAPI[AcceptableUsage, AcceptableUsageApply, Acceptab
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes and edges.
 
         Examples:
 
@@ -67,7 +67,26 @@ class AcceptableUsageAPI(TypeAPI[AcceptableUsage, AcceptableUsageApply, Acceptab
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more acceptable usage.
+
+        Args:
+            external_id: External id of the acceptable usage to delete.
+            space: The space where all the acceptable usage are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete acceptable_usage by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> client.acceptable_usage.delete("my_acceptable_usage")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -83,11 +102,31 @@ class AcceptableUsageAPI(TypeAPI[AcceptableUsage, AcceptableUsageApply, Acceptab
     def retrieve(self, external_id: Sequence[str]) -> AcceptableUsageList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> AcceptableUsage | AcceptableUsageList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> AcceptableUsage | AcceptableUsageList:
+        """Retrieve one or more acceptable usages by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the acceptable usages.
+            space: The space where all the acceptable usages are located.
+
+        Returns:
+            The requested acceptable usages.
+
+        Examples:
+
+            Retrieve acceptable_usage by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> acceptable_usage = client.acceptable_usage.retrieve("my_acceptable_usage")
+
+        """
         if isinstance(external_id, str):
-            return self._retrieve((self._sources.space, external_id))
+            return self._retrieve((space, external_id))
         else:
-            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(space, ext_id) for ext_id in external_id])
 
     def search(
         self,

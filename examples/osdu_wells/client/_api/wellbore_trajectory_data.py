@@ -395,7 +395,7 @@ class WellboreTrajectoryDataAPI(
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes and edges.
 
         Examples:
 
@@ -422,7 +422,26 @@ class WellboreTrajectoryDataAPI(
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more wellbore trajectory datum.
+
+        Args:
+            external_id: External id of the wellbore trajectory datum to delete.
+            space: The space where all the wellbore trajectory datum are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete wellbore_trajectory_datum by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> client.wellbore_trajectory_data.delete("my_wellbore_trajectory_datum")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -438,9 +457,29 @@ class WellboreTrajectoryDataAPI(
     def retrieve(self, external_id: Sequence[str]) -> WellboreTrajectoryDataList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> WellboreTrajectoryData | WellboreTrajectoryDataList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> WellboreTrajectoryData | WellboreTrajectoryDataList:
+        """Retrieve one or more wellbore trajectory data by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the wellbore trajectory data.
+            space: The space where all the wellbore trajectory data are located.
+
+        Returns:
+            The requested wellbore trajectory data.
+
+        Examples:
+
+            Retrieve wellbore_trajectory_datum by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_trajectory_datum = client.wellbore_trajectory_data.retrieve("my_wellbore_trajectory_datum")
+
+        """
         if isinstance(external_id, str):
-            wellbore_trajectory_datum = self._retrieve((self._sources.space, external_id))
+            wellbore_trajectory_datum = self._retrieve((space, external_id))
 
             artefact_edges = self.artefacts.retrieve(external_id)
             wellbore_trajectory_datum.artefacts = [edge.end_node.external_id for edge in artefact_edges]
@@ -465,7 +504,7 @@ class WellboreTrajectoryDataAPI(
 
             return wellbore_trajectory_datum
         else:
-            wellbore_trajectory_data = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            wellbore_trajectory_data = self._retrieve([(space, ext_id) for ext_id in external_id])
 
             artefact_edges = self.artefacts.retrieve(external_id)
             self._set_artefacts(wellbore_trajectory_data, artefact_edges)

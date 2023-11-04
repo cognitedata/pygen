@@ -102,7 +102,7 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes and edges.
 
         Examples:
 
@@ -127,7 +127,26 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more wgs 84 coordinate.
+
+        Args:
+            external_id: External id of the wgs 84 coordinate to delete.
+            space: The space where all the wgs 84 coordinate are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete wgs_84_coordinate by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> client.wgs_84_coordinates.delete("my_wgs_84_coordinate")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -143,16 +162,36 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
     def retrieve(self, external_id: Sequence[str]) -> WgsCoordinatesList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> WgsCoordinates | WgsCoordinatesList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> WgsCoordinates | WgsCoordinatesList:
+        """Retrieve one or more wgs 84 coordinates by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the wgs 84 coordinates.
+            space: The space where all the wgs 84 coordinates are located.
+
+        Returns:
+            The requested wgs 84 coordinates.
+
+        Examples:
+
+            Retrieve wgs_84_coordinate by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wgs_84_coordinate = client.wgs_84_coordinates.retrieve("my_wgs_84_coordinate")
+
+        """
         if isinstance(external_id, str):
-            wgs_84_coordinate = self._retrieve((self._sources.space, external_id))
+            wgs_84_coordinate = self._retrieve((space, external_id))
 
             feature_edges = self.features.retrieve(external_id)
             wgs_84_coordinate.features = [edge.end_node.external_id for edge in feature_edges]
 
             return wgs_84_coordinate
         else:
-            wgs_84_coordinates = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            wgs_84_coordinates = self._retrieve([(space, ext_id) for ext_id in external_id])
 
             feature_edges = self.features.retrieve(external_id)
             self._set_features(wgs_84_coordinates, feature_edges)

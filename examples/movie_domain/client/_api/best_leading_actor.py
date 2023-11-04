@@ -42,7 +42,7 @@ class BestLeadingActorAPI(TypeAPI[BestLeadingActor, BestLeadingActorApply, BestL
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes and edges.
 
         Examples:
 
@@ -67,7 +67,26 @@ class BestLeadingActorAPI(TypeAPI[BestLeadingActor, BestLeadingActorApply, BestL
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more best leading actor.
+
+        Args:
+            external_id: External id of the best leading actor to delete.
+            space: The space where all the best leading actor are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete best_leading_actor by id:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> client.best_leading_actor.delete("my_best_leading_actor")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -83,11 +102,31 @@ class BestLeadingActorAPI(TypeAPI[BestLeadingActor, BestLeadingActorApply, BestL
     def retrieve(self, external_id: Sequence[str]) -> BestLeadingActorList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> BestLeadingActor | BestLeadingActorList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> BestLeadingActor | BestLeadingActorList:
+        """Retrieve one or more best leading actors by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the best leading actors.
+            space: The space where all the best leading actors are located.
+
+        Returns:
+            The requested best leading actors.
+
+        Examples:
+
+            Retrieve best_leading_actor by id:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> best_leading_actor = client.best_leading_actor.retrieve("my_best_leading_actor")
+
+        """
         if isinstance(external_id, str):
-            return self._retrieve((self._sources.space, external_id))
+            return self._retrieve((space, external_id))
         else:
-            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(space, ext_id) for ext_id in external_id])
 
     def search(
         self,

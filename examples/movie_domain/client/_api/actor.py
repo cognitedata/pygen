@@ -129,7 +129,7 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes and edges.
 
         Examples:
 
@@ -154,7 +154,26 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more actor.
+
+        Args:
+            external_id: External id of the actor to delete.
+            space: The space where all the actor are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete actor by id:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> client.actor.delete("my_actor")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -170,9 +189,27 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
     def retrieve(self, external_id: Sequence[str]) -> ActorList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> Actor | ActorList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> Actor | ActorList:
+        """Retrieve one or more actors by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the actors.
+            space: The space where all the actors are located.
+
+        Returns:
+            The requested actors.
+
+        Examples:
+
+            Retrieve actor by id:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> actor = client.actor.retrieve("my_actor")
+
+        """
         if isinstance(external_id, str):
-            actor = self._retrieve((self._sources.space, external_id))
+            actor = self._retrieve((space, external_id))
 
             movie_edges = self.movies.retrieve(external_id)
             actor.movies = [edge.end_node.external_id for edge in movie_edges]
@@ -181,7 +218,7 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
 
             return actor
         else:
-            actors = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            actors = self._retrieve([(space, ext_id) for ext_id in external_id])
 
             movie_edges = self.movies.retrieve(external_id)
             self._set_movies(actors, movie_edges)

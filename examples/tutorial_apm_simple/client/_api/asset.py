@@ -551,7 +551,7 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes and edges.
 
         Examples:
 
@@ -576,7 +576,24 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="tutorial_apm_simple") -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space: str = "tutorial_apm_simple") -> dm.InstancesDeleteResult:
+        """Delete one or more asset.
+
+        Args:
+            external_id: External id of the asset to delete.
+            space: The space where all the asset are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete asset by id:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> client.asset.delete("my_asset")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -592,9 +609,27 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
     def retrieve(self, external_id: Sequence[str]) -> AssetList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> Asset | AssetList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "tutorial_apm_simple") -> Asset | AssetList:
+        """Retrieve one or more assets by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the assets.
+            space: The space where all the assets are located.
+
+        Returns:
+            The requested assets.
+
+        Examples:
+
+            Retrieve asset by id:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> asset = client.asset.retrieve("my_asset")
+
+        """
         if isinstance(external_id, str):
-            asset = self._retrieve((self._sources.space, external_id))
+            asset = self._retrieve((space, external_id))
 
             child_edges = self.children.retrieve(external_id)
             asset.children = [edge.end_node.external_id for edge in child_edges]
@@ -603,7 +638,7 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
 
             return asset
         else:
-            assets = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            assets = self._retrieve([(space, ext_id) for ext_id in external_id])
 
             child_edges = self.children.retrieve(external_id)
             self._set_children(assets, child_edges)

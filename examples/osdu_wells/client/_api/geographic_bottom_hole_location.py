@@ -49,7 +49,7 @@ class GeographicBottomHoleLocationAPI(
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes and edges.
 
         Examples:
 
@@ -76,7 +76,26 @@ class GeographicBottomHoleLocationAPI(
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more geographic bottom hole location.
+
+        Args:
+            external_id: External id of the geographic bottom hole location to delete.
+            space: The space where all the geographic bottom hole location are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete geographic_bottom_hole_location by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> client.geographic_bottom_hole_location.delete("my_geographic_bottom_hole_location")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -93,12 +112,30 @@ class GeographicBottomHoleLocationAPI(
         ...
 
     def retrieve(
-        self, external_id: str | Sequence[str]
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
     ) -> GeographicBottomHoleLocation | GeographicBottomHoleLocationList:
+        """Retrieve one or more geographic bottom hole locations by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the geographic bottom hole locations.
+            space: The space where all the geographic bottom hole locations are located.
+
+        Returns:
+            The requested geographic bottom hole locations.
+
+        Examples:
+
+            Retrieve geographic_bottom_hole_location by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> geographic_bottom_hole_location = client.geographic_bottom_hole_location.retrieve("my_geographic_bottom_hole_location")
+
+        """
         if isinstance(external_id, str):
-            return self._retrieve((self._sources.space, external_id))
+            return self._retrieve((space, external_id))
         else:
-            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(space, ext_id) for ext_id in external_id])
 
     def search(
         self,

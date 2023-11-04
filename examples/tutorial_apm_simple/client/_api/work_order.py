@@ -148,7 +148,7 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes and edges.
 
         Examples:
 
@@ -173,7 +173,24 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="tutorial_apm_simple") -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space: str = "tutorial_apm_simple") -> dm.InstancesDeleteResult:
+        """Delete one or more work order.
+
+        Args:
+            external_id: External id of the work order to delete.
+            space: The space where all the work order are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete work_order by id:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> client.work_order.delete("my_work_order")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -189,9 +206,29 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
     def retrieve(self, external_id: Sequence[str]) -> WorkOrderList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> WorkOrder | WorkOrderList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "tutorial_apm_simple"
+    ) -> WorkOrder | WorkOrderList:
+        """Retrieve one or more work orders by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the work orders.
+            space: The space where all the work orders are located.
+
+        Returns:
+            The requested work orders.
+
+        Examples:
+
+            Retrieve work_order by id:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> work_order = client.work_order.retrieve("my_work_order")
+
+        """
         if isinstance(external_id, str):
-            work_order = self._retrieve((self._sources.space, external_id))
+            work_order = self._retrieve((space, external_id))
 
             linked_asset_edges = self.linked_assets.retrieve(external_id)
             work_order.linked_assets = [edge.end_node.external_id for edge in linked_asset_edges]
@@ -200,7 +237,7 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
 
             return work_order
         else:
-            work_orders = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            work_orders = self._retrieve([(space, ext_id) for ext_id in external_id])
 
             linked_asset_edges = self.linked_assets.retrieve(external_id)
             self._set_linked_assets(work_orders, linked_asset_edges)

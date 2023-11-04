@@ -42,7 +42,7 @@ class BestDirectorAPI(TypeAPI[BestDirector, BestDirectorApply, BestDirectorList]
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes and edges.
 
         Examples:
 
@@ -67,7 +67,26 @@ class BestDirectorAPI(TypeAPI[BestDirector, BestDirectorApply, BestDirectorList]
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more best director.
+
+        Args:
+            external_id: External id of the best director to delete.
+            space: The space where all the best director are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete best_director by id:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> client.best_director.delete("my_best_director")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -83,11 +102,31 @@ class BestDirectorAPI(TypeAPI[BestDirector, BestDirectorApply, BestDirectorList]
     def retrieve(self, external_id: Sequence[str]) -> BestDirectorList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> BestDirector | BestDirectorList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> BestDirector | BestDirectorList:
+        """Retrieve one or more best directors by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the best directors.
+            space: The space where all the best directors are located.
+
+        Returns:
+            The requested best directors.
+
+        Examples:
+
+            Retrieve best_director by id:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> best_director = client.best_director.retrieve("my_best_director")
+
+        """
         if isinstance(external_id, str):
-            return self._retrieve((self._sources.space, external_id))
+            return self._retrieve((space, external_id))
         else:
-            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(space, ext_id) for ext_id in external_id])
 
     def search(
         self,

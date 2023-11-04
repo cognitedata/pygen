@@ -137,7 +137,7 @@ class MovieAPI(TypeAPI[Movie, MovieApply, MovieList]):
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes and edges.
 
         Examples:
 
@@ -162,7 +162,26 @@ class MovieAPI(TypeAPI[Movie, MovieApply, MovieList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more movie.
+
+        Args:
+            external_id: External id of the movie to delete.
+            space: The space where all the movie are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete movie by id:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> client.movie.delete("my_movie")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -178,9 +197,27 @@ class MovieAPI(TypeAPI[Movie, MovieApply, MovieList]):
     def retrieve(self, external_id: Sequence[str]) -> MovieList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> Movie | MovieList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> Movie | MovieList:
+        """Retrieve one or more movies by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the movies.
+            space: The space where all the movies are located.
+
+        Returns:
+            The requested movies.
+
+        Examples:
+
+            Retrieve movie by id:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> movie = client.movie.retrieve("my_movie")
+
+        """
         if isinstance(external_id, str):
-            movie = self._retrieve((self._sources.space, external_id))
+            movie = self._retrieve((space, external_id))
 
             actor_edges = self.actors.retrieve(external_id)
             movie.actors = [edge.end_node.external_id for edge in actor_edges]
@@ -189,7 +226,7 @@ class MovieAPI(TypeAPI[Movie, MovieApply, MovieList]):
 
             return movie
         else:
-            movies = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            movies = self._retrieve([(space, ext_id) for ext_id in external_id])
 
             actor_edges = self.actors.retrieve(external_id)
             self._set_actors(movies, actor_edges)

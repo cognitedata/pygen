@@ -212,7 +212,7 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes and edges.
 
         Examples:
 
@@ -237,7 +237,26 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more technical assurance.
+
+        Args:
+            external_id: External id of the technical assurance to delete.
+            space: The space where all the technical assurance are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete technical_assurance by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> client.technical_assurances.delete("my_technical_assurance")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -253,9 +272,29 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
     def retrieve(self, external_id: Sequence[str]) -> TechnicalAssurancesList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> TechnicalAssurances | TechnicalAssurancesList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> TechnicalAssurances | TechnicalAssurancesList:
+        """Retrieve one or more technical assurances by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the technical assurances.
+            space: The space where all the technical assurances are located.
+
+        Returns:
+            The requested technical assurances.
+
+        Examples:
+
+            Retrieve technical_assurance by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> technical_assurance = client.technical_assurances.retrieve("my_technical_assurance")
+
+        """
         if isinstance(external_id, str):
-            technical_assurance = self._retrieve((self._sources.space, external_id))
+            technical_assurance = self._retrieve((space, external_id))
 
             acceptable_usage_edges = self.acceptable_usage.retrieve(external_id)
             technical_assurance.acceptable_usage = [edge.end_node.external_id for edge in acceptable_usage_edges]
@@ -266,7 +305,7 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
 
             return technical_assurance
         else:
-            technical_assurances = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            technical_assurances = self._retrieve([(space, ext_id) for ext_id in external_id])
 
             acceptable_usage_edges = self.acceptable_usage.retrieve(external_id)
             self._set_acceptable_usage(technical_assurances, acceptable_usage_edges)

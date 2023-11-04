@@ -97,7 +97,7 @@ class CdfModelAPI(TypeAPI[CdfModel, CdfModelApply, CdfModelList]):
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes and edges.
 
         Examples:
 
@@ -122,7 +122,24 @@ class CdfModelAPI(TypeAPI[CdfModel, CdfModelApply, CdfModelList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="cdf_3d_schema") -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space: str = "cdf_3d_schema") -> dm.InstancesDeleteResult:
+        """Delete one or more cdf 3 d model.
+
+        Args:
+            external_id: External id of the cdf 3 d model to delete.
+            space: The space where all the cdf 3 d model are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete cdf_3_d_model by id:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> client.cdf_3_d_model.delete("my_cdf_3_d_model")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -138,16 +155,34 @@ class CdfModelAPI(TypeAPI[CdfModel, CdfModelApply, CdfModelList]):
     def retrieve(self, external_id: Sequence[str]) -> CdfModelList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> CdfModel | CdfModelList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "cdf_3d_schema") -> CdfModel | CdfModelList:
+        """Retrieve one or more cdf 3 d models by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the cdf 3 d models.
+            space: The space where all the cdf 3 d models are located.
+
+        Returns:
+            The requested cdf 3 d models.
+
+        Examples:
+
+            Retrieve cdf_3_d_model by id:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> cdf_3_d_model = client.cdf_3_d_model.retrieve("my_cdf_3_d_model")
+
+        """
         if isinstance(external_id, str):
-            cdf_3_d_model = self._retrieve((self._sources.space, external_id))
+            cdf_3_d_model = self._retrieve((space, external_id))
 
             entity_edges = self.entities.retrieve(external_id)
             cdf_3_d_model.entities = [edge.end_node.external_id for edge in entity_edges]
 
             return cdf_3_d_model
         else:
-            cdf_3_d_models = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            cdf_3_d_models = self._retrieve([(space, ext_id) for ext_id in external_id])
 
             entity_edges = self.entities.retrieve(external_id)
             self._set_entities(cdf_3_d_models, entity_edges)

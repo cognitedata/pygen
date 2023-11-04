@@ -129,7 +129,7 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes and edges.
 
         Examples:
 
@@ -154,7 +154,26 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more role.
+
+        Args:
+            external_id: External id of the role to delete.
+            space: The space where all the role are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete role by id:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> client.role.delete("my_role")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -170,9 +189,27 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
     def retrieve(self, external_id: Sequence[str]) -> RoleList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> Role | RoleList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> Role | RoleList:
+        """Retrieve one or more roles by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the roles.
+            space: The space where all the roles are located.
+
+        Returns:
+            The requested roles.
+
+        Examples:
+
+            Retrieve role by id:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> role = client.role.retrieve("my_role")
+
+        """
         if isinstance(external_id, str):
-            role = self._retrieve((self._sources.space, external_id))
+            role = self._retrieve((space, external_id))
 
             movie_edges = self.movies.retrieve(external_id)
             role.movies = [edge.end_node.external_id for edge in movie_edges]
@@ -181,7 +218,7 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
 
             return role
         else:
-            roles = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            roles = self._retrieve([(space, ext_id) for ext_id in external_id])
 
             movie_edges = self.movies.retrieve(external_id)
             self._set_movies(roles, movie_edges)

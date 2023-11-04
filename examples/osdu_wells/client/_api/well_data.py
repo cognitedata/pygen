@@ -479,7 +479,7 @@ class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes and edges.
 
         Examples:
 
@@ -504,7 +504,26 @@ class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more well datum.
+
+        Args:
+            external_id: External id of the well datum to delete.
+            space: The space where all the well datum are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete well_datum by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> client.well_data.delete("my_well_datum")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -520,9 +539,29 @@ class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
     def retrieve(self, external_id: Sequence[str]) -> WellDataList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> WellData | WellDataList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> WellData | WellDataList:
+        """Retrieve one or more well data by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the well data.
+            space: The space where all the well data are located.
+
+        Returns:
+            The requested well data.
+
+        Examples:
+
+            Retrieve well_datum by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> well_datum = client.well_data.retrieve("my_well_datum")
+
+        """
         if isinstance(external_id, str):
-            well_datum = self._retrieve((self._sources.space, external_id))
+            well_datum = self._retrieve((space, external_id))
 
             facility_event_edges = self.facility_events.retrieve(external_id)
             well_datum.facility_events = [edge.end_node.external_id for edge in facility_event_edges]
@@ -545,7 +584,7 @@ class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
 
             return well_datum
         else:
-            well_data = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            well_data = self._retrieve([(space, ext_id) for ext_id in external_id])
 
             facility_event_edges = self.facility_events.retrieve(external_id)
             self._set_facility_events(well_data, facility_event_edges)

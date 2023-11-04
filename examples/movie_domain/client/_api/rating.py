@@ -694,7 +694,7 @@ class RatingAPI(TypeAPI[Rating, RatingApply, RatingList]):
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes and edges.
 
         Examples:
 
@@ -719,7 +719,26 @@ class RatingAPI(TypeAPI[Rating, RatingApply, RatingList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more rating.
+
+        Args:
+            external_id: External id of the rating to delete.
+            space: The space where all the rating are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete rating by id:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> client.rating.delete("my_rating")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -735,11 +754,31 @@ class RatingAPI(TypeAPI[Rating, RatingApply, RatingList]):
     def retrieve(self, external_id: Sequence[str]) -> RatingList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> Rating | RatingList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> Rating | RatingList:
+        """Retrieve one or more ratings by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the ratings.
+            space: The space where all the ratings are located.
+
+        Returns:
+            The requested ratings.
+
+        Examples:
+
+            Retrieve rating by id:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> rating = client.rating.retrieve("my_rating")
+
+        """
         if isinstance(external_id, str):
-            return self._retrieve((self._sources.space, external_id))
+            return self._retrieve((space, external_id))
         else:
-            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(space, ext_id) for ext_id in external_id])
 
     def search(
         self,

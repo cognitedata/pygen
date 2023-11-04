@@ -42,7 +42,7 @@ class SpatialAreaAPI(TypeAPI[SpatialArea, SpatialAreaApply, SpatialAreaList]):
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes and edges.
 
         Examples:
 
@@ -67,7 +67,26 @@ class SpatialAreaAPI(TypeAPI[SpatialArea, SpatialAreaApply, SpatialAreaList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more spatial area.
+
+        Args:
+            external_id: External id of the spatial area to delete.
+            space: The space where all the spatial area are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete spatial_area by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> client.spatial_area.delete("my_spatial_area")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -83,11 +102,31 @@ class SpatialAreaAPI(TypeAPI[SpatialArea, SpatialAreaApply, SpatialAreaList]):
     def retrieve(self, external_id: Sequence[str]) -> SpatialAreaList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> SpatialArea | SpatialAreaList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> SpatialArea | SpatialAreaList:
+        """Retrieve one or more spatial areas by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the spatial areas.
+            space: The space where all the spatial areas are located.
+
+        Returns:
+            The requested spatial areas.
+
+        Examples:
+
+            Retrieve spatial_area by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> spatial_area = client.spatial_area.retrieve("my_spatial_area")
+
+        """
         if isinstance(external_id, str):
-            return self._retrieve((self._sources.space, external_id))
+            return self._retrieve((space, external_id))
         else:
-            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(space, ext_id) for ext_id in external_id])
 
     def search(
         self,

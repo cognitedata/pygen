@@ -41,7 +41,7 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes and edges.
 
         Examples:
 
@@ -66,7 +66,26 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more case.
+
+        Args:
+            external_id: External id of the case to delete.
+            space: The space where all the case are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete case by id:
+
+                >>> from shop.client import ShopClient
+                >>> client = ShopClient()
+                >>> client.case.delete("my_case")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -82,11 +101,29 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
     def retrieve(self, external_id: Sequence[str]) -> CaseList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> Case | CaseList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> Case | CaseList:
+        """Retrieve one or more cases by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the cases.
+            space: The space where all the cases are located.
+
+        Returns:
+            The requested cases.
+
+        Examples:
+
+            Retrieve case by id:
+
+                >>> from shop.client import ShopClient
+                >>> client = ShopClient()
+                >>> case = client.case.retrieve("my_case")
+
+        """
         if isinstance(external_id, str):
-            return self._retrieve((self._sources.space, external_id))
+            return self._retrieve((space, external_id))
         else:
-            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(space, ext_id) for ext_id in external_id])
 
     def search(
         self,

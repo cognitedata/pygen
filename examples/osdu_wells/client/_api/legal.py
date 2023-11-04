@@ -40,7 +40,7 @@ class LegalAPI(TypeAPI[Legal, LegalApply, LegalList]):
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes and edges.
 
         Examples:
 
@@ -65,7 +65,26 @@ class LegalAPI(TypeAPI[Legal, LegalApply, LegalList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more legal.
+
+        Args:
+            external_id: External id of the legal to delete.
+            space: The space where all the legal are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete legal by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> client.legal.delete("my_legal")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -81,11 +100,29 @@ class LegalAPI(TypeAPI[Legal, LegalApply, LegalList]):
     def retrieve(self, external_id: Sequence[str]) -> LegalList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> Legal | LegalList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> Legal | LegalList:
+        """Retrieve one or more legals by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the legals.
+            space: The space where all the legals are located.
+
+        Returns:
+            The requested legals.
+
+        Examples:
+
+            Retrieve legal by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> legal = client.legal.retrieve("my_legal")
+
+        """
         if isinstance(external_id, str):
-            return self._retrieve((self._sources.space, external_id))
+            return self._retrieve((space, external_id))
         else:
-            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(space, ext_id) for ext_id in external_id])
 
     def search(
         self,

@@ -91,7 +91,7 @@ class WellAPI(TypeAPI[Well, WellApply, WellList]):
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes and edges.
 
         Examples:
 
@@ -116,7 +116,26 @@ class WellAPI(TypeAPI[Well, WellApply, WellList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more well.
+
+        Args:
+            external_id: External id of the well to delete.
+            space: The space where all the well are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete well by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> client.well.delete("my_well")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -132,16 +151,34 @@ class WellAPI(TypeAPI[Well, WellApply, WellList]):
     def retrieve(self, external_id: Sequence[str]) -> WellList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> Well | WellList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> Well | WellList:
+        """Retrieve one or more wells by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the wells.
+            space: The space where all the wells are located.
+
+        Returns:
+            The requested wells.
+
+        Examples:
+
+            Retrieve well by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> well = client.well.retrieve("my_well")
+
+        """
         if isinstance(external_id, str):
-            well = self._retrieve((self._sources.space, external_id))
+            well = self._retrieve((space, external_id))
 
             meta_edges = self.meta.retrieve(external_id)
             well.meta = [edge.end_node.external_id for edge in meta_edges]
 
             return well
         else:
-            wells = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            wells = self._retrieve([(space, ext_id) for ext_id in external_id])
 
             meta_edges = self.meta.retrieve(external_id)
             self._set_meta(wells, meta_edges)

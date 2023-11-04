@@ -42,7 +42,7 @@ class FacilityOperatorsAPI(TypeAPI[FacilityOperators, FacilityOperatorsApply, Fa
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes and edges.
 
         Examples:
 
@@ -67,7 +67,26 @@ class FacilityOperatorsAPI(TypeAPI[FacilityOperators, FacilityOperatorsApply, Fa
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more facility operator.
+
+        Args:
+            external_id: External id of the facility operator to delete.
+            space: The space where all the facility operator are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete facility_operator by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> client.facility_operators.delete("my_facility_operator")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -83,11 +102,31 @@ class FacilityOperatorsAPI(TypeAPI[FacilityOperators, FacilityOperatorsApply, Fa
     def retrieve(self, external_id: Sequence[str]) -> FacilityOperatorsList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> FacilityOperators | FacilityOperatorsList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> FacilityOperators | FacilityOperatorsList:
+        """Retrieve one or more facility operators by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the facility operators.
+            space: The space where all the facility operators are located.
+
+        Returns:
+            The requested facility operators.
+
+        Examples:
+
+            Retrieve facility_operator by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> facility_operator = client.facility_operators.retrieve("my_facility_operator")
+
+        """
         if isinstance(external_id, str):
-            return self._retrieve((self._sources.space, external_id))
+            return self._retrieve((space, external_id))
         else:
-            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(space, ext_id) for ext_id in external_id])
 
     def search(
         self,

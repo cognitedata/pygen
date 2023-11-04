@@ -138,7 +138,7 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes and edges.
 
         Examples:
 
@@ -163,7 +163,26 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more director.
+
+        Args:
+            external_id: External id of the director to delete.
+            space: The space where all the director are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete director by id:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> client.director.delete("my_director")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -179,9 +198,29 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
     def retrieve(self, external_id: Sequence[str]) -> DirectorList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> Director | DirectorList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> Director | DirectorList:
+        """Retrieve one or more directors by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the directors.
+            space: The space where all the directors are located.
+
+        Returns:
+            The requested directors.
+
+        Examples:
+
+            Retrieve director by id:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> director = client.director.retrieve("my_director")
+
+        """
         if isinstance(external_id, str):
-            director = self._retrieve((self._sources.space, external_id))
+            director = self._retrieve((space, external_id))
 
             movie_edges = self.movies.retrieve(external_id)
             director.movies = [edge.end_node.external_id for edge in movie_edges]
@@ -190,7 +229,7 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
 
             return director
         else:
-            directors = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            directors = self._retrieve([(space, ext_id) for ext_id in external_id])
 
             movie_edges = self.movies.retrieve(external_id)
             self._set_movies(directors, movie_edges)

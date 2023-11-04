@@ -42,7 +42,7 @@ class LineageAssertionsAPI(TypeAPI[LineageAssertions, LineageAssertionsApply, Li
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes and edges.
 
         Examples:
 
@@ -67,7 +67,26 @@ class LineageAssertionsAPI(TypeAPI[LineageAssertions, LineageAssertionsApply, Li
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more lineage assertion.
+
+        Args:
+            external_id: External id of the lineage assertion to delete.
+            space: The space where all the lineage assertion are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete lineage_assertion by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> client.lineage_assertions.delete("my_lineage_assertion")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -83,11 +102,31 @@ class LineageAssertionsAPI(TypeAPI[LineageAssertions, LineageAssertionsApply, Li
     def retrieve(self, external_id: Sequence[str]) -> LineageAssertionsList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> LineageAssertions | LineageAssertionsList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> LineageAssertions | LineageAssertionsList:
+        """Retrieve one or more lineage assertions by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the lineage assertions.
+            space: The space where all the lineage assertions are located.
+
+        Returns:
+            The requested lineage assertions.
+
+        Examples:
+
+            Retrieve lineage_assertion by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> lineage_assertion = client.lineage_assertions.retrieve("my_lineage_assertion")
+
+        """
         if isinstance(external_id, str):
-            return self._retrieve((self._sources.space, external_id))
+            return self._retrieve((space, external_id))
         else:
-            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(space, ext_id) for ext_id in external_id])
 
     def search(
         self,

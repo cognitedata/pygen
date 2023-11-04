@@ -104,7 +104,7 @@ class AsIngestedCoordinatesAPI(TypeAPI[AsIngestedCoordinates, AsIngestedCoordina
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes and edges.
 
         Examples:
 
@@ -131,7 +131,26 @@ class AsIngestedCoordinatesAPI(TypeAPI[AsIngestedCoordinates, AsIngestedCoordina
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more as ingested coordinate.
+
+        Args:
+            external_id: External id of the as ingested coordinate to delete.
+            space: The space where all the as ingested coordinate are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete as_ingested_coordinate by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> client.as_ingested_coordinates.delete("my_as_ingested_coordinate")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -147,16 +166,36 @@ class AsIngestedCoordinatesAPI(TypeAPI[AsIngestedCoordinates, AsIngestedCoordina
     def retrieve(self, external_id: Sequence[str]) -> AsIngestedCoordinatesList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> AsIngestedCoordinates | AsIngestedCoordinatesList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> AsIngestedCoordinates | AsIngestedCoordinatesList:
+        """Retrieve one or more as ingested coordinates by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the as ingested coordinates.
+            space: The space where all the as ingested coordinates are located.
+
+        Returns:
+            The requested as ingested coordinates.
+
+        Examples:
+
+            Retrieve as_ingested_coordinate by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> as_ingested_coordinate = client.as_ingested_coordinates.retrieve("my_as_ingested_coordinate")
+
+        """
         if isinstance(external_id, str):
-            as_ingested_coordinate = self._retrieve((self._sources.space, external_id))
+            as_ingested_coordinate = self._retrieve((space, external_id))
 
             feature_edges = self.features.retrieve(external_id)
             as_ingested_coordinate.features = [edge.end_node.external_id for edge in feature_edges]
 
             return as_ingested_coordinate
         else:
-            as_ingested_coordinates = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            as_ingested_coordinates = self._retrieve([(space, ext_id) for ext_id in external_id])
 
             feature_edges = self.features.retrieve(external_id)
             self._set_features(as_ingested_coordinates, feature_edges)

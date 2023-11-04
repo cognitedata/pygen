@@ -154,7 +154,7 @@ class DateTransformationPairAPI(
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes and edges.
 
         Examples:
 
@@ -181,7 +181,24 @@ class DateTransformationPairAPI(
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="market") -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space: str = "market") -> dm.InstancesDeleteResult:
+        """Delete one or more date transformation pair.
+
+        Args:
+            external_id: External id of the date transformation pair to delete.
+            space: The space where all the date transformation pair are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete date_transformation_pair by id:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> client.date_transformation_pair.delete("my_date_transformation_pair")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -197,9 +214,29 @@ class DateTransformationPairAPI(
     def retrieve(self, external_id: Sequence[str]) -> DateTransformationPairList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> DateTransformationPair | DateTransformationPairList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "market"
+    ) -> DateTransformationPair | DateTransformationPairList:
+        """Retrieve one or more date transformation pairs by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the date transformation pairs.
+            space: The space where all the date transformation pairs are located.
+
+        Returns:
+            The requested date transformation pairs.
+
+        Examples:
+
+            Retrieve date_transformation_pair by id:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> date_transformation_pair = client.date_transformation_pair.retrieve("my_date_transformation_pair")
+
+        """
         if isinstance(external_id, str):
-            date_transformation_pair = self._retrieve((self._sources.space, external_id))
+            date_transformation_pair = self._retrieve((space, external_id))
 
             end_edges = self.end.retrieve(external_id)
             date_transformation_pair.end = [edge.end_node.external_id for edge in end_edges]
@@ -208,7 +245,7 @@ class DateTransformationPairAPI(
 
             return date_transformation_pair
         else:
-            date_transformation_pairs = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            date_transformation_pairs = self._retrieve([(space, ext_id) for ext_id in external_id])
 
             end_edges = self.end.retrieve(external_id)
             self._set_end(date_transformation_pairs, end_edges)

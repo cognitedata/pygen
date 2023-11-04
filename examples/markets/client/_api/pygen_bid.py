@@ -43,7 +43,7 @@ class PygenBidAPI(TypeAPI[PygenBid, PygenBidApply, PygenBidList]):
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes and edges.
 
         Examples:
 
@@ -68,7 +68,24 @@ class PygenBidAPI(TypeAPI[PygenBid, PygenBidApply, PygenBidList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="market") -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space: str = "market") -> dm.InstancesDeleteResult:
+        """Delete one or more pygen bid.
+
+        Args:
+            external_id: External id of the pygen bid to delete.
+            space: The space where all the pygen bid are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete pygen_bid by id:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> client.pygen_bid.delete("my_pygen_bid")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -84,11 +101,29 @@ class PygenBidAPI(TypeAPI[PygenBid, PygenBidApply, PygenBidList]):
     def retrieve(self, external_id: Sequence[str]) -> PygenBidList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> PygenBid | PygenBidList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "market") -> PygenBid | PygenBidList:
+        """Retrieve one or more pygen bids by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the pygen bids.
+            space: The space where all the pygen bids are located.
+
+        Returns:
+            The requested pygen bids.
+
+        Examples:
+
+            Retrieve pygen_bid by id:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> pygen_bid = client.pygen_bid.retrieve("my_pygen_bid")
+
+        """
         if isinstance(external_id, str):
-            return self._retrieve((self._sources.space, external_id))
+            return self._retrieve((space, external_id))
         else:
-            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(space, ext_id) for ext_id in external_id])
 
     def search(
         self,

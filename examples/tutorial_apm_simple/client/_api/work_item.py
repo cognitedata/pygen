@@ -95,7 +95,7 @@ class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes and edges.
 
         Examples:
 
@@ -120,7 +120,24 @@ class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="tutorial_apm_simple") -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space: str = "tutorial_apm_simple") -> dm.InstancesDeleteResult:
+        """Delete one or more work item.
+
+        Args:
+            external_id: External id of the work item to delete.
+            space: The space where all the work item are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete work_item by id:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> client.work_item.delete("my_work_item")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -136,16 +153,34 @@ class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
     def retrieve(self, external_id: Sequence[str]) -> WorkItemList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> WorkItem | WorkItemList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "tutorial_apm_simple") -> WorkItem | WorkItemList:
+        """Retrieve one or more work items by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the work items.
+            space: The space where all the work items are located.
+
+        Returns:
+            The requested work items.
+
+        Examples:
+
+            Retrieve work_item by id:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> work_item = client.work_item.retrieve("my_work_item")
+
+        """
         if isinstance(external_id, str):
-            work_item = self._retrieve((self._sources.space, external_id))
+            work_item = self._retrieve((space, external_id))
 
             linked_asset_edges = self.linked_assets.retrieve(external_id)
             work_item.linked_assets = [edge.end_node.external_id for edge in linked_asset_edges]
 
             return work_item
         else:
-            work_items = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            work_items = self._retrieve([(space, ext_id) for ext_id in external_id])
 
             linked_asset_edges = self.linked_assets.retrieve(external_id)
             self._set_linked_assets(work_items, linked_asset_edges)

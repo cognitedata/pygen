@@ -41,7 +41,7 @@ class CogBidAPI(TypeAPI[CogBid, CogBidApply, CogBidList]):
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes and edges.
 
         Examples:
 
@@ -66,7 +66,24 @@ class CogBidAPI(TypeAPI[CogBid, CogBidApply, CogBidList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="market") -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space: str = "market") -> dm.InstancesDeleteResult:
+        """Delete one or more cog bid.
+
+        Args:
+            external_id: External id of the cog bid to delete.
+            space: The space where all the cog bid are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete cog_bid by id:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> client.cog_bid.delete("my_cog_bid")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -82,11 +99,29 @@ class CogBidAPI(TypeAPI[CogBid, CogBidApply, CogBidList]):
     def retrieve(self, external_id: Sequence[str]) -> CogBidList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> CogBid | CogBidList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "market") -> CogBid | CogBidList:
+        """Retrieve one or more cog bids by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the cog bids.
+            space: The space where all the cog bids are located.
+
+        Returns:
+            The requested cog bids.
+
+        Examples:
+
+            Retrieve cog_bid by id:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> cog_bid = client.cog_bid.retrieve("my_cog_bid")
+
+        """
         if isinstance(external_id, str):
-            return self._retrieve((self._sources.space, external_id))
+            return self._retrieve((space, external_id))
         else:
-            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(space, ext_id) for ext_id in external_id])
 
     def search(
         self,

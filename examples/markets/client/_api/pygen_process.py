@@ -42,7 +42,7 @@ class PygenProcessAPI(TypeAPI[PygenProcess, PygenProcessApply, PygenProcessList]
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes and edges.
 
         Examples:
 
@@ -67,7 +67,24 @@ class PygenProcessAPI(TypeAPI[PygenProcess, PygenProcessApply, PygenProcessList]
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="market") -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space: str = "market") -> dm.InstancesDeleteResult:
+        """Delete one or more pygen proces.
+
+        Args:
+            external_id: External id of the pygen proces to delete.
+            space: The space where all the pygen proces are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete pygen_proces by id:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> client.pygen_process.delete("my_pygen_proces")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -83,11 +100,29 @@ class PygenProcessAPI(TypeAPI[PygenProcess, PygenProcessApply, PygenProcessList]
     def retrieve(self, external_id: Sequence[str]) -> PygenProcessList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> PygenProcess | PygenProcessList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "market") -> PygenProcess | PygenProcessList:
+        """Retrieve one or more pygen process by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the pygen process.
+            space: The space where all the pygen process are located.
+
+        Returns:
+            The requested pygen process.
+
+        Examples:
+
+            Retrieve pygen_proces by id:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> pygen_proces = client.pygen_process.retrieve("my_pygen_proces")
+
+        """
         if isinstance(external_id, str):
-            return self._retrieve((self._sources.space, external_id))
+            return self._retrieve((space, external_id))
         else:
-            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(space, ext_id) for ext_id in external_id])
 
     def search(
         self,

@@ -630,7 +630,7 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes and edges.
 
         Examples:
 
@@ -655,7 +655,26 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more wellbore datum.
+
+        Args:
+            external_id: External id of the wellbore datum to delete.
+            space: The space where all the wellbore datum are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete wellbore_datum by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> client.wellbore_data.delete("my_wellbore_datum")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -671,9 +690,29 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
     def retrieve(self, external_id: Sequence[str]) -> WellboreDataList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> WellboreData | WellboreDataList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> WellboreData | WellboreDataList:
+        """Retrieve one or more wellbore data by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the wellbore data.
+            space: The space where all the wellbore data are located.
+
+        Returns:
+            The requested wellbore data.
+
+        Examples:
+
+            Retrieve wellbore_datum by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_datum = client.wellbore_data.retrieve("my_wellbore_datum")
+
+        """
         if isinstance(external_id, str):
-            wellbore_datum = self._retrieve((self._sources.space, external_id))
+            wellbore_datum = self._retrieve((space, external_id))
 
             drilling_reason_edges = self.drilling_reasons.retrieve(external_id)
             wellbore_datum.drilling_reasons = [edge.end_node.external_id for edge in drilling_reason_edges]
@@ -702,7 +741,7 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
 
             return wellbore_datum
         else:
-            wellbore_data = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            wellbore_data = self._retrieve([(space, ext_id) for ext_id in external_id])
 
             drilling_reason_edges = self.drilling_reasons.retrieve(external_id)
             self._set_drilling_reasons(wellbore_data, drilling_reason_edges)

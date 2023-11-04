@@ -93,7 +93,7 @@ class WellboreAPI(TypeAPI[Wellbore, WellboreApply, WellboreList]):
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes and edges.
 
         Examples:
 
@@ -118,7 +118,26 @@ class WellboreAPI(TypeAPI[Wellbore, WellboreApply, WellboreList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more wellbore.
+
+        Args:
+            external_id: External id of the wellbore to delete.
+            space: The space where all the wellbore are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete wellbore by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> client.wellbore.delete("my_wellbore")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -134,16 +153,36 @@ class WellboreAPI(TypeAPI[Wellbore, WellboreApply, WellboreList]):
     def retrieve(self, external_id: Sequence[str]) -> WellboreList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> Wellbore | WellboreList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> Wellbore | WellboreList:
+        """Retrieve one or more wellbores by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the wellbores.
+            space: The space where all the wellbores are located.
+
+        Returns:
+            The requested wellbores.
+
+        Examples:
+
+            Retrieve wellbore by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore = client.wellbore.retrieve("my_wellbore")
+
+        """
         if isinstance(external_id, str):
-            wellbore = self._retrieve((self._sources.space, external_id))
+            wellbore = self._retrieve((space, external_id))
 
             meta_edges = self.meta.retrieve(external_id)
             wellbore.meta = [edge.end_node.external_id for edge in meta_edges]
 
             return wellbore
         else:
-            wellbores = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            wellbores = self._retrieve([(space, ext_id) for ext_id in external_id])
 
             meta_edges = self.meta.retrieve(external_id)
             self._set_meta(wellbores, meta_edges)

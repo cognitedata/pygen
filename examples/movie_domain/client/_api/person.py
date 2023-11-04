@@ -91,7 +91,7 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes and edges.
 
         Examples:
 
@@ -116,7 +116,26 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more person.
+
+        Args:
+            external_id: External id of the person to delete.
+            space: The space where all the person are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete person by id:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> client.person.delete("my_person")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -132,16 +151,36 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
     def retrieve(self, external_id: Sequence[str]) -> PersonList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> Person | PersonList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> Person | PersonList:
+        """Retrieve one or more persons by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the persons.
+            space: The space where all the persons are located.
+
+        Returns:
+            The requested persons.
+
+        Examples:
+
+            Retrieve person by id:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> person = client.person.retrieve("my_person")
+
+        """
         if isinstance(external_id, str):
-            person = self._retrieve((self._sources.space, external_id))
+            person = self._retrieve((space, external_id))
 
             role_edges = self.roles.retrieve(external_id)
             person.roles = [edge.end_node.external_id for edge in role_edges]
 
             return person
         else:
-            persons = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            persons = self._retrieve([(space, ext_id) for ext_id in external_id])
 
             role_edges = self.roles.retrieve(external_id)
             self._set_roles(persons, role_edges)

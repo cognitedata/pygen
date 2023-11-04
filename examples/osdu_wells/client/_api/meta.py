@@ -40,7 +40,7 @@ class MetaAPI(TypeAPI[Meta, MetaApply, MetaList]):
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes and edges.
 
         Examples:
 
@@ -65,7 +65,26 @@ class MetaAPI(TypeAPI[Meta, MetaApply, MetaList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more meta.
+
+        Args:
+            external_id: External id of the meta to delete.
+            space: The space where all the meta are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete meta by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> client.meta.delete("my_meta")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -81,11 +100,29 @@ class MetaAPI(TypeAPI[Meta, MetaApply, MetaList]):
     def retrieve(self, external_id: Sequence[str]) -> MetaList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> Meta | MetaList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> Meta | MetaList:
+        """Retrieve one or more metas by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the metas.
+            space: The space where all the metas are located.
+
+        Returns:
+            The requested metas.
+
+        Examples:
+
+            Retrieve meta by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> meta = client.meta.retrieve("my_meta")
+
+        """
         if isinstance(external_id, str):
-            return self._retrieve((self._sources.space, external_id))
+            return self._retrieve((space, external_id))
         else:
-            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(space, ext_id) for ext_id in external_id])
 
     def search(
         self,

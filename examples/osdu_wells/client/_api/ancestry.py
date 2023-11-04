@@ -42,7 +42,7 @@ class AncestryAPI(TypeAPI[Ancestry, AncestryApply, AncestryList]):
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes and edges.
 
         Examples:
 
@@ -67,7 +67,26 @@ class AncestryAPI(TypeAPI[Ancestry, AncestryApply, AncestryList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more ancestry.
+
+        Args:
+            external_id: External id of the ancestry to delete.
+            space: The space where all the ancestry are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete ancestry by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> client.ancestry.delete("my_ancestry")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -83,11 +102,31 @@ class AncestryAPI(TypeAPI[Ancestry, AncestryApply, AncestryList]):
     def retrieve(self, external_id: Sequence[str]) -> AncestryList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> Ancestry | AncestryList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> Ancestry | AncestryList:
+        """Retrieve one or more ancestries by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the ancestries.
+            space: The space where all the ancestries are located.
+
+        Returns:
+            The requested ancestries.
+
+        Examples:
+
+            Retrieve ancestry by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> ancestry = client.ancestry.retrieve("my_ancestry")
+
+        """
         if isinstance(external_id, str):
-            return self._retrieve((self._sources.space, external_id))
+            return self._retrieve((space, external_id))
         else:
-            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(space, ext_id) for ext_id in external_id])
 
     def search(
         self,

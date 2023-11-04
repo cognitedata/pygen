@@ -47,7 +47,7 @@ class CdfConnectionPropertiesAPI(
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes and edges.
 
         Examples:
 
@@ -74,7 +74,24 @@ class CdfConnectionPropertiesAPI(
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="cdf_3d_schema") -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space: str = "cdf_3d_schema") -> dm.InstancesDeleteResult:
+        """Delete one or more cdf 3 d connection property.
+
+        Args:
+            external_id: External id of the cdf 3 d connection property to delete.
+            space: The space where all the cdf 3 d connection property are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete cdf_3_d_connection_property by id:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> client.cdf_3_d_connection_properties.delete("my_cdf_3_d_connection_property")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -90,11 +107,31 @@ class CdfConnectionPropertiesAPI(
     def retrieve(self, external_id: Sequence[str]) -> CdfConnectionPropertiesList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> CdfConnectionProperties | CdfConnectionPropertiesList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "cdf_3d_schema"
+    ) -> CdfConnectionProperties | CdfConnectionPropertiesList:
+        """Retrieve one or more cdf 3 d connection properties by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the cdf 3 d connection properties.
+            space: The space where all the cdf 3 d connection properties are located.
+
+        Returns:
+            The requested cdf 3 d connection properties.
+
+        Examples:
+
+            Retrieve cdf_3_d_connection_property by id:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> cdf_3_d_connection_property = client.cdf_3_d_connection_properties.retrieve("my_cdf_3_d_connection_property")
+
+        """
         if isinstance(external_id, str):
-            return self._retrieve((self._sources.space, external_id))
+            return self._retrieve((space, external_id))
         else:
-            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(space, ext_id) for ext_id in external_id])
 
     @overload
     def aggregate(
