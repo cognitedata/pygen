@@ -27,7 +27,7 @@ class DirectorMoviesAPI:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "Role.movies"},
+            {"space": "IntegrationTestsImmutable", "externalId": "Role.movies"},
         )
         if isinstance(external_id, str):
             is_director = f.Equals(
@@ -50,7 +50,7 @@ class DirectorMoviesAPI:
         filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "Role.movies"},
+            {"space": "IntegrationTestsImmutable", "externalId": "Role.movies"},
         )
         filters.append(is_edge_type)
         if director_id:
@@ -72,7 +72,7 @@ class DirectorNominationAPI:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "Role.nomination"},
+            {"space": "IntegrationTestsImmutable", "externalId": "Role.nomination"},
         )
         if isinstance(external_id, str):
             is_director = f.Equals(
@@ -95,7 +95,7 @@ class DirectorNominationAPI:
         filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "Role.nomination"},
+            {"space": "IntegrationTestsImmutable", "externalId": "Role.nomination"},
         )
         filters.append(is_edge_type)
         if director_id:

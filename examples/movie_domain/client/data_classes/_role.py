@@ -55,7 +55,7 @@ class RoleApply(DomainModelApply):
         properties = {}
         if self.person is not None:
             properties["person"] = {
-                "space": "IntegrationTestsImmutable",
+                "space": "IntegrationTestsImmutable" if isinstance(self.person, str) else self.person.space,
                 "externalId": self.person if isinstance(self.person, str) else self.person.external_id,
             }
         if self.won_oscar is not None:
@@ -110,33 +110,37 @@ class RoleApply(DomainModelApply):
     def _create_movie_edge(self, movie: Union[str, MovieApply]) -> dm.EdgeApply:
         if isinstance(movie, str):
             end_node_ext_id = movie
+            end_node_space = "IntegrationTestsImmutable"
         elif isinstance(movie, DomainModelApply):
             end_node_ext_id = movie.external_id
+            end_node_space = movie.space
         else:
             raise TypeError(f"Expected str or MovieApply, got {type(movie)}")
 
         return dm.EdgeApply(
-            space="IntegrationTestsImmutable",
+            space=self.space,
             external_id=f"{self.external_id}:{end_node_ext_id}",
             type=dm.DirectRelationReference("IntegrationTestsImmutable", "Role.movies"),
             start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference("IntegrationTestsImmutable", end_node_ext_id),
+            end_node=dm.DirectRelationReference(end_node_space, end_node_ext_id),
         )
 
     def _create_nomination_edge(self, nomination: Union[str, NominationApply]) -> dm.EdgeApply:
         if isinstance(nomination, str):
             end_node_ext_id = nomination
+            end_node_space = "IntegrationTestsImmutable"
         elif isinstance(nomination, DomainModelApply):
             end_node_ext_id = nomination.external_id
+            end_node_space = nomination.space
         else:
             raise TypeError(f"Expected str or NominationApply, got {type(nomination)}")
 
         return dm.EdgeApply(
-            space="IntegrationTestsImmutable",
+            space=self.space,
             external_id=f"{self.external_id}:{end_node_ext_id}",
             type=dm.DirectRelationReference("IntegrationTestsImmutable", "Role.nomination"),
             start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference("IntegrationTestsImmutable", end_node_ext_id),
+            end_node=dm.DirectRelationReference(end_node_space, end_node_ext_id),
         )
 
 

@@ -20,7 +20,7 @@ class RoleMoviesAPI:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "Role.movies"},
+            {"space": "IntegrationTestsImmutable", "externalId": "Role.movies"},
         )
         if isinstance(external_id, str):
             is_role = f.Equals(
@@ -43,7 +43,7 @@ class RoleMoviesAPI:
         filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "Role.movies"},
+            {"space": "IntegrationTestsImmutable", "externalId": "Role.movies"},
         )
         filters.append(is_edge_type)
         if role_id:
@@ -65,7 +65,7 @@ class RoleNominationAPI:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "Role.nomination"},
+            {"space": "IntegrationTestsImmutable", "externalId": "Role.nomination"},
         )
         if isinstance(external_id, str):
             is_role = f.Equals(
@@ -88,7 +88,7 @@ class RoleNominationAPI:
         filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "Role.nomination"},
+            {"space": "IntegrationTestsImmutable", "externalId": "Role.nomination"},
         )
         filters.append(is_edge_type)
         if role_id:

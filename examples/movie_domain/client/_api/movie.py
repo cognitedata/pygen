@@ -28,7 +28,7 @@ class MovieActorsAPI:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "Movie.actors"},
+            {"space": "IntegrationTestsImmutable", "externalId": "Movie.actors"},
         )
         if isinstance(external_id, str):
             is_movie = f.Equals(
@@ -51,7 +51,7 @@ class MovieActorsAPI:
         filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "Movie.actors"},
+            {"space": "IntegrationTestsImmutable", "externalId": "Movie.actors"},
         )
         filters.append(is_edge_type)
         if movie_id:
@@ -73,7 +73,7 @@ class MovieDirectorsAPI:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "Movie.directors"},
+            {"space": "IntegrationTestsImmutable", "externalId": "Movie.directors"},
         )
         if isinstance(external_id, str):
             is_movie = f.Equals(
@@ -96,7 +96,7 @@ class MovieDirectorsAPI:
         filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "Movie.directors"},
+            {"space": "IntegrationTestsImmutable", "externalId": "Movie.directors"},
         )
         filters.append(is_edge_type)
         if movie_id:

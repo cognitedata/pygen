@@ -72,7 +72,7 @@ class MovieApply(DomainModelApply):
             properties["meta"] = self.meta
         if self.rating is not None:
             properties["rating"] = {
-                "space": "IntegrationTestsImmutable",
+                "space": "IntegrationTestsImmutable" if isinstance(self.rating, str) else self.rating.space,
                 "externalId": self.rating if isinstance(self.rating, str) else self.rating.external_id,
             }
         if self.release_year is not None:
@@ -131,33 +131,37 @@ class MovieApply(DomainModelApply):
     def _create_actor_edge(self, actor: Union[str, ActorApply]) -> dm.EdgeApply:
         if isinstance(actor, str):
             end_node_ext_id = actor
+            end_node_space = "IntegrationTestsImmutable"
         elif isinstance(actor, DomainModelApply):
             end_node_ext_id = actor.external_id
+            end_node_space = actor.space
         else:
             raise TypeError(f"Expected str or ActorApply, got {type(actor)}")
 
         return dm.EdgeApply(
-            space="IntegrationTestsImmutable",
+            space=self.space,
             external_id=f"{self.external_id}:{end_node_ext_id}",
             type=dm.DirectRelationReference("IntegrationTestsImmutable", "Movie.actors"),
             start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference("IntegrationTestsImmutable", end_node_ext_id),
+            end_node=dm.DirectRelationReference(end_node_space, end_node_ext_id),
         )
 
     def _create_director_edge(self, director: Union[str, DirectorApply]) -> dm.EdgeApply:
         if isinstance(director, str):
             end_node_ext_id = director
+            end_node_space = "IntegrationTestsImmutable"
         elif isinstance(director, DomainModelApply):
             end_node_ext_id = director.external_id
+            end_node_space = director.space
         else:
             raise TypeError(f"Expected str or DirectorApply, got {type(director)}")
 
         return dm.EdgeApply(
-            space="IntegrationTestsImmutable",
+            space=self.space,
             external_id=f"{self.external_id}:{end_node_ext_id}",
             type=dm.DirectRelationReference("IntegrationTestsImmutable", "Movie.directors"),
             start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference("IntegrationTestsImmutable", end_node_ext_id),
+            end_node=dm.DirectRelationReference(end_node_space, end_node_ext_id),
         )
 
 

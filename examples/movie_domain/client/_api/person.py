@@ -28,7 +28,7 @@ class PersonRolesAPI:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "Person.roles"},
+            {"space": "IntegrationTestsImmutable", "externalId": "Person.roles"},
         )
         if isinstance(external_id, str):
             is_person = f.Equals(
@@ -51,7 +51,7 @@ class PersonRolesAPI:
         filters = []
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "Person.roles"},
+            {"space": "IntegrationTestsImmutable", "externalId": "Person.roles"},
         )
         filters.append(is_edge_type)
         if person_id:
