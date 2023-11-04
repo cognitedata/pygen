@@ -35,6 +35,26 @@ class ValueTransformationAPI(TypeAPI[ValueTransformation, ValueTransformationApp
     def apply(
         self, value_transformation: ValueTransformationApply | Sequence[ValueTransformationApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) value transformations.
+
+        Args:
+            value_transformation: Value transformation or sequence of value transformations to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new value_transformation:
+
+                >>> from markets.client import MarketClient
+                >>> from markets.client.data_classes import ValueTransformationApply
+                >>> client = MarketClient()
+                >>> value_transformation = ValueTransformationApply(external_id="my_value_transformation", ...)
+                >>> result = client.value_transformation.apply(value_transformation)
+
+        """
         if isinstance(value_transformation, ValueTransformationApply):
             instances = value_transformation.to_instances_apply(self._view_by_write_class)
         else:

@@ -35,6 +35,26 @@ class BestLeadingActorAPI(TypeAPI[BestLeadingActor, BestLeadingActorApply, BestL
     def apply(
         self, best_leading_actor: BestLeadingActorApply | Sequence[BestLeadingActorApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) best leading actors.
+
+        Args:
+            best_leading_actor: Best leading actor or sequence of best leading actors to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new best_leading_actor:
+
+                >>> from movie_domain.client import MovieClient
+                >>> from movie_domain.client.data_classes import BestLeadingActorApply
+                >>> client = MovieClient()
+                >>> best_leading_actor = BestLeadingActorApply(external_id="my_best_leading_actor", ...)
+                >>> result = client.best_leading_actor.apply(best_leading_actor)
+
+        """
         if isinstance(best_leading_actor, BestLeadingActorApply):
             instances = best_leading_actor.to_instances_apply(self._view_by_write_class)
         else:

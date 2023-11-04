@@ -76,6 +76,30 @@ class CdfEntityAPI(TypeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
     def apply(
         self, cdf_3_d_entity: CdfEntityApply | Sequence[CdfEntityApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) cdf 3 d entities.
+
+        Note: This method iterates through all nodes linked to cdf_3_d_entity and create them including the edges
+        between the nodes. For example, if any of `in_model_3_d` are set, then these
+        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+
+        Args:
+            cdf_3_d_entity: Cdf 3 d entity or sequence of cdf 3 d entities to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new cdf_3_d_entity:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> from tutorial_apm_simple.client.data_classes import CdfEntityApply
+                >>> client = ApmSimpleClient()
+                >>> cdf_3_d_entity = CdfEntityApply(external_id="my_cdf_3_d_entity", ...)
+                >>> result = client.cdf_3_d_entity.apply(cdf_3_d_entity)
+
+        """
         if isinstance(cdf_3_d_entity, CdfEntityApply):
             instances = cdf_3_d_entity.to_instances_apply(self._view_by_write_class)
         else:

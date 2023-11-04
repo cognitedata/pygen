@@ -33,6 +33,26 @@ class LegalAPI(TypeAPI[Legal, LegalApply, LegalList]):
         self._view_by_write_class = view_by_write_class
 
     def apply(self, legal: LegalApply | Sequence[LegalApply], replace: bool = False) -> dm.InstancesApplyResult:
+        """Add or update (upsert) legals.
+
+        Args:
+            legal: Legal or sequence of legals to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new legal:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> from osdu_wells.client.data_classes import LegalApply
+                >>> client = OSDUClient()
+                >>> legal = LegalApply(external_id="my_legal", ...)
+                >>> result = client.legal.apply(legal)
+
+        """
         if isinstance(legal, LegalApply):
             instances = legal.to_instances_apply(self._view_by_write_class)
         else:

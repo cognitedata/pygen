@@ -33,6 +33,26 @@ class AclAPI(TypeAPI[Acl, AclApply, AclList]):
         self._view_by_write_class = view_by_write_class
 
     def apply(self, acl: AclApply | Sequence[AclApply], replace: bool = False) -> dm.InstancesApplyResult:
+        """Add or update (upsert) acls.
+
+        Args:
+            acl: Acl or sequence of acls to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new acl:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> from osdu_wells.client.data_classes import AclApply
+                >>> client = OSDUClient()
+                >>> acl = AclApply(external_id="my_acl", ...)
+                >>> result = client.acl.apply(acl)
+
+        """
         if isinstance(acl, AclApply):
             instances = acl.to_instances_apply(self._view_by_write_class)
         else:

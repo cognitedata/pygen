@@ -35,6 +35,26 @@ class AcceptableUsageAPI(TypeAPI[AcceptableUsage, AcceptableUsageApply, Acceptab
     def apply(
         self, acceptable_usage: AcceptableUsageApply | Sequence[AcceptableUsageApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) acceptable usages.
+
+        Args:
+            acceptable_usage: Acceptable usage or sequence of acceptable usages to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new acceptable_usage:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> from osdu_wells.client.data_classes import AcceptableUsageApply
+                >>> client = OSDUClient()
+                >>> acceptable_usage = AcceptableUsageApply(external_id="my_acceptable_usage", ...)
+                >>> result = client.acceptable_usage.apply(acceptable_usage)
+
+        """
         if isinstance(acceptable_usage, AcceptableUsageApply):
             instances = acceptable_usage.to_instances_apply(self._view_by_write_class)
         else:

@@ -35,6 +35,26 @@ class GeometryAPI(TypeAPI[Geometry, GeometryApply, GeometryList]):
     def apply(
         self, geometry: GeometryApply | Sequence[GeometryApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) geometries.
+
+        Args:
+            geometry: Geometry or sequence of geometries to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new geometry:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> from osdu_wells.client.data_classes import GeometryApply
+                >>> client = OSDUClient()
+                >>> geometry = GeometryApply(external_id="my_geometry", ...)
+                >>> result = client.geometry.apply(geometry)
+
+        """
         if isinstance(geometry, GeometryApply):
             instances = geometry.to_instances_apply(self._view_by_write_class)
         else:

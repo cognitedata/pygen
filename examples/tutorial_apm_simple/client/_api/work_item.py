@@ -84,6 +84,30 @@ class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
     def apply(
         self, work_item: WorkItemApply | Sequence[WorkItemApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) work items.
+
+        Note: This method iterates through all nodes linked to work_item and create them including the edges
+        between the nodes. For example, if any of `linked_assets` are set, then these
+        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+
+        Args:
+            work_item: Work item or sequence of work items to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new work_item:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> from tutorial_apm_simple.client.data_classes import WorkItemApply
+                >>> client = ApmSimpleClient()
+                >>> work_item = WorkItemApply(external_id="my_work_item", ...)
+                >>> result = client.work_item.apply(work_item)
+
+        """
         if isinstance(work_item, WorkItemApply):
             instances = work_item.to_instances_apply(self._view_by_write_class)
         else:

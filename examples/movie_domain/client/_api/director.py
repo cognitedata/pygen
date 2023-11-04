@@ -127,6 +127,30 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
     def apply(
         self, director: DirectorApply | Sequence[DirectorApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) directors.
+
+        Note: This method iterates through all nodes linked to director and create them including the edges
+        between the nodes. For example, if any of `movies` or `nomination` are set, then these
+        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+
+        Args:
+            director: Director or sequence of directors to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new director:
+
+                >>> from movie_domain.client import MovieClient
+                >>> from movie_domain.client.data_classes import DirectorApply
+                >>> client = MovieClient()
+                >>> director = DirectorApply(external_id="my_director", ...)
+                >>> result = client.director.apply(director)
+
+        """
         if isinstance(director, DirectorApply):
             instances = director.to_instances_apply(self._view_by_write_class)
         else:

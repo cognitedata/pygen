@@ -118,6 +118,30 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
         self.nomination = ActorNominationAPI(client)
 
     def apply(self, actor: ActorApply | Sequence[ActorApply], replace: bool = False) -> dm.InstancesApplyResult:
+        """Add or update (upsert) actors.
+
+        Note: This method iterates through all nodes linked to actor and create them including the edges
+        between the nodes. For example, if any of `movies` or `nomination` are set, then these
+        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+
+        Args:
+            actor: Actor or sequence of actors to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new actor:
+
+                >>> from movie_domain.client import MovieClient
+                >>> from movie_domain.client.data_classes import ActorApply
+                >>> client = MovieClient()
+                >>> actor = ActorApply(external_id="my_actor", ...)
+                >>> result = client.actor.apply(actor)
+
+        """
         if isinstance(actor, ActorApply):
             instances = actor.to_instances_apply(self._view_by_write_class)
         else:

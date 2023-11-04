@@ -91,6 +91,30 @@ class WellboreTrajectoryAPI(TypeAPI[WellboreTrajectory, WellboreTrajectoryApply,
     def apply(
         self, wellbore_trajectory: WellboreTrajectoryApply | Sequence[WellboreTrajectoryApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) wellbore trajectories.
+
+        Note: This method iterates through all nodes linked to wellbore_trajectory and create them including the edges
+        between the nodes. For example, if any of `meta` are set, then these
+        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+
+        Args:
+            wellbore_trajectory: Wellbore trajectory or sequence of wellbore trajectories to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new wellbore_trajectory:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> from osdu_wells.client.data_classes import WellboreTrajectoryApply
+                >>> client = OSDUClient()
+                >>> wellbore_trajectory = WellboreTrajectoryApply(external_id="my_wellbore_trajectory", ...)
+                >>> result = client.wellbore_trajectory.apply(wellbore_trajectory)
+
+        """
         if isinstance(wellbore_trajectory, WellboreTrajectoryApply):
             instances = wellbore_trajectory.to_instances_apply(self._view_by_write_class)
         else:

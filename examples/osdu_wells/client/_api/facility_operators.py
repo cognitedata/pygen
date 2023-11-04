@@ -35,6 +35,26 @@ class FacilityOperatorsAPI(TypeAPI[FacilityOperators, FacilityOperatorsApply, Fa
     def apply(
         self, facility_operator: FacilityOperatorsApply | Sequence[FacilityOperatorsApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) facility operators.
+
+        Args:
+            facility_operator: Facility operator or sequence of facility operators to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new facility_operator:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> from osdu_wells.client.data_classes import FacilityOperatorsApply
+                >>> client = OSDUClient()
+                >>> facility_operator = FacilityOperatorsApply(external_id="my_facility_operator", ...)
+                >>> result = client.facility_operators.apply(facility_operator)
+
+        """
         if isinstance(facility_operator, FacilityOperatorsApply):
             instances = facility_operator.to_instances_apply(self._view_by_write_class)
         else:

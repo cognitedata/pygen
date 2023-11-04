@@ -137,6 +137,30 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
     def apply(
         self, work_order: WorkOrderApply | Sequence[WorkOrderApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) work orders.
+
+        Note: This method iterates through all nodes linked to work_order and create them including the edges
+        between the nodes. For example, if any of `linked_assets` or `work_items` are set, then these
+        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+
+        Args:
+            work_order: Work order or sequence of work orders to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new work_order:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> from tutorial_apm_simple.client.data_classes import WorkOrderApply
+                >>> client = ApmSimpleClient()
+                >>> work_order = WorkOrderApply(external_id="my_work_order", ...)
+                >>> result = client.work_order.apply(work_order)
+
+        """
         if isinstance(work_order, WorkOrderApply):
             instances = work_order.to_instances_apply(self._view_by_write_class)
         else:

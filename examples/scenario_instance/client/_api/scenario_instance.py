@@ -424,6 +424,26 @@ class ScenarioInstanceAPI(TypeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
     def apply(
         self, scenario_instance: ScenarioInstanceApply | Sequence[ScenarioInstanceApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) scenario instances.
+
+        Args:
+            scenario_instance: Scenario instance or sequence of scenario instances to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new scenario_instance:
+
+                >>> from scenario_instance.client import ScenarioInstanceClient
+                >>> from scenario_instance.client.data_classes import ScenarioInstanceApply
+                >>> client = ScenarioInstanceClient()
+                >>> scenario_instance = ScenarioInstanceApply(external_id="my_scenario_instance", ...)
+                >>> result = client.scenario_instance.apply(scenario_instance)
+
+        """
         if isinstance(scenario_instance, ScenarioInstanceApply):
             instances = scenario_instance.to_instances_apply(self._view_by_write_class)
         else:

@@ -687,6 +687,26 @@ class RatingAPI(TypeAPI[Rating, RatingApply, RatingList]):
         self.votes = RatingVotesAPI(client, view_id)
 
     def apply(self, rating: RatingApply | Sequence[RatingApply], replace: bool = False) -> dm.InstancesApplyResult:
+        """Add or update (upsert) ratings.
+
+        Args:
+            rating: Rating or sequence of ratings to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new rating:
+
+                >>> from movie_domain.client import MovieClient
+                >>> from movie_domain.client.data_classes import RatingApply
+                >>> client = MovieClient()
+                >>> rating = RatingApply(external_id="my_rating", ...)
+                >>> result = client.rating.apply(rating)
+
+        """
         if isinstance(rating, RatingApply):
             instances = rating.to_instances_apply(self._view_by_write_class)
         else:

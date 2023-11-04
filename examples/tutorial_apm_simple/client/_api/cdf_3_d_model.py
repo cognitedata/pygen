@@ -86,6 +86,30 @@ class CdfModelAPI(TypeAPI[CdfModel, CdfModelApply, CdfModelList]):
     def apply(
         self, cdf_3_d_model: CdfModelApply | Sequence[CdfModelApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) cdf 3 d models.
+
+        Note: This method iterates through all nodes linked to cdf_3_d_model and create them including the edges
+        between the nodes. For example, if any of `entities` are set, then these
+        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+
+        Args:
+            cdf_3_d_model: Cdf 3 d model or sequence of cdf 3 d models to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new cdf_3_d_model:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> from tutorial_apm_simple.client.data_classes import CdfModelApply
+                >>> client = ApmSimpleClient()
+                >>> cdf_3_d_model = CdfModelApply(external_id="my_cdf_3_d_model", ...)
+                >>> result = client.cdf_3_d_model.apply(cdf_3_d_model)
+
+        """
         if isinstance(cdf_3_d_model, CdfModelApply):
             instances = cdf_3_d_model.to_instances_apply(self._view_by_write_class)
         else:

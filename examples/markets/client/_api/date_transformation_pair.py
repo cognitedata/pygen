@@ -143,6 +143,30 @@ class DateTransformationPairAPI(
         date_transformation_pair: DateTransformationPairApply | Sequence[DateTransformationPairApply],
         replace: bool = False,
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) date transformation pairs.
+
+        Note: This method iterates through all nodes linked to date_transformation_pair and create them including the edges
+        between the nodes. For example, if any of `end` or `start` are set, then these
+        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+
+        Args:
+            date_transformation_pair: Date transformation pair or sequence of date transformation pairs to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new date_transformation_pair:
+
+                >>> from markets.client import MarketClient
+                >>> from markets.client.data_classes import DateTransformationPairApply
+                >>> client = MarketClient()
+                >>> date_transformation_pair = DateTransformationPairApply(external_id="my_date_transformation_pair", ...)
+                >>> result = client.date_transformation_pair.apply(date_transformation_pair)
+
+        """
         if isinstance(date_transformation_pair, DateTransformationPairApply):
             instances = date_transformation_pair.to_instances_apply(self._view_by_write_class)
         else:

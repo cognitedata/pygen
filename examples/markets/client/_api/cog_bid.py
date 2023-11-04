@@ -34,6 +34,26 @@ class CogBidAPI(TypeAPI[CogBid, CogBidApply, CogBidList]):
         self._view_by_write_class = view_by_write_class
 
     def apply(self, cog_bid: CogBidApply | Sequence[CogBidApply], replace: bool = False) -> dm.InstancesApplyResult:
+        """Add or update (upsert) cog bids.
+
+        Args:
+            cog_bid: Cog bid or sequence of cog bids to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new cog_bid:
+
+                >>> from markets.client import MarketClient
+                >>> from markets.client.data_classes import CogBidApply
+                >>> client = MarketClient()
+                >>> cog_bid = CogBidApply(external_id="my_cog_bid", ...)
+                >>> result = client.cog_bid.apply(cog_bid)
+
+        """
         if isinstance(cog_bid, CogBidApply):
             instances = cog_bid.to_instances_apply(self._view_by_write_class)
         else:

@@ -42,6 +42,26 @@ class GeographicBottomHoleLocationAPI(
         | Sequence[GeographicBottomHoleLocationApply],
         replace: bool = False,
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) geographic bottom hole locations.
+
+        Args:
+            geographic_bottom_hole_location: Geographic bottom hole location or sequence of geographic bottom hole locations to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new geographic_bottom_hole_location:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> from osdu_wells.client.data_classes import GeographicBottomHoleLocationApply
+                >>> client = OSDUClient()
+                >>> geographic_bottom_hole_location = GeographicBottomHoleLocationApply(external_id="my_geographic_bottom_hole_location", ...)
+                >>> result = client.geographic_bottom_hole_location.apply(geographic_bottom_hole_location)
+
+        """
         if isinstance(geographic_bottom_hole_location, GeographicBottomHoleLocationApply):
             instances = geographic_bottom_hole_location.to_instances_apply(self._view_by_write_class)
         else:

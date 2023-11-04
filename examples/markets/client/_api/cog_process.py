@@ -35,6 +35,26 @@ class CogProcessAPI(TypeAPI[CogProcess, CogProcessApply, CogProcessList]):
     def apply(
         self, cog_proces: CogProcessApply | Sequence[CogProcessApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) cog process.
+
+        Args:
+            cog_proces: Cog proces or sequence of cog process to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new cog_proces:
+
+                >>> from markets.client import MarketClient
+                >>> from markets.client.data_classes import CogProcessApply
+                >>> client = MarketClient()
+                >>> cog_proces = CogProcessApply(external_id="my_cog_proces", ...)
+                >>> result = client.cog_process.apply(cog_proces)
+
+        """
         if isinstance(cog_proces, CogProcessApply):
             instances = cog_proces.to_instances_apply(self._view_by_write_class)
         else:

@@ -36,6 +36,26 @@ class PygenBidAPI(TypeAPI[PygenBid, PygenBidApply, PygenBidList]):
     def apply(
         self, pygen_bid: PygenBidApply | Sequence[PygenBidApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) pygen bids.
+
+        Args:
+            pygen_bid: Pygen bid or sequence of pygen bids to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new pygen_bid:
+
+                >>> from markets.client import MarketClient
+                >>> from markets.client.data_classes import PygenBidApply
+                >>> client = MarketClient()
+                >>> pygen_bid = PygenBidApply(external_id="my_pygen_bid", ...)
+                >>> result = client.pygen_bid.apply(pygen_bid)
+
+        """
         if isinstance(pygen_bid, PygenBidApply):
             instances = pygen_bid.to_instances_apply(self._view_by_write_class)
         else:

@@ -468,6 +468,30 @@ class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
     def apply(
         self, well_datum: WellDataApply | Sequence[WellDataApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) well data.
+
+        Note: This method iterates through all nodes linked to well_datum and create them including the edges
+        between the nodes. For example, if any of `facility_events`, `facility_operators`, `facility_specifications`, `facility_states`, `geo_contexts`, `historical_interests`, `name_aliases`, `technical_assurances` or `vertical_measurements` are set, then these
+        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+
+        Args:
+            well_datum: Well datum or sequence of well data to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new well_datum:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> from osdu_wells.client.data_classes import WellDataApply
+                >>> client = OSDUClient()
+                >>> well_datum = WellDataApply(external_id="my_well_datum", ...)
+                >>> result = client.well_data.apply(well_datum)
+
+        """
         if isinstance(well_datum, WellDataApply):
             instances = well_datum.to_instances_apply(self._view_by_write_class)
         else:

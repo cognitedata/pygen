@@ -91,6 +91,30 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
     def apply(
         self, wgs_84_coordinate: WgsCoordinatesApply | Sequence[WgsCoordinatesApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) wgs 84 coordinates.
+
+        Note: This method iterates through all nodes linked to wgs_84_coordinate and create them including the edges
+        between the nodes. For example, if any of `features` are set, then these
+        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+
+        Args:
+            wgs_84_coordinate: Wgs 84 coordinate or sequence of wgs 84 coordinates to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new wgs_84_coordinate:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> from osdu_wells.client.data_classes import WgsCoordinatesApply
+                >>> client = OSDUClient()
+                >>> wgs_84_coordinate = WgsCoordinatesApply(external_id="my_wgs_84_coordinate", ...)
+                >>> result = client.wgs_84_coordinates.apply(wgs_84_coordinate)
+
+        """
         if isinstance(wgs_84_coordinate, WgsCoordinatesApply):
             instances = wgs_84_coordinate.to_instances_apply(self._view_by_write_class)
         else:

@@ -35,6 +35,26 @@ class NameAliasesAPI(TypeAPI[NameAliases, NameAliasesApply, NameAliasesList]):
     def apply(
         self, name_alias: NameAliasesApply | Sequence[NameAliasesApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) name aliases.
+
+        Args:
+            name_alias: Name alias or sequence of name aliases to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new name_alias:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> from osdu_wells.client.data_classes import NameAliasesApply
+                >>> client = OSDUClient()
+                >>> name_alias = NameAliasesApply(external_id="my_name_alias", ...)
+                >>> result = client.name_aliases.apply(name_alias)
+
+        """
         if isinstance(name_alias, NameAliasesApply):
             instances = name_alias.to_instances_apply(self._view_by_write_class)
         else:

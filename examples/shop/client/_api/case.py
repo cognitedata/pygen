@@ -34,6 +34,26 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
         self._view_by_write_class = view_by_write_class
 
     def apply(self, case: CaseApply | Sequence[CaseApply], replace: bool = False) -> dm.InstancesApplyResult:
+        """Add or update (upsert) cases.
+
+        Args:
+            case: Case or sequence of cases to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new case:
+
+                >>> from shop.client import ShopClient
+                >>> from shop.client.data_classes import CaseApply
+                >>> client = ShopClient()
+                >>> case = CaseApply(external_id="my_case", ...)
+                >>> result = client.case.apply(case)
+
+        """
         if isinstance(case, CaseApply):
             instances = case.to_instances_apply(self._view_by_write_class)
         else:

@@ -35,6 +35,26 @@ class HistoricalInterestsAPI(TypeAPI[HistoricalInterests, HistoricalInterestsApp
     def apply(
         self, historical_interest: HistoricalInterestsApply | Sequence[HistoricalInterestsApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) historical interests.
+
+        Args:
+            historical_interest: Historical interest or sequence of historical interests to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new historical_interest:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> from osdu_wells.client.data_classes import HistoricalInterestsApply
+                >>> client = OSDUClient()
+                >>> historical_interest = HistoricalInterestsApply(external_id="my_historical_interest", ...)
+                >>> result = client.historical_interests.apply(historical_interest)
+
+        """
         if isinstance(historical_interest, HistoricalInterestsApply):
             instances = historical_interest.to_instances_apply(self._view_by_write_class)
         else:

@@ -35,6 +35,26 @@ class SpatialAreaAPI(TypeAPI[SpatialArea, SpatialAreaApply, SpatialAreaList]):
     def apply(
         self, spatial_area: SpatialAreaApply | Sequence[SpatialAreaApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) spatial areas.
+
+        Args:
+            spatial_area: Spatial area or sequence of spatial areas to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new spatial_area:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> from osdu_wells.client.data_classes import SpatialAreaApply
+                >>> client = OSDUClient()
+                >>> spatial_area = SpatialAreaApply(external_id="my_spatial_area", ...)
+                >>> result = client.spatial_area.apply(spatial_area)
+
+        """
         if isinstance(spatial_area, SpatialAreaApply):
             instances = spatial_area.to_instances_apply(self._view_by_write_class)
         else:

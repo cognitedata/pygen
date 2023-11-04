@@ -19,7 +19,7 @@
                 >>> from {{ top_level_package }} import {{ client_name }}
                 >>> from {{ top_level_package }}.data_classes import {{ data_class.write_name }}
                 >>> client = {{ client_name }}()
-                >>> {{ data_class.variable }} = {{ data_class.write_name }}(external_id="my_external_id", ...)
+                >>> {{ data_class.variable }} = {{ data_class.write_name }}(external_id="my_{{ data_class.variable }}", ...)
                 >>> result = client.{{ api_class.client_attribute }}.apply({{ data_class.variable }})
 
         """

@@ -33,6 +33,26 @@ class MetaAPI(TypeAPI[Meta, MetaApply, MetaList]):
         self._view_by_write_class = view_by_write_class
 
     def apply(self, meta: MetaApply | Sequence[MetaApply], replace: bool = False) -> dm.InstancesApplyResult:
+        """Add or update (upsert) metas.
+
+        Args:
+            meta: Meta or sequence of metas to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new meta:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> from osdu_wells.client.data_classes import MetaApply
+                >>> client = OSDUClient()
+                >>> meta = MetaApply(external_id="my_meta", ...)
+                >>> result = client.meta.apply(meta)
+
+        """
         if isinstance(meta, MetaApply):
             instances = meta.to_instances_apply(self._view_by_write_class)
         else:

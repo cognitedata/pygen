@@ -540,6 +540,30 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
         self.pressure = AssetPressureAPI(client, view_id)
 
     def apply(self, asset: AssetApply | Sequence[AssetApply], replace: bool = False) -> dm.InstancesApplyResult:
+        """Add or update (upsert) assets.
+
+        Note: This method iterates through all nodes linked to asset and create them including the edges
+        between the nodes. For example, if any of `children` or `in_model_3_d` are set, then these
+        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+
+        Args:
+            asset: Asset or sequence of assets to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new asset:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> from tutorial_apm_simple.client.data_classes import AssetApply
+                >>> client = ApmSimpleClient()
+                >>> asset = AssetApply(external_id="my_asset", ...)
+                >>> result = client.asset.apply(asset)
+
+        """
         if isinstance(asset, AssetApply):
             instances = asset.to_instances_apply(self._view_by_write_class)
         else:

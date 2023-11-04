@@ -619,6 +619,30 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
     def apply(
         self, wellbore_datum: WellboreDataApply | Sequence[WellboreDataApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) wellbore data.
+
+        Note: This method iterates through all nodes linked to wellbore_datum and create them including the edges
+        between the nodes. For example, if any of `drilling_reasons`, `facility_events`, `facility_operators`, `facility_specifications`, `facility_states`, `geo_contexts`, `historical_interests`, `name_aliases`, `technical_assurances`, `vertical_measurements` or `wellbore_costs` are set, then these
+        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+
+        Args:
+            wellbore_datum: Wellbore datum or sequence of wellbore data to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new wellbore_datum:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> from osdu_wells.client.data_classes import WellboreDataApply
+                >>> client = OSDUClient()
+                >>> wellbore_datum = WellboreDataApply(external_id="my_wellbore_datum", ...)
+                >>> result = client.wellbore_data.apply(wellbore_datum)
+
+        """
         if isinstance(wellbore_datum, WellboreDataApply):
             instances = wellbore_datum.to_instances_apply(self._view_by_write_class)
         else:

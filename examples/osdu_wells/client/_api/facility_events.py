@@ -35,6 +35,26 @@ class FacilityEventsAPI(TypeAPI[FacilityEvents, FacilityEventsApply, FacilityEve
     def apply(
         self, facility_event: FacilityEventsApply | Sequence[FacilityEventsApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) facility events.
+
+        Args:
+            facility_event: Facility event or sequence of facility events to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new facility_event:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> from osdu_wells.client.data_classes import FacilityEventsApply
+                >>> client = OSDUClient()
+                >>> facility_event = FacilityEventsApply(external_id="my_facility_event", ...)
+                >>> result = client.facility_events.apply(facility_event)
+
+        """
         if isinstance(facility_event, FacilityEventsApply):
             instances = facility_event.to_instances_apply(self._view_by_write_class)
         else:

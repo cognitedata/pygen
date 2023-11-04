@@ -80,6 +80,30 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
         self.roles = PersonRolesAPI(client)
 
     def apply(self, person: PersonApply | Sequence[PersonApply], replace: bool = False) -> dm.InstancesApplyResult:
+        """Add or update (upsert) persons.
+
+        Note: This method iterates through all nodes linked to person and create them including the edges
+        between the nodes. For example, if any of `roles` are set, then these
+        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+
+        Args:
+            person: Person or sequence of persons to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new person:
+
+                >>> from movie_domain.client import MovieClient
+                >>> from movie_domain.client.data_classes import PersonApply
+                >>> client = MovieClient()
+                >>> person = PersonApply(external_id="my_person", ...)
+                >>> result = client.person.apply(person)
+
+        """
         if isinstance(person, PersonApply):
             instances = person.to_instances_apply(self._view_by_write_class)
         else:

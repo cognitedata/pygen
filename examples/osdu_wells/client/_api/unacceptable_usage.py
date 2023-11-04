@@ -35,6 +35,26 @@ class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
     def apply(
         self, unacceptable_usage: UnacceptableUsageApply | Sequence[UnacceptableUsageApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) unacceptable usages.
+
+        Args:
+            unacceptable_usage: Unacceptable usage or sequence of unacceptable usages to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new unacceptable_usage:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> from osdu_wells.client.data_classes import UnacceptableUsageApply
+                >>> client = OSDUClient()
+                >>> unacceptable_usage = UnacceptableUsageApply(external_id="my_unacceptable_usage", ...)
+                >>> result = client.unacceptable_usage.apply(unacceptable_usage)
+
+        """
         if isinstance(unacceptable_usage, UnacceptableUsageApply):
             instances = unacceptable_usage.to_instances_apply(self._view_by_write_class)
         else:

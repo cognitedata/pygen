@@ -35,6 +35,26 @@ class ReviewersAPI(TypeAPI[Reviewers, ReviewersApply, ReviewersList]):
     def apply(
         self, reviewer: ReviewersApply | Sequence[ReviewersApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) reviewers.
+
+        Args:
+            reviewer: Reviewer or sequence of reviewers to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new reviewer:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> from osdu_wells.client.data_classes import ReviewersApply
+                >>> client = OSDUClient()
+                >>> reviewer = ReviewersApply(external_id="my_reviewer", ...)
+                >>> result = client.reviewers.apply(reviewer)
+
+        """
         if isinstance(reviewer, ReviewersApply):
             instances = reviewer.to_instances_apply(self._view_by_write_class)
         else:

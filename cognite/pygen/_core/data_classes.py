@@ -528,7 +528,11 @@ class DataClass:
 
     @property
     def one_to_many_edges_docs(self) -> str:
-        return ", ".join(f"`{field_.name}`" for field_ in self.one_to_many_edges)
+        edges = list(self.one_to_many_edges)
+        if len(edges) == 1:
+            return f"`{edges[0].name}`"
+        else:
+            return ", ".join(f"`{field_.name}`" for field_ in edges[:-1]) + f" or `{edges[-1].name}`"
 
     @property
     def fields_literals(self) -> str:

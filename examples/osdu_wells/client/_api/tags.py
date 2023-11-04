@@ -33,6 +33,26 @@ class TagsAPI(TypeAPI[Tags, TagsApply, TagsList]):
         self._view_by_write_class = view_by_write_class
 
     def apply(self, tag: TagsApply | Sequence[TagsApply], replace: bool = False) -> dm.InstancesApplyResult:
+        """Add or update (upsert) tags.
+
+        Args:
+            tag: Tag or sequence of tags to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new tag:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> from osdu_wells.client.data_classes import TagsApply
+                >>> client = OSDUClient()
+                >>> tag = TagsApply(external_id="my_tag", ...)
+                >>> result = client.tags.apply(tag)
+
+        """
         if isinstance(tag, TagsApply):
             instances = tag.to_instances_apply(self._view_by_write_class)
         else:

@@ -35,6 +35,26 @@ class SpatialPointAPI(TypeAPI[SpatialPoint, SpatialPointApply, SpatialPointList]
     def apply(
         self, spatial_point: SpatialPointApply | Sequence[SpatialPointApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) spatial points.
+
+        Args:
+            spatial_point: Spatial point or sequence of spatial points to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new spatial_point:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> from osdu_wells.client.data_classes import SpatialPointApply
+                >>> client = OSDUClient()
+                >>> spatial_point = SpatialPointApply(external_id="my_spatial_point", ...)
+                >>> result = client.spatial_point.apply(spatial_point)
+
+        """
         if isinstance(spatial_point, SpatialPointApply):
             instances = spatial_point.to_instances_apply(self._view_by_write_class)
         else:

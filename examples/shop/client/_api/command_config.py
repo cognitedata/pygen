@@ -35,6 +35,26 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
     def apply(
         self, command_config: CommandConfigApply | Sequence[CommandConfigApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) command configs.
+
+        Args:
+            command_config: Command config or sequence of command configs to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new command_config:
+
+                >>> from shop.client import ShopClient
+                >>> from shop.client.data_classes import CommandConfigApply
+                >>> client = ShopClient()
+                >>> command_config = CommandConfigApply(external_id="my_command_config", ...)
+                >>> result = client.command_config.apply(command_config)
+
+        """
         if isinstance(command_config, CommandConfigApply):
             instances = command_config.to_instances_apply(self._view_by_write_class)
         else:

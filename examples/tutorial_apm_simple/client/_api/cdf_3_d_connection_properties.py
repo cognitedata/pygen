@@ -40,6 +40,26 @@ class CdfConnectionPropertiesAPI(
         cdf_3_d_connection_property: CdfConnectionPropertiesApply | Sequence[CdfConnectionPropertiesApply],
         replace: bool = False,
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) cdf 3 d connection properties.
+
+        Args:
+            cdf_3_d_connection_property: Cdf 3 d connection property or sequence of cdf 3 d connection properties to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            InstancesApplyResult: Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new cdf_3_d_connection_property:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> from tutorial_apm_simple.client.data_classes import CdfConnectionPropertiesApply
+                >>> client = ApmSimpleClient()
+                >>> cdf_3_d_connection_property = CdfConnectionPropertiesApply(external_id="my_cdf_3_d_connection_property", ...)
+                >>> result = client.cdf_3_d_connection_properties.apply(cdf_3_d_connection_property)
+
+        """
         if isinstance(cdf_3_d_connection_property, CdfConnectionPropertiesApply):
             instances = cdf_3_d_connection_property.to_instances_apply(self._view_by_write_class)
         else:
