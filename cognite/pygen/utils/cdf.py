@@ -640,13 +640,14 @@ def clean_model(client: CogniteClient, model_id: DataModelIdentifier, remove_spa
 
 
 def clean_space(client: CogniteClient, space: str) -> None:
-    is_source_space = filters.Equals(["edge", "startNode", "space"], space)
-    edges = client.data_modeling.instances.list("edge", limit=-1, filter=is_source_space)
-    is_space = filters.Equals(["node", "space"], space)
-    nodes = client.data_modeling.instances.list("node", limit=-1, filter=is_space)
-    if edges or nodes:
-        instances = client.data_modeling.instances.delete(nodes=nodes.as_ids(), edges=edges.as_ids())
-        print(f"Deleted {len(instances.nodes)} edges and {len(instances.nodes)} nodes")
+    edges = client.data_modeling.instances.list("edge", limit=-1, filter=filters.Equals(["edge", "space"], space))
+    if edges:
+        instances = client.data_modeling.instances.delete(edges=edges.as_ids())
+        print(f"Deleted {len(instances.edges)} edges")
+    nodes = client.data_modeling.instances.list("node", limit=-1, filter=filters.Equals(["node", "space"], space))
+    if nodes:
+        instances = client.data_modeling.instances.delete(nodes=nodes.as_ids())
+        print(f"Deleted {len(instances.nodes)} nodes")
     views = client.data_modeling.views.list(limit=-1, space=space)
     if views:
         deleted_views = client.data_modeling.views.delete(views.as_ids())
