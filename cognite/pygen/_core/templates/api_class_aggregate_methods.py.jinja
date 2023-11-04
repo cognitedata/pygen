@@ -46,6 +46,32 @@
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across {{ data_class.doc_name_plural }}
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.{% if data_class.has_text_field %}
+            query: The query to search for in the text field.
+            search_property: The text field to search in.{% endif %}{% for parm in list_method.parameters %}
+            {{ parm.name }}: {{ parm.description }}{% endfor %}
+            limit: Maximum number of {{ data_class.doc_name_plural }} to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above. {% if data_class.has_one_to_many_edges %}
+            retrieve_edges: Whether to retrieve {{ data_class.one_to_many_edges_docs }} external ids for the {{ data_class.doc_name_plural }}. Defaults to True.{% endif %}
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count {{ data_class.doc_name_plural }} in space `my_space`:
+
+                >>> from {{ top_level_package }} import {{ client_name }}
+                >>> client = {{ client_name }}()
+                >>> result = client.{{ api_class.client_attribute }}.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,{% for parm in list_method.parameters %}
             {{ parm.name }},{% endfor %}
@@ -75,6 +101,22 @@
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for {{ data_class.doc_name_plural }}
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.{% if data_class.has_text_field %}
+            query: The query to search for in the text field.
+            search_property: The text field to search in.{% endif %}{% for parm in list_method.parameters %}
+            {{ parm.name }}: {{ parm.description }}{% endfor %}
+            limit: Maximum number of {{ data_class.doc_name_plural }} to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above. {% if data_class.has_one_to_many_edges %}
+            retrieve_edges: Whether to retrieve {{ data_class.one_to_many_edges_docs }} external ids for the {{ data_class.doc_name_plural }}. Defaults to True.{% endif %}
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,{% for parm in list_method.parameters %}
             {{ parm.name }},{% endfor %}
