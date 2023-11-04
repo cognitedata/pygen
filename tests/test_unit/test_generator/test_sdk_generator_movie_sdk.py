@@ -72,6 +72,7 @@ def create_fields_test_cases():
         PrimitiveField(
             name="name",
             prop_name="name",
+            doc_name="name",
             type_="str",
             prop=cast(dm.MappedProperty, prop),
             is_nullable=False,
@@ -115,6 +116,7 @@ def create_fields_test_cases():
         EdgeOneToMany(
             name="roles",
             prop_name="roles",
+            doc_name="role",
             prop=cast(dm.SingleHopConnectionDefinition, prop),
             data_class=data_class,
             variable="role",
@@ -150,6 +152,7 @@ def create_fields_test_cases():
             type_="str",
             is_nullable=False,
             pydantic_field="Field",
+            doc_name="config",
         ),
         "Optional[list[str]] = None",
         "list[str]",
@@ -195,6 +198,7 @@ def create_fields_test_cases():
         EdgeOneToOne(
             name="person",
             prop_name="person",
+            doc_name="person",
             prop=cast(dm.MappedProperty, prop),
             data_class=data_class,
             pydantic_field="Field",
@@ -225,6 +229,7 @@ def create_fields_test_cases():
         PrimitiveField(
             name="won_oscar",
             prop_name="wonOscar",
+            doc_name="won oscar",
             prop=cast(dm.MappedProperty, prop),
             is_nullable=True,
             default=None,
@@ -397,12 +402,12 @@ def test_create_list_method(person_view: dm.View, pygen_config: PygenConfig) -> 
         field_naming=pygen_config.naming.field,
     )
     parameters = [
-        FilterParameter("min_birth_year", "int"),
-        FilterParameter("max_birth_year", "int"),
-        FilterParameter("name", "str | list[str]"),
-        FilterParameter("name_prefix", "str"),
-        FilterParameter("external_id_prefix", "str"),
-        FilterParameter("space", "str | list[str]"),
+        FilterParameter("min_birth_year", "int", description="The minimum value of the birth year to filter on."),
+        FilterParameter("max_birth_year", "int", description="The maximum value of the birth year to filter on."),
+        FilterParameter("name", "str | list[str]", description="The name to filter on."),
+        FilterParameter("name_prefix", "str", description="The prefix of the name to filter on."),
+        FilterParameter("external_id_prefix", "str", description="The prefix of the external ID to filter on."),
+        FilterParameter("space", "str | list[str]", description="The space to filter on."),
     ]
     expected = ListMethod(
         parameters=parameters,
@@ -447,11 +452,14 @@ def test_create_list_method_actors(actor_view: dm.View, pygen_config: PygenConfi
     )
     parameters = [
         FilterParameter(
-            "person", "str | tuple[str, str] | list[str] | list[tuple[str, str]]", space="IntegrationTestsImmutable"
+            "person",
+            "str | tuple[str, str] | list[str] | list[tuple[str, str]]",
+            space="IntegrationTestsImmutable",
+            description="The person to filter on.",
         ),
-        FilterParameter("won_oscar", "bool"),
-        FilterParameter("external_id_prefix", "str"),
-        FilterParameter("space", "str | list[str]"),
+        FilterParameter("won_oscar", "bool", description="The won oscar to filter on."),
+        FilterParameter("external_id_prefix", "str", description="The prefix of the external ID to filter on."),
+        FilterParameter("space", "str | list[str]", description="The space to filter on."),
     ]
     expected = ListMethod(
         parameters=parameters,
