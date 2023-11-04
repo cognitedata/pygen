@@ -7,6 +7,7 @@ from collections.abc import Sequence
 from contextlib import suppress
 from datetime import datetime
 from pathlib import Path
+from time import sleep
 from typing import Any, Callable, Optional, Protocol, Union, get_args, get_origin, get_type_hints
 
 from cognite.client import CogniteClient
@@ -15,7 +16,9 @@ from cognite.client.data_classes import FileMetadata, FileMetadataList, TimeSeri
 from cognite.client.data_classes._base import CogniteResource, T_CogniteResource, T_CogniteResourceList
 from cognite.client.data_classes.data_modeling import (
     ContainerId,
+    ContainerList,
     DataModel,
+    DataModelIdentifier,
     DirectRelationReference,
     EdgeApply,
     EdgeApplyResultList,
@@ -27,6 +30,7 @@ from cognite.client.data_classes.data_modeling import (
     NodeOrEdgeData,
     SingleHopConnectionDefinition,
     View,
+    ViewList,
     data_types,
 )
 from cognite.client.exceptions import CogniteNotFoundError
@@ -592,3 +596,80 @@ class CogniteResourceDataTypesConverter:
             return {"externalId": str(value)}
 
         return value
+
+
+def clean_model(client: CogniteClient, model_id: DataModelIdentifier, remove_space: bool = False) -> None:
+    """
+    Deletes the data model, the views and all the containers referenced by the views.
+
+    Args:
+        client: Connected CogniteClient
+        model_id: ID of the data model to delete.
+        remove_space: If True, the space will be deleted as well. Defaults to False.
+
+    """
+    model = client.data_modeling.data_models.retrieve(model_id, inline_views=True).latest_version()
+    views = ViewList([view for view in model.views])
+    containers = ContainerList(
+        [prop.container for view in views for prop in view.properties.values() if isinstance(prop, MappedProperty)]
+    )
+
+    if containers:
+        deleted_containers = client.data_modeling.containers.delete(containers.as_ids())
+        print(f"Deleted {len(deleted_containers)} containers")
+    for _ in range(3):
+        deleted_views = client.data_modeling.views.delete(views.as_ids())
+        print(f"Deleted {len(deleted_views)} views")
+
+        retrieved = client.data_modeling.views.retrieve(ids=views.as_ids())
+        if not retrieved:
+            break
+        # Views are not always successfully deleted on the first try, so we have a retry logic.
+        sleep(1)
+    deleted_model = client.data_modeling.data_models.delete(model_id)
+    print(f"Deleted {len(deleted_model)} data models")
+
+    if remove_space:
+        deleted_space = client.data_modeling.spaces.delete(model.space)
+        print(f"Deleted space {deleted_space}")
+
+
+def clean_model_interactive(client: CogniteClient, remove_space: bool = False) -> None:
+    """
+    Interactive version of clean_model.
+
+    This will list all available spaces, and let the user select which one to delete from,
+    and then list all available models in that space, and let the user select which one to delete.
+
+    Args:
+        client: Connected CogniteClient
+        remove_space: If True, the space will be deleted as well. Defaults to False.
+
+    """
+    spaces = client.data_modeling.spaces.list(limit=-1)
+    if not spaces:
+        print("No spaces found")
+        return
+    index = _user_options(spaces.as_ids())
+    selected_space = spaces[index]
+    models = client.data_modeling.data_models.list(space=selected_space.name, limit=-1)
+    if not models:
+        print("No models found")
+        return
+    index = _user_options([(model.external_id, model.version) for model in models])
+    selected_model = models[index]
+    clean_model(client, selected_model.as_id(), remove_space)
+
+
+def _user_options(alternatives: list) -> int:
+    for i, alternative in enumerate(alternatives, 1):
+        print(f"{i}) {alternative}")
+    print("\n q) Quit")
+    while True:
+        answer = input("Select option: ")
+        if answer.casefold() == "q":
+            raise KeyboardInterrupt
+        try:
+            return int(answer) - 1
+        except ValueError:
+            print("Invalid input, please try again")
