@@ -158,7 +158,7 @@ def person_apply_to_instances_test_cases():
                         "version": "2",
                     },
                     "properties": {
-                        "person": {"externalId": "person:quentin_tarantino", "space": "instance_space"},
+                        "person": {"externalId": "person:quentin_tarantino", "space": "IntegrationTestsImmutable"},
                         "wonOscar": False,
                     },
                 }
@@ -215,7 +215,7 @@ def person_apply_to_instances_test_cases():
                         "version": "2",
                     },
                     "properties": {
-                        "person": {"externalId": "person:quentin_tarantino", "space": "instance_space"},
+                        "person": {"externalId": "person:quentin_tarantino", "space": "IntegrationTestsImmutable"},
                         "wonOscar": True,
                     },
                 }
