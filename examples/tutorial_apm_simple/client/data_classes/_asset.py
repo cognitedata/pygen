@@ -56,6 +56,37 @@ _ASSET_PROPERTIES_BY_FIELD = {
 
 
 class Asset(DomainModel):
+    """This represent a read version of asset.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the asset.
+        area_id: @name area identification
+        category_id: @name category identification
+        children: The child field.
+        created_date: @name created date
+        description: The description field.
+        documents: The document field.
+        in_model_3_d: Cdf3dModel the Cdf3dEntity is part of
+        is_active: @name active
+        is_critical_line: @name critical line
+        measurements: The measurement field.
+        metrics: The metric field.
+        parent: The parent field.
+        pressure: The pressure field.
+        source_db: @name source data
+        specification: The specification field.
+        tag: The tag field.
+        trajectory: The trajectory field.
+        updated_date: @name updated date
+        created_time: The created time of the asset node.
+        last_updated_time: The last updated time of the asset node.
+        deleted_time: If present, the deleted time of the asset node.
+        version: The version of the asset node.
+    """
+
     space: str = "tutorial_apm_simple"
     area_id: Optional[int] = Field(None, alias="areaId")
     category_id: Optional[int] = Field(None, alias="categoryId")
@@ -77,6 +108,7 @@ class Asset(DomainModel):
     updated_date: Optional[datetime.datetime] = Field(None, alias="updatedDate")
 
     def as_apply(self) -> AssetApply:
+        """Convert this read version of asset to a write version."""
         return AssetApply(
             space=self.space,
             external_id=self.external_id,
@@ -102,6 +134,37 @@ class Asset(DomainModel):
 
 
 class AssetApply(DomainModelApply):
+    """This represent a write version of asset.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the asset.
+        area_id: @name area identification
+        category_id: @name category identification
+        children: The child field.
+        created_date: @name created date
+        description: The description field.
+        documents: The document field.
+        in_model_3_d: Cdf3dModel the Cdf3dEntity is part of
+        is_active: @name active
+        is_critical_line: @name critical line
+        measurements: The measurement field.
+        metrics: The metric field.
+        parent: The parent field.
+        pressure: The pressure field.
+        source_db: @name source data
+        specification: The specification field.
+        tag: The tag field.
+        trajectory: The trajectory field.
+        updated_date: @name updated date
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "tutorial_apm_simple"
     area_id: Optional[int] = Field(None, alias="areaId")
     category_id: Optional[int] = Field(None, alias="categoryId")
@@ -246,11 +309,16 @@ class AssetApply(DomainModelApply):
 
 
 class AssetList(TypeList[Asset]):
+    """List of assets in read version."""
+
     _NODE = Asset
 
     def as_apply(self) -> AssetApplyList:
+        """Convert this read version of asset to a write version."""
         return AssetApplyList([node.as_apply() for node in self.data])
 
 
 class AssetApplyList(TypeApplyList[AssetApply]):
+    """List of assets in write version."""
+
     _NODE = AssetApply

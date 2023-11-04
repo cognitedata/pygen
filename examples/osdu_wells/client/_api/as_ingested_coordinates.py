@@ -25,6 +25,24 @@ class AsIngestedCoordinatesFeaturesAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more features edges by id(s) of a as ingested coordinate.
+
+        Args:
+            external_id: External id or list of external ids source as ingested coordinate.
+            space: The space where all the feature edges are located.
+
+        Returns:
+            The requested feature edges.
+
+        Examples:
+
+            Retrieve features edge by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> as_ingested_coordinate = client.as_ingested_coordinates.features.retrieve("my_features")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -54,6 +72,26 @@ class AsIngestedCoordinatesFeaturesAPI:
         limit=DEFAULT_LIMIT_READ,
         space="IntegrationTestsImmutable",
     ) -> dm.EdgeList:
+        """List features edges of a as ingested coordinate.
+
+        Args:
+            as_ingested_coordinate_id: Id of the source as ingested coordinate.
+            limit: Maximum number of feature edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the feature edges are located.
+
+        Returns:
+            The requested feature edges.
+
+        Examples:
+
+            List 5 features edges connected to "my_as_ingested_coordinate":
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> as_ingested_coordinate = client.as_ingested_coordinates.features.list("my_as_ingested_coordinate", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -93,6 +131,30 @@ class AsIngestedCoordinatesAPI(TypeAPI[AsIngestedCoordinates, AsIngestedCoordina
         as_ingested_coordinate: AsIngestedCoordinatesApply | Sequence[AsIngestedCoordinatesApply],
         replace: bool = False,
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) as ingested coordinates.
+
+        Note: This method iterates through all nodes linked to as_ingested_coordinate and create them including the edges
+        between the nodes. For example, if any of `features` are set, then these
+        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+
+        Args:
+            as_ingested_coordinate: As ingested coordinate or sequence of as ingested coordinates to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new as_ingested_coordinate:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> from osdu_wells.client.data_classes import AsIngestedCoordinatesApply
+                >>> client = OSDUClient()
+                >>> as_ingested_coordinate = AsIngestedCoordinatesApply(external_id="my_as_ingested_coordinate", ...)
+                >>> result = client.as_ingested_coordinates.apply(as_ingested_coordinate)
+
+        """
         if isinstance(as_ingested_coordinate, AsIngestedCoordinatesApply):
             instances = as_ingested_coordinate.to_instances_apply(self._view_by_write_class)
         else:
@@ -107,7 +169,26 @@ class AsIngestedCoordinatesAPI(TypeAPI[AsIngestedCoordinates, AsIngestedCoordina
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more as ingested coordinate.
+
+        Args:
+            external_id: External id of the as ingested coordinate to delete.
+            space: The space where all the as ingested coordinate are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete as_ingested_coordinate by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> client.as_ingested_coordinates.delete("my_as_ingested_coordinate")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -123,16 +204,36 @@ class AsIngestedCoordinatesAPI(TypeAPI[AsIngestedCoordinates, AsIngestedCoordina
     def retrieve(self, external_id: Sequence[str]) -> AsIngestedCoordinatesList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> AsIngestedCoordinates | AsIngestedCoordinatesList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> AsIngestedCoordinates | AsIngestedCoordinatesList:
+        """Retrieve one or more as ingested coordinates by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the as ingested coordinates.
+            space: The space where all the as ingested coordinates are located.
+
+        Returns:
+            The requested as ingested coordinates.
+
+        Examples:
+
+            Retrieve as_ingested_coordinate by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> as_ingested_coordinate = client.as_ingested_coordinates.retrieve("my_as_ingested_coordinate")
+
+        """
         if isinstance(external_id, str):
-            as_ingested_coordinate = self._retrieve((self._sources.space, external_id))
+            as_ingested_coordinate = self._retrieve((space, external_id))
 
             feature_edges = self.features.retrieve(external_id)
             as_ingested_coordinate.features = [edge.end_node.external_id for edge in feature_edges]
 
             return as_ingested_coordinate
         else:
-            as_ingested_coordinates = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            as_ingested_coordinates = self._retrieve([(space, ext_id) for ext_id in external_id])
 
             feature_edges = self.features.retrieve(external_id)
             self._set_features(as_ingested_coordinates, feature_edges)
@@ -162,6 +263,43 @@ class AsIngestedCoordinatesAPI(TypeAPI[AsIngestedCoordinates, AsIngestedCoordina
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> AsIngestedCoordinatesList:
+        """Search as ingested coordinates
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            coordinate_reference_system_id: The coordinate reference system id to filter on.
+            coordinate_reference_system_id_prefix: The prefix of the coordinate reference system id to filter on.
+            vertical_coordinate_reference_system_id: The vertical coordinate reference system id to filter on.
+            vertical_coordinate_reference_system_id_prefix: The prefix of the vertical coordinate reference system id to filter on.
+            vertical_unit_id: The vertical unit id to filter on.
+            vertical_unit_id_prefix: The prefix of the vertical unit id to filter on.
+            persistable_reference_crs: The persistable reference cr to filter on.
+            persistable_reference_crs_prefix: The prefix of the persistable reference cr to filter on.
+            persistable_reference_unit_z: The persistable reference unit z to filter on.
+            persistable_reference_unit_z_prefix: The prefix of the persistable reference unit z to filter on.
+            persistable_reference_vertical_crs: The persistable reference vertical cr to filter on.
+            persistable_reference_vertical_crs_prefix: The prefix of the persistable reference vertical cr to filter on.
+            type: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of as ingested coordinates to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `features` external ids for the as ingested coordinates. Defaults to True.
+
+        Returns:
+            Search results as ingested coordinates matching the query.
+
+        Examples:
+
+           Search for 'my_as_ingested_coordinate' in all text properties:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> as_ingested_coordinates = client.as_ingested_coordinates.search('my_as_ingested_coordinate')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             coordinate_reference_system_id,
@@ -279,6 +417,47 @@ class AsIngestedCoordinatesAPI(TypeAPI[AsIngestedCoordinates, AsIngestedCoordina
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across as ingested coordinates
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            coordinate_reference_system_id: The coordinate reference system id to filter on.
+            coordinate_reference_system_id_prefix: The prefix of the coordinate reference system id to filter on.
+            vertical_coordinate_reference_system_id: The vertical coordinate reference system id to filter on.
+            vertical_coordinate_reference_system_id_prefix: The prefix of the vertical coordinate reference system id to filter on.
+            vertical_unit_id: The vertical unit id to filter on.
+            vertical_unit_id_prefix: The prefix of the vertical unit id to filter on.
+            persistable_reference_crs: The persistable reference cr to filter on.
+            persistable_reference_crs_prefix: The prefix of the persistable reference cr to filter on.
+            persistable_reference_unit_z: The persistable reference unit z to filter on.
+            persistable_reference_unit_z_prefix: The prefix of the persistable reference unit z to filter on.
+            persistable_reference_vertical_crs: The persistable reference vertical cr to filter on.
+            persistable_reference_vertical_crs_prefix: The prefix of the persistable reference vertical cr to filter on.
+            type: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of as ingested coordinates to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `features` external ids for the as ingested coordinates. Defaults to True.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count as ingested coordinates in space `my_space`:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> result = client.as_ingested_coordinates.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             coordinate_reference_system_id,
@@ -336,6 +515,37 @@ class AsIngestedCoordinatesAPI(TypeAPI[AsIngestedCoordinates, AsIngestedCoordina
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for as ingested coordinates
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            coordinate_reference_system_id: The coordinate reference system id to filter on.
+            coordinate_reference_system_id_prefix: The prefix of the coordinate reference system id to filter on.
+            vertical_coordinate_reference_system_id: The vertical coordinate reference system id to filter on.
+            vertical_coordinate_reference_system_id_prefix: The prefix of the vertical coordinate reference system id to filter on.
+            vertical_unit_id: The vertical unit id to filter on.
+            vertical_unit_id_prefix: The prefix of the vertical unit id to filter on.
+            persistable_reference_crs: The persistable reference cr to filter on.
+            persistable_reference_crs_prefix: The prefix of the persistable reference cr to filter on.
+            persistable_reference_unit_z: The persistable reference unit z to filter on.
+            persistable_reference_unit_z_prefix: The prefix of the persistable reference unit z to filter on.
+            persistable_reference_vertical_crs: The persistable reference vertical cr to filter on.
+            persistable_reference_vertical_crs_prefix: The prefix of the persistable reference vertical cr to filter on.
+            type: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of as ingested coordinates to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `features` external ids for the as ingested coordinates. Defaults to True.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             coordinate_reference_system_id,
@@ -389,6 +599,41 @@ class AsIngestedCoordinatesAPI(TypeAPI[AsIngestedCoordinates, AsIngestedCoordina
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> AsIngestedCoordinatesList:
+        """List/filter as ingested coordinates
+
+        Args:
+            coordinate_reference_system_id: The coordinate reference system id to filter on.
+            coordinate_reference_system_id_prefix: The prefix of the coordinate reference system id to filter on.
+            vertical_coordinate_reference_system_id: The vertical coordinate reference system id to filter on.
+            vertical_coordinate_reference_system_id_prefix: The prefix of the vertical coordinate reference system id to filter on.
+            vertical_unit_id: The vertical unit id to filter on.
+            vertical_unit_id_prefix: The prefix of the vertical unit id to filter on.
+            persistable_reference_crs: The persistable reference cr to filter on.
+            persistable_reference_crs_prefix: The prefix of the persistable reference cr to filter on.
+            persistable_reference_unit_z: The persistable reference unit z to filter on.
+            persistable_reference_unit_z_prefix: The prefix of the persistable reference unit z to filter on.
+            persistable_reference_vertical_crs: The persistable reference vertical cr to filter on.
+            persistable_reference_vertical_crs_prefix: The prefix of the persistable reference vertical cr to filter on.
+            type: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of as ingested coordinates to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `features` external ids for the as ingested coordinates. Defaults to True.
+
+        Returns:
+            List of requested as ingested coordinates
+
+        Examples:
+
+            List as ingested coordinates and limit to 5:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> as_ingested_coordinates = client.as_ingested_coordinates.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             coordinate_reference_system_id,

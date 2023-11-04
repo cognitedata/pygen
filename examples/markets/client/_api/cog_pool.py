@@ -33,6 +33,26 @@ class CogPoolAPI(TypeAPI[CogPool, CogPoolApply, CogPoolList]):
         self._view_by_write_class = view_by_write_class
 
     def apply(self, cog_pool: CogPoolApply | Sequence[CogPoolApply], replace: bool = False) -> dm.InstancesApplyResult:
+        """Add or update (upsert) cog pools.
+
+        Args:
+            cog_pool: Cog pool or sequence of cog pools to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new cog_pool:
+
+                >>> from markets.client import MarketClient
+                >>> from markets.client.data_classes import CogPoolApply
+                >>> client = MarketClient()
+                >>> cog_pool = CogPoolApply(external_id="my_cog_pool", ...)
+                >>> result = client.cog_pool.apply(cog_pool)
+
+        """
         if isinstance(cog_pool, CogPoolApply):
             instances = cog_pool.to_instances_apply(self._view_by_write_class)
         else:
@@ -45,7 +65,24 @@ class CogPoolAPI(TypeAPI[CogPool, CogPoolApply, CogPoolList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="market") -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space: str = "market") -> dm.InstancesDeleteResult:
+        """Delete one or more cog pool.
+
+        Args:
+            external_id: External id of the cog pool to delete.
+            space: The space where all the cog pool are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete cog_pool by id:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> client.cog_pool.delete("my_cog_pool")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -61,11 +98,29 @@ class CogPoolAPI(TypeAPI[CogPool, CogPoolApply, CogPoolList]):
     def retrieve(self, external_id: Sequence[str]) -> CogPoolList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> CogPool | CogPoolList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "market") -> CogPool | CogPoolList:
+        """Retrieve one or more cog pools by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the cog pools.
+            space: The space where all the cog pools are located.
+
+        Returns:
+            The requested cog pools.
+
+        Examples:
+
+            Retrieve cog_pool by id:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> cog_pool = client.cog_pool.retrieve("my_cog_pool")
+
+        """
         if isinstance(external_id, str):
-            return self._retrieve((self._sources.space, external_id))
+            return self._retrieve((space, external_id))
         else:
-            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(space, ext_id) for ext_id in external_id])
 
     def search(
         self,
@@ -86,6 +141,38 @@ class CogPoolAPI(TypeAPI[CogPool, CogPoolApply, CogPoolList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> CogPoolList:
+        """Search cog pools
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            min_max_price: The minimum value of the max price to filter on.
+            max_max_price: The maximum value of the max price to filter on.
+            min_min_price: The minimum value of the min price to filter on.
+            max_min_price: The maximum value of the min price to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            time_unit: The time unit to filter on.
+            time_unit_prefix: The prefix of the time unit to filter on.
+            timezone: The timezone to filter on.
+            timezone_prefix: The prefix of the timezone to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of cog pools to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results cog pools matching the query.
+
+        Examples:
+
+           Search for 'my_cog_pool' in all text properties:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> cog_pools = client.cog_pool.search('my_cog_pool')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             min_max_price,
@@ -185,6 +272,42 @@ class CogPoolAPI(TypeAPI[CogPool, CogPoolApply, CogPoolList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across cog pools
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            min_max_price: The minimum value of the max price to filter on.
+            max_max_price: The maximum value of the max price to filter on.
+            min_min_price: The minimum value of the min price to filter on.
+            max_min_price: The maximum value of the min price to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            time_unit: The time unit to filter on.
+            time_unit_prefix: The prefix of the time unit to filter on.
+            timezone: The timezone to filter on.
+            timezone_prefix: The prefix of the timezone to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of cog pools to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count cog pools in space `my_space`:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> result = client.cog_pool.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             min_max_price,
@@ -234,6 +357,32 @@ class CogPoolAPI(TypeAPI[CogPool, CogPoolApply, CogPoolList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for cog pools
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            min_max_price: The minimum value of the max price to filter on.
+            max_max_price: The maximum value of the max price to filter on.
+            min_min_price: The minimum value of the min price to filter on.
+            max_min_price: The maximum value of the min price to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            time_unit: The time unit to filter on.
+            time_unit_prefix: The prefix of the time unit to filter on.
+            timezone: The timezone to filter on.
+            timezone_prefix: The prefix of the timezone to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of cog pools to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             min_max_price,
@@ -278,6 +427,36 @@ class CogPoolAPI(TypeAPI[CogPool, CogPoolApply, CogPoolList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> CogPoolList:
+        """List/filter cog pools
+
+        Args:
+            min_max_price: The minimum value of the max price to filter on.
+            max_max_price: The maximum value of the max price to filter on.
+            min_min_price: The minimum value of the min price to filter on.
+            max_min_price: The maximum value of the min price to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            time_unit: The time unit to filter on.
+            time_unit_prefix: The prefix of the time unit to filter on.
+            timezone: The timezone to filter on.
+            timezone_prefix: The prefix of the timezone to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of cog pools to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested cog pools
+
+        Examples:
+
+            List cog pools and limit to 5:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> cog_pools = client.cog_pool.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             min_max_price,

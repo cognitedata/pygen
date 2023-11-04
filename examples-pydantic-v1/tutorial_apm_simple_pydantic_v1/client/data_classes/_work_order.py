@@ -77,6 +77,40 @@ _WORKORDER_PROPERTIES_BY_FIELD = {
 
 
 class WorkOrder(DomainModel):
+    """This represent a read version of work order.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the work order.
+        actual_hours: @name actual (hours)
+        created_date: @name created date
+        description: The description field.
+        due_date: @name due date
+        duration_hours: @name duration (hours)
+        end_time: @name end time
+        is_active: @name active
+        is_cancelled: @name cancelled
+        is_completed: @name completed
+        is_safety_critical: @name safety critical
+        linked_assets: The linked asset field.
+        percentage_progress: @name percentage progress
+        planned_start: @name planned start
+        priority_description: @name priority description
+        program_number: @name program number
+        start_time: @name start time
+        status: The status field.
+        title: The title field.
+        work_items: The work item field.
+        work_order_number: @name work order number
+        work_package_number: @name work package number
+        created_time: The created time of the work order node.
+        last_updated_time: The last updated time of the work order node.
+        deleted_time: If present, the deleted time of the work order node.
+        version: The version of the work order node.
+    """
+
     space: str = "tutorial_apm_simple"
     actual_hours: Optional[int] = Field(None, alias="actualHours")
     created_date: Optional[datetime.datetime] = Field(None, alias="createdDate")
@@ -101,6 +135,7 @@ class WorkOrder(DomainModel):
     work_package_number: Optional[str] = Field(None, alias="workPackageNumber")
 
     def as_apply(self) -> WorkOrderApply:
+        """Convert this read version of work order to a write version."""
         return WorkOrderApply(
             space=self.space,
             external_id=self.external_id,
@@ -129,6 +164,40 @@ class WorkOrder(DomainModel):
 
 
 class WorkOrderApply(DomainModelApply):
+    """This represent a write version of work order.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the work order.
+        actual_hours: @name actual (hours)
+        created_date: @name created date
+        description: The description field.
+        due_date: @name due date
+        duration_hours: @name duration (hours)
+        end_time: @name end time
+        is_active: @name active
+        is_cancelled: @name cancelled
+        is_completed: @name completed
+        is_safety_critical: @name safety critical
+        linked_assets: The linked asset field.
+        percentage_progress: @name percentage progress
+        planned_start: @name planned start
+        priority_description: @name priority description
+        program_number: @name program number
+        start_time: @name start time
+        status: The status field.
+        title: The title field.
+        work_items: The work item field.
+        work_order_number: @name work order number
+        work_package_number: @name work package number
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "tutorial_apm_simple"
     actual_hours: Optional[int] = Field(None, alias="actualHours")
     created_date: Optional[datetime.datetime] = Field(None, alias="createdDate")
@@ -274,11 +343,16 @@ class WorkOrderApply(DomainModelApply):
 
 
 class WorkOrderList(TypeList[WorkOrder]):
+    """List of work orders in read version."""
+
     _NODE = WorkOrder
 
     def as_apply(self) -> WorkOrderApplyList:
+        """Convert this read version of work order to a write version."""
         return WorkOrderApplyList([node.as_apply() for node in self.data])
 
 
 class WorkOrderApplyList(TypeApplyList[WorkOrderApply]):
+    """List of work orders in write version."""
+
     _NODE = WorkOrderApply

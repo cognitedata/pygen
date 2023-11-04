@@ -35,6 +35,26 @@ class FacilityOperatorsAPI(TypeAPI[FacilityOperators, FacilityOperatorsApply, Fa
     def apply(
         self, facility_operator: FacilityOperatorsApply | Sequence[FacilityOperatorsApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) facility operators.
+
+        Args:
+            facility_operator: Facility operator or sequence of facility operators to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new facility_operator:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> from osdu_wells.client.data_classes import FacilityOperatorsApply
+                >>> client = OSDUClient()
+                >>> facility_operator = FacilityOperatorsApply(external_id="my_facility_operator", ...)
+                >>> result = client.facility_operators.apply(facility_operator)
+
+        """
         if isinstance(facility_operator, FacilityOperatorsApply):
             instances = facility_operator.to_instances_apply(self._view_by_write_class)
         else:
@@ -47,7 +67,26 @@ class FacilityOperatorsAPI(TypeAPI[FacilityOperators, FacilityOperatorsApply, Fa
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more facility operator.
+
+        Args:
+            external_id: External id of the facility operator to delete.
+            space: The space where all the facility operator are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete facility_operator by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> client.facility_operators.delete("my_facility_operator")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -63,11 +102,31 @@ class FacilityOperatorsAPI(TypeAPI[FacilityOperators, FacilityOperatorsApply, Fa
     def retrieve(self, external_id: Sequence[str]) -> FacilityOperatorsList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> FacilityOperators | FacilityOperatorsList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> FacilityOperators | FacilityOperatorsList:
+        """Retrieve one or more facility operators by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the facility operators.
+            space: The space where all the facility operators are located.
+
+        Returns:
+            The requested facility operators.
+
+        Examples:
+
+            Retrieve facility_operator by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> facility_operator = client.facility_operators.retrieve("my_facility_operator")
+
+        """
         if isinstance(external_id, str):
-            return self._retrieve((self._sources.space, external_id))
+            return self._retrieve((space, external_id))
         else:
-            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(space, ext_id) for ext_id in external_id])
 
     def search(
         self,
@@ -88,6 +147,38 @@ class FacilityOperatorsAPI(TypeAPI[FacilityOperators, FacilityOperatorsApply, Fa
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> FacilityOperatorsList:
+        """Search facility operators
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            effective_date_time: The effective date time to filter on.
+            effective_date_time_prefix: The prefix of the effective date time to filter on.
+            facility_operator_id: The facility operator id to filter on.
+            facility_operator_id_prefix: The prefix of the facility operator id to filter on.
+            facility_operator_organisation_id: The facility operator organisation id to filter on.
+            facility_operator_organisation_id_prefix: The prefix of the facility operator organisation id to filter on.
+            remark: The remark to filter on.
+            remark_prefix: The prefix of the remark to filter on.
+            termination_date_time: The termination date time to filter on.
+            termination_date_time_prefix: The prefix of the termination date time to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of facility operators to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results facility operators matching the query.
+
+        Examples:
+
+           Search for 'my_facility_operator' in all text properties:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> facility_operators = client.facility_operators.search('my_facility_operator')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             effective_date_time,
@@ -187,6 +278,42 @@ class FacilityOperatorsAPI(TypeAPI[FacilityOperators, FacilityOperatorsApply, Fa
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across facility operators
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            effective_date_time: The effective date time to filter on.
+            effective_date_time_prefix: The prefix of the effective date time to filter on.
+            facility_operator_id: The facility operator id to filter on.
+            facility_operator_id_prefix: The prefix of the facility operator id to filter on.
+            facility_operator_organisation_id: The facility operator organisation id to filter on.
+            facility_operator_organisation_id_prefix: The prefix of the facility operator organisation id to filter on.
+            remark: The remark to filter on.
+            remark_prefix: The prefix of the remark to filter on.
+            termination_date_time: The termination date time to filter on.
+            termination_date_time_prefix: The prefix of the termination date time to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of facility operators to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count facility operators in space `my_space`:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> result = client.facility_operators.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             effective_date_time,
@@ -236,6 +363,32 @@ class FacilityOperatorsAPI(TypeAPI[FacilityOperators, FacilityOperatorsApply, Fa
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for facility operators
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            effective_date_time: The effective date time to filter on.
+            effective_date_time_prefix: The prefix of the effective date time to filter on.
+            facility_operator_id: The facility operator id to filter on.
+            facility_operator_id_prefix: The prefix of the facility operator id to filter on.
+            facility_operator_organisation_id: The facility operator organisation id to filter on.
+            facility_operator_organisation_id_prefix: The prefix of the facility operator organisation id to filter on.
+            remark: The remark to filter on.
+            remark_prefix: The prefix of the remark to filter on.
+            termination_date_time: The termination date time to filter on.
+            termination_date_time_prefix: The prefix of the termination date time to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of facility operators to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             effective_date_time,
@@ -280,6 +433,36 @@ class FacilityOperatorsAPI(TypeAPI[FacilityOperators, FacilityOperatorsApply, Fa
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> FacilityOperatorsList:
+        """List/filter facility operators
+
+        Args:
+            effective_date_time: The effective date time to filter on.
+            effective_date_time_prefix: The prefix of the effective date time to filter on.
+            facility_operator_id: The facility operator id to filter on.
+            facility_operator_id_prefix: The prefix of the facility operator id to filter on.
+            facility_operator_organisation_id: The facility operator organisation id to filter on.
+            facility_operator_organisation_id_prefix: The prefix of the facility operator organisation id to filter on.
+            remark: The remark to filter on.
+            remark_prefix: The prefix of the remark to filter on.
+            termination_date_time: The termination date time to filter on.
+            termination_date_time_prefix: The prefix of the termination date time to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of facility operators to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested facility operators
+
+        Examples:
+
+            List facility operators and limit to 5:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> facility_operators = client.facility_operators.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             effective_date_time,

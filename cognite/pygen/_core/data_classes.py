@@ -12,7 +12,7 @@ from cognite.client.data_classes.data_modeling.data_types import ListablePropert
 from typing_extensions import Self
 
 from cognite.pygen import config as pygen_config
-from cognite.pygen.utils.text import create_name
+from cognite.pygen.utils.text import create_name, to_words
 
 _PRIMITIVE_TYPES = (dm.Text, dm.Boolean, dm.Float32, dm.Float64, dm.Int32, dm.Int64, dm.Timestamp, dm.Date, dm.Json)
 _EXTERNAL_TYPES = (dm.TimeSeriesReference, dm.FileReference, dm.SequenceReference)
@@ -46,6 +46,7 @@ class Field(ABC):
 
     Args:
         name: The name of the field. This is used in the generated Python code.
+        doc_name: The name of the field in the documentation.
         prop_name: The name of the property in the data model. This is used when reading and writing to CDF.
         pydantic_field: The name to use for the import 'from pydantic import Field'. This is used in the edge case
                         when the name 'Field' name clashes with the data model class name.
@@ -53,6 +54,7 @@ class Field(ABC):
     """
 
     name: str
+    doc_name: str
     prop_name: str
     pydantic_field: str
 
@@ -71,6 +73,7 @@ class Field(ABC):
         pydantic_field: str = "Field",
     ) -> Field:
         name = create_name(prop_name, field_naming.name)
+        doc_name = to_words(name, singularize=True)
         if isinstance(prop, dm.SingleHopConnectionDefinition):
             variable = create_name(prop_name, field_naming.variable)
 
@@ -79,6 +82,7 @@ class Field(ABC):
             edge_api_attribute = create_name(prop_name, field_naming.api_class_attribute)
             return EdgeOneToMany(
                 name=name,
+                doc_name=doc_name,
                 prop_name=prop_name,
                 prop=prop,
                 data_class=data_class_by_view_id[ViewSpaceExternalId(prop.source.space, prop.source.external_id)],
@@ -95,6 +99,7 @@ class Field(ABC):
                 return PrimitiveListField(
                     name=name,
                     prop_name=prop_name,
+                    doc_name=doc_name,
                     type_=type_,
                     is_nullable=prop.nullable,
                     prop=prop,
@@ -109,6 +114,7 @@ class Field(ABC):
                 return CDFExternalField(
                     name=name,
                     prop_name=prop_name,
+                    doc_name=doc_name,
                     type_=type_,
                     is_nullable=prop.nullable,
                     prop=prop,
@@ -120,6 +126,7 @@ class Field(ABC):
                 return PrimitiveField(
                     name=name,
                     prop_name=prop_name,
+                    doc_name=doc_name,
                     type_=type_,
                     is_nullable=prop.nullable,
                     default=prop.default_value,
@@ -131,7 +138,12 @@ class Field(ABC):
             view_id = cast(dm.ViewId, prop.source)
             target_data_class = data_class_by_view_id[ViewSpaceExternalId(view_id.space, view_id.external_id)]
             return EdgeOneToOne(
-                name=name, prop_name=prop_name, prop=prop, data_class=target_data_class, pydantic_field=pydantic_field
+                name=name,
+                prop_name=prop_name,
+                prop=prop,
+                data_class=target_data_class,
+                pydantic_field=pydantic_field,
+                doc_name=doc_name,
             )
 
         else:
@@ -160,6 +172,18 @@ class Field(ABC):
     def is_text_field(self) -> bool:
         raise NotImplementedError()
 
+    @property
+    @abstractmethod
+    def description(self) -> str | None:
+        raise NotImplementedError
+
+    @property
+    def argument_documentation(self) -> str:
+        if self.description:
+            return self.description
+        else:
+            return f"The {self.doc_name} field."
+
 
 @dataclass(frozen=True)
 class PrimitiveFieldCore(Field, ABC):
@@ -178,6 +202,10 @@ class PrimitiveFieldCore(Field, ABC):
     @property
     def is_text_field(self) -> bool:
         return self.type_ == "str"
+
+    @property
+    def description(self) -> str | None:
+        return self.prop.description
 
 
 @dataclass(frozen=True)
@@ -295,6 +323,10 @@ class EdgeOneToOne(EdgeField):
         else:
             return f"{left_side} {self.pydantic_field}(None, repr=False)"
 
+    @property
+    def description(self) -> str | None:
+        return self.prop.description
+
 
 @dataclass(frozen=True)
 class EdgeOneToMany(EdgeField):
@@ -306,6 +338,10 @@ class EdgeOneToMany(EdgeField):
     edge_api_class: str
     edge_api_attribute: str
     prop: dm.SingleHopConnectionDefinition
+
+    @property
+    def description(self) -> str | None:
+        return self.prop.description
 
     def as_read_type_hint(self) -> str:
         if self.need_alias:
@@ -333,6 +369,8 @@ class DataClass:
     write_name: str
     read_list_name: str
     write_list_name: str
+    doc_name: str
+    doc_list_name: str
     variable: str
     variable_list: str
     file_name: str
@@ -346,6 +384,8 @@ class DataClass:
         class_name = create_name(view_name, data_class.name)
         variable_name = create_name(view_name, data_class.variable)
         variable_list = create_name(view_name, data_class.variable_list)
+        doc_name = to_words(view_name, singularize=True)
+        doc_list_name = to_words(view_name, pluralize=True)
         if variable_name == variable_list:
             variable_list = f"{variable_list}_list"
         file_name = f"_{create_name(view_name, data_class.file)}"
@@ -355,6 +395,8 @@ class DataClass:
             write_name=f"{class_name}Apply",
             read_list_name=f"{class_name}List",
             write_list_name=f"{class_name}ApplyList",
+            doc_name=doc_name,
+            doc_list_name=doc_list_name,
             variable=variable_name,
             variable_list=variable_list,
             file_name=file_name,
@@ -521,6 +563,14 @@ class DataClass:
         return ", ".join(f'"{field_.name}"' for field_ in self.text_fields)
 
     @property
+    def one_to_many_edges_docs(self) -> str:
+        edges = list(self.one_to_many_edges)
+        if len(edges) == 1:
+            return f"`{edges[0].name}`"
+        else:
+            return ", ".join(f"`{field_.name}`" for field_ in edges[:-1]) + f" or `{edges[-1].name}`"
+
+    @property
     def fields_literals(self) -> str:
         return ", ".join(f'"{field_.name}"' for field_ in self if isinstance(field_, PrimitiveFieldCore))
 
@@ -591,6 +641,7 @@ class MultiAPIClass:
 class FilterParameter:
     name: str
     type_: str
+    description: str
     default: None = None
     space: str | None = None
 
@@ -688,6 +739,7 @@ _EXTERNAL_ID_FIELD = PrimitiveField(
     name="external_id",
     prop_name="externalId",
     type_="str",
+    doc_name="external ID",
     is_nullable=False,
     default=None,
     prop=dm.MappedProperty(
@@ -703,6 +755,7 @@ _SPACE_FIELD = PrimitiveField(
     name="space",
     prop_name="space",
     type_="str",
+    doc_name="space",
     is_nullable=False,
     default=None,
     prop=dm.MappedProperty(
@@ -732,7 +785,9 @@ class ListMethod:
                 for selected_filter in config.get(field_.prop.type, field_.prop_name):
                     if selected_filter is dm.filters.Equals:
                         if field_.name not in parameters_by_name:
-                            parameter = FilterParameter(name=field_.name, type_=field_.type_)
+                            parameter = FilterParameter(
+                                name=field_.name, type_=field_.type_, description=f"The {field_.doc_name} to filter on."
+                            )
                             parameters_by_name[parameter.name] = parameter
                         else:
                             # Equals and In filter share parameter, you have to extend the type hint.
@@ -747,7 +802,11 @@ class ListMethod:
                         )
                     elif selected_filter is dm.filters.In:
                         if field_.name not in parameters_by_name:
-                            parameter = FilterParameter(field_.name, type_=f"list[{field_.type_}]")
+                            parameter = FilterParameter(
+                                field_.name,
+                                type_=f"list[{field_.type_}]",
+                                description=f"The {field_.doc_name} to filter on.",
+                            )
                             parameters_by_name[parameter.name] = parameter
                         else:
                             # Equals and In filter share parameter, you have to extend the type hint.
@@ -761,7 +820,11 @@ class ListMethod:
                             )
                         )
                     elif selected_filter is dm.filters.Prefix:
-                        parameter = FilterParameter(name=f"{field_.name}_prefix", type_=field_.type_)
+                        parameter = FilterParameter(
+                            name=f"{field_.name}_prefix",
+                            type_=field_.type_,
+                            description=f"The prefix of the {field_.doc_name} to filter on.",
+                        )
                         parameters_by_name[parameter.name] = parameter
                         list_filters.append(
                             FilterCondition(
@@ -771,8 +834,16 @@ class ListMethod:
                             )
                         )
                     elif selected_filter is dm.filters.Range:
-                        min_parameter = FilterParameter(name=f"min_{field_.name}", type_=field_.type_)
-                        max_parameter = FilterParameter(name=f"max_{field_.name}", type_=field_.type_)
+                        min_parameter = FilterParameter(
+                            name=f"min_{field_.name}",
+                            type_=field_.type_,
+                            description=f"The minimum value of the {field_.doc_name} to filter on.",
+                        )
+                        max_parameter = FilterParameter(
+                            name=f"max_{field_.name}",
+                            type_=field_.type_,
+                            description=f"The maximum value of the {field_.doc_name} to filter on.",
+                        )
                         parameters_by_name[min_parameter.name] = min_parameter
                         parameters_by_name[max_parameter.name] = max_parameter
                         list_filters.append(
@@ -790,7 +861,10 @@ class ListMethod:
                     if selected_filter is dm.filters.Equals:
                         if field_.name not in parameters_by_name:
                             parameter = FilterParameter(
-                                name=field_.name, type_="str | tuple[str, str]", space=field_.data_class.view_id.space
+                                name=field_.name,
+                                type_="str | tuple[str, str]",
+                                space=field_.data_class.view_id.space,
+                                description=f"The {field_.doc_name} to filter on.",
                             )
                             parameters_by_name[parameter.name] = parameter
                         else:
@@ -814,6 +888,7 @@ class ListMethod:
                                 name=field_.name,
                                 type_="list[str] | list[tuple[str, str]]",
                                 space=field_.data_class.view_id.space,
+                                description=f"The {field_.doc_name} to filter on.",
                             )
                             parameters_by_name[parameter.name] = parameter
                         else:

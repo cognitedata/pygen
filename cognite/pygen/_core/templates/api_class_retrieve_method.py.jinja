@@ -1,0 +1,41 @@
+    @overload
+    def retrieve(self, external_id: str) -> {{ data_class.read_name }}:
+        ...
+
+    @overload
+    def retrieve(self, external_id: Sequence[str]) -> {{ data_class.read_list_name }}:
+        ...
+
+    def retrieve(self, external_id: str | Sequence[str], space: str ="{{ data_class.view_id.space }}") -> {{ data_class.read_name }} | {{ data_class.read_list_name }}:
+        """Retrieve one or more {{data_class.doc_list_name}} by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the {{ data_class.doc_list_name }}.
+            space: The space where all the {{ data_class.doc_list_name }} are located.
+
+        Returns:
+            The requested {{ data_class.doc_list_name }}.
+
+        Examples:
+
+            Retrieve {{ data_class.variable }} by id:
+
+                >>> from {{ top_level_package }} import {{ client_name }}
+                >>> client = {{ client_name }}()
+                >>> {{ data_class.variable }} = client.{{ api_class.client_attribute }}.retrieve("my_{{ data_class.variable }}")
+
+        """
+        if isinstance(external_id, str):
+            {% if data_class.has_one_to_many_edges %}{{ data_class.variable }} = self._retrieve((space, external_id))
+{% for field in data_class.one_to_many_edges %}
+            {{ field.variable }}_edges = self.{{ field.edge_api_attribute }}.retrieve(external_id)
+            {{ data_class.variable }}.{{ field.name }} = [edge.end_node.external_id for edge in {{ field.variable }}_edges]{% endfor %}
+
+            return {{ data_class.variable }}{% else %}return self._retrieve((space, external_id)){% endif %}
+        else:
+            {% if data_class.has_one_to_many_edges %}{{ data_class.variable_list }} = self._retrieve([(space, ext_id) for ext_id in external_id])
+{% for field in data_class.one_to_many_edges %}
+            {{ field.variable }}_edges = self.{{ field.edge_api_attribute }}.retrieve(external_id)
+            self._set_{{ field.name }}({{ data_class.variable_list }}, {{ field.variable }}_edges){% endfor %}
+
+            return {{ data_class.variable_list }}{% else %}return self._retrieve([(space, ext_id) for ext_id in external_id]){% endif %}

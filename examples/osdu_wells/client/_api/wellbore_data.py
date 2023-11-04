@@ -25,6 +25,24 @@ class WellboreDataDrillingReasonsAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more drilling_reasons edges by id(s) of a wellbore datum.
+
+        Args:
+            external_id: External id or list of external ids source wellbore datum.
+            space: The space where all the drilling reason edges are located.
+
+        Returns:
+            The requested drilling reason edges.
+
+        Examples:
+
+            Retrieve drilling_reasons edge by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_datum = client.wellbore_data.drilling_reasons.retrieve("my_drilling_reasons")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -54,6 +72,26 @@ class WellboreDataDrillingReasonsAPI:
         limit=DEFAULT_LIMIT_READ,
         space="IntegrationTestsImmutable",
     ) -> dm.EdgeList:
+        """List drilling_reasons edges of a wellbore datum.
+
+        Args:
+            wellbore_datum_id: Id of the source wellbore datum.
+            limit: Maximum number of drilling reason edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the drilling reason edges are located.
+
+        Returns:
+            The requested drilling reason edges.
+
+        Examples:
+
+            List 5 drilling_reasons edges connected to "my_wellbore_datum":
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_datum = client.wellbore_data.drilling_reasons.list("my_wellbore_datum", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -77,6 +115,24 @@ class WellboreDataFacilityEventsAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more facility_events edges by id(s) of a wellbore datum.
+
+        Args:
+            external_id: External id or list of external ids source wellbore datum.
+            space: The space where all the facility event edges are located.
+
+        Returns:
+            The requested facility event edges.
+
+        Examples:
+
+            Retrieve facility_events edge by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_datum = client.wellbore_data.facility_events.retrieve("my_facility_events")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -106,6 +162,26 @@ class WellboreDataFacilityEventsAPI:
         limit=DEFAULT_LIMIT_READ,
         space="IntegrationTestsImmutable",
     ) -> dm.EdgeList:
+        """List facility_events edges of a wellbore datum.
+
+        Args:
+            wellbore_datum_id: Id of the source wellbore datum.
+            limit: Maximum number of facility event edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the facility event edges are located.
+
+        Returns:
+            The requested facility event edges.
+
+        Examples:
+
+            List 5 facility_events edges connected to "my_wellbore_datum":
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_datum = client.wellbore_data.facility_events.list("my_wellbore_datum", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -129,6 +205,24 @@ class WellboreDataFacilityOperatorsAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more facility_operators edges by id(s) of a wellbore datum.
+
+        Args:
+            external_id: External id or list of external ids source wellbore datum.
+            space: The space where all the facility operator edges are located.
+
+        Returns:
+            The requested facility operator edges.
+
+        Examples:
+
+            Retrieve facility_operators edge by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_datum = client.wellbore_data.facility_operators.retrieve("my_facility_operators")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -158,6 +252,26 @@ class WellboreDataFacilityOperatorsAPI:
         limit=DEFAULT_LIMIT_READ,
         space="IntegrationTestsImmutable",
     ) -> dm.EdgeList:
+        """List facility_operators edges of a wellbore datum.
+
+        Args:
+            wellbore_datum_id: Id of the source wellbore datum.
+            limit: Maximum number of facility operator edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the facility operator edges are located.
+
+        Returns:
+            The requested facility operator edges.
+
+        Examples:
+
+            List 5 facility_operators edges connected to "my_wellbore_datum":
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_datum = client.wellbore_data.facility_operators.list("my_wellbore_datum", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -181,6 +295,24 @@ class WellboreDataFacilitySpecificationsAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more facility_specifications edges by id(s) of a wellbore datum.
+
+        Args:
+            external_id: External id or list of external ids source wellbore datum.
+            space: The space where all the facility specification edges are located.
+
+        Returns:
+            The requested facility specification edges.
+
+        Examples:
+
+            Retrieve facility_specifications edge by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_datum = client.wellbore_data.facility_specifications.retrieve("my_facility_specifications")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -210,6 +342,26 @@ class WellboreDataFacilitySpecificationsAPI:
         limit=DEFAULT_LIMIT_READ,
         space="IntegrationTestsImmutable",
     ) -> dm.EdgeList:
+        """List facility_specifications edges of a wellbore datum.
+
+        Args:
+            wellbore_datum_id: Id of the source wellbore datum.
+            limit: Maximum number of facility specification edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the facility specification edges are located.
+
+        Returns:
+            The requested facility specification edges.
+
+        Examples:
+
+            List 5 facility_specifications edges connected to "my_wellbore_datum":
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_datum = client.wellbore_data.facility_specifications.list("my_wellbore_datum", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -233,6 +385,24 @@ class WellboreDataFacilityStatesAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more facility_states edges by id(s) of a wellbore datum.
+
+        Args:
+            external_id: External id or list of external ids source wellbore datum.
+            space: The space where all the facility state edges are located.
+
+        Returns:
+            The requested facility state edges.
+
+        Examples:
+
+            Retrieve facility_states edge by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_datum = client.wellbore_data.facility_states.retrieve("my_facility_states")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -262,6 +432,26 @@ class WellboreDataFacilityStatesAPI:
         limit=DEFAULT_LIMIT_READ,
         space="IntegrationTestsImmutable",
     ) -> dm.EdgeList:
+        """List facility_states edges of a wellbore datum.
+
+        Args:
+            wellbore_datum_id: Id of the source wellbore datum.
+            limit: Maximum number of facility state edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the facility state edges are located.
+
+        Returns:
+            The requested facility state edges.
+
+        Examples:
+
+            List 5 facility_states edges connected to "my_wellbore_datum":
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_datum = client.wellbore_data.facility_states.list("my_wellbore_datum", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -285,6 +475,24 @@ class WellboreDataGeoContextsAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more geo_contexts edges by id(s) of a wellbore datum.
+
+        Args:
+            external_id: External id or list of external ids source wellbore datum.
+            space: The space where all the geo context edges are located.
+
+        Returns:
+            The requested geo context edges.
+
+        Examples:
+
+            Retrieve geo_contexts edge by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_datum = client.wellbore_data.geo_contexts.retrieve("my_geo_contexts")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -314,6 +522,26 @@ class WellboreDataGeoContextsAPI:
         limit=DEFAULT_LIMIT_READ,
         space="IntegrationTestsImmutable",
     ) -> dm.EdgeList:
+        """List geo_contexts edges of a wellbore datum.
+
+        Args:
+            wellbore_datum_id: Id of the source wellbore datum.
+            limit: Maximum number of geo context edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the geo context edges are located.
+
+        Returns:
+            The requested geo context edges.
+
+        Examples:
+
+            List 5 geo_contexts edges connected to "my_wellbore_datum":
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_datum = client.wellbore_data.geo_contexts.list("my_wellbore_datum", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -337,6 +565,24 @@ class WellboreDataHistoricalInterestsAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more historical_interests edges by id(s) of a wellbore datum.
+
+        Args:
+            external_id: External id or list of external ids source wellbore datum.
+            space: The space where all the historical interest edges are located.
+
+        Returns:
+            The requested historical interest edges.
+
+        Examples:
+
+            Retrieve historical_interests edge by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_datum = client.wellbore_data.historical_interests.retrieve("my_historical_interests")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -366,6 +612,26 @@ class WellboreDataHistoricalInterestsAPI:
         limit=DEFAULT_LIMIT_READ,
         space="IntegrationTestsImmutable",
     ) -> dm.EdgeList:
+        """List historical_interests edges of a wellbore datum.
+
+        Args:
+            wellbore_datum_id: Id of the source wellbore datum.
+            limit: Maximum number of historical interest edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the historical interest edges are located.
+
+        Returns:
+            The requested historical interest edges.
+
+        Examples:
+
+            List 5 historical_interests edges connected to "my_wellbore_datum":
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_datum = client.wellbore_data.historical_interests.list("my_wellbore_datum", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -389,6 +655,24 @@ class WellboreDataNameAliasesAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more name_aliases edges by id(s) of a wellbore datum.
+
+        Args:
+            external_id: External id or list of external ids source wellbore datum.
+            space: The space where all the name alias edges are located.
+
+        Returns:
+            The requested name alias edges.
+
+        Examples:
+
+            Retrieve name_aliases edge by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_datum = client.wellbore_data.name_aliases.retrieve("my_name_aliases")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -418,6 +702,26 @@ class WellboreDataNameAliasesAPI:
         limit=DEFAULT_LIMIT_READ,
         space="IntegrationTestsImmutable",
     ) -> dm.EdgeList:
+        """List name_aliases edges of a wellbore datum.
+
+        Args:
+            wellbore_datum_id: Id of the source wellbore datum.
+            limit: Maximum number of name alias edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the name alias edges are located.
+
+        Returns:
+            The requested name alias edges.
+
+        Examples:
+
+            List 5 name_aliases edges connected to "my_wellbore_datum":
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_datum = client.wellbore_data.name_aliases.list("my_wellbore_datum", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -441,6 +745,24 @@ class WellboreDataTechnicalAssurancesAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more technical_assurances edges by id(s) of a wellbore datum.
+
+        Args:
+            external_id: External id or list of external ids source wellbore datum.
+            space: The space where all the technical assurance edges are located.
+
+        Returns:
+            The requested technical assurance edges.
+
+        Examples:
+
+            Retrieve technical_assurances edge by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_datum = client.wellbore_data.technical_assurances.retrieve("my_technical_assurances")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -470,6 +792,26 @@ class WellboreDataTechnicalAssurancesAPI:
         limit=DEFAULT_LIMIT_READ,
         space="IntegrationTestsImmutable",
     ) -> dm.EdgeList:
+        """List technical_assurances edges of a wellbore datum.
+
+        Args:
+            wellbore_datum_id: Id of the source wellbore datum.
+            limit: Maximum number of technical assurance edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the technical assurance edges are located.
+
+        Returns:
+            The requested technical assurance edges.
+
+        Examples:
+
+            List 5 technical_assurances edges connected to "my_wellbore_datum":
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_datum = client.wellbore_data.technical_assurances.list("my_wellbore_datum", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -493,6 +835,24 @@ class WellboreDataVerticalMeasurementsAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more vertical_measurements edges by id(s) of a wellbore datum.
+
+        Args:
+            external_id: External id or list of external ids source wellbore datum.
+            space: The space where all the vertical measurement edges are located.
+
+        Returns:
+            The requested vertical measurement edges.
+
+        Examples:
+
+            Retrieve vertical_measurements edge by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_datum = client.wellbore_data.vertical_measurements.retrieve("my_vertical_measurements")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -522,6 +882,26 @@ class WellboreDataVerticalMeasurementsAPI:
         limit=DEFAULT_LIMIT_READ,
         space="IntegrationTestsImmutable",
     ) -> dm.EdgeList:
+        """List vertical_measurements edges of a wellbore datum.
+
+        Args:
+            wellbore_datum_id: Id of the source wellbore datum.
+            limit: Maximum number of vertical measurement edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the vertical measurement edges are located.
+
+        Returns:
+            The requested vertical measurement edges.
+
+        Examples:
+
+            List 5 vertical_measurements edges connected to "my_wellbore_datum":
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_datum = client.wellbore_data.vertical_measurements.list("my_wellbore_datum", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -545,6 +925,24 @@ class WellboreDataWellboreCostsAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more wellbore_costs edges by id(s) of a wellbore datum.
+
+        Args:
+            external_id: External id or list of external ids source wellbore datum.
+            space: The space where all the wellbore cost edges are located.
+
+        Returns:
+            The requested wellbore cost edges.
+
+        Examples:
+
+            Retrieve wellbore_costs edge by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_datum = client.wellbore_data.wellbore_costs.retrieve("my_wellbore_costs")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -574,6 +972,26 @@ class WellboreDataWellboreCostsAPI:
         limit=DEFAULT_LIMIT_READ,
         space="IntegrationTestsImmutable",
     ) -> dm.EdgeList:
+        """List wellbore_costs edges of a wellbore datum.
+
+        Args:
+            wellbore_datum_id: Id of the source wellbore datum.
+            limit: Maximum number of wellbore cost edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the wellbore cost edges are located.
+
+        Returns:
+            The requested wellbore cost edges.
+
+        Examples:
+
+            List 5 wellbore_costs edges connected to "my_wellbore_datum":
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_datum = client.wellbore_data.wellbore_costs.list("my_wellbore_datum", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -619,6 +1037,30 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
     def apply(
         self, wellbore_datum: WellboreDataApply | Sequence[WellboreDataApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) wellbore data.
+
+        Note: This method iterates through all nodes linked to wellbore_datum and create them including the edges
+        between the nodes. For example, if any of `drilling_reasons`, `facility_events`, `facility_operators`, `facility_specifications`, `facility_states`, `geo_contexts`, `historical_interests`, `name_aliases`, `technical_assurances`, `vertical_measurements` or `wellbore_costs` are set, then these
+        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+
+        Args:
+            wellbore_datum: Wellbore datum or sequence of wellbore data to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new wellbore_datum:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> from osdu_wells.client.data_classes import WellboreDataApply
+                >>> client = OSDUClient()
+                >>> wellbore_datum = WellboreDataApply(external_id="my_wellbore_datum", ...)
+                >>> result = client.wellbore_data.apply(wellbore_datum)
+
+        """
         if isinstance(wellbore_datum, WellboreDataApply):
             instances = wellbore_datum.to_instances_apply(self._view_by_write_class)
         else:
@@ -631,7 +1073,26 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more wellbore datum.
+
+        Args:
+            external_id: External id of the wellbore datum to delete.
+            space: The space where all the wellbore datum are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete wellbore_datum by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> client.wellbore_data.delete("my_wellbore_datum")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -647,9 +1108,29 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
     def retrieve(self, external_id: Sequence[str]) -> WellboreDataList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> WellboreData | WellboreDataList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> WellboreData | WellboreDataList:
+        """Retrieve one or more wellbore data by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the wellbore data.
+            space: The space where all the wellbore data are located.
+
+        Returns:
+            The requested wellbore data.
+
+        Examples:
+
+            Retrieve wellbore_datum by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_datum = client.wellbore_data.retrieve("my_wellbore_datum")
+
+        """
         if isinstance(external_id, str):
-            wellbore_datum = self._retrieve((self._sources.space, external_id))
+            wellbore_datum = self._retrieve((space, external_id))
 
             drilling_reason_edges = self.drilling_reasons.retrieve(external_id)
             wellbore_datum.drilling_reasons = [edge.end_node.external_id for edge in drilling_reason_edges]
@@ -678,7 +1159,7 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
 
             return wellbore_datum
         else:
-            wellbore_data = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            wellbore_data = self._retrieve([(space, ext_id) for ext_id in external_id])
 
             drilling_reason_edges = self.drilling_reasons.retrieve(external_id)
             self._set_drilling_reasons(wellbore_data, drilling_reason_edges)
@@ -793,6 +1274,108 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> WellboreDataList:
+        """Search wellbore data
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            business_intention_id: The business intention id to filter on.
+            business_intention_id_prefix: The prefix of the business intention id to filter on.
+            condition_id: The condition id to filter on.
+            condition_id_prefix: The prefix of the condition id to filter on.
+            current_operator_id: The current operator id to filter on.
+            current_operator_id_prefix: The prefix of the current operator id to filter on.
+            data_source_organisation_id: The data source organisation id to filter on.
+            data_source_organisation_id_prefix: The prefix of the data source organisation id to filter on.
+            default_vertical_measurement_id: The default vertical measurement id to filter on.
+            default_vertical_measurement_id_prefix: The prefix of the default vertical measurement id to filter on.
+            definitive_trajectory_id: The definitive trajectory id to filter on.
+            definitive_trajectory_id_prefix: The prefix of the definitive trajectory id to filter on.
+            existence_kind: The existence kind to filter on.
+            existence_kind_prefix: The prefix of the existence kind to filter on.
+            facility_description: The facility description to filter on.
+            facility_description_prefix: The prefix of the facility description to filter on.
+            facility_id: The facility id to filter on.
+            facility_id_prefix: The prefix of the facility id to filter on.
+            facility_name: The facility name to filter on.
+            facility_name_prefix: The prefix of the facility name to filter on.
+            facility_type_id: The facility type id to filter on.
+            facility_type_id_prefix: The prefix of the facility type id to filter on.
+            fluid_direction_id: The fluid direction id to filter on.
+            fluid_direction_id_prefix: The prefix of the fluid direction id to filter on.
+            formation_name_at_total_depth: The formation name at total depth to filter on.
+            formation_name_at_total_depth_prefix: The prefix of the formation name at total depth to filter on.
+            geographic_bottom_hole_location: The geographic bottom hole location to filter on.
+            initial_operator_id: The initial operator id to filter on.
+            initial_operator_id_prefix: The prefix of the initial operator id to filter on.
+            interest_type_id: The interest type id to filter on.
+            interest_type_id_prefix: The prefix of the interest type id to filter on.
+            kick_off_wellbore: The kick off wellbore to filter on.
+            kick_off_wellbore_prefix: The prefix of the kick off wellbore to filter on.
+            operating_environment_id: The operating environment id to filter on.
+            operating_environment_id_prefix: The prefix of the operating environment id to filter on.
+            outcome_id: The outcome id to filter on.
+            outcome_id_prefix: The prefix of the outcome id to filter on.
+            primary_product_type_id: The primary product type id to filter on.
+            primary_product_type_id_prefix: The prefix of the primary product type id to filter on.
+            projected_bottom_hole_location: The projected bottom hole location to filter on.
+            resource_curation_status: The resource curation status to filter on.
+            resource_curation_status_prefix: The prefix of the resource curation status to filter on.
+            resource_home_region_id: The resource home region id to filter on.
+            resource_home_region_id_prefix: The prefix of the resource home region id to filter on.
+            resource_lifecycle_status: The resource lifecycle status to filter on.
+            resource_lifecycle_status_prefix: The prefix of the resource lifecycle status to filter on.
+            resource_security_classification: The resource security classification to filter on.
+            resource_security_classification_prefix: The prefix of the resource security classification to filter on.
+            role_id: The role id to filter on.
+            role_id_prefix: The prefix of the role id to filter on.
+            secondary_product_type_id: The secondary product type id to filter on.
+            secondary_product_type_id_prefix: The prefix of the secondary product type id to filter on.
+            min_sequence_number: The minimum value of the sequence number to filter on.
+            max_sequence_number: The maximum value of the sequence number to filter on.
+            show_product_type_id: The show product type id to filter on.
+            show_product_type_id_prefix: The prefix of the show product type id to filter on.
+            source: The source to filter on.
+            source_prefix: The prefix of the source to filter on.
+            spatial_location: The spatial location to filter on.
+            status_summary_id: The status summary id to filter on.
+            status_summary_id_prefix: The prefix of the status summary id to filter on.
+            target_formation: The target formation to filter on.
+            target_formation_prefix: The prefix of the target formation to filter on.
+            technical_assurance_type_id: The technical assurance type id to filter on.
+            technical_assurance_type_id_prefix: The prefix of the technical assurance type id to filter on.
+            tertiary_product_type_id: The tertiary product type id to filter on.
+            tertiary_product_type_id_prefix: The prefix of the tertiary product type id to filter on.
+            trajectory_type_id: The trajectory type id to filter on.
+            trajectory_type_id_prefix: The prefix of the trajectory type id to filter on.
+            version_creation_reason: The version creation reason to filter on.
+            version_creation_reason_prefix: The prefix of the version creation reason to filter on.
+            was_business_interest_financial_non_operated: The was business interest financial non operated to filter on.
+            was_business_interest_financial_operated: The was business interest financial operated to filter on.
+            was_business_interest_obligatory: The was business interest obligatory to filter on.
+            was_business_interest_technical: The was business interest technical to filter on.
+            well_id: The well id to filter on.
+            well_id_prefix: The prefix of the well id to filter on.
+            wellbore_reason_id: The wellbore reason id to filter on.
+            wellbore_reason_id_prefix: The prefix of the wellbore reason id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of wellbore data to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `drilling_reasons`, `facility_events`, `facility_operators`, `facility_specifications`, `facility_states`, `geo_contexts`, `historical_interests`, `name_aliases`, `technical_assurances`, `vertical_measurements` or `wellbore_costs` external ids for the wellbore data. Defaults to True.
+
+        Returns:
+            Search results wellbore data matching the query.
+
+        Examples:
+
+           Search for 'my_wellbore_datum' in all text properties:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_data = client.wellbore_data.search('my_wellbore_datum')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             business_intention_id,
@@ -1168,6 +1751,112 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across wellbore data
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            business_intention_id: The business intention id to filter on.
+            business_intention_id_prefix: The prefix of the business intention id to filter on.
+            condition_id: The condition id to filter on.
+            condition_id_prefix: The prefix of the condition id to filter on.
+            current_operator_id: The current operator id to filter on.
+            current_operator_id_prefix: The prefix of the current operator id to filter on.
+            data_source_organisation_id: The data source organisation id to filter on.
+            data_source_organisation_id_prefix: The prefix of the data source organisation id to filter on.
+            default_vertical_measurement_id: The default vertical measurement id to filter on.
+            default_vertical_measurement_id_prefix: The prefix of the default vertical measurement id to filter on.
+            definitive_trajectory_id: The definitive trajectory id to filter on.
+            definitive_trajectory_id_prefix: The prefix of the definitive trajectory id to filter on.
+            existence_kind: The existence kind to filter on.
+            existence_kind_prefix: The prefix of the existence kind to filter on.
+            facility_description: The facility description to filter on.
+            facility_description_prefix: The prefix of the facility description to filter on.
+            facility_id: The facility id to filter on.
+            facility_id_prefix: The prefix of the facility id to filter on.
+            facility_name: The facility name to filter on.
+            facility_name_prefix: The prefix of the facility name to filter on.
+            facility_type_id: The facility type id to filter on.
+            facility_type_id_prefix: The prefix of the facility type id to filter on.
+            fluid_direction_id: The fluid direction id to filter on.
+            fluid_direction_id_prefix: The prefix of the fluid direction id to filter on.
+            formation_name_at_total_depth: The formation name at total depth to filter on.
+            formation_name_at_total_depth_prefix: The prefix of the formation name at total depth to filter on.
+            geographic_bottom_hole_location: The geographic bottom hole location to filter on.
+            initial_operator_id: The initial operator id to filter on.
+            initial_operator_id_prefix: The prefix of the initial operator id to filter on.
+            interest_type_id: The interest type id to filter on.
+            interest_type_id_prefix: The prefix of the interest type id to filter on.
+            kick_off_wellbore: The kick off wellbore to filter on.
+            kick_off_wellbore_prefix: The prefix of the kick off wellbore to filter on.
+            operating_environment_id: The operating environment id to filter on.
+            operating_environment_id_prefix: The prefix of the operating environment id to filter on.
+            outcome_id: The outcome id to filter on.
+            outcome_id_prefix: The prefix of the outcome id to filter on.
+            primary_product_type_id: The primary product type id to filter on.
+            primary_product_type_id_prefix: The prefix of the primary product type id to filter on.
+            projected_bottom_hole_location: The projected bottom hole location to filter on.
+            resource_curation_status: The resource curation status to filter on.
+            resource_curation_status_prefix: The prefix of the resource curation status to filter on.
+            resource_home_region_id: The resource home region id to filter on.
+            resource_home_region_id_prefix: The prefix of the resource home region id to filter on.
+            resource_lifecycle_status: The resource lifecycle status to filter on.
+            resource_lifecycle_status_prefix: The prefix of the resource lifecycle status to filter on.
+            resource_security_classification: The resource security classification to filter on.
+            resource_security_classification_prefix: The prefix of the resource security classification to filter on.
+            role_id: The role id to filter on.
+            role_id_prefix: The prefix of the role id to filter on.
+            secondary_product_type_id: The secondary product type id to filter on.
+            secondary_product_type_id_prefix: The prefix of the secondary product type id to filter on.
+            min_sequence_number: The minimum value of the sequence number to filter on.
+            max_sequence_number: The maximum value of the sequence number to filter on.
+            show_product_type_id: The show product type id to filter on.
+            show_product_type_id_prefix: The prefix of the show product type id to filter on.
+            source: The source to filter on.
+            source_prefix: The prefix of the source to filter on.
+            spatial_location: The spatial location to filter on.
+            status_summary_id: The status summary id to filter on.
+            status_summary_id_prefix: The prefix of the status summary id to filter on.
+            target_formation: The target formation to filter on.
+            target_formation_prefix: The prefix of the target formation to filter on.
+            technical_assurance_type_id: The technical assurance type id to filter on.
+            technical_assurance_type_id_prefix: The prefix of the technical assurance type id to filter on.
+            tertiary_product_type_id: The tertiary product type id to filter on.
+            tertiary_product_type_id_prefix: The prefix of the tertiary product type id to filter on.
+            trajectory_type_id: The trajectory type id to filter on.
+            trajectory_type_id_prefix: The prefix of the trajectory type id to filter on.
+            version_creation_reason: The version creation reason to filter on.
+            version_creation_reason_prefix: The prefix of the version creation reason to filter on.
+            was_business_interest_financial_non_operated: The was business interest financial non operated to filter on.
+            was_business_interest_financial_operated: The was business interest financial operated to filter on.
+            was_business_interest_obligatory: The was business interest obligatory to filter on.
+            was_business_interest_technical: The was business interest technical to filter on.
+            well_id: The well id to filter on.
+            well_id_prefix: The prefix of the well id to filter on.
+            wellbore_reason_id: The wellbore reason id to filter on.
+            wellbore_reason_id_prefix: The prefix of the wellbore reason id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of wellbore data to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `drilling_reasons`, `facility_events`, `facility_operators`, `facility_specifications`, `facility_states`, `geo_contexts`, `historical_interests`, `name_aliases`, `technical_assurances`, `vertical_measurements` or `wellbore_costs` external ids for the wellbore data. Defaults to True.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count wellbore data in space `my_space`:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> result = client.wellbore_data.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             business_intention_id,
@@ -1355,6 +2044,102 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for wellbore data
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            business_intention_id: The business intention id to filter on.
+            business_intention_id_prefix: The prefix of the business intention id to filter on.
+            condition_id: The condition id to filter on.
+            condition_id_prefix: The prefix of the condition id to filter on.
+            current_operator_id: The current operator id to filter on.
+            current_operator_id_prefix: The prefix of the current operator id to filter on.
+            data_source_organisation_id: The data source organisation id to filter on.
+            data_source_organisation_id_prefix: The prefix of the data source organisation id to filter on.
+            default_vertical_measurement_id: The default vertical measurement id to filter on.
+            default_vertical_measurement_id_prefix: The prefix of the default vertical measurement id to filter on.
+            definitive_trajectory_id: The definitive trajectory id to filter on.
+            definitive_trajectory_id_prefix: The prefix of the definitive trajectory id to filter on.
+            existence_kind: The existence kind to filter on.
+            existence_kind_prefix: The prefix of the existence kind to filter on.
+            facility_description: The facility description to filter on.
+            facility_description_prefix: The prefix of the facility description to filter on.
+            facility_id: The facility id to filter on.
+            facility_id_prefix: The prefix of the facility id to filter on.
+            facility_name: The facility name to filter on.
+            facility_name_prefix: The prefix of the facility name to filter on.
+            facility_type_id: The facility type id to filter on.
+            facility_type_id_prefix: The prefix of the facility type id to filter on.
+            fluid_direction_id: The fluid direction id to filter on.
+            fluid_direction_id_prefix: The prefix of the fluid direction id to filter on.
+            formation_name_at_total_depth: The formation name at total depth to filter on.
+            formation_name_at_total_depth_prefix: The prefix of the formation name at total depth to filter on.
+            geographic_bottom_hole_location: The geographic bottom hole location to filter on.
+            initial_operator_id: The initial operator id to filter on.
+            initial_operator_id_prefix: The prefix of the initial operator id to filter on.
+            interest_type_id: The interest type id to filter on.
+            interest_type_id_prefix: The prefix of the interest type id to filter on.
+            kick_off_wellbore: The kick off wellbore to filter on.
+            kick_off_wellbore_prefix: The prefix of the kick off wellbore to filter on.
+            operating_environment_id: The operating environment id to filter on.
+            operating_environment_id_prefix: The prefix of the operating environment id to filter on.
+            outcome_id: The outcome id to filter on.
+            outcome_id_prefix: The prefix of the outcome id to filter on.
+            primary_product_type_id: The primary product type id to filter on.
+            primary_product_type_id_prefix: The prefix of the primary product type id to filter on.
+            projected_bottom_hole_location: The projected bottom hole location to filter on.
+            resource_curation_status: The resource curation status to filter on.
+            resource_curation_status_prefix: The prefix of the resource curation status to filter on.
+            resource_home_region_id: The resource home region id to filter on.
+            resource_home_region_id_prefix: The prefix of the resource home region id to filter on.
+            resource_lifecycle_status: The resource lifecycle status to filter on.
+            resource_lifecycle_status_prefix: The prefix of the resource lifecycle status to filter on.
+            resource_security_classification: The resource security classification to filter on.
+            resource_security_classification_prefix: The prefix of the resource security classification to filter on.
+            role_id: The role id to filter on.
+            role_id_prefix: The prefix of the role id to filter on.
+            secondary_product_type_id: The secondary product type id to filter on.
+            secondary_product_type_id_prefix: The prefix of the secondary product type id to filter on.
+            min_sequence_number: The minimum value of the sequence number to filter on.
+            max_sequence_number: The maximum value of the sequence number to filter on.
+            show_product_type_id: The show product type id to filter on.
+            show_product_type_id_prefix: The prefix of the show product type id to filter on.
+            source: The source to filter on.
+            source_prefix: The prefix of the source to filter on.
+            spatial_location: The spatial location to filter on.
+            status_summary_id: The status summary id to filter on.
+            status_summary_id_prefix: The prefix of the status summary id to filter on.
+            target_formation: The target formation to filter on.
+            target_formation_prefix: The prefix of the target formation to filter on.
+            technical_assurance_type_id: The technical assurance type id to filter on.
+            technical_assurance_type_id_prefix: The prefix of the technical assurance type id to filter on.
+            tertiary_product_type_id: The tertiary product type id to filter on.
+            tertiary_product_type_id_prefix: The prefix of the tertiary product type id to filter on.
+            trajectory_type_id: The trajectory type id to filter on.
+            trajectory_type_id_prefix: The prefix of the trajectory type id to filter on.
+            version_creation_reason: The version creation reason to filter on.
+            version_creation_reason_prefix: The prefix of the version creation reason to filter on.
+            was_business_interest_financial_non_operated: The was business interest financial non operated to filter on.
+            was_business_interest_financial_operated: The was business interest financial operated to filter on.
+            was_business_interest_obligatory: The was business interest obligatory to filter on.
+            was_business_interest_technical: The was business interest technical to filter on.
+            well_id: The well id to filter on.
+            well_id_prefix: The prefix of the well id to filter on.
+            wellbore_reason_id: The wellbore reason id to filter on.
+            wellbore_reason_id_prefix: The prefix of the wellbore reason id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of wellbore data to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `drilling_reasons`, `facility_events`, `facility_operators`, `facility_specifications`, `facility_states`, `geo_contexts`, `historical_interests`, `name_aliases`, `technical_assurances`, `vertical_measurements` or `wellbore_costs` external ids for the wellbore data. Defaults to True.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             business_intention_id,
@@ -1538,6 +2323,106 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> WellboreDataList:
+        """List/filter wellbore data
+
+        Args:
+            business_intention_id: The business intention id to filter on.
+            business_intention_id_prefix: The prefix of the business intention id to filter on.
+            condition_id: The condition id to filter on.
+            condition_id_prefix: The prefix of the condition id to filter on.
+            current_operator_id: The current operator id to filter on.
+            current_operator_id_prefix: The prefix of the current operator id to filter on.
+            data_source_organisation_id: The data source organisation id to filter on.
+            data_source_organisation_id_prefix: The prefix of the data source organisation id to filter on.
+            default_vertical_measurement_id: The default vertical measurement id to filter on.
+            default_vertical_measurement_id_prefix: The prefix of the default vertical measurement id to filter on.
+            definitive_trajectory_id: The definitive trajectory id to filter on.
+            definitive_trajectory_id_prefix: The prefix of the definitive trajectory id to filter on.
+            existence_kind: The existence kind to filter on.
+            existence_kind_prefix: The prefix of the existence kind to filter on.
+            facility_description: The facility description to filter on.
+            facility_description_prefix: The prefix of the facility description to filter on.
+            facility_id: The facility id to filter on.
+            facility_id_prefix: The prefix of the facility id to filter on.
+            facility_name: The facility name to filter on.
+            facility_name_prefix: The prefix of the facility name to filter on.
+            facility_type_id: The facility type id to filter on.
+            facility_type_id_prefix: The prefix of the facility type id to filter on.
+            fluid_direction_id: The fluid direction id to filter on.
+            fluid_direction_id_prefix: The prefix of the fluid direction id to filter on.
+            formation_name_at_total_depth: The formation name at total depth to filter on.
+            formation_name_at_total_depth_prefix: The prefix of the formation name at total depth to filter on.
+            geographic_bottom_hole_location: The geographic bottom hole location to filter on.
+            initial_operator_id: The initial operator id to filter on.
+            initial_operator_id_prefix: The prefix of the initial operator id to filter on.
+            interest_type_id: The interest type id to filter on.
+            interest_type_id_prefix: The prefix of the interest type id to filter on.
+            kick_off_wellbore: The kick off wellbore to filter on.
+            kick_off_wellbore_prefix: The prefix of the kick off wellbore to filter on.
+            operating_environment_id: The operating environment id to filter on.
+            operating_environment_id_prefix: The prefix of the operating environment id to filter on.
+            outcome_id: The outcome id to filter on.
+            outcome_id_prefix: The prefix of the outcome id to filter on.
+            primary_product_type_id: The primary product type id to filter on.
+            primary_product_type_id_prefix: The prefix of the primary product type id to filter on.
+            projected_bottom_hole_location: The projected bottom hole location to filter on.
+            resource_curation_status: The resource curation status to filter on.
+            resource_curation_status_prefix: The prefix of the resource curation status to filter on.
+            resource_home_region_id: The resource home region id to filter on.
+            resource_home_region_id_prefix: The prefix of the resource home region id to filter on.
+            resource_lifecycle_status: The resource lifecycle status to filter on.
+            resource_lifecycle_status_prefix: The prefix of the resource lifecycle status to filter on.
+            resource_security_classification: The resource security classification to filter on.
+            resource_security_classification_prefix: The prefix of the resource security classification to filter on.
+            role_id: The role id to filter on.
+            role_id_prefix: The prefix of the role id to filter on.
+            secondary_product_type_id: The secondary product type id to filter on.
+            secondary_product_type_id_prefix: The prefix of the secondary product type id to filter on.
+            min_sequence_number: The minimum value of the sequence number to filter on.
+            max_sequence_number: The maximum value of the sequence number to filter on.
+            show_product_type_id: The show product type id to filter on.
+            show_product_type_id_prefix: The prefix of the show product type id to filter on.
+            source: The source to filter on.
+            source_prefix: The prefix of the source to filter on.
+            spatial_location: The spatial location to filter on.
+            status_summary_id: The status summary id to filter on.
+            status_summary_id_prefix: The prefix of the status summary id to filter on.
+            target_formation: The target formation to filter on.
+            target_formation_prefix: The prefix of the target formation to filter on.
+            technical_assurance_type_id: The technical assurance type id to filter on.
+            technical_assurance_type_id_prefix: The prefix of the technical assurance type id to filter on.
+            tertiary_product_type_id: The tertiary product type id to filter on.
+            tertiary_product_type_id_prefix: The prefix of the tertiary product type id to filter on.
+            trajectory_type_id: The trajectory type id to filter on.
+            trajectory_type_id_prefix: The prefix of the trajectory type id to filter on.
+            version_creation_reason: The version creation reason to filter on.
+            version_creation_reason_prefix: The prefix of the version creation reason to filter on.
+            was_business_interest_financial_non_operated: The was business interest financial non operated to filter on.
+            was_business_interest_financial_operated: The was business interest financial operated to filter on.
+            was_business_interest_obligatory: The was business interest obligatory to filter on.
+            was_business_interest_technical: The was business interest technical to filter on.
+            well_id: The well id to filter on.
+            well_id_prefix: The prefix of the well id to filter on.
+            wellbore_reason_id: The wellbore reason id to filter on.
+            wellbore_reason_id_prefix: The prefix of the wellbore reason id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of wellbore data to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `drilling_reasons`, `facility_events`, `facility_operators`, `facility_specifications`, `facility_states`, `geo_contexts`, `historical_interests`, `name_aliases`, `technical_assurances`, `vertical_measurements` or `wellbore_costs` external ids for the wellbore data. Defaults to True.
+
+        Returns:
+            List of requested wellbore data
+
+        Examples:
+
+            List wellbore data and limit to 5:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_data = client.wellbore_data.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             business_intention_id,

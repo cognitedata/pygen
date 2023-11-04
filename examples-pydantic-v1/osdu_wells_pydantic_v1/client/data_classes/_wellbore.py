@@ -33,6 +33,32 @@ _WELLBORE_PROPERTIES_BY_FIELD = {
 
 
 class Wellbore(DomainModel):
+    """This represent a read version of wellbore.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the wellbore.
+        acl: The acl field.
+        ancestry: The ancestry field.
+        create_time: The create time field.
+        create_user: The create user field.
+        data: The datum field.
+        id: The id field.
+        kind: The kind field.
+        legal: The legal field.
+        meta: The meta field.
+        modify_time: The modify time field.
+        modify_user: The modify user field.
+        tags: The tag field.
+        version: The version field.
+        created_time: The created time of the wellbore node.
+        last_updated_time: The last updated time of the wellbore node.
+        deleted_time: If present, the deleted time of the wellbore node.
+        version: The version of the wellbore node.
+    """
+
     space: str = "IntegrationTestsImmutable"
     acl: Optional[str] = None
     ancestry: Optional[str] = None
@@ -49,6 +75,7 @@ class Wellbore(DomainModel):
     version: Optional[int] = None
 
     def as_apply(self) -> WellboreApply:
+        """Convert this read version of wellbore to a write version."""
         return WellboreApply(
             space=self.space,
             external_id=self.external_id,
@@ -69,6 +96,32 @@ class Wellbore(DomainModel):
 
 
 class WellboreApply(DomainModelApply):
+    """This represent a write version of wellbore.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the wellbore.
+        acl: The acl field.
+        ancestry: The ancestry field.
+        create_time: The create time field.
+        create_user: The create user field.
+        data: The datum field.
+        id: The id field.
+        kind: The kind field.
+        legal: The legal field.
+        meta: The meta field.
+        modify_time: The modify time field.
+        modify_user: The modify user field.
+        tags: The tag field.
+        version: The version field.
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "IntegrationTestsImmutable"
     acl: Union[AclApply, str, None] = Field(None, repr=False)
     ancestry: Union[AncestryApply, str, None] = Field(None, repr=False)
@@ -205,11 +258,16 @@ class WellboreApply(DomainModelApply):
 
 
 class WellboreList(TypeList[Wellbore]):
+    """List of wellbores in read version."""
+
     _NODE = Wellbore
 
     def as_apply(self) -> WellboreApplyList:
+        """Convert this read version of wellbore to a write version."""
         return WellboreApplyList([node.as_apply() for node in self.data])
 
 
 class WellboreApplyList(TypeApplyList[WellboreApply]):
+    """List of wellbores in write version."""
+
     _NODE = WellboreApply

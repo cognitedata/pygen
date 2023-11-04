@@ -19,9 +19,14 @@ def top_level_package() -> str:
 
 
 @pytest.fixture
-def sdk_generator(pygen_pool_model, cog_pool_model, top_level_package) -> SDKGenerator:
+def client_name() -> str:
+    return "MarketClient"
+
+
+@pytest.fixture
+def sdk_generator(pygen_pool_model, cog_pool_model, top_level_package, client_name: str) -> SDKGenerator:
     return SDKGenerator(
-        top_level_package=top_level_package, client_name="MarketClient", data_model=[pygen_pool_model, cog_pool_model]
+        top_level_package=top_level_package, client_name=client_name, data_model=[pygen_pool_model, cog_pool_model]
     )
 
 
@@ -70,13 +75,13 @@ def test_generate_date_transformation_pairs_data_class(
 
 
 def test_generate_date_transformation_pairs_data_api(
-    date_transformation_generator: APIGenerator, top_level_package: str, code_formatter: CodeFormatter
+    date_transformation_generator: APIGenerator, top_level_package: str, client_name: str, code_formatter: CodeFormatter
 ):
     # Arrange
     expected = MarketSDKFiles.date_transformation_pair_api.read_text()
 
     # Act
-    actual = date_transformation_generator.generate_api_file(top_level_package)
+    actual = date_transformation_generator.generate_api_file(top_level_package, client_name)
 
     # Assert
     actual = code_formatter.format_code(actual)

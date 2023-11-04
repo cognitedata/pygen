@@ -32,6 +32,29 @@ _WORKITEM_PROPERTIES_BY_FIELD = {
 
 
 class WorkItem(DomainModel):
+    """This represent a read version of work item.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the work item.
+        criticality: The criticality field.
+        description: The description field.
+        is_completed: @name completed
+        item_info: @name item information
+        item_name: @name item name
+        linked_assets: The linked asset field.
+        method: The method field.
+        title: The title field.
+        to_be_done: @name to be done
+        work_order: The work order field.
+        created_time: The created time of the work item node.
+        last_updated_time: The last updated time of the work item node.
+        deleted_time: If present, the deleted time of the work item node.
+        version: The version of the work item node.
+    """
+
     space: str = "tutorial_apm_simple"
     criticality: Optional[str] = None
     description: Optional[str] = None
@@ -45,6 +68,7 @@ class WorkItem(DomainModel):
     work_order: Optional[str] = Field(None, alias="workOrder")
 
     def as_apply(self) -> WorkItemApply:
+        """Convert this read version of work item to a write version."""
         return WorkItemApply(
             space=self.space,
             external_id=self.external_id,
@@ -62,6 +86,29 @@ class WorkItem(DomainModel):
 
 
 class WorkItemApply(DomainModelApply):
+    """This represent a write version of work item.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the work item.
+        criticality: The criticality field.
+        description: The description field.
+        is_completed: @name completed
+        item_info: @name item information
+        item_name: @name item name
+        linked_assets: The linked asset field.
+        method: The method field.
+        title: The title field.
+        to_be_done: @name to be done
+        work_order: The work order field.
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "tutorial_apm_simple"
     criticality: Optional[str] = None
     description: Optional[str] = None
@@ -157,11 +204,16 @@ class WorkItemApply(DomainModelApply):
 
 
 class WorkItemList(TypeList[WorkItem]):
+    """List of work items in read version."""
+
     _NODE = WorkItem
 
     def as_apply(self) -> WorkItemApplyList:
+        """Convert this read version of work item to a write version."""
         return WorkItemApplyList([node.as_apply() for node in self.data])
 
 
 class WorkItemApplyList(TypeApplyList[WorkItemApply]):
+    """List of work items in write version."""
+
     _NODE = WorkItemApply

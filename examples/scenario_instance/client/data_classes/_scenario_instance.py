@@ -36,6 +36,27 @@ _SCENARIOINSTANCE_PROPERTIES_BY_FIELD = {
 
 
 class ScenarioInstance(DomainModel):
+    """This represent a read version of scenario instance.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the scenario instance.
+        aggregation: The aggregation field.
+        country: The country field.
+        instance: The instance field.
+        market: The market field.
+        price_area: The price area field.
+        price_forecast: The price forecast field.
+        scenario: The scenario field.
+        start: The start field.
+        created_time: The created time of the scenario instance node.
+        last_updated_time: The last updated time of the scenario instance node.
+        deleted_time: If present, the deleted time of the scenario instance node.
+        version: The version of the scenario instance node.
+    """
+
     space: str = "IntegrationTestsImmutable"
     aggregation: Optional[str] = None
     country: Optional[str] = None
@@ -47,6 +68,7 @@ class ScenarioInstance(DomainModel):
     start: Optional[datetime.datetime] = None
 
     def as_apply(self) -> ScenarioInstanceApply:
+        """Convert this read version of scenario instance to a write version."""
         return ScenarioInstanceApply(
             space=self.space,
             external_id=self.external_id,
@@ -62,6 +84,27 @@ class ScenarioInstance(DomainModel):
 
 
 class ScenarioInstanceApply(DomainModelApply):
+    """This represent a write version of scenario instance.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the scenario instance.
+        aggregation: The aggregation field.
+        country: The country field.
+        instance: The instance field.
+        market: The market field.
+        price_area: The price area field.
+        price_forecast: The price forecast field.
+        scenario: The scenario field.
+        start: The start field.
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "IntegrationTestsImmutable"
     aggregation: Optional[str] = None
     country: Optional[str] = None
@@ -118,11 +161,16 @@ class ScenarioInstanceApply(DomainModelApply):
 
 
 class ScenarioInstanceList(TypeList[ScenarioInstance]):
+    """List of scenario instances in read version."""
+
     _NODE = ScenarioInstance
 
     def as_apply(self) -> ScenarioInstanceApplyList:
+        """Convert this read version of scenario instance to a write version."""
         return ScenarioInstanceApplyList([node.as_apply() for node in self.data])
 
 
 class ScenarioInstanceApplyList(TypeApplyList[ScenarioInstanceApply]):
+    """List of scenario instances in write version."""
+
     _NODE = ScenarioInstanceApply

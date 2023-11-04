@@ -42,6 +42,24 @@ _FACILITYOPERATORS_PROPERTIES_BY_FIELD = {
 
 
 class FacilityOperators(DomainModel):
+    """This represent a read version of facility operator.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the facility operator.
+        effective_date_time: The effective date time field.
+        facility_operator_id: The facility operator id field.
+        facility_operator_organisation_id: The facility operator organisation id field.
+        remark: The remark field.
+        termination_date_time: The termination date time field.
+        created_time: The created time of the facility operator node.
+        last_updated_time: The last updated time of the facility operator node.
+        deleted_time: If present, the deleted time of the facility operator node.
+        version: The version of the facility operator node.
+    """
+
     space: str = "IntegrationTestsImmutable"
     effective_date_time: Optional[str] = Field(None, alias="EffectiveDateTime")
     facility_operator_id: Optional[str] = Field(None, alias="FacilityOperatorID")
@@ -50,6 +68,7 @@ class FacilityOperators(DomainModel):
     termination_date_time: Optional[str] = Field(None, alias="TerminationDateTime")
 
     def as_apply(self) -> FacilityOperatorsApply:
+        """Convert this read version of facility operator to a write version."""
         return FacilityOperatorsApply(
             space=self.space,
             external_id=self.external_id,
@@ -62,6 +81,24 @@ class FacilityOperators(DomainModel):
 
 
 class FacilityOperatorsApply(DomainModelApply):
+    """This represent a write version of facility operator.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the facility operator.
+        effective_date_time: The effective date time field.
+        facility_operator_id: The facility operator id field.
+        facility_operator_organisation_id: The facility operator organisation id field.
+        remark: The remark field.
+        termination_date_time: The termination date time field.
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "IntegrationTestsImmutable"
     effective_date_time: Optional[str] = Field(None, alias="EffectiveDateTime")
     facility_operator_id: Optional[str] = Field(None, alias="FacilityOperatorID")
@@ -109,11 +146,16 @@ class FacilityOperatorsApply(DomainModelApply):
 
 
 class FacilityOperatorsList(TypeList[FacilityOperators]):
+    """List of facility operators in read version."""
+
     _NODE = FacilityOperators
 
     def as_apply(self) -> FacilityOperatorsApplyList:
+        """Convert this read version of facility operator to a write version."""
         return FacilityOperatorsApplyList([node.as_apply() for node in self.data])
 
 
 class FacilityOperatorsApplyList(TypeApplyList[FacilityOperatorsApply]):
+    """List of facility operators in write version."""
+
     _NODE = FacilityOperatorsApply

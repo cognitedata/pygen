@@ -33,6 +33,25 @@ _GEOCONTEXTS_PROPERTIES_BY_FIELD = {
 
 
 class GeoContexts(DomainModel):
+    """This represent a read version of geo context.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the geo context.
+        basin_id: The basin id field.
+        field_id: The field id field.
+        geo_political_entity_id: The geo political entity id field.
+        geo_type_id: The geo type id field.
+        play_id: The play id field.
+        prospect_id: The prospect id field.
+        created_time: The created time of the geo context node.
+        last_updated_time: The last updated time of the geo context node.
+        deleted_time: If present, the deleted time of the geo context node.
+        version: The version of the geo context node.
+    """
+
     space: str = "IntegrationTestsImmutable"
     basin_id: Optional[str] = Field(None, alias="BasinID")
     field_id: Optional[str] = Field(None, alias="FieldID")
@@ -42,6 +61,7 @@ class GeoContexts(DomainModel):
     prospect_id: Optional[str] = Field(None, alias="ProspectID")
 
     def as_apply(self) -> GeoContextsApply:
+        """Convert this read version of geo context to a write version."""
         return GeoContextsApply(
             space=self.space,
             external_id=self.external_id,
@@ -55,6 +75,25 @@ class GeoContexts(DomainModel):
 
 
 class GeoContextsApply(DomainModelApply):
+    """This represent a write version of geo context.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the geo context.
+        basin_id: The basin id field.
+        field_id: The field id field.
+        geo_political_entity_id: The geo political entity id field.
+        geo_type_id: The geo type id field.
+        play_id: The play id field.
+        prospect_id: The prospect id field.
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "IntegrationTestsImmutable"
     basin_id: Optional[str] = Field(None, alias="BasinID")
     field_id: Optional[str] = Field(None, alias="FieldID")
@@ -105,11 +144,16 @@ class GeoContextsApply(DomainModelApply):
 
 
 class GeoContextsList(TypeList[GeoContexts]):
+    """List of geo contexts in read version."""
+
     _NODE = GeoContexts
 
     def as_apply(self) -> GeoContextsApplyList:
+        """Convert this read version of geo context to a write version."""
         return GeoContextsApplyList([node.as_apply() for node in self.data])
 
 
 class GeoContextsApplyList(TypeApplyList[GeoContextsApply]):
+    """List of geo contexts in write version."""
+
     _NODE = GeoContextsApply

@@ -1,0 +1,36 @@
+    def search(
+        self,
+        query: str,
+        properties: {{ data_class.text_field_names }} | Sequence[{{ data_class.text_field_names }}] | None = None,{% for parm in list_method.parameters %}
+        {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> {{ data_class.read_list_name }}:
+        """Search {{ data_class.doc_list_name }}
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.{% for parm in list_method.parameters %}
+            {{ parm.name }}: {{ parm.description }}{% endfor %}
+            limit: Maximum number of {{ data_class.doc_list_name }} to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above. {% if data_class.has_one_to_many_edges %}
+            retrieve_edges: Whether to retrieve {{ data_class.one_to_many_edges_docs }} external ids for the {{ data_class.doc_list_name }}. Defaults to True.{% endif %}
+
+        Returns:
+            Search results {{ data_class.doc_list_name}} matching the query.
+
+        Examples:
+
+           Search for 'my_{{ data_class.variable }}' in all text properties:
+
+                >>> from {{ top_level_package }} import {{ client_name }}
+                >>> client = {{ client_name }}()
+                >>> {{ data_class.variable_list }} = client.{{ api_class.client_attribute }}.search('my_{{ data_class.variable }}')
+
+        """
+        filter_ = _create_filter(
+            self._view_id,{% for parm in list_method.parameters %}
+            {{ parm.name }},{% endfor %}
+            filter,
+        )
+        return self._search(self._view_id, query, {{ data_class.properties_dict_name }}, properties, filter_, limit)

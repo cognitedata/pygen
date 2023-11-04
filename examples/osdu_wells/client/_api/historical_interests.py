@@ -35,6 +35,26 @@ class HistoricalInterestsAPI(TypeAPI[HistoricalInterests, HistoricalInterestsApp
     def apply(
         self, historical_interest: HistoricalInterestsApply | Sequence[HistoricalInterestsApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) historical interests.
+
+        Args:
+            historical_interest: Historical interest or sequence of historical interests to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new historical_interest:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> from osdu_wells.client.data_classes import HistoricalInterestsApply
+                >>> client = OSDUClient()
+                >>> historical_interest = HistoricalInterestsApply(external_id="my_historical_interest", ...)
+                >>> result = client.historical_interests.apply(historical_interest)
+
+        """
         if isinstance(historical_interest, HistoricalInterestsApply):
             instances = historical_interest.to_instances_apply(self._view_by_write_class)
         else:
@@ -47,7 +67,26 @@ class HistoricalInterestsAPI(TypeAPI[HistoricalInterests, HistoricalInterestsApp
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more historical interest.
+
+        Args:
+            external_id: External id of the historical interest to delete.
+            space: The space where all the historical interest are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete historical_interest by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> client.historical_interests.delete("my_historical_interest")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -63,11 +102,31 @@ class HistoricalInterestsAPI(TypeAPI[HistoricalInterests, HistoricalInterestsApp
     def retrieve(self, external_id: Sequence[str]) -> HistoricalInterestsList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> HistoricalInterests | HistoricalInterestsList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> HistoricalInterests | HistoricalInterestsList:
+        """Retrieve one or more historical interests by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the historical interests.
+            space: The space where all the historical interests are located.
+
+        Returns:
+            The requested historical interests.
+
+        Examples:
+
+            Retrieve historical_interest by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> historical_interest = client.historical_interests.retrieve("my_historical_interest")
+
+        """
         if isinstance(external_id, str):
-            return self._retrieve((self._sources.space, external_id))
+            return self._retrieve((space, external_id))
         else:
-            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(space, ext_id) for ext_id in external_id])
 
     def search(
         self,
@@ -84,6 +143,34 @@ class HistoricalInterestsAPI(TypeAPI[HistoricalInterests, HistoricalInterestsApp
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> HistoricalInterestsList:
+        """Search historical interests
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            effective_date_time: The effective date time to filter on.
+            effective_date_time_prefix: The prefix of the effective date time to filter on.
+            interest_type_id: The interest type id to filter on.
+            interest_type_id_prefix: The prefix of the interest type id to filter on.
+            termination_date_time: The termination date time to filter on.
+            termination_date_time_prefix: The prefix of the termination date time to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of historical interests to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results historical interests matching the query.
+
+        Examples:
+
+           Search for 'my_historical_interest' in all text properties:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> historical_interests = client.historical_interests.search('my_historical_interest')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             effective_date_time,
@@ -167,6 +254,38 @@ class HistoricalInterestsAPI(TypeAPI[HistoricalInterests, HistoricalInterestsApp
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across historical interests
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            effective_date_time: The effective date time to filter on.
+            effective_date_time_prefix: The prefix of the effective date time to filter on.
+            interest_type_id: The interest type id to filter on.
+            interest_type_id_prefix: The prefix of the interest type id to filter on.
+            termination_date_time: The termination date time to filter on.
+            termination_date_time_prefix: The prefix of the termination date time to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of historical interests to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count historical interests in space `my_space`:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> result = client.historical_interests.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             effective_date_time,
@@ -208,6 +327,28 @@ class HistoricalInterestsAPI(TypeAPI[HistoricalInterests, HistoricalInterestsApp
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for historical interests
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            effective_date_time: The effective date time to filter on.
+            effective_date_time_prefix: The prefix of the effective date time to filter on.
+            interest_type_id: The interest type id to filter on.
+            interest_type_id_prefix: The prefix of the interest type id to filter on.
+            termination_date_time: The termination date time to filter on.
+            termination_date_time_prefix: The prefix of the termination date time to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of historical interests to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             effective_date_time,
@@ -244,6 +385,32 @@ class HistoricalInterestsAPI(TypeAPI[HistoricalInterests, HistoricalInterestsApp
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> HistoricalInterestsList:
+        """List/filter historical interests
+
+        Args:
+            effective_date_time: The effective date time to filter on.
+            effective_date_time_prefix: The prefix of the effective date time to filter on.
+            interest_type_id: The interest type id to filter on.
+            interest_type_id_prefix: The prefix of the interest type id to filter on.
+            termination_date_time: The termination date time to filter on.
+            termination_date_time_prefix: The prefix of the termination date time to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of historical interests to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested historical interests
+
+        Examples:
+
+            List historical interests and limit to 5:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> historical_interests = client.historical_interests.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             effective_date_time,

@@ -33,6 +33,26 @@ class LegalAPI(TypeAPI[Legal, LegalApply, LegalList]):
         self._view_by_write_class = view_by_write_class
 
     def apply(self, legal: LegalApply | Sequence[LegalApply], replace: bool = False) -> dm.InstancesApplyResult:
+        """Add or update (upsert) legals.
+
+        Args:
+            legal: Legal or sequence of legals to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new legal:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> from osdu_wells.client.data_classes import LegalApply
+                >>> client = OSDUClient()
+                >>> legal = LegalApply(external_id="my_legal", ...)
+                >>> result = client.legal.apply(legal)
+
+        """
         if isinstance(legal, LegalApply):
             instances = legal.to_instances_apply(self._view_by_write_class)
         else:
@@ -45,7 +65,26 @@ class LegalAPI(TypeAPI[Legal, LegalApply, LegalList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more legal.
+
+        Args:
+            external_id: External id of the legal to delete.
+            space: The space where all the legal are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete legal by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> client.legal.delete("my_legal")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -61,11 +100,29 @@ class LegalAPI(TypeAPI[Legal, LegalApply, LegalList]):
     def retrieve(self, external_id: Sequence[str]) -> LegalList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> Legal | LegalList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> Legal | LegalList:
+        """Retrieve one or more legals by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the legals.
+            space: The space where all the legals are located.
+
+        Returns:
+            The requested legals.
+
+        Examples:
+
+            Retrieve legal by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> legal = client.legal.retrieve("my_legal")
+
+        """
         if isinstance(external_id, str):
-            return self._retrieve((self._sources.space, external_id))
+            return self._retrieve((space, external_id))
         else:
-            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(space, ext_id) for ext_id in external_id])
 
     def search(
         self,
@@ -78,6 +135,30 @@ class LegalAPI(TypeAPI[Legal, LegalApply, LegalList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> LegalList:
+        """Search legals
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            status: The status to filter on.
+            status_prefix: The prefix of the status to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of legals to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results legals matching the query.
+
+        Examples:
+
+           Search for 'my_legal' in all text properties:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> legals = client.legal.search('my_legal')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             status,
@@ -145,6 +226,34 @@ class LegalAPI(TypeAPI[Legal, LegalApply, LegalList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across legals
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            status: The status to filter on.
+            status_prefix: The prefix of the status to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of legals to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count legals in space `my_space`:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> result = client.legal.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             status,
@@ -178,6 +287,24 @@ class LegalAPI(TypeAPI[Legal, LegalApply, LegalList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for legals
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            status: The status to filter on.
+            status_prefix: The prefix of the status to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of legals to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             status,
@@ -206,6 +333,28 @@ class LegalAPI(TypeAPI[Legal, LegalApply, LegalList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> LegalList:
+        """List/filter legals
+
+        Args:
+            status: The status to filter on.
+            status_prefix: The prefix of the status to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of legals to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested legals
+
+        Examples:
+
+            List legals and limit to 5:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> legals = client.legal.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             status,

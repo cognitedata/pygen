@@ -35,6 +35,26 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
     def apply(
         self, command_config: CommandConfigApply | Sequence[CommandConfigApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) command configs.
+
+        Args:
+            command_config: Command config or sequence of command configs to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new command_config:
+
+                >>> from shop_pydantic_v1.client import ShopClient
+                >>> from shop_pydantic_v1.client.data_classes import CommandConfigApply
+                >>> client = ShopClient()
+                >>> command_config = CommandConfigApply(external_id="my_command_config", ...)
+                >>> result = client.command_config.apply(command_config)
+
+        """
         if isinstance(command_config, CommandConfigApply):
             instances = command_config.to_instances_apply(self._view_by_write_class)
         else:
@@ -47,7 +67,26 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more command config.
+
+        Args:
+            external_id: External id of the command config to delete.
+            space: The space where all the command config are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete command_config by id:
+
+                >>> from shop_pydantic_v1.client import ShopClient
+                >>> client = ShopClient()
+                >>> client.command_config.delete("my_command_config")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -63,11 +102,31 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
     def retrieve(self, external_id: Sequence[str]) -> CommandConfigList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> CommandConfig | CommandConfigList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> CommandConfig | CommandConfigList:
+        """Retrieve one or more command configs by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the command configs.
+            space: The space where all the command configs are located.
+
+        Returns:
+            The requested command configs.
+
+        Examples:
+
+            Retrieve command_config by id:
+
+                >>> from shop_pydantic_v1.client import ShopClient
+                >>> client = ShopClient()
+                >>> command_config = client.command_config.retrieve("my_command_config")
+
+        """
         if isinstance(external_id, str):
-            return self._retrieve((self._sources.space, external_id))
+            return self._retrieve((space, external_id))
         else:
-            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(space, ext_id) for ext_id in external_id])
 
     def search(
         self,
@@ -78,6 +137,28 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> CommandConfigList:
+        """Search command configs
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of command configs to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results command configs matching the query.
+
+        Examples:
+
+           Search for 'my_command_config' in all text properties:
+
+                >>> from shop_pydantic_v1.client import ShopClient
+                >>> client = ShopClient()
+                >>> command_configs = client.command_config.search('my_command_config')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             external_id_prefix,
@@ -137,6 +218,32 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across command configs
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of command configs to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count command configs in space `my_space`:
+
+                >>> from shop_pydantic_v1.client import ShopClient
+                >>> client = ShopClient()
+                >>> result = client.command_config.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             external_id_prefix,
@@ -166,6 +273,22 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for command configs
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of command configs to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             external_id_prefix,
@@ -190,6 +313,26 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> CommandConfigList:
+        """List/filter command configs
+
+        Args:
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of command configs to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested command configs
+
+        Examples:
+
+            List command configs and limit to 5:
+
+                >>> from shop_pydantic_v1.client import ShopClient
+                >>> client = ShopClient()
+                >>> command_configs = client.command_config.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             external_id_prefix,

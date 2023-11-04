@@ -21,12 +21,29 @@ _LEGAL_PROPERTIES_BY_FIELD = {
 
 
 class Legal(DomainModel):
+    """This represent a read version of legal.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the legal.
+        legaltags: The legaltag field.
+        other_relevant_data_countries: The other relevant data country field.
+        status: The status field.
+        created_time: The created time of the legal node.
+        last_updated_time: The last updated time of the legal node.
+        deleted_time: If present, the deleted time of the legal node.
+        version: The version of the legal node.
+    """
+
     space: str = "IntegrationTestsImmutable"
     legaltags: Optional[list[str]] = None
     other_relevant_data_countries: Optional[list[str]] = Field(None, alias="otherRelevantDataCountries")
     status: Optional[str] = None
 
     def as_apply(self) -> LegalApply:
+        """Convert this read version of legal to a write version."""
         return LegalApply(
             space=self.space,
             external_id=self.external_id,
@@ -37,6 +54,22 @@ class Legal(DomainModel):
 
 
 class LegalApply(DomainModelApply):
+    """This represent a write version of legal.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the legal.
+        legaltags: The legaltag field.
+        other_relevant_data_countries: The other relevant data country field.
+        status: The status field.
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "IntegrationTestsImmutable"
     legaltags: Optional[list[str]] = None
     other_relevant_data_countries: Optional[list[str]] = Field(None, alias="otherRelevantDataCountries")
@@ -78,11 +111,16 @@ class LegalApply(DomainModelApply):
 
 
 class LegalList(TypeList[Legal]):
+    """List of legals in read version."""
+
     _NODE = Legal
 
     def as_apply(self) -> LegalApplyList:
+        """Convert this read version of legal to a write version."""
         return LegalApplyList([node.as_apply() for node in self.data])
 
 
 class LegalApplyList(TypeApplyList[LegalApply]):
+    """List of legals in write version."""
+
     _NODE = LegalApply

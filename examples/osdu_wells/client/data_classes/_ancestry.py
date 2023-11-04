@@ -18,10 +18,25 @@ _ANCESTRY_PROPERTIES_BY_FIELD = {
 
 
 class Ancestry(DomainModel):
+    """This represent a read version of ancestry.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the ancestry.
+        parents: The parent field.
+        created_time: The created time of the ancestry node.
+        last_updated_time: The last updated time of the ancestry node.
+        deleted_time: If present, the deleted time of the ancestry node.
+        version: The version of the ancestry node.
+    """
+
     space: str = "IntegrationTestsImmutable"
     parents: Optional[list[str]] = None
 
     def as_apply(self) -> AncestryApply:
+        """Convert this read version of ancestry to a write version."""
         return AncestryApply(
             space=self.space,
             external_id=self.external_id,
@@ -30,6 +45,20 @@ class Ancestry(DomainModel):
 
 
 class AncestryApply(DomainModelApply):
+    """This represent a write version of ancestry.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the ancestry.
+        parents: The parent field.
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "IntegrationTestsImmutable"
     parents: Optional[list[str]] = None
 
@@ -65,11 +94,16 @@ class AncestryApply(DomainModelApply):
 
 
 class AncestryList(TypeList[Ancestry]):
+    """List of ancestries in read version."""
+
     _NODE = Ancestry
 
     def as_apply(self) -> AncestryApplyList:
+        """Convert this read version of ancestry to a write version."""
         return AncestryApplyList([node.as_apply() for node in self.data])
 
 
 class AncestryApplyList(TypeApplyList[AncestryApply]):
+    """List of ancestries in write version."""
+
     _NODE = AncestryApply

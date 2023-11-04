@@ -19,10 +19,25 @@ _TAGS_PROPERTIES_BY_FIELD = {
 
 
 class Tags(DomainModel):
+    """This represent a read version of tag.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the tag.
+        name_of_key: The name of key field.
+        created_time: The created time of the tag node.
+        last_updated_time: The last updated time of the tag node.
+        deleted_time: If present, the deleted time of the tag node.
+        version: The version of the tag node.
+    """
+
     space: str = "IntegrationTestsImmutable"
     name_of_key: Optional[str] = Field(None, alias="NameOfKey")
 
     def as_apply(self) -> TagsApply:
+        """Convert this read version of tag to a write version."""
         return TagsApply(
             space=self.space,
             external_id=self.external_id,
@@ -31,6 +46,20 @@ class Tags(DomainModel):
 
 
 class TagsApply(DomainModelApply):
+    """This represent a write version of tag.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the tag.
+        name_of_key: The name of key field.
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "IntegrationTestsImmutable"
     name_of_key: Optional[str] = Field(None, alias="NameOfKey")
 
@@ -66,11 +95,16 @@ class TagsApply(DomainModelApply):
 
 
 class TagsList(TypeList[Tags]):
+    """List of tags in read version."""
+
     _NODE = Tags
 
     def as_apply(self) -> TagsApplyList:
+        """Convert this read version of tag to a write version."""
         return TagsApplyList([node.as_apply() for node in self.data])
 
 
 class TagsApplyList(TypeApplyList[TagsApply]):
+    """List of tags in write version."""
+
     _NODE = TagsApply

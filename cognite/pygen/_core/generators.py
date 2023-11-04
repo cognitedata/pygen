@@ -199,7 +199,7 @@ class MultiAPIGenerator:
         for api in self.sub_apis:
             file_name = api.api_class.file_name
             sdk[data_classes_dir / f"_{file_name}.py"] = api.generate_data_class_file()
-            sdk[api_dir / f"{file_name}.py"] = api.generate_api_file(self.top_level_package)
+            sdk[api_dir / f"{file_name}.py"] = api.generate_api_file(self.top_level_package, self.client_name)
 
         sdk[client_dir / "__init__.py"] = self.generate_client_init_file()
         sdk[data_classes_dir / "__init__.py"] = self.generate_data_classes_init_file()
@@ -263,12 +263,13 @@ class APIGenerator:
 
         return type_data.render(data_class=self.data_class, space=self.view_identifier.space) + "\n"
 
-    def generate_api_file(self, top_level_package: str) -> str:
+    def generate_api_file(self, top_level_package: str, client_name: str) -> str:
         type_api = self._env.get_template("api_class.py.jinja")
 
         return (
             type_api.render(
                 top_level_package=top_level_package,
+                client_name=client_name,
                 api_class=self.api_class,
                 data_class=self.data_class,
                 list_method=ListMethod.from_fields(self.data_class.fields, self._config.filtering),

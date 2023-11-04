@@ -19,11 +19,27 @@ __all__ = [
 
 
 class DateTransformationPair(DomainModel):
+    """This represent a read version of date transformation pair.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the date transformation pair.
+        end: The end field.
+        start: The start field.
+        created_time: The created time of the date transformation pair node.
+        last_updated_time: The last updated time of the date transformation pair node.
+        deleted_time: If present, the deleted time of the date transformation pair node.
+        version: The version of the date transformation pair node.
+    """
+
     space: str = "market"
     end: Optional[list[str]] = None
     start: Optional[list[str]] = None
 
     def as_apply(self) -> DateTransformationPairApply:
+        """Convert this read version of date transformation pair to a write version."""
         return DateTransformationPairApply(
             space=self.space,
             external_id=self.external_id,
@@ -33,6 +49,21 @@ class DateTransformationPair(DomainModel):
 
 
 class DateTransformationPairApply(DomainModelApply):
+    """This represent a write version of date transformation pair.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the date transformation pair.
+        end: The end field.
+        start: The start field.
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "market"
     end: Union[list[DateTransformationApply], list[str], None] = Field(default=None, repr=False)
     start: Union[list[DateTransformationApply], list[str], None] = Field(default=None, repr=False)
@@ -107,11 +138,16 @@ class DateTransformationPairApply(DomainModelApply):
 
 
 class DateTransformationPairList(TypeList[DateTransformationPair]):
+    """List of date transformation pairs in read version."""
+
     _NODE = DateTransformationPair
 
     def as_apply(self) -> DateTransformationPairApplyList:
+        """Convert this read version of date transformation pair to a write version."""
         return DateTransformationPairApplyList([node.as_apply() for node in self.data])
 
 
 class DateTransformationPairApplyList(TypeApplyList[DateTransformationPairApply]):
+    """List of date transformation pairs in write version."""
+
     _NODE = DateTransformationPairApply

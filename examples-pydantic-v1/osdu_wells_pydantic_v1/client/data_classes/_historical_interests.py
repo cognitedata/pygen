@@ -28,12 +28,29 @@ _HISTORICALINTERESTS_PROPERTIES_BY_FIELD = {
 
 
 class HistoricalInterests(DomainModel):
+    """This represent a read version of historical interest.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the historical interest.
+        effective_date_time: The effective date time field.
+        interest_type_id: The interest type id field.
+        termination_date_time: The termination date time field.
+        created_time: The created time of the historical interest node.
+        last_updated_time: The last updated time of the historical interest node.
+        deleted_time: If present, the deleted time of the historical interest node.
+        version: The version of the historical interest node.
+    """
+
     space: str = "IntegrationTestsImmutable"
     effective_date_time: Optional[str] = Field(None, alias="EffectiveDateTime")
     interest_type_id: Optional[str] = Field(None, alias="InterestTypeID")
     termination_date_time: Optional[str] = Field(None, alias="TerminationDateTime")
 
     def as_apply(self) -> HistoricalInterestsApply:
+        """Convert this read version of historical interest to a write version."""
         return HistoricalInterestsApply(
             space=self.space,
             external_id=self.external_id,
@@ -44,6 +61,22 @@ class HistoricalInterests(DomainModel):
 
 
 class HistoricalInterestsApply(DomainModelApply):
+    """This represent a write version of historical interest.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the historical interest.
+        effective_date_time: The effective date time field.
+        interest_type_id: The interest type id field.
+        termination_date_time: The termination date time field.
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "IntegrationTestsImmutable"
     effective_date_time: Optional[str] = Field(None, alias="EffectiveDateTime")
     interest_type_id: Optional[str] = Field(None, alias="InterestTypeID")
@@ -85,11 +118,16 @@ class HistoricalInterestsApply(DomainModelApply):
 
 
 class HistoricalInterestsList(TypeList[HistoricalInterests]):
+    """List of historical interests in read version."""
+
     _NODE = HistoricalInterests
 
     def as_apply(self) -> HistoricalInterestsApplyList:
+        """Convert this read version of historical interest to a write version."""
         return HistoricalInterestsApplyList([node.as_apply() for node in self.data])
 
 
 class HistoricalInterestsApplyList(TypeApplyList[HistoricalInterestsApply]):
+    """List of historical interests in write version."""
+
     _NODE = HistoricalInterestsApply

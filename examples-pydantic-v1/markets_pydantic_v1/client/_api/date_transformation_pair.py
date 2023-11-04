@@ -20,6 +20,24 @@ class DateTransformationPairEndAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="market") -> dm.EdgeList:
+        """Retrieve one or more end edges by id(s) of a date transformation pair.
+
+        Args:
+            external_id: External id or list of external ids source date transformation pair.
+            space: The space where all the end edges are located.
+
+        Returns:
+            The requested end edges.
+
+        Examples:
+
+            Retrieve end edge by id:
+
+                >>> from markets_pydantic_v1.client import MarketClient
+                >>> client = MarketClient()
+                >>> date_transformation_pair = client.date_transformation_pair.end.retrieve("my_end")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -46,6 +64,26 @@ class DateTransformationPairEndAPI:
     def list(
         self, date_transformation_pair_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="market"
     ) -> dm.EdgeList:
+        """List end edges of a date transformation pair.
+
+        Args:
+            date_transformation_pair_id: Id of the source date transformation pair.
+            limit: Maximum number of end edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the end edges are located.
+
+        Returns:
+            The requested end edges.
+
+        Examples:
+
+            List 5 end edges connected to "my_date_transformation_pair":
+
+                >>> from markets_pydantic_v1.client import MarketClient
+                >>> client = MarketClient()
+                >>> date_transformation_pair = client.date_transformation_pair.end.list("my_date_transformation_pair", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -73,6 +111,24 @@ class DateTransformationPairStartAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="market") -> dm.EdgeList:
+        """Retrieve one or more start edges by id(s) of a date transformation pair.
+
+        Args:
+            external_id: External id or list of external ids source date transformation pair.
+            space: The space where all the start edges are located.
+
+        Returns:
+            The requested start edges.
+
+        Examples:
+
+            Retrieve start edge by id:
+
+                >>> from markets_pydantic_v1.client import MarketClient
+                >>> client = MarketClient()
+                >>> date_transformation_pair = client.date_transformation_pair.start.retrieve("my_start")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -99,6 +155,26 @@ class DateTransformationPairStartAPI:
     def list(
         self, date_transformation_pair_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="market"
     ) -> dm.EdgeList:
+        """List start edges of a date transformation pair.
+
+        Args:
+            date_transformation_pair_id: Id of the source date transformation pair.
+            limit: Maximum number of start edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the start edges are located.
+
+        Returns:
+            The requested start edges.
+
+        Examples:
+
+            List 5 start edges connected to "my_date_transformation_pair":
+
+                >>> from markets_pydantic_v1.client import MarketClient
+                >>> client = MarketClient()
+                >>> date_transformation_pair = client.date_transformation_pair.start.list("my_date_transformation_pair", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -143,6 +219,30 @@ class DateTransformationPairAPI(
         date_transformation_pair: DateTransformationPairApply | Sequence[DateTransformationPairApply],
         replace: bool = False,
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) date transformation pairs.
+
+        Note: This method iterates through all nodes linked to date_transformation_pair and create them including the edges
+        between the nodes. For example, if any of `end` or `start` are set, then these
+        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+
+        Args:
+            date_transformation_pair: Date transformation pair or sequence of date transformation pairs to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new date_transformation_pair:
+
+                >>> from markets_pydantic_v1.client import MarketClient
+                >>> from markets_pydantic_v1.client.data_classes import DateTransformationPairApply
+                >>> client = MarketClient()
+                >>> date_transformation_pair = DateTransformationPairApply(external_id="my_date_transformation_pair", ...)
+                >>> result = client.date_transformation_pair.apply(date_transformation_pair)
+
+        """
         if isinstance(date_transformation_pair, DateTransformationPairApply):
             instances = date_transformation_pair.to_instances_apply(self._view_by_write_class)
         else:
@@ -157,7 +257,24 @@ class DateTransformationPairAPI(
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="market") -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space: str = "market") -> dm.InstancesDeleteResult:
+        """Delete one or more date transformation pair.
+
+        Args:
+            external_id: External id of the date transformation pair to delete.
+            space: The space where all the date transformation pair are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete date_transformation_pair by id:
+
+                >>> from markets_pydantic_v1.client import MarketClient
+                >>> client = MarketClient()
+                >>> client.date_transformation_pair.delete("my_date_transformation_pair")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -173,9 +290,29 @@ class DateTransformationPairAPI(
     def retrieve(self, external_id: Sequence[str]) -> DateTransformationPairList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> DateTransformationPair | DateTransformationPairList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "market"
+    ) -> DateTransformationPair | DateTransformationPairList:
+        """Retrieve one or more date transformation pairs by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the date transformation pairs.
+            space: The space where all the date transformation pairs are located.
+
+        Returns:
+            The requested date transformation pairs.
+
+        Examples:
+
+            Retrieve date_transformation_pair by id:
+
+                >>> from markets_pydantic_v1.client import MarketClient
+                >>> client = MarketClient()
+                >>> date_transformation_pair = client.date_transformation_pair.retrieve("my_date_transformation_pair")
+
+        """
         if isinstance(external_id, str):
-            date_transformation_pair = self._retrieve((self._sources.space, external_id))
+            date_transformation_pair = self._retrieve((space, external_id))
 
             end_edges = self.end.retrieve(external_id)
             date_transformation_pair.end = [edge.end_node.external_id for edge in end_edges]
@@ -184,7 +321,7 @@ class DateTransformationPairAPI(
 
             return date_transformation_pair
         else:
-            date_transformation_pairs = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            date_transformation_pairs = self._retrieve([(space, ext_id) for ext_id in external_id])
 
             end_edges = self.end.retrieve(external_id)
             self._set_end(date_transformation_pairs, end_edges)
@@ -201,6 +338,27 @@ class DateTransformationPairAPI(
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> DateTransformationPairList:
+        """List/filter date transformation pairs
+
+        Args:
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of date transformation pairs to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `end` or `start` external ids for the date transformation pairs. Defaults to True.
+
+        Returns:
+            List of requested date transformation pairs
+
+        Examples:
+
+            List date transformation pairs and limit to 5:
+
+                >>> from markets_pydantic_v1.client import MarketClient
+                >>> client = MarketClient()
+                >>> date_transformation_pairs = client.date_transformation_pair.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             external_id_prefix,

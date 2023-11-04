@@ -33,6 +33,25 @@ _TECHNICALASSURANCES_PROPERTIES_BY_FIELD = {
 
 
 class TechnicalAssurances(DomainModel):
+    """This represent a read version of technical assurance.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the technical assurance.
+        acceptable_usage: The acceptable usage field.
+        comment: The comment field.
+        effective_date: The effective date field.
+        reviewers: The reviewer field.
+        technical_assurance_type_id: The technical assurance type id field.
+        unacceptable_usage: The unacceptable usage field.
+        created_time: The created time of the technical assurance node.
+        last_updated_time: The last updated time of the technical assurance node.
+        deleted_time: If present, the deleted time of the technical assurance node.
+        version: The version of the technical assurance node.
+    """
+
     space: str = "IntegrationTestsImmutable"
     acceptable_usage: Optional[list[str]] = Field(None, alias="AcceptableUsage")
     comment: Optional[str] = Field(None, alias="Comment")
@@ -42,6 +61,7 @@ class TechnicalAssurances(DomainModel):
     unacceptable_usage: Optional[list[str]] = Field(None, alias="UnacceptableUsage")
 
     def as_apply(self) -> TechnicalAssurancesApply:
+        """Convert this read version of technical assurance to a write version."""
         return TechnicalAssurancesApply(
             space=self.space,
             external_id=self.external_id,
@@ -55,6 +75,25 @@ class TechnicalAssurances(DomainModel):
 
 
 class TechnicalAssurancesApply(DomainModelApply):
+    """This represent a write version of technical assurance.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the technical assurance.
+        acceptable_usage: The acceptable usage field.
+        comment: The comment field.
+        effective_date: The effective date field.
+        reviewers: The reviewer field.
+        technical_assurance_type_id: The technical assurance type id field.
+        unacceptable_usage: The unacceptable usage field.
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "IntegrationTestsImmutable"
     acceptable_usage: Union[list[AcceptableUsageApply], list[str], None] = Field(
         default=None, repr=False, alias="AcceptableUsage"
@@ -184,11 +223,16 @@ class TechnicalAssurancesApply(DomainModelApply):
 
 
 class TechnicalAssurancesList(TypeList[TechnicalAssurances]):
+    """List of technical assurances in read version."""
+
     _NODE = TechnicalAssurances
 
     def as_apply(self) -> TechnicalAssurancesApplyList:
+        """Convert this read version of technical assurance to a write version."""
         return TechnicalAssurancesApplyList([node.as_apply() for node in self.data])
 
 
 class TechnicalAssurancesApplyList(TypeApplyList[TechnicalAssurancesApply]):
+    """List of technical assurances in write version."""
+
     _NODE = TechnicalAssurancesApply

@@ -24,6 +24,24 @@ class DirectorMoviesAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more movies edges by id(s) of a director.
+
+        Args:
+            external_id: External id or list of external ids source director.
+            space: The space where all the movie edges are located.
+
+        Returns:
+            The requested movie edges.
+
+        Examples:
+
+            Retrieve movies edge by id:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> director = client.director.movies.retrieve("my_movies")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -46,6 +64,26 @@ class DirectorMoviesAPI:
     def list(
         self, director_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="IntegrationTestsImmutable"
     ) -> dm.EdgeList:
+        """List movies edges of a director.
+
+        Args:
+            director_id: Id of the source director.
+            limit: Maximum number of movie edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the movie edges are located.
+
+        Returns:
+            The requested movie edges.
+
+        Examples:
+
+            List 5 movies edges connected to "my_director":
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> director = client.director.movies.list("my_director", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -69,6 +107,24 @@ class DirectorNominationAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more nomination edges by id(s) of a director.
+
+        Args:
+            external_id: External id or list of external ids source director.
+            space: The space where all the nomination edges are located.
+
+        Returns:
+            The requested nomination edges.
+
+        Examples:
+
+            Retrieve nomination edge by id:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> director = client.director.nomination.retrieve("my_nomination")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -91,6 +147,26 @@ class DirectorNominationAPI:
     def list(
         self, director_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="IntegrationTestsImmutable"
     ) -> dm.EdgeList:
+        """List nomination edges of a director.
+
+        Args:
+            director_id: Id of the source director.
+            limit: Maximum number of nomination edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the nomination edges are located.
+
+        Returns:
+            The requested nomination edges.
+
+        Examples:
+
+            List 5 nomination edges connected to "my_director":
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> director = client.director.nomination.list("my_director", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -127,6 +203,30 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
     def apply(
         self, director: DirectorApply | Sequence[DirectorApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) directors.
+
+        Note: This method iterates through all nodes linked to director and create them including the edges
+        between the nodes. For example, if any of `movies` or `nomination` are set, then these
+        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+
+        Args:
+            director: Director or sequence of directors to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new director:
+
+                >>> from movie_domain.client import MovieClient
+                >>> from movie_domain.client.data_classes import DirectorApply
+                >>> client = MovieClient()
+                >>> director = DirectorApply(external_id="my_director", ...)
+                >>> result = client.director.apply(director)
+
+        """
         if isinstance(director, DirectorApply):
             instances = director.to_instances_apply(self._view_by_write_class)
         else:
@@ -139,7 +239,26 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more director.
+
+        Args:
+            external_id: External id of the director to delete.
+            space: The space where all the director are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete director by id:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> client.director.delete("my_director")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -155,9 +274,29 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
     def retrieve(self, external_id: Sequence[str]) -> DirectorList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> Director | DirectorList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> Director | DirectorList:
+        """Retrieve one or more directors by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the directors.
+            space: The space where all the directors are located.
+
+        Returns:
+            The requested directors.
+
+        Examples:
+
+            Retrieve director by id:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> director = client.director.retrieve("my_director")
+
+        """
         if isinstance(external_id, str):
-            director = self._retrieve((self._sources.space, external_id))
+            director = self._retrieve((space, external_id))
 
             movie_edges = self.movies.retrieve(external_id)
             director.movies = [edge.end_node.external_id for edge in movie_edges]
@@ -166,7 +305,7 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
 
             return director
         else:
-            directors = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            directors = self._retrieve([(space, ext_id) for ext_id in external_id])
 
             movie_edges = self.movies.retrieve(external_id)
             self._set_movies(directors, movie_edges)
@@ -226,6 +365,33 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across directors
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            person: The person to filter on.
+            won_oscar: The won oscar to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of directors to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `movies` or `nomination` external ids for the directors. Defaults to True.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count directors in space `my_space`:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> result = client.director.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             person,
@@ -257,6 +423,23 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for directors
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            person: The person to filter on.
+            won_oscar: The won oscar to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of directors to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `movies` or `nomination` external ids for the directors. Defaults to True.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             person,
@@ -286,6 +469,29 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> DirectorList:
+        """List/filter directors
+
+        Args:
+            person: The person to filter on.
+            won_oscar: The won oscar to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of directors to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `movies` or `nomination` external ids for the directors. Defaults to True.
+
+        Returns:
+            List of requested directors
+
+        Examples:
+
+            List directors and limit to 5:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> directors = client.director.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             person,

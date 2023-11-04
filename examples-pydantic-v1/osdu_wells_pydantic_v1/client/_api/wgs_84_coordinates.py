@@ -25,6 +25,24 @@ class WgsCoordinatesFeaturesAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more features edges by id(s) of a wgs 84 coordinate.
+
+        Args:
+            external_id: External id or list of external ids source wgs 84 coordinate.
+            space: The space where all the feature edges are located.
+
+        Returns:
+            The requested feature edges.
+
+        Examples:
+
+            Retrieve features edge by id:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wgs_84_coordinate = client.wgs_84_coordinates.features.retrieve("my_features")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -54,6 +72,26 @@ class WgsCoordinatesFeaturesAPI:
         limit=DEFAULT_LIMIT_READ,
         space="IntegrationTestsImmutable",
     ) -> dm.EdgeList:
+        """List features edges of a wgs 84 coordinate.
+
+        Args:
+            wgs_84_coordinate_id: Id of the source wgs 84 coordinate.
+            limit: Maximum number of feature edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the feature edges are located.
+
+        Returns:
+            The requested feature edges.
+
+        Examples:
+
+            List 5 features edges connected to "my_wgs_84_coordinate":
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wgs_84_coordinate = client.wgs_84_coordinates.features.list("my_wgs_84_coordinate", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -91,6 +129,30 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
     def apply(
         self, wgs_84_coordinate: WgsCoordinatesApply | Sequence[WgsCoordinatesApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) wgs 84 coordinates.
+
+        Note: This method iterates through all nodes linked to wgs_84_coordinate and create them including the edges
+        between the nodes. For example, if any of `features` are set, then these
+        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+
+        Args:
+            wgs_84_coordinate: Wgs 84 coordinate or sequence of wgs 84 coordinates to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new wgs_84_coordinate:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> from osdu_wells_pydantic_v1.client.data_classes import WgsCoordinatesApply
+                >>> client = OSDUClient()
+                >>> wgs_84_coordinate = WgsCoordinatesApply(external_id="my_wgs_84_coordinate", ...)
+                >>> result = client.wgs_84_coordinates.apply(wgs_84_coordinate)
+
+        """
         if isinstance(wgs_84_coordinate, WgsCoordinatesApply):
             instances = wgs_84_coordinate.to_instances_apply(self._view_by_write_class)
         else:
@@ -103,7 +165,26 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more wgs 84 coordinate.
+
+        Args:
+            external_id: External id of the wgs 84 coordinate to delete.
+            space: The space where all the wgs 84 coordinate are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete wgs_84_coordinate by id:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> client.wgs_84_coordinates.delete("my_wgs_84_coordinate")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -119,16 +200,36 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
     def retrieve(self, external_id: Sequence[str]) -> WgsCoordinatesList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> WgsCoordinates | WgsCoordinatesList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> WgsCoordinates | WgsCoordinatesList:
+        """Retrieve one or more wgs 84 coordinates by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the wgs 84 coordinates.
+            space: The space where all the wgs 84 coordinates are located.
+
+        Returns:
+            The requested wgs 84 coordinates.
+
+        Examples:
+
+            Retrieve wgs_84_coordinate by id:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wgs_84_coordinate = client.wgs_84_coordinates.retrieve("my_wgs_84_coordinate")
+
+        """
         if isinstance(external_id, str):
-            wgs_84_coordinate = self._retrieve((self._sources.space, external_id))
+            wgs_84_coordinate = self._retrieve((space, external_id))
 
             feature_edges = self.features.retrieve(external_id)
             wgs_84_coordinate.features = [edge.end_node.external_id for edge in feature_edges]
 
             return wgs_84_coordinate
         else:
-            wgs_84_coordinates = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            wgs_84_coordinates = self._retrieve([(space, ext_id) for ext_id in external_id])
 
             feature_edges = self.features.retrieve(external_id)
             self._set_features(wgs_84_coordinates, feature_edges)
@@ -146,6 +247,31 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> WgsCoordinatesList:
+        """Search wgs 84 coordinates
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            type: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of wgs 84 coordinates to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `features` external ids for the wgs 84 coordinates. Defaults to True.
+
+        Returns:
+            Search results wgs 84 coordinates matching the query.
+
+        Examples:
+
+           Search for 'my_wgs_84_coordinate' in all text properties:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wgs_84_coordinates = client.wgs_84_coordinates.search('my_wgs_84_coordinate')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             type,
@@ -213,6 +339,35 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across wgs 84 coordinates
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            type: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of wgs 84 coordinates to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `features` external ids for the wgs 84 coordinates. Defaults to True.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count wgs 84 coordinates in space `my_space`:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> result = client.wgs_84_coordinates.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             type,
@@ -246,6 +401,25 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for wgs 84 coordinates
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            type: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of wgs 84 coordinates to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `features` external ids for the wgs 84 coordinates. Defaults to True.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             type,
@@ -275,6 +449,29 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> WgsCoordinatesList:
+        """List/filter wgs 84 coordinates
+
+        Args:
+            type: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of wgs 84 coordinates to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `features` external ids for the wgs 84 coordinates. Defaults to True.
+
+        Returns:
+            List of requested wgs 84 coordinates
+
+        Examples:
+
+            List wgs 84 coordinates and limit to 5:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wgs_84_coordinates = client.wgs_84_coordinates.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             type,

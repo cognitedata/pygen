@@ -29,6 +29,23 @@ _FACILITYEVENTS_PROPERTIES_BY_FIELD = {
 
 
 class FacilityEvents(DomainModel):
+    """This represent a read version of facility event.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the facility event.
+        effective_date_time: The effective date time field.
+        facility_event_type_id: The facility event type id field.
+        remark: The remark field.
+        termination_date_time: The termination date time field.
+        created_time: The created time of the facility event node.
+        last_updated_time: The last updated time of the facility event node.
+        deleted_time: If present, the deleted time of the facility event node.
+        version: The version of the facility event node.
+    """
+
     space: str = "IntegrationTestsImmutable"
     effective_date_time: Optional[str] = Field(None, alias="EffectiveDateTime")
     facility_event_type_id: Optional[str] = Field(None, alias="FacilityEventTypeID")
@@ -36,6 +53,7 @@ class FacilityEvents(DomainModel):
     termination_date_time: Optional[str] = Field(None, alias="TerminationDateTime")
 
     def as_apply(self) -> FacilityEventsApply:
+        """Convert this read version of facility event to a write version."""
         return FacilityEventsApply(
             space=self.space,
             external_id=self.external_id,
@@ -47,6 +65,23 @@ class FacilityEvents(DomainModel):
 
 
 class FacilityEventsApply(DomainModelApply):
+    """This represent a write version of facility event.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the facility event.
+        effective_date_time: The effective date time field.
+        facility_event_type_id: The facility event type id field.
+        remark: The remark field.
+        termination_date_time: The termination date time field.
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "IntegrationTestsImmutable"
     effective_date_time: Optional[str] = Field(None, alias="EffectiveDateTime")
     facility_event_type_id: Optional[str] = Field(None, alias="FacilityEventTypeID")
@@ -91,11 +126,16 @@ class FacilityEventsApply(DomainModelApply):
 
 
 class FacilityEventsList(TypeList[FacilityEvents]):
+    """List of facility events in read version."""
+
     _NODE = FacilityEvents
 
     def as_apply(self) -> FacilityEventsApplyList:
+        """Convert this read version of facility event to a write version."""
         return FacilityEventsApplyList([node.as_apply() for node in self.data])
 
 
 class FacilityEventsApplyList(TypeApplyList[FacilityEventsApply]):
+    """List of facility events in write version."""
+
     _NODE = FacilityEventsApply

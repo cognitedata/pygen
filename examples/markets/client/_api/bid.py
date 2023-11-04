@@ -26,6 +26,26 @@ class BidAPI(TypeAPI[Bid, BidApply, BidList]):
         self._view_by_write_class = view_by_write_class
 
     def apply(self, bid: BidApply | Sequence[BidApply], replace: bool = False) -> dm.InstancesApplyResult:
+        """Add or update (upsert) bids.
+
+        Args:
+            bid: Bid or sequence of bids to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new bid:
+
+                >>> from markets.client import MarketClient
+                >>> from markets.client.data_classes import BidApply
+                >>> client = MarketClient()
+                >>> bid = BidApply(external_id="my_bid", ...)
+                >>> result = client.bid.apply(bid)
+
+        """
         if isinstance(bid, BidApply):
             instances = bid.to_instances_apply(self._view_by_write_class)
         else:
@@ -38,7 +58,24 @@ class BidAPI(TypeAPI[Bid, BidApply, BidList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="market") -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space: str = "market") -> dm.InstancesDeleteResult:
+        """Delete one or more bid.
+
+        Args:
+            external_id: External id of the bid to delete.
+            space: The space where all the bid are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete bid by id:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> client.bid.delete("my_bid")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -54,11 +91,29 @@ class BidAPI(TypeAPI[Bid, BidApply, BidList]):
     def retrieve(self, external_id: Sequence[str]) -> BidList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> Bid | BidList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "market") -> Bid | BidList:
+        """Retrieve one or more bids by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the bids.
+            space: The space where all the bids are located.
+
+        Returns:
+            The requested bids.
+
+        Examples:
+
+            Retrieve bid by id:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> bid = client.bid.retrieve("my_bid")
+
+        """
         if isinstance(external_id, str):
-            return self._retrieve((self._sources.space, external_id))
+            return self._retrieve((space, external_id))
         else:
-            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(space, ext_id) for ext_id in external_id])
 
     def search(
         self,
@@ -74,6 +129,33 @@ class BidAPI(TypeAPI[Bid, BidApply, BidList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> BidList:
+        """Search bids
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            min_date: The minimum value of the date to filter on.
+            max_date: The maximum value of the date to filter on.
+            market: The market to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of bids to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results bids matching the query.
+
+        Examples:
+
+           Search for 'my_bid' in all text properties:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> bids = client.bid.search('my_bid')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             min_date,
@@ -153,6 +235,37 @@ class BidAPI(TypeAPI[Bid, BidApply, BidList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across bids
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            min_date: The minimum value of the date to filter on.
+            max_date: The maximum value of the date to filter on.
+            market: The market to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of bids to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count bids in space `my_space`:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> result = client.bid.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             min_date,
@@ -192,6 +305,27 @@ class BidAPI(TypeAPI[Bid, BidApply, BidList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for bids
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            min_date: The minimum value of the date to filter on.
+            max_date: The maximum value of the date to filter on.
+            market: The market to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of bids to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             min_date,
@@ -226,6 +360,31 @@ class BidAPI(TypeAPI[Bid, BidApply, BidList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> BidList:
+        """List/filter bids
+
+        Args:
+            min_date: The minimum value of the date to filter on.
+            max_date: The maximum value of the date to filter on.
+            market: The market to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of bids to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested bids
+
+        Examples:
+
+            List bids and limit to 5:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> bids = client.bid.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             min_date,

@@ -35,6 +35,26 @@ class SpatialAreaAPI(TypeAPI[SpatialArea, SpatialAreaApply, SpatialAreaList]):
     def apply(
         self, spatial_area: SpatialAreaApply | Sequence[SpatialAreaApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) spatial areas.
+
+        Args:
+            spatial_area: Spatial area or sequence of spatial areas to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new spatial_area:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> from osdu_wells.client.data_classes import SpatialAreaApply
+                >>> client = OSDUClient()
+                >>> spatial_area = SpatialAreaApply(external_id="my_spatial_area", ...)
+                >>> result = client.spatial_area.apply(spatial_area)
+
+        """
         if isinstance(spatial_area, SpatialAreaApply):
             instances = spatial_area.to_instances_apply(self._view_by_write_class)
         else:
@@ -47,7 +67,26 @@ class SpatialAreaAPI(TypeAPI[SpatialArea, SpatialAreaApply, SpatialAreaList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more spatial area.
+
+        Args:
+            external_id: External id of the spatial area to delete.
+            space: The space where all the spatial area are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete spatial_area by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> client.spatial_area.delete("my_spatial_area")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -63,11 +102,31 @@ class SpatialAreaAPI(TypeAPI[SpatialArea, SpatialAreaApply, SpatialAreaList]):
     def retrieve(self, external_id: Sequence[str]) -> SpatialAreaList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> SpatialArea | SpatialAreaList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> SpatialArea | SpatialAreaList:
+        """Retrieve one or more spatial areas by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the spatial areas.
+            space: The space where all the spatial areas are located.
+
+        Returns:
+            The requested spatial areas.
+
+        Examples:
+
+            Retrieve spatial_area by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> spatial_area = client.spatial_area.retrieve("my_spatial_area")
+
+        """
         if isinstance(external_id, str):
-            return self._retrieve((self._sources.space, external_id))
+            return self._retrieve((space, external_id))
         else:
-            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(space, ext_id) for ext_id in external_id])
 
     def search(
         self,
@@ -94,6 +153,44 @@ class SpatialAreaAPI(TypeAPI[SpatialArea, SpatialAreaApply, SpatialAreaList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> SpatialAreaList:
+        """Search spatial areas
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            as_ingested_coordinates: The as ingested coordinate to filter on.
+            coordinate_quality_check_date_time: The coordinate quality check date time to filter on.
+            coordinate_quality_check_date_time_prefix: The prefix of the coordinate quality check date time to filter on.
+            coordinate_quality_check_performed_by: The coordinate quality check performed by to filter on.
+            coordinate_quality_check_performed_by_prefix: The prefix of the coordinate quality check performed by to filter on.
+            qualitative_spatial_accuracy_type_id: The qualitative spatial accuracy type id to filter on.
+            qualitative_spatial_accuracy_type_id_prefix: The prefix of the qualitative spatial accuracy type id to filter on.
+            quantitative_accuracy_band_id: The quantitative accuracy band id to filter on.
+            quantitative_accuracy_band_id_prefix: The prefix of the quantitative accuracy band id to filter on.
+            spatial_geometry_type_id: The spatial geometry type id to filter on.
+            spatial_geometry_type_id_prefix: The prefix of the spatial geometry type id to filter on.
+            spatial_location_coordinates_date: The spatial location coordinates date to filter on.
+            spatial_location_coordinates_date_prefix: The prefix of the spatial location coordinates date to filter on.
+            spatial_parameter_type_id: The spatial parameter type id to filter on.
+            spatial_parameter_type_id_prefix: The prefix of the spatial parameter type id to filter on.
+            wgs_84_coordinates: The wgs 84 coordinate to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of spatial areas to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results spatial areas matching the query.
+
+        Examples:
+
+           Search for 'my_spatial_area' in all text properties:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> spatial_areas = client.spatial_area.search('my_spatial_area')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             as_ingested_coordinates,
@@ -217,6 +314,48 @@ class SpatialAreaAPI(TypeAPI[SpatialArea, SpatialAreaApply, SpatialAreaList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across spatial areas
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            as_ingested_coordinates: The as ingested coordinate to filter on.
+            coordinate_quality_check_date_time: The coordinate quality check date time to filter on.
+            coordinate_quality_check_date_time_prefix: The prefix of the coordinate quality check date time to filter on.
+            coordinate_quality_check_performed_by: The coordinate quality check performed by to filter on.
+            coordinate_quality_check_performed_by_prefix: The prefix of the coordinate quality check performed by to filter on.
+            qualitative_spatial_accuracy_type_id: The qualitative spatial accuracy type id to filter on.
+            qualitative_spatial_accuracy_type_id_prefix: The prefix of the qualitative spatial accuracy type id to filter on.
+            quantitative_accuracy_band_id: The quantitative accuracy band id to filter on.
+            quantitative_accuracy_band_id_prefix: The prefix of the quantitative accuracy band id to filter on.
+            spatial_geometry_type_id: The spatial geometry type id to filter on.
+            spatial_geometry_type_id_prefix: The prefix of the spatial geometry type id to filter on.
+            spatial_location_coordinates_date: The spatial location coordinates date to filter on.
+            spatial_location_coordinates_date_prefix: The prefix of the spatial location coordinates date to filter on.
+            spatial_parameter_type_id: The spatial parameter type id to filter on.
+            spatial_parameter_type_id_prefix: The prefix of the spatial parameter type id to filter on.
+            wgs_84_coordinates: The wgs 84 coordinate to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of spatial areas to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count spatial areas in space `my_space`:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> result = client.spatial_area.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             as_ingested_coordinates,
@@ -278,6 +417,38 @@ class SpatialAreaAPI(TypeAPI[SpatialArea, SpatialAreaApply, SpatialAreaList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for spatial areas
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            as_ingested_coordinates: The as ingested coordinate to filter on.
+            coordinate_quality_check_date_time: The coordinate quality check date time to filter on.
+            coordinate_quality_check_date_time_prefix: The prefix of the coordinate quality check date time to filter on.
+            coordinate_quality_check_performed_by: The coordinate quality check performed by to filter on.
+            coordinate_quality_check_performed_by_prefix: The prefix of the coordinate quality check performed by to filter on.
+            qualitative_spatial_accuracy_type_id: The qualitative spatial accuracy type id to filter on.
+            qualitative_spatial_accuracy_type_id_prefix: The prefix of the qualitative spatial accuracy type id to filter on.
+            quantitative_accuracy_band_id: The quantitative accuracy band id to filter on.
+            quantitative_accuracy_band_id_prefix: The prefix of the quantitative accuracy band id to filter on.
+            spatial_geometry_type_id: The spatial geometry type id to filter on.
+            spatial_geometry_type_id_prefix: The prefix of the spatial geometry type id to filter on.
+            spatial_location_coordinates_date: The spatial location coordinates date to filter on.
+            spatial_location_coordinates_date_prefix: The prefix of the spatial location coordinates date to filter on.
+            spatial_parameter_type_id: The spatial parameter type id to filter on.
+            spatial_parameter_type_id_prefix: The prefix of the spatial parameter type id to filter on.
+            wgs_84_coordinates: The wgs 84 coordinate to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of spatial areas to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             as_ingested_coordinates,
@@ -334,6 +505,42 @@ class SpatialAreaAPI(TypeAPI[SpatialArea, SpatialAreaApply, SpatialAreaList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> SpatialAreaList:
+        """List/filter spatial areas
+
+        Args:
+            as_ingested_coordinates: The as ingested coordinate to filter on.
+            coordinate_quality_check_date_time: The coordinate quality check date time to filter on.
+            coordinate_quality_check_date_time_prefix: The prefix of the coordinate quality check date time to filter on.
+            coordinate_quality_check_performed_by: The coordinate quality check performed by to filter on.
+            coordinate_quality_check_performed_by_prefix: The prefix of the coordinate quality check performed by to filter on.
+            qualitative_spatial_accuracy_type_id: The qualitative spatial accuracy type id to filter on.
+            qualitative_spatial_accuracy_type_id_prefix: The prefix of the qualitative spatial accuracy type id to filter on.
+            quantitative_accuracy_band_id: The quantitative accuracy band id to filter on.
+            quantitative_accuracy_band_id_prefix: The prefix of the quantitative accuracy band id to filter on.
+            spatial_geometry_type_id: The spatial geometry type id to filter on.
+            spatial_geometry_type_id_prefix: The prefix of the spatial geometry type id to filter on.
+            spatial_location_coordinates_date: The spatial location coordinates date to filter on.
+            spatial_location_coordinates_date_prefix: The prefix of the spatial location coordinates date to filter on.
+            spatial_parameter_type_id: The spatial parameter type id to filter on.
+            spatial_parameter_type_id_prefix: The prefix of the spatial parameter type id to filter on.
+            wgs_84_coordinates: The wgs 84 coordinate to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of spatial areas to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested spatial areas
+
+        Examples:
+
+            List spatial areas and limit to 5:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> spatial_areas = client.spatial_area.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             as_ingested_coordinates,

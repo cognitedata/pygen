@@ -24,6 +24,24 @@ class ActorMoviesAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more movies edges by id(s) of a actor.
+
+        Args:
+            external_id: External id or list of external ids source actor.
+            space: The space where all the movie edges are located.
+
+        Returns:
+            The requested movie edges.
+
+        Examples:
+
+            Retrieve movies edge by id:
+
+                >>> from movie_domain_pydantic_v1.client import MovieClient
+                >>> client = MovieClient()
+                >>> actor = client.actor.movies.retrieve("my_movies")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -46,6 +64,26 @@ class ActorMoviesAPI:
     def list(
         self, actor_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="IntegrationTestsImmutable"
     ) -> dm.EdgeList:
+        """List movies edges of a actor.
+
+        Args:
+            actor_id: Id of the source actor.
+            limit: Maximum number of movie edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the movie edges are located.
+
+        Returns:
+            The requested movie edges.
+
+        Examples:
+
+            List 5 movies edges connected to "my_actor":
+
+                >>> from movie_domain_pydantic_v1.client import MovieClient
+                >>> client = MovieClient()
+                >>> actor = client.actor.movies.list("my_actor", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -69,6 +107,24 @@ class ActorNominationAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more nomination edges by id(s) of a actor.
+
+        Args:
+            external_id: External id or list of external ids source actor.
+            space: The space where all the nomination edges are located.
+
+        Returns:
+            The requested nomination edges.
+
+        Examples:
+
+            Retrieve nomination edge by id:
+
+                >>> from movie_domain_pydantic_v1.client import MovieClient
+                >>> client = MovieClient()
+                >>> actor = client.actor.nomination.retrieve("my_nomination")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -91,6 +147,26 @@ class ActorNominationAPI:
     def list(
         self, actor_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="IntegrationTestsImmutable"
     ) -> dm.EdgeList:
+        """List nomination edges of a actor.
+
+        Args:
+            actor_id: Id of the source actor.
+            limit: Maximum number of nomination edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the nomination edges are located.
+
+        Returns:
+            The requested nomination edges.
+
+        Examples:
+
+            List 5 nomination edges connected to "my_actor":
+
+                >>> from movie_domain_pydantic_v1.client import MovieClient
+                >>> client = MovieClient()
+                >>> actor = client.actor.nomination.list("my_actor", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -125,6 +201,30 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
         self.nomination = ActorNominationAPI(client)
 
     def apply(self, actor: ActorApply | Sequence[ActorApply], replace: bool = False) -> dm.InstancesApplyResult:
+        """Add or update (upsert) actors.
+
+        Note: This method iterates through all nodes linked to actor and create them including the edges
+        between the nodes. For example, if any of `movies` or `nomination` are set, then these
+        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+
+        Args:
+            actor: Actor or sequence of actors to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new actor:
+
+                >>> from movie_domain_pydantic_v1.client import MovieClient
+                >>> from movie_domain_pydantic_v1.client.data_classes import ActorApply
+                >>> client = MovieClient()
+                >>> actor = ActorApply(external_id="my_actor", ...)
+                >>> result = client.actor.apply(actor)
+
+        """
         if isinstance(actor, ActorApply):
             instances = actor.to_instances_apply(self._view_by_write_class)
         else:
@@ -137,7 +237,26 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more actor.
+
+        Args:
+            external_id: External id of the actor to delete.
+            space: The space where all the actor are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete actor by id:
+
+                >>> from movie_domain_pydantic_v1.client import MovieClient
+                >>> client = MovieClient()
+                >>> client.actor.delete("my_actor")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -153,9 +272,27 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
     def retrieve(self, external_id: Sequence[str]) -> ActorList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> Actor | ActorList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> Actor | ActorList:
+        """Retrieve one or more actors by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the actors.
+            space: The space where all the actors are located.
+
+        Returns:
+            The requested actors.
+
+        Examples:
+
+            Retrieve actor by id:
+
+                >>> from movie_domain_pydantic_v1.client import MovieClient
+                >>> client = MovieClient()
+                >>> actor = client.actor.retrieve("my_actor")
+
+        """
         if isinstance(external_id, str):
-            actor = self._retrieve((self._sources.space, external_id))
+            actor = self._retrieve((space, external_id))
 
             movie_edges = self.movies.retrieve(external_id)
             actor.movies = [edge.end_node.external_id for edge in movie_edges]
@@ -164,7 +301,7 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
 
             return actor
         else:
-            actors = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            actors = self._retrieve([(space, ext_id) for ext_id in external_id])
 
             movie_edges = self.movies.retrieve(external_id)
             self._set_movies(actors, movie_edges)
@@ -224,6 +361,33 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across actors
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            person: The person to filter on.
+            won_oscar: The won oscar to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of actors to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `movies` or `nomination` external ids for the actors. Defaults to True.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count actors in space `my_space`:
+
+                >>> from movie_domain_pydantic_v1.client import MovieClient
+                >>> client = MovieClient()
+                >>> result = client.actor.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             person,
@@ -255,6 +419,23 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for actors
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            person: The person to filter on.
+            won_oscar: The won oscar to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of actors to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `movies` or `nomination` external ids for the actors. Defaults to True.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             person,
@@ -284,6 +465,29 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> ActorList:
+        """List/filter actors
+
+        Args:
+            person: The person to filter on.
+            won_oscar: The won oscar to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of actors to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `movies` or `nomination` external ids for the actors. Defaults to True.
+
+        Returns:
+            List of requested actors
+
+        Examples:
+
+            List actors and limit to 5:
+
+                >>> from movie_domain_pydantic_v1.client import MovieClient
+                >>> client = MovieClient()
+                >>> actors = client.actor.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             person,

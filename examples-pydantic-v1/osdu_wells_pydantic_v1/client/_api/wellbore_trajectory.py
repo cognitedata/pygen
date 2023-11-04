@@ -25,6 +25,24 @@ class WellboreTrajectoryMetaAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more meta edges by id(s) of a wellbore trajectory.
+
+        Args:
+            external_id: External id or list of external ids source wellbore trajectory.
+            space: The space where all the meta edges are located.
+
+        Returns:
+            The requested meta edges.
+
+        Examples:
+
+            Retrieve meta edge by id:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_trajectory = client.wellbore_trajectory.meta.retrieve("my_meta")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -54,6 +72,26 @@ class WellboreTrajectoryMetaAPI:
         limit=DEFAULT_LIMIT_READ,
         space="IntegrationTestsImmutable",
     ) -> dm.EdgeList:
+        """List meta edges of a wellbore trajectory.
+
+        Args:
+            wellbore_trajectory_id: Id of the source wellbore trajectory.
+            limit: Maximum number of meta edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the meta edges are located.
+
+        Returns:
+            The requested meta edges.
+
+        Examples:
+
+            List 5 meta edges connected to "my_wellbore_trajectory":
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_trajectory = client.wellbore_trajectory.meta.list("my_wellbore_trajectory", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -91,6 +129,30 @@ class WellboreTrajectoryAPI(TypeAPI[WellboreTrajectory, WellboreTrajectoryApply,
     def apply(
         self, wellbore_trajectory: WellboreTrajectoryApply | Sequence[WellboreTrajectoryApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) wellbore trajectories.
+
+        Note: This method iterates through all nodes linked to wellbore_trajectory and create them including the edges
+        between the nodes. For example, if any of `meta` are set, then these
+        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+
+        Args:
+            wellbore_trajectory: Wellbore trajectory or sequence of wellbore trajectories to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new wellbore_trajectory:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> from osdu_wells_pydantic_v1.client.data_classes import WellboreTrajectoryApply
+                >>> client = OSDUClient()
+                >>> wellbore_trajectory = WellboreTrajectoryApply(external_id="my_wellbore_trajectory", ...)
+                >>> result = client.wellbore_trajectory.apply(wellbore_trajectory)
+
+        """
         if isinstance(wellbore_trajectory, WellboreTrajectoryApply):
             instances = wellbore_trajectory.to_instances_apply(self._view_by_write_class)
         else:
@@ -103,7 +165,26 @@ class WellboreTrajectoryAPI(TypeAPI[WellboreTrajectory, WellboreTrajectoryApply,
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more wellbore trajectory.
+
+        Args:
+            external_id: External id of the wellbore trajectory to delete.
+            space: The space where all the wellbore trajectory are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete wellbore_trajectory by id:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> client.wellbore_trajectory.delete("my_wellbore_trajectory")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -119,16 +200,36 @@ class WellboreTrajectoryAPI(TypeAPI[WellboreTrajectory, WellboreTrajectoryApply,
     def retrieve(self, external_id: Sequence[str]) -> WellboreTrajectoryList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> WellboreTrajectory | WellboreTrajectoryList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> WellboreTrajectory | WellboreTrajectoryList:
+        """Retrieve one or more wellbore trajectories by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the wellbore trajectories.
+            space: The space where all the wellbore trajectories are located.
+
+        Returns:
+            The requested wellbore trajectories.
+
+        Examples:
+
+            Retrieve wellbore_trajectory by id:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_trajectory = client.wellbore_trajectory.retrieve("my_wellbore_trajectory")
+
+        """
         if isinstance(external_id, str):
-            wellbore_trajectory = self._retrieve((self._sources.space, external_id))
+            wellbore_trajectory = self._retrieve((space, external_id))
 
             meta_edges = self.meta.retrieve(external_id)
             wellbore_trajectory.meta = [edge.end_node.external_id for edge in meta_edges]
 
             return wellbore_trajectory
         else:
-            wellbore_trajectories = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            wellbore_trajectories = self._retrieve([(space, ext_id) for ext_id in external_id])
 
             meta_edges = self.meta.retrieve(external_id)
             self._set_meta(wellbore_trajectories, meta_edges)
@@ -163,6 +264,48 @@ class WellboreTrajectoryAPI(TypeAPI[WellboreTrajectory, WellboreTrajectoryApply,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> WellboreTrajectoryList:
+        """Search wellbore trajectories
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            acl: The acl to filter on.
+            ancestry: The ancestry to filter on.
+            create_time: The create time to filter on.
+            create_time_prefix: The prefix of the create time to filter on.
+            create_user: The create user to filter on.
+            create_user_prefix: The prefix of the create user to filter on.
+            data: The datum to filter on.
+            id: The id to filter on.
+            id_prefix: The prefix of the id to filter on.
+            kind: The kind to filter on.
+            kind_prefix: The prefix of the kind to filter on.
+            legal: The legal to filter on.
+            modify_time: The modify time to filter on.
+            modify_time_prefix: The prefix of the modify time to filter on.
+            modify_user: The modify user to filter on.
+            modify_user_prefix: The prefix of the modify user to filter on.
+            tags: The tag to filter on.
+            min_version: The minimum value of the version to filter on.
+            max_version: The maximum value of the version to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of wellbore trajectories to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `meta` external ids for the wellbore trajectories. Defaults to True.
+
+        Returns:
+            Search results wellbore trajectories matching the query.
+
+        Examples:
+
+           Search for 'my_wellbore_trajectory' in all text properties:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_trajectories = client.wellbore_trajectory.search('my_wellbore_trajectory')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             acl,
@@ -298,6 +441,52 @@ class WellboreTrajectoryAPI(TypeAPI[WellboreTrajectory, WellboreTrajectoryApply,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across wellbore trajectories
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            acl: The acl to filter on.
+            ancestry: The ancestry to filter on.
+            create_time: The create time to filter on.
+            create_time_prefix: The prefix of the create time to filter on.
+            create_user: The create user to filter on.
+            create_user_prefix: The prefix of the create user to filter on.
+            data: The datum to filter on.
+            id: The id to filter on.
+            id_prefix: The prefix of the id to filter on.
+            kind: The kind to filter on.
+            kind_prefix: The prefix of the kind to filter on.
+            legal: The legal to filter on.
+            modify_time: The modify time to filter on.
+            modify_time_prefix: The prefix of the modify time to filter on.
+            modify_user: The modify user to filter on.
+            modify_user_prefix: The prefix of the modify user to filter on.
+            tags: The tag to filter on.
+            min_version: The minimum value of the version to filter on.
+            max_version: The maximum value of the version to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of wellbore trajectories to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `meta` external ids for the wellbore trajectories. Defaults to True.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count wellbore trajectories in space `my_space`:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> result = client.wellbore_trajectory.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             acl,
@@ -365,6 +554,42 @@ class WellboreTrajectoryAPI(TypeAPI[WellboreTrajectory, WellboreTrajectoryApply,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for wellbore trajectories
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            acl: The acl to filter on.
+            ancestry: The ancestry to filter on.
+            create_time: The create time to filter on.
+            create_time_prefix: The prefix of the create time to filter on.
+            create_user: The create user to filter on.
+            create_user_prefix: The prefix of the create user to filter on.
+            data: The datum to filter on.
+            id: The id to filter on.
+            id_prefix: The prefix of the id to filter on.
+            kind: The kind to filter on.
+            kind_prefix: The prefix of the kind to filter on.
+            legal: The legal to filter on.
+            modify_time: The modify time to filter on.
+            modify_time_prefix: The prefix of the modify time to filter on.
+            modify_user: The modify user to filter on.
+            modify_user_prefix: The prefix of the modify user to filter on.
+            tags: The tag to filter on.
+            min_version: The minimum value of the version to filter on.
+            max_version: The maximum value of the version to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of wellbore trajectories to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `meta` external ids for the wellbore trajectories. Defaults to True.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             acl,
@@ -428,6 +653,46 @@ class WellboreTrajectoryAPI(TypeAPI[WellboreTrajectory, WellboreTrajectoryApply,
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> WellboreTrajectoryList:
+        """List/filter wellbore trajectories
+
+        Args:
+            acl: The acl to filter on.
+            ancestry: The ancestry to filter on.
+            create_time: The create time to filter on.
+            create_time_prefix: The prefix of the create time to filter on.
+            create_user: The create user to filter on.
+            create_user_prefix: The prefix of the create user to filter on.
+            data: The datum to filter on.
+            id: The id to filter on.
+            id_prefix: The prefix of the id to filter on.
+            kind: The kind to filter on.
+            kind_prefix: The prefix of the kind to filter on.
+            legal: The legal to filter on.
+            modify_time: The modify time to filter on.
+            modify_time_prefix: The prefix of the modify time to filter on.
+            modify_user: The modify user to filter on.
+            modify_user_prefix: The prefix of the modify user to filter on.
+            tags: The tag to filter on.
+            min_version: The minimum value of the version to filter on.
+            max_version: The maximum value of the version to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of wellbore trajectories to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `meta` external ids for the wellbore trajectories. Defaults to True.
+
+        Returns:
+            List of requested wellbore trajectories
+
+        Examples:
+
+            List wellbore trajectories and limit to 5:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_trajectories = client.wellbore_trajectory.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             acl,

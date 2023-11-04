@@ -26,6 +26,24 @@ class WorkOrderLinkedAssetsAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="tutorial_apm_simple") -> dm.EdgeList:
+        """Retrieve one or more linked_assets edges by id(s) of a work order.
+
+        Args:
+            external_id: External id or list of external ids source work order.
+            space: The space where all the linked asset edges are located.
+
+        Returns:
+            The requested linked asset edges.
+
+        Examples:
+
+            Retrieve linked_assets edge by id:
+
+                >>> from tutorial_apm_simple_pydantic_v1.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> work_order = client.work_order.linked_assets.retrieve("my_linked_assets")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -52,6 +70,26 @@ class WorkOrderLinkedAssetsAPI:
     def list(
         self, work_order_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="tutorial_apm_simple"
     ) -> dm.EdgeList:
+        """List linked_assets edges of a work order.
+
+        Args:
+            work_order_id: Id of the source work order.
+            limit: Maximum number of linked asset edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the linked asset edges are located.
+
+        Returns:
+            The requested linked asset edges.
+
+        Examples:
+
+            List 5 linked_assets edges connected to "my_work_order":
+
+                >>> from tutorial_apm_simple_pydantic_v1.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> work_order = client.work_order.linked_assets.list("my_work_order", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -75,6 +113,24 @@ class WorkOrderWorkItemsAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="tutorial_apm_simple") -> dm.EdgeList:
+        """Retrieve one or more work_items edges by id(s) of a work order.
+
+        Args:
+            external_id: External id or list of external ids source work order.
+            space: The space where all the work item edges are located.
+
+        Returns:
+            The requested work item edges.
+
+        Examples:
+
+            Retrieve work_items edge by id:
+
+                >>> from tutorial_apm_simple_pydantic_v1.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> work_order = client.work_order.work_items.retrieve("my_work_items")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -101,6 +157,26 @@ class WorkOrderWorkItemsAPI:
     def list(
         self, work_order_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="tutorial_apm_simple"
     ) -> dm.EdgeList:
+        """List work_items edges of a work order.
+
+        Args:
+            work_order_id: Id of the source work order.
+            limit: Maximum number of work item edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the work item edges are located.
+
+        Returns:
+            The requested work item edges.
+
+        Examples:
+
+            List 5 work_items edges connected to "my_work_order":
+
+                >>> from tutorial_apm_simple_pydantic_v1.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> work_order = client.work_order.work_items.list("my_work_order", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -137,6 +213,30 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
     def apply(
         self, work_order: WorkOrderApply | Sequence[WorkOrderApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) work orders.
+
+        Note: This method iterates through all nodes linked to work_order and create them including the edges
+        between the nodes. For example, if any of `linked_assets` or `work_items` are set, then these
+        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+
+        Args:
+            work_order: Work order or sequence of work orders to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new work_order:
+
+                >>> from tutorial_apm_simple_pydantic_v1.client import ApmSimpleClient
+                >>> from tutorial_apm_simple_pydantic_v1.client.data_classes import WorkOrderApply
+                >>> client = ApmSimpleClient()
+                >>> work_order = WorkOrderApply(external_id="my_work_order", ...)
+                >>> result = client.work_order.apply(work_order)
+
+        """
         if isinstance(work_order, WorkOrderApply):
             instances = work_order.to_instances_apply(self._view_by_write_class)
         else:
@@ -149,7 +249,24 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="tutorial_apm_simple") -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space: str = "tutorial_apm_simple") -> dm.InstancesDeleteResult:
+        """Delete one or more work order.
+
+        Args:
+            external_id: External id of the work order to delete.
+            space: The space where all the work order are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete work_order by id:
+
+                >>> from tutorial_apm_simple_pydantic_v1.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> client.work_order.delete("my_work_order")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -165,9 +282,29 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
     def retrieve(self, external_id: Sequence[str]) -> WorkOrderList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> WorkOrder | WorkOrderList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "tutorial_apm_simple"
+    ) -> WorkOrder | WorkOrderList:
+        """Retrieve one or more work orders by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the work orders.
+            space: The space where all the work orders are located.
+
+        Returns:
+            The requested work orders.
+
+        Examples:
+
+            Retrieve work_order by id:
+
+                >>> from tutorial_apm_simple_pydantic_v1.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> work_order = client.work_order.retrieve("my_work_order")
+
+        """
         if isinstance(external_id, str):
-            work_order = self._retrieve((self._sources.space, external_id))
+            work_order = self._retrieve((space, external_id))
 
             linked_asset_edges = self.linked_assets.retrieve(external_id)
             work_order.linked_assets = [edge.end_node.external_id for edge in linked_asset_edges]
@@ -176,7 +313,7 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
 
             return work_order
         else:
-            work_orders = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            work_orders = self._retrieve([(space, ext_id) for ext_id in external_id])
 
             linked_asset_edges = self.linked_assets.retrieve(external_id)
             self._set_linked_assets(work_orders, linked_asset_edges)
@@ -228,6 +365,63 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> WorkOrderList:
+        """Search work orders
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            min_actual_hours: The minimum value of the actual hour to filter on.
+            max_actual_hours: The maximum value of the actual hour to filter on.
+            min_created_date: The minimum value of the created date to filter on.
+            max_created_date: The maximum value of the created date to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            min_due_date: The minimum value of the due date to filter on.
+            max_due_date: The maximum value of the due date to filter on.
+            min_duration_hours: The minimum value of the duration hour to filter on.
+            max_duration_hours: The maximum value of the duration hour to filter on.
+            min_end_time: The minimum value of the end time to filter on.
+            max_end_time: The maximum value of the end time to filter on.
+            is_active: The is active to filter on.
+            is_cancelled: The is cancelled to filter on.
+            is_completed: The is completed to filter on.
+            is_safety_critical: The is safety critical to filter on.
+            min_percentage_progress: The minimum value of the percentage progres to filter on.
+            max_percentage_progress: The maximum value of the percentage progres to filter on.
+            min_planned_start: The minimum value of the planned start to filter on.
+            max_planned_start: The maximum value of the planned start to filter on.
+            priority_description: The priority description to filter on.
+            priority_description_prefix: The prefix of the priority description to filter on.
+            program_number: The program number to filter on.
+            program_number_prefix: The prefix of the program number to filter on.
+            min_start_time: The minimum value of the start time to filter on.
+            max_start_time: The maximum value of the start time to filter on.
+            status: The status to filter on.
+            status_prefix: The prefix of the status to filter on.
+            title: The title to filter on.
+            title_prefix: The prefix of the title to filter on.
+            work_order_number: The work order number to filter on.
+            work_order_number_prefix: The prefix of the work order number to filter on.
+            work_package_number: The work package number to filter on.
+            work_package_number_prefix: The prefix of the work package number to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of work orders to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `linked_assets` or `work_items` external ids for the work orders. Defaults to True.
+
+        Returns:
+            Search results work orders matching the query.
+
+        Examples:
+
+           Search for 'my_work_order' in all text properties:
+
+                >>> from tutorial_apm_simple_pydantic_v1.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> work_orders = client.work_order.search('my_work_order')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             min_actual_hours,
@@ -423,6 +617,67 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across work orders
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            min_actual_hours: The minimum value of the actual hour to filter on.
+            max_actual_hours: The maximum value of the actual hour to filter on.
+            min_created_date: The minimum value of the created date to filter on.
+            max_created_date: The maximum value of the created date to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            min_due_date: The minimum value of the due date to filter on.
+            max_due_date: The maximum value of the due date to filter on.
+            min_duration_hours: The minimum value of the duration hour to filter on.
+            max_duration_hours: The maximum value of the duration hour to filter on.
+            min_end_time: The minimum value of the end time to filter on.
+            max_end_time: The maximum value of the end time to filter on.
+            is_active: The is active to filter on.
+            is_cancelled: The is cancelled to filter on.
+            is_completed: The is completed to filter on.
+            is_safety_critical: The is safety critical to filter on.
+            min_percentage_progress: The minimum value of the percentage progres to filter on.
+            max_percentage_progress: The maximum value of the percentage progres to filter on.
+            min_planned_start: The minimum value of the planned start to filter on.
+            max_planned_start: The maximum value of the planned start to filter on.
+            priority_description: The priority description to filter on.
+            priority_description_prefix: The prefix of the priority description to filter on.
+            program_number: The program number to filter on.
+            program_number_prefix: The prefix of the program number to filter on.
+            min_start_time: The minimum value of the start time to filter on.
+            max_start_time: The maximum value of the start time to filter on.
+            status: The status to filter on.
+            status_prefix: The prefix of the status to filter on.
+            title: The title to filter on.
+            title_prefix: The prefix of the title to filter on.
+            work_order_number: The work order number to filter on.
+            work_order_number_prefix: The prefix of the work order number to filter on.
+            work_package_number: The work package number to filter on.
+            work_package_number_prefix: The prefix of the work package number to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of work orders to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `linked_assets` or `work_items` external ids for the work orders. Defaults to True.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count work orders in space `my_space`:
+
+                >>> from tutorial_apm_simple_pydantic_v1.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> result = client.work_order.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             min_actual_hours,
@@ -520,6 +775,57 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for work orders
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            min_actual_hours: The minimum value of the actual hour to filter on.
+            max_actual_hours: The maximum value of the actual hour to filter on.
+            min_created_date: The minimum value of the created date to filter on.
+            max_created_date: The maximum value of the created date to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            min_due_date: The minimum value of the due date to filter on.
+            max_due_date: The maximum value of the due date to filter on.
+            min_duration_hours: The minimum value of the duration hour to filter on.
+            max_duration_hours: The maximum value of the duration hour to filter on.
+            min_end_time: The minimum value of the end time to filter on.
+            max_end_time: The maximum value of the end time to filter on.
+            is_active: The is active to filter on.
+            is_cancelled: The is cancelled to filter on.
+            is_completed: The is completed to filter on.
+            is_safety_critical: The is safety critical to filter on.
+            min_percentage_progress: The minimum value of the percentage progres to filter on.
+            max_percentage_progress: The maximum value of the percentage progres to filter on.
+            min_planned_start: The minimum value of the planned start to filter on.
+            max_planned_start: The maximum value of the planned start to filter on.
+            priority_description: The priority description to filter on.
+            priority_description_prefix: The prefix of the priority description to filter on.
+            program_number: The program number to filter on.
+            program_number_prefix: The prefix of the program number to filter on.
+            min_start_time: The minimum value of the start time to filter on.
+            max_start_time: The maximum value of the start time to filter on.
+            status: The status to filter on.
+            status_prefix: The prefix of the status to filter on.
+            title: The title to filter on.
+            title_prefix: The prefix of the title to filter on.
+            work_order_number: The work order number to filter on.
+            work_order_number_prefix: The prefix of the work order number to filter on.
+            work_package_number: The work package number to filter on.
+            work_package_number_prefix: The prefix of the work package number to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of work orders to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `linked_assets` or `work_items` external ids for the work orders. Defaults to True.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             min_actual_hours,
@@ -613,6 +919,61 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> WorkOrderList:
+        """List/filter work orders
+
+        Args:
+            min_actual_hours: The minimum value of the actual hour to filter on.
+            max_actual_hours: The maximum value of the actual hour to filter on.
+            min_created_date: The minimum value of the created date to filter on.
+            max_created_date: The maximum value of the created date to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            min_due_date: The minimum value of the due date to filter on.
+            max_due_date: The maximum value of the due date to filter on.
+            min_duration_hours: The minimum value of the duration hour to filter on.
+            max_duration_hours: The maximum value of the duration hour to filter on.
+            min_end_time: The minimum value of the end time to filter on.
+            max_end_time: The maximum value of the end time to filter on.
+            is_active: The is active to filter on.
+            is_cancelled: The is cancelled to filter on.
+            is_completed: The is completed to filter on.
+            is_safety_critical: The is safety critical to filter on.
+            min_percentage_progress: The minimum value of the percentage progres to filter on.
+            max_percentage_progress: The maximum value of the percentage progres to filter on.
+            min_planned_start: The minimum value of the planned start to filter on.
+            max_planned_start: The maximum value of the planned start to filter on.
+            priority_description: The priority description to filter on.
+            priority_description_prefix: The prefix of the priority description to filter on.
+            program_number: The program number to filter on.
+            program_number_prefix: The prefix of the program number to filter on.
+            min_start_time: The minimum value of the start time to filter on.
+            max_start_time: The maximum value of the start time to filter on.
+            status: The status to filter on.
+            status_prefix: The prefix of the status to filter on.
+            title: The title to filter on.
+            title_prefix: The prefix of the title to filter on.
+            work_order_number: The work order number to filter on.
+            work_order_number_prefix: The prefix of the work order number to filter on.
+            work_package_number: The work package number to filter on.
+            work_package_number_prefix: The prefix of the work package number to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of work orders to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `linked_assets` or `work_items` external ids for the work orders. Defaults to True.
+
+        Returns:
+            List of requested work orders
+
+        Examples:
+
+            List work orders and limit to 5:
+
+                >>> from tutorial_apm_simple_pydantic_v1.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> work_orders = client.work_order.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             min_actual_hours,

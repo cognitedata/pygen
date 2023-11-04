@@ -37,7 +37,9 @@ def test_generate_api_file_scenario_instance(
     assert scenario_instance_api_generator.data_class.has_single_timeseries_fields
 
     # Act
-    actual = scenario_instance_api_generator.generate_api_file(SCENARIO_INSTANCE_SDK.top_level_package)
+    actual = scenario_instance_api_generator.generate_api_file(
+        SCENARIO_INSTANCE_SDK.top_level_package, SCENARIO_INSTANCE_SDK.client_name
+    )
     actual = code_formatter.format_code(actual)
 
     # Assert

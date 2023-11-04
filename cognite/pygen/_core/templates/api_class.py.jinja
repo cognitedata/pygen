@@ -24,6 +24,24 @@ class {{ field.edge_api_class }}:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="{{ field.prop.type.space }}") -> dm.EdgeList:
+        """Retrieve one or more {{field.edge_api_attribute}} edges by id(s) of a {{ data_class.doc_name }}.
+
+        Args:
+            external_id: External id or list of external ids source {{ data_class.doc_name }}.
+            space: The space where all the {{ field.doc_name }} edges are located.
+
+        Returns:
+            The requested {{ field.doc_name }} edges.
+
+        Examples:
+
+            Retrieve {{ field.name }} edge by id:
+
+                >>> from {{ top_level_package }} import {{ client_name }}
+                >>> client = {{ client_name }}()
+                >>> {{ data_class.variable }} = client.{{ api_class.client_attribute }}.{{ field.edge_api_attribute }}.retrieve("my_{{ field.name }}")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -44,6 +62,26 @@ class {{ field.edge_api_class }}:
             return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_{{ data_class.variable_list }}))
 
     def list(self, {{ data_class.variable }}_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="{{ field.prop.type.space }}") -> dm.EdgeList:
+        """List {{field.edge_api_attribute}} edges of a {{ data_class.doc_name }}.
+
+        Args:
+            {{ data_class.variable }}_id: Id of the source {{ data_class.doc_name }}.
+            limit: Maximum number of {{ field.doc_name }} edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the {{ field.doc_name }} edges are located.
+
+        Returns:
+            The requested {{ field.doc_name }} edges.
+
+        Examples:
+
+            List 5 {{field.edge_api_attribute}} edges connected to "my_{{ data_class.variable }}":
+
+                >>> from {{ top_level_package }} import {{ client_name }}
+                >>> client = {{ client_name }}()
+                >>> {{ data_class.variable }} = client.{{ api_class.client_attribute }}.{{ field.edge_api_attribute }}.list("my_{{ data_class.variable }}", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -77,184 +115,17 @@ class {{ api_class.name }}(TypeAPI[{{ data_class.read_name }}, {{ data_class.wri
         self.{{ field.edge_api_attribute }} = {{ field.edge_api_class }}(client){% endfor %}{% for timeseries in data_class.single_timeseries_fields %}
         self.{{ timeseries.edge_api_attribute }} = {{ timeseries.edge_api_class }}API(client, view_id){% endfor %}
 
-    def apply(self, {{ data_class.variable }}: {{ data_class.write_name }} | Sequence[{{ data_class.write_name }}], replace: bool = False) -> dm.InstancesApplyResult:
-        if isinstance({{ data_class.variable }}, {{ data_class.write_name }}):
-            instances = {{ data_class.variable }}.to_instances_apply(self._view_by_write_class)
-        else:
-            instances = {{ data_class.write_list_name }}({{ data_class.variable }}).to_instances_apply(self._view_by_write_class)
-        return self._client.data_modeling.instances.apply(
-            nodes=instances.nodes,
-            edges=instances.edges,
-            auto_create_start_nodes=True,
-            auto_create_end_nodes=True,
-            replace=replace,
-        )
+{% include 'api_class_apply_method.py.jinja' %}
 
-    def delete(self, external_id: str | Sequence[str], space="{{ data_class.view_id.space }}") -> dm.InstancesDeleteResult:
-        if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
-        else:
-            return self._client.data_modeling.instances.delete(
-                nodes=[(space, id) for id in external_id],
-            )
+{% include 'api_class_delete_method.py.jinja' %}
 
-    @overload
-    def retrieve(self, external_id: str) -> {{ data_class.read_name }}:
-        ...
-
-    @overload
-    def retrieve(self, external_id: Sequence[str]) -> {{ data_class.read_list_name }}:
-        ...
-
-    def retrieve(self, external_id: str | Sequence[str]) -> {{ data_class.read_name }} | {{ data_class.read_list_name }}:
-        if isinstance(external_id, str):
-            {% if data_class.has_one_to_many_edges %}{{ data_class.variable }} = self._retrieve((self._sources.space, external_id))
-{% for field in data_class.one_to_many_edges %}
-            {{ field.variable }}_edges = self.{{ field.edge_api_attribute }}.retrieve(external_id)
-            {{ data_class.variable }}.{{ field.name }} = [edge.end_node.external_id for edge in {{ field.variable }}_edges]{% endfor %}
-
-            return {{ data_class.variable }}{% else %}return self._retrieve((self._sources.space, external_id)){% endif %}
-        else:
-            {% if data_class.has_one_to_many_edges %}{{ data_class.variable_list }} = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
-{% for field in data_class.one_to_many_edges %}
-            {{ field.variable }}_edges = self.{{ field.edge_api_attribute }}.retrieve(external_id)
-            self._set_{{ field.name }}({{ data_class.variable_list }}, {{ field.variable }}_edges){% endfor %}
-
-            return {{ data_class.variable_list }}{% else %}return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id]){% endif %}
+{% include 'api_class_retrieve_method.py.jinja' %}
 {% if data_class.has_text_field %}
-    def search(
-        self,
-        query: str,
-        properties: {{ data_class.text_field_names }} | Sequence[{{ data_class.text_field_names }}] | None = None,{% for parm in list_method.parameters %}
-        {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
-        limit: int = DEFAULT_LIMIT_READ,
-        filter: dm.Filter | None = None,
-    ) -> {{ data_class.read_list_name }}:
-        filter_ = _create_filter(
-            self._view_id,{% for parm in list_method.parameters %}
-            {{ parm.name }},{% endfor %}
-            filter,
-        )
-        return self._search(self._view_id, query, {{ data_class.properties_dict_name }}, properties, filter_, limit){% endif %}
+{% include 'api_class_search_method.py.jinja' %}{% endif %}
 {% if data_class.has_primitive_fields %}
-    @overload
-    def aggregate(
-        self,
-        aggregations: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
-        property: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,
-        group_by: None = None,{% if data_class.has_text_field %}
-        query: str | None = None,
-        search_properties: {{ data_class.text_field_names }} | Sequence[{{ data_class.text_field_names }}] | None = None,{% endif %}{% for parm in list_method.parameters %}
-        {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
-        limit: int = DEFAULT_LIMIT_READ,
-        filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue]:
-        ...
+{% include 'api_class_aggregate_methods.py.jinja' %}{% endif %}
 
-    @overload
-    def aggregate(
-        self,
-        aggregations: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
-        property: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,
-        group_by: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] = None,{% if data_class.has_text_field %}
-        query: str | None = None,
-        search_properties: {{ data_class.text_field_names }} | Sequence[{{ data_class.text_field_names }}] | None = None,{% endif %}{% for parm in list_method.parameters %}
-        {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
-        limit: int = DEFAULT_LIMIT_READ,
-        filter: dm.Filter | None = None,
-    ) -> InstanceAggregationResultList:
-        ...
-
-    def aggregate(
-        self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | Sequence[Aggregations]
-        | Sequence[dm.aggregations.MetricAggregation],
-        property: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,
-        group_by: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,{% if data_class.has_text_field %}
-        query: str | None = None,
-        search_property: {{ data_class.text_field_names }} | Sequence[{{ data_class.text_field_names }}] | None = None,{% endif %}{% for parm in list_method.parameters %}
-        {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
-        limit: int = DEFAULT_LIMIT_READ,
-        filter: dm.Filter | None = None,
-    ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
-        filter_ = _create_filter(
-            self._view_id,{% for parm in list_method.parameters %}
-            {{ parm.name }},{% endfor %}
-            filter,
-        )
-        return self._aggregate(
-            self._view_id,
-            aggregate,
-            {{ data_class.properties_dict_name }},
-            property,
-            group_by,{% if data_class.has_text_field %}
-            query,
-            search_property,{% else %}
-            None,
-            None,{% endif %}
-            limit,
-            filter_,
-        )
-
-    def histogram(
-        self,
-        property: {{ data_class.field_names }},
-        interval: float,{% if data_class.has_text_field %}
-        query: str | None = None,
-        search_property: {{ data_class.text_field_names }} | Sequence[{{ data_class.text_field_names }}] | None = None,{% endif %}{% for parm in list_method.parameters %}
-        {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
-        limit: int = DEFAULT_LIMIT_READ,
-        filter: dm.Filter | None = None,
-    ) -> dm.aggregations.HistogramValue:
-        filter_ = _create_filter(
-            self._view_id,{% for parm in list_method.parameters %}
-            {{ parm.name }},{% endfor %}
-            filter,
-        )
-        return self._histogram(
-            self._view_id,
-            property,
-            interval,
-            {{ data_class.properties_dict_name }},{% if data_class.has_text_field %}
-            query,
-            search_property,{% else %}
-            None,
-            None,{% endif %}
-            limit,
-            filter_,
-        ){% endif %}
-
-    def list(
-        self,{% for parm in list_method.parameters %}
-        {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
-        limit: int = DEFAULT_LIMIT_READ,
-        filter: dm.Filter | None = None,{% if data_class.has_one_to_many_edges %}
-        retrieve_edges: bool = True,{% endif %}
-    ) -> {{ data_class.read_list_name }}:
-        filter_ = _create_filter(
-            self._view_id,{% for parm in list_method.parameters %}
-            {{ parm.name }},{% endfor %}
-            filter,
-        )
-
-        {% if data_class.has_one_to_many_edges %}{{ data_class.variable_list }} = self._list(limit=limit, filter=filter_)
-
-        if retrieve_edges:{% for field in data_class.one_to_many_edges %}
-            if len(external_ids := {{ data_class.variable_list }}.as_external_ids()) > IN_FILTER_LIMIT:
-                {{ field.variable }}_edges = self.{{ field.edge_api_attribute }}.list(limit=-1)
-            else:
-                {{ field.variable }}_edges = self.{{ field.edge_api_attribute }}.list(external_ids, limit=-1)
-            self._set_{{ field.name }}({{ data_class.variable_list }}, {{ field.variable }}_edges){% endfor %}
-
-        return {{ data_class.variable_list }}{% else %}return self._list(limit=limit, filter=filter_){% endif %}
+{% include 'api_class_list_method.py.jinja' %}
 {% for field in data_class.one_to_many_edges %}
     @staticmethod
     def _set_{{ field.name }}({{ data_class.variable_list }}: Sequence[{{ data_class.read_name }}], {{ field.variable }}_edges: Sequence[dm.Edge]):

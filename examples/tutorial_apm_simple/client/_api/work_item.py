@@ -25,6 +25,24 @@ class WorkItemLinkedAssetsAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="tutorial_apm_simple") -> dm.EdgeList:
+        """Retrieve one or more linked_assets edges by id(s) of a work item.
+
+        Args:
+            external_id: External id or list of external ids source work item.
+            space: The space where all the linked asset edges are located.
+
+        Returns:
+            The requested linked asset edges.
+
+        Examples:
+
+            Retrieve linked_assets edge by id:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> work_item = client.work_item.linked_assets.retrieve("my_linked_assets")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -49,6 +67,26 @@ class WorkItemLinkedAssetsAPI:
     def list(
         self, work_item_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="tutorial_apm_simple"
     ) -> dm.EdgeList:
+        """List linked_assets edges of a work item.
+
+        Args:
+            work_item_id: Id of the source work item.
+            limit: Maximum number of linked asset edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the linked asset edges are located.
+
+        Returns:
+            The requested linked asset edges.
+
+        Examples:
+
+            List 5 linked_assets edges connected to "my_work_item":
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> work_item = client.work_item.linked_assets.list("my_work_item", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -84,6 +122,30 @@ class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
     def apply(
         self, work_item: WorkItemApply | Sequence[WorkItemApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) work items.
+
+        Note: This method iterates through all nodes linked to work_item and create them including the edges
+        between the nodes. For example, if any of `linked_assets` are set, then these
+        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+
+        Args:
+            work_item: Work item or sequence of work items to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new work_item:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> from tutorial_apm_simple.client.data_classes import WorkItemApply
+                >>> client = ApmSimpleClient()
+                >>> work_item = WorkItemApply(external_id="my_work_item", ...)
+                >>> result = client.work_item.apply(work_item)
+
+        """
         if isinstance(work_item, WorkItemApply):
             instances = work_item.to_instances_apply(self._view_by_write_class)
         else:
@@ -96,7 +158,24 @@ class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="tutorial_apm_simple") -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space: str = "tutorial_apm_simple") -> dm.InstancesDeleteResult:
+        """Delete one or more work item.
+
+        Args:
+            external_id: External id of the work item to delete.
+            space: The space where all the work item are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete work_item by id:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> client.work_item.delete("my_work_item")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -112,16 +191,34 @@ class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
     def retrieve(self, external_id: Sequence[str]) -> WorkItemList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> WorkItem | WorkItemList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "tutorial_apm_simple") -> WorkItem | WorkItemList:
+        """Retrieve one or more work items by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the work items.
+            space: The space where all the work items are located.
+
+        Returns:
+            The requested work items.
+
+        Examples:
+
+            Retrieve work_item by id:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> work_item = client.work_item.retrieve("my_work_item")
+
+        """
         if isinstance(external_id, str):
-            work_item = self._retrieve((self._sources.space, external_id))
+            work_item = self._retrieve((space, external_id))
 
             linked_asset_edges = self.linked_assets.retrieve(external_id)
             work_item.linked_assets = [edge.end_node.external_id for edge in linked_asset_edges]
 
             return work_item
         else:
-            work_items = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            work_items = self._retrieve([(space, ext_id) for ext_id in external_id])
 
             linked_asset_edges = self.linked_assets.retrieve(external_id)
             self._set_linked_assets(work_items, linked_asset_edges)
@@ -152,6 +249,44 @@ class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> WorkItemList:
+        """Search work items
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            criticality: The criticality to filter on.
+            criticality_prefix: The prefix of the criticality to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            is_completed: The is completed to filter on.
+            item_info: The item info to filter on.
+            item_info_prefix: The prefix of the item info to filter on.
+            item_name: The item name to filter on.
+            item_name_prefix: The prefix of the item name to filter on.
+            method: The method to filter on.
+            method_prefix: The prefix of the method to filter on.
+            title: The title to filter on.
+            title_prefix: The prefix of the title to filter on.
+            to_be_done: The to be done to filter on.
+            work_order: The work order to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of work items to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `linked_assets` external ids for the work items. Defaults to True.
+
+        Returns:
+            Search results work items matching the query.
+
+        Examples:
+
+           Search for 'my_work_item' in all text properties:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> work_items = client.work_item.search('my_work_item')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             criticality,
@@ -271,6 +406,48 @@ class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across work items
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            criticality: The criticality to filter on.
+            criticality_prefix: The prefix of the criticality to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            is_completed: The is completed to filter on.
+            item_info: The item info to filter on.
+            item_info_prefix: The prefix of the item info to filter on.
+            item_name: The item name to filter on.
+            item_name_prefix: The prefix of the item name to filter on.
+            method: The method to filter on.
+            method_prefix: The prefix of the method to filter on.
+            title: The title to filter on.
+            title_prefix: The prefix of the title to filter on.
+            to_be_done: The to be done to filter on.
+            work_order: The work order to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of work items to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `linked_assets` external ids for the work items. Defaults to True.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count work items in space `my_space`:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> result = client.work_item.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             criticality,
@@ -330,6 +507,38 @@ class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for work items
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            criticality: The criticality to filter on.
+            criticality_prefix: The prefix of the criticality to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            is_completed: The is completed to filter on.
+            item_info: The item info to filter on.
+            item_info_prefix: The prefix of the item info to filter on.
+            item_name: The item name to filter on.
+            item_name_prefix: The prefix of the item name to filter on.
+            method: The method to filter on.
+            method_prefix: The prefix of the method to filter on.
+            title: The title to filter on.
+            title_prefix: The prefix of the title to filter on.
+            to_be_done: The to be done to filter on.
+            work_order: The work order to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of work items to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `linked_assets` external ids for the work items. Defaults to True.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             criticality,
@@ -385,6 +594,42 @@ class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> WorkItemList:
+        """List/filter work items
+
+        Args:
+            criticality: The criticality to filter on.
+            criticality_prefix: The prefix of the criticality to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            is_completed: The is completed to filter on.
+            item_info: The item info to filter on.
+            item_info_prefix: The prefix of the item info to filter on.
+            item_name: The item name to filter on.
+            item_name_prefix: The prefix of the item name to filter on.
+            method: The method to filter on.
+            method_prefix: The prefix of the method to filter on.
+            title: The title to filter on.
+            title_prefix: The prefix of the title to filter on.
+            to_be_done: The to be done to filter on.
+            work_order: The work order to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of work items to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `linked_assets` external ids for the work items. Defaults to True.
+
+        Returns:
+            List of requested work items
+
+        Examples:
+
+            List work items and limit to 5:
+
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> work_items = client.work_item.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             criticality,

@@ -35,6 +35,26 @@ class ArtefactsAPI(TypeAPI[Artefacts, ArtefactsApply, ArtefactsList]):
     def apply(
         self, artefact: ArtefactsApply | Sequence[ArtefactsApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) artefacts.
+
+        Args:
+            artefact: Artefact or sequence of artefacts to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new artefact:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> from osdu_wells_pydantic_v1.client.data_classes import ArtefactsApply
+                >>> client = OSDUClient()
+                >>> artefact = ArtefactsApply(external_id="my_artefact", ...)
+                >>> result = client.artefacts.apply(artefact)
+
+        """
         if isinstance(artefact, ArtefactsApply):
             instances = artefact.to_instances_apply(self._view_by_write_class)
         else:
@@ -47,7 +67,26 @@ class ArtefactsAPI(TypeAPI[Artefacts, ArtefactsApply, ArtefactsList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more artefact.
+
+        Args:
+            external_id: External id of the artefact to delete.
+            space: The space where all the artefact are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete artefact by id:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> client.artefacts.delete("my_artefact")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -63,11 +102,31 @@ class ArtefactsAPI(TypeAPI[Artefacts, ArtefactsApply, ArtefactsList]):
     def retrieve(self, external_id: Sequence[str]) -> ArtefactsList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> Artefacts | ArtefactsList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> Artefacts | ArtefactsList:
+        """Retrieve one or more artefacts by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the artefacts.
+            space: The space where all the artefacts are located.
+
+        Returns:
+            The requested artefacts.
+
+        Examples:
+
+            Retrieve artefact by id:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> artefact = client.artefacts.retrieve("my_artefact")
+
+        """
         if isinstance(external_id, str):
-            return self._retrieve((self._sources.space, external_id))
+            return self._retrieve((space, external_id))
         else:
-            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(space, ext_id) for ext_id in external_id])
 
     def search(
         self,
@@ -84,6 +143,34 @@ class ArtefactsAPI(TypeAPI[Artefacts, ArtefactsApply, ArtefactsList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> ArtefactsList:
+        """Search artefacts
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            resource_id: The resource id to filter on.
+            resource_id_prefix: The prefix of the resource id to filter on.
+            resource_kind: The resource kind to filter on.
+            resource_kind_prefix: The prefix of the resource kind to filter on.
+            role_id: The role id to filter on.
+            role_id_prefix: The prefix of the role id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of artefacts to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results artefacts matching the query.
+
+        Examples:
+
+           Search for 'my_artefact' in all text properties:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> artefacts = client.artefacts.search('my_artefact')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             resource_id,
@@ -167,6 +254,38 @@ class ArtefactsAPI(TypeAPI[Artefacts, ArtefactsApply, ArtefactsList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across artefacts
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            resource_id: The resource id to filter on.
+            resource_id_prefix: The prefix of the resource id to filter on.
+            resource_kind: The resource kind to filter on.
+            resource_kind_prefix: The prefix of the resource kind to filter on.
+            role_id: The role id to filter on.
+            role_id_prefix: The prefix of the role id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of artefacts to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count artefacts in space `my_space`:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> result = client.artefacts.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             resource_id,
@@ -208,6 +327,28 @@ class ArtefactsAPI(TypeAPI[Artefacts, ArtefactsApply, ArtefactsList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for artefacts
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            resource_id: The resource id to filter on.
+            resource_id_prefix: The prefix of the resource id to filter on.
+            resource_kind: The resource kind to filter on.
+            resource_kind_prefix: The prefix of the resource kind to filter on.
+            role_id: The role id to filter on.
+            role_id_prefix: The prefix of the role id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of artefacts to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             resource_id,
@@ -244,6 +385,32 @@ class ArtefactsAPI(TypeAPI[Artefacts, ArtefactsApply, ArtefactsList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> ArtefactsList:
+        """List/filter artefacts
+
+        Args:
+            resource_id: The resource id to filter on.
+            resource_id_prefix: The prefix of the resource id to filter on.
+            resource_kind: The resource kind to filter on.
+            resource_kind_prefix: The prefix of the resource kind to filter on.
+            role_id: The role id to filter on.
+            role_id_prefix: The prefix of the role id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of artefacts to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested artefacts
+
+        Examples:
+
+            List artefacts and limit to 5:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> artefacts = client.artefacts.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             resource_id,

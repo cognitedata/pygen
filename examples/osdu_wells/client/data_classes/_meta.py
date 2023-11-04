@@ -23,6 +23,24 @@ _META_PROPERTIES_BY_FIELD = {
 
 
 class Meta(DomainModel):
+    """This represent a read version of meta.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the meta.
+        kind: The kind field.
+        name: The name field.
+        persistable_reference: The persistable reference field.
+        property_names: The property name field.
+        unit_of_measure_id: The unit of measure id field.
+        created_time: The created time of the meta node.
+        last_updated_time: The last updated time of the meta node.
+        deleted_time: If present, the deleted time of the meta node.
+        version: The version of the meta node.
+    """
+
     space: str = "IntegrationTestsImmutable"
     kind: Optional[str] = None
     name: Optional[str] = None
@@ -31,6 +49,7 @@ class Meta(DomainModel):
     unit_of_measure_id: Optional[str] = Field(None, alias="unitOfMeasureID")
 
     def as_apply(self) -> MetaApply:
+        """Convert this read version of meta to a write version."""
         return MetaApply(
             space=self.space,
             external_id=self.external_id,
@@ -43,6 +62,24 @@ class Meta(DomainModel):
 
 
 class MetaApply(DomainModelApply):
+    """This represent a write version of meta.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the meta.
+        kind: The kind field.
+        name: The name field.
+        persistable_reference: The persistable reference field.
+        property_names: The property name field.
+        unit_of_measure_id: The unit of measure id field.
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "IntegrationTestsImmutable"
     kind: Optional[str] = None
     name: Optional[str] = None
@@ -90,11 +127,16 @@ class MetaApply(DomainModelApply):
 
 
 class MetaList(TypeList[Meta]):
+    """List of metas in read version."""
+
     _NODE = Meta
 
     def as_apply(self) -> MetaApplyList:
+        """Convert this read version of meta to a write version."""
         return MetaApplyList([node.as_apply() for node in self.data])
 
 
 class MetaApplyList(TypeApplyList[MetaApply]):
+    """List of metas in write version."""
+
     _NODE = MetaApply

@@ -41,6 +41,26 @@ class ProjectedBottomHoleLocationAPI(
         projected_bottom_hole_location: ProjectedBottomHoleLocationApply | Sequence[ProjectedBottomHoleLocationApply],
         replace: bool = False,
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) projected bottom hole locations.
+
+        Args:
+            projected_bottom_hole_location: Projected bottom hole location or sequence of projected bottom hole locations to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new projected_bottom_hole_location:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> from osdu_wells.client.data_classes import ProjectedBottomHoleLocationApply
+                >>> client = OSDUClient()
+                >>> projected_bottom_hole_location = ProjectedBottomHoleLocationApply(external_id="my_projected_bottom_hole_location", ...)
+                >>> result = client.projected_bottom_hole_location.apply(projected_bottom_hole_location)
+
+        """
         if isinstance(projected_bottom_hole_location, ProjectedBottomHoleLocationApply):
             instances = projected_bottom_hole_location.to_instances_apply(self._view_by_write_class)
         else:
@@ -55,7 +75,26 @@ class ProjectedBottomHoleLocationAPI(
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more projected bottom hole location.
+
+        Args:
+            external_id: External id of the projected bottom hole location to delete.
+            space: The space where all the projected bottom hole location are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete projected_bottom_hole_location by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> client.projected_bottom_hole_location.delete("my_projected_bottom_hole_location")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -72,12 +111,30 @@ class ProjectedBottomHoleLocationAPI(
         ...
 
     def retrieve(
-        self, external_id: str | Sequence[str]
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
     ) -> ProjectedBottomHoleLocation | ProjectedBottomHoleLocationList:
+        """Retrieve one or more projected bottom hole locations by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the projected bottom hole locations.
+            space: The space where all the projected bottom hole locations are located.
+
+        Returns:
+            The requested projected bottom hole locations.
+
+        Examples:
+
+            Retrieve projected_bottom_hole_location by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> projected_bottom_hole_location = client.projected_bottom_hole_location.retrieve("my_projected_bottom_hole_location")
+
+        """
         if isinstance(external_id, str):
-            return self._retrieve((self._sources.space, external_id))
+            return self._retrieve((space, external_id))
         else:
-            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(space, ext_id) for ext_id in external_id])
 
     def search(
         self,
@@ -106,6 +163,44 @@ class ProjectedBottomHoleLocationAPI(
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> ProjectedBottomHoleLocationList:
+        """Search projected bottom hole locations
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            as_ingested_coordinates: The as ingested coordinate to filter on.
+            coordinate_quality_check_date_time: The coordinate quality check date time to filter on.
+            coordinate_quality_check_date_time_prefix: The prefix of the coordinate quality check date time to filter on.
+            coordinate_quality_check_performed_by: The coordinate quality check performed by to filter on.
+            coordinate_quality_check_performed_by_prefix: The prefix of the coordinate quality check performed by to filter on.
+            qualitative_spatial_accuracy_type_id: The qualitative spatial accuracy type id to filter on.
+            qualitative_spatial_accuracy_type_id_prefix: The prefix of the qualitative spatial accuracy type id to filter on.
+            quantitative_accuracy_band_id: The quantitative accuracy band id to filter on.
+            quantitative_accuracy_band_id_prefix: The prefix of the quantitative accuracy band id to filter on.
+            spatial_geometry_type_id: The spatial geometry type id to filter on.
+            spatial_geometry_type_id_prefix: The prefix of the spatial geometry type id to filter on.
+            spatial_location_coordinates_date: The spatial location coordinates date to filter on.
+            spatial_location_coordinates_date_prefix: The prefix of the spatial location coordinates date to filter on.
+            spatial_parameter_type_id: The spatial parameter type id to filter on.
+            spatial_parameter_type_id_prefix: The prefix of the spatial parameter type id to filter on.
+            wgs_84_coordinates: The wgs 84 coordinate to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of projected bottom hole locations to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results projected bottom hole locations matching the query.
+
+        Examples:
+
+           Search for 'my_projected_bottom_hole_location' in all text properties:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> projected_bottom_hole_locations = client.projected_bottom_hole_location.search('my_projected_bottom_hole_location')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             as_ingested_coordinates,
@@ -237,6 +332,48 @@ class ProjectedBottomHoleLocationAPI(
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across projected bottom hole locations
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            as_ingested_coordinates: The as ingested coordinate to filter on.
+            coordinate_quality_check_date_time: The coordinate quality check date time to filter on.
+            coordinate_quality_check_date_time_prefix: The prefix of the coordinate quality check date time to filter on.
+            coordinate_quality_check_performed_by: The coordinate quality check performed by to filter on.
+            coordinate_quality_check_performed_by_prefix: The prefix of the coordinate quality check performed by to filter on.
+            qualitative_spatial_accuracy_type_id: The qualitative spatial accuracy type id to filter on.
+            qualitative_spatial_accuracy_type_id_prefix: The prefix of the qualitative spatial accuracy type id to filter on.
+            quantitative_accuracy_band_id: The quantitative accuracy band id to filter on.
+            quantitative_accuracy_band_id_prefix: The prefix of the quantitative accuracy band id to filter on.
+            spatial_geometry_type_id: The spatial geometry type id to filter on.
+            spatial_geometry_type_id_prefix: The prefix of the spatial geometry type id to filter on.
+            spatial_location_coordinates_date: The spatial location coordinates date to filter on.
+            spatial_location_coordinates_date_prefix: The prefix of the spatial location coordinates date to filter on.
+            spatial_parameter_type_id: The spatial parameter type id to filter on.
+            spatial_parameter_type_id_prefix: The prefix of the spatial parameter type id to filter on.
+            wgs_84_coordinates: The wgs 84 coordinate to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of projected bottom hole locations to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count projected bottom hole locations in space `my_space`:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> result = client.projected_bottom_hole_location.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             as_ingested_coordinates,
@@ -300,6 +437,38 @@ class ProjectedBottomHoleLocationAPI(
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for projected bottom hole locations
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            as_ingested_coordinates: The as ingested coordinate to filter on.
+            coordinate_quality_check_date_time: The coordinate quality check date time to filter on.
+            coordinate_quality_check_date_time_prefix: The prefix of the coordinate quality check date time to filter on.
+            coordinate_quality_check_performed_by: The coordinate quality check performed by to filter on.
+            coordinate_quality_check_performed_by_prefix: The prefix of the coordinate quality check performed by to filter on.
+            qualitative_spatial_accuracy_type_id: The qualitative spatial accuracy type id to filter on.
+            qualitative_spatial_accuracy_type_id_prefix: The prefix of the qualitative spatial accuracy type id to filter on.
+            quantitative_accuracy_band_id: The quantitative accuracy band id to filter on.
+            quantitative_accuracy_band_id_prefix: The prefix of the quantitative accuracy band id to filter on.
+            spatial_geometry_type_id: The spatial geometry type id to filter on.
+            spatial_geometry_type_id_prefix: The prefix of the spatial geometry type id to filter on.
+            spatial_location_coordinates_date: The spatial location coordinates date to filter on.
+            spatial_location_coordinates_date_prefix: The prefix of the spatial location coordinates date to filter on.
+            spatial_parameter_type_id: The spatial parameter type id to filter on.
+            spatial_parameter_type_id_prefix: The prefix of the spatial parameter type id to filter on.
+            wgs_84_coordinates: The wgs 84 coordinate to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of projected bottom hole locations to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             as_ingested_coordinates,
@@ -356,6 +525,42 @@ class ProjectedBottomHoleLocationAPI(
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> ProjectedBottomHoleLocationList:
+        """List/filter projected bottom hole locations
+
+        Args:
+            as_ingested_coordinates: The as ingested coordinate to filter on.
+            coordinate_quality_check_date_time: The coordinate quality check date time to filter on.
+            coordinate_quality_check_date_time_prefix: The prefix of the coordinate quality check date time to filter on.
+            coordinate_quality_check_performed_by: The coordinate quality check performed by to filter on.
+            coordinate_quality_check_performed_by_prefix: The prefix of the coordinate quality check performed by to filter on.
+            qualitative_spatial_accuracy_type_id: The qualitative spatial accuracy type id to filter on.
+            qualitative_spatial_accuracy_type_id_prefix: The prefix of the qualitative spatial accuracy type id to filter on.
+            quantitative_accuracy_band_id: The quantitative accuracy band id to filter on.
+            quantitative_accuracy_band_id_prefix: The prefix of the quantitative accuracy band id to filter on.
+            spatial_geometry_type_id: The spatial geometry type id to filter on.
+            spatial_geometry_type_id_prefix: The prefix of the spatial geometry type id to filter on.
+            spatial_location_coordinates_date: The spatial location coordinates date to filter on.
+            spatial_location_coordinates_date_prefix: The prefix of the spatial location coordinates date to filter on.
+            spatial_parameter_type_id: The spatial parameter type id to filter on.
+            spatial_parameter_type_id_prefix: The prefix of the spatial parameter type id to filter on.
+            wgs_84_coordinates: The wgs 84 coordinate to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of projected bottom hole locations to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested projected bottom hole locations
+
+        Examples:
+
+            List projected bottom hole locations and limit to 5:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> projected_bottom_hole_locations = client.projected_bottom_hole_location.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             as_ingested_coordinates,

@@ -33,6 +33,26 @@ class ProcessAPI(TypeAPI[Process, ProcessApply, ProcessList]):
         self._view_by_write_class = view_by_write_class
 
     def apply(self, proces: ProcessApply | Sequence[ProcessApply], replace: bool = False) -> dm.InstancesApplyResult:
+        """Add or update (upsert) process.
+
+        Args:
+            proces: Proces or sequence of process to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new proces:
+
+                >>> from markets.client import MarketClient
+                >>> from markets.client.data_classes import ProcessApply
+                >>> client = MarketClient()
+                >>> proces = ProcessApply(external_id="my_proces", ...)
+                >>> result = client.process.apply(proces)
+
+        """
         if isinstance(proces, ProcessApply):
             instances = proces.to_instances_apply(self._view_by_write_class)
         else:
@@ -45,7 +65,24 @@ class ProcessAPI(TypeAPI[Process, ProcessApply, ProcessList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="market") -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space: str = "market") -> dm.InstancesDeleteResult:
+        """Delete one or more proces.
+
+        Args:
+            external_id: External id of the proces to delete.
+            space: The space where all the proces are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete proces by id:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> client.process.delete("my_proces")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -61,11 +98,29 @@ class ProcessAPI(TypeAPI[Process, ProcessApply, ProcessList]):
     def retrieve(self, external_id: Sequence[str]) -> ProcessList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> Process | ProcessList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "market") -> Process | ProcessList:
+        """Retrieve one or more process by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the process.
+            space: The space where all the process are located.
+
+        Returns:
+            The requested process.
+
+        Examples:
+
+            Retrieve proces by id:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> proces = client.process.retrieve("my_proces")
+
+        """
         if isinstance(external_id, str):
-            return self._retrieve((self._sources.space, external_id))
+            return self._retrieve((space, external_id))
         else:
-            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(space, ext_id) for ext_id in external_id])
 
     def search(
         self,
@@ -79,6 +134,31 @@ class ProcessAPI(TypeAPI[Process, ProcessApply, ProcessList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> ProcessList:
+        """Search process
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            bid: The bid to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of process to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results process matching the query.
+
+        Examples:
+
+           Search for 'my_proces' in all text properties:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> process = client.process.search('my_proces')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             bid,
@@ -150,6 +230,35 @@ class ProcessAPI(TypeAPI[Process, ProcessApply, ProcessList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across process
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            bid: The bid to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of process to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count process in space `my_space`:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> result = client.process.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             bid,
@@ -185,6 +294,25 @@ class ProcessAPI(TypeAPI[Process, ProcessApply, ProcessList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for process
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            bid: The bid to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of process to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             bid,
@@ -215,6 +343,29 @@ class ProcessAPI(TypeAPI[Process, ProcessApply, ProcessList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> ProcessList:
+        """List/filter process
+
+        Args:
+            bid: The bid to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of process to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested process
+
+        Examples:
+
+            List process and limit to 5:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> process = client.process.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             bid,

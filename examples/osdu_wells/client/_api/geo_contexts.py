@@ -35,6 +35,26 @@ class GeoContextsAPI(TypeAPI[GeoContexts, GeoContextsApply, GeoContextsList]):
     def apply(
         self, geo_context: GeoContextsApply | Sequence[GeoContextsApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) geo contexts.
+
+        Args:
+            geo_context: Geo context or sequence of geo contexts to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new geo_context:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> from osdu_wells.client.data_classes import GeoContextsApply
+                >>> client = OSDUClient()
+                >>> geo_context = GeoContextsApply(external_id="my_geo_context", ...)
+                >>> result = client.geo_contexts.apply(geo_context)
+
+        """
         if isinstance(geo_context, GeoContextsApply):
             instances = geo_context.to_instances_apply(self._view_by_write_class)
         else:
@@ -47,7 +67,26 @@ class GeoContextsAPI(TypeAPI[GeoContexts, GeoContextsApply, GeoContextsList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more geo context.
+
+        Args:
+            external_id: External id of the geo context to delete.
+            space: The space where all the geo context are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete geo_context by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> client.geo_contexts.delete("my_geo_context")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -63,11 +102,31 @@ class GeoContextsAPI(TypeAPI[GeoContexts, GeoContextsApply, GeoContextsList]):
     def retrieve(self, external_id: Sequence[str]) -> GeoContextsList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> GeoContexts | GeoContextsList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> GeoContexts | GeoContextsList:
+        """Retrieve one or more geo contexts by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the geo contexts.
+            space: The space where all the geo contexts are located.
+
+        Returns:
+            The requested geo contexts.
+
+        Examples:
+
+            Retrieve geo_context by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> geo_context = client.geo_contexts.retrieve("my_geo_context")
+
+        """
         if isinstance(external_id, str):
-            return self._retrieve((self._sources.space, external_id))
+            return self._retrieve((space, external_id))
         else:
-            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(space, ext_id) for ext_id in external_id])
 
     def search(
         self,
@@ -90,6 +149,40 @@ class GeoContextsAPI(TypeAPI[GeoContexts, GeoContextsApply, GeoContextsList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> GeoContextsList:
+        """Search geo contexts
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            basin_id: The basin id to filter on.
+            basin_id_prefix: The prefix of the basin id to filter on.
+            field_id: The field id to filter on.
+            field_id_prefix: The prefix of the field id to filter on.
+            geo_political_entity_id: The geo political entity id to filter on.
+            geo_political_entity_id_prefix: The prefix of the geo political entity id to filter on.
+            geo_type_id: The geo type id to filter on.
+            geo_type_id_prefix: The prefix of the geo type id to filter on.
+            play_id: The play id to filter on.
+            play_id_prefix: The prefix of the play id to filter on.
+            prospect_id: The prospect id to filter on.
+            prospect_id_prefix: The prefix of the prospect id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of geo contexts to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results geo contexts matching the query.
+
+        Examples:
+
+           Search for 'my_geo_context' in all text properties:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> geo_contexts = client.geo_contexts.search('my_geo_context')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             basin_id,
@@ -197,6 +290,44 @@ class GeoContextsAPI(TypeAPI[GeoContexts, GeoContextsApply, GeoContextsList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across geo contexts
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            basin_id: The basin id to filter on.
+            basin_id_prefix: The prefix of the basin id to filter on.
+            field_id: The field id to filter on.
+            field_id_prefix: The prefix of the field id to filter on.
+            geo_political_entity_id: The geo political entity id to filter on.
+            geo_political_entity_id_prefix: The prefix of the geo political entity id to filter on.
+            geo_type_id: The geo type id to filter on.
+            geo_type_id_prefix: The prefix of the geo type id to filter on.
+            play_id: The play id to filter on.
+            play_id_prefix: The prefix of the play id to filter on.
+            prospect_id: The prospect id to filter on.
+            prospect_id_prefix: The prefix of the prospect id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of geo contexts to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count geo contexts in space `my_space`:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> result = client.geo_contexts.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             basin_id,
@@ -250,6 +381,34 @@ class GeoContextsAPI(TypeAPI[GeoContexts, GeoContextsApply, GeoContextsList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for geo contexts
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            basin_id: The basin id to filter on.
+            basin_id_prefix: The prefix of the basin id to filter on.
+            field_id: The field id to filter on.
+            field_id_prefix: The prefix of the field id to filter on.
+            geo_political_entity_id: The geo political entity id to filter on.
+            geo_political_entity_id_prefix: The prefix of the geo political entity id to filter on.
+            geo_type_id: The geo type id to filter on.
+            geo_type_id_prefix: The prefix of the geo type id to filter on.
+            play_id: The play id to filter on.
+            play_id_prefix: The prefix of the play id to filter on.
+            prospect_id: The prospect id to filter on.
+            prospect_id_prefix: The prefix of the prospect id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of geo contexts to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             basin_id,
@@ -298,6 +457,38 @@ class GeoContextsAPI(TypeAPI[GeoContexts, GeoContextsApply, GeoContextsList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> GeoContextsList:
+        """List/filter geo contexts
+
+        Args:
+            basin_id: The basin id to filter on.
+            basin_id_prefix: The prefix of the basin id to filter on.
+            field_id: The field id to filter on.
+            field_id_prefix: The prefix of the field id to filter on.
+            geo_political_entity_id: The geo political entity id to filter on.
+            geo_political_entity_id_prefix: The prefix of the geo political entity id to filter on.
+            geo_type_id: The geo type id to filter on.
+            geo_type_id_prefix: The prefix of the geo type id to filter on.
+            play_id: The play id to filter on.
+            play_id_prefix: The prefix of the play id to filter on.
+            prospect_id: The prospect id to filter on.
+            prospect_id_prefix: The prefix of the prospect id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of geo contexts to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested geo contexts
+
+        Examples:
+
+            List geo contexts and limit to 5:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> geo_contexts = client.geo_contexts.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             basin_id,

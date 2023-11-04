@@ -58,6 +58,30 @@ _SPATIALAREA_PROPERTIES_BY_FIELD = {
 
 
 class SpatialArea(DomainModel):
+    """This represent a read version of spatial area.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the spatial area.
+        applied_operations: The applied operation field.
+        as_ingested_coordinates: The as ingested coordinate field.
+        coordinate_quality_check_date_time: The coordinate quality check date time field.
+        coordinate_quality_check_performed_by: The coordinate quality check performed by field.
+        coordinate_quality_check_remarks: The coordinate quality check remark field.
+        qualitative_spatial_accuracy_type_id: The qualitative spatial accuracy type id field.
+        quantitative_accuracy_band_id: The quantitative accuracy band id field.
+        spatial_geometry_type_id: The spatial geometry type id field.
+        spatial_location_coordinates_date: The spatial location coordinates date field.
+        spatial_parameter_type_id: The spatial parameter type id field.
+        wgs_84_coordinates: The wgs 84 coordinate field.
+        created_time: The created time of the spatial area node.
+        last_updated_time: The last updated time of the spatial area node.
+        deleted_time: If present, the deleted time of the spatial area node.
+        version: The version of the spatial area node.
+    """
+
     space: str = "IntegrationTestsImmutable"
     applied_operations: Optional[list[str]] = Field(None, alias="AppliedOperations")
     as_ingested_coordinates: Optional[str] = Field(None, alias="AsIngestedCoordinates")
@@ -72,6 +96,7 @@ class SpatialArea(DomainModel):
     wgs_84_coordinates: Optional[str] = Field(None, alias="Wgs84Coordinates")
 
     def as_apply(self) -> SpatialAreaApply:
+        """Convert this read version of spatial area to a write version."""
         return SpatialAreaApply(
             space=self.space,
             external_id=self.external_id,
@@ -90,6 +115,30 @@ class SpatialArea(DomainModel):
 
 
 class SpatialAreaApply(DomainModelApply):
+    """This represent a write version of spatial area.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the spatial area.
+        applied_operations: The applied operation field.
+        as_ingested_coordinates: The as ingested coordinate field.
+        coordinate_quality_check_date_time: The coordinate quality check date time field.
+        coordinate_quality_check_performed_by: The coordinate quality check performed by field.
+        coordinate_quality_check_remarks: The coordinate quality check remark field.
+        qualitative_spatial_accuracy_type_id: The qualitative spatial accuracy type id field.
+        quantitative_accuracy_band_id: The quantitative accuracy band id field.
+        spatial_geometry_type_id: The spatial geometry type id field.
+        spatial_location_coordinates_date: The spatial location coordinates date field.
+        spatial_parameter_type_id: The spatial parameter type id field.
+        wgs_84_coordinates: The wgs 84 coordinate field.
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "IntegrationTestsImmutable"
     applied_operations: Optional[list[str]] = Field(None, alias="AppliedOperations")
     as_ingested_coordinates: Union[AsIngestedCoordinatesApply, str, None] = Field(
@@ -177,11 +226,16 @@ class SpatialAreaApply(DomainModelApply):
 
 
 class SpatialAreaList(TypeList[SpatialArea]):
+    """List of spatial areas in read version."""
+
     _NODE = SpatialArea
 
     def as_apply(self) -> SpatialAreaApplyList:
+        """Convert this read version of spatial area to a write version."""
         return SpatialAreaApplyList([node.as_apply() for node in self.data])
 
 
 class SpatialAreaApplyList(TypeApplyList[SpatialAreaApply]):
+    """List of spatial areas in write version."""
+
     _NODE = SpatialAreaApply

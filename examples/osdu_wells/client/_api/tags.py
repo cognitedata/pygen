@@ -33,6 +33,26 @@ class TagsAPI(TypeAPI[Tags, TagsApply, TagsList]):
         self._view_by_write_class = view_by_write_class
 
     def apply(self, tag: TagsApply | Sequence[TagsApply], replace: bool = False) -> dm.InstancesApplyResult:
+        """Add or update (upsert) tags.
+
+        Args:
+            tag: Tag or sequence of tags to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new tag:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> from osdu_wells.client.data_classes import TagsApply
+                >>> client = OSDUClient()
+                >>> tag = TagsApply(external_id="my_tag", ...)
+                >>> result = client.tags.apply(tag)
+
+        """
         if isinstance(tag, TagsApply):
             instances = tag.to_instances_apply(self._view_by_write_class)
         else:
@@ -45,7 +65,26 @@ class TagsAPI(TypeAPI[Tags, TagsApply, TagsList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more tag.
+
+        Args:
+            external_id: External id of the tag to delete.
+            space: The space where all the tag are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete tag by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> client.tags.delete("my_tag")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -61,11 +100,29 @@ class TagsAPI(TypeAPI[Tags, TagsApply, TagsList]):
     def retrieve(self, external_id: Sequence[str]) -> TagsList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> Tags | TagsList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> Tags | TagsList:
+        """Retrieve one or more tags by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the tags.
+            space: The space where all the tags are located.
+
+        Returns:
+            The requested tags.
+
+        Examples:
+
+            Retrieve tag by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> tag = client.tags.retrieve("my_tag")
+
+        """
         if isinstance(external_id, str):
-            return self._retrieve((self._sources.space, external_id))
+            return self._retrieve((space, external_id))
         else:
-            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(space, ext_id) for ext_id in external_id])
 
     def search(
         self,
@@ -78,6 +135,30 @@ class TagsAPI(TypeAPI[Tags, TagsApply, TagsList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> TagsList:
+        """Search tags
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            name_of_key: The name of key to filter on.
+            name_of_key_prefix: The prefix of the name of key to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of tags to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results tags matching the query.
+
+        Examples:
+
+           Search for 'my_tag' in all text properties:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> tags = client.tags.search('my_tag')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             name_of_key,
@@ -145,6 +226,34 @@ class TagsAPI(TypeAPI[Tags, TagsApply, TagsList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across tags
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            name_of_key: The name of key to filter on.
+            name_of_key_prefix: The prefix of the name of key to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of tags to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count tags in space `my_space`:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> result = client.tags.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             name_of_key,
@@ -178,6 +287,24 @@ class TagsAPI(TypeAPI[Tags, TagsApply, TagsList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for tags
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            name_of_key: The name of key to filter on.
+            name_of_key_prefix: The prefix of the name of key to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of tags to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             name_of_key,
@@ -206,6 +333,28 @@ class TagsAPI(TypeAPI[Tags, TagsApply, TagsList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> TagsList:
+        """List/filter tags
+
+        Args:
+            name_of_key: The name of key to filter on.
+            name_of_key_prefix: The prefix of the name of key to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of tags to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested tags
+
+        Examples:
+
+            List tags and limit to 5:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> tags = client.tags.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             name_of_key,

@@ -27,6 +27,24 @@ class WellboreTrajectoryDataArtefactsAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more artefacts edges by id(s) of a wellbore trajectory datum.
+
+        Args:
+            external_id: External id or list of external ids source wellbore trajectory datum.
+            space: The space where all the artefact edges are located.
+
+        Returns:
+            The requested artefact edges.
+
+        Examples:
+
+            Retrieve artefacts edge by id:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_trajectory_datum = client.wellbore_trajectory_data.artefacts.retrieve("my_artefacts")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -56,6 +74,26 @@ class WellboreTrajectoryDataArtefactsAPI:
         limit=DEFAULT_LIMIT_READ,
         space="IntegrationTestsImmutable",
     ) -> dm.EdgeList:
+        """List artefacts edges of a wellbore trajectory datum.
+
+        Args:
+            wellbore_trajectory_datum_id: Id of the source wellbore trajectory datum.
+            limit: Maximum number of artefact edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the artefact edges are located.
+
+        Returns:
+            The requested artefact edges.
+
+        Examples:
+
+            List 5 artefacts edges connected to "my_wellbore_trajectory_datum":
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_trajectory_datum = client.wellbore_trajectory_data.artefacts.list("my_wellbore_trajectory_datum", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -83,6 +121,24 @@ class WellboreTrajectoryDataAvailableTrajectoryStationPropertiesAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more available_trajectory_station_properties edges by id(s) of a wellbore trajectory datum.
+
+        Args:
+            external_id: External id or list of external ids source wellbore trajectory datum.
+            space: The space where all the available trajectory station property edges are located.
+
+        Returns:
+            The requested available trajectory station property edges.
+
+        Examples:
+
+            Retrieve available_trajectory_station_properties edge by id:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_trajectory_datum = client.wellbore_trajectory_data.available_trajectory_station_properties.retrieve("my_available_trajectory_station_properties")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -112,6 +168,26 @@ class WellboreTrajectoryDataAvailableTrajectoryStationPropertiesAPI:
         limit=DEFAULT_LIMIT_READ,
         space="IntegrationTestsImmutable",
     ) -> dm.EdgeList:
+        """List available_trajectory_station_properties edges of a wellbore trajectory datum.
+
+        Args:
+            wellbore_trajectory_datum_id: Id of the source wellbore trajectory datum.
+            limit: Maximum number of available trajectory station property edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the available trajectory station property edges are located.
+
+        Returns:
+            The requested available trajectory station property edges.
+
+        Examples:
+
+            List 5 available_trajectory_station_properties edges connected to "my_wellbore_trajectory_datum":
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_trajectory_datum = client.wellbore_trajectory_data.available_trajectory_station_properties.list("my_wellbore_trajectory_datum", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -139,6 +215,24 @@ class WellboreTrajectoryDataGeoContextsAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more geo_contexts edges by id(s) of a wellbore trajectory datum.
+
+        Args:
+            external_id: External id or list of external ids source wellbore trajectory datum.
+            space: The space where all the geo context edges are located.
+
+        Returns:
+            The requested geo context edges.
+
+        Examples:
+
+            Retrieve geo_contexts edge by id:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_trajectory_datum = client.wellbore_trajectory_data.geo_contexts.retrieve("my_geo_contexts")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -168,6 +262,26 @@ class WellboreTrajectoryDataGeoContextsAPI:
         limit=DEFAULT_LIMIT_READ,
         space="IntegrationTestsImmutable",
     ) -> dm.EdgeList:
+        """List geo_contexts edges of a wellbore trajectory datum.
+
+        Args:
+            wellbore_trajectory_datum_id: Id of the source wellbore trajectory datum.
+            limit: Maximum number of geo context edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the geo context edges are located.
+
+        Returns:
+            The requested geo context edges.
+
+        Examples:
+
+            List 5 geo_contexts edges connected to "my_wellbore_trajectory_datum":
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_trajectory_datum = client.wellbore_trajectory_data.geo_contexts.list("my_wellbore_trajectory_datum", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -195,6 +309,24 @@ class WellboreTrajectoryDataLineageAssertionsAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more lineage_assertions edges by id(s) of a wellbore trajectory datum.
+
+        Args:
+            external_id: External id or list of external ids source wellbore trajectory datum.
+            space: The space where all the lineage assertion edges are located.
+
+        Returns:
+            The requested lineage assertion edges.
+
+        Examples:
+
+            Retrieve lineage_assertions edge by id:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_trajectory_datum = client.wellbore_trajectory_data.lineage_assertions.retrieve("my_lineage_assertions")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -224,6 +356,26 @@ class WellboreTrajectoryDataLineageAssertionsAPI:
         limit=DEFAULT_LIMIT_READ,
         space="IntegrationTestsImmutable",
     ) -> dm.EdgeList:
+        """List lineage_assertions edges of a wellbore trajectory datum.
+
+        Args:
+            wellbore_trajectory_datum_id: Id of the source wellbore trajectory datum.
+            limit: Maximum number of lineage assertion edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the lineage assertion edges are located.
+
+        Returns:
+            The requested lineage assertion edges.
+
+        Examples:
+
+            List 5 lineage_assertions edges connected to "my_wellbore_trajectory_datum":
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_trajectory_datum = client.wellbore_trajectory_data.lineage_assertions.list("my_wellbore_trajectory_datum", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -251,6 +403,24 @@ class WellboreTrajectoryDataNameAliasesAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more name_aliases edges by id(s) of a wellbore trajectory datum.
+
+        Args:
+            external_id: External id or list of external ids source wellbore trajectory datum.
+            space: The space where all the name alias edges are located.
+
+        Returns:
+            The requested name alias edges.
+
+        Examples:
+
+            Retrieve name_aliases edge by id:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_trajectory_datum = client.wellbore_trajectory_data.name_aliases.retrieve("my_name_aliases")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -280,6 +450,26 @@ class WellboreTrajectoryDataNameAliasesAPI:
         limit=DEFAULT_LIMIT_READ,
         space="IntegrationTestsImmutable",
     ) -> dm.EdgeList:
+        """List name_aliases edges of a wellbore trajectory datum.
+
+        Args:
+            wellbore_trajectory_datum_id: Id of the source wellbore trajectory datum.
+            limit: Maximum number of name alias edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the name alias edges are located.
+
+        Returns:
+            The requested name alias edges.
+
+        Examples:
+
+            List 5 name_aliases edges connected to "my_wellbore_trajectory_datum":
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_trajectory_datum = client.wellbore_trajectory_data.name_aliases.list("my_wellbore_trajectory_datum", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -307,6 +497,24 @@ class WellboreTrajectoryDataTechnicalAssurancesAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more technical_assurances edges by id(s) of a wellbore trajectory datum.
+
+        Args:
+            external_id: External id or list of external ids source wellbore trajectory datum.
+            space: The space where all the technical assurance edges are located.
+
+        Returns:
+            The requested technical assurance edges.
+
+        Examples:
+
+            Retrieve technical_assurances edge by id:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_trajectory_datum = client.wellbore_trajectory_data.technical_assurances.retrieve("my_technical_assurances")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -336,6 +544,26 @@ class WellboreTrajectoryDataTechnicalAssurancesAPI:
         limit=DEFAULT_LIMIT_READ,
         space="IntegrationTestsImmutable",
     ) -> dm.EdgeList:
+        """List technical_assurances edges of a wellbore trajectory datum.
+
+        Args:
+            wellbore_trajectory_datum_id: Id of the source wellbore trajectory datum.
+            limit: Maximum number of technical assurance edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the technical assurance edges are located.
+
+        Returns:
+            The requested technical assurance edges.
+
+        Examples:
+
+            List 5 technical_assurances edges connected to "my_wellbore_trajectory_datum":
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_trajectory_datum = client.wellbore_trajectory_data.technical_assurances.list("my_wellbore_trajectory_datum", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -386,6 +614,30 @@ class WellboreTrajectoryDataAPI(
         wellbore_trajectory_datum: WellboreTrajectoryDataApply | Sequence[WellboreTrajectoryDataApply],
         replace: bool = False,
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) wellbore trajectory data.
+
+        Note: This method iterates through all nodes linked to wellbore_trajectory_datum and create them including the edges
+        between the nodes. For example, if any of `artefacts`, `available_trajectory_station_properties`, `geo_contexts`, `lineage_assertions`, `name_aliases` or `technical_assurances` are set, then these
+        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+
+        Args:
+            wellbore_trajectory_datum: Wellbore trajectory datum or sequence of wellbore trajectory data to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new wellbore_trajectory_datum:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> from osdu_wells_pydantic_v1.client.data_classes import WellboreTrajectoryDataApply
+                >>> client = OSDUClient()
+                >>> wellbore_trajectory_datum = WellboreTrajectoryDataApply(external_id="my_wellbore_trajectory_datum", ...)
+                >>> result = client.wellbore_trajectory_data.apply(wellbore_trajectory_datum)
+
+        """
         if isinstance(wellbore_trajectory_datum, WellboreTrajectoryDataApply):
             instances = wellbore_trajectory_datum.to_instances_apply(self._view_by_write_class)
         else:
@@ -400,7 +652,26 @@ class WellboreTrajectoryDataAPI(
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more wellbore trajectory datum.
+
+        Args:
+            external_id: External id of the wellbore trajectory datum to delete.
+            space: The space where all the wellbore trajectory datum are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete wellbore_trajectory_datum by id:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> client.wellbore_trajectory_data.delete("my_wellbore_trajectory_datum")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -416,9 +687,29 @@ class WellboreTrajectoryDataAPI(
     def retrieve(self, external_id: Sequence[str]) -> WellboreTrajectoryDataList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> WellboreTrajectoryData | WellboreTrajectoryDataList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> WellboreTrajectoryData | WellboreTrajectoryDataList:
+        """Retrieve one or more wellbore trajectory data by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the wellbore trajectory data.
+            space: The space where all the wellbore trajectory data are located.
+
+        Returns:
+            The requested wellbore trajectory data.
+
+        Examples:
+
+            Retrieve wellbore_trajectory_datum by id:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_trajectory_datum = client.wellbore_trajectory_data.retrieve("my_wellbore_trajectory_datum")
+
+        """
         if isinstance(external_id, str):
-            wellbore_trajectory_datum = self._retrieve((self._sources.space, external_id))
+            wellbore_trajectory_datum = self._retrieve((space, external_id))
 
             artefact_edges = self.artefacts.retrieve(external_id)
             wellbore_trajectory_datum.artefacts = [edge.end_node.external_id for edge in artefact_edges]
@@ -443,7 +734,7 @@ class WellboreTrajectoryDataAPI(
 
             return wellbore_trajectory_datum
         else:
-            wellbore_trajectory_data = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            wellbore_trajectory_data = self._retrieve([(space, ext_id) for ext_id in external_id])
 
             artefact_edges = self.artefacts.retrieve(external_id)
             self._set_artefacts(wellbore_trajectory_data, artefact_edges)
@@ -553,6 +844,109 @@ class WellboreTrajectoryDataAPI(
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> WellboreTrajectoryDataList:
+        """Search wellbore trajectory data
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            acquisition_date: The acquisition date to filter on.
+            acquisition_date_prefix: The prefix of the acquisition date to filter on.
+            acquisition_remark: The acquisition remark to filter on.
+            acquisition_remark_prefix: The prefix of the acquisition remark to filter on.
+            active_indicator: The active indicator to filter on.
+            applied_operations_date_time: The applied operations date time to filter on.
+            applied_operations_date_time_prefix: The prefix of the applied operations date time to filter on.
+            applied_operations_remarks: The applied operations remark to filter on.
+            applied_operations_remarks_prefix: The prefix of the applied operations remark to filter on.
+            applied_operations_user: The applied operations user to filter on.
+            applied_operations_user_prefix: The prefix of the applied operations user to filter on.
+            azimuth_reference_type: The azimuth reference type to filter on.
+            azimuth_reference_type_prefix: The prefix of the azimuth reference type to filter on.
+            min_base_depth_measured_depth: The minimum value of the base depth measured depth to filter on.
+            max_base_depth_measured_depth: The maximum value of the base depth measured depth to filter on.
+            calculation_method_type: The calculation method type to filter on.
+            calculation_method_type_prefix: The prefix of the calculation method type to filter on.
+            company_id: The company id to filter on.
+            company_id_prefix: The prefix of the company id to filter on.
+            creation_date_time: The creation date time to filter on.
+            creation_date_time_prefix: The prefix of the creation date time to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            end_date_time: The end date time to filter on.
+            end_date_time_prefix: The prefix of the end date time to filter on.
+            existence_kind: The existence kind to filter on.
+            existence_kind_prefix: The prefix of the existence kind to filter on.
+            min_extrapolated_measured_depth: The minimum value of the extrapolated measured depth to filter on.
+            max_extrapolated_measured_depth: The maximum value of the extrapolated measured depth to filter on.
+            extrapolated_measured_depth_remark: The extrapolated measured depth remark to filter on.
+            extrapolated_measured_depth_remark_prefix: The prefix of the extrapolated measured depth remark to filter on.
+            geographic_crsid: The geographic crsid to filter on.
+            geographic_crsid_prefix: The prefix of the geographic crsid to filter on.
+            is_discoverable: The is discoverable to filter on.
+            is_extended_load: The is extended load to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            projected_crsid: The projected crsid to filter on.
+            projected_crsid_prefix: The prefix of the projected crsid to filter on.
+            resource_curation_status: The resource curation status to filter on.
+            resource_curation_status_prefix: The prefix of the resource curation status to filter on.
+            resource_home_region_id: The resource home region id to filter on.
+            resource_home_region_id_prefix: The prefix of the resource home region id to filter on.
+            resource_lifecycle_status: The resource lifecycle status to filter on.
+            resource_lifecycle_status_prefix: The prefix of the resource lifecycle status to filter on.
+            resource_security_classification: The resource security classification to filter on.
+            resource_security_classification_prefix: The prefix of the resource security classification to filter on.
+            service_company_id: The service company id to filter on.
+            service_company_id_prefix: The prefix of the service company id to filter on.
+            source: The source to filter on.
+            source_prefix: The prefix of the source to filter on.
+            spatial_area: The spatial area to filter on.
+            spatial_point: The spatial point to filter on.
+            start_date_time: The start date time to filter on.
+            start_date_time_prefix: The prefix of the start date time to filter on.
+            submitter_name: The submitter name to filter on.
+            submitter_name_prefix: The prefix of the submitter name to filter on.
+            min_surface_grid_convergence: The minimum value of the surface grid convergence to filter on.
+            max_surface_grid_convergence: The maximum value of the surface grid convergence to filter on.
+            min_surface_scale_factor: The minimum value of the surface scale factor to filter on.
+            max_surface_scale_factor: The maximum value of the surface scale factor to filter on.
+            survey_reference_identifier: The survey reference identifier to filter on.
+            survey_reference_identifier_prefix: The prefix of the survey reference identifier to filter on.
+            survey_tool_type_id: The survey tool type id to filter on.
+            survey_tool_type_id_prefix: The prefix of the survey tool type id to filter on.
+            survey_type: The survey type to filter on.
+            survey_type_prefix: The prefix of the survey type to filter on.
+            survey_version: The survey version to filter on.
+            survey_version_prefix: The prefix of the survey version to filter on.
+            min_tie_measured_depth: The minimum value of the tie measured depth to filter on.
+            max_tie_measured_depth: The maximum value of the tie measured depth to filter on.
+            min_tie_true_vertical_depth: The minimum value of the tie true vertical depth to filter on.
+            max_tie_true_vertical_depth: The maximum value of the tie true vertical depth to filter on.
+            min_top_depth_measured_depth: The minimum value of the top depth measured depth to filter on.
+            max_top_depth_measured_depth: The maximum value of the top depth measured depth to filter on.
+            min_tortuosity: The minimum value of the tortuosity to filter on.
+            max_tortuosity: The maximum value of the tortuosity to filter on.
+            vertical_measurement: The vertical measurement to filter on.
+            wellbore_id: The wellbore id to filter on.
+            wellbore_id_prefix: The prefix of the wellbore id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of wellbore trajectory data to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `artefacts`, `available_trajectory_station_properties`, `geo_contexts`, `lineage_assertions`, `name_aliases` or `technical_assurances` external ids for the wellbore trajectory data. Defaults to True.
+
+        Returns:
+            Search results wellbore trajectory data matching the query.
+
+        Examples:
+
+           Search for 'my_wellbore_trajectory_datum' in all text properties:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_trajectory_data = client.wellbore_trajectory_data.search('my_wellbore_trajectory_datum')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             acquisition_date,
@@ -934,6 +1328,113 @@ class WellboreTrajectoryDataAPI(
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across wellbore trajectory data
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            acquisition_date: The acquisition date to filter on.
+            acquisition_date_prefix: The prefix of the acquisition date to filter on.
+            acquisition_remark: The acquisition remark to filter on.
+            acquisition_remark_prefix: The prefix of the acquisition remark to filter on.
+            active_indicator: The active indicator to filter on.
+            applied_operations_date_time: The applied operations date time to filter on.
+            applied_operations_date_time_prefix: The prefix of the applied operations date time to filter on.
+            applied_operations_remarks: The applied operations remark to filter on.
+            applied_operations_remarks_prefix: The prefix of the applied operations remark to filter on.
+            applied_operations_user: The applied operations user to filter on.
+            applied_operations_user_prefix: The prefix of the applied operations user to filter on.
+            azimuth_reference_type: The azimuth reference type to filter on.
+            azimuth_reference_type_prefix: The prefix of the azimuth reference type to filter on.
+            min_base_depth_measured_depth: The minimum value of the base depth measured depth to filter on.
+            max_base_depth_measured_depth: The maximum value of the base depth measured depth to filter on.
+            calculation_method_type: The calculation method type to filter on.
+            calculation_method_type_prefix: The prefix of the calculation method type to filter on.
+            company_id: The company id to filter on.
+            company_id_prefix: The prefix of the company id to filter on.
+            creation_date_time: The creation date time to filter on.
+            creation_date_time_prefix: The prefix of the creation date time to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            end_date_time: The end date time to filter on.
+            end_date_time_prefix: The prefix of the end date time to filter on.
+            existence_kind: The existence kind to filter on.
+            existence_kind_prefix: The prefix of the existence kind to filter on.
+            min_extrapolated_measured_depth: The minimum value of the extrapolated measured depth to filter on.
+            max_extrapolated_measured_depth: The maximum value of the extrapolated measured depth to filter on.
+            extrapolated_measured_depth_remark: The extrapolated measured depth remark to filter on.
+            extrapolated_measured_depth_remark_prefix: The prefix of the extrapolated measured depth remark to filter on.
+            geographic_crsid: The geographic crsid to filter on.
+            geographic_crsid_prefix: The prefix of the geographic crsid to filter on.
+            is_discoverable: The is discoverable to filter on.
+            is_extended_load: The is extended load to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            projected_crsid: The projected crsid to filter on.
+            projected_crsid_prefix: The prefix of the projected crsid to filter on.
+            resource_curation_status: The resource curation status to filter on.
+            resource_curation_status_prefix: The prefix of the resource curation status to filter on.
+            resource_home_region_id: The resource home region id to filter on.
+            resource_home_region_id_prefix: The prefix of the resource home region id to filter on.
+            resource_lifecycle_status: The resource lifecycle status to filter on.
+            resource_lifecycle_status_prefix: The prefix of the resource lifecycle status to filter on.
+            resource_security_classification: The resource security classification to filter on.
+            resource_security_classification_prefix: The prefix of the resource security classification to filter on.
+            service_company_id: The service company id to filter on.
+            service_company_id_prefix: The prefix of the service company id to filter on.
+            source: The source to filter on.
+            source_prefix: The prefix of the source to filter on.
+            spatial_area: The spatial area to filter on.
+            spatial_point: The spatial point to filter on.
+            start_date_time: The start date time to filter on.
+            start_date_time_prefix: The prefix of the start date time to filter on.
+            submitter_name: The submitter name to filter on.
+            submitter_name_prefix: The prefix of the submitter name to filter on.
+            min_surface_grid_convergence: The minimum value of the surface grid convergence to filter on.
+            max_surface_grid_convergence: The maximum value of the surface grid convergence to filter on.
+            min_surface_scale_factor: The minimum value of the surface scale factor to filter on.
+            max_surface_scale_factor: The maximum value of the surface scale factor to filter on.
+            survey_reference_identifier: The survey reference identifier to filter on.
+            survey_reference_identifier_prefix: The prefix of the survey reference identifier to filter on.
+            survey_tool_type_id: The survey tool type id to filter on.
+            survey_tool_type_id_prefix: The prefix of the survey tool type id to filter on.
+            survey_type: The survey type to filter on.
+            survey_type_prefix: The prefix of the survey type to filter on.
+            survey_version: The survey version to filter on.
+            survey_version_prefix: The prefix of the survey version to filter on.
+            min_tie_measured_depth: The minimum value of the tie measured depth to filter on.
+            max_tie_measured_depth: The maximum value of the tie measured depth to filter on.
+            min_tie_true_vertical_depth: The minimum value of the tie true vertical depth to filter on.
+            max_tie_true_vertical_depth: The maximum value of the tie true vertical depth to filter on.
+            min_top_depth_measured_depth: The minimum value of the top depth measured depth to filter on.
+            max_top_depth_measured_depth: The maximum value of the top depth measured depth to filter on.
+            min_tortuosity: The minimum value of the tortuosity to filter on.
+            max_tortuosity: The maximum value of the tortuosity to filter on.
+            vertical_measurement: The vertical measurement to filter on.
+            wellbore_id: The wellbore id to filter on.
+            wellbore_id_prefix: The prefix of the wellbore id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of wellbore trajectory data to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `artefacts`, `available_trajectory_station_properties`, `geo_contexts`, `lineage_assertions`, `name_aliases` or `technical_assurances` external ids for the wellbore trajectory data. Defaults to True.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count wellbore trajectory data in space `my_space`:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> result = client.wellbore_trajectory_data.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             acquisition_date,
@@ -1123,6 +1624,103 @@ class WellboreTrajectoryDataAPI(
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for wellbore trajectory data
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            acquisition_date: The acquisition date to filter on.
+            acquisition_date_prefix: The prefix of the acquisition date to filter on.
+            acquisition_remark: The acquisition remark to filter on.
+            acquisition_remark_prefix: The prefix of the acquisition remark to filter on.
+            active_indicator: The active indicator to filter on.
+            applied_operations_date_time: The applied operations date time to filter on.
+            applied_operations_date_time_prefix: The prefix of the applied operations date time to filter on.
+            applied_operations_remarks: The applied operations remark to filter on.
+            applied_operations_remarks_prefix: The prefix of the applied operations remark to filter on.
+            applied_operations_user: The applied operations user to filter on.
+            applied_operations_user_prefix: The prefix of the applied operations user to filter on.
+            azimuth_reference_type: The azimuth reference type to filter on.
+            azimuth_reference_type_prefix: The prefix of the azimuth reference type to filter on.
+            min_base_depth_measured_depth: The minimum value of the base depth measured depth to filter on.
+            max_base_depth_measured_depth: The maximum value of the base depth measured depth to filter on.
+            calculation_method_type: The calculation method type to filter on.
+            calculation_method_type_prefix: The prefix of the calculation method type to filter on.
+            company_id: The company id to filter on.
+            company_id_prefix: The prefix of the company id to filter on.
+            creation_date_time: The creation date time to filter on.
+            creation_date_time_prefix: The prefix of the creation date time to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            end_date_time: The end date time to filter on.
+            end_date_time_prefix: The prefix of the end date time to filter on.
+            existence_kind: The existence kind to filter on.
+            existence_kind_prefix: The prefix of the existence kind to filter on.
+            min_extrapolated_measured_depth: The minimum value of the extrapolated measured depth to filter on.
+            max_extrapolated_measured_depth: The maximum value of the extrapolated measured depth to filter on.
+            extrapolated_measured_depth_remark: The extrapolated measured depth remark to filter on.
+            extrapolated_measured_depth_remark_prefix: The prefix of the extrapolated measured depth remark to filter on.
+            geographic_crsid: The geographic crsid to filter on.
+            geographic_crsid_prefix: The prefix of the geographic crsid to filter on.
+            is_discoverable: The is discoverable to filter on.
+            is_extended_load: The is extended load to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            projected_crsid: The projected crsid to filter on.
+            projected_crsid_prefix: The prefix of the projected crsid to filter on.
+            resource_curation_status: The resource curation status to filter on.
+            resource_curation_status_prefix: The prefix of the resource curation status to filter on.
+            resource_home_region_id: The resource home region id to filter on.
+            resource_home_region_id_prefix: The prefix of the resource home region id to filter on.
+            resource_lifecycle_status: The resource lifecycle status to filter on.
+            resource_lifecycle_status_prefix: The prefix of the resource lifecycle status to filter on.
+            resource_security_classification: The resource security classification to filter on.
+            resource_security_classification_prefix: The prefix of the resource security classification to filter on.
+            service_company_id: The service company id to filter on.
+            service_company_id_prefix: The prefix of the service company id to filter on.
+            source: The source to filter on.
+            source_prefix: The prefix of the source to filter on.
+            spatial_area: The spatial area to filter on.
+            spatial_point: The spatial point to filter on.
+            start_date_time: The start date time to filter on.
+            start_date_time_prefix: The prefix of the start date time to filter on.
+            submitter_name: The submitter name to filter on.
+            submitter_name_prefix: The prefix of the submitter name to filter on.
+            min_surface_grid_convergence: The minimum value of the surface grid convergence to filter on.
+            max_surface_grid_convergence: The maximum value of the surface grid convergence to filter on.
+            min_surface_scale_factor: The minimum value of the surface scale factor to filter on.
+            max_surface_scale_factor: The maximum value of the surface scale factor to filter on.
+            survey_reference_identifier: The survey reference identifier to filter on.
+            survey_reference_identifier_prefix: The prefix of the survey reference identifier to filter on.
+            survey_tool_type_id: The survey tool type id to filter on.
+            survey_tool_type_id_prefix: The prefix of the survey tool type id to filter on.
+            survey_type: The survey type to filter on.
+            survey_type_prefix: The prefix of the survey type to filter on.
+            survey_version: The survey version to filter on.
+            survey_version_prefix: The prefix of the survey version to filter on.
+            min_tie_measured_depth: The minimum value of the tie measured depth to filter on.
+            max_tie_measured_depth: The maximum value of the tie measured depth to filter on.
+            min_tie_true_vertical_depth: The minimum value of the tie true vertical depth to filter on.
+            max_tie_true_vertical_depth: The maximum value of the tie true vertical depth to filter on.
+            min_top_depth_measured_depth: The minimum value of the top depth measured depth to filter on.
+            max_top_depth_measured_depth: The maximum value of the top depth measured depth to filter on.
+            min_tortuosity: The minimum value of the tortuosity to filter on.
+            max_tortuosity: The maximum value of the tortuosity to filter on.
+            vertical_measurement: The vertical measurement to filter on.
+            wellbore_id: The wellbore id to filter on.
+            wellbore_id_prefix: The prefix of the wellbore id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of wellbore trajectory data to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `artefacts`, `available_trajectory_station_properties`, `geo_contexts`, `lineage_assertions`, `name_aliases` or `technical_assurances` external ids for the wellbore trajectory data. Defaults to True.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             acquisition_date,
@@ -1308,6 +1906,107 @@ class WellboreTrajectoryDataAPI(
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> WellboreTrajectoryDataList:
+        """List/filter wellbore trajectory data
+
+        Args:
+            acquisition_date: The acquisition date to filter on.
+            acquisition_date_prefix: The prefix of the acquisition date to filter on.
+            acquisition_remark: The acquisition remark to filter on.
+            acquisition_remark_prefix: The prefix of the acquisition remark to filter on.
+            active_indicator: The active indicator to filter on.
+            applied_operations_date_time: The applied operations date time to filter on.
+            applied_operations_date_time_prefix: The prefix of the applied operations date time to filter on.
+            applied_operations_remarks: The applied operations remark to filter on.
+            applied_operations_remarks_prefix: The prefix of the applied operations remark to filter on.
+            applied_operations_user: The applied operations user to filter on.
+            applied_operations_user_prefix: The prefix of the applied operations user to filter on.
+            azimuth_reference_type: The azimuth reference type to filter on.
+            azimuth_reference_type_prefix: The prefix of the azimuth reference type to filter on.
+            min_base_depth_measured_depth: The minimum value of the base depth measured depth to filter on.
+            max_base_depth_measured_depth: The maximum value of the base depth measured depth to filter on.
+            calculation_method_type: The calculation method type to filter on.
+            calculation_method_type_prefix: The prefix of the calculation method type to filter on.
+            company_id: The company id to filter on.
+            company_id_prefix: The prefix of the company id to filter on.
+            creation_date_time: The creation date time to filter on.
+            creation_date_time_prefix: The prefix of the creation date time to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            end_date_time: The end date time to filter on.
+            end_date_time_prefix: The prefix of the end date time to filter on.
+            existence_kind: The existence kind to filter on.
+            existence_kind_prefix: The prefix of the existence kind to filter on.
+            min_extrapolated_measured_depth: The minimum value of the extrapolated measured depth to filter on.
+            max_extrapolated_measured_depth: The maximum value of the extrapolated measured depth to filter on.
+            extrapolated_measured_depth_remark: The extrapolated measured depth remark to filter on.
+            extrapolated_measured_depth_remark_prefix: The prefix of the extrapolated measured depth remark to filter on.
+            geographic_crsid: The geographic crsid to filter on.
+            geographic_crsid_prefix: The prefix of the geographic crsid to filter on.
+            is_discoverable: The is discoverable to filter on.
+            is_extended_load: The is extended load to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            projected_crsid: The projected crsid to filter on.
+            projected_crsid_prefix: The prefix of the projected crsid to filter on.
+            resource_curation_status: The resource curation status to filter on.
+            resource_curation_status_prefix: The prefix of the resource curation status to filter on.
+            resource_home_region_id: The resource home region id to filter on.
+            resource_home_region_id_prefix: The prefix of the resource home region id to filter on.
+            resource_lifecycle_status: The resource lifecycle status to filter on.
+            resource_lifecycle_status_prefix: The prefix of the resource lifecycle status to filter on.
+            resource_security_classification: The resource security classification to filter on.
+            resource_security_classification_prefix: The prefix of the resource security classification to filter on.
+            service_company_id: The service company id to filter on.
+            service_company_id_prefix: The prefix of the service company id to filter on.
+            source: The source to filter on.
+            source_prefix: The prefix of the source to filter on.
+            spatial_area: The spatial area to filter on.
+            spatial_point: The spatial point to filter on.
+            start_date_time: The start date time to filter on.
+            start_date_time_prefix: The prefix of the start date time to filter on.
+            submitter_name: The submitter name to filter on.
+            submitter_name_prefix: The prefix of the submitter name to filter on.
+            min_surface_grid_convergence: The minimum value of the surface grid convergence to filter on.
+            max_surface_grid_convergence: The maximum value of the surface grid convergence to filter on.
+            min_surface_scale_factor: The minimum value of the surface scale factor to filter on.
+            max_surface_scale_factor: The maximum value of the surface scale factor to filter on.
+            survey_reference_identifier: The survey reference identifier to filter on.
+            survey_reference_identifier_prefix: The prefix of the survey reference identifier to filter on.
+            survey_tool_type_id: The survey tool type id to filter on.
+            survey_tool_type_id_prefix: The prefix of the survey tool type id to filter on.
+            survey_type: The survey type to filter on.
+            survey_type_prefix: The prefix of the survey type to filter on.
+            survey_version: The survey version to filter on.
+            survey_version_prefix: The prefix of the survey version to filter on.
+            min_tie_measured_depth: The minimum value of the tie measured depth to filter on.
+            max_tie_measured_depth: The maximum value of the tie measured depth to filter on.
+            min_tie_true_vertical_depth: The minimum value of the tie true vertical depth to filter on.
+            max_tie_true_vertical_depth: The maximum value of the tie true vertical depth to filter on.
+            min_top_depth_measured_depth: The minimum value of the top depth measured depth to filter on.
+            max_top_depth_measured_depth: The maximum value of the top depth measured depth to filter on.
+            min_tortuosity: The minimum value of the tortuosity to filter on.
+            max_tortuosity: The maximum value of the tortuosity to filter on.
+            vertical_measurement: The vertical measurement to filter on.
+            wellbore_id: The wellbore id to filter on.
+            wellbore_id_prefix: The prefix of the wellbore id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of wellbore trajectory data to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `artefacts`, `available_trajectory_station_properties`, `geo_contexts`, `lineage_assertions`, `name_aliases` or `technical_assurances` external ids for the wellbore trajectory data. Defaults to True.
+
+        Returns:
+            List of requested wellbore trajectory data
+
+        Examples:
+
+            List wellbore trajectory data and limit to 5:
+
+                >>> from osdu_wells_pydantic_v1.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> wellbore_trajectory_data = client.wellbore_trajectory_data.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             acquisition_date,

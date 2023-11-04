@@ -35,6 +35,26 @@ class PygenPoolAPI(TypeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
     def apply(
         self, pygen_pool: PygenPoolApply | Sequence[PygenPoolApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) pygen pools.
+
+        Args:
+            pygen_pool: Pygen pool or sequence of pygen pools to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new pygen_pool:
+
+                >>> from markets.client import MarketClient
+                >>> from markets.client.data_classes import PygenPoolApply
+                >>> client = MarketClient()
+                >>> pygen_pool = PygenPoolApply(external_id="my_pygen_pool", ...)
+                >>> result = client.pygen_pool.apply(pygen_pool)
+
+        """
         if isinstance(pygen_pool, PygenPoolApply):
             instances = pygen_pool.to_instances_apply(self._view_by_write_class)
         else:
@@ -47,7 +67,24 @@ class PygenPoolAPI(TypeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="market") -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | Sequence[str], space: str = "market") -> dm.InstancesDeleteResult:
+        """Delete one or more pygen pool.
+
+        Args:
+            external_id: External id of the pygen pool to delete.
+            space: The space where all the pygen pool are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete pygen_pool by id:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> client.pygen_pool.delete("my_pygen_pool")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -63,11 +100,29 @@ class PygenPoolAPI(TypeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
     def retrieve(self, external_id: Sequence[str]) -> PygenPoolList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> PygenPool | PygenPoolList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "market") -> PygenPool | PygenPoolList:
+        """Retrieve one or more pygen pools by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the pygen pools.
+            space: The space where all the pygen pools are located.
+
+        Returns:
+            The requested pygen pools.
+
+        Examples:
+
+            Retrieve pygen_pool by id:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> pygen_pool = client.pygen_pool.retrieve("my_pygen_pool")
+
+        """
         if isinstance(external_id, str):
-            return self._retrieve((self._sources.space, external_id))
+            return self._retrieve((space, external_id))
         else:
-            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(space, ext_id) for ext_id in external_id])
 
     def search(
         self,
@@ -84,6 +139,34 @@ class PygenPoolAPI(TypeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> PygenPoolList:
+        """Search pygen pools
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            min_day_of_week: The minimum value of the day of week to filter on.
+            max_day_of_week: The maximum value of the day of week to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            timezone: The timezone to filter on.
+            timezone_prefix: The prefix of the timezone to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of pygen pools to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results pygen pools matching the query.
+
+        Examples:
+
+           Search for 'my_pygen_pool' in all text properties:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> pygen_pools = client.pygen_pool.search('my_pygen_pool')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             min_day_of_week,
@@ -167,6 +250,38 @@ class PygenPoolAPI(TypeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across pygen pools
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            min_day_of_week: The minimum value of the day of week to filter on.
+            max_day_of_week: The maximum value of the day of week to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            timezone: The timezone to filter on.
+            timezone_prefix: The prefix of the timezone to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of pygen pools to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count pygen pools in space `my_space`:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> result = client.pygen_pool.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             min_day_of_week,
@@ -208,6 +323,28 @@ class PygenPoolAPI(TypeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for pygen pools
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            min_day_of_week: The minimum value of the day of week to filter on.
+            max_day_of_week: The maximum value of the day of week to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            timezone: The timezone to filter on.
+            timezone_prefix: The prefix of the timezone to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of pygen pools to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             min_day_of_week,
@@ -244,6 +381,32 @@ class PygenPoolAPI(TypeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> PygenPoolList:
+        """List/filter pygen pools
+
+        Args:
+            min_day_of_week: The minimum value of the day of week to filter on.
+            max_day_of_week: The maximum value of the day of week to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            timezone: The timezone to filter on.
+            timezone_prefix: The prefix of the timezone to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of pygen pools to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested pygen pools
+
+        Examples:
+
+            List pygen pools and limit to 5:
+
+                >>> from markets.client import MarketClient
+                >>> client = MarketClient()
+                >>> pygen_pools = client.pygen_pool.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             min_day_of_week,

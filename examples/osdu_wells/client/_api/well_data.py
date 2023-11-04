@@ -25,6 +25,24 @@ class WellDataFacilityEventsAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more facility_events edges by id(s) of a well datum.
+
+        Args:
+            external_id: External id or list of external ids source well datum.
+            space: The space where all the facility event edges are located.
+
+        Returns:
+            The requested facility event edges.
+
+        Examples:
+
+            Retrieve facility_events edge by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> well_datum = client.well_data.facility_events.retrieve("my_facility_events")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -49,6 +67,26 @@ class WellDataFacilityEventsAPI:
     def list(
         self, well_datum_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="IntegrationTestsImmutable"
     ) -> dm.EdgeList:
+        """List facility_events edges of a well datum.
+
+        Args:
+            well_datum_id: Id of the source well datum.
+            limit: Maximum number of facility event edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the facility event edges are located.
+
+        Returns:
+            The requested facility event edges.
+
+        Examples:
+
+            List 5 facility_events edges connected to "my_well_datum":
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> well_datum = client.well_data.facility_events.list("my_well_datum", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -72,6 +110,24 @@ class WellDataFacilityOperatorsAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more facility_operators edges by id(s) of a well datum.
+
+        Args:
+            external_id: External id or list of external ids source well datum.
+            space: The space where all the facility operator edges are located.
+
+        Returns:
+            The requested facility operator edges.
+
+        Examples:
+
+            Retrieve facility_operators edge by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> well_datum = client.well_data.facility_operators.retrieve("my_facility_operators")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -96,6 +152,26 @@ class WellDataFacilityOperatorsAPI:
     def list(
         self, well_datum_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="IntegrationTestsImmutable"
     ) -> dm.EdgeList:
+        """List facility_operators edges of a well datum.
+
+        Args:
+            well_datum_id: Id of the source well datum.
+            limit: Maximum number of facility operator edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the facility operator edges are located.
+
+        Returns:
+            The requested facility operator edges.
+
+        Examples:
+
+            List 5 facility_operators edges connected to "my_well_datum":
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> well_datum = client.well_data.facility_operators.list("my_well_datum", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -119,6 +195,24 @@ class WellDataFacilitySpecificationsAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more facility_specifications edges by id(s) of a well datum.
+
+        Args:
+            external_id: External id or list of external ids source well datum.
+            space: The space where all the facility specification edges are located.
+
+        Returns:
+            The requested facility specification edges.
+
+        Examples:
+
+            Retrieve facility_specifications edge by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> well_datum = client.well_data.facility_specifications.retrieve("my_facility_specifications")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -143,6 +237,26 @@ class WellDataFacilitySpecificationsAPI:
     def list(
         self, well_datum_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="IntegrationTestsImmutable"
     ) -> dm.EdgeList:
+        """List facility_specifications edges of a well datum.
+
+        Args:
+            well_datum_id: Id of the source well datum.
+            limit: Maximum number of facility specification edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the facility specification edges are located.
+
+        Returns:
+            The requested facility specification edges.
+
+        Examples:
+
+            List 5 facility_specifications edges connected to "my_well_datum":
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> well_datum = client.well_data.facility_specifications.list("my_well_datum", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -166,6 +280,24 @@ class WellDataFacilityStatesAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more facility_states edges by id(s) of a well datum.
+
+        Args:
+            external_id: External id or list of external ids source well datum.
+            space: The space where all the facility state edges are located.
+
+        Returns:
+            The requested facility state edges.
+
+        Examples:
+
+            Retrieve facility_states edge by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> well_datum = client.well_data.facility_states.retrieve("my_facility_states")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -190,6 +322,26 @@ class WellDataFacilityStatesAPI:
     def list(
         self, well_datum_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="IntegrationTestsImmutable"
     ) -> dm.EdgeList:
+        """List facility_states edges of a well datum.
+
+        Args:
+            well_datum_id: Id of the source well datum.
+            limit: Maximum number of facility state edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the facility state edges are located.
+
+        Returns:
+            The requested facility state edges.
+
+        Examples:
+
+            List 5 facility_states edges connected to "my_well_datum":
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> well_datum = client.well_data.facility_states.list("my_well_datum", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -213,6 +365,24 @@ class WellDataGeoContextsAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more geo_contexts edges by id(s) of a well datum.
+
+        Args:
+            external_id: External id or list of external ids source well datum.
+            space: The space where all the geo context edges are located.
+
+        Returns:
+            The requested geo context edges.
+
+        Examples:
+
+            Retrieve geo_contexts edge by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> well_datum = client.well_data.geo_contexts.retrieve("my_geo_contexts")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -237,6 +407,26 @@ class WellDataGeoContextsAPI:
     def list(
         self, well_datum_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="IntegrationTestsImmutable"
     ) -> dm.EdgeList:
+        """List geo_contexts edges of a well datum.
+
+        Args:
+            well_datum_id: Id of the source well datum.
+            limit: Maximum number of geo context edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the geo context edges are located.
+
+        Returns:
+            The requested geo context edges.
+
+        Examples:
+
+            List 5 geo_contexts edges connected to "my_well_datum":
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> well_datum = client.well_data.geo_contexts.list("my_well_datum", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -260,6 +450,24 @@ class WellDataHistoricalInterestsAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more historical_interests edges by id(s) of a well datum.
+
+        Args:
+            external_id: External id or list of external ids source well datum.
+            space: The space where all the historical interest edges are located.
+
+        Returns:
+            The requested historical interest edges.
+
+        Examples:
+
+            Retrieve historical_interests edge by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> well_datum = client.well_data.historical_interests.retrieve("my_historical_interests")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -284,6 +492,26 @@ class WellDataHistoricalInterestsAPI:
     def list(
         self, well_datum_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="IntegrationTestsImmutable"
     ) -> dm.EdgeList:
+        """List historical_interests edges of a well datum.
+
+        Args:
+            well_datum_id: Id of the source well datum.
+            limit: Maximum number of historical interest edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the historical interest edges are located.
+
+        Returns:
+            The requested historical interest edges.
+
+        Examples:
+
+            List 5 historical_interests edges connected to "my_well_datum":
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> well_datum = client.well_data.historical_interests.list("my_well_datum", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -307,6 +535,24 @@ class WellDataNameAliasesAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more name_aliases edges by id(s) of a well datum.
+
+        Args:
+            external_id: External id or list of external ids source well datum.
+            space: The space where all the name alias edges are located.
+
+        Returns:
+            The requested name alias edges.
+
+        Examples:
+
+            Retrieve name_aliases edge by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> well_datum = client.well_data.name_aliases.retrieve("my_name_aliases")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -331,6 +577,26 @@ class WellDataNameAliasesAPI:
     def list(
         self, well_datum_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="IntegrationTestsImmutable"
     ) -> dm.EdgeList:
+        """List name_aliases edges of a well datum.
+
+        Args:
+            well_datum_id: Id of the source well datum.
+            limit: Maximum number of name alias edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the name alias edges are located.
+
+        Returns:
+            The requested name alias edges.
+
+        Examples:
+
+            List 5 name_aliases edges connected to "my_well_datum":
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> well_datum = client.well_data.name_aliases.list("my_well_datum", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -354,6 +620,24 @@ class WellDataTechnicalAssurancesAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more technical_assurances edges by id(s) of a well datum.
+
+        Args:
+            external_id: External id or list of external ids source well datum.
+            space: The space where all the technical assurance edges are located.
+
+        Returns:
+            The requested technical assurance edges.
+
+        Examples:
+
+            Retrieve technical_assurances edge by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> well_datum = client.well_data.technical_assurances.retrieve("my_technical_assurances")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -378,6 +662,26 @@ class WellDataTechnicalAssurancesAPI:
     def list(
         self, well_datum_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="IntegrationTestsImmutable"
     ) -> dm.EdgeList:
+        """List technical_assurances edges of a well datum.
+
+        Args:
+            well_datum_id: Id of the source well datum.
+            limit: Maximum number of technical assurance edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the technical assurance edges are located.
+
+        Returns:
+            The requested technical assurance edges.
+
+        Examples:
+
+            List 5 technical_assurances edges connected to "my_well_datum":
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> well_datum = client.well_data.technical_assurances.list("my_well_datum", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -401,6 +705,24 @@ class WellDataVerticalMeasurementsAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more vertical_measurements edges by id(s) of a well datum.
+
+        Args:
+            external_id: External id or list of external ids source well datum.
+            space: The space where all the vertical measurement edges are located.
+
+        Returns:
+            The requested vertical measurement edges.
+
+        Examples:
+
+            Retrieve vertical_measurements edge by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> well_datum = client.well_data.vertical_measurements.retrieve("my_vertical_measurements")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -425,6 +747,26 @@ class WellDataVerticalMeasurementsAPI:
     def list(
         self, well_datum_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="IntegrationTestsImmutable"
     ) -> dm.EdgeList:
+        """List vertical_measurements edges of a well datum.
+
+        Args:
+            well_datum_id: Id of the source well datum.
+            limit: Maximum number of vertical measurement edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the vertical measurement edges are located.
+
+        Returns:
+            The requested vertical measurement edges.
+
+        Examples:
+
+            List 5 vertical_measurements edges connected to "my_well_datum":
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> well_datum = client.well_data.vertical_measurements.list("my_well_datum", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -468,6 +810,30 @@ class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
     def apply(
         self, well_datum: WellDataApply | Sequence[WellDataApply], replace: bool = False
     ) -> dm.InstancesApplyResult:
+        """Add or update (upsert) well data.
+
+        Note: This method iterates through all nodes linked to well_datum and create them including the edges
+        between the nodes. For example, if any of `facility_events`, `facility_operators`, `facility_specifications`, `facility_states`, `geo_contexts`, `historical_interests`, `name_aliases`, `technical_assurances` or `vertical_measurements` are set, then these
+        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+
+        Args:
+            well_datum: Well datum or sequence of well data to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new well_datum:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> from osdu_wells.client.data_classes import WellDataApply
+                >>> client = OSDUClient()
+                >>> well_datum = WellDataApply(external_id="my_well_datum", ...)
+                >>> result = client.well_data.apply(well_datum)
+
+        """
         if isinstance(well_datum, WellDataApply):
             instances = well_datum.to_instances_apply(self._view_by_write_class)
         else:
@@ -480,7 +846,26 @@ class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more well datum.
+
+        Args:
+            external_id: External id of the well datum to delete.
+            space: The space where all the well datum are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete well_datum by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> client.well_data.delete("my_well_datum")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -496,9 +881,29 @@ class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
     def retrieve(self, external_id: Sequence[str]) -> WellDataList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> WellData | WellDataList:
+    def retrieve(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> WellData | WellDataList:
+        """Retrieve one or more well data by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the well data.
+            space: The space where all the well data are located.
+
+        Returns:
+            The requested well data.
+
+        Examples:
+
+            Retrieve well_datum by id:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> well_datum = client.well_data.retrieve("my_well_datum")
+
+        """
         if isinstance(external_id, str):
-            well_datum = self._retrieve((self._sources.space, external_id))
+            well_datum = self._retrieve((space, external_id))
 
             facility_event_edges = self.facility_events.retrieve(external_id)
             well_datum.facility_events = [edge.end_node.external_id for edge in facility_event_edges]
@@ -521,7 +926,7 @@ class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
 
             return well_datum
         else:
-            well_data = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            well_data = self._retrieve([(space, ext_id) for ext_id in external_id])
 
             facility_event_edges = self.facility_events.retrieve(external_id)
             self._set_facility_events(well_data, facility_event_edges)
@@ -606,6 +1011,82 @@ class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> WellDataList:
+        """Search well data
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            business_intention_id: The business intention id to filter on.
+            business_intention_id_prefix: The prefix of the business intention id to filter on.
+            condition_id: The condition id to filter on.
+            condition_id_prefix: The prefix of the condition id to filter on.
+            current_operator_id: The current operator id to filter on.
+            current_operator_id_prefix: The prefix of the current operator id to filter on.
+            data_source_organisation_id: The data source organisation id to filter on.
+            data_source_organisation_id_prefix: The prefix of the data source organisation id to filter on.
+            default_vertical_crsid: The default vertical crsid to filter on.
+            default_vertical_crsid_prefix: The prefix of the default vertical crsid to filter on.
+            default_vertical_measurement_id: The default vertical measurement id to filter on.
+            default_vertical_measurement_id_prefix: The prefix of the default vertical measurement id to filter on.
+            existence_kind: The existence kind to filter on.
+            existence_kind_prefix: The prefix of the existence kind to filter on.
+            facility_description: The facility description to filter on.
+            facility_description_prefix: The prefix of the facility description to filter on.
+            facility_id: The facility id to filter on.
+            facility_id_prefix: The prefix of the facility id to filter on.
+            facility_name: The facility name to filter on.
+            facility_name_prefix: The prefix of the facility name to filter on.
+            facility_type_id: The facility type id to filter on.
+            facility_type_id_prefix: The prefix of the facility type id to filter on.
+            initial_operator_id: The initial operator id to filter on.
+            initial_operator_id_prefix: The prefix of the initial operator id to filter on.
+            interest_type_id: The interest type id to filter on.
+            interest_type_id_prefix: The prefix of the interest type id to filter on.
+            operating_environment_id: The operating environment id to filter on.
+            operating_environment_id_prefix: The prefix of the operating environment id to filter on.
+            outcome_id: The outcome id to filter on.
+            outcome_id_prefix: The prefix of the outcome id to filter on.
+            resource_curation_status: The resource curation status to filter on.
+            resource_curation_status_prefix: The prefix of the resource curation status to filter on.
+            resource_home_region_id: The resource home region id to filter on.
+            resource_home_region_id_prefix: The prefix of the resource home region id to filter on.
+            resource_lifecycle_status: The resource lifecycle status to filter on.
+            resource_lifecycle_status_prefix: The prefix of the resource lifecycle status to filter on.
+            resource_security_classification: The resource security classification to filter on.
+            resource_security_classification_prefix: The prefix of the resource security classification to filter on.
+            role_id: The role id to filter on.
+            role_id_prefix: The prefix of the role id to filter on.
+            source: The source to filter on.
+            source_prefix: The prefix of the source to filter on.
+            spatial_location: The spatial location to filter on.
+            status_summary_id: The status summary id to filter on.
+            status_summary_id_prefix: The prefix of the status summary id to filter on.
+            technical_assurance_type_id: The technical assurance type id to filter on.
+            technical_assurance_type_id_prefix: The prefix of the technical assurance type id to filter on.
+            version_creation_reason: The version creation reason to filter on.
+            version_creation_reason_prefix: The prefix of the version creation reason to filter on.
+            was_business_interest_financial_non_operated: The was business interest financial non operated to filter on.
+            was_business_interest_financial_operated: The was business interest financial operated to filter on.
+            was_business_interest_obligatory: The was business interest obligatory to filter on.
+            was_business_interest_technical: The was business interest technical to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of well data to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `facility_events`, `facility_operators`, `facility_specifications`, `facility_states`, `geo_contexts`, `historical_interests`, `name_aliases`, `technical_assurances` or `vertical_measurements` external ids for the well data. Defaults to True.
+
+        Returns:
+            Search results well data matching the query.
+
+        Examples:
+
+           Search for 'my_well_datum' in all text properties:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> well_data = client.well_data.search('my_well_datum')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             business_intention_id,
@@ -877,6 +1358,86 @@ class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across well data
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            business_intention_id: The business intention id to filter on.
+            business_intention_id_prefix: The prefix of the business intention id to filter on.
+            condition_id: The condition id to filter on.
+            condition_id_prefix: The prefix of the condition id to filter on.
+            current_operator_id: The current operator id to filter on.
+            current_operator_id_prefix: The prefix of the current operator id to filter on.
+            data_source_organisation_id: The data source organisation id to filter on.
+            data_source_organisation_id_prefix: The prefix of the data source organisation id to filter on.
+            default_vertical_crsid: The default vertical crsid to filter on.
+            default_vertical_crsid_prefix: The prefix of the default vertical crsid to filter on.
+            default_vertical_measurement_id: The default vertical measurement id to filter on.
+            default_vertical_measurement_id_prefix: The prefix of the default vertical measurement id to filter on.
+            existence_kind: The existence kind to filter on.
+            existence_kind_prefix: The prefix of the existence kind to filter on.
+            facility_description: The facility description to filter on.
+            facility_description_prefix: The prefix of the facility description to filter on.
+            facility_id: The facility id to filter on.
+            facility_id_prefix: The prefix of the facility id to filter on.
+            facility_name: The facility name to filter on.
+            facility_name_prefix: The prefix of the facility name to filter on.
+            facility_type_id: The facility type id to filter on.
+            facility_type_id_prefix: The prefix of the facility type id to filter on.
+            initial_operator_id: The initial operator id to filter on.
+            initial_operator_id_prefix: The prefix of the initial operator id to filter on.
+            interest_type_id: The interest type id to filter on.
+            interest_type_id_prefix: The prefix of the interest type id to filter on.
+            operating_environment_id: The operating environment id to filter on.
+            operating_environment_id_prefix: The prefix of the operating environment id to filter on.
+            outcome_id: The outcome id to filter on.
+            outcome_id_prefix: The prefix of the outcome id to filter on.
+            resource_curation_status: The resource curation status to filter on.
+            resource_curation_status_prefix: The prefix of the resource curation status to filter on.
+            resource_home_region_id: The resource home region id to filter on.
+            resource_home_region_id_prefix: The prefix of the resource home region id to filter on.
+            resource_lifecycle_status: The resource lifecycle status to filter on.
+            resource_lifecycle_status_prefix: The prefix of the resource lifecycle status to filter on.
+            resource_security_classification: The resource security classification to filter on.
+            resource_security_classification_prefix: The prefix of the resource security classification to filter on.
+            role_id: The role id to filter on.
+            role_id_prefix: The prefix of the role id to filter on.
+            source: The source to filter on.
+            source_prefix: The prefix of the source to filter on.
+            spatial_location: The spatial location to filter on.
+            status_summary_id: The status summary id to filter on.
+            status_summary_id_prefix: The prefix of the status summary id to filter on.
+            technical_assurance_type_id: The technical assurance type id to filter on.
+            technical_assurance_type_id_prefix: The prefix of the technical assurance type id to filter on.
+            version_creation_reason: The version creation reason to filter on.
+            version_creation_reason_prefix: The prefix of the version creation reason to filter on.
+            was_business_interest_financial_non_operated: The was business interest financial non operated to filter on.
+            was_business_interest_financial_operated: The was business interest financial operated to filter on.
+            was_business_interest_obligatory: The was business interest obligatory to filter on.
+            was_business_interest_technical: The was business interest technical to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of well data to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `facility_events`, `facility_operators`, `facility_specifications`, `facility_states`, `geo_contexts`, `historical_interests`, `name_aliases`, `technical_assurances` or `vertical_measurements` external ids for the well data. Defaults to True.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count well data in space `my_space`:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> result = client.well_data.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             business_intention_id,
@@ -1012,6 +1573,76 @@ class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for well data
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            business_intention_id: The business intention id to filter on.
+            business_intention_id_prefix: The prefix of the business intention id to filter on.
+            condition_id: The condition id to filter on.
+            condition_id_prefix: The prefix of the condition id to filter on.
+            current_operator_id: The current operator id to filter on.
+            current_operator_id_prefix: The prefix of the current operator id to filter on.
+            data_source_organisation_id: The data source organisation id to filter on.
+            data_source_organisation_id_prefix: The prefix of the data source organisation id to filter on.
+            default_vertical_crsid: The default vertical crsid to filter on.
+            default_vertical_crsid_prefix: The prefix of the default vertical crsid to filter on.
+            default_vertical_measurement_id: The default vertical measurement id to filter on.
+            default_vertical_measurement_id_prefix: The prefix of the default vertical measurement id to filter on.
+            existence_kind: The existence kind to filter on.
+            existence_kind_prefix: The prefix of the existence kind to filter on.
+            facility_description: The facility description to filter on.
+            facility_description_prefix: The prefix of the facility description to filter on.
+            facility_id: The facility id to filter on.
+            facility_id_prefix: The prefix of the facility id to filter on.
+            facility_name: The facility name to filter on.
+            facility_name_prefix: The prefix of the facility name to filter on.
+            facility_type_id: The facility type id to filter on.
+            facility_type_id_prefix: The prefix of the facility type id to filter on.
+            initial_operator_id: The initial operator id to filter on.
+            initial_operator_id_prefix: The prefix of the initial operator id to filter on.
+            interest_type_id: The interest type id to filter on.
+            interest_type_id_prefix: The prefix of the interest type id to filter on.
+            operating_environment_id: The operating environment id to filter on.
+            operating_environment_id_prefix: The prefix of the operating environment id to filter on.
+            outcome_id: The outcome id to filter on.
+            outcome_id_prefix: The prefix of the outcome id to filter on.
+            resource_curation_status: The resource curation status to filter on.
+            resource_curation_status_prefix: The prefix of the resource curation status to filter on.
+            resource_home_region_id: The resource home region id to filter on.
+            resource_home_region_id_prefix: The prefix of the resource home region id to filter on.
+            resource_lifecycle_status: The resource lifecycle status to filter on.
+            resource_lifecycle_status_prefix: The prefix of the resource lifecycle status to filter on.
+            resource_security_classification: The resource security classification to filter on.
+            resource_security_classification_prefix: The prefix of the resource security classification to filter on.
+            role_id: The role id to filter on.
+            role_id_prefix: The prefix of the role id to filter on.
+            source: The source to filter on.
+            source_prefix: The prefix of the source to filter on.
+            spatial_location: The spatial location to filter on.
+            status_summary_id: The status summary id to filter on.
+            status_summary_id_prefix: The prefix of the status summary id to filter on.
+            technical_assurance_type_id: The technical assurance type id to filter on.
+            technical_assurance_type_id_prefix: The prefix of the technical assurance type id to filter on.
+            version_creation_reason: The version creation reason to filter on.
+            version_creation_reason_prefix: The prefix of the version creation reason to filter on.
+            was_business_interest_financial_non_operated: The was business interest financial non operated to filter on.
+            was_business_interest_financial_operated: The was business interest financial operated to filter on.
+            was_business_interest_obligatory: The was business interest obligatory to filter on.
+            was_business_interest_technical: The was business interest technical to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of well data to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `facility_events`, `facility_operators`, `facility_specifications`, `facility_states`, `geo_contexts`, `historical_interests`, `name_aliases`, `technical_assurances` or `vertical_measurements` external ids for the well data. Defaults to True.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             business_intention_id,
@@ -1143,6 +1774,80 @@ class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> WellDataList:
+        """List/filter well data
+
+        Args:
+            business_intention_id: The business intention id to filter on.
+            business_intention_id_prefix: The prefix of the business intention id to filter on.
+            condition_id: The condition id to filter on.
+            condition_id_prefix: The prefix of the condition id to filter on.
+            current_operator_id: The current operator id to filter on.
+            current_operator_id_prefix: The prefix of the current operator id to filter on.
+            data_source_organisation_id: The data source organisation id to filter on.
+            data_source_organisation_id_prefix: The prefix of the data source organisation id to filter on.
+            default_vertical_crsid: The default vertical crsid to filter on.
+            default_vertical_crsid_prefix: The prefix of the default vertical crsid to filter on.
+            default_vertical_measurement_id: The default vertical measurement id to filter on.
+            default_vertical_measurement_id_prefix: The prefix of the default vertical measurement id to filter on.
+            existence_kind: The existence kind to filter on.
+            existence_kind_prefix: The prefix of the existence kind to filter on.
+            facility_description: The facility description to filter on.
+            facility_description_prefix: The prefix of the facility description to filter on.
+            facility_id: The facility id to filter on.
+            facility_id_prefix: The prefix of the facility id to filter on.
+            facility_name: The facility name to filter on.
+            facility_name_prefix: The prefix of the facility name to filter on.
+            facility_type_id: The facility type id to filter on.
+            facility_type_id_prefix: The prefix of the facility type id to filter on.
+            initial_operator_id: The initial operator id to filter on.
+            initial_operator_id_prefix: The prefix of the initial operator id to filter on.
+            interest_type_id: The interest type id to filter on.
+            interest_type_id_prefix: The prefix of the interest type id to filter on.
+            operating_environment_id: The operating environment id to filter on.
+            operating_environment_id_prefix: The prefix of the operating environment id to filter on.
+            outcome_id: The outcome id to filter on.
+            outcome_id_prefix: The prefix of the outcome id to filter on.
+            resource_curation_status: The resource curation status to filter on.
+            resource_curation_status_prefix: The prefix of the resource curation status to filter on.
+            resource_home_region_id: The resource home region id to filter on.
+            resource_home_region_id_prefix: The prefix of the resource home region id to filter on.
+            resource_lifecycle_status: The resource lifecycle status to filter on.
+            resource_lifecycle_status_prefix: The prefix of the resource lifecycle status to filter on.
+            resource_security_classification: The resource security classification to filter on.
+            resource_security_classification_prefix: The prefix of the resource security classification to filter on.
+            role_id: The role id to filter on.
+            role_id_prefix: The prefix of the role id to filter on.
+            source: The source to filter on.
+            source_prefix: The prefix of the source to filter on.
+            spatial_location: The spatial location to filter on.
+            status_summary_id: The status summary id to filter on.
+            status_summary_id_prefix: The prefix of the status summary id to filter on.
+            technical_assurance_type_id: The technical assurance type id to filter on.
+            technical_assurance_type_id_prefix: The prefix of the technical assurance type id to filter on.
+            version_creation_reason: The version creation reason to filter on.
+            version_creation_reason_prefix: The prefix of the version creation reason to filter on.
+            was_business_interest_financial_non_operated: The was business interest financial non operated to filter on.
+            was_business_interest_financial_operated: The was business interest financial operated to filter on.
+            was_business_interest_obligatory: The was business interest obligatory to filter on.
+            was_business_interest_technical: The was business interest technical to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of well data to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `facility_events`, `facility_operators`, `facility_specifications`, `facility_states`, `geo_contexts`, `historical_interests`, `name_aliases`, `technical_assurances` or `vertical_measurements` external ids for the well data. Defaults to True.
+
+        Returns:
+            List of requested well data
+
+        Examples:
+
+            List well data and limit to 5:
+
+                >>> from osdu_wells.client import OSDUClient
+                >>> client = OSDUClient()
+                >>> well_data = client.well_data.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             business_intention_id,

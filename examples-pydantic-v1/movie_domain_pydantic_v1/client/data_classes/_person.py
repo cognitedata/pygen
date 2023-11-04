@@ -23,12 +23,29 @@ _PERSON_PROPERTIES_BY_FIELD = {
 
 
 class Person(DomainModel):
+    """This represent a read version of person.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the person.
+        birth_year: The birth year field.
+        name: The name field.
+        roles: The role field.
+        created_time: The created time of the person node.
+        last_updated_time: The last updated time of the person node.
+        deleted_time: If present, the deleted time of the person node.
+        version: The version of the person node.
+    """
+
     space: str = "IntegrationTestsImmutable"
     birth_year: Optional[int] = Field(None, alias="birthYear")
     name: Optional[str] = None
     roles: Optional[list[str]] = None
 
     def as_apply(self) -> PersonApply:
+        """Convert this read version of person to a write version."""
         return PersonApply(
             space=self.space,
             external_id=self.external_id,
@@ -39,6 +56,22 @@ class Person(DomainModel):
 
 
 class PersonApply(DomainModelApply):
+    """This represent a write version of person.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the person.
+        birth_year: The birth year field.
+        name: The name field.
+        roles: The role field.
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "IntegrationTestsImmutable"
     birth_year: Optional[int] = Field(None, alias="birthYear")
     name: str
@@ -105,11 +138,16 @@ class PersonApply(DomainModelApply):
 
 
 class PersonList(TypeList[Person]):
+    """List of persons in read version."""
+
     _NODE = Person
 
     def as_apply(self) -> PersonApplyList:
+        """Convert this read version of person to a write version."""
         return PersonApplyList([node.as_apply() for node in self.data])
 
 
 class PersonApplyList(TypeApplyList[PersonApply]):
+    """List of persons in write version."""
+
     _NODE = PersonApply

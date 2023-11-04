@@ -34,6 +34,26 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
         self._view_by_write_class = view_by_write_class
 
     def apply(self, case: CaseApply | Sequence[CaseApply], replace: bool = False) -> dm.InstancesApplyResult:
+        """Add or update (upsert) cases.
+
+        Args:
+            case: Case or sequence of cases to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new case:
+
+                >>> from shop.client import ShopClient
+                >>> from shop.client.data_classes import CaseApply
+                >>> client = ShopClient()
+                >>> case = CaseApply(external_id="my_case", ...)
+                >>> result = client.case.apply(case)
+
+        """
         if isinstance(case, CaseApply):
             instances = case.to_instances_apply(self._view_by_write_class)
         else:
@@ -46,7 +66,26 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more case.
+
+        Args:
+            external_id: External id of the case to delete.
+            space: The space where all the case are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete case by id:
+
+                >>> from shop.client import ShopClient
+                >>> client = ShopClient()
+                >>> client.case.delete("my_case")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -62,11 +101,29 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
     def retrieve(self, external_id: Sequence[str]) -> CaseList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> Case | CaseList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> Case | CaseList:
+        """Retrieve one or more cases by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the cases.
+            space: The space where all the cases are located.
+
+        Returns:
+            The requested cases.
+
+        Examples:
+
+            Retrieve case by id:
+
+                >>> from shop.client import ShopClient
+                >>> client = ShopClient()
+                >>> case = client.case.retrieve("my_case")
+
+        """
         if isinstance(external_id, str):
-            return self._retrieve((self._sources.space, external_id))
+            return self._retrieve((space, external_id))
         else:
-            return self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            return self._retrieve([(space, ext_id) for ext_id in external_id])
 
     def search(
         self,
@@ -90,6 +147,41 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> CaseList:
+        """Search cases
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            arguments: The argument to filter on.
+            arguments_prefix: The prefix of the argument to filter on.
+            commands: The command to filter on.
+            min_end_time: The minimum value of the end time to filter on.
+            max_end_time: The maximum value of the end time to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            run_status: The run status to filter on.
+            run_status_prefix: The prefix of the run status to filter on.
+            scenario: The scenario to filter on.
+            scenario_prefix: The prefix of the scenario to filter on.
+            min_start_time: The minimum value of the start time to filter on.
+            max_start_time: The maximum value of the start time to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of cases to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results cases matching the query.
+
+        Examples:
+
+           Search for 'my_case' in all text properties:
+
+                >>> from shop.client import ShopClient
+                >>> client = ShopClient()
+                >>> cases = client.case.search('my_case')
+
+        """
         filter_ = _create_filter(
             self._view_id,
             arguments,
@@ -201,6 +293,45 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across cases
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            arguments: The argument to filter on.
+            arguments_prefix: The prefix of the argument to filter on.
+            commands: The command to filter on.
+            min_end_time: The minimum value of the end time to filter on.
+            max_end_time: The maximum value of the end time to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            run_status: The run status to filter on.
+            run_status_prefix: The prefix of the run status to filter on.
+            scenario: The scenario to filter on.
+            scenario_prefix: The prefix of the scenario to filter on.
+            min_start_time: The minimum value of the start time to filter on.
+            max_start_time: The maximum value of the start time to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of cases to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count cases in space `my_space`:
+
+                >>> from shop.client import ShopClient
+                >>> client = ShopClient()
+                >>> result = client.case.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             arguments,
@@ -256,6 +387,35 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for cases
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            arguments: The argument to filter on.
+            arguments_prefix: The prefix of the argument to filter on.
+            commands: The command to filter on.
+            min_end_time: The minimum value of the end time to filter on.
+            max_end_time: The maximum value of the end time to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            run_status: The run status to filter on.
+            run_status_prefix: The prefix of the run status to filter on.
+            scenario: The scenario to filter on.
+            scenario_prefix: The prefix of the scenario to filter on.
+            min_start_time: The minimum value of the start time to filter on.
+            max_start_time: The maximum value of the start time to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of cases to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             arguments,
@@ -306,6 +466,39 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> CaseList:
+        """List/filter cases
+
+        Args:
+            arguments: The argument to filter on.
+            arguments_prefix: The prefix of the argument to filter on.
+            commands: The command to filter on.
+            min_end_time: The minimum value of the end time to filter on.
+            max_end_time: The maximum value of the end time to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            run_status: The run status to filter on.
+            run_status_prefix: The prefix of the run status to filter on.
+            scenario: The scenario to filter on.
+            scenario_prefix: The prefix of the scenario to filter on.
+            min_start_time: The minimum value of the start time to filter on.
+            max_start_time: The maximum value of the start time to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of cases to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            List of requested cases
+
+        Examples:
+
+            List cases and limit to 5:
+
+                >>> from shop.client import ShopClient
+                >>> client = ShopClient()
+                >>> cases = client.case.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             arguments,

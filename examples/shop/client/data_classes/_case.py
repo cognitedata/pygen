@@ -33,6 +33,29 @@ _CASE_PROPERTIES_BY_FIELD = {
 
 
 class Case(DomainModel):
+    """This represent a read version of case.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the case.
+        arguments: The argument field.
+        bid: The bid field.
+        bid_history: The bid history field.
+        commands: The command field.
+        cut_files: The cut file field.
+        end_time: The end time field.
+        name: The name field.
+        run_status: The run status field.
+        scenario: The scenario field.
+        start_time: The start time field.
+        created_time: The created time of the case node.
+        last_updated_time: The last updated time of the case node.
+        deleted_time: If present, the deleted time of the case node.
+        version: The version of the case node.
+    """
+
     space: str = "IntegrationTestsImmutable"
     arguments: Optional[str] = None
     bid: Optional[str] = None
@@ -46,6 +69,7 @@ class Case(DomainModel):
     start_time: Optional[datetime.datetime] = None
 
     def as_apply(self) -> CaseApply:
+        """Convert this read version of case to a write version."""
         return CaseApply(
             space=self.space,
             external_id=self.external_id,
@@ -63,6 +87,29 @@ class Case(DomainModel):
 
 
 class CaseApply(DomainModelApply):
+    """This represent a write version of case.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the case.
+        arguments: The argument field.
+        bid: The bid field.
+        bid_history: The bid history field.
+        commands: The command field.
+        cut_files: The cut file field.
+        end_time: The end time field.
+        name: The name field.
+        run_status: The run status field.
+        scenario: The scenario field.
+        start_time: The start time field.
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "IntegrationTestsImmutable"
     arguments: Optional[str] = None
     bid: Optional[str] = None
@@ -133,11 +180,16 @@ class CaseApply(DomainModelApply):
 
 
 class CaseList(TypeList[Case]):
+    """List of cases in read version."""
+
     _NODE = Case
 
     def as_apply(self) -> CaseApplyList:
+        """Convert this read version of case to a write version."""
         return CaseApplyList([node.as_apply() for node in self.data])
 
 
 class CaseApplyList(TypeApplyList[CaseApply]):
+    """List of cases in write version."""
+
     _NODE = CaseApply

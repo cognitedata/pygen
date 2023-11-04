@@ -23,6 +23,24 @@ _COGPOOL_PROPERTIES_BY_FIELD = {
 
 
 class CogPool(DomainModel):
+    """This represent a read version of cog pool.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the cog pool.
+        max_price: The max price field.
+        min_price: The min price field.
+        name: The name field.
+        time_unit: The time unit field.
+        timezone: The timezone field.
+        created_time: The created time of the cog pool node.
+        last_updated_time: The last updated time of the cog pool node.
+        deleted_time: If present, the deleted time of the cog pool node.
+        version: The version of the cog pool node.
+    """
+
     space: str = "market"
     max_price: Optional[float] = Field(None, alias="maxPrice")
     min_price: Optional[float] = Field(None, alias="minPrice")
@@ -31,6 +49,7 @@ class CogPool(DomainModel):
     timezone: Optional[str] = None
 
     def as_apply(self) -> CogPoolApply:
+        """Convert this read version of cog pool to a write version."""
         return CogPoolApply(
             space=self.space,
             external_id=self.external_id,
@@ -43,6 +62,24 @@ class CogPool(DomainModel):
 
 
 class CogPoolApply(DomainModelApply):
+    """This represent a write version of cog pool.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the cog pool.
+        max_price: The max price field.
+        min_price: The min price field.
+        name: The name field.
+        time_unit: The time unit field.
+        timezone: The timezone field.
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "market"
     max_price: Optional[float] = Field(None, alias="maxPrice")
     min_price: Optional[float] = Field(None, alias="minPrice")
@@ -90,11 +127,16 @@ class CogPoolApply(DomainModelApply):
 
 
 class CogPoolList(TypeList[CogPool]):
+    """List of cog pools in read version."""
+
     _NODE = CogPool
 
     def as_apply(self) -> CogPoolApplyList:
+        """Convert this read version of cog pool to a write version."""
         return CogPoolApplyList([node.as_apply() for node in self.data])
 
 
 class CogPoolApplyList(TypeApplyList[CogPoolApply]):
+    """List of cog pools in write version."""
+
     _NODE = CogPoolApply

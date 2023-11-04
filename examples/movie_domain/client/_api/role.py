@@ -17,6 +17,24 @@ class RoleMoviesAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more movies edges by id(s) of a role.
+
+        Args:
+            external_id: External id or list of external ids source role.
+            space: The space where all the movie edges are located.
+
+        Returns:
+            The requested movie edges.
+
+        Examples:
+
+            Retrieve movies edge by id:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> role = client.role.movies.retrieve("my_movies")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -39,6 +57,26 @@ class RoleMoviesAPI:
     def list(
         self, role_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="IntegrationTestsImmutable"
     ) -> dm.EdgeList:
+        """List movies edges of a role.
+
+        Args:
+            role_id: Id of the source role.
+            limit: Maximum number of movie edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the movie edges are located.
+
+        Returns:
+            The requested movie edges.
+
+        Examples:
+
+            List 5 movies edges connected to "my_role":
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> role = client.role.movies.list("my_role", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -62,6 +100,24 @@ class RoleNominationAPI:
         self._client = client
 
     def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+        """Retrieve one or more nomination edges by id(s) of a role.
+
+        Args:
+            external_id: External id or list of external ids source role.
+            space: The space where all the nomination edges are located.
+
+        Returns:
+            The requested nomination edges.
+
+        Examples:
+
+            Retrieve nomination edge by id:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> role = client.role.nomination.retrieve("my_nomination")
+
+        """
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
@@ -84,6 +140,26 @@ class RoleNominationAPI:
     def list(
         self, role_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="IntegrationTestsImmutable"
     ) -> dm.EdgeList:
+        """List nomination edges of a role.
+
+        Args:
+            role_id: Id of the source role.
+            limit: Maximum number of nomination edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the nomination edges are located.
+
+        Returns:
+            The requested nomination edges.
+
+        Examples:
+
+            List 5 nomination edges connected to "my_role":
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> role = client.role.nomination.list("my_role", limit=5)
+
+        """
         f = dm.filters
         filters = []
         is_edge_type = f.Equals(
@@ -118,6 +194,30 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
         self.nomination = RoleNominationAPI(client)
 
     def apply(self, role: RoleApply | Sequence[RoleApply], replace: bool = False) -> dm.InstancesApplyResult:
+        """Add or update (upsert) roles.
+
+        Note: This method iterates through all nodes linked to role and create them including the edges
+        between the nodes. For example, if any of `movies` or `nomination` are set, then these
+        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+
+        Args:
+            role: Role or sequence of roles to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            Created instance(s), i.e., nodes and edges.
+
+        Examples:
+
+            Create a new role:
+
+                >>> from movie_domain.client import MovieClient
+                >>> from movie_domain.client.data_classes import RoleApply
+                >>> client = MovieClient()
+                >>> role = RoleApply(external_id="my_role", ...)
+                >>> result = client.role.apply(role)
+
+        """
         if isinstance(role, RoleApply):
             instances = role.to_instances_apply(self._view_by_write_class)
         else:
@@ -130,7 +230,26 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
             replace=replace,
         )
 
-    def delete(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more role.
+
+        Args:
+            external_id: External id of the role to delete.
+            space: The space where all the role are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete role by id:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> client.role.delete("my_role")
+        """
         if isinstance(external_id, str):
             return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         else:
@@ -146,9 +265,27 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
     def retrieve(self, external_id: Sequence[str]) -> RoleList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str]) -> Role | RoleList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> Role | RoleList:
+        """Retrieve one or more roles by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the roles.
+            space: The space where all the roles are located.
+
+        Returns:
+            The requested roles.
+
+        Examples:
+
+            Retrieve role by id:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> role = client.role.retrieve("my_role")
+
+        """
         if isinstance(external_id, str):
-            role = self._retrieve((self._sources.space, external_id))
+            role = self._retrieve((space, external_id))
 
             movie_edges = self.movies.retrieve(external_id)
             role.movies = [edge.end_node.external_id for edge in movie_edges]
@@ -157,7 +294,7 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
 
             return role
         else:
-            roles = self._retrieve([(self._sources.space, ext_id) for ext_id in external_id])
+            roles = self._retrieve([(space, ext_id) for ext_id in external_id])
 
             movie_edges = self.movies.retrieve(external_id)
             self._set_movies(roles, movie_edges)
@@ -217,6 +354,33 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across roles
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            person: The person to filter on.
+            won_oscar: The won oscar to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of roles to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `movies` or `nomination` external ids for the roles. Defaults to True.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count roles in space `my_space`:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> result = client.role.aggregate("count", space="my_space")
+
+        """
+
         filter_ = _create_filter(
             self._view_id,
             person,
@@ -248,6 +412,23 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for roles
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            person: The person to filter on.
+            won_oscar: The won oscar to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of roles to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `movies` or `nomination` external ids for the roles. Defaults to True.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
         filter_ = _create_filter(
             self._view_id,
             person,
@@ -277,6 +458,29 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
     ) -> RoleList:
+        """List/filter roles
+
+        Args:
+            person: The person to filter on.
+            won_oscar: The won oscar to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of roles to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `movies` or `nomination` external ids for the roles. Defaults to True.
+
+        Returns:
+            List of requested roles
+
+        Examples:
+
+            List roles and limit to 5:
+
+                >>> from movie_domain.client import MovieClient
+                >>> client = MovieClient()
+                >>> roles = client.role.list(limit=5)
+
+        """
         filter_ = _create_filter(
             self._view_id,
             person,

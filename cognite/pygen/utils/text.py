@@ -178,6 +178,30 @@ def to_snake(string: str, pluralize: bool = False, singularize: bool = False) ->
     return "_".join(map(str.lower, words))
 
 
+def to_words(string: str, pluralize: bool = False, singularize: bool = False):
+    """
+    Convert input string to words
+
+    Args:
+        string: The string to convert.
+        pluralize: Whether to pluralize the last word.
+        singularize: Whether to singularize the last word.
+    Returns:
+        words of the input string.
+
+    Examples:
+        >>> to_words("aB")
+        'a b'
+        >>> to_words('CamelCase')
+        'camel case'
+        >>> to_words('APM_Activity', pluralize=True)
+        'apm activities'
+        >>> to_words('APM_Activities', singularize=True)
+        'apm activity'
+    """
+    return to_snake(string, pluralize, singularize).replace("_", " ")
+
+
 # These are words which are not pluralized as we want to by inflect
 # Fox example, "person" becomes "people" instead of "persons", which is more grammatically correct, however,
 # "persons" is more consistent with the rest of the API.

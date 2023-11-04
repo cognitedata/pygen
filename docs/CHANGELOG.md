@@ -13,7 +13,13 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## [0.20.0] - 02-11-23
+## [0.30.0] - 04-11-23
+### Added
+* `pygen` now generates docstrings for all methods in the generated SDK. The docstrings are based on the
+  documentation in the data model.
+* Support for `target_unit` and `target_unit_system` in the generated SDK for `Timeseries` and `DataPoints`.
+
+## [0.29.0] - 02-11-23
 ### Added
 * Support for filtering on `space` in all filter methods.
 ### Fixed

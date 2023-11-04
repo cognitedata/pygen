@@ -1,0 +1,24 @@
+    def delete(self, external_id: str | Sequence[str], space: str ="{{ data_class.view_id.space }}") -> dm.InstancesDeleteResult:
+        """Delete one or more {{ data_class.doc_name }}.
+
+        Args:
+            external_id: External id of the {{ data_class.doc_name }} to delete.
+            space: The space where all the {{ data_class.doc_name }} are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete {{ data_class.variable }} by id:
+
+                >>> from {{ top_level_package }} import {{ client_name }}
+                >>> client = {{ client_name }}()
+                >>> client.{{ api_class.client_attribute }}.delete("my_{{ data_class.variable }}")
+        """
+        if isinstance(external_id, str):
+            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
+        else:
+            return self._client.data_modeling.instances.delete(
+                nodes=[(space, id) for id in external_id],
+            )

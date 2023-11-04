@@ -21,6 +21,23 @@ _DIRECTOR_PROPERTIES_BY_FIELD = {
 
 
 class Director(DomainModel):
+    """This represent a read version of director.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the director.
+        movies: The movie field.
+        nomination: The nomination field.
+        person: The person field.
+        won_oscar: The won oscar field.
+        created_time: The created time of the director node.
+        last_updated_time: The last updated time of the director node.
+        deleted_time: If present, the deleted time of the director node.
+        version: The version of the director node.
+    """
+
     space: str = "IntegrationTestsImmutable"
     movies: Optional[list[str]] = None
     nomination: Optional[list[str]] = None
@@ -28,6 +45,7 @@ class Director(DomainModel):
     won_oscar: Optional[bool] = Field(None, alias="wonOscar")
 
     def as_apply(self) -> DirectorApply:
+        """Convert this read version of director to a write version."""
         return DirectorApply(
             space=self.space,
             external_id=self.external_id,
@@ -39,6 +57,23 @@ class Director(DomainModel):
 
 
 class DirectorApply(DomainModelApply):
+    """This represent a write version of director.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the director.
+        movies: The movie field.
+        nomination: The nomination field.
+        person: The person field.
+        won_oscar: The won oscar field.
+        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     space: str = "IntegrationTestsImmutable"
     movies: Union[list[MovieApply], list[str], None] = Field(default=None, repr=False)
     nomination: Union[list[NominationApply], list[str], None] = Field(default=None, repr=False)
@@ -141,11 +176,16 @@ class DirectorApply(DomainModelApply):
 
 
 class DirectorList(TypeList[Director]):
+    """List of directors in read version."""
+
     _NODE = Director
 
     def as_apply(self) -> DirectorApplyList:
+        """Convert this read version of director to a write version."""
         return DirectorApplyList([node.as_apply() for node in self.data])
 
 
 class DirectorApplyList(TypeApplyList[DirectorApply]):
+    """List of directors in write version."""
+
     _NODE = DirectorApply
