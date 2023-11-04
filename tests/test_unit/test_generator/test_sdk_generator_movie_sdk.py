@@ -36,8 +36,13 @@ def top_level_package() -> str:
 
 
 @pytest.fixture
-def sdk_generator(movie_model, top_level_package) -> SDKGenerator:
-    return SDKGenerator(top_level_package, "MovieClient", movie_model)
+def client_name() -> str:
+    return "MovieClient"
+
+
+@pytest.fixture
+def sdk_generator(movie_model, top_level_package, client_name) -> SDKGenerator:
+    return SDKGenerator(top_level_package, client_name, movie_model)
 
 
 @pytest.fixture
@@ -305,13 +310,13 @@ def test_create_view_data_class_actors(
 
 
 def test_create_view_api_classes_actors(
-    actor_api_generator: APIGenerator, top_level_package: str, code_formatter: CodeFormatter
+    actor_api_generator: APIGenerator, top_level_package: str, client_name: str, code_formatter: CodeFormatter
 ):
     # Arrange
     expected = MovieSDKFiles.actors_api.read_text()
 
     # Act
-    actual = actor_api_generator.generate_api_file(top_level_package)
+    actual = actor_api_generator.generate_api_file(top_level_package, client_name)
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -319,13 +324,13 @@ def test_create_view_api_classes_actors(
 
 
 def test_create_view_api_classes_persons(
-    person_api_generator: APIGenerator, top_level_package: str, code_formatter: CodeFormatter
+    person_api_generator: APIGenerator, top_level_package: str, client_name: str, code_formatter: CodeFormatter
 ):
     # Arrange
     expected = MovieSDKFiles.persons_api.read_text()
 
     # Act
-    actual = person_api_generator.generate_api_file(top_level_package)
+    actual = person_api_generator.generate_api_file(top_level_package, client_name)
     actual = code_formatter.format_code(actual)
 
     # Assert

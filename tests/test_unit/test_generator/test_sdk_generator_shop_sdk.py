@@ -18,8 +18,13 @@ def top_level_package() -> str:
 
 
 @pytest.fixture
-def sdk_generator(shop_model: dm.DataModel, top_level_package: str):
-    return SDKGenerator(top_level_package, "ShopClient", shop_model)
+def client_name() -> str:
+    return "ShopClient"
+
+
+@pytest.fixture
+def sdk_generator(shop_model: dm.DataModel, top_level_package: str, client_name: str):
+    return SDKGenerator(top_level_package, client_name, shop_model)
 
 
 @pytest.fixture
@@ -65,7 +70,7 @@ def test_generate_data_class_file_command_configs(
 
 
 def test_create_view_api_classes_command_configs(
-    command_api_generator: APIGenerator, top_level_package: str, code_formatter: CodeFormatter
+    command_api_generator: APIGenerator, top_level_package: str, client_name: str, code_formatter: CodeFormatter
 ):
     # Arrange
     expected = ShopSDKFiles.command_configs_api.read_text()

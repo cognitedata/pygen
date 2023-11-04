@@ -1,21 +1,26 @@
     def apply(self, {{ data_class.variable }}: {{ data_class.write_name }} | Sequence[{{ data_class.write_name }}], replace: bool = False) -> dm.InstancesApplyResult:
-         """`Add or update (upsert) {{data_class.doc_name_plural}}. <https://developer.cognite.com/api#tag/Instances/operation/applyNodeAndEdges>`_
+        """Add or update (upsert) {{data_class.doc_name_plural}}.{% if data_class.has_one_to_many_edges %}
+
+        Note: This method iterates through all nodes linked to {{ data_class.variable }} and create them including the edges
+        between the nodes. For example, if any of {{ data_class.one_to_many_edges_docs }} are set, then these
+        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.{% endif %}
 
         Args:
-            {{ data_class.variable }} : Nodes to apply
-            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)? Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+            {{ data_class.variable }}: {{ data_class.doc_name.capitalize() }} or sequence of {{ data_class.doc_name_plural }} to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
             InstancesApplyResult: Created instance(s), i.e., nodes and edges.
 
         Examples:
 
-            Create new {{ data_class.variable }} without data:
+            Create a new {{ data_class.variable }}:
 
-                >>> from cognite.client import CogniteClient
-                >>> from cognite.client.data_classes.data_modeling import EdgeApply, NodeOrEdgeData, NodeApply
-                >>> c = CogniteClient()
-                >>> nodes = [NodeApply("mySpace", "myNodeId")]
-                >>> res = c.data_modeling.instances.apply(nodes)
+                >>> from {{ top_level_package }} import {{ client_name }}
+                >>> from {{ top_level_package }}.data_classes import {{ data_class.write_name }}
+                >>> client = {{ client_name }}()
+                >>> {{ data_class.variable }} = {{ data_class.write_name }}(external_id="my_external_id", ...)
+                >>> result = client.{{ api_class.client_attribute }}.apply({{ data_class.variable }})
 
         """
         if isinstance({{ data_class.variable }}, {{ data_class.write_name }}):

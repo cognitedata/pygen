@@ -527,6 +527,10 @@ class DataClass:
         return ", ".join(f'"{field_.name}"' for field_ in self.text_fields)
 
     @property
+    def one_to_many_edges_docs(self) -> str:
+        return ", ".join(f"`{field_.name}`" for field_ in self.one_to_many_edges)
+
+    @property
     def fields_literals(self) -> str:
         return ", ".join(f'"{field_.name}"' for field_ in self if isinstance(field_, PrimitiveFieldCore))
 
