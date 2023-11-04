@@ -16,7 +16,6 @@ from cognite.client.data_classes import FileMetadata, FileMetadataList, TimeSeri
 from cognite.client.data_classes._base import CogniteResource, T_CogniteResource, T_CogniteResourceList
 from cognite.client.data_classes.data_modeling import (
     ContainerId,
-    ContainerList,
     DataModel,
     DataModelIdentifier,
     DirectRelationReference,
@@ -32,6 +31,7 @@ from cognite.client.data_classes.data_modeling import (
     View,
     ViewList,
     data_types,
+    filters,
 )
 from cognite.client.exceptions import CogniteNotFoundError
 
@@ -609,29 +609,57 @@ def clean_model(client: CogniteClient, model_id: DataModelIdentifier, remove_spa
 
     """
     model = client.data_modeling.data_models.retrieve(model_id, inline_views=True).latest_version()
-    views = ViewList([view for view in model.views])
-    containers = ContainerList(
-        [prop.container for view in views for prop in view.properties.values() if isinstance(prop, MappedProperty)]
+    views = ViewList([view for view in model.views if not view.is_global])
+    containers = list(
+        {
+            prop.container
+            for view in views
+            for prop in (view.properties or {}).values()
+            if isinstance(prop, MappedProperty)
+        }
     )
 
     if containers:
-        deleted_containers = client.data_modeling.containers.delete(containers.as_ids())
+        deleted_containers = client.data_modeling.containers.delete(containers)
         print(f"Deleted {len(deleted_containers)} containers")
-    for _ in range(3):
-        deleted_views = client.data_modeling.views.delete(views.as_ids())
-        print(f"Deleted {len(deleted_views)} views")
+    if views:
+        for _ in range(3):
+            deleted_views = client.data_modeling.views.delete(views.as_ids())
+            print(f"Deleted {len(deleted_views)} views")
 
-        retrieved = client.data_modeling.views.retrieve(ids=views.as_ids())
-        if not retrieved:
-            break
-        # Views are not always successfully deleted on the first try, so we have a retry logic.
-        sleep(1)
+            retrieved = client.data_modeling.views.retrieve(ids=views.as_ids())
+            if not retrieved:
+                break
+            # Views are not always successfully deleted on the first try, so we have a retry logic.
+            sleep(1)
     deleted_model = client.data_modeling.data_models.delete(model_id)
     print(f"Deleted {len(deleted_model)} data models")
 
     if remove_space:
-        deleted_space = client.data_modeling.spaces.delete(model.space)
-        print(f"Deleted space {deleted_space}")
+        clean_space(client, model.space)
+
+
+def clean_space(client: CogniteClient, space: str) -> None:
+    is_source_space = filters.Equals(["edge", "startNode", "space"], space)
+    edges = client.data_modeling.instances.list("edge", limit=-1, filter=is_source_space)
+    is_space = filters.Equals(["node", "space"], space)
+    nodes = client.data_modeling.instances.list("node", limit=-1, filter=is_space)
+    if edges or nodes:
+        instances = client.data_modeling.instances.delete(nodes=nodes.as_ids(), edges=edges.as_ids())
+        print(f"Deleted {len(instances.nodes)} edges and {len(instances.nodes)} nodes")
+    views = client.data_modeling.views.list(limit=-1, space=space)
+    if views:
+        deleted_views = client.data_modeling.views.delete(views.as_ids())
+        print(f"Deleted {len(deleted_views)} views")
+    containers = client.data_modeling.containers.list(limit=-1, space=space)
+    if containers:
+        deleted_containers = client.data_modeling.containers.delete(containers.as_ids())
+        print(f"Deleted {len(deleted_containers)} containers")
+    if data_models := client.data_modeling.data_models.list(limit=-1, space=space):
+        deleted_data_models = client.data_modeling.data_models.delete(data_models.as_ids())
+        print(f"Deleted {len(deleted_data_models)} data models")
+    deleted_space = client.data_modeling.spaces.delete(space)
+    print(f"Deleted space {deleted_space}")
 
 
 def clean_model_interactive(client: CogniteClient, remove_space: bool = False) -> None:
@@ -652,11 +680,11 @@ def clean_model_interactive(client: CogniteClient, remove_space: bool = False) -
         return
     index = _user_options(spaces.as_ids())
     selected_space = spaces[index]
-    models = client.data_modeling.data_models.list(space=selected_space.name, limit=-1)
+    models = client.data_modeling.data_models.list(space=selected_space.space, limit=-1)
     if not models:
         print("No models found")
         return
-    index = _user_options([(model.external_id, model.version) for model in models])
+    index = _user_options([model.as_id() for model in models])
     selected_model = models[index]
     clean_model(client, selected_model.as_id(), remove_space)
 
