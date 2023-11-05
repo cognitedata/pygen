@@ -18,7 +18,7 @@ views:
     sourceId:
       container:
         space: IntegrationTestsImmutable
-        externalId: Sourceable
+        externalId: Checklist
       containerPropertyIdentifier: sourceId
       type:
         list: false
@@ -33,7 +33,7 @@ views:
     source:
       container:
         space: IntegrationTestsImmutable
-        externalId: Sourceable
+        externalId: Checklist
       containerPropertyIdentifier: source
       type:
         list: false
@@ -48,7 +48,7 @@ views:
     title:
       container:
         space: IntegrationTestsImmutable
-        externalId: Describable
+        externalId: Checklist
       containerPropertyIdentifier: title
       type:
         list: false
@@ -63,7 +63,7 @@ views:
     description:
       container:
         space: IntegrationTestsImmutable
-        externalId: Describable
+        externalId: Checklist
       containerPropertyIdentifier: description
       type:
         list: false
@@ -78,7 +78,7 @@ views:
     labels:
       container:
         space: IntegrationTestsImmutable
-        externalId: Describable
+        externalId: Checklist
       containerPropertyIdentifier: labels
       type:
         list: true
@@ -93,7 +93,7 @@ views:
     startTime:
       container:
         space: IntegrationTestsImmutable
-        externalId: Schedulable
+        externalId: Checklist
       containerPropertyIdentifier: startTime
       type:
         list: false
@@ -107,7 +107,7 @@ views:
     endTime:
       container:
         space: IntegrationTestsImmutable
-        externalId: Schedulable
+        externalId: Checklist
       containerPropertyIdentifier: endTime
       type:
         list: false
@@ -121,7 +121,7 @@ views:
     visibility:
       container:
         space: IntegrationTestsImmutable
-        externalId: Creatable
+        externalId: Checklist
       containerPropertyIdentifier: visibility
       type:
         list: false
@@ -136,12 +136,12 @@ views:
     createdBy:
       container:
         space: IntegrationTestsImmutable
-        externalId: Creatable
+        externalId: Checklist
       containerPropertyIdentifier: createdBy
       type:
         container:
           space: IntegrationTestsImmutable
-          externalId: CDF_User
+          externalId: Checklist
           type: container
         type: direct
         source:
@@ -156,12 +156,12 @@ views:
     updatedBy:
       container:
         space: IntegrationTestsImmutable
-        externalId: Creatable
+        externalId: Checklist
       containerPropertyIdentifier: updatedBy
       type:
         container:
           space: IntegrationTestsImmutable
-          externalId: CDF_User
+          externalId: Checklist
           type: container
         type: direct
         source:
@@ -176,7 +176,7 @@ views:
     isArchived:
       container:
         space: IntegrationTestsImmutable
-        externalId: Creatable
+        externalId: Checklist
       containerPropertyIdentifier: isArchived
       type:
         list: false
@@ -225,7 +225,7 @@ views:
       type:
         container:
           space: IntegrationTestsImmutable
-          externalId: Asset
+          externalId: Checklist
           type: container
         type: direct
         source:
@@ -281,7 +281,7 @@ views:
     sourceId:
       container:
         space: IntegrationTestsImmutable
-        externalId: Sourceable
+        externalId: ChecklistItem
       containerPropertyIdentifier: sourceId
       type:
         list: false
@@ -296,7 +296,7 @@ views:
     source:
       container:
         space: IntegrationTestsImmutable
-        externalId: Sourceable
+        externalId: ChecklistItem
       containerPropertyIdentifier: source
       type:
         list: false
@@ -311,7 +311,7 @@ views:
     title:
       container:
         space: IntegrationTestsImmutable
-        externalId: Describable
+        externalId: ChecklistItem
       containerPropertyIdentifier: title
       type:
         list: false
@@ -326,7 +326,7 @@ views:
     description:
       container:
         space: IntegrationTestsImmutable
-        externalId: Describable
+        externalId: ChecklistItem
       containerPropertyIdentifier: description
       type:
         list: false
@@ -341,7 +341,7 @@ views:
     labels:
       container:
         space: IntegrationTestsImmutable
-        externalId: Describable
+        externalId: ChecklistItem
       containerPropertyIdentifier: labels
       type:
         list: true
@@ -356,7 +356,7 @@ views:
     startTime:
       container:
         space: IntegrationTestsImmutable
-        externalId: Schedulable
+        externalId: ChecklistItem
       containerPropertyIdentifier: startTime
       type:
         list: false
@@ -370,7 +370,7 @@ views:
     endTime:
       container:
         space: IntegrationTestsImmutable
-        externalId: Schedulable
+        externalId: ChecklistItem
       containerPropertyIdentifier: endTime
       type:
         list: false
@@ -384,7 +384,7 @@ views:
     visibility:
       container:
         space: IntegrationTestsImmutable
-        externalId: Creatable
+        externalId: ChecklistItem
       containerPropertyIdentifier: visibility
       type:
         list: false
@@ -399,12 +399,12 @@ views:
     createdBy:
       container:
         space: IntegrationTestsImmutable
-        externalId: Creatable
+        externalId: ChecklistItem
       containerPropertyIdentifier: createdBy
       type:
         container:
           space: IntegrationTestsImmutable
-          externalId: CDF_User
+          externalId: ChecklistItem
           type: container
         type: direct
         source:
@@ -419,12 +419,12 @@ views:
     updatedBy:
       container:
         space: IntegrationTestsImmutable
-        externalId: Creatable
+        externalId: ChecklistItem
       containerPropertyIdentifier: updatedBy
       type:
         container:
           space: IntegrationTestsImmutable
-          externalId: CDF_User
+          externalId: ChecklistItem
           type: container
         type: direct
         source:
@@ -439,7 +439,7 @@ views:
     isArchived:
       container:
         space: IntegrationTestsImmutable
-        externalId: Creatable
+        externalId: ChecklistItem
       containerPropertyIdentifier: isArchived
       type:
         list: false
@@ -502,7 +502,7 @@ views:
       type:
         container:
           space: IntegrationTestsImmutable
-          externalId: Asset
+          externalId: ChecklistItem
           type: container
         type: direct
         source:
@@ -571,7 +571,7 @@ views:
     sourceId:
       container:
         space: IntegrationTestsImmutable
-        externalId: Sourceable
+        externalId: Observation
       containerPropertyIdentifier: sourceId
       type:
         list: false
@@ -586,7 +586,7 @@ views:
     source:
       container:
         space: IntegrationTestsImmutable
-        externalId: Sourceable
+        externalId: Observation
       containerPropertyIdentifier: source
       type:
         list: false
@@ -601,7 +601,7 @@ views:
     title:
       container:
         space: IntegrationTestsImmutable
-        externalId: Describable
+        externalId: Observation
       containerPropertyIdentifier: title
       type:
         list: false
@@ -616,7 +616,7 @@ views:
     description:
       container:
         space: IntegrationTestsImmutable
-        externalId: Describable
+        externalId: Observation
       containerPropertyIdentifier: description
       type:
         list: false
@@ -631,7 +631,7 @@ views:
     labels:
       container:
         space: IntegrationTestsImmutable
-        externalId: Describable
+        externalId: Observation
       containerPropertyIdentifier: labels
       type:
         list: true
@@ -646,7 +646,7 @@ views:
     visibility:
       container:
         space: IntegrationTestsImmutable
-        externalId: Creatable
+        externalId: Observation
       containerPropertyIdentifier: visibility
       type:
         list: false
@@ -661,12 +661,12 @@ views:
     createdBy:
       container:
         space: IntegrationTestsImmutable
-        externalId: Creatable
+        externalId: Observation
       containerPropertyIdentifier: createdBy
       type:
         container:
           space: IntegrationTestsImmutable
-          externalId: CDF_User
+          externalId: Observation
           type: container
         type: direct
         source:
@@ -681,12 +681,12 @@ views:
     updatedBy:
       container:
         space: IntegrationTestsImmutable
-        externalId: Creatable
+        externalId: Observation
       containerPropertyIdentifier: updatedBy
       type:
         container:
           space: IntegrationTestsImmutable
-          externalId: CDF_User
+          externalId: Observation
           type: container
         type: direct
         source:
@@ -701,7 +701,7 @@ views:
     isArchived:
       container:
         space: IntegrationTestsImmutable
-        externalId: Creatable
+        externalId: Observation
       containerPropertyIdentifier: isArchived
       type:
         list: false
@@ -735,7 +735,7 @@ views:
       type:
         container:
           space: IntegrationTestsImmutable
-          externalId: Asset
+          externalId: Observation
           type: container
         type: direct
         source:
@@ -769,7 +769,7 @@ views:
       type:
         container:
           space: IntegrationTestsImmutable
-          externalId: Asset
+          externalId: Observation
           type: container
         type: direct
         source:
@@ -844,7 +844,7 @@ views:
     title:
       container:
         space: IntegrationTestsImmutable
-        externalId: Describable
+        externalId: Template
       containerPropertyIdentifier: title
       type:
         list: false
@@ -859,7 +859,7 @@ views:
     description:
       container:
         space: IntegrationTestsImmutable
-        externalId: Describable
+        externalId: Template
       containerPropertyIdentifier: description
       type:
         list: false
@@ -874,7 +874,7 @@ views:
     labels:
       container:
         space: IntegrationTestsImmutable
-        externalId: Describable
+        externalId: Template
       containerPropertyIdentifier: labels
       type:
         list: true
@@ -889,7 +889,7 @@ views:
     visibility:
       container:
         space: IntegrationTestsImmutable
-        externalId: Creatable
+        externalId: Template
       containerPropertyIdentifier: visibility
       type:
         list: false
@@ -904,12 +904,12 @@ views:
     createdBy:
       container:
         space: IntegrationTestsImmutable
-        externalId: Creatable
+        externalId: Template
       containerPropertyIdentifier: createdBy
       type:
         container:
           space: IntegrationTestsImmutable
-          externalId: CDF_User
+          externalId: Template
           type: container
         type: direct
         source:
@@ -924,12 +924,12 @@ views:
     updatedBy:
       container:
         space: IntegrationTestsImmutable
-        externalId: Creatable
+        externalId: Template
       containerPropertyIdentifier: updatedBy
       type:
         container:
           space: IntegrationTestsImmutable
-          externalId: CDF_User
+          externalId: Template
           type: container
         type: direct
         source:
@@ -944,7 +944,7 @@ views:
     isArchived:
       container:
         space: IntegrationTestsImmutable
-        externalId: Creatable
+        externalId: Template
       containerPropertyIdentifier: isArchived
       type:
         list: false
@@ -978,7 +978,7 @@ views:
       type:
         container:
           space: IntegrationTestsImmutable
-          externalId: Asset
+          externalId: Template
           type: container
         type: direct
         source:
@@ -1034,7 +1034,7 @@ views:
     title:
       container:
         space: IntegrationTestsImmutable
-        externalId: Describable
+        externalId: TemplateItem
       containerPropertyIdentifier: title
       type:
         list: false
@@ -1049,7 +1049,7 @@ views:
     description:
       container:
         space: IntegrationTestsImmutable
-        externalId: Describable
+        externalId: TemplateItem
       containerPropertyIdentifier: description
       type:
         list: false
@@ -1064,7 +1064,7 @@ views:
     labels:
       container:
         space: IntegrationTestsImmutable
-        externalId: Describable
+        externalId: TemplateItem
       containerPropertyIdentifier: labels
       type:
         list: true
@@ -1079,7 +1079,7 @@ views:
     visibility:
       container:
         space: IntegrationTestsImmutable
-        externalId: Creatable
+        externalId: TemplateItem
       containerPropertyIdentifier: visibility
       type:
         list: false
@@ -1094,12 +1094,12 @@ views:
     createdBy:
       container:
         space: IntegrationTestsImmutable
-        externalId: Creatable
+        externalId: TemplateItem
       containerPropertyIdentifier: createdBy
       type:
         container:
           space: IntegrationTestsImmutable
-          externalId: CDF_User
+          externalId: TemplateItem
           type: container
         type: direct
         source:
@@ -1114,12 +1114,12 @@ views:
     updatedBy:
       container:
         space: IntegrationTestsImmutable
-        externalId: Creatable
+        externalId: TemplateItem
       containerPropertyIdentifier: updatedBy
       type:
         container:
           space: IntegrationTestsImmutable
-          externalId: CDF_User
+          externalId: TemplateItem
           type: container
         type: direct
         source:
@@ -1134,7 +1134,7 @@ views:
     isArchived:
       container:
         space: IntegrationTestsImmutable
-        externalId: Creatable
+        externalId: TemplateItem
       containerPropertyIdentifier: isArchived
       type:
         list: false
@@ -1167,7 +1167,7 @@ views:
       type:
         container:
           space: IntegrationTestsImmutable
-          externalId: Asset
+          externalId: TemplateItem
           type: container
         type: direct
         source:
@@ -1222,7 +1222,7 @@ views:
     visibility:
       container:
         space: IntegrationTestsImmutable
-        externalId: Creatable
+        externalId: MeasurementReading
       containerPropertyIdentifier: visibility
       type:
         list: false
@@ -1237,12 +1237,12 @@ views:
     createdBy:
       container:
         space: IntegrationTestsImmutable
-        externalId: Creatable
+        externalId: MeasurementReading
       containerPropertyIdentifier: createdBy
       type:
         container:
           space: IntegrationTestsImmutable
-          externalId: CDF_User
+          externalId: MeasurementReading
           type: container
         type: direct
         source:
@@ -1257,12 +1257,12 @@ views:
     updatedBy:
       container:
         space: IntegrationTestsImmutable
-        externalId: Creatable
+        externalId: MeasurementReading
       containerPropertyIdentifier: updatedBy
       type:
         container:
           space: IntegrationTestsImmutable
-          externalId: CDF_User
+          externalId: MeasurementReading
           type: container
         type: direct
         source:
@@ -1277,7 +1277,7 @@ views:
     isArchived:
       container:
         space: IntegrationTestsImmutable
-        externalId: Creatable
+        externalId: MeasurementReading
       containerPropertyIdentifier: isArchived
       type:
         list: false
@@ -1436,7 +1436,7 @@ views:
     startTime:
       container:
         space: IntegrationTestsImmutable
-        externalId: Schedulable
+        externalId: Schedule
       containerPropertyIdentifier: startTime
       type:
         list: false
@@ -1450,7 +1450,7 @@ views:
     endTime:
       container:
         space: IntegrationTestsImmutable
-        externalId: Schedulable
+        externalId: Schedule
       containerPropertyIdentifier: endTime
       type:
         list: false
@@ -1464,7 +1464,7 @@ views:
     visibility:
       container:
         space: IntegrationTestsImmutable
-        externalId: Creatable
+        externalId: Schedule
       containerPropertyIdentifier: visibility
       type:
         list: false
@@ -1479,12 +1479,12 @@ views:
     createdBy:
       container:
         space: IntegrationTestsImmutable
-        externalId: Creatable
+        externalId: Schedule
       containerPropertyIdentifier: createdBy
       type:
         container:
           space: IntegrationTestsImmutable
-          externalId: CDF_User
+          externalId: Schedule
           type: container
         type: direct
         source:
@@ -1499,12 +1499,12 @@ views:
     updatedBy:
       container:
         space: IntegrationTestsImmutable
-        externalId: Creatable
+        externalId: Schedule
       containerPropertyIdentifier: updatedBy
       type:
         container:
           space: IntegrationTestsImmutable
-          externalId: CDF_User
+          externalId: Schedule
           type: container
         type: direct
         source:
@@ -1519,7 +1519,7 @@ views:
     isArchived:
       container:
         space: IntegrationTestsImmutable
-        externalId: Creatable
+        externalId: Schedule
       containerPropertyIdentifier: isArchived
       type:
         list: false
@@ -1672,7 +1672,7 @@ views:
       type:
         container:
           space: IntegrationTestsImmutable
-          externalId: CDF_UserPreferences
+          externalId: CDF_User
           type: container
         type: direct
         source:
@@ -1749,7 +1749,7 @@ views:
     sourceId:
       container:
         space: IntegrationTestsImmutable
-        externalId: Sourceable
+        externalId: Asset
       containerPropertyIdentifier: sourceId
       type:
         list: false
@@ -1764,7 +1764,7 @@ views:
     source:
       container:
         space: IntegrationTestsImmutable
-        externalId: Sourceable
+        externalId: Asset
       containerPropertyIdentifier: source
       type:
         list: false
@@ -1779,7 +1779,7 @@ views:
     title:
       container:
         space: IntegrationTestsImmutable
-        externalId: Describable
+        externalId: Asset
       containerPropertyIdentifier: title
       type:
         list: false
@@ -1794,7 +1794,7 @@ views:
     description:
       container:
         space: IntegrationTestsImmutable
-        externalId: Describable
+        externalId: Asset
       containerPropertyIdentifier: description
       type:
         list: false
@@ -1809,7 +1809,7 @@ views:
     labels:
       container:
         space: IntegrationTestsImmutable
-        externalId: Describable
+        externalId: Asset
       containerPropertyIdentifier: labels
       type:
         list: true
