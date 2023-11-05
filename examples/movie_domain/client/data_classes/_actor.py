@@ -90,7 +90,7 @@ class ActorApply(DomainModelApply):
         properties = {}
         if self.person is not None:
             properties["person"] = {
-                "space": "IntegrationTestsImmutable",
+                "space": self.space if isinstance(self.person, str) else self.person.space,
                 "externalId": self.person if isinstance(self.person, str) else self.person.external_id,
             }
         if self.won_oscar is not None:

@@ -73,7 +73,7 @@ class {{ data_class.write_name }}(DomainModelApply):
         properties = {}{% for field in data_class.property_fields %}
         if self.{{ field.name }} is not None:
             properties["{{ field.prop_name }}"] = {% if field.is_edge %}{
-                "space": "{{ field.data_class.view_id.space }}",
+                "space":  self.space if isinstance(self.{{ field.name }}, str) else self.{{ field.name }}.space,
                 "externalId": self.{{ field.name }} if isinstance(self.{{ field.name }}, str) else self.{{ field.name }}.external_id,
             }{% else %}self.{{ field.name }}{% if field.is_time_field %}.isoformat({% if field.is_timestamp %}timespec="milliseconds"{% endif %}){% endif %}{% endif %}{% endfor %}
         if properties:
