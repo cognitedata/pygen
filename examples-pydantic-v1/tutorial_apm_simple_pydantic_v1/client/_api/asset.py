@@ -625,7 +625,7 @@ class AssetChildrenAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space="tutorial_apm_simple") -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "tutorial_apm_simple") -> dm.EdgeList:
         """Retrieve one or more children edges by id(s) of a asset.
 
         Args:
@@ -647,29 +647,27 @@ class AssetChildrenAPI:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "Asset.children"},
+            {"space": "tutorial_apm_simple", "externalId": "Asset.children"},
         )
         if isinstance(external_id, str):
-            is_asset = f.Equals(
+            is_assets = f.Equals(
                 ["edge", "startNode"],
                 {"space": space, "externalId": external_id},
             )
-            return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_asset))
-
         else:
             is_assets = f.In(
                 ["edge", "startNode"],
                 [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
-            return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_assets))
+        return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_assets))
 
     def list(
-        self, asset_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="tutorial_apm_simple"
+        self, asset_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space: str = "tutorial_apm_simple"
     ) -> dm.EdgeList:
         """List children edges of a asset.
 
         Args:
-            asset_id: Id of the source asset.
+            asset_id: ID of the source asset.
             limit: Maximum number of child edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
             space: The space where all the child edges are located.
@@ -687,12 +685,12 @@ class AssetChildrenAPI:
 
         """
         f = dm.filters
-        filters = []
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": space, "externalId": "Asset.children"},
-        )
-        filters.append(is_edge_type)
+        filters = [
+            f.Equals(
+                ["edge", "type"],
+                {"space": "tutorial_apm_simple", "externalId": "Asset.children"},
+            )
+        ]
         if asset_id:
             asset_ids = [asset_id] if isinstance(asset_id, str) else asset_id
             is_assets = f.In(
@@ -708,7 +706,7 @@ class AssetInModelAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space="cdf_3d_schema") -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "cdf_3d_schema") -> dm.EdgeList:
         """Retrieve one or more in_model_3_d edges by id(s) of a asset.
 
         Args:
@@ -730,29 +728,27 @@ class AssetInModelAPI:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "cdf3dEntityConnection"},
+            {"space": "tutorial_apm_simple", "externalId": "cdf3dEntityConnection"},
         )
         if isinstance(external_id, str):
-            is_asset = f.Equals(
+            is_assets = f.Equals(
                 ["edge", "startNode"],
                 {"space": space, "externalId": external_id},
             )
-            return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_asset))
-
         else:
             is_assets = f.In(
                 ["edge", "startNode"],
                 [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
-            return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_assets))
+        return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_assets))
 
     def list(
-        self, asset_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="cdf_3d_schema"
+        self, asset_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space: str = "cdf_3d_schema"
     ) -> dm.EdgeList:
         """List in_model_3_d edges of a asset.
 
         Args:
-            asset_id: Id of the source asset.
+            asset_id: ID of the source asset.
             limit: Maximum number of in model 3 d edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
             space: The space where all the in model 3 d edges are located.
@@ -770,12 +766,12 @@ class AssetInModelAPI:
 
         """
         f = dm.filters
-        filters = []
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": space, "externalId": "cdf3dEntityConnection"},
-        )
-        filters.append(is_edge_type)
+        filters = [
+            f.Equals(
+                ["edge", "type"],
+                {"space": "tutorial_apm_simple", "externalId": "cdf3dEntityConnection"},
+            )
+        ]
         if asset_id:
             asset_ids = [asset_id] if isinstance(asset_id, str) else asset_id
             is_assets = f.In(
@@ -895,18 +891,18 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
         if isinstance(external_id, str):
             asset = self._retrieve((space, external_id))
 
-            child_edges = self.children.retrieve(external_id)
+            child_edges = self.children.retrieve(external_id, space=space)
             asset.children = [edge.end_node.external_id for edge in child_edges]
-            in_model_3_d_edges = self.in_model_3_d.retrieve(external_id)
+            in_model_3_d_edges = self.in_model_3_d.retrieve(external_id, space=space)
             asset.in_model_3_d = [edge.end_node.external_id for edge in in_model_3_d_edges]
 
             return asset
         else:
             assets = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            child_edges = self.children.retrieve(external_id)
+            child_edges = self.children.retrieve(external_id, space=space)
             self._set_children(assets, child_edges)
-            in_model_3_d_edges = self.in_model_3_d.retrieve(external_id)
+            in_model_3_d_edges = self.in_model_3_d.retrieve(external_id, space=space)
             self._set_in_model_3_d(assets, in_model_3_d_edges)
 
             return assets
@@ -1370,14 +1366,14 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
 
         if retrieve_edges:
             if len(external_ids := assets.as_external_ids()) > IN_FILTER_LIMIT:
-                child_edges = self.children.list(limit=-1)
+                child_edges = self.children.list(limit=-1, space=space)
             else:
-                child_edges = self.children.list(external_ids, limit=-1)
+                child_edges = self.children.list(external_ids, limit=-1, space=space)
             self._set_children(assets, child_edges)
             if len(external_ids := assets.as_external_ids()) > IN_FILTER_LIMIT:
-                in_model_3_d_edges = self.in_model_3_d.list(limit=-1)
+                in_model_3_d_edges = self.in_model_3_d.list(limit=-1, space=space)
             else:
-                in_model_3_d_edges = self.in_model_3_d.list(external_ids, limit=-1)
+                in_model_3_d_edges = self.in_model_3_d.list(external_ids, limit=-1, space=space)
             self._set_in_model_3_d(assets, in_model_3_d_edges)
 
         return assets

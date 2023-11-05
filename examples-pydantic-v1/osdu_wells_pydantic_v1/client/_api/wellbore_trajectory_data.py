@@ -26,7 +26,7 @@ class WellboreTrajectoryDataArtefactsAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
         """Retrieve one or more artefacts edges by id(s) of a wellbore trajectory datum.
 
         Args:
@@ -48,36 +48,32 @@ class WellboreTrajectoryDataArtefactsAPI:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "WellboreTrajectoryData.Artefacts"},
+            {"space": "IntegrationTestsImmutable", "externalId": "WellboreTrajectoryData.Artefacts"},
         )
         if isinstance(external_id, str):
-            is_wellbore_trajectory_datum = f.Equals(
+            is_wellbore_trajectory_data = f.Equals(
                 ["edge", "startNode"],
                 {"space": space, "externalId": external_id},
             )
-            return self._client.data_modeling.instances.list(
-                "edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_trajectory_datum)
-            )
-
         else:
             is_wellbore_trajectory_data = f.In(
                 ["edge", "startNode"],
                 [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
-            return self._client.data_modeling.instances.list(
-                "edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_trajectory_data)
-            )
+        return self._client.data_modeling.instances.list(
+            "edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_trajectory_data)
+        )
 
     def list(
         self,
         wellbore_trajectory_datum_id: str | list[str] | None = None,
         limit=DEFAULT_LIMIT_READ,
-        space="IntegrationTestsImmutable",
+        space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
         """List artefacts edges of a wellbore trajectory datum.
 
         Args:
-            wellbore_trajectory_datum_id: Id of the source wellbore trajectory datum.
+            wellbore_trajectory_datum_id: ID of the source wellbore trajectory datum.
             limit: Maximum number of artefact edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
             space: The space where all the artefact edges are located.
@@ -95,12 +91,12 @@ class WellboreTrajectoryDataArtefactsAPI:
 
         """
         f = dm.filters
-        filters = []
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": space, "externalId": "WellboreTrajectoryData.Artefacts"},
-        )
-        filters.append(is_edge_type)
+        filters = [
+            f.Equals(
+                ["edge", "type"],
+                {"space": "IntegrationTestsImmutable", "externalId": "WellboreTrajectoryData.Artefacts"},
+            )
+        ]
         if wellbore_trajectory_datum_id:
             wellbore_trajectory_datum_ids = (
                 [wellbore_trajectory_datum_id]
@@ -120,7 +116,7 @@ class WellboreTrajectoryDataAvailableTrajectoryStationPropertiesAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
         """Retrieve one or more available_trajectory_station_properties edges by id(s) of a wellbore trajectory datum.
 
         Args:
@@ -142,36 +138,35 @@ class WellboreTrajectoryDataAvailableTrajectoryStationPropertiesAPI:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "WellboreTrajectoryData.AvailableTrajectoryStationProperties"},
+            {
+                "space": "IntegrationTestsImmutable",
+                "externalId": "WellboreTrajectoryData.AvailableTrajectoryStationProperties",
+            },
         )
         if isinstance(external_id, str):
-            is_wellbore_trajectory_datum = f.Equals(
+            is_wellbore_trajectory_data = f.Equals(
                 ["edge", "startNode"],
                 {"space": space, "externalId": external_id},
             )
-            return self._client.data_modeling.instances.list(
-                "edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_trajectory_datum)
-            )
-
         else:
             is_wellbore_trajectory_data = f.In(
                 ["edge", "startNode"],
                 [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
-            return self._client.data_modeling.instances.list(
-                "edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_trajectory_data)
-            )
+        return self._client.data_modeling.instances.list(
+            "edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_trajectory_data)
+        )
 
     def list(
         self,
         wellbore_trajectory_datum_id: str | list[str] | None = None,
         limit=DEFAULT_LIMIT_READ,
-        space="IntegrationTestsImmutable",
+        space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
         """List available_trajectory_station_properties edges of a wellbore trajectory datum.
 
         Args:
-            wellbore_trajectory_datum_id: Id of the source wellbore trajectory datum.
+            wellbore_trajectory_datum_id: ID of the source wellbore trajectory datum.
             limit: Maximum number of available trajectory station property edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
             space: The space where all the available trajectory station property edges are located.
@@ -189,12 +184,15 @@ class WellboreTrajectoryDataAvailableTrajectoryStationPropertiesAPI:
 
         """
         f = dm.filters
-        filters = []
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": space, "externalId": "WellboreTrajectoryData.AvailableTrajectoryStationProperties"},
-        )
-        filters.append(is_edge_type)
+        filters = [
+            f.Equals(
+                ["edge", "type"],
+                {
+                    "space": "IntegrationTestsImmutable",
+                    "externalId": "WellboreTrajectoryData.AvailableTrajectoryStationProperties",
+                },
+            )
+        ]
         if wellbore_trajectory_datum_id:
             wellbore_trajectory_datum_ids = (
                 [wellbore_trajectory_datum_id]
@@ -214,7 +212,7 @@ class WellboreTrajectoryDataGeoContextsAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
         """Retrieve one or more geo_contexts edges by id(s) of a wellbore trajectory datum.
 
         Args:
@@ -236,36 +234,32 @@ class WellboreTrajectoryDataGeoContextsAPI:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "WellboreTrajectoryData.GeoContexts"},
+            {"space": "IntegrationTestsImmutable", "externalId": "WellboreTrajectoryData.GeoContexts"},
         )
         if isinstance(external_id, str):
-            is_wellbore_trajectory_datum = f.Equals(
+            is_wellbore_trajectory_data = f.Equals(
                 ["edge", "startNode"],
                 {"space": space, "externalId": external_id},
             )
-            return self._client.data_modeling.instances.list(
-                "edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_trajectory_datum)
-            )
-
         else:
             is_wellbore_trajectory_data = f.In(
                 ["edge", "startNode"],
                 [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
-            return self._client.data_modeling.instances.list(
-                "edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_trajectory_data)
-            )
+        return self._client.data_modeling.instances.list(
+            "edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_trajectory_data)
+        )
 
     def list(
         self,
         wellbore_trajectory_datum_id: str | list[str] | None = None,
         limit=DEFAULT_LIMIT_READ,
-        space="IntegrationTestsImmutable",
+        space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
         """List geo_contexts edges of a wellbore trajectory datum.
 
         Args:
-            wellbore_trajectory_datum_id: Id of the source wellbore trajectory datum.
+            wellbore_trajectory_datum_id: ID of the source wellbore trajectory datum.
             limit: Maximum number of geo context edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
             space: The space where all the geo context edges are located.
@@ -283,12 +277,12 @@ class WellboreTrajectoryDataGeoContextsAPI:
 
         """
         f = dm.filters
-        filters = []
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": space, "externalId": "WellboreTrajectoryData.GeoContexts"},
-        )
-        filters.append(is_edge_type)
+        filters = [
+            f.Equals(
+                ["edge", "type"],
+                {"space": "IntegrationTestsImmutable", "externalId": "WellboreTrajectoryData.GeoContexts"},
+            )
+        ]
         if wellbore_trajectory_datum_id:
             wellbore_trajectory_datum_ids = (
                 [wellbore_trajectory_datum_id]
@@ -308,7 +302,7 @@ class WellboreTrajectoryDataLineageAssertionsAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
         """Retrieve one or more lineage_assertions edges by id(s) of a wellbore trajectory datum.
 
         Args:
@@ -330,36 +324,32 @@ class WellboreTrajectoryDataLineageAssertionsAPI:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "WellboreTrajectoryData.LineageAssertions"},
+            {"space": "IntegrationTestsImmutable", "externalId": "WellboreTrajectoryData.LineageAssertions"},
         )
         if isinstance(external_id, str):
-            is_wellbore_trajectory_datum = f.Equals(
+            is_wellbore_trajectory_data = f.Equals(
                 ["edge", "startNode"],
                 {"space": space, "externalId": external_id},
             )
-            return self._client.data_modeling.instances.list(
-                "edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_trajectory_datum)
-            )
-
         else:
             is_wellbore_trajectory_data = f.In(
                 ["edge", "startNode"],
                 [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
-            return self._client.data_modeling.instances.list(
-                "edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_trajectory_data)
-            )
+        return self._client.data_modeling.instances.list(
+            "edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_trajectory_data)
+        )
 
     def list(
         self,
         wellbore_trajectory_datum_id: str | list[str] | None = None,
         limit=DEFAULT_LIMIT_READ,
-        space="IntegrationTestsImmutable",
+        space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
         """List lineage_assertions edges of a wellbore trajectory datum.
 
         Args:
-            wellbore_trajectory_datum_id: Id of the source wellbore trajectory datum.
+            wellbore_trajectory_datum_id: ID of the source wellbore trajectory datum.
             limit: Maximum number of lineage assertion edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
             space: The space where all the lineage assertion edges are located.
@@ -377,12 +367,12 @@ class WellboreTrajectoryDataLineageAssertionsAPI:
 
         """
         f = dm.filters
-        filters = []
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": space, "externalId": "WellboreTrajectoryData.LineageAssertions"},
-        )
-        filters.append(is_edge_type)
+        filters = [
+            f.Equals(
+                ["edge", "type"],
+                {"space": "IntegrationTestsImmutable", "externalId": "WellboreTrajectoryData.LineageAssertions"},
+            )
+        ]
         if wellbore_trajectory_datum_id:
             wellbore_trajectory_datum_ids = (
                 [wellbore_trajectory_datum_id]
@@ -402,7 +392,7 @@ class WellboreTrajectoryDataNameAliasesAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
         """Retrieve one or more name_aliases edges by id(s) of a wellbore trajectory datum.
 
         Args:
@@ -424,36 +414,32 @@ class WellboreTrajectoryDataNameAliasesAPI:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "WellboreTrajectoryData.NameAliases"},
+            {"space": "IntegrationTestsImmutable", "externalId": "WellboreTrajectoryData.NameAliases"},
         )
         if isinstance(external_id, str):
-            is_wellbore_trajectory_datum = f.Equals(
+            is_wellbore_trajectory_data = f.Equals(
                 ["edge", "startNode"],
                 {"space": space, "externalId": external_id},
             )
-            return self._client.data_modeling.instances.list(
-                "edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_trajectory_datum)
-            )
-
         else:
             is_wellbore_trajectory_data = f.In(
                 ["edge", "startNode"],
                 [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
-            return self._client.data_modeling.instances.list(
-                "edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_trajectory_data)
-            )
+        return self._client.data_modeling.instances.list(
+            "edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_trajectory_data)
+        )
 
     def list(
         self,
         wellbore_trajectory_datum_id: str | list[str] | None = None,
         limit=DEFAULT_LIMIT_READ,
-        space="IntegrationTestsImmutable",
+        space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
         """List name_aliases edges of a wellbore trajectory datum.
 
         Args:
-            wellbore_trajectory_datum_id: Id of the source wellbore trajectory datum.
+            wellbore_trajectory_datum_id: ID of the source wellbore trajectory datum.
             limit: Maximum number of name alias edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
             space: The space where all the name alias edges are located.
@@ -471,12 +457,12 @@ class WellboreTrajectoryDataNameAliasesAPI:
 
         """
         f = dm.filters
-        filters = []
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": space, "externalId": "WellboreTrajectoryData.NameAliases"},
-        )
-        filters.append(is_edge_type)
+        filters = [
+            f.Equals(
+                ["edge", "type"],
+                {"space": "IntegrationTestsImmutable", "externalId": "WellboreTrajectoryData.NameAliases"},
+            )
+        ]
         if wellbore_trajectory_datum_id:
             wellbore_trajectory_datum_ids = (
                 [wellbore_trajectory_datum_id]
@@ -496,7 +482,7 @@ class WellboreTrajectoryDataTechnicalAssurancesAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
         """Retrieve one or more technical_assurances edges by id(s) of a wellbore trajectory datum.
 
         Args:
@@ -518,36 +504,32 @@ class WellboreTrajectoryDataTechnicalAssurancesAPI:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "WellboreTrajectoryData.TechnicalAssurances"},
+            {"space": "IntegrationTestsImmutable", "externalId": "WellboreTrajectoryData.TechnicalAssurances"},
         )
         if isinstance(external_id, str):
-            is_wellbore_trajectory_datum = f.Equals(
+            is_wellbore_trajectory_data = f.Equals(
                 ["edge", "startNode"],
                 {"space": space, "externalId": external_id},
             )
-            return self._client.data_modeling.instances.list(
-                "edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_trajectory_datum)
-            )
-
         else:
             is_wellbore_trajectory_data = f.In(
                 ["edge", "startNode"],
                 [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
-            return self._client.data_modeling.instances.list(
-                "edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_trajectory_data)
-            )
+        return self._client.data_modeling.instances.list(
+            "edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_trajectory_data)
+        )
 
     def list(
         self,
         wellbore_trajectory_datum_id: str | list[str] | None = None,
         limit=DEFAULT_LIMIT_READ,
-        space="IntegrationTestsImmutable",
+        space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
         """List technical_assurances edges of a wellbore trajectory datum.
 
         Args:
-            wellbore_trajectory_datum_id: Id of the source wellbore trajectory datum.
+            wellbore_trajectory_datum_id: ID of the source wellbore trajectory datum.
             limit: Maximum number of technical assurance edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
             space: The space where all the technical assurance edges are located.
@@ -565,12 +547,12 @@ class WellboreTrajectoryDataTechnicalAssurancesAPI:
 
         """
         f = dm.filters
-        filters = []
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": space, "externalId": "WellboreTrajectoryData.TechnicalAssurances"},
-        )
-        filters.append(is_edge_type)
+        filters = [
+            f.Equals(
+                ["edge", "type"],
+                {"space": "IntegrationTestsImmutable", "externalId": "WellboreTrajectoryData.TechnicalAssurances"},
+            )
+        ]
         if wellbore_trajectory_datum_id:
             wellbore_trajectory_datum_ids = (
                 [wellbore_trajectory_datum_id]
@@ -711,23 +693,23 @@ class WellboreTrajectoryDataAPI(
         if isinstance(external_id, str):
             wellbore_trajectory_datum = self._retrieve((space, external_id))
 
-            artefact_edges = self.artefacts.retrieve(external_id)
+            artefact_edges = self.artefacts.retrieve(external_id, space=space)
             wellbore_trajectory_datum.artefacts = [edge.end_node.external_id for edge in artefact_edges]
             available_trajectory_station_property_edges = self.available_trajectory_station_properties.retrieve(
-                external_id
+                external_id, space=space
             )
             wellbore_trajectory_datum.available_trajectory_station_properties = [
                 edge.end_node.external_id for edge in available_trajectory_station_property_edges
             ]
-            geo_context_edges = self.geo_contexts.retrieve(external_id)
+            geo_context_edges = self.geo_contexts.retrieve(external_id, space=space)
             wellbore_trajectory_datum.geo_contexts = [edge.end_node.external_id for edge in geo_context_edges]
-            lineage_assertion_edges = self.lineage_assertions.retrieve(external_id)
+            lineage_assertion_edges = self.lineage_assertions.retrieve(external_id, space=space)
             wellbore_trajectory_datum.lineage_assertions = [
                 edge.end_node.external_id for edge in lineage_assertion_edges
             ]
-            name_alias_edges = self.name_aliases.retrieve(external_id)
+            name_alias_edges = self.name_aliases.retrieve(external_id, space=space)
             wellbore_trajectory_datum.name_aliases = [edge.end_node.external_id for edge in name_alias_edges]
-            technical_assurance_edges = self.technical_assurances.retrieve(external_id)
+            technical_assurance_edges = self.technical_assurances.retrieve(external_id, space=space)
             wellbore_trajectory_datum.technical_assurances = [
                 edge.end_node.external_id for edge in technical_assurance_edges
             ]
@@ -736,21 +718,21 @@ class WellboreTrajectoryDataAPI(
         else:
             wellbore_trajectory_data = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            artefact_edges = self.artefacts.retrieve(external_id)
+            artefact_edges = self.artefacts.retrieve(external_id, space=space)
             self._set_artefacts(wellbore_trajectory_data, artefact_edges)
             available_trajectory_station_property_edges = self.available_trajectory_station_properties.retrieve(
-                external_id
+                external_id, space=space
             )
             self._set_available_trajectory_station_properties(
                 wellbore_trajectory_data, available_trajectory_station_property_edges
             )
-            geo_context_edges = self.geo_contexts.retrieve(external_id)
+            geo_context_edges = self.geo_contexts.retrieve(external_id, space=space)
             self._set_geo_contexts(wellbore_trajectory_data, geo_context_edges)
-            lineage_assertion_edges = self.lineage_assertions.retrieve(external_id)
+            lineage_assertion_edges = self.lineage_assertions.retrieve(external_id, space=space)
             self._set_lineage_assertions(wellbore_trajectory_data, lineage_assertion_edges)
-            name_alias_edges = self.name_aliases.retrieve(external_id)
+            name_alias_edges = self.name_aliases.retrieve(external_id, space=space)
             self._set_name_aliases(wellbore_trajectory_data, name_alias_edges)
-            technical_assurance_edges = self.technical_assurances.retrieve(external_id)
+            technical_assurance_edges = self.technical_assurances.retrieve(external_id, space=space)
             self._set_technical_assurances(wellbore_trajectory_data, technical_assurance_edges)
 
             return wellbore_trajectory_data
@@ -2098,40 +2080,40 @@ class WellboreTrajectoryDataAPI(
 
         if retrieve_edges:
             if len(external_ids := wellbore_trajectory_data.as_external_ids()) > IN_FILTER_LIMIT:
-                artefact_edges = self.artefacts.list(limit=-1)
+                artefact_edges = self.artefacts.list(limit=-1, space=space)
             else:
-                artefact_edges = self.artefacts.list(external_ids, limit=-1)
+                artefact_edges = self.artefacts.list(external_ids, limit=-1, space=space)
             self._set_artefacts(wellbore_trajectory_data, artefact_edges)
             if len(external_ids := wellbore_trajectory_data.as_external_ids()) > IN_FILTER_LIMIT:
                 available_trajectory_station_property_edges = self.available_trajectory_station_properties.list(
-                    limit=-1
+                    limit=-1, space=space
                 )
             else:
                 available_trajectory_station_property_edges = self.available_trajectory_station_properties.list(
-                    external_ids, limit=-1
+                    external_ids, limit=-1, space=space
                 )
             self._set_available_trajectory_station_properties(
                 wellbore_trajectory_data, available_trajectory_station_property_edges
             )
             if len(external_ids := wellbore_trajectory_data.as_external_ids()) > IN_FILTER_LIMIT:
-                geo_context_edges = self.geo_contexts.list(limit=-1)
+                geo_context_edges = self.geo_contexts.list(limit=-1, space=space)
             else:
-                geo_context_edges = self.geo_contexts.list(external_ids, limit=-1)
+                geo_context_edges = self.geo_contexts.list(external_ids, limit=-1, space=space)
             self._set_geo_contexts(wellbore_trajectory_data, geo_context_edges)
             if len(external_ids := wellbore_trajectory_data.as_external_ids()) > IN_FILTER_LIMIT:
-                lineage_assertion_edges = self.lineage_assertions.list(limit=-1)
+                lineage_assertion_edges = self.lineage_assertions.list(limit=-1, space=space)
             else:
-                lineage_assertion_edges = self.lineage_assertions.list(external_ids, limit=-1)
+                lineage_assertion_edges = self.lineage_assertions.list(external_ids, limit=-1, space=space)
             self._set_lineage_assertions(wellbore_trajectory_data, lineage_assertion_edges)
             if len(external_ids := wellbore_trajectory_data.as_external_ids()) > IN_FILTER_LIMIT:
-                name_alias_edges = self.name_aliases.list(limit=-1)
+                name_alias_edges = self.name_aliases.list(limit=-1, space=space)
             else:
-                name_alias_edges = self.name_aliases.list(external_ids, limit=-1)
+                name_alias_edges = self.name_aliases.list(external_ids, limit=-1, space=space)
             self._set_name_aliases(wellbore_trajectory_data, name_alias_edges)
             if len(external_ids := wellbore_trajectory_data.as_external_ids()) > IN_FILTER_LIMIT:
-                technical_assurance_edges = self.technical_assurances.list(limit=-1)
+                technical_assurance_edges = self.technical_assurances.list(limit=-1, space=space)
             else:
-                technical_assurance_edges = self.technical_assurances.list(external_ids, limit=-1)
+                technical_assurance_edges = self.technical_assurances.list(external_ids, limit=-1, space=space)
             self._set_technical_assurances(wellbore_trajectory_data, technical_assurance_edges)
 
         return wellbore_trajectory_data

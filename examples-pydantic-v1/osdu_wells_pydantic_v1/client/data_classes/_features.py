@@ -89,7 +89,7 @@ class FeaturesApply(DomainModelApply):
             properties["bbox"] = self.bbox
         if self.geometry is not None:
             properties["geometry"] = {
-                "space": "IntegrationTestsImmutable",
+                "space": self.space if isinstance(self.geometry, str) else self.geometry.space,
                 "externalId": self.geometry if isinstance(self.geometry, str) else self.geometry.external_id,
             }
         if self.type is not None:

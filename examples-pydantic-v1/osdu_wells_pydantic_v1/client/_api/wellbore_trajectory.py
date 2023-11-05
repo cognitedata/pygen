@@ -24,7 +24,7 @@ class WellboreTrajectoryMetaAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
         """Retrieve one or more meta edges by id(s) of a wellbore trajectory.
 
         Args:
@@ -46,36 +46,32 @@ class WellboreTrajectoryMetaAPI:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "WellboreTrajectory.meta"},
+            {"space": "IntegrationTestsImmutable", "externalId": "WellboreTrajectory.meta"},
         )
         if isinstance(external_id, str):
-            is_wellbore_trajectory = f.Equals(
+            is_wellbore_trajectories = f.Equals(
                 ["edge", "startNode"],
                 {"space": space, "externalId": external_id},
             )
-            return self._client.data_modeling.instances.list(
-                "edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_trajectory)
-            )
-
         else:
             is_wellbore_trajectories = f.In(
                 ["edge", "startNode"],
                 [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
-            return self._client.data_modeling.instances.list(
-                "edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_trajectories)
-            )
+        return self._client.data_modeling.instances.list(
+            "edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_trajectories)
+        )
 
     def list(
         self,
         wellbore_trajectory_id: str | list[str] | None = None,
         limit=DEFAULT_LIMIT_READ,
-        space="IntegrationTestsImmutable",
+        space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
         """List meta edges of a wellbore trajectory.
 
         Args:
-            wellbore_trajectory_id: Id of the source wellbore trajectory.
+            wellbore_trajectory_id: ID of the source wellbore trajectory.
             limit: Maximum number of meta edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
             space: The space where all the meta edges are located.
@@ -93,12 +89,12 @@ class WellboreTrajectoryMetaAPI:
 
         """
         f = dm.filters
-        filters = []
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": space, "externalId": "WellboreTrajectory.meta"},
-        )
-        filters.append(is_edge_type)
+        filters = [
+            f.Equals(
+                ["edge", "type"],
+                {"space": "IntegrationTestsImmutable", "externalId": "WellboreTrajectory.meta"},
+            )
+        ]
         if wellbore_trajectory_id:
             wellbore_trajectory_ids = (
                 [wellbore_trajectory_id] if isinstance(wellbore_trajectory_id, str) else wellbore_trajectory_id
@@ -224,14 +220,14 @@ class WellboreTrajectoryAPI(TypeAPI[WellboreTrajectory, WellboreTrajectoryApply,
         if isinstance(external_id, str):
             wellbore_trajectory = self._retrieve((space, external_id))
 
-            meta_edges = self.meta.retrieve(external_id)
+            meta_edges = self.meta.retrieve(external_id, space=space)
             wellbore_trajectory.meta = [edge.end_node.external_id for edge in meta_edges]
 
             return wellbore_trajectory
         else:
             wellbore_trajectories = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            meta_edges = self.meta.retrieve(external_id)
+            meta_edges = self.meta.retrieve(external_id, space=space)
             self._set_meta(wellbore_trajectories, meta_edges)
 
             return wellbore_trajectories
@@ -723,9 +719,9 @@ class WellboreTrajectoryAPI(TypeAPI[WellboreTrajectory, WellboreTrajectoryApply,
 
         if retrieve_edges:
             if len(external_ids := wellbore_trajectories.as_external_ids()) > IN_FILTER_LIMIT:
-                meta_edges = self.meta.list(limit=-1)
+                meta_edges = self.meta.list(limit=-1, space=space)
             else:
-                meta_edges = self.meta.list(external_ids, limit=-1)
+                meta_edges = self.meta.list(external_ids, limit=-1, space=space)
             self._set_meta(wellbore_trajectories, meta_edges)
 
         return wellbore_trajectories

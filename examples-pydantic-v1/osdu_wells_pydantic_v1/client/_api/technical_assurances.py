@@ -24,7 +24,7 @@ class TechnicalAssurancesAcceptableUsageAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
         """Retrieve one or more acceptable_usage edges by id(s) of a technical assurance.
 
         Args:
@@ -46,36 +46,32 @@ class TechnicalAssurancesAcceptableUsageAPI:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "TechnicalAssurances.AcceptableUsage"},
+            {"space": "IntegrationTestsImmutable", "externalId": "TechnicalAssurances.AcceptableUsage"},
         )
         if isinstance(external_id, str):
-            is_technical_assurance = f.Equals(
+            is_technical_assurances = f.Equals(
                 ["edge", "startNode"],
                 {"space": space, "externalId": external_id},
             )
-            return self._client.data_modeling.instances.list(
-                "edge", limit=-1, filter=f.And(is_edge_type, is_technical_assurance)
-            )
-
         else:
             is_technical_assurances = f.In(
                 ["edge", "startNode"],
                 [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
-            return self._client.data_modeling.instances.list(
-                "edge", limit=-1, filter=f.And(is_edge_type, is_technical_assurances)
-            )
+        return self._client.data_modeling.instances.list(
+            "edge", limit=-1, filter=f.And(is_edge_type, is_technical_assurances)
+        )
 
     def list(
         self,
         technical_assurance_id: str | list[str] | None = None,
         limit=DEFAULT_LIMIT_READ,
-        space="IntegrationTestsImmutable",
+        space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
         """List acceptable_usage edges of a technical assurance.
 
         Args:
-            technical_assurance_id: Id of the source technical assurance.
+            technical_assurance_id: ID of the source technical assurance.
             limit: Maximum number of acceptable usage edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
             space: The space where all the acceptable usage edges are located.
@@ -93,12 +89,12 @@ class TechnicalAssurancesAcceptableUsageAPI:
 
         """
         f = dm.filters
-        filters = []
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": space, "externalId": "TechnicalAssurances.AcceptableUsage"},
-        )
-        filters.append(is_edge_type)
+        filters = [
+            f.Equals(
+                ["edge", "type"],
+                {"space": "IntegrationTestsImmutable", "externalId": "TechnicalAssurances.AcceptableUsage"},
+            )
+        ]
         if technical_assurance_id:
             technical_assurance_ids = (
                 [technical_assurance_id] if isinstance(technical_assurance_id, str) else technical_assurance_id
@@ -116,7 +112,7 @@ class TechnicalAssurancesReviewersAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
         """Retrieve one or more reviewers edges by id(s) of a technical assurance.
 
         Args:
@@ -138,36 +134,32 @@ class TechnicalAssurancesReviewersAPI:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "TechnicalAssurances.Reviewers"},
+            {"space": "IntegrationTestsImmutable", "externalId": "TechnicalAssurances.Reviewers"},
         )
         if isinstance(external_id, str):
-            is_technical_assurance = f.Equals(
+            is_technical_assurances = f.Equals(
                 ["edge", "startNode"],
                 {"space": space, "externalId": external_id},
             )
-            return self._client.data_modeling.instances.list(
-                "edge", limit=-1, filter=f.And(is_edge_type, is_technical_assurance)
-            )
-
         else:
             is_technical_assurances = f.In(
                 ["edge", "startNode"],
                 [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
-            return self._client.data_modeling.instances.list(
-                "edge", limit=-1, filter=f.And(is_edge_type, is_technical_assurances)
-            )
+        return self._client.data_modeling.instances.list(
+            "edge", limit=-1, filter=f.And(is_edge_type, is_technical_assurances)
+        )
 
     def list(
         self,
         technical_assurance_id: str | list[str] | None = None,
         limit=DEFAULT_LIMIT_READ,
-        space="IntegrationTestsImmutable",
+        space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
         """List reviewers edges of a technical assurance.
 
         Args:
-            technical_assurance_id: Id of the source technical assurance.
+            technical_assurance_id: ID of the source technical assurance.
             limit: Maximum number of reviewer edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
             space: The space where all the reviewer edges are located.
@@ -185,12 +177,12 @@ class TechnicalAssurancesReviewersAPI:
 
         """
         f = dm.filters
-        filters = []
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": space, "externalId": "TechnicalAssurances.Reviewers"},
-        )
-        filters.append(is_edge_type)
+        filters = [
+            f.Equals(
+                ["edge", "type"],
+                {"space": "IntegrationTestsImmutable", "externalId": "TechnicalAssurances.Reviewers"},
+            )
+        ]
         if technical_assurance_id:
             technical_assurance_ids = (
                 [technical_assurance_id] if isinstance(technical_assurance_id, str) else technical_assurance_id
@@ -208,7 +200,7 @@ class TechnicalAssurancesUnacceptableUsageAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
         """Retrieve one or more unacceptable_usage edges by id(s) of a technical assurance.
 
         Args:
@@ -230,36 +222,32 @@ class TechnicalAssurancesUnacceptableUsageAPI:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "TechnicalAssurances.UnacceptableUsage"},
+            {"space": "IntegrationTestsImmutable", "externalId": "TechnicalAssurances.UnacceptableUsage"},
         )
         if isinstance(external_id, str):
-            is_technical_assurance = f.Equals(
+            is_technical_assurances = f.Equals(
                 ["edge", "startNode"],
                 {"space": space, "externalId": external_id},
             )
-            return self._client.data_modeling.instances.list(
-                "edge", limit=-1, filter=f.And(is_edge_type, is_technical_assurance)
-            )
-
         else:
             is_technical_assurances = f.In(
                 ["edge", "startNode"],
                 [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
-            return self._client.data_modeling.instances.list(
-                "edge", limit=-1, filter=f.And(is_edge_type, is_technical_assurances)
-            )
+        return self._client.data_modeling.instances.list(
+            "edge", limit=-1, filter=f.And(is_edge_type, is_technical_assurances)
+        )
 
     def list(
         self,
         technical_assurance_id: str | list[str] | None = None,
         limit=DEFAULT_LIMIT_READ,
-        space="IntegrationTestsImmutable",
+        space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
         """List unacceptable_usage edges of a technical assurance.
 
         Args:
-            technical_assurance_id: Id of the source technical assurance.
+            technical_assurance_id: ID of the source technical assurance.
             limit: Maximum number of unacceptable usage edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
             space: The space where all the unacceptable usage edges are located.
@@ -277,12 +265,12 @@ class TechnicalAssurancesUnacceptableUsageAPI:
 
         """
         f = dm.filters
-        filters = []
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": space, "externalId": "TechnicalAssurances.UnacceptableUsage"},
-        )
-        filters.append(is_edge_type)
+        filters = [
+            f.Equals(
+                ["edge", "type"],
+                {"space": "IntegrationTestsImmutable", "externalId": "TechnicalAssurances.UnacceptableUsage"},
+            )
+        ]
         if technical_assurance_id:
             technical_assurance_ids = (
                 [technical_assurance_id] if isinstance(technical_assurance_id, str) else technical_assurance_id
@@ -410,22 +398,22 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
         if isinstance(external_id, str):
             technical_assurance = self._retrieve((space, external_id))
 
-            acceptable_usage_edges = self.acceptable_usage.retrieve(external_id)
+            acceptable_usage_edges = self.acceptable_usage.retrieve(external_id, space=space)
             technical_assurance.acceptable_usage = [edge.end_node.external_id for edge in acceptable_usage_edges]
-            reviewer_edges = self.reviewers.retrieve(external_id)
+            reviewer_edges = self.reviewers.retrieve(external_id, space=space)
             technical_assurance.reviewers = [edge.end_node.external_id for edge in reviewer_edges]
-            unacceptable_usage_edges = self.unacceptable_usage.retrieve(external_id)
+            unacceptable_usage_edges = self.unacceptable_usage.retrieve(external_id, space=space)
             technical_assurance.unacceptable_usage = [edge.end_node.external_id for edge in unacceptable_usage_edges]
 
             return technical_assurance
         else:
             technical_assurances = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            acceptable_usage_edges = self.acceptable_usage.retrieve(external_id)
+            acceptable_usage_edges = self.acceptable_usage.retrieve(external_id, space=space)
             self._set_acceptable_usage(technical_assurances, acceptable_usage_edges)
-            reviewer_edges = self.reviewers.retrieve(external_id)
+            reviewer_edges = self.reviewers.retrieve(external_id, space=space)
             self._set_reviewers(technical_assurances, reviewer_edges)
-            unacceptable_usage_edges = self.unacceptable_usage.retrieve(external_id)
+            unacceptable_usage_edges = self.unacceptable_usage.retrieve(external_id, space=space)
             self._set_unacceptable_usage(technical_assurances, unacceptable_usage_edges)
 
             return technical_assurances
@@ -735,19 +723,19 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
 
         if retrieve_edges:
             if len(external_ids := technical_assurances.as_external_ids()) > IN_FILTER_LIMIT:
-                acceptable_usage_edges = self.acceptable_usage.list(limit=-1)
+                acceptable_usage_edges = self.acceptable_usage.list(limit=-1, space=space)
             else:
-                acceptable_usage_edges = self.acceptable_usage.list(external_ids, limit=-1)
+                acceptable_usage_edges = self.acceptable_usage.list(external_ids, limit=-1, space=space)
             self._set_acceptable_usage(technical_assurances, acceptable_usage_edges)
             if len(external_ids := technical_assurances.as_external_ids()) > IN_FILTER_LIMIT:
-                reviewer_edges = self.reviewers.list(limit=-1)
+                reviewer_edges = self.reviewers.list(limit=-1, space=space)
             else:
-                reviewer_edges = self.reviewers.list(external_ids, limit=-1)
+                reviewer_edges = self.reviewers.list(external_ids, limit=-1, space=space)
             self._set_reviewers(technical_assurances, reviewer_edges)
             if len(external_ids := technical_assurances.as_external_ids()) > IN_FILTER_LIMIT:
-                unacceptable_usage_edges = self.unacceptable_usage.list(limit=-1)
+                unacceptable_usage_edges = self.unacceptable_usage.list(limit=-1, space=space)
             else:
-                unacceptable_usage_edges = self.unacceptable_usage.list(external_ids, limit=-1)
+                unacceptable_usage_edges = self.unacceptable_usage.list(external_ids, limit=-1, space=space)
             self._set_unacceptable_usage(technical_assurances, unacceptable_usage_edges)
 
         return technical_assurances
