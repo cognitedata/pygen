@@ -35,9 +35,9 @@
 
         if retrieve_edges:{% for field in data_class.one_to_many_edges %}
             if len(external_ids := {{ data_class.variable_list }}.as_external_ids()) > IN_FILTER_LIMIT:
-                {{ field.variable }}_edges = self.{{ field.edge_api_attribute }}.list(limit=-1)
+                {{ field.variable }}_edges = self.{{ field.edge_api_attribute }}.list(limit=-1, space=space)
             else:
-                {{ field.variable }}_edges = self.{{ field.edge_api_attribute }}.list(external_ids, limit=-1)
+                {{ field.variable }}_edges = self.{{ field.edge_api_attribute }}.list(external_ids, limit=-1, space=space)
             self._set_{{ field.name }}({{ data_class.variable_list }}, {{ field.variable }}_edges){% endfor %}
 
         return {{ data_class.variable_list }}{% else %}return self._list(limit=limit, filter=filter_){% endif %}

@@ -289,18 +289,18 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
         if isinstance(external_id, str):
             actor = self._retrieve((space, external_id))
 
-            movie_edges = self.movies.retrieve(external_id)
+            movie_edges = self.movies.retrieve(external_id, space=space)
             actor.movies = [edge.end_node.external_id for edge in movie_edges]
-            nomination_edges = self.nomination.retrieve(external_id)
+            nomination_edges = self.nomination.retrieve(external_id, space=space)
             actor.nomination = [edge.end_node.external_id for edge in nomination_edges]
 
             return actor
         else:
             actors = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            movie_edges = self.movies.retrieve(external_id)
+            movie_edges = self.movies.retrieve(external_id, space=space)
             self._set_movies(actors, movie_edges)
-            nomination_edges = self.nomination.retrieve(external_id)
+            nomination_edges = self.nomination.retrieve(external_id, space=space)
             self._set_nomination(actors, nomination_edges)
 
             return actors
@@ -496,14 +496,14 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
 
         if retrieve_edges:
             if len(external_ids := actors.as_external_ids()) > IN_FILTER_LIMIT:
-                movie_edges = self.movies.list(limit=-1)
+                movie_edges = self.movies.list(limit=-1, space=space)
             else:
-                movie_edges = self.movies.list(external_ids, limit=-1)
+                movie_edges = self.movies.list(external_ids, limit=-1, space=space)
             self._set_movies(actors, movie_edges)
             if len(external_ids := actors.as_external_ids()) > IN_FILTER_LIMIT:
-                nomination_edges = self.nomination.list(limit=-1)
+                nomination_edges = self.nomination.list(limit=-1, space=space)
             else:
-                nomination_edges = self.nomination.list(external_ids, limit=-1)
+                nomination_edges = self.nomination.list(external_ids, limit=-1, space=space)
             self._set_nomination(actors, nomination_edges)
 
         return actors
