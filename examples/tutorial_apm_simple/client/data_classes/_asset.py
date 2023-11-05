@@ -213,7 +213,7 @@ class AssetApply(DomainModelApply):
             properties["metrics"] = self.metrics
         if self.parent is not None:
             properties["parent"] = {
-                "space": "tutorial_apm_simple",
+                "space": self.space if isinstance(self.parent, str) else self.parent.space,
                 "externalId": self.parent if isinstance(self.parent, str) else self.parent.external_id,
             }
         if self.pressure is not None:
@@ -277,34 +277,34 @@ class AssetApply(DomainModelApply):
 
     def _create_child_edge(self, child: Union[str, AssetApply]) -> dm.EdgeApply:
         if isinstance(child, str):
-            end_node_ext_id = child
+            end_space, end_node_ext_id = self.space, child
         elif isinstance(child, DomainModelApply):
-            end_node_ext_id = child.external_id
+            end_space, end_node_ext_id = child.space, child.external_id
         else:
             raise TypeError(f"Expected str or AssetApply, got {type(child)}")
 
         return dm.EdgeApply(
-            space="tutorial_apm_simple",
+            space=self.space,
             external_id=f"{self.external_id}:{end_node_ext_id}",
             type=dm.DirectRelationReference("tutorial_apm_simple", "Asset.children"),
             start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference("tutorial_apm_simple", end_node_ext_id),
+            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
         )
 
     def _create_in_model_3_d_edge(self, in_model_3_d: Union[str, CdfModelApply]) -> dm.EdgeApply:
         if isinstance(in_model_3_d, str):
-            end_node_ext_id = in_model_3_d
+            end_space, end_node_ext_id = self.space, in_model_3_d
         elif isinstance(in_model_3_d, DomainModelApply):
-            end_node_ext_id = in_model_3_d.external_id
+            end_space, end_node_ext_id = in_model_3_d.space, in_model_3_d.external_id
         else:
             raise TypeError(f"Expected str or CdfModelApply, got {type(in_model_3_d)}")
 
         return dm.EdgeApply(
-            space="tutorial_apm_simple",
+            space=self.space,
             external_id=f"{self.external_id}:{end_node_ext_id}",
             type=dm.DirectRelationReference("cdf_3d_schema", "cdf3dEntityConnection"),
             start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference("cdf_3d_schema", end_node_ext_id),
+            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
         )
 
 

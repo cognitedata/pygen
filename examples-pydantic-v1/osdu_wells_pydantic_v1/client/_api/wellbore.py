@@ -24,7 +24,7 @@ class WellboreMetaAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
         """Retrieve one or more meta edges by id(s) of a wellbore.
 
         Args:
@@ -46,29 +46,30 @@ class WellboreMetaAPI:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "Wellbore.meta"},
+            {"space": "IntegrationTestsImmutable", "externalId": "Wellbore.meta"},
         )
         if isinstance(external_id, str):
-            is_wellbore = f.Equals(
+            is_wellbores = f.Equals(
                 ["edge", "startNode"],
                 {"space": space, "externalId": external_id},
             )
-            return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_wellbore))
-
         else:
             is_wellbores = f.In(
                 ["edge", "startNode"],
                 [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
-            return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_wellbores))
+        return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_wellbores))
 
     def list(
-        self, wellbore_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="IntegrationTestsImmutable"
+        self,
+        wellbore_id: str | list[str] | None = None,
+        limit=DEFAULT_LIMIT_READ,
+        space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
         """List meta edges of a wellbore.
 
         Args:
-            wellbore_id: Id of the source wellbore.
+            wellbore_id: ID of the source wellbore.
             limit: Maximum number of meta edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
             space: The space where all the meta edges are located.
@@ -86,12 +87,12 @@ class WellboreMetaAPI:
 
         """
         f = dm.filters
-        filters = []
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": space, "externalId": "Wellbore.meta"},
-        )
-        filters.append(is_edge_type)
+        filters = [
+            f.Equals(
+                ["edge", "type"],
+                {"space": "IntegrationTestsImmutable", "externalId": "Wellbore.meta"},
+            )
+        ]
         if wellbore_id:
             wellbore_ids = [wellbore_id] if isinstance(wellbore_id, str) else wellbore_id
             is_wellbores = f.In(
@@ -215,14 +216,14 @@ class WellboreAPI(TypeAPI[Wellbore, WellboreApply, WellboreList]):
         if isinstance(external_id, str):
             wellbore = self._retrieve((space, external_id))
 
-            meta_edges = self.meta.retrieve(external_id)
+            meta_edges = self.meta.retrieve(external_id, space=space)
             wellbore.meta = [edge.end_node.external_id for edge in meta_edges]
 
             return wellbore
         else:
             wellbores = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            meta_edges = self.meta.retrieve(external_id)
+            meta_edges = self.meta.retrieve(external_id, space=space)
             self._set_meta(wellbores, meta_edges)
 
             return wellbores
@@ -714,9 +715,9 @@ class WellboreAPI(TypeAPI[Wellbore, WellboreApply, WellboreList]):
 
         if retrieve_edges:
             if len(external_ids := wellbores.as_external_ids()) > IN_FILTER_LIMIT:
-                meta_edges = self.meta.list(limit=-1)
+                meta_edges = self.meta.list(limit=-1, space=space)
             else:
-                meta_edges = self.meta.list(external_ids, limit=-1)
+                meta_edges = self.meta.list(external_ids, limit=-1, space=space)
             self._set_meta(wellbores, meta_edges)
 
         return wellbores

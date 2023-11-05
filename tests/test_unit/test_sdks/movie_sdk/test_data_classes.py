@@ -389,3 +389,41 @@ def test_as_apply_list(person_and_person_apply: tuple[movie.Person, movie.Person
 
     # Assert
     assert actual == movie.PersonApplyList([person_apply])
+
+
+def test_person_apply_setting_space():
+    # Arrange
+    space = "myCustomSpace"
+    person = movie.ActorApply(
+        space=space,
+        external_id="actor:christoph_waltz",
+        person=movie.PersonApply(
+            name="Christoph Waltz",
+            birth_year=1956,
+            external_id="person:christoph_waltz",
+            space=space,
+        ),
+        won_oscar=True,
+        movies=[
+            movie.MovieApply(
+                external_id="movie:django_unchained",
+                title="Django Unchained",
+                space=space,
+                release_year=2012,
+                actors=["actor:christoph_waltz"],
+                directors=["director:quentin_tarantino"],
+                run_time_minutes=165,
+            )
+        ],
+    )
+
+    # Act
+    instances = person.to_instances_apply()
+
+    # Assert
+    assert not (
+        nodes := [n for n in instances.nodes if n.space != space]
+    ), f"Found nodes with unexpected space: {nodes}"
+    assert not (
+        edges := [e for e in instances.edges if e.space != space]
+    ), f"Found edges with unexpected space: {edges}"

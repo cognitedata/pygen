@@ -15,6 +15,7 @@ nav:
         - Exploration Local Notebook: quickstart/notebook.ipynb
         - Building Solution: quickstart/project.md
         - Data Population (Ingestion): quickstart/ingestion.ipynb
+        - Data Migration: quickstart/migration.ipynb
     - Installation: installation.md
     - CLI: cli.md
     - Examples:

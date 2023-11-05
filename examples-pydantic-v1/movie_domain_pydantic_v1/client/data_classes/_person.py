@@ -122,18 +122,18 @@ class PersonApply(DomainModelApply):
 
     def _create_role_edge(self, role: Union[str, RoleApply]) -> dm.EdgeApply:
         if isinstance(role, str):
-            end_node_ext_id = role
+            end_space, end_node_ext_id = self.space, role
         elif isinstance(role, DomainModelApply):
-            end_node_ext_id = role.external_id
+            end_space, end_node_ext_id = role.space, role.external_id
         else:
             raise TypeError(f"Expected str or RoleApply, got {type(role)}")
 
         return dm.EdgeApply(
-            space="IntegrationTestsImmutable",
+            space=self.space,
             external_id=f"{self.external_id}:{end_node_ext_id}",
             type=dm.DirectRelationReference("IntegrationTestsImmutable", "Person.roles"),
             start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference("IntegrationTestsImmutable", end_node_ext_id),
+            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
         )
 
 

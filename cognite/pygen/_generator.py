@@ -40,19 +40,19 @@ def generate_sdk(
 
     Args:
         model_id: The ID(s) of the data model(s) used to create a tailored SDK. You can also pass in the data model(s)
-          directly to avoid fetching them from CDF.
+            directly to avoid fetching them from CDF.
         client: The cognite client used for fetching the data model. This is required if you pass in
-          data models ID(s) in the `model_id` argument and not a data model.
+            data models ID(s) in the `model_id` argument and not a data model.
         top_level_package: The name of the top level package for the SDK. For example,
-          if we have top_level_package=`apm.client` and the client_name=`APMClient`, then
-          the importing the client will be `from apm.client import APMClient`. If nothing is passed,
-          the package will be [external_id:snake].client of the first data model given, while
-          the client name will be [external_id:pascal_case]
+            if we have top_level_package=`apm.client` and the client_name=`APMClient`, then
+            the importing the client will be `from apm.client import APMClient`. If nothing is passed,
+            the package will be [external_id:snake].client of the first data model given, while
+            the client name will be [external_id:pascal_case]
         client_name: The name of the client class. For example, `APMClient`. See above for more details.
         output_dir: The location to output the generated SDK. Defaults to the current working directory.
         logger: A logger function to log progress. Defaults to print.
         pydantic_version: The version of pydantic to use. Defaults to "infer" which will use
-                          the environment to detect the installed version of pydantic.
+            the environment to detect the installed version of pydantic.
         overwrite: Whether to overwrite the output directory if it already exists. Defaults to False.
         format_code: Whether to format the generated code using black. Defaults to True.
         config: The configuration used to control how to generate the SDK.
@@ -98,14 +98,14 @@ def generate_sdk_notebook(
 
     Args:
         model_id: The ID(s) of the data model(s) used to create a tailored SDK. You can also pass in the data model(s)
-          directly to avoid fetching them from CDF.
+            directly to avoid fetching them from CDF.
         client: The cognite client used for fetching the data model. This is required if you pass in
-          data models ID(s) in the `model_id` argument and not a data model.
+            data models ID(s) in the `model_id` argument and not a data model.
         top_level_package: The name of the top level package for the SDK. For example,
-          if we have top_level_package=`apm.client` and the client_name=`APMClient`, then
-          the importing the client will be `from apm.client import APMClient`. If nothing is passed,
-          the package will be [external_id:snake].client of the first data model given, while
-          the client name will be [external_id:pascal_case]
+            if we have top_level_package=`apm.client` and the client_name=`APMClient`, then
+            the importing the client will be `from apm.client import APMClient`. If nothing is passed,
+            the package will be [external_id:snake].client of the first data model given, while
+            the client name will be [external_id:pascal_case]
         client_name: The name of the client class. For example, `APMClient`. See above for more details.
         config: The configuration used to control how to generate the SDK.
 

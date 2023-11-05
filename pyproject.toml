@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cognite-pygen"
-version = "0.30.0"
+version = "0.30.1"
 description = "Cognite Python SDK Generator"
 readme = "README.md"
 authors = ["Cognite <support@cognite.com>"]
@@ -104,8 +104,9 @@ types-PyYAML = "^6"
 types-toml = "^0.10"
 IPython = "*"
 matplotlib = "*"
-tabulate = "*" # Use to generate markdown tables from pandas dataframes
-pytest-icdiff = "^0.8" # Used for better diffs in pytest
+tabulate = "*"
+pytest-icdiff = "^0.8"
+Faker = "*"
 
 [tool.pytest.ini_options]
 filterwarnings = [

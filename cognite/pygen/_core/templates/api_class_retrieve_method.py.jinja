@@ -28,14 +28,14 @@
         if isinstance(external_id, str):
             {% if data_class.has_one_to_many_edges %}{{ data_class.variable }} = self._retrieve((space, external_id))
 {% for field in data_class.one_to_many_edges %}
-            {{ field.variable }}_edges = self.{{ field.edge_api_attribute }}.retrieve(external_id)
+            {{ field.variable }}_edges = self.{{ field.edge_api_attribute }}.retrieve(external_id, space=space)
             {{ data_class.variable }}.{{ field.name }} = [edge.end_node.external_id for edge in {{ field.variable }}_edges]{% endfor %}
 
             return {{ data_class.variable }}{% else %}return self._retrieve((space, external_id)){% endif %}
         else:
             {% if data_class.has_one_to_many_edges %}{{ data_class.variable_list }} = self._retrieve([(space, ext_id) for ext_id in external_id])
 {% for field in data_class.one_to_many_edges %}
-            {{ field.variable }}_edges = self.{{ field.edge_api_attribute }}.retrieve(external_id)
+            {{ field.variable }}_edges = self.{{ field.edge_api_attribute }}.retrieve(external_id, space=space)
             self._set_{{ field.name }}({{ data_class.variable_list }}, {{ field.variable }}_edges){% endfor %}
 
             return {{ data_class.variable_list }}{% else %}return self._retrieve([(space, ext_id) for ext_id in external_id]){% endif %}

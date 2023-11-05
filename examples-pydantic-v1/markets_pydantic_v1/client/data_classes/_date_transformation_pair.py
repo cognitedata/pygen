@@ -106,34 +106,34 @@ class DateTransformationPairApply(DomainModelApply):
 
     def _create_end_edge(self, end: Union[str, DateTransformationApply]) -> dm.EdgeApply:
         if isinstance(end, str):
-            end_node_ext_id = end
+            end_space, end_node_ext_id = self.space, end
         elif isinstance(end, DomainModelApply):
-            end_node_ext_id = end.external_id
+            end_space, end_node_ext_id = end.space, end.external_id
         else:
             raise TypeError(f"Expected str or DateTransformationApply, got {type(end)}")
 
         return dm.EdgeApply(
-            space="market",
+            space=self.space,
             external_id=f"{self.external_id}:{end_node_ext_id}",
             type=dm.DirectRelationReference("market", "DateTransformationPair.end"),
             start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference("market", end_node_ext_id),
+            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
         )
 
     def _create_start_edge(self, start: Union[str, DateTransformationApply]) -> dm.EdgeApply:
         if isinstance(start, str):
-            end_node_ext_id = start
+            end_space, end_node_ext_id = self.space, start
         elif isinstance(start, DomainModelApply):
-            end_node_ext_id = start.external_id
+            end_space, end_node_ext_id = start.space, start.external_id
         else:
             raise TypeError(f"Expected str or DateTransformationApply, got {type(start)}")
 
         return dm.EdgeApply(
-            space="market",
+            space=self.space,
             external_id=f"{self.external_id}:{end_node_ext_id}",
             type=dm.DirectRelationReference("market", "DateTransformationPair.start"),
             start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference("market", end_node_ext_id),
+            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
         )
 
 

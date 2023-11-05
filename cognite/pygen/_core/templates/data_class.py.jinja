@@ -73,7 +73,7 @@ class {{ data_class.write_name }}(DomainModelApply):
         properties = {}{% for field in data_class.property_fields %}
         if self.{{ field.name }} is not None:
             properties["{{ field.prop_name }}"] = {% if field.is_edge %}{
-                "space": "{{ field.data_class.view_id.space }}",
+                "space":  self.space if isinstance(self.{{ field.name }}, str) else self.{{ field.name }}.space,
                 "externalId": self.{{ field.name }} if isinstance(self.{{ field.name }}, str) else self.{{ field.name }}.external_id,
             }{% else %}self.{{ field.name }}{% if field.is_time_field %}.isoformat({% if field.is_timestamp %}timespec="milliseconds"{% endif %}){% endif %}{% endif %}{% endfor %}
         if properties:
@@ -115,18 +115,18 @@ class {{ data_class.write_name }}(DomainModelApply):
 {%  for field in data_class.one_to_many_edges %}
     def _create_{{ field.variable }}_edge(self, {{ field.variable }}: Union[str, {{ field.data_class.write_name }}]) -> dm.EdgeApply:
         if isinstance({{ field.variable }}, str):
-            end_node_ext_id = {{ field.variable }}
+            end_space, end_node_ext_id = self.space, {{ field.variable }}
         elif isinstance({{ field.variable }}, DomainModelApply):
-            end_node_ext_id = {{ field.variable }}.external_id
+            end_space, end_node_ext_id = {{ field.variable }}.space, {{ field.variable }}.external_id
         else:
             raise TypeError(f"Expected str or {{ field.data_class.write_name }}, got {type({{ field.variable }})}")
 
         return dm.EdgeApply(
-            space="{{ space }}",
+            space=self.space,
             external_id=f"{self.external_id}:{end_node_ext_id}",
             type=dm.DirectRelationReference("{{ field.prop.type.space }}", "{{ field.prop.type.external_id }}"),
             start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference("{{ field.prop.source.space }}", end_node_ext_id),
+            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
         )
 {% endfor %}
 

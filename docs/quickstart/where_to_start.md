@@ -28,6 +28,10 @@ a machine learning model workflow using `scikit-learn` or `tensorflow`, then you
 check it into git history. See the [Project](project.html) for more information.
 
 ## (Intermediate) Ingestion Data into CDF
-`pygen` can also be used to create an extractor that is used to ingest data into CDF. The typicaly use case
+`pygen` can also be used to create an extractor that is used to ingest data into CDF. The typical use case
 is when you have a data source that is creating nested data and you want to perform client side validation of the
 data before ingesting it into CDF. See the [Data Population](ingestion.html) for more information.
+
+## (Intermediate) Migration Data between Data Models
+`pygen` can also be used to move data from one model to another. In short, you create an SDK using `pygen` for each
+data model, and then write the code to move data between the models. See the [Data migration](migration.html) for more information.

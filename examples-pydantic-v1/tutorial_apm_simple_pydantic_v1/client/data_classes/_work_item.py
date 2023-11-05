@@ -147,7 +147,7 @@ class WorkItemApply(DomainModelApply):
             properties["toBeDone"] = self.to_be_done
         if self.work_order is not None:
             properties["workOrder"] = {
-                "space": "tutorial_apm_simple",
+                "space": self.space if isinstance(self.work_order, str) else self.work_order.space,
                 "externalId": self.work_order if isinstance(self.work_order, str) else self.work_order.external_id,
             }
         if properties:
@@ -188,18 +188,18 @@ class WorkItemApply(DomainModelApply):
 
     def _create_linked_asset_edge(self, linked_asset: Union[str, AssetApply]) -> dm.EdgeApply:
         if isinstance(linked_asset, str):
-            end_node_ext_id = linked_asset
+            end_space, end_node_ext_id = self.space, linked_asset
         elif isinstance(linked_asset, DomainModelApply):
-            end_node_ext_id = linked_asset.external_id
+            end_space, end_node_ext_id = linked_asset.space, linked_asset.external_id
         else:
             raise TypeError(f"Expected str or AssetApply, got {type(linked_asset)}")
 
         return dm.EdgeApply(
-            space="tutorial_apm_simple",
+            space=self.space,
             external_id=f"{self.external_id}:{end_node_ext_id}",
             type=dm.DirectRelationReference("tutorial_apm_simple", "WorkItem.linkedAssets"),
             start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference("tutorial_apm_simple", end_node_ext_id),
+            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
         )
 
 

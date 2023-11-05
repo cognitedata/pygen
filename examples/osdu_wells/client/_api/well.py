@@ -24,7 +24,7 @@ class WellMetaAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
         """Retrieve one or more meta edges by id(s) of a well.
 
         Args:
@@ -46,29 +46,27 @@ class WellMetaAPI:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "Well.meta"},
+            {"space": "IntegrationTestsImmutable", "externalId": "Well.meta"},
         )
         if isinstance(external_id, str):
-            is_well = f.Equals(
+            is_wells = f.Equals(
                 ["edge", "startNode"],
                 {"space": space, "externalId": external_id},
             )
-            return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_well))
-
         else:
             is_wells = f.In(
                 ["edge", "startNode"],
                 [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
-            return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_wells))
+        return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_wells))
 
     def list(
-        self, well_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="IntegrationTestsImmutable"
+        self, well_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space: str = "IntegrationTestsImmutable"
     ) -> dm.EdgeList:
         """List meta edges of a well.
 
         Args:
-            well_id: Id of the source well.
+            well_id: ID of the source well.
             limit: Maximum number of meta edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
             space: The space where all the meta edges are located.
@@ -86,12 +84,12 @@ class WellMetaAPI:
 
         """
         f = dm.filters
-        filters = []
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": space, "externalId": "Well.meta"},
-        )
-        filters.append(is_edge_type)
+        filters = [
+            f.Equals(
+                ["edge", "type"],
+                {"space": "IntegrationTestsImmutable", "externalId": "Well.meta"},
+            )
+        ]
         if well_id:
             well_ids = [well_id] if isinstance(well_id, str) else well_id
             is_wells = f.In(
@@ -211,14 +209,14 @@ class WellAPI(TypeAPI[Well, WellApply, WellList]):
         if isinstance(external_id, str):
             well = self._retrieve((space, external_id))
 
-            meta_edges = self.meta.retrieve(external_id)
+            meta_edges = self.meta.retrieve(external_id, space=space)
             well.meta = [edge.end_node.external_id for edge in meta_edges]
 
             return well
         else:
             wells = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            meta_edges = self.meta.retrieve(external_id)
+            meta_edges = self.meta.retrieve(external_id, space=space)
             self._set_meta(wells, meta_edges)
 
             return wells
@@ -710,9 +708,9 @@ class WellAPI(TypeAPI[Well, WellApply, WellList]):
 
         if retrieve_edges:
             if len(external_ids := wells.as_external_ids()) > IN_FILTER_LIMIT:
-                meta_edges = self.meta.list(limit=-1)
+                meta_edges = self.meta.list(limit=-1, space=space)
             else:
-                meta_edges = self.meta.list(external_ids, limit=-1)
+                meta_edges = self.meta.list(external_ids, limit=-1, space=space)
             self._set_meta(wells, meta_edges)
 
         return wells

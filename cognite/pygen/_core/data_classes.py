@@ -5,7 +5,6 @@ from abc import ABC, abstractmethod
 from collections import defaultdict
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass, field
-from typing import cast
 
 from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.data_modeling.data_types import ListablePropertyType
@@ -73,6 +72,10 @@ class Field(ABC):
         pydantic_field: str = "Field",
     ) -> Field:
         name = create_name(prop_name, field_naming.name)
+        # Todo: Name collision needs a better solution
+        if name == "interval":
+            name = "interval_"
+
         doc_name = to_words(name, singularize=True)
         if isinstance(prop, dm.SingleHopConnectionDefinition):
             variable = create_name(prop_name, field_naming.variable)
@@ -134,9 +137,27 @@ class Field(ABC):
                     pydantic_field=pydantic_field,
                 )
         elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation):
-            # For direct relation the source is required.
-            view_id = cast(dm.ViewId, prop.source)
-            target_data_class = data_class_by_view_id[ViewSpaceExternalId(view_id.space, view_id.external_id)]
+            if prop.source is not None:
+                # Connected in View
+                target_data_class = data_class_by_view_id[
+                    ViewSpaceExternalId(prop.source.space, prop.source.external_id)
+                ]
+            else:
+                # Connected in Container
+                # Todo: This is a hack, we are assuming (gambling) that the container ExternalId is the same as the
+                #   view ExternalId. This is not always true.
+                if (
+                    view_id := ViewSpaceExternalId(prop.container.space, prop.container.external_id)
+                ) in data_class_by_view_id:
+                    target_data_class = data_class_by_view_id[view_id]
+                elif prop.type.container and (
+                    (view_id := ViewSpaceExternalId(prop.type.container.space, prop.type.container.external_id))
+                    in data_class_by_view_id
+                ):
+                    target_data_class = data_class_by_view_id[view_id]
+                else:
+                    raise ValueError(f"Could not find data class for {prop_name=}")
+
             return EdgeOneToOne(
                 name=name,
                 prop_name=prop_name,

@@ -311,34 +311,34 @@ class WorkOrderApply(DomainModelApply):
 
     def _create_linked_asset_edge(self, linked_asset: Union[str, AssetApply]) -> dm.EdgeApply:
         if isinstance(linked_asset, str):
-            end_node_ext_id = linked_asset
+            end_space, end_node_ext_id = self.space, linked_asset
         elif isinstance(linked_asset, DomainModelApply):
-            end_node_ext_id = linked_asset.external_id
+            end_space, end_node_ext_id = linked_asset.space, linked_asset.external_id
         else:
             raise TypeError(f"Expected str or AssetApply, got {type(linked_asset)}")
 
         return dm.EdgeApply(
-            space="tutorial_apm_simple",
+            space=self.space,
             external_id=f"{self.external_id}:{end_node_ext_id}",
             type=dm.DirectRelationReference("tutorial_apm_simple", "WorkOrder.linkedAssets"),
             start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference("tutorial_apm_simple", end_node_ext_id),
+            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
         )
 
     def _create_work_item_edge(self, work_item: Union[str, WorkItemApply]) -> dm.EdgeApply:
         if isinstance(work_item, str):
-            end_node_ext_id = work_item
+            end_space, end_node_ext_id = self.space, work_item
         elif isinstance(work_item, DomainModelApply):
-            end_node_ext_id = work_item.external_id
+            end_space, end_node_ext_id = work_item.space, work_item.external_id
         else:
             raise TypeError(f"Expected str or WorkItemApply, got {type(work_item)}")
 
         return dm.EdgeApply(
-            space="tutorial_apm_simple",
+            space=self.space,
             external_id=f"{self.external_id}:{end_node_ext_id}",
             type=dm.DirectRelationReference("tutorial_apm_simple", "WorkOrder.workItems"),
             start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference("tutorial_apm_simple", end_node_ext_id),
+            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
         )
 
 

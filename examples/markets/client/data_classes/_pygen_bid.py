@@ -110,7 +110,7 @@ class PygenBidApply(DomainModelApply):
             properties["isBlock"] = self.is_block
         if self.market is not None:
             properties["market"] = {
-                "space": "market",
+                "space": self.space if isinstance(self.market, str) else self.market.space,
                 "externalId": self.market if isinstance(self.market, str) else self.market.external_id,
             }
         if self.minimum_price is not None:
