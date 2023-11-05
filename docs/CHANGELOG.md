@@ -21,6 +21,8 @@ Changes are grouped as follows
   to filter on `["edge", "type"]` instead of the `space` passed in.
 * When calling `.apply` all one-to-one edges had `space` set to the model space instead of the `space` set in the
   node object. This is now fixed.
+* When calling `.list` and `.retrieve` in the generated NodeAPI classes, the `space` parameter was not propagated
+  to the underlying `.list` and `.retrieve` calls to the EdgeAPI classes. This is now fixed.
 
 ## [0.30.0] - 04-11-23
 ### Added
