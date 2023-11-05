@@ -194,18 +194,18 @@ class AsIngestedCoordinatesApply(DomainModelApply):
 
     def _create_feature_edge(self, feature: Union[str, FeaturesApply]) -> dm.EdgeApply:
         if isinstance(feature, str):
-            end_node_ext_id = feature
+            end_space, end_node_ext_id = self.space, feature
         elif isinstance(feature, DomainModelApply):
-            end_node_ext_id = feature.external_id
+            end_space, end_node_ext_id = feature.space, feature.external_id
         else:
             raise TypeError(f"Expected str or FeaturesApply, got {type(feature)}")
 
         return dm.EdgeApply(
-            space="IntegrationTestsImmutable",
+            space=self.space,
             external_id=f"{self.external_id}:{end_node_ext_id}",
             type=dm.DirectRelationReference("IntegrationTestsImmutable", "AsIngestedCoordinates.features"),
             start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference("IntegrationTestsImmutable", end_node_ext_id),
+            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
         )
 
 

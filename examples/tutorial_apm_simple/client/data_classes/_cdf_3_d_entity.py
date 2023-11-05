@@ -85,18 +85,18 @@ class CdfEntityApply(DomainModelApply):
 
     def _create_in_model_3_d_edge(self, in_model_3_d: Union[str, CdfModelApply]) -> dm.EdgeApply:
         if isinstance(in_model_3_d, str):
-            end_node_ext_id = in_model_3_d
+            end_space, end_node_ext_id = self.space, in_model_3_d
         elif isinstance(in_model_3_d, DomainModelApply):
-            end_node_ext_id = in_model_3_d.external_id
+            end_space, end_node_ext_id = in_model_3_d.space, in_model_3_d.external_id
         else:
             raise TypeError(f"Expected str or CdfModelApply, got {type(in_model_3_d)}")
 
         return dm.EdgeApply(
-            space="cdf_3d_schema",
+            space=self.space,
             external_id=f"{self.external_id}:{end_node_ext_id}",
             type=dm.DirectRelationReference("cdf_3d_schema", "cdf3dEntityConnection"),
             start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference("cdf_3d_schema", end_node_ext_id),
+            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
         )
 
 

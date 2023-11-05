@@ -770,186 +770,186 @@ class WellboreDataApply(DomainModelApply):
 
     def _create_drilling_reason_edge(self, drilling_reason: Union[str, DrillingReasonsApply]) -> dm.EdgeApply:
         if isinstance(drilling_reason, str):
-            end_node_ext_id = drilling_reason
+            end_space, end_node_ext_id = self.space, drilling_reason
         elif isinstance(drilling_reason, DomainModelApply):
-            end_node_ext_id = drilling_reason.external_id
+            end_space, end_node_ext_id = drilling_reason.space, drilling_reason.external_id
         else:
             raise TypeError(f"Expected str or DrillingReasonsApply, got {type(drilling_reason)}")
 
         return dm.EdgeApply(
-            space="IntegrationTestsImmutable",
+            space=self.space,
             external_id=f"{self.external_id}:{end_node_ext_id}",
             type=dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.DrillingReasons"),
             start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference("IntegrationTestsImmutable", end_node_ext_id),
+            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
         )
 
     def _create_facility_event_edge(self, facility_event: Union[str, FacilityEventsApply]) -> dm.EdgeApply:
         if isinstance(facility_event, str):
-            end_node_ext_id = facility_event
+            end_space, end_node_ext_id = self.space, facility_event
         elif isinstance(facility_event, DomainModelApply):
-            end_node_ext_id = facility_event.external_id
+            end_space, end_node_ext_id = facility_event.space, facility_event.external_id
         else:
             raise TypeError(f"Expected str or FacilityEventsApply, got {type(facility_event)}")
 
         return dm.EdgeApply(
-            space="IntegrationTestsImmutable",
+            space=self.space,
             external_id=f"{self.external_id}:{end_node_ext_id}",
             type=dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.FacilityEvents"),
             start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference("IntegrationTestsImmutable", end_node_ext_id),
+            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
         )
 
     def _create_facility_operator_edge(self, facility_operator: Union[str, FacilityOperatorsApply]) -> dm.EdgeApply:
         if isinstance(facility_operator, str):
-            end_node_ext_id = facility_operator
+            end_space, end_node_ext_id = self.space, facility_operator
         elif isinstance(facility_operator, DomainModelApply):
-            end_node_ext_id = facility_operator.external_id
+            end_space, end_node_ext_id = facility_operator.space, facility_operator.external_id
         else:
             raise TypeError(f"Expected str or FacilityOperatorsApply, got {type(facility_operator)}")
 
         return dm.EdgeApply(
-            space="IntegrationTestsImmutable",
+            space=self.space,
             external_id=f"{self.external_id}:{end_node_ext_id}",
             type=dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.FacilityOperators"),
             start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference("IntegrationTestsImmutable", end_node_ext_id),
+            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
         )
 
     def _create_facility_specification_edge(
         self, facility_specification: Union[str, FacilitySpecificationsApply]
     ) -> dm.EdgeApply:
         if isinstance(facility_specification, str):
-            end_node_ext_id = facility_specification
+            end_space, end_node_ext_id = self.space, facility_specification
         elif isinstance(facility_specification, DomainModelApply):
-            end_node_ext_id = facility_specification.external_id
+            end_space, end_node_ext_id = facility_specification.space, facility_specification.external_id
         else:
             raise TypeError(f"Expected str or FacilitySpecificationsApply, got {type(facility_specification)}")
 
         return dm.EdgeApply(
-            space="IntegrationTestsImmutable",
+            space=self.space,
             external_id=f"{self.external_id}:{end_node_ext_id}",
             type=dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.FacilitySpecifications"),
             start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference("IntegrationTestsImmutable", end_node_ext_id),
+            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
         )
 
     def _create_facility_state_edge(self, facility_state: Union[str, FacilityStatesApply]) -> dm.EdgeApply:
         if isinstance(facility_state, str):
-            end_node_ext_id = facility_state
+            end_space, end_node_ext_id = self.space, facility_state
         elif isinstance(facility_state, DomainModelApply):
-            end_node_ext_id = facility_state.external_id
+            end_space, end_node_ext_id = facility_state.space, facility_state.external_id
         else:
             raise TypeError(f"Expected str or FacilityStatesApply, got {type(facility_state)}")
 
         return dm.EdgeApply(
-            space="IntegrationTestsImmutable",
+            space=self.space,
             external_id=f"{self.external_id}:{end_node_ext_id}",
             type=dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.FacilityStates"),
             start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference("IntegrationTestsImmutable", end_node_ext_id),
+            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
         )
 
     def _create_geo_context_edge(self, geo_context: Union[str, GeoContextsApply]) -> dm.EdgeApply:
         if isinstance(geo_context, str):
-            end_node_ext_id = geo_context
+            end_space, end_node_ext_id = self.space, geo_context
         elif isinstance(geo_context, DomainModelApply):
-            end_node_ext_id = geo_context.external_id
+            end_space, end_node_ext_id = geo_context.space, geo_context.external_id
         else:
             raise TypeError(f"Expected str or GeoContextsApply, got {type(geo_context)}")
 
         return dm.EdgeApply(
-            space="IntegrationTestsImmutable",
+            space=self.space,
             external_id=f"{self.external_id}:{end_node_ext_id}",
             type=dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.GeoContexts"),
             start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference("IntegrationTestsImmutable", end_node_ext_id),
+            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
         )
 
     def _create_historical_interest_edge(
         self, historical_interest: Union[str, HistoricalInterestsApply]
     ) -> dm.EdgeApply:
         if isinstance(historical_interest, str):
-            end_node_ext_id = historical_interest
+            end_space, end_node_ext_id = self.space, historical_interest
         elif isinstance(historical_interest, DomainModelApply):
-            end_node_ext_id = historical_interest.external_id
+            end_space, end_node_ext_id = historical_interest.space, historical_interest.external_id
         else:
             raise TypeError(f"Expected str or HistoricalInterestsApply, got {type(historical_interest)}")
 
         return dm.EdgeApply(
-            space="IntegrationTestsImmutable",
+            space=self.space,
             external_id=f"{self.external_id}:{end_node_ext_id}",
             type=dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.HistoricalInterests"),
             start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference("IntegrationTestsImmutable", end_node_ext_id),
+            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
         )
 
     def _create_name_alias_edge(self, name_alias: Union[str, NameAliasesApply]) -> dm.EdgeApply:
         if isinstance(name_alias, str):
-            end_node_ext_id = name_alias
+            end_space, end_node_ext_id = self.space, name_alias
         elif isinstance(name_alias, DomainModelApply):
-            end_node_ext_id = name_alias.external_id
+            end_space, end_node_ext_id = name_alias.space, name_alias.external_id
         else:
             raise TypeError(f"Expected str or NameAliasesApply, got {type(name_alias)}")
 
         return dm.EdgeApply(
-            space="IntegrationTestsImmutable",
+            space=self.space,
             external_id=f"{self.external_id}:{end_node_ext_id}",
             type=dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.NameAliases"),
             start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference("IntegrationTestsImmutable", end_node_ext_id),
+            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
         )
 
     def _create_technical_assurance_edge(
         self, technical_assurance: Union[str, TechnicalAssurancesApply]
     ) -> dm.EdgeApply:
         if isinstance(technical_assurance, str):
-            end_node_ext_id = technical_assurance
+            end_space, end_node_ext_id = self.space, technical_assurance
         elif isinstance(technical_assurance, DomainModelApply):
-            end_node_ext_id = technical_assurance.external_id
+            end_space, end_node_ext_id = technical_assurance.space, technical_assurance.external_id
         else:
             raise TypeError(f"Expected str or TechnicalAssurancesApply, got {type(technical_assurance)}")
 
         return dm.EdgeApply(
-            space="IntegrationTestsImmutable",
+            space=self.space,
             external_id=f"{self.external_id}:{end_node_ext_id}",
             type=dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.TechnicalAssurances"),
             start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference("IntegrationTestsImmutable", end_node_ext_id),
+            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
         )
 
     def _create_vertical_measurement_edge(
         self, vertical_measurement: Union[str, VerticalMeasurementsApply]
     ) -> dm.EdgeApply:
         if isinstance(vertical_measurement, str):
-            end_node_ext_id = vertical_measurement
+            end_space, end_node_ext_id = self.space, vertical_measurement
         elif isinstance(vertical_measurement, DomainModelApply):
-            end_node_ext_id = vertical_measurement.external_id
+            end_space, end_node_ext_id = vertical_measurement.space, vertical_measurement.external_id
         else:
             raise TypeError(f"Expected str or VerticalMeasurementsApply, got {type(vertical_measurement)}")
 
         return dm.EdgeApply(
-            space="IntegrationTestsImmutable",
+            space=self.space,
             external_id=f"{self.external_id}:{end_node_ext_id}",
             type=dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.VerticalMeasurements"),
             start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference("IntegrationTestsImmutable", end_node_ext_id),
+            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
         )
 
     def _create_wellbore_cost_edge(self, wellbore_cost: Union[str, WellboreCostsApply]) -> dm.EdgeApply:
         if isinstance(wellbore_cost, str):
-            end_node_ext_id = wellbore_cost
+            end_space, end_node_ext_id = self.space, wellbore_cost
         elif isinstance(wellbore_cost, DomainModelApply):
-            end_node_ext_id = wellbore_cost.external_id
+            end_space, end_node_ext_id = wellbore_cost.space, wellbore_cost.external_id
         else:
             raise TypeError(f"Expected str or WellboreCostsApply, got {type(wellbore_cost)}")
 
         return dm.EdgeApply(
-            space="IntegrationTestsImmutable",
+            space=self.space,
             external_id=f"{self.external_id}:{end_node_ext_id}",
             type=dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.WellboreCosts"),
             start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference("IntegrationTestsImmutable", end_node_ext_id),
+            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
         )
 
 

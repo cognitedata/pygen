@@ -242,18 +242,18 @@ class WellApply(DomainModelApply):
 
     def _create_meta_edge(self, meta: Union[str, MetaApply]) -> dm.EdgeApply:
         if isinstance(meta, str):
-            end_node_ext_id = meta
+            end_space, end_node_ext_id = self.space, meta
         elif isinstance(meta, DomainModelApply):
-            end_node_ext_id = meta.external_id
+            end_space, end_node_ext_id = meta.space, meta.external_id
         else:
             raise TypeError(f"Expected str or MetaApply, got {type(meta)}")
 
         return dm.EdgeApply(
-            space="IntegrationTestsImmutable",
+            space=self.space,
             external_id=f"{self.external_id}:{end_node_ext_id}",
             type=dm.DirectRelationReference("IntegrationTestsImmutable", "Well.meta"),
             start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference("IntegrationTestsImmutable", end_node_ext_id),
+            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
         )
 
 
