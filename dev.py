@@ -87,10 +87,11 @@ def deploy():
         containers = example_sdk.load_containers()
         new_containers = client.data_modeling.containers.apply(containers)
         for container in new_containers:
-            typer.echo(f"Created container {container.name} in space {container.space}")
+            typer.echo(f"Created container {container.external_id} in space {container.space}")
 
     new_model = client.data_modeling.data_models.apply(data_models.as_apply())
-    typer.echo(f"Created data model {new_model.name} in space {new_model.space}")
+    for model in new_model:
+        typer.echo(f"Created data model {model.external_id} in space {model.space}")
 
 
 @app.command("list", help="List all example files which are expected to be changed manually")

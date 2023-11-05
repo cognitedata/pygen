@@ -139,10 +139,11 @@ APM_APP_DATA_SOURCE = ExampleSDK(
 )
 
 APM_APP_DATA_SINK = ExampleSDK(
-    data_models=[DataModelId("apm", "ApmAppData", "v3")],
+    data_models=[DataModelId("IntegrationTestsImmutable", "ApmAppData", "v3")],
     _top_level_package="sysdm_domain.client",
     client_name="SysDMClient",
     download_only=True,
+    has_container_file=True,
 )
 
 
