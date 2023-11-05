@@ -1,0 +1,446 @@
+- space: IntegrationTestsImmutable
+  externalId: Observation
+  usedFor: node
+  properties:
+    status:
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+    asset:
+      type:
+        container:
+          space: IntegrationTestsImmutable
+          externalId: Asset
+          type: container
+        type: direct
+      nullable: true
+      autoIncrement: false
+    files:
+      type:
+        list: true
+        type: file
+      nullable: true
+      autoIncrement: false
+    rootLocation:
+      type:
+        container:
+          space: IntegrationTestsImmutable
+          externalId: Asset
+          type: container
+        type: direct
+      nullable: true
+      autoIncrement: false
+    troubleshooting:
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+    priority:
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+    type:
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+- space: IntegrationTestsImmutable
+  externalId: Template
+  usedFor: node
+  properties:
+    status:
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+    rootLocation:
+      type:
+        container:
+          space: IntegrationTestsImmutable
+          externalId: Asset
+          type: container
+        type: direct
+      nullable: true
+      autoIncrement: false
+    assignedTo:
+      type:
+        list: true
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+- space: IntegrationTestsImmutable
+  externalId: ChecklistItem
+  usedFor: node
+  properties:
+    order:
+      type:
+        list: false
+        type: int32
+      nullable: true
+      autoIncrement: false
+    status:
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+    note:
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+    asset:
+      type:
+        container:
+          space: IntegrationTestsImmutable
+          externalId: Asset
+          type: container
+        type: direct
+      nullable: true
+      autoIncrement: false
+    files:
+      type:
+        list: true
+        type: file
+      nullable: true
+      autoIncrement: false
+- space: IntegrationTestsImmutable
+  externalId: Asset
+  usedFor: node
+  properties:
+    parent:
+      type:
+        container:
+          space: IntegrationTestsImmutable
+          externalId: Asset
+          type: container
+        type: direct
+      nullable: true
+      autoIncrement: false
+    root:
+      type:
+        container:
+          space: IntegrationTestsImmutable
+          externalId: Asset
+          type: container
+        type: direct
+      nullable: true
+      autoIncrement: false
+- space: IntegrationTestsImmutable
+  externalId: Creatable
+  usedFor: node
+  properties:
+    visibility:
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+    createdBy:
+      type:
+        container:
+          space: IntegrationTestsImmutable
+          externalId: CDF_User
+          type: container
+        type: direct
+      nullable: true
+      autoIncrement: false
+    updatedBy:
+      type:
+        container:
+          space: IntegrationTestsImmutable
+          externalId: CDF_User
+          type: container
+        type: direct
+      nullable: true
+      autoIncrement: false
+    isArchived:
+      type:
+        list: false
+        type: boolean
+      nullable: true
+      autoIncrement: false
+- space: IntegrationTestsImmutable
+  externalId: Schedulable
+  usedFor: node
+  properties:
+    startTime:
+      type:
+        list: false
+        type: timestamp
+      nullable: true
+      autoIncrement: false
+    endTime:
+      type:
+        list: false
+        type: timestamp
+      nullable: true
+      autoIncrement: false
+- space: IntegrationTestsImmutable
+  externalId: TemplateItem
+  usedFor: node
+  properties:
+    order:
+      type:
+        list: false
+        type: int32
+      nullable: true
+      autoIncrement: false
+    asset:
+      type:
+        container:
+          space: IntegrationTestsImmutable
+          externalId: Asset
+          type: container
+        type: direct
+      nullable: true
+      autoIncrement: false
+- space: IntegrationTestsImmutable
+  externalId: MeasurementReading
+  usedFor: node
+  properties:
+    type:
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+    order:
+      type:
+        list: false
+        type: int32
+      nullable: true
+      autoIncrement: false
+    timeseries:
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      autoIncrement: false
+    min:
+      type:
+        list: false
+        type: float64
+      nullable: true
+      autoIncrement: false
+    max:
+      type:
+        list: false
+        type: float64
+      nullable: true
+      autoIncrement: false
+    options:
+      type:
+        list: true
+        type: json
+      nullable: true
+      autoIncrement: false
+    measuredAt:
+      type:
+        list: false
+        type: timestamp
+      nullable: true
+      autoIncrement: false
+    numericReading:
+      type:
+        list: false
+        type: float64
+      nullable: true
+      autoIncrement: false
+    stringReading:
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+- space: IntegrationTestsImmutable
+  externalId: CDF_User
+  usedFor: node
+  properties:
+    email:
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: false
+      autoIncrement: false
+    preferences:
+      type:
+        container:
+          space: IntegrationTestsImmutable
+          externalId: CDF_UserPreferences
+          type: container
+        type: direct
+      nullable: true
+      autoIncrement: false
+    name:
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+- space: IntegrationTestsImmutable
+  externalId: Checklist
+  usedFor: node
+  properties:
+    type:
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+    status:
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+    rootLocation:
+      type:
+        container:
+          space: IntegrationTestsImmutable
+          externalId: Asset
+          type: container
+        type: direct
+      nullable: true
+      autoIncrement: false
+    assignedTo:
+      type:
+        list: true
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+- space: IntegrationTestsImmutable
+  externalId: CDF_UserPreferences
+  usedFor: node
+  properties:
+    language:
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+    apmAppConfig:
+      type:
+        list: false
+        type: json
+      nullable: true
+      autoIncrement: false
+- space: IntegrationTestsImmutable
+  externalId: Describable
+  usedFor: node
+  properties:
+    title:
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+    description:
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+    labels:
+      type:
+        list: true
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+- space: IntegrationTestsImmutable
+  externalId: Schedule
+  usedFor: node
+  properties:
+    status:
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+    timezone:
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+    exceptionDates:
+      type:
+        list: true
+        type: timestamp
+      nullable: true
+      autoIncrement: false
+    freq:
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+    interval:
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+    byDay:
+      type:
+        list: true
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+    until:
+      type:
+        list: false
+        type: timestamp
+      nullable: true
+      autoIncrement: false
+- space: IntegrationTestsImmutable
+  externalId: Sourceable
+  usedFor: node
+  properties:
+    sourceId:
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+    source:
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
