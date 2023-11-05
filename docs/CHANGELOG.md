@@ -13,6 +13,11 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.31.0] - 05-11-23
+### Fixed
+* When setting `space` for a node in the generated SDK, the automatically created edges would not be created in the
+  same space. This is now fixed.
+
 ## [0.30.0] - 04-11-23
 ### Added
 * `pygen` now generates docstrings for all methods in the generated SDK. The docstrings are based on the
