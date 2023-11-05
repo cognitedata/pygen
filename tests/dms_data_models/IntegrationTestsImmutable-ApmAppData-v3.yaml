@@ -1578,7 +1578,7 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: false
+      nullable: true
       autoIncrement: false
       source: null
       defaultValue: null

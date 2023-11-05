@@ -66,20 +66,12 @@
       description: Visibility of node (PUBLIC, PRIVATE, PROTECTED)
     createdBy:
       type:
-        container:
-          space: cdf_apps_shared
-          externalId: CDF_User
-          type: container
         type: direct
       nullable: true
       autoIncrement: false
       description: Who created this node?
     updatedBy:
       type:
-        container:
-          space: cdf_apps_shared
-          externalId: CDF_User
-          type: container
         type: direct
       nullable: true
       autoIncrement: false
@@ -109,10 +101,6 @@
       description: The status of the checklist
     rootLocation:
       type:
-        container:
-          space: cdf_core
-          externalId: Asset
-          type: container
         type: direct
       nullable: true
       autoIncrement: false
@@ -193,20 +181,12 @@
       description: Visibility of node (PUBLIC, PRIVATE, PROTECTED)
     createdBy:
       type:
-        container:
-          space: cdf_apps_shared
-          externalId: CDF_User
-          type: container
         type: direct
       nullable: true
       autoIncrement: false
       description: Who created this node?
     updatedBy:
       type:
-        container:
-          space: cdf_apps_shared
-          externalId: CDF_User
-          type: container
         type: direct
       nullable: true
       autoIncrement: false
@@ -243,10 +223,6 @@
       description: Additional notes for the checklist item
     asset:
       type:
-        container:
-          space: cdf_core
-          externalId: Asset
-          type: container
         type: direct
       nullable: true
       autoIncrement: false
@@ -312,20 +288,12 @@
       description: Visibility of node (PUBLIC, PRIVATE, PROTECTED)
     createdBy:
       type:
-        container:
-          space: cdf_apps_shared
-          externalId: CDF_User
-          type: container
         type: direct
       nullable: true
       autoIncrement: false
       description: Who created this node?
     updatedBy:
       type:
-        container:
-          space: cdf_apps_shared
-          externalId: CDF_User
-          type: container
         type: direct
       nullable: true
       autoIncrement: false
@@ -347,10 +315,6 @@
       description: The status of the observation (draft, completed, sent)
     asset:
       type:
-        container:
-          space: cdf_core
-          externalId: Asset
-          type: container
         type: direct
       nullable: true
       autoIncrement: false
@@ -364,10 +328,6 @@
       description: List of associated files
     rootLocation:
       type:
-        container:
-          space: cdf_core
-          externalId: Asset
-          type: container
         type: direct
       nullable: true
       autoIncrement: false
@@ -435,20 +395,12 @@
       description: Visibility of node (PUBLIC, PRIVATE, PROTECTED)
     createdBy:
       type:
-        container:
-          space: cdf_apps_shared
-          externalId: CDF_User
-          type: container
         type: direct
       nullable: true
       autoIncrement: false
       description: Who created this node?
     updatedBy:
       type:
-        container:
-          space: cdf_apps_shared
-          externalId: CDF_User
-          type: container
         type: direct
       nullable: true
       autoIncrement: false
@@ -470,10 +422,6 @@
       description: Status of the template eg. draft, ready, etc.
     rootLocation:
       type:
-        container:
-          space: cdf_core
-          externalId: Asset
-          type: container
         type: direct
       nullable: true
       autoIncrement: false
@@ -524,20 +472,12 @@
       description: Visibility of node (PUBLIC, PRIVATE, PROTECTED)
     createdBy:
       type:
-        container:
-          space: cdf_apps_shared
-          externalId: CDF_User
-          type: container
         type: direct
       nullable: true
       autoIncrement: false
       description: Who created this node?
     updatedBy:
       type:
-        container:
-          space: cdf_apps_shared
-          externalId: CDF_User
-          type: container
         type: direct
       nullable: true
       autoIncrement: false
@@ -558,10 +498,6 @@
       description: The execution order of the template item
     asset:
       type:
-        container:
-          space: cdf_core
-          externalId: Asset
-          type: container
         type: direct
       nullable: true
       autoIncrement: false
@@ -580,20 +516,12 @@
       description: Visibility of node (PUBLIC, PRIVATE, PROTECTED)
     createdBy:
       type:
-        container:
-          space: cdf_apps_shared
-          externalId: CDF_User
-          type: container
         type: direct
       nullable: true
       autoIncrement: false
       description: Who created this node?
     updatedBy:
       type:
-        container:
-          space: cdf_apps_shared
-          externalId: CDF_User
-          type: container
         type: direct
       nullable: true
       autoIncrement: false
@@ -700,20 +628,12 @@
       description: Visibility of node (PUBLIC, PRIVATE, PROTECTED)
     createdBy:
       type:
-        container:
-          space: cdf_apps_shared
-          externalId: CDF_User
-          type: container
         type: direct
       nullable: true
       autoIncrement: false
       description: Who created this node?
     updatedBy:
       type:
-        container:
-          space: cdf_apps_shared
-          externalId: CDF_User
-          type: container
         type: direct
       nullable: true
       autoIncrement: false
@@ -795,15 +715,11 @@
         list: false
         collation: ucs_basic
         type: text
-      nullable: false
+      nullable: true
       autoIncrement: false
       description: Email of user
     preferences:
       type:
-        container:
-          space: cdf_apps_shared
-          externalId: CDF_UserPreferences
-          type: container
         type: direct
       nullable: true
       autoIncrement: false
@@ -881,20 +797,12 @@
       description: Text based labels for generic use
     parent:
       type:
-        container:
-          space: cdf_core
-          externalId: Asset
-          type: container
         type: direct
       nullable: true
       autoIncrement: false
       description: Parent of this asset
     root:
       type:
-        container:
-          space: cdf_core
-          externalId: Asset
-          type: container
         type: direct
       nullable: true
       autoIncrement: false
