@@ -24,7 +24,7 @@ class WorkItemLinkedAssetsAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space="tutorial_apm_simple") -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "tutorial_apm_simple") -> dm.EdgeList:
         """Retrieve one or more linked_assets edges by id(s) of a work item.
 
         Args:
@@ -46,31 +46,27 @@ class WorkItemLinkedAssetsAPI:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "WorkItem.linkedAssets"},
+            {"space": "tutorial_apm_simple", "externalId": "WorkItem.linkedAssets"},
         )
         if isinstance(external_id, str):
-            is_work_item = f.Equals(
+            is_work_items = f.Equals(
                 ["edge", "startNode"],
                 {"space": space, "externalId": external_id},
             )
-            return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_work_item))
-
         else:
             is_work_items = f.In(
                 ["edge", "startNode"],
                 [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
-            return self._client.data_modeling.instances.list(
-                "edge", limit=-1, filter=f.And(is_edge_type, is_work_items)
-            )
+        return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_work_items))
 
     def list(
-        self, work_item_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="tutorial_apm_simple"
+        self, work_item_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space: str = "tutorial_apm_simple"
     ) -> dm.EdgeList:
         """List linked_assets edges of a work item.
 
         Args:
-            work_item_id: Id of the source work item.
+            work_item_id: ID of the source work item.
             limit: Maximum number of linked asset edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
             space: The space where all the linked asset edges are located.
@@ -88,12 +84,12 @@ class WorkItemLinkedAssetsAPI:
 
         """
         f = dm.filters
-        filters = []
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": space, "externalId": "WorkItem.linkedAssets"},
-        )
-        filters.append(is_edge_type)
+        filters = [
+            f.Equals(
+                ["edge", "type"],
+                {"space": "tutorial_apm_simple", "externalId": "WorkItem.linkedAssets"},
+            )
+        ]
         if work_item_id:
             work_item_ids = [work_item_id] if isinstance(work_item_id, str) else work_item_id
             is_work_items = f.In(

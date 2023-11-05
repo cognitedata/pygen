@@ -24,7 +24,7 @@ class AsIngestedCoordinatesFeaturesAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
         """Retrieve one or more features edges by id(s) of a as ingested coordinate.
 
         Args:
@@ -46,36 +46,32 @@ class AsIngestedCoordinatesFeaturesAPI:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "AsIngestedCoordinates.features"},
+            {"space": "IntegrationTestsImmutable", "externalId": "AsIngestedCoordinates.features"},
         )
         if isinstance(external_id, str):
-            is_as_ingested_coordinate = f.Equals(
+            is_as_ingested_coordinates = f.Equals(
                 ["edge", "startNode"],
                 {"space": space, "externalId": external_id},
             )
-            return self._client.data_modeling.instances.list(
-                "edge", limit=-1, filter=f.And(is_edge_type, is_as_ingested_coordinate)
-            )
-
         else:
             is_as_ingested_coordinates = f.In(
                 ["edge", "startNode"],
                 [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
-            return self._client.data_modeling.instances.list(
-                "edge", limit=-1, filter=f.And(is_edge_type, is_as_ingested_coordinates)
-            )
+        return self._client.data_modeling.instances.list(
+            "edge", limit=-1, filter=f.And(is_edge_type, is_as_ingested_coordinates)
+        )
 
     def list(
         self,
         as_ingested_coordinate_id: str | list[str] | None = None,
         limit=DEFAULT_LIMIT_READ,
-        space="IntegrationTestsImmutable",
+        space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
         """List features edges of a as ingested coordinate.
 
         Args:
-            as_ingested_coordinate_id: Id of the source as ingested coordinate.
+            as_ingested_coordinate_id: ID of the source as ingested coordinate.
             limit: Maximum number of feature edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
             space: The space where all the feature edges are located.
@@ -93,12 +89,12 @@ class AsIngestedCoordinatesFeaturesAPI:
 
         """
         f = dm.filters
-        filters = []
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": space, "externalId": "AsIngestedCoordinates.features"},
-        )
-        filters.append(is_edge_type)
+        filters = [
+            f.Equals(
+                ["edge", "type"],
+                {"space": "IntegrationTestsImmutable", "externalId": "AsIngestedCoordinates.features"},
+            )
+        ]
         if as_ingested_coordinate_id:
             as_ingested_coordinate_ids = (
                 [as_ingested_coordinate_id] if isinstance(as_ingested_coordinate_id, str) else as_ingested_coordinate_id

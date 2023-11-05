@@ -213,7 +213,7 @@ class AssetApply(DomainModelApply):
             properties["metrics"] = self.metrics
         if self.parent is not None:
             properties["parent"] = {
-                "space": "tutorial_apm_simple",
+                "space": self.space if isinstance(self.parent, str) else self.parent.space,
                 "externalId": self.parent if isinstance(self.parent, str) else self.parent.external_id,
             }
         if self.pressure is not None:

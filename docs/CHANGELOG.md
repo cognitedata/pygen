@@ -13,10 +13,14 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## [0.31.0] - 05-11-23
+## [0.30.1] - 05-11-23
 ### Fixed
 * When setting `space` for a node in the generated SDK, the automatically created edges would not be created in the
   same space. This is now fixed.
+* When calling `.retrieve` or `.list` in the generated EdgeAPI class, the generated SDK now uses the model `space`
+  to filter on `["edge", "type"]` instead of the `space` passed in.
+* When calling `.apply` all one-to-one edges had `space` set to the model space instead of the `space` set in the
+  node object. This is now fixed.
 
 ## [0.30.0] - 04-11-23
 ### Added

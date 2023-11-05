@@ -166,7 +166,9 @@ class SpatialLocationApply(DomainModelApply):
             properties["AppliedOperations"] = self.applied_operations
         if self.as_ingested_coordinates is not None:
             properties["AsIngestedCoordinates"] = {
-                "space": "IntegrationTestsImmutable",
+                "space": self.space
+                if isinstance(self.as_ingested_coordinates, str)
+                else self.as_ingested_coordinates.space,
                 "externalId": self.as_ingested_coordinates
                 if isinstance(self.as_ingested_coordinates, str)
                 else self.as_ingested_coordinates.external_id,
@@ -189,7 +191,7 @@ class SpatialLocationApply(DomainModelApply):
             properties["SpatialParameterTypeID"] = self.spatial_parameter_type_id
         if self.wgs_84_coordinates is not None:
             properties["Wgs84Coordinates"] = {
-                "space": "IntegrationTestsImmutable",
+                "space": self.space if isinstance(self.wgs_84_coordinates, str) else self.wgs_84_coordinates.space,
                 "externalId": self.wgs_84_coordinates
                 if isinstance(self.wgs_84_coordinates, str)
                 else self.wgs_84_coordinates.external_id,

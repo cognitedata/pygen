@@ -24,7 +24,7 @@ class PersonRolesAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
         """Retrieve one or more roles edges by id(s) of a person.
 
         Args:
@@ -46,29 +46,30 @@ class PersonRolesAPI:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "Person.roles"},
+            {"space": "IntegrationTestsImmutable", "externalId": "Person.roles"},
         )
         if isinstance(external_id, str):
-            is_person = f.Equals(
+            is_persons = f.Equals(
                 ["edge", "startNode"],
                 {"space": space, "externalId": external_id},
             )
-            return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_person))
-
         else:
             is_persons = f.In(
                 ["edge", "startNode"],
                 [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
-            return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_persons))
+        return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_persons))
 
     def list(
-        self, person_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="IntegrationTestsImmutable"
+        self,
+        person_id: str | list[str] | None = None,
+        limit=DEFAULT_LIMIT_READ,
+        space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
         """List roles edges of a person.
 
         Args:
-            person_id: Id of the source person.
+            person_id: ID of the source person.
             limit: Maximum number of role edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
             space: The space where all the role edges are located.
@@ -86,12 +87,12 @@ class PersonRolesAPI:
 
         """
         f = dm.filters
-        filters = []
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": space, "externalId": "Person.roles"},
-        )
-        filters.append(is_edge_type)
+        filters = [
+            f.Equals(
+                ["edge", "type"],
+                {"space": "IntegrationTestsImmutable", "externalId": "Person.roles"},
+            )
+        ]
         if person_id:
             person_ids = [person_id] if isinstance(person_id, str) else person_id
             is_persons = f.In(

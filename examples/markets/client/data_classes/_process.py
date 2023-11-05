@@ -81,7 +81,7 @@ class ProcessApply(DomainModelApply):
         properties = {}
         if self.bid is not None:
             properties["bid"] = {
-                "space": "market",
+                "space": self.space if isinstance(self.bid, str) else self.bid.space,
                 "externalId": self.bid if isinstance(self.bid, str) else self.bid.external_id,
             }
         if self.name is not None:

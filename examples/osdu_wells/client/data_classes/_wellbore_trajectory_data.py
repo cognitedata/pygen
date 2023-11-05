@@ -573,14 +573,14 @@ class WellboreTrajectoryDataApply(DomainModelApply):
             properties["Source"] = self.source
         if self.spatial_area is not None:
             properties["SpatialArea"] = {
-                "space": "IntegrationTestsImmutable",
+                "space": self.space if isinstance(self.spatial_area, str) else self.spatial_area.space,
                 "externalId": self.spatial_area
                 if isinstance(self.spatial_area, str)
                 else self.spatial_area.external_id,
             }
         if self.spatial_point is not None:
             properties["SpatialPoint"] = {
-                "space": "IntegrationTestsImmutable",
+                "space": self.space if isinstance(self.spatial_point, str) else self.spatial_point.space,
                 "externalId": self.spatial_point
                 if isinstance(self.spatial_point, str)
                 else self.spatial_point.external_id,
@@ -613,7 +613,7 @@ class WellboreTrajectoryDataApply(DomainModelApply):
             properties["Tortuosity"] = self.tortuosity
         if self.vertical_measurement is not None:
             properties["VerticalMeasurement"] = {
-                "space": "IntegrationTestsImmutable",
+                "space": self.space if isinstance(self.vertical_measurement, str) else self.vertical_measurement.space,
                 "externalId": self.vertical_measurement
                 if isinstance(self.vertical_measurement, str)
                 else self.vertical_measurement.external_id,

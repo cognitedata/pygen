@@ -19,7 +19,7 @@ class DateTransformationPairEndAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space="market") -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "market") -> dm.EdgeList:
         """Retrieve one or more end edges by id(s) of a date transformation pair.
 
         Args:
@@ -41,33 +41,32 @@ class DateTransformationPairEndAPI:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "DateTransformationPair.end"},
+            {"space": "market", "externalId": "DateTransformationPair.end"},
         )
         if isinstance(external_id, str):
-            is_date_transformation_pair = f.Equals(
+            is_date_transformation_pairs = f.Equals(
                 ["edge", "startNode"],
                 {"space": space, "externalId": external_id},
             )
-            return self._client.data_modeling.instances.list(
-                "edge", limit=-1, filter=f.And(is_edge_type, is_date_transformation_pair)
-            )
-
         else:
             is_date_transformation_pairs = f.In(
                 ["edge", "startNode"],
                 [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
-            return self._client.data_modeling.instances.list(
-                "edge", limit=-1, filter=f.And(is_edge_type, is_date_transformation_pairs)
-            )
+        return self._client.data_modeling.instances.list(
+            "edge", limit=-1, filter=f.And(is_edge_type, is_date_transformation_pairs)
+        )
 
     def list(
-        self, date_transformation_pair_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="market"
+        self,
+        date_transformation_pair_id: str | list[str] | None = None,
+        limit=DEFAULT_LIMIT_READ,
+        space: str = "market",
     ) -> dm.EdgeList:
         """List end edges of a date transformation pair.
 
         Args:
-            date_transformation_pair_id: Id of the source date transformation pair.
+            date_transformation_pair_id: ID of the source date transformation pair.
             limit: Maximum number of end edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
             space: The space where all the end edges are located.
@@ -85,12 +84,12 @@ class DateTransformationPairEndAPI:
 
         """
         f = dm.filters
-        filters = []
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": space, "externalId": "DateTransformationPair.end"},
-        )
-        filters.append(is_edge_type)
+        filters = [
+            f.Equals(
+                ["edge", "type"],
+                {"space": "market", "externalId": "DateTransformationPair.end"},
+            )
+        ]
         if date_transformation_pair_id:
             date_transformation_pair_ids = (
                 [date_transformation_pair_id]
@@ -110,7 +109,7 @@ class DateTransformationPairStartAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space="market") -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "market") -> dm.EdgeList:
         """Retrieve one or more start edges by id(s) of a date transformation pair.
 
         Args:
@@ -132,33 +131,32 @@ class DateTransformationPairStartAPI:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "DateTransformationPair.start"},
+            {"space": "market", "externalId": "DateTransformationPair.start"},
         )
         if isinstance(external_id, str):
-            is_date_transformation_pair = f.Equals(
+            is_date_transformation_pairs = f.Equals(
                 ["edge", "startNode"],
                 {"space": space, "externalId": external_id},
             )
-            return self._client.data_modeling.instances.list(
-                "edge", limit=-1, filter=f.And(is_edge_type, is_date_transformation_pair)
-            )
-
         else:
             is_date_transformation_pairs = f.In(
                 ["edge", "startNode"],
                 [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
-            return self._client.data_modeling.instances.list(
-                "edge", limit=-1, filter=f.And(is_edge_type, is_date_transformation_pairs)
-            )
+        return self._client.data_modeling.instances.list(
+            "edge", limit=-1, filter=f.And(is_edge_type, is_date_transformation_pairs)
+        )
 
     def list(
-        self, date_transformation_pair_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="market"
+        self,
+        date_transformation_pair_id: str | list[str] | None = None,
+        limit=DEFAULT_LIMIT_READ,
+        space: str = "market",
     ) -> dm.EdgeList:
         """List start edges of a date transformation pair.
 
         Args:
-            date_transformation_pair_id: Id of the source date transformation pair.
+            date_transformation_pair_id: ID of the source date transformation pair.
             limit: Maximum number of start edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
             space: The space where all the start edges are located.
@@ -176,12 +174,12 @@ class DateTransformationPairStartAPI:
 
         """
         f = dm.filters
-        filters = []
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": space, "externalId": "DateTransformationPair.start"},
-        )
-        filters.append(is_edge_type)
+        filters = [
+            f.Equals(
+                ["edge", "type"],
+                {"space": "market", "externalId": "DateTransformationPair.start"},
+            )
+        ]
         if date_transformation_pair_id:
             date_transformation_pair_ids = (
                 [date_transformation_pair_id]

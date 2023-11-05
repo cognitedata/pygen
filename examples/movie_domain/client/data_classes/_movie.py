@@ -113,7 +113,7 @@ class MovieApply(DomainModelApply):
             properties["meta"] = self.meta
         if self.rating is not None:
             properties["rating"] = {
-                "space": "IntegrationTestsImmutable",
+                "space": self.space if isinstance(self.rating, str) else self.rating.space,
                 "externalId": self.rating if isinstance(self.rating, str) else self.rating.external_id,
             }
         if self.release_year is not None:

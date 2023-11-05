@@ -138,7 +138,7 @@ class CaseApply(DomainModelApply):
             properties["bid_history"] = self.bid_history
         if self.commands is not None:
             properties["commands"] = {
-                "space": "IntegrationTestsImmutable",
+                "space": self.space if isinstance(self.commands, str) else self.commands.space,
                 "externalId": self.commands if isinstance(self.commands, str) else self.commands.external_id,
             }
         if self.cut_files is not None:

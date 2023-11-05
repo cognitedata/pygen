@@ -24,7 +24,7 @@ class WgsCoordinatesFeaturesAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
         """Retrieve one or more features edges by id(s) of a wgs 84 coordinate.
 
         Args:
@@ -46,36 +46,32 @@ class WgsCoordinatesFeaturesAPI:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "Wgs84Coordinates.features"},
+            {"space": "IntegrationTestsImmutable", "externalId": "Wgs84Coordinates.features"},
         )
         if isinstance(external_id, str):
-            is_wgs_84_coordinate = f.Equals(
+            is_wgs_84_coordinates = f.Equals(
                 ["edge", "startNode"],
                 {"space": space, "externalId": external_id},
             )
-            return self._client.data_modeling.instances.list(
-                "edge", limit=-1, filter=f.And(is_edge_type, is_wgs_84_coordinate)
-            )
-
         else:
             is_wgs_84_coordinates = f.In(
                 ["edge", "startNode"],
                 [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
-            return self._client.data_modeling.instances.list(
-                "edge", limit=-1, filter=f.And(is_edge_type, is_wgs_84_coordinates)
-            )
+        return self._client.data_modeling.instances.list(
+            "edge", limit=-1, filter=f.And(is_edge_type, is_wgs_84_coordinates)
+        )
 
     def list(
         self,
         wgs_84_coordinate_id: str | list[str] | None = None,
         limit=DEFAULT_LIMIT_READ,
-        space="IntegrationTestsImmutable",
+        space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
         """List features edges of a wgs 84 coordinate.
 
         Args:
-            wgs_84_coordinate_id: Id of the source wgs 84 coordinate.
+            wgs_84_coordinate_id: ID of the source wgs 84 coordinate.
             limit: Maximum number of feature edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
             space: The space where all the feature edges are located.
@@ -93,12 +89,12 @@ class WgsCoordinatesFeaturesAPI:
 
         """
         f = dm.filters
-        filters = []
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": space, "externalId": "Wgs84Coordinates.features"},
-        )
-        filters.append(is_edge_type)
+        filters = [
+            f.Equals(
+                ["edge", "type"],
+                {"space": "IntegrationTestsImmutable", "externalId": "Wgs84Coordinates.features"},
+            )
+        ]
         if wgs_84_coordinate_id:
             wgs_84_coordinate_ids = (
                 [wgs_84_coordinate_id] if isinstance(wgs_84_coordinate_id, str) else wgs_84_coordinate_id

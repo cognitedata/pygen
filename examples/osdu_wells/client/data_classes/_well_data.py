@@ -421,7 +421,7 @@ class WellDataApply(DomainModelApply):
             properties["Source"] = self.source
         if self.spatial_location is not None:
             properties["SpatialLocation"] = {
-                "space": "IntegrationTestsImmutable",
+                "space": self.space if isinstance(self.spatial_location, str) else self.spatial_location.space,
                 "externalId": self.spatial_location
                 if isinstance(self.spatial_location, str)
                 else self.spatial_location.external_id,

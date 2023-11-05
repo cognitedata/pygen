@@ -147,7 +147,7 @@ class WorkItemApply(DomainModelApply):
             properties["toBeDone"] = self.to_be_done
         if self.work_order is not None:
             properties["workOrder"] = {
-                "space": "tutorial_apm_simple",
+                "space": self.space if isinstance(self.work_order, str) else self.work_order.space,
                 "externalId": self.work_order if isinstance(self.work_order, str) else self.work_order.external_id,
             }
         if properties:

@@ -145,7 +145,7 @@ class ActorNominationAPI:
         """List nomination edges of a actor.
 
         Args:
-            actor_id: Id of the source actor.
+            actor_id: ID of the source actor.
             limit: Maximum number of nomination edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
             space: The space where all the nomination edges are located.

@@ -14,7 +14,7 @@ class CdfEntityInModelAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space="cdf_3d_schema") -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "cdf_3d_schema") -> dm.EdgeList:
         """Retrieve one or more in_model_3_d edges by id(s) of a cdf 3 d entity.
 
         Args:
@@ -36,33 +36,29 @@ class CdfEntityInModelAPI:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "cdf3dEntityConnection"},
+            {"space": "cdf_3d_schema", "externalId": "cdf3dEntityConnection"},
         )
         if isinstance(external_id, str):
-            is_cdf_3_d_entity = f.Equals(
+            is_cdf_3_d_entities = f.Equals(
                 ["edge", "startNode"],
                 {"space": space, "externalId": external_id},
             )
-            return self._client.data_modeling.instances.list(
-                "edge", limit=-1, filter=f.And(is_edge_type, is_cdf_3_d_entity)
-            )
-
         else:
             is_cdf_3_d_entities = f.In(
                 ["edge", "startNode"],
                 [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
-            return self._client.data_modeling.instances.list(
-                "edge", limit=-1, filter=f.And(is_edge_type, is_cdf_3_d_entities)
-            )
+        return self._client.data_modeling.instances.list(
+            "edge", limit=-1, filter=f.And(is_edge_type, is_cdf_3_d_entities)
+        )
 
     def list(
-        self, cdf_3_d_entity_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="cdf_3d_schema"
+        self, cdf_3_d_entity_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space: str = "cdf_3d_schema"
     ) -> dm.EdgeList:
         """List in_model_3_d edges of a cdf 3 d entity.
 
         Args:
-            cdf_3_d_entity_id: Id of the source cdf 3 d entity.
+            cdf_3_d_entity_id: ID of the source cdf 3 d entity.
             limit: Maximum number of in model 3 d edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
             space: The space where all the in model 3 d edges are located.
@@ -80,12 +76,12 @@ class CdfEntityInModelAPI:
 
         """
         f = dm.filters
-        filters = []
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": space, "externalId": "cdf3dEntityConnection"},
-        )
-        filters.append(is_edge_type)
+        filters = [
+            f.Equals(
+                ["edge", "type"],
+                {"space": "cdf_3d_schema", "externalId": "cdf3dEntityConnection"},
+            )
+        ]
         if cdf_3_d_entity_id:
             cdf_3_d_entity_ids = [cdf_3_d_entity_id] if isinstance(cdf_3_d_entity_id, str) else cdf_3_d_entity_id
             is_cdf_3_d_entities = f.In(

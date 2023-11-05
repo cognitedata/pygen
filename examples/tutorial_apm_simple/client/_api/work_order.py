@@ -25,7 +25,7 @@ class WorkOrderLinkedAssetsAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space="tutorial_apm_simple") -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "tutorial_apm_simple") -> dm.EdgeList:
         """Retrieve one or more linked_assets edges by id(s) of a work order.
 
         Args:
@@ -47,33 +47,27 @@ class WorkOrderLinkedAssetsAPI:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "WorkOrder.linkedAssets"},
+            {"space": "tutorial_apm_simple", "externalId": "WorkOrder.linkedAssets"},
         )
         if isinstance(external_id, str):
-            is_work_order = f.Equals(
+            is_work_orders = f.Equals(
                 ["edge", "startNode"],
                 {"space": space, "externalId": external_id},
             )
-            return self._client.data_modeling.instances.list(
-                "edge", limit=-1, filter=f.And(is_edge_type, is_work_order)
-            )
-
         else:
             is_work_orders = f.In(
                 ["edge", "startNode"],
                 [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
-            return self._client.data_modeling.instances.list(
-                "edge", limit=-1, filter=f.And(is_edge_type, is_work_orders)
-            )
+        return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_work_orders))
 
     def list(
-        self, work_order_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="tutorial_apm_simple"
+        self, work_order_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space: str = "tutorial_apm_simple"
     ) -> dm.EdgeList:
         """List linked_assets edges of a work order.
 
         Args:
-            work_order_id: Id of the source work order.
+            work_order_id: ID of the source work order.
             limit: Maximum number of linked asset edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
             space: The space where all the linked asset edges are located.
@@ -91,12 +85,12 @@ class WorkOrderLinkedAssetsAPI:
 
         """
         f = dm.filters
-        filters = []
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": space, "externalId": "WorkOrder.linkedAssets"},
-        )
-        filters.append(is_edge_type)
+        filters = [
+            f.Equals(
+                ["edge", "type"],
+                {"space": "tutorial_apm_simple", "externalId": "WorkOrder.linkedAssets"},
+            )
+        ]
         if work_order_id:
             work_order_ids = [work_order_id] if isinstance(work_order_id, str) else work_order_id
             is_work_orders = f.In(
@@ -112,7 +106,7 @@ class WorkOrderWorkItemsAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space="tutorial_apm_simple") -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "tutorial_apm_simple") -> dm.EdgeList:
         """Retrieve one or more work_items edges by id(s) of a work order.
 
         Args:
@@ -134,33 +128,27 @@ class WorkOrderWorkItemsAPI:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "WorkOrder.workItems"},
+            {"space": "tutorial_apm_simple", "externalId": "WorkOrder.workItems"},
         )
         if isinstance(external_id, str):
-            is_work_order = f.Equals(
+            is_work_orders = f.Equals(
                 ["edge", "startNode"],
                 {"space": space, "externalId": external_id},
             )
-            return self._client.data_modeling.instances.list(
-                "edge", limit=-1, filter=f.And(is_edge_type, is_work_order)
-            )
-
         else:
             is_work_orders = f.In(
                 ["edge", "startNode"],
                 [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
-            return self._client.data_modeling.instances.list(
-                "edge", limit=-1, filter=f.And(is_edge_type, is_work_orders)
-            )
+        return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_work_orders))
 
     def list(
-        self, work_order_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="tutorial_apm_simple"
+        self, work_order_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space: str = "tutorial_apm_simple"
     ) -> dm.EdgeList:
         """List work_items edges of a work order.
 
         Args:
-            work_order_id: Id of the source work order.
+            work_order_id: ID of the source work order.
             limit: Maximum number of work item edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
             space: The space where all the work item edges are located.
@@ -178,12 +166,12 @@ class WorkOrderWorkItemsAPI:
 
         """
         f = dm.filters
-        filters = []
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": space, "externalId": "WorkOrder.workItems"},
-        )
-        filters.append(is_edge_type)
+        filters = [
+            f.Equals(
+                ["edge", "type"],
+                {"space": "tutorial_apm_simple", "externalId": "WorkOrder.workItems"},
+            )
+        ]
         if work_order_id:
             work_order_ids = [work_order_id] if isinstance(work_order_id, str) else work_order_id
             is_work_orders = f.In(

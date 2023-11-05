@@ -147,12 +147,12 @@ class WellboreApply(DomainModelApply):
         properties = {}
         if self.acl is not None:
             properties["acl"] = {
-                "space": "IntegrationTestsImmutable",
+                "space": self.space if isinstance(self.acl, str) else self.acl.space,
                 "externalId": self.acl if isinstance(self.acl, str) else self.acl.external_id,
             }
         if self.ancestry is not None:
             properties["ancestry"] = {
-                "space": "IntegrationTestsImmutable",
+                "space": self.space if isinstance(self.ancestry, str) else self.ancestry.space,
                 "externalId": self.ancestry if isinstance(self.ancestry, str) else self.ancestry.external_id,
             }
         if self.create_time is not None:
@@ -161,7 +161,7 @@ class WellboreApply(DomainModelApply):
             properties["createUser"] = self.create_user
         if self.data is not None:
             properties["data"] = {
-                "space": "IntegrationTestsImmutable",
+                "space": self.space if isinstance(self.data, str) else self.data.space,
                 "externalId": self.data if isinstance(self.data, str) else self.data.external_id,
             }
         if self.id is not None:
@@ -170,7 +170,7 @@ class WellboreApply(DomainModelApply):
             properties["kind"] = self.kind
         if self.legal is not None:
             properties["legal"] = {
-                "space": "IntegrationTestsImmutable",
+                "space": self.space if isinstance(self.legal, str) else self.legal.space,
                 "externalId": self.legal if isinstance(self.legal, str) else self.legal.external_id,
             }
         if self.modify_time is not None:
@@ -179,7 +179,7 @@ class WellboreApply(DomainModelApply):
             properties["modifyUser"] = self.modify_user
         if self.tags is not None:
             properties["tags"] = {
-                "space": "IntegrationTestsImmutable",
+                "space": self.space if isinstance(self.tags, str) else self.tags.space,
                 "externalId": self.tags if isinstance(self.tags, str) else self.tags.external_id,
             }
         if self.version is not None:

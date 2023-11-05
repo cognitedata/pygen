@@ -537,7 +537,9 @@ class WellboreDataApply(DomainModelApply):
             properties["FormationNameAtTotalDepth"] = self.formation_name_at_total_depth
         if self.geographic_bottom_hole_location is not None:
             properties["GeographicBottomHoleLocation"] = {
-                "space": "IntegrationTestsImmutable",
+                "space": self.space
+                if isinstance(self.geographic_bottom_hole_location, str)
+                else self.geographic_bottom_hole_location.space,
                 "externalId": self.geographic_bottom_hole_location
                 if isinstance(self.geographic_bottom_hole_location, str)
                 else self.geographic_bottom_hole_location.external_id,
@@ -556,7 +558,9 @@ class WellboreDataApply(DomainModelApply):
             properties["PrimaryProductTypeID"] = self.primary_product_type_id
         if self.projected_bottom_hole_location is not None:
             properties["ProjectedBottomHoleLocation"] = {
-                "space": "IntegrationTestsImmutable",
+                "space": self.space
+                if isinstance(self.projected_bottom_hole_location, str)
+                else self.projected_bottom_hole_location.space,
                 "externalId": self.projected_bottom_hole_location
                 if isinstance(self.projected_bottom_hole_location, str)
                 else self.projected_bottom_hole_location.external_id,
@@ -583,7 +587,7 @@ class WellboreDataApply(DomainModelApply):
             properties["Source"] = self.source
         if self.spatial_location is not None:
             properties["SpatialLocation"] = {
-                "space": "IntegrationTestsImmutable",
+                "space": self.space if isinstance(self.spatial_location, str) else self.spatial_location.space,
                 "externalId": self.spatial_location
                 if isinstance(self.spatial_location, str)
                 else self.spatial_location.external_id,

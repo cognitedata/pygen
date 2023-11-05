@@ -23,7 +23,7 @@ class DirectorMoviesAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
         """Retrieve one or more movies edges by id(s) of a director.
 
         Args:
@@ -45,29 +45,30 @@ class DirectorMoviesAPI:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "Role.movies"},
+            {"space": "IntegrationTestsImmutable", "externalId": "Role.movies"},
         )
         if isinstance(external_id, str):
-            is_director = f.Equals(
+            is_directors = f.Equals(
                 ["edge", "startNode"],
                 {"space": space, "externalId": external_id},
             )
-            return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_director))
-
         else:
             is_directors = f.In(
                 ["edge", "startNode"],
                 [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
-            return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_directors))
+        return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_directors))
 
     def list(
-        self, director_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="IntegrationTestsImmutable"
+        self,
+        director_id: str | list[str] | None = None,
+        limit=DEFAULT_LIMIT_READ,
+        space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
         """List movies edges of a director.
 
         Args:
-            director_id: Id of the source director.
+            director_id: ID of the source director.
             limit: Maximum number of movie edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
             space: The space where all the movie edges are located.
@@ -85,12 +86,12 @@ class DirectorMoviesAPI:
 
         """
         f = dm.filters
-        filters = []
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": space, "externalId": "Role.movies"},
-        )
-        filters.append(is_edge_type)
+        filters = [
+            f.Equals(
+                ["edge", "type"],
+                {"space": "IntegrationTestsImmutable", "externalId": "Role.movies"},
+            )
+        ]
         if director_id:
             director_ids = [director_id] if isinstance(director_id, str) else director_id
             is_directors = f.In(
@@ -106,7 +107,7 @@ class DirectorNominationAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space="IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
         """Retrieve one or more nomination edges by id(s) of a director.
 
         Args:
@@ -128,29 +129,30 @@ class DirectorNominationAPI:
         f = dm.filters
         is_edge_type = f.Equals(
             ["edge", "type"],
-            {"space": space, "externalId": "Role.nomination"},
+            {"space": "IntegrationTestsImmutable", "externalId": "Role.nomination"},
         )
         if isinstance(external_id, str):
-            is_director = f.Equals(
+            is_directors = f.Equals(
                 ["edge", "startNode"],
                 {"space": space, "externalId": external_id},
             )
-            return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_director))
-
         else:
             is_directors = f.In(
                 ["edge", "startNode"],
                 [{"space": space, "externalId": ext_id} for ext_id in external_id],
             )
-            return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_directors))
+        return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_directors))
 
     def list(
-        self, director_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space="IntegrationTestsImmutable"
+        self,
+        director_id: str | list[str] | None = None,
+        limit=DEFAULT_LIMIT_READ,
+        space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
         """List nomination edges of a director.
 
         Args:
-            director_id: Id of the source director.
+            director_id: ID of the source director.
             limit: Maximum number of nomination edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
             space: The space where all the nomination edges are located.
@@ -168,12 +170,12 @@ class DirectorNominationAPI:
 
         """
         f = dm.filters
-        filters = []
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": space, "externalId": "Role.nomination"},
-        )
-        filters.append(is_edge_type)
+        filters = [
+            f.Equals(
+                ["edge", "type"],
+                {"space": "IntegrationTestsImmutable", "externalId": "Role.nomination"},
+            )
+        ]
         if director_id:
             director_ids = [director_id] if isinstance(director_id, str) else director_id
             is_directors = f.In(
