@@ -146,9 +146,17 @@ class Field(ABC):
                 # Connected in Container
                 # Todo: This is a hack, we are assuming (gambling) that the container ExternalId is the same as the
                 #   view ExternalId. This is not always true.
-                target_data_class = data_class_by_view_id[
-                    ViewSpaceExternalId(prop.container.space, prop.container.external_id)
-                ]
+                if (
+                    view_id := ViewSpaceExternalId(prop.container.space, prop.container.external_id)
+                ) in data_class_by_view_id:
+                    target_data_class = data_class_by_view_id[view_id]
+                elif prop.type.container and (
+                    (view_id := ViewSpaceExternalId(prop.type.container.space, prop.type.container.external_id))
+                    in data_class_by_view_id
+                ):
+                    target_data_class = data_class_by_view_id[view_id]
+                else:
+                    raise ValueError(f"Could not find data class for {prop_name=}")
 
             return EdgeOneToOne(
                 name=name,
