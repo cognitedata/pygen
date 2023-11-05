@@ -139,10 +139,6 @@ views:
         externalId: Checklist
       containerPropertyIdentifier: createdBy
       type:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Checklist
-          type: container
         type: direct
         source:
           space: IntegrationTestsImmutable
@@ -159,10 +155,6 @@ views:
         externalId: Checklist
       containerPropertyIdentifier: updatedBy
       type:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Checklist
-          type: container
         type: direct
         source:
           space: IntegrationTestsImmutable
@@ -223,10 +215,6 @@ views:
         externalId: Checklist
       containerPropertyIdentifier: rootLocation
       type:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Checklist
-          type: container
         type: direct
         source:
           space: IntegrationTestsImmutable
@@ -402,10 +390,6 @@ views:
         externalId: ChecklistItem
       containerPropertyIdentifier: createdBy
       type:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: ChecklistItem
-          type: container
         type: direct
         source:
           space: IntegrationTestsImmutable
@@ -422,10 +406,6 @@ views:
         externalId: ChecklistItem
       containerPropertyIdentifier: updatedBy
       type:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: ChecklistItem
-          type: container
         type: direct
         source:
           space: IntegrationTestsImmutable
@@ -500,10 +480,6 @@ views:
         externalId: ChecklistItem
       containerPropertyIdentifier: asset
       type:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: ChecklistItem
-          type: container
         type: direct
         source:
           space: IntegrationTestsImmutable
@@ -664,10 +640,6 @@ views:
         externalId: Observation
       containerPropertyIdentifier: createdBy
       type:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Observation
-          type: container
         type: direct
         source:
           space: IntegrationTestsImmutable
@@ -684,10 +656,6 @@ views:
         externalId: Observation
       containerPropertyIdentifier: updatedBy
       type:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Observation
-          type: container
         type: direct
         source:
           space: IntegrationTestsImmutable
@@ -733,10 +701,6 @@ views:
         externalId: Observation
       containerPropertyIdentifier: asset
       type:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Observation
-          type: container
         type: direct
         source:
           space: IntegrationTestsImmutable
@@ -767,10 +731,6 @@ views:
         externalId: Observation
       containerPropertyIdentifier: rootLocation
       type:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Observation
-          type: container
         type: direct
         source:
           space: IntegrationTestsImmutable
@@ -907,10 +867,6 @@ views:
         externalId: Template
       containerPropertyIdentifier: createdBy
       type:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Template
-          type: container
         type: direct
         source:
           space: IntegrationTestsImmutable
@@ -927,10 +883,6 @@ views:
         externalId: Template
       containerPropertyIdentifier: updatedBy
       type:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Template
-          type: container
         type: direct
         source:
           space: IntegrationTestsImmutable
@@ -976,10 +928,6 @@ views:
         externalId: Template
       containerPropertyIdentifier: rootLocation
       type:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Template
-          type: container
         type: direct
         source:
           space: IntegrationTestsImmutable
@@ -1097,10 +1045,6 @@ views:
         externalId: TemplateItem
       containerPropertyIdentifier: createdBy
       type:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: TemplateItem
-          type: container
         type: direct
         source:
           space: IntegrationTestsImmutable
@@ -1117,10 +1061,6 @@ views:
         externalId: TemplateItem
       containerPropertyIdentifier: updatedBy
       type:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: TemplateItem
-          type: container
         type: direct
         source:
           space: IntegrationTestsImmutable
@@ -1165,10 +1105,6 @@ views:
         externalId: TemplateItem
       containerPropertyIdentifier: asset
       type:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: TemplateItem
-          type: container
         type: direct
         source:
           space: IntegrationTestsImmutable
@@ -1240,10 +1176,6 @@ views:
         externalId: MeasurementReading
       containerPropertyIdentifier: createdBy
       type:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: MeasurementReading
-          type: container
         type: direct
         source:
           space: IntegrationTestsImmutable
@@ -1260,10 +1192,6 @@ views:
         externalId: MeasurementReading
       containerPropertyIdentifier: updatedBy
       type:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: MeasurementReading
-          type: container
         type: direct
         source:
           space: IntegrationTestsImmutable
@@ -1482,10 +1410,6 @@ views:
         externalId: Schedule
       containerPropertyIdentifier: createdBy
       type:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Schedule
-          type: container
         type: direct
         source:
           space: IntegrationTestsImmutable
@@ -1502,10 +1426,6 @@ views:
         externalId: Schedule
       containerPropertyIdentifier: updatedBy
       type:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Schedule
-          type: container
         type: direct
         source:
           space: IntegrationTestsImmutable
@@ -1670,10 +1590,6 @@ views:
         externalId: CDF_User
       containerPropertyIdentifier: preferences
       type:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: CDF_User
-          type: container
         type: direct
         source:
           space: IntegrationTestsImmutable
@@ -1827,10 +1743,6 @@ views:
         externalId: Asset
       containerPropertyIdentifier: parent
       type:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Asset
-          type: container
         type: direct
         source:
           space: IntegrationTestsImmutable
@@ -1847,10 +1759,6 @@ views:
         externalId: Asset
       containerPropertyIdentifier: root
       type:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Asset
-          type: container
         type: direct
         source:
           space: IntegrationTestsImmutable
