@@ -104,8 +104,9 @@ types-PyYAML = "^6"
 types-toml = "^0.10"
 IPython = "*"
 matplotlib = "*"
-tabulate = "*" # Use to generate markdown tables from pandas dataframes
-pytest-icdiff = "^0.8" # Used for better diffs in pytest
+tabulate = "*"
+pytest-icdiff = "^0.8"
+Faker = "*"
 
 [tool.pytest.ini_options]
 filterwarnings = [

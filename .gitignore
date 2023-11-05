@@ -56,10 +56,11 @@ tests/test_gqlpygen/tmp
 playground/
 data_models/
 examples/movie_domain/data/settings.toml
-config.toml
+config*.toml
 playground
 examples/playground.ipynb
 playground.py
 .dmypy.json
 .secret.toml
 docs/examples/movie_domain
+docs/quickstart/apm_domain/
