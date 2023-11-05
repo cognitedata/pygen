@@ -891,18 +891,18 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
         if isinstance(external_id, str):
             asset = self._retrieve((space, external_id))
 
-            child_edges = self.children.retrieve(external_id)
+            child_edges = self.children.retrieve(external_id, space=space)
             asset.children = [edge.end_node.external_id for edge in child_edges]
-            in_model_3_d_edges = self.in_model_3_d.retrieve(external_id)
+            in_model_3_d_edges = self.in_model_3_d.retrieve(external_id, space=space)
             asset.in_model_3_d = [edge.end_node.external_id for edge in in_model_3_d_edges]
 
             return asset
         else:
             assets = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            child_edges = self.children.retrieve(external_id)
+            child_edges = self.children.retrieve(external_id, space=space)
             self._set_children(assets, child_edges)
-            in_model_3_d_edges = self.in_model_3_d.retrieve(external_id)
+            in_model_3_d_edges = self.in_model_3_d.retrieve(external_id, space=space)
             self._set_in_model_3_d(assets, in_model_3_d_edges)
 
             return assets
@@ -1366,14 +1366,14 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
 
         if retrieve_edges:
             if len(external_ids := assets.as_external_ids()) > IN_FILTER_LIMIT:
-                child_edges = self.children.list(limit=-1)
+                child_edges = self.children.list(limit=-1, space=space)
             else:
-                child_edges = self.children.list(external_ids, limit=-1)
+                child_edges = self.children.list(external_ids, limit=-1, space=space)
             self._set_children(assets, child_edges)
             if len(external_ids := assets.as_external_ids()) > IN_FILTER_LIMIT:
-                in_model_3_d_edges = self.in_model_3_d.list(limit=-1)
+                in_model_3_d_edges = self.in_model_3_d.list(limit=-1, space=space)
             else:
-                in_model_3_d_edges = self.in_model_3_d.list(external_ids, limit=-1)
+                in_model_3_d_edges = self.in_model_3_d.list(external_ids, limit=-1, space=space)
             self._set_in_model_3_d(assets, in_model_3_d_edges)
 
         return assets

@@ -209,14 +209,14 @@ class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
         if isinstance(external_id, str):
             work_item = self._retrieve((space, external_id))
 
-            linked_asset_edges = self.linked_assets.retrieve(external_id)
+            linked_asset_edges = self.linked_assets.retrieve(external_id, space=space)
             work_item.linked_assets = [edge.end_node.external_id for edge in linked_asset_edges]
 
             return work_item
         else:
             work_items = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            linked_asset_edges = self.linked_assets.retrieve(external_id)
+            linked_asset_edges = self.linked_assets.retrieve(external_id, space=space)
             self._set_linked_assets(work_items, linked_asset_edges)
 
             return work_items
@@ -652,9 +652,9 @@ class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
 
         if retrieve_edges:
             if len(external_ids := work_items.as_external_ids()) > IN_FILTER_LIMIT:
-                linked_asset_edges = self.linked_assets.list(limit=-1)
+                linked_asset_edges = self.linked_assets.list(limit=-1, space=space)
             else:
-                linked_asset_edges = self.linked_assets.list(external_ids, limit=-1)
+                linked_asset_edges = self.linked_assets.list(external_ids, limit=-1, space=space)
             self._set_linked_assets(work_items, linked_asset_edges)
 
         return work_items

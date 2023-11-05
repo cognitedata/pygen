@@ -1066,56 +1066,56 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
         if isinstance(external_id, str):
             wellbore_datum = self._retrieve((space, external_id))
 
-            drilling_reason_edges = self.drilling_reasons.retrieve(external_id)
+            drilling_reason_edges = self.drilling_reasons.retrieve(external_id, space=space)
             wellbore_datum.drilling_reasons = [edge.end_node.external_id for edge in drilling_reason_edges]
-            facility_event_edges = self.facility_events.retrieve(external_id)
+            facility_event_edges = self.facility_events.retrieve(external_id, space=space)
             wellbore_datum.facility_events = [edge.end_node.external_id for edge in facility_event_edges]
-            facility_operator_edges = self.facility_operators.retrieve(external_id)
+            facility_operator_edges = self.facility_operators.retrieve(external_id, space=space)
             wellbore_datum.facility_operators = [edge.end_node.external_id for edge in facility_operator_edges]
-            facility_specification_edges = self.facility_specifications.retrieve(external_id)
+            facility_specification_edges = self.facility_specifications.retrieve(external_id, space=space)
             wellbore_datum.facility_specifications = [
                 edge.end_node.external_id for edge in facility_specification_edges
             ]
-            facility_state_edges = self.facility_states.retrieve(external_id)
+            facility_state_edges = self.facility_states.retrieve(external_id, space=space)
             wellbore_datum.facility_states = [edge.end_node.external_id for edge in facility_state_edges]
-            geo_context_edges = self.geo_contexts.retrieve(external_id)
+            geo_context_edges = self.geo_contexts.retrieve(external_id, space=space)
             wellbore_datum.geo_contexts = [edge.end_node.external_id for edge in geo_context_edges]
-            historical_interest_edges = self.historical_interests.retrieve(external_id)
+            historical_interest_edges = self.historical_interests.retrieve(external_id, space=space)
             wellbore_datum.historical_interests = [edge.end_node.external_id for edge in historical_interest_edges]
-            name_alias_edges = self.name_aliases.retrieve(external_id)
+            name_alias_edges = self.name_aliases.retrieve(external_id, space=space)
             wellbore_datum.name_aliases = [edge.end_node.external_id for edge in name_alias_edges]
-            technical_assurance_edges = self.technical_assurances.retrieve(external_id)
+            technical_assurance_edges = self.technical_assurances.retrieve(external_id, space=space)
             wellbore_datum.technical_assurances = [edge.end_node.external_id for edge in technical_assurance_edges]
-            vertical_measurement_edges = self.vertical_measurements.retrieve(external_id)
+            vertical_measurement_edges = self.vertical_measurements.retrieve(external_id, space=space)
             wellbore_datum.vertical_measurements = [edge.end_node.external_id for edge in vertical_measurement_edges]
-            wellbore_cost_edges = self.wellbore_costs.retrieve(external_id)
+            wellbore_cost_edges = self.wellbore_costs.retrieve(external_id, space=space)
             wellbore_datum.wellbore_costs = [edge.end_node.external_id for edge in wellbore_cost_edges]
 
             return wellbore_datum
         else:
             wellbore_data = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            drilling_reason_edges = self.drilling_reasons.retrieve(external_id)
+            drilling_reason_edges = self.drilling_reasons.retrieve(external_id, space=space)
             self._set_drilling_reasons(wellbore_data, drilling_reason_edges)
-            facility_event_edges = self.facility_events.retrieve(external_id)
+            facility_event_edges = self.facility_events.retrieve(external_id, space=space)
             self._set_facility_events(wellbore_data, facility_event_edges)
-            facility_operator_edges = self.facility_operators.retrieve(external_id)
+            facility_operator_edges = self.facility_operators.retrieve(external_id, space=space)
             self._set_facility_operators(wellbore_data, facility_operator_edges)
-            facility_specification_edges = self.facility_specifications.retrieve(external_id)
+            facility_specification_edges = self.facility_specifications.retrieve(external_id, space=space)
             self._set_facility_specifications(wellbore_data, facility_specification_edges)
-            facility_state_edges = self.facility_states.retrieve(external_id)
+            facility_state_edges = self.facility_states.retrieve(external_id, space=space)
             self._set_facility_states(wellbore_data, facility_state_edges)
-            geo_context_edges = self.geo_contexts.retrieve(external_id)
+            geo_context_edges = self.geo_contexts.retrieve(external_id, space=space)
             self._set_geo_contexts(wellbore_data, geo_context_edges)
-            historical_interest_edges = self.historical_interests.retrieve(external_id)
+            historical_interest_edges = self.historical_interests.retrieve(external_id, space=space)
             self._set_historical_interests(wellbore_data, historical_interest_edges)
-            name_alias_edges = self.name_aliases.retrieve(external_id)
+            name_alias_edges = self.name_aliases.retrieve(external_id, space=space)
             self._set_name_aliases(wellbore_data, name_alias_edges)
-            technical_assurance_edges = self.technical_assurances.retrieve(external_id)
+            technical_assurance_edges = self.technical_assurances.retrieve(external_id, space=space)
             self._set_technical_assurances(wellbore_data, technical_assurance_edges)
-            vertical_measurement_edges = self.vertical_measurements.retrieve(external_id)
+            vertical_measurement_edges = self.vertical_measurements.retrieve(external_id, space=space)
             self._set_vertical_measurements(wellbore_data, vertical_measurement_edges)
-            wellbore_cost_edges = self.wellbore_costs.retrieve(external_id)
+            wellbore_cost_edges = self.wellbore_costs.retrieve(external_id, space=space)
             self._set_wellbore_costs(wellbore_data, wellbore_cost_edges)
 
             return wellbore_data
@@ -2447,59 +2447,59 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
 
         if retrieve_edges:
             if len(external_ids := wellbore_data.as_external_ids()) > IN_FILTER_LIMIT:
-                drilling_reason_edges = self.drilling_reasons.list(limit=-1)
+                drilling_reason_edges = self.drilling_reasons.list(limit=-1, space=space)
             else:
-                drilling_reason_edges = self.drilling_reasons.list(external_ids, limit=-1)
+                drilling_reason_edges = self.drilling_reasons.list(external_ids, limit=-1, space=space)
             self._set_drilling_reasons(wellbore_data, drilling_reason_edges)
             if len(external_ids := wellbore_data.as_external_ids()) > IN_FILTER_LIMIT:
-                facility_event_edges = self.facility_events.list(limit=-1)
+                facility_event_edges = self.facility_events.list(limit=-1, space=space)
             else:
-                facility_event_edges = self.facility_events.list(external_ids, limit=-1)
+                facility_event_edges = self.facility_events.list(external_ids, limit=-1, space=space)
             self._set_facility_events(wellbore_data, facility_event_edges)
             if len(external_ids := wellbore_data.as_external_ids()) > IN_FILTER_LIMIT:
-                facility_operator_edges = self.facility_operators.list(limit=-1)
+                facility_operator_edges = self.facility_operators.list(limit=-1, space=space)
             else:
-                facility_operator_edges = self.facility_operators.list(external_ids, limit=-1)
+                facility_operator_edges = self.facility_operators.list(external_ids, limit=-1, space=space)
             self._set_facility_operators(wellbore_data, facility_operator_edges)
             if len(external_ids := wellbore_data.as_external_ids()) > IN_FILTER_LIMIT:
-                facility_specification_edges = self.facility_specifications.list(limit=-1)
+                facility_specification_edges = self.facility_specifications.list(limit=-1, space=space)
             else:
-                facility_specification_edges = self.facility_specifications.list(external_ids, limit=-1)
+                facility_specification_edges = self.facility_specifications.list(external_ids, limit=-1, space=space)
             self._set_facility_specifications(wellbore_data, facility_specification_edges)
             if len(external_ids := wellbore_data.as_external_ids()) > IN_FILTER_LIMIT:
-                facility_state_edges = self.facility_states.list(limit=-1)
+                facility_state_edges = self.facility_states.list(limit=-1, space=space)
             else:
-                facility_state_edges = self.facility_states.list(external_ids, limit=-1)
+                facility_state_edges = self.facility_states.list(external_ids, limit=-1, space=space)
             self._set_facility_states(wellbore_data, facility_state_edges)
             if len(external_ids := wellbore_data.as_external_ids()) > IN_FILTER_LIMIT:
-                geo_context_edges = self.geo_contexts.list(limit=-1)
+                geo_context_edges = self.geo_contexts.list(limit=-1, space=space)
             else:
-                geo_context_edges = self.geo_contexts.list(external_ids, limit=-1)
+                geo_context_edges = self.geo_contexts.list(external_ids, limit=-1, space=space)
             self._set_geo_contexts(wellbore_data, geo_context_edges)
             if len(external_ids := wellbore_data.as_external_ids()) > IN_FILTER_LIMIT:
-                historical_interest_edges = self.historical_interests.list(limit=-1)
+                historical_interest_edges = self.historical_interests.list(limit=-1, space=space)
             else:
-                historical_interest_edges = self.historical_interests.list(external_ids, limit=-1)
+                historical_interest_edges = self.historical_interests.list(external_ids, limit=-1, space=space)
             self._set_historical_interests(wellbore_data, historical_interest_edges)
             if len(external_ids := wellbore_data.as_external_ids()) > IN_FILTER_LIMIT:
-                name_alias_edges = self.name_aliases.list(limit=-1)
+                name_alias_edges = self.name_aliases.list(limit=-1, space=space)
             else:
-                name_alias_edges = self.name_aliases.list(external_ids, limit=-1)
+                name_alias_edges = self.name_aliases.list(external_ids, limit=-1, space=space)
             self._set_name_aliases(wellbore_data, name_alias_edges)
             if len(external_ids := wellbore_data.as_external_ids()) > IN_FILTER_LIMIT:
-                technical_assurance_edges = self.technical_assurances.list(limit=-1)
+                technical_assurance_edges = self.technical_assurances.list(limit=-1, space=space)
             else:
-                technical_assurance_edges = self.technical_assurances.list(external_ids, limit=-1)
+                technical_assurance_edges = self.technical_assurances.list(external_ids, limit=-1, space=space)
             self._set_technical_assurances(wellbore_data, technical_assurance_edges)
             if len(external_ids := wellbore_data.as_external_ids()) > IN_FILTER_LIMIT:
-                vertical_measurement_edges = self.vertical_measurements.list(limit=-1)
+                vertical_measurement_edges = self.vertical_measurements.list(limit=-1, space=space)
             else:
-                vertical_measurement_edges = self.vertical_measurements.list(external_ids, limit=-1)
+                vertical_measurement_edges = self.vertical_measurements.list(external_ids, limit=-1, space=space)
             self._set_vertical_measurements(wellbore_data, vertical_measurement_edges)
             if len(external_ids := wellbore_data.as_external_ids()) > IN_FILTER_LIMIT:
-                wellbore_cost_edges = self.wellbore_costs.list(limit=-1)
+                wellbore_cost_edges = self.wellbore_costs.list(limit=-1, space=space)
             else:
-                wellbore_cost_edges = self.wellbore_costs.list(external_ids, limit=-1)
+                wellbore_cost_edges = self.wellbore_costs.list(external_ids, limit=-1, space=space)
             self._set_wellbore_costs(wellbore_data, wellbore_cost_edges)
 
         return wellbore_data

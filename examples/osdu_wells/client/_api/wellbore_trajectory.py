@@ -220,14 +220,14 @@ class WellboreTrajectoryAPI(TypeAPI[WellboreTrajectory, WellboreTrajectoryApply,
         if isinstance(external_id, str):
             wellbore_trajectory = self._retrieve((space, external_id))
 
-            meta_edges = self.meta.retrieve(external_id)
+            meta_edges = self.meta.retrieve(external_id, space=space)
             wellbore_trajectory.meta = [edge.end_node.external_id for edge in meta_edges]
 
             return wellbore_trajectory
         else:
             wellbore_trajectories = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            meta_edges = self.meta.retrieve(external_id)
+            meta_edges = self.meta.retrieve(external_id, space=space)
             self._set_meta(wellbore_trajectories, meta_edges)
 
             return wellbore_trajectories
@@ -719,9 +719,9 @@ class WellboreTrajectoryAPI(TypeAPI[WellboreTrajectory, WellboreTrajectoryApply,
 
         if retrieve_edges:
             if len(external_ids := wellbore_trajectories.as_external_ids()) > IN_FILTER_LIMIT:
-                meta_edges = self.meta.list(limit=-1)
+                meta_edges = self.meta.list(limit=-1, space=space)
             else:
-                meta_edges = self.meta.list(external_ids, limit=-1)
+                meta_edges = self.meta.list(external_ids, limit=-1, space=space)
             self._set_meta(wellbore_trajectories, meta_edges)
 
         return wellbore_trajectories

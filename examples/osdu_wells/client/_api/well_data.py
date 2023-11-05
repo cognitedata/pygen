@@ -896,46 +896,46 @@ class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
         if isinstance(external_id, str):
             well_datum = self._retrieve((space, external_id))
 
-            facility_event_edges = self.facility_events.retrieve(external_id)
+            facility_event_edges = self.facility_events.retrieve(external_id, space=space)
             well_datum.facility_events = [edge.end_node.external_id for edge in facility_event_edges]
-            facility_operator_edges = self.facility_operators.retrieve(external_id)
+            facility_operator_edges = self.facility_operators.retrieve(external_id, space=space)
             well_datum.facility_operators = [edge.end_node.external_id for edge in facility_operator_edges]
-            facility_specification_edges = self.facility_specifications.retrieve(external_id)
+            facility_specification_edges = self.facility_specifications.retrieve(external_id, space=space)
             well_datum.facility_specifications = [edge.end_node.external_id for edge in facility_specification_edges]
-            facility_state_edges = self.facility_states.retrieve(external_id)
+            facility_state_edges = self.facility_states.retrieve(external_id, space=space)
             well_datum.facility_states = [edge.end_node.external_id for edge in facility_state_edges]
-            geo_context_edges = self.geo_contexts.retrieve(external_id)
+            geo_context_edges = self.geo_contexts.retrieve(external_id, space=space)
             well_datum.geo_contexts = [edge.end_node.external_id for edge in geo_context_edges]
-            historical_interest_edges = self.historical_interests.retrieve(external_id)
+            historical_interest_edges = self.historical_interests.retrieve(external_id, space=space)
             well_datum.historical_interests = [edge.end_node.external_id for edge in historical_interest_edges]
-            name_alias_edges = self.name_aliases.retrieve(external_id)
+            name_alias_edges = self.name_aliases.retrieve(external_id, space=space)
             well_datum.name_aliases = [edge.end_node.external_id for edge in name_alias_edges]
-            technical_assurance_edges = self.technical_assurances.retrieve(external_id)
+            technical_assurance_edges = self.technical_assurances.retrieve(external_id, space=space)
             well_datum.technical_assurances = [edge.end_node.external_id for edge in technical_assurance_edges]
-            vertical_measurement_edges = self.vertical_measurements.retrieve(external_id)
+            vertical_measurement_edges = self.vertical_measurements.retrieve(external_id, space=space)
             well_datum.vertical_measurements = [edge.end_node.external_id for edge in vertical_measurement_edges]
 
             return well_datum
         else:
             well_data = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            facility_event_edges = self.facility_events.retrieve(external_id)
+            facility_event_edges = self.facility_events.retrieve(external_id, space=space)
             self._set_facility_events(well_data, facility_event_edges)
-            facility_operator_edges = self.facility_operators.retrieve(external_id)
+            facility_operator_edges = self.facility_operators.retrieve(external_id, space=space)
             self._set_facility_operators(well_data, facility_operator_edges)
-            facility_specification_edges = self.facility_specifications.retrieve(external_id)
+            facility_specification_edges = self.facility_specifications.retrieve(external_id, space=space)
             self._set_facility_specifications(well_data, facility_specification_edges)
-            facility_state_edges = self.facility_states.retrieve(external_id)
+            facility_state_edges = self.facility_states.retrieve(external_id, space=space)
             self._set_facility_states(well_data, facility_state_edges)
-            geo_context_edges = self.geo_contexts.retrieve(external_id)
+            geo_context_edges = self.geo_contexts.retrieve(external_id, space=space)
             self._set_geo_contexts(well_data, geo_context_edges)
-            historical_interest_edges = self.historical_interests.retrieve(external_id)
+            historical_interest_edges = self.historical_interests.retrieve(external_id, space=space)
             self._set_historical_interests(well_data, historical_interest_edges)
-            name_alias_edges = self.name_aliases.retrieve(external_id)
+            name_alias_edges = self.name_aliases.retrieve(external_id, space=space)
             self._set_name_aliases(well_data, name_alias_edges)
-            technical_assurance_edges = self.technical_assurances.retrieve(external_id)
+            technical_assurance_edges = self.technical_assurances.retrieve(external_id, space=space)
             self._set_technical_assurances(well_data, technical_assurance_edges)
-            vertical_measurement_edges = self.vertical_measurements.retrieve(external_id)
+            vertical_measurement_edges = self.vertical_measurements.retrieve(external_id, space=space)
             self._set_vertical_measurements(well_data, vertical_measurement_edges)
 
             return well_data
@@ -1903,49 +1903,49 @@ class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
 
         if retrieve_edges:
             if len(external_ids := well_data.as_external_ids()) > IN_FILTER_LIMIT:
-                facility_event_edges = self.facility_events.list(limit=-1)
+                facility_event_edges = self.facility_events.list(limit=-1, space=space)
             else:
-                facility_event_edges = self.facility_events.list(external_ids, limit=-1)
+                facility_event_edges = self.facility_events.list(external_ids, limit=-1, space=space)
             self._set_facility_events(well_data, facility_event_edges)
             if len(external_ids := well_data.as_external_ids()) > IN_FILTER_LIMIT:
-                facility_operator_edges = self.facility_operators.list(limit=-1)
+                facility_operator_edges = self.facility_operators.list(limit=-1, space=space)
             else:
-                facility_operator_edges = self.facility_operators.list(external_ids, limit=-1)
+                facility_operator_edges = self.facility_operators.list(external_ids, limit=-1, space=space)
             self._set_facility_operators(well_data, facility_operator_edges)
             if len(external_ids := well_data.as_external_ids()) > IN_FILTER_LIMIT:
-                facility_specification_edges = self.facility_specifications.list(limit=-1)
+                facility_specification_edges = self.facility_specifications.list(limit=-1, space=space)
             else:
-                facility_specification_edges = self.facility_specifications.list(external_ids, limit=-1)
+                facility_specification_edges = self.facility_specifications.list(external_ids, limit=-1, space=space)
             self._set_facility_specifications(well_data, facility_specification_edges)
             if len(external_ids := well_data.as_external_ids()) > IN_FILTER_LIMIT:
-                facility_state_edges = self.facility_states.list(limit=-1)
+                facility_state_edges = self.facility_states.list(limit=-1, space=space)
             else:
-                facility_state_edges = self.facility_states.list(external_ids, limit=-1)
+                facility_state_edges = self.facility_states.list(external_ids, limit=-1, space=space)
             self._set_facility_states(well_data, facility_state_edges)
             if len(external_ids := well_data.as_external_ids()) > IN_FILTER_LIMIT:
-                geo_context_edges = self.geo_contexts.list(limit=-1)
+                geo_context_edges = self.geo_contexts.list(limit=-1, space=space)
             else:
-                geo_context_edges = self.geo_contexts.list(external_ids, limit=-1)
+                geo_context_edges = self.geo_contexts.list(external_ids, limit=-1, space=space)
             self._set_geo_contexts(well_data, geo_context_edges)
             if len(external_ids := well_data.as_external_ids()) > IN_FILTER_LIMIT:
-                historical_interest_edges = self.historical_interests.list(limit=-1)
+                historical_interest_edges = self.historical_interests.list(limit=-1, space=space)
             else:
-                historical_interest_edges = self.historical_interests.list(external_ids, limit=-1)
+                historical_interest_edges = self.historical_interests.list(external_ids, limit=-1, space=space)
             self._set_historical_interests(well_data, historical_interest_edges)
             if len(external_ids := well_data.as_external_ids()) > IN_FILTER_LIMIT:
-                name_alias_edges = self.name_aliases.list(limit=-1)
+                name_alias_edges = self.name_aliases.list(limit=-1, space=space)
             else:
-                name_alias_edges = self.name_aliases.list(external_ids, limit=-1)
+                name_alias_edges = self.name_aliases.list(external_ids, limit=-1, space=space)
             self._set_name_aliases(well_data, name_alias_edges)
             if len(external_ids := well_data.as_external_ids()) > IN_FILTER_LIMIT:
-                technical_assurance_edges = self.technical_assurances.list(limit=-1)
+                technical_assurance_edges = self.technical_assurances.list(limit=-1, space=space)
             else:
-                technical_assurance_edges = self.technical_assurances.list(external_ids, limit=-1)
+                technical_assurance_edges = self.technical_assurances.list(external_ids, limit=-1, space=space)
             self._set_technical_assurances(well_data, technical_assurance_edges)
             if len(external_ids := well_data.as_external_ids()) > IN_FILTER_LIMIT:
-                vertical_measurement_edges = self.vertical_measurements.list(limit=-1)
+                vertical_measurement_edges = self.vertical_measurements.list(limit=-1, space=space)
             else:
-                vertical_measurement_edges = self.vertical_measurements.list(external_ids, limit=-1)
+                vertical_measurement_edges = self.vertical_measurements.list(external_ids, limit=-1, space=space)
             self._set_vertical_measurements(well_data, vertical_measurement_edges)
 
         return well_data

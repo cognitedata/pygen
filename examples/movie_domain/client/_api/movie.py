@@ -297,18 +297,18 @@ class MovieAPI(TypeAPI[Movie, MovieApply, MovieList]):
         if isinstance(external_id, str):
             movie = self._retrieve((space, external_id))
 
-            actor_edges = self.actors.retrieve(external_id)
+            actor_edges = self.actors.retrieve(external_id, space=space)
             movie.actors = [edge.end_node.external_id for edge in actor_edges]
-            director_edges = self.directors.retrieve(external_id)
+            director_edges = self.directors.retrieve(external_id, space=space)
             movie.directors = [edge.end_node.external_id for edge in director_edges]
 
             return movie
         else:
             movies = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            actor_edges = self.actors.retrieve(external_id)
+            actor_edges = self.actors.retrieve(external_id, space=space)
             self._set_actors(movies, actor_edges)
-            director_edges = self.directors.retrieve(external_id)
+            director_edges = self.directors.retrieve(external_id, space=space)
             self._set_directors(movies, director_edges)
 
             return movies
@@ -632,14 +632,14 @@ class MovieAPI(TypeAPI[Movie, MovieApply, MovieList]):
 
         if retrieve_edges:
             if len(external_ids := movies.as_external_ids()) > IN_FILTER_LIMIT:
-                actor_edges = self.actors.list(limit=-1)
+                actor_edges = self.actors.list(limit=-1, space=space)
             else:
-                actor_edges = self.actors.list(external_ids, limit=-1)
+                actor_edges = self.actors.list(external_ids, limit=-1, space=space)
             self._set_actors(movies, actor_edges)
             if len(external_ids := movies.as_external_ids()) > IN_FILTER_LIMIT:
-                director_edges = self.directors.list(limit=-1)
+                director_edges = self.directors.list(limit=-1, space=space)
             else:
-                director_edges = self.directors.list(external_ids, limit=-1)
+                director_edges = self.directors.list(external_ids, limit=-1, space=space)
             self._set_directors(movies, director_edges)
 
         return movies

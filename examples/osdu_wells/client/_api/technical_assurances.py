@@ -398,22 +398,22 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
         if isinstance(external_id, str):
             technical_assurance = self._retrieve((space, external_id))
 
-            acceptable_usage_edges = self.acceptable_usage.retrieve(external_id)
+            acceptable_usage_edges = self.acceptable_usage.retrieve(external_id, space=space)
             technical_assurance.acceptable_usage = [edge.end_node.external_id for edge in acceptable_usage_edges]
-            reviewer_edges = self.reviewers.retrieve(external_id)
+            reviewer_edges = self.reviewers.retrieve(external_id, space=space)
             technical_assurance.reviewers = [edge.end_node.external_id for edge in reviewer_edges]
-            unacceptable_usage_edges = self.unacceptable_usage.retrieve(external_id)
+            unacceptable_usage_edges = self.unacceptable_usage.retrieve(external_id, space=space)
             technical_assurance.unacceptable_usage = [edge.end_node.external_id for edge in unacceptable_usage_edges]
 
             return technical_assurance
         else:
             technical_assurances = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            acceptable_usage_edges = self.acceptable_usage.retrieve(external_id)
+            acceptable_usage_edges = self.acceptable_usage.retrieve(external_id, space=space)
             self._set_acceptable_usage(technical_assurances, acceptable_usage_edges)
-            reviewer_edges = self.reviewers.retrieve(external_id)
+            reviewer_edges = self.reviewers.retrieve(external_id, space=space)
             self._set_reviewers(technical_assurances, reviewer_edges)
-            unacceptable_usage_edges = self.unacceptable_usage.retrieve(external_id)
+            unacceptable_usage_edges = self.unacceptable_usage.retrieve(external_id, space=space)
             self._set_unacceptable_usage(technical_assurances, unacceptable_usage_edges)
 
             return technical_assurances
@@ -723,19 +723,19 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
 
         if retrieve_edges:
             if len(external_ids := technical_assurances.as_external_ids()) > IN_FILTER_LIMIT:
-                acceptable_usage_edges = self.acceptable_usage.list(limit=-1)
+                acceptable_usage_edges = self.acceptable_usage.list(limit=-1, space=space)
             else:
-                acceptable_usage_edges = self.acceptable_usage.list(external_ids, limit=-1)
+                acceptable_usage_edges = self.acceptable_usage.list(external_ids, limit=-1, space=space)
             self._set_acceptable_usage(technical_assurances, acceptable_usage_edges)
             if len(external_ids := technical_assurances.as_external_ids()) > IN_FILTER_LIMIT:
-                reviewer_edges = self.reviewers.list(limit=-1)
+                reviewer_edges = self.reviewers.list(limit=-1, space=space)
             else:
-                reviewer_edges = self.reviewers.list(external_ids, limit=-1)
+                reviewer_edges = self.reviewers.list(external_ids, limit=-1, space=space)
             self._set_reviewers(technical_assurances, reviewer_edges)
             if len(external_ids := technical_assurances.as_external_ids()) > IN_FILTER_LIMIT:
-                unacceptable_usage_edges = self.unacceptable_usage.list(limit=-1)
+                unacceptable_usage_edges = self.unacceptable_usage.list(limit=-1, space=space)
             else:
-                unacceptable_usage_edges = self.unacceptable_usage.list(external_ids, limit=-1)
+                unacceptable_usage_edges = self.unacceptable_usage.list(external_ids, limit=-1, space=space)
             self._set_unacceptable_usage(technical_assurances, unacceptable_usage_edges)
 
         return technical_assurances

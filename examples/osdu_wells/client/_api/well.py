@@ -209,14 +209,14 @@ class WellAPI(TypeAPI[Well, WellApply, WellList]):
         if isinstance(external_id, str):
             well = self._retrieve((space, external_id))
 
-            meta_edges = self.meta.retrieve(external_id)
+            meta_edges = self.meta.retrieve(external_id, space=space)
             well.meta = [edge.end_node.external_id for edge in meta_edges]
 
             return well
         else:
             wells = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            meta_edges = self.meta.retrieve(external_id)
+            meta_edges = self.meta.retrieve(external_id, space=space)
             self._set_meta(wells, meta_edges)
 
             return wells
@@ -708,9 +708,9 @@ class WellAPI(TypeAPI[Well, WellApply, WellList]):
 
         if retrieve_edges:
             if len(external_ids := wells.as_external_ids()) > IN_FILTER_LIMIT:
-                meta_edges = self.meta.list(limit=-1)
+                meta_edges = self.meta.list(limit=-1, space=space)
             else:
-                meta_edges = self.meta.list(external_ids, limit=-1)
+                meta_edges = self.meta.list(external_ids, limit=-1, space=space)
             self._set_meta(wells, meta_edges)
 
         return wells

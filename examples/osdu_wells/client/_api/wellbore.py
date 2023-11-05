@@ -216,14 +216,14 @@ class WellboreAPI(TypeAPI[Wellbore, WellboreApply, WellboreList]):
         if isinstance(external_id, str):
             wellbore = self._retrieve((space, external_id))
 
-            meta_edges = self.meta.retrieve(external_id)
+            meta_edges = self.meta.retrieve(external_id, space=space)
             wellbore.meta = [edge.end_node.external_id for edge in meta_edges]
 
             return wellbore
         else:
             wellbores = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            meta_edges = self.meta.retrieve(external_id)
+            meta_edges = self.meta.retrieve(external_id, space=space)
             self._set_meta(wellbores, meta_edges)
 
             return wellbores
@@ -715,9 +715,9 @@ class WellboreAPI(TypeAPI[Wellbore, WellboreApply, WellboreList]):
 
         if retrieve_edges:
             if len(external_ids := wellbores.as_external_ids()) > IN_FILTER_LIMIT:
-                meta_edges = self.meta.list(limit=-1)
+                meta_edges = self.meta.list(limit=-1, space=space)
             else:
-                meta_edges = self.meta.list(external_ids, limit=-1)
+                meta_edges = self.meta.list(external_ids, limit=-1, space=space)
             self._set_meta(wellbores, meta_edges)
 
         return wellbores

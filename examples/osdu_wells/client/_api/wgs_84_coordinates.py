@@ -220,14 +220,14 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
         if isinstance(external_id, str):
             wgs_84_coordinate = self._retrieve((space, external_id))
 
-            feature_edges = self.features.retrieve(external_id)
+            feature_edges = self.features.retrieve(external_id, space=space)
             wgs_84_coordinate.features = [edge.end_node.external_id for edge in feature_edges]
 
             return wgs_84_coordinate
         else:
             wgs_84_coordinates = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            feature_edges = self.features.retrieve(external_id)
+            feature_edges = self.features.retrieve(external_id, space=space)
             self._set_features(wgs_84_coordinates, feature_edges)
 
             return wgs_84_coordinates
@@ -481,9 +481,9 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
 
         if retrieve_edges:
             if len(external_ids := wgs_84_coordinates.as_external_ids()) > IN_FILTER_LIMIT:
-                feature_edges = self.features.list(limit=-1)
+                feature_edges = self.features.list(limit=-1, space=space)
             else:
-                feature_edges = self.features.list(external_ids, limit=-1)
+                feature_edges = self.features.list(external_ids, limit=-1, space=space)
             self._set_features(wgs_84_coordinates, feature_edges)
 
         return wgs_84_coordinates

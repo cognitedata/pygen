@@ -211,14 +211,14 @@ class CdfModelAPI(TypeAPI[CdfModel, CdfModelApply, CdfModelList]):
         if isinstance(external_id, str):
             cdf_3_d_model = self._retrieve((space, external_id))
 
-            entity_edges = self.entities.retrieve(external_id)
+            entity_edges = self.entities.retrieve(external_id, space=space)
             cdf_3_d_model.entities = [edge.end_node.external_id for edge in entity_edges]
 
             return cdf_3_d_model
         else:
             cdf_3_d_models = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            entity_edges = self.entities.retrieve(external_id)
+            entity_edges = self.entities.retrieve(external_id, space=space)
             self._set_entities(cdf_3_d_models, entity_edges)
 
             return cdf_3_d_models
@@ -472,9 +472,9 @@ class CdfModelAPI(TypeAPI[CdfModel, CdfModelApply, CdfModelList]):
 
         if retrieve_edges:
             if len(external_ids := cdf_3_d_models.as_external_ids()) > IN_FILTER_LIMIT:
-                entity_edges = self.entities.list(limit=-1)
+                entity_edges = self.entities.list(limit=-1, space=space)
             else:
-                entity_edges = self.entities.list(external_ids, limit=-1)
+                entity_edges = self.entities.list(external_ids, limit=-1, space=space)
             self._set_entities(cdf_3_d_models, entity_edges)
 
         return cdf_3_d_models

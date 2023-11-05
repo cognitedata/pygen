@@ -283,18 +283,18 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
         if isinstance(external_id, str):
             role = self._retrieve((space, external_id))
 
-            movie_edges = self.movies.retrieve(external_id)
+            movie_edges = self.movies.retrieve(external_id, space=space)
             role.movies = [edge.end_node.external_id for edge in movie_edges]
-            nomination_edges = self.nomination.retrieve(external_id)
+            nomination_edges = self.nomination.retrieve(external_id, space=space)
             role.nomination = [edge.end_node.external_id for edge in nomination_edges]
 
             return role
         else:
             roles = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            movie_edges = self.movies.retrieve(external_id)
+            movie_edges = self.movies.retrieve(external_id, space=space)
             self._set_movies(roles, movie_edges)
-            nomination_edges = self.nomination.retrieve(external_id)
+            nomination_edges = self.nomination.retrieve(external_id, space=space)
             self._set_nomination(roles, nomination_edges)
 
             return roles
@@ -490,14 +490,14 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
 
         if retrieve_edges:
             if len(external_ids := roles.as_external_ids()) > IN_FILTER_LIMIT:
-                movie_edges = self.movies.list(limit=-1)
+                movie_edges = self.movies.list(limit=-1, space=space)
             else:
-                movie_edges = self.movies.list(external_ids, limit=-1)
+                movie_edges = self.movies.list(external_ids, limit=-1, space=space)
             self._set_movies(roles, movie_edges)
             if len(external_ids := roles.as_external_ids()) > IN_FILTER_LIMIT:
-                nomination_edges = self.nomination.list(limit=-1)
+                nomination_edges = self.nomination.list(limit=-1, space=space)
             else:
-                nomination_edges = self.nomination.list(external_ids, limit=-1)
+                nomination_edges = self.nomination.list(external_ids, limit=-1, space=space)
             self._set_nomination(roles, nomination_edges)
 
         return roles

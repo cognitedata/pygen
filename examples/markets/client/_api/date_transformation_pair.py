@@ -312,18 +312,18 @@ class DateTransformationPairAPI(
         if isinstance(external_id, str):
             date_transformation_pair = self._retrieve((space, external_id))
 
-            end_edges = self.end.retrieve(external_id)
+            end_edges = self.end.retrieve(external_id, space=space)
             date_transformation_pair.end = [edge.end_node.external_id for edge in end_edges]
-            start_edges = self.start.retrieve(external_id)
+            start_edges = self.start.retrieve(external_id, space=space)
             date_transformation_pair.start = [edge.end_node.external_id for edge in start_edges]
 
             return date_transformation_pair
         else:
             date_transformation_pairs = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            end_edges = self.end.retrieve(external_id)
+            end_edges = self.end.retrieve(external_id, space=space)
             self._set_end(date_transformation_pairs, end_edges)
-            start_edges = self.start.retrieve(external_id)
+            start_edges = self.start.retrieve(external_id, space=space)
             self._set_start(date_transformation_pairs, start_edges)
 
             return date_transformation_pairs
@@ -368,14 +368,14 @@ class DateTransformationPairAPI(
 
         if retrieve_edges:
             if len(external_ids := date_transformation_pairs.as_external_ids()) > IN_FILTER_LIMIT:
-                end_edges = self.end.list(limit=-1)
+                end_edges = self.end.list(limit=-1, space=space)
             else:
-                end_edges = self.end.list(external_ids, limit=-1)
+                end_edges = self.end.list(external_ids, limit=-1, space=space)
             self._set_end(date_transformation_pairs, end_edges)
             if len(external_ids := date_transformation_pairs.as_external_ids()) > IN_FILTER_LIMIT:
-                start_edges = self.start.list(limit=-1)
+                start_edges = self.start.list(limit=-1, space=space)
             else:
-                start_edges = self.start.list(external_ids, limit=-1)
+                start_edges = self.start.list(external_ids, limit=-1, space=space)
             self._set_start(date_transformation_pairs, start_edges)
 
         return date_transformation_pairs

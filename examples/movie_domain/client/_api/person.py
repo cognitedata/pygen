@@ -214,14 +214,14 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
         if isinstance(external_id, str):
             person = self._retrieve((space, external_id))
 
-            role_edges = self.roles.retrieve(external_id)
+            role_edges = self.roles.retrieve(external_id, space=space)
             person.roles = [edge.end_node.external_id for edge in role_edges]
 
             return person
         else:
             persons = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            role_edges = self.roles.retrieve(external_id)
+            role_edges = self.roles.retrieve(external_id, space=space)
             self._set_roles(persons, role_edges)
 
             return persons
@@ -503,9 +503,9 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
 
         if retrieve_edges:
             if len(external_ids := persons.as_external_ids()) > IN_FILTER_LIMIT:
-                role_edges = self.roles.list(limit=-1)
+                role_edges = self.roles.list(limit=-1, space=space)
             else:
-                role_edges = self.roles.list(external_ids, limit=-1)
+                role_edges = self.roles.list(external_ids, limit=-1, space=space)
             self._set_roles(persons, role_edges)
 
         return persons

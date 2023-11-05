@@ -691,23 +691,23 @@ class WellboreTrajectoryDataAPI(
         if isinstance(external_id, str):
             wellbore_trajectory_datum = self._retrieve((space, external_id))
 
-            artefact_edges = self.artefacts.retrieve(external_id)
+            artefact_edges = self.artefacts.retrieve(external_id, space=space)
             wellbore_trajectory_datum.artefacts = [edge.end_node.external_id for edge in artefact_edges]
             available_trajectory_station_property_edges = self.available_trajectory_station_properties.retrieve(
-                external_id
+                external_id, space=space
             )
             wellbore_trajectory_datum.available_trajectory_station_properties = [
                 edge.end_node.external_id for edge in available_trajectory_station_property_edges
             ]
-            geo_context_edges = self.geo_contexts.retrieve(external_id)
+            geo_context_edges = self.geo_contexts.retrieve(external_id, space=space)
             wellbore_trajectory_datum.geo_contexts = [edge.end_node.external_id for edge in geo_context_edges]
-            lineage_assertion_edges = self.lineage_assertions.retrieve(external_id)
+            lineage_assertion_edges = self.lineage_assertions.retrieve(external_id, space=space)
             wellbore_trajectory_datum.lineage_assertions = [
                 edge.end_node.external_id for edge in lineage_assertion_edges
             ]
-            name_alias_edges = self.name_aliases.retrieve(external_id)
+            name_alias_edges = self.name_aliases.retrieve(external_id, space=space)
             wellbore_trajectory_datum.name_aliases = [edge.end_node.external_id for edge in name_alias_edges]
-            technical_assurance_edges = self.technical_assurances.retrieve(external_id)
+            technical_assurance_edges = self.technical_assurances.retrieve(external_id, space=space)
             wellbore_trajectory_datum.technical_assurances = [
                 edge.end_node.external_id for edge in technical_assurance_edges
             ]
@@ -716,21 +716,21 @@ class WellboreTrajectoryDataAPI(
         else:
             wellbore_trajectory_data = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            artefact_edges = self.artefacts.retrieve(external_id)
+            artefact_edges = self.artefacts.retrieve(external_id, space=space)
             self._set_artefacts(wellbore_trajectory_data, artefact_edges)
             available_trajectory_station_property_edges = self.available_trajectory_station_properties.retrieve(
-                external_id
+                external_id, space=space
             )
             self._set_available_trajectory_station_properties(
                 wellbore_trajectory_data, available_trajectory_station_property_edges
             )
-            geo_context_edges = self.geo_contexts.retrieve(external_id)
+            geo_context_edges = self.geo_contexts.retrieve(external_id, space=space)
             self._set_geo_contexts(wellbore_trajectory_data, geo_context_edges)
-            lineage_assertion_edges = self.lineage_assertions.retrieve(external_id)
+            lineage_assertion_edges = self.lineage_assertions.retrieve(external_id, space=space)
             self._set_lineage_assertions(wellbore_trajectory_data, lineage_assertion_edges)
-            name_alias_edges = self.name_aliases.retrieve(external_id)
+            name_alias_edges = self.name_aliases.retrieve(external_id, space=space)
             self._set_name_aliases(wellbore_trajectory_data, name_alias_edges)
-            technical_assurance_edges = self.technical_assurances.retrieve(external_id)
+            technical_assurance_edges = self.technical_assurances.retrieve(external_id, space=space)
             self._set_technical_assurances(wellbore_trajectory_data, technical_assurance_edges)
 
             return wellbore_trajectory_data
@@ -2078,40 +2078,40 @@ class WellboreTrajectoryDataAPI(
 
         if retrieve_edges:
             if len(external_ids := wellbore_trajectory_data.as_external_ids()) > IN_FILTER_LIMIT:
-                artefact_edges = self.artefacts.list(limit=-1)
+                artefact_edges = self.artefacts.list(limit=-1, space=space)
             else:
-                artefact_edges = self.artefacts.list(external_ids, limit=-1)
+                artefact_edges = self.artefacts.list(external_ids, limit=-1, space=space)
             self._set_artefacts(wellbore_trajectory_data, artefact_edges)
             if len(external_ids := wellbore_trajectory_data.as_external_ids()) > IN_FILTER_LIMIT:
                 available_trajectory_station_property_edges = self.available_trajectory_station_properties.list(
-                    limit=-1
+                    limit=-1, space=space
                 )
             else:
                 available_trajectory_station_property_edges = self.available_trajectory_station_properties.list(
-                    external_ids, limit=-1
+                    external_ids, limit=-1, space=space
                 )
             self._set_available_trajectory_station_properties(
                 wellbore_trajectory_data, available_trajectory_station_property_edges
             )
             if len(external_ids := wellbore_trajectory_data.as_external_ids()) > IN_FILTER_LIMIT:
-                geo_context_edges = self.geo_contexts.list(limit=-1)
+                geo_context_edges = self.geo_contexts.list(limit=-1, space=space)
             else:
-                geo_context_edges = self.geo_contexts.list(external_ids, limit=-1)
+                geo_context_edges = self.geo_contexts.list(external_ids, limit=-1, space=space)
             self._set_geo_contexts(wellbore_trajectory_data, geo_context_edges)
             if len(external_ids := wellbore_trajectory_data.as_external_ids()) > IN_FILTER_LIMIT:
-                lineage_assertion_edges = self.lineage_assertions.list(limit=-1)
+                lineage_assertion_edges = self.lineage_assertions.list(limit=-1, space=space)
             else:
-                lineage_assertion_edges = self.lineage_assertions.list(external_ids, limit=-1)
+                lineage_assertion_edges = self.lineage_assertions.list(external_ids, limit=-1, space=space)
             self._set_lineage_assertions(wellbore_trajectory_data, lineage_assertion_edges)
             if len(external_ids := wellbore_trajectory_data.as_external_ids()) > IN_FILTER_LIMIT:
-                name_alias_edges = self.name_aliases.list(limit=-1)
+                name_alias_edges = self.name_aliases.list(limit=-1, space=space)
             else:
-                name_alias_edges = self.name_aliases.list(external_ids, limit=-1)
+                name_alias_edges = self.name_aliases.list(external_ids, limit=-1, space=space)
             self._set_name_aliases(wellbore_trajectory_data, name_alias_edges)
             if len(external_ids := wellbore_trajectory_data.as_external_ids()) > IN_FILTER_LIMIT:
-                technical_assurance_edges = self.technical_assurances.list(limit=-1)
+                technical_assurance_edges = self.technical_assurances.list(limit=-1, space=space)
             else:
-                technical_assurance_edges = self.technical_assurances.list(external_ids, limit=-1)
+                technical_assurance_edges = self.technical_assurances.list(external_ids, limit=-1, space=space)
             self._set_technical_assurances(wellbore_trajectory_data, technical_assurance_edges)
 
         return wellbore_trajectory_data

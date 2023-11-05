@@ -224,14 +224,14 @@ class AsIngestedCoordinatesAPI(TypeAPI[AsIngestedCoordinates, AsIngestedCoordina
         if isinstance(external_id, str):
             as_ingested_coordinate = self._retrieve((space, external_id))
 
-            feature_edges = self.features.retrieve(external_id)
+            feature_edges = self.features.retrieve(external_id, space=space)
             as_ingested_coordinate.features = [edge.end_node.external_id for edge in feature_edges]
 
             return as_ingested_coordinate
         else:
             as_ingested_coordinates = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            feature_edges = self.features.retrieve(external_id)
+            feature_edges = self.features.retrieve(external_id, space=space)
             self._set_features(as_ingested_coordinates, feature_edges)
 
             return as_ingested_coordinates
@@ -655,9 +655,9 @@ class AsIngestedCoordinatesAPI(TypeAPI[AsIngestedCoordinates, AsIngestedCoordina
 
         if retrieve_edges:
             if len(external_ids := as_ingested_coordinates.as_external_ids()) > IN_FILTER_LIMIT:
-                feature_edges = self.features.list(limit=-1)
+                feature_edges = self.features.list(limit=-1, space=space)
             else:
-                feature_edges = self.features.list(external_ids, limit=-1)
+                feature_edges = self.features.list(external_ids, limit=-1, space=space)
             self._set_features(as_ingested_coordinates, feature_edges)
 
         return as_ingested_coordinates

@@ -294,18 +294,18 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         if isinstance(external_id, str):
             work_order = self._retrieve((space, external_id))
 
-            linked_asset_edges = self.linked_assets.retrieve(external_id)
+            linked_asset_edges = self.linked_assets.retrieve(external_id, space=space)
             work_order.linked_assets = [edge.end_node.external_id for edge in linked_asset_edges]
-            work_item_edges = self.work_items.retrieve(external_id)
+            work_item_edges = self.work_items.retrieve(external_id, space=space)
             work_order.work_items = [edge.end_node.external_id for edge in work_item_edges]
 
             return work_order
         else:
             work_orders = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            linked_asset_edges = self.linked_assets.retrieve(external_id)
+            linked_asset_edges = self.linked_assets.retrieve(external_id, space=space)
             self._set_linked_assets(work_orders, linked_asset_edges)
-            work_item_edges = self.work_items.retrieve(external_id)
+            work_item_edges = self.work_items.retrieve(external_id, space=space)
             self._set_work_items(work_orders, work_item_edges)
 
             return work_orders
@@ -1007,14 +1007,14 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
 
         if retrieve_edges:
             if len(external_ids := work_orders.as_external_ids()) > IN_FILTER_LIMIT:
-                linked_asset_edges = self.linked_assets.list(limit=-1)
+                linked_asset_edges = self.linked_assets.list(limit=-1, space=space)
             else:
-                linked_asset_edges = self.linked_assets.list(external_ids, limit=-1)
+                linked_asset_edges = self.linked_assets.list(external_ids, limit=-1, space=space)
             self._set_linked_assets(work_orders, linked_asset_edges)
             if len(external_ids := work_orders.as_external_ids()) > IN_FILTER_LIMIT:
-                work_item_edges = self.work_items.list(limit=-1)
+                work_item_edges = self.work_items.list(limit=-1, space=space)
             else:
-                work_item_edges = self.work_items.list(external_ids, limit=-1)
+                work_item_edges = self.work_items.list(external_ids, limit=-1, space=space)
             self._set_work_items(work_orders, work_item_edges)
 
         return work_orders
