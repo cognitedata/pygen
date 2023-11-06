@@ -258,7 +258,9 @@ def test_fields_from_property(
     pygen_config: PygenConfig,
 ):
     # Act
-    actual = Field.from_property(prop_name, property_, data_class_by_view_id, pygen_config.naming.field, view_name)
+    actual = Field.from_property(
+        prop_name, property_, data_class_by_view_id, pygen_config.naming.field, view_name, dm.ViewId("a", "b", "c")
+    )
 
     # Assert
     assert actual == expected

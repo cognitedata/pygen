@@ -11,6 +11,7 @@ from cognite.client.data_classes.data_modeling.data_types import ListablePropert
 from typing_extensions import Self
 
 from cognite.pygen import config as pygen_config
+from cognite.pygen.config.reserved_words import is_reserved_word
 from cognite.pygen.utils.text import create_name, to_words
 
 _PRIMITIVE_TYPES = (dm.Text, dm.Boolean, dm.Float32, dm.Float64, dm.Int32, dm.Int64, dm.Timestamp, dm.Date, dm.Json)
@@ -69,12 +70,12 @@ class Field(ABC):
         data_class_by_view_id: dict[ViewSpaceExternalId, DataClass],
         field_naming: pygen_config.FieldNaming,
         view_name: str,
+        view_id: dm.ViewId,
         pydantic_field: str = "Field",
     ) -> Field:
         name = create_name(prop_name, field_naming.name)
-        # Todo: Name collision needs a better solution
-        if name == "interval":
-            name = "interval_"
+        if is_reserved_word(name, "field", view_id, prop_name):
+            name = f"{name}_"
 
         doc_name = to_words(name, singularize=True)
         if isinstance(prop, dm.SingleHopConnectionDefinition):
@@ -147,14 +148,18 @@ class Field(ABC):
                 # Todo: This is a hack, we are assuming (gambling) that the container ExternalId is the same as the
                 #   view ExternalId. This is not always true.
                 if (
-                    view_id := ViewSpaceExternalId(prop.container.space, prop.container.external_id)
+                    view_id_no_version := ViewSpaceExternalId(prop.container.space, prop.container.external_id)
                 ) in data_class_by_view_id:
-                    target_data_class = data_class_by_view_id[view_id]
+                    target_data_class = data_class_by_view_id[view_id_no_version]
                 elif prop.type.container and (
-                    (view_id := ViewSpaceExternalId(prop.type.container.space, prop.type.container.external_id))
+                    (
+                        view_id_no_version := ViewSpaceExternalId(
+                            prop.type.container.space, prop.type.container.external_id
+                        )
+                    )
                     in data_class_by_view_id
                 ):
-                    target_data_class = data_class_by_view_id[view_id]
+                    target_data_class = data_class_by_view_id[view_id_no_version]
                 else:
                     raise ValueError(f"Could not find data class for {prop_name=}")
 
@@ -403,6 +408,9 @@ class DataClass:
     def from_view(cls, view: dm.View, data_class: pygen_config.DataClassNaming) -> Self:
         view_name = (view.name or view.external_id).replace(" ", "_")
         class_name = create_name(view_name, data_class.name)
+        if is_reserved_word(class_name, "data class", view.as_id()):
+            class_name = f"{class_name}_"
+
         variable_name = create_name(view_name, data_class.variable)
         variable_list = create_name(view_name, data_class.variable_list)
         doc_name = to_words(view_name, singularize=True)
@@ -434,7 +442,13 @@ class DataClass:
         pydantic_field = self.pydantic_field
         for prop_name, prop in properties.items():
             field_ = Field.from_property(
-                prop_name, prop, data_class_by_view_id, field_naming, self.view_name, pydantic_field=pydantic_field
+                prop_name,
+                prop,
+                data_class_by_view_id,
+                field_naming,
+                self.view_name,
+                dm.ViewId(self.view_id.space, self.view_id.external_id, self.view_version),
+                pydantic_field=pydantic_field,
             )
             self.fields.append(field_)
 

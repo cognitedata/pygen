@@ -18,6 +18,7 @@ from cognite.pygen._core.data_classes import (
     ViewSpaceExternalId,
 )
 from cognite.pygen.config import PygenConfig
+from cognite.pygen.warnings import ViewPropertyNameCollisionWarning
 
 
 def load_field_test_cases():
@@ -131,7 +132,12 @@ def test_load_field(
 ) -> None:
     # Act
     actual = Field.from_property(
-        property_.name, property_, data_class_by_id, pygen_config.naming.field, view_name="dummy"
+        property_.name,
+        property_,
+        data_class_by_id,
+        pygen_config.naming.field,
+        view_name="dummy",
+        view_id=dm.ViewId("a", "b", "c"),
     )
 
     # Assert
@@ -332,3 +338,29 @@ def test_filter_condition(filter_condition: FilterCondition, expected_args: str)
 
     # Assert
     assert actual == expected_args
+
+
+@pytest.mark.parametrize(
+    "property_, expected_name",
+    [
+        (
+            dm.MappedProperty(dm.ContainerId("dummy", "dummy"), "property", dm.Text(), True, True, name="property"),
+            "property_",
+        ),
+        (
+            dm.MappedProperty(dm.ContainerId("dummy", "dummy"), "property", dm.Text(), True, True, name="version"),
+            "version_",
+        ),
+    ],
+)
+def test_field_from_property_expect_warning(
+    property_: dm.MappedProperty | dm.ConnectionDefinition, expected_name, pygen_config: PygenConfig
+) -> None:
+    # Act
+    with pytest.warns(ViewPropertyNameCollisionWarning):
+        actual = Field.from_property(
+            property_.name, property_, {}, pygen_config.naming.field, "dummy", dm.ViewId("a", "b", "c")
+        )
+
+    # Assert
+    assert actual.name == expected_name
