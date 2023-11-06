@@ -423,7 +423,6 @@ def test_data_class_from_view_expected_warning_file_name(
     [
         ("interval", "interval_"),
         ("limit", "limit_"),
-        ("space", "space_"),
         ("filter", "filter_"),
         ("replace", "replace_"),
         ("retrieve_edges", "retrieve_edges_"),
