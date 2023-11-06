@@ -18,7 +18,11 @@ from cognite.pygen._core.data_classes import (
     ViewSpaceExternalId,
 )
 from cognite.pygen.config import PygenConfig
-from cognite.pygen.warnings import ViewNameCollisionWarning, ViewPropertyNameCollisionWarning
+from cognite.pygen.warnings import (
+    ParameterNameCollisionWarning,
+    ViewNameCollisionWarning,
+    ViewPropertyNameCollisionWarning,
+)
 
 
 def load_field_test_cases():
@@ -345,6 +349,9 @@ def test_filter_condition(filter_condition: FilterCondition, expected_args: str)
     [
         ("property", "property_"),
         ("version", "version_"),
+        ("yield", "yield_"),
+        ("len", "len_"),
+        ("def", "def_"),
     ],
 )
 def test_field_from_property_expect_warning(name: str, expected_name, pygen_config: PygenConfig) -> None:
@@ -409,3 +416,24 @@ def test_data_class_from_view_expected_warning_file_name(
         actual = DataClass.from_view(view, pygen_config.naming.data_class)
     # Assert
     assert actual.file_name == expected_name
+
+
+@pytest.mark.parametrize(
+    "name, expected_name",
+    [
+        ("interval", "interval_"),
+        ("limit", "limit_"),
+        ("space", "space_"),
+        ("filter", "filter_"),
+        ("replace", "replace_"),
+        ("retrieve_edges", "retrieve_edges_"),
+        ("property", "property_"),
+    ],
+)
+def test_filter_parameter_expected_warning(name: str, expected_name: str, pygen_config: PygenConfig) -> None:
+    # Act
+    with pytest.warns(ParameterNameCollisionWarning):
+        actual = FilterParameter(name, "str", "dummy")
+
+    # Assert
+    assert actual.name == expected_name

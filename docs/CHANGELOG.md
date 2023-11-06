@@ -17,6 +17,10 @@ Changes are grouped as follows
 ### Fixed
 * Views without primitive fields caused `ImportError` in the `generate_sdk_notebook` method. This is now fixed.
 
+## [0.30.2] - 06-11-23
+### Fixed
+* Views without primitive fields caused `ImportError` in the `generate_sdk_notebook` method. This is now fixed.
+
 ## [0.30.1] - 05-11-23
 ### Fixed
 * When setting `space` for a node in the generated SDK, the automatically created edges would not be created in the

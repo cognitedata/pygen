@@ -23,8 +23,6 @@ FIELD_NAMES = {
 PARAMETER_NAMES = {
     "interval",
     "limit",
-    "external_id",
-    "space",
     "filter",
     "replace",
     "retrieve_edges",
@@ -48,10 +46,10 @@ _NAMES_BY_TYPE = {
 def is_reserved_word(
     word: str,
     word_type: Literal["field", "data class", "parameter", "filename"],
-    view_id: dm.ViewId,
+    view_id: dm.ViewId | None = None,
     property_name: str | None = None,
 ) -> bool:
     if keyword.iskeyword(word) or word in PYTHON_BUILTIN_NAMES or word in _NAMES_BY_TYPE[word_type]:
-        NameCollisionWarning.create(view_id, word_type, property_name).warn()
+        NameCollisionWarning.create(word, view_id, property_name).warn()
         return True
     return False

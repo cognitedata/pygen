@@ -683,6 +683,10 @@ class FilterParameter:
     default: None = None
     space: str | None = None
 
+    def __post_init__(self):
+        if is_reserved_word(self.name, "parameter"):
+            self.name = f"{self.name}_"
+
     @property
     def annotation(self) -> str:
         return f"{self.type_} | None"
