@@ -13,9 +13,9 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## [0.30.2] - 06-11-23
+## [0.30.3] - 06-11-23
 ### Fixed
-* Views without primitive fields caused `ImportError` in the `generate_sdk_notebook` method. This is now fixed.
+* `pygen` now handles name collisions with Python keywords, bulitins, and `pygen` reserved words.
 
 ## [0.30.2] - 06-11-23
 ### Fixed
