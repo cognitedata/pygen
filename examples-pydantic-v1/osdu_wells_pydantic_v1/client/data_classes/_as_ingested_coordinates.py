@@ -27,7 +27,7 @@ AsIngestedCoordinatesTextFields = Literal[
     "persistable_reference_crs",
     "persistable_reference_unit_z",
     "persistable_reference_vertical_crs",
-    "type",
+    "type_",
 ]
 AsIngestedCoordinatesFields = Literal[
     "coordinate_reference_system_id",
@@ -37,7 +37,7 @@ AsIngestedCoordinatesFields = Literal[
     "persistable_reference_crs",
     "persistable_reference_unit_z",
     "persistable_reference_vertical_crs",
-    "type",
+    "type_",
 ]
 
 _ASINGESTEDCOORDINATES_PROPERTIES_BY_FIELD = {
@@ -48,7 +48,7 @@ _ASINGESTEDCOORDINATES_PROPERTIES_BY_FIELD = {
     "persistable_reference_crs": "persistableReferenceCrs",
     "persistable_reference_unit_z": "persistableReferenceUnitZ",
     "persistable_reference_vertical_crs": "persistableReferenceVerticalCrs",
-    "type": "type",
+    "type_": "type",
 }
 
 
@@ -68,7 +68,7 @@ class AsIngestedCoordinates(DomainModel):
         persistable_reference_crs: The persistable reference cr field.
         persistable_reference_unit_z: The persistable reference unit z field.
         persistable_reference_vertical_crs: The persistable reference vertical cr field.
-        type: The type field.
+        type_: The type field.
         created_time: The created time of the as ingested coordinate node.
         last_updated_time: The last updated time of the as ingested coordinate node.
         deleted_time: If present, the deleted time of the as ingested coordinate node.
@@ -84,7 +84,7 @@ class AsIngestedCoordinates(DomainModel):
     persistable_reference_crs: Optional[str] = Field(None, alias="persistableReferenceCrs")
     persistable_reference_unit_z: Optional[str] = Field(None, alias="persistableReferenceUnitZ")
     persistable_reference_vertical_crs: Optional[str] = Field(None, alias="persistableReferenceVerticalCrs")
-    type: Optional[str] = None
+    type_: Optional[str] = Field(None, alias="type")
 
     def as_apply(self) -> AsIngestedCoordinatesApply:
         """Convert this read version of as ingested coordinate to a write version."""
@@ -99,7 +99,7 @@ class AsIngestedCoordinates(DomainModel):
             persistable_reference_crs=self.persistable_reference_crs,
             persistable_reference_unit_z=self.persistable_reference_unit_z,
             persistable_reference_vertical_crs=self.persistable_reference_vertical_crs,
-            type=self.type,
+            type_=self.type_,
         )
 
 
@@ -119,7 +119,7 @@ class AsIngestedCoordinatesApply(DomainModelApply):
         persistable_reference_crs: The persistable reference cr field.
         persistable_reference_unit_z: The persistable reference unit z field.
         persistable_reference_vertical_crs: The persistable reference vertical cr field.
-        type: The type field.
+        type_: The type field.
         existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
@@ -135,7 +135,7 @@ class AsIngestedCoordinatesApply(DomainModelApply):
     persistable_reference_crs: Optional[str] = Field(None, alias="persistableReferenceCrs")
     persistable_reference_unit_z: Optional[str] = Field(None, alias="persistableReferenceUnitZ")
     persistable_reference_vertical_crs: Optional[str] = Field(None, alias="persistableReferenceVerticalCrs")
-    type: Optional[str] = None
+    type_: Optional[str] = Field(None, alias="type")
 
     def _to_instances_apply(
         self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
@@ -159,8 +159,8 @@ class AsIngestedCoordinatesApply(DomainModelApply):
             properties["persistableReferenceUnitZ"] = self.persistable_reference_unit_z
         if self.persistable_reference_vertical_crs is not None:
             properties["persistableReferenceVerticalCrs"] = self.persistable_reference_vertical_crs
-        if self.type is not None:
-            properties["type"] = self.type
+        if self.type_ is not None:
+            properties["type"] = self.type_
         if properties:
             source = dm.NodeOrEdgeData(
                 source=write_view or dm.ViewId("IntegrationTestsImmutable", "AsIngestedCoordinates", "da1e4eb90494da"),
