@@ -13,12 +13,12 @@ if TYPE_CHECKING:
 __all__ = ["Features", "FeaturesApply", "FeaturesList", "FeaturesApplyList", "FeaturesFields", "FeaturesTextFields"]
 
 
-FeaturesTextFields = Literal["type"]
-FeaturesFields = Literal["bbox", "type"]
+FeaturesTextFields = Literal["type_"]
+FeaturesFields = Literal["bbox", "type_"]
 
 _FEATURES_PROPERTIES_BY_FIELD = {
     "bbox": "bbox",
-    "type": "type",
+    "type_": "type",
 }
 
 
@@ -32,7 +32,7 @@ class Features(DomainModel):
         external_id: The external id of the feature.
         bbox: The bbox field.
         geometry: The geometry field.
-        type: The type field.
+        type_: The type field.
         created_time: The created time of the feature node.
         last_updated_time: The last updated time of the feature node.
         deleted_time: If present, the deleted time of the feature node.
@@ -42,7 +42,7 @@ class Features(DomainModel):
     space: str = "IntegrationTestsImmutable"
     bbox: Optional[list[float]] = None
     geometry: Optional[str] = None
-    type: Optional[str] = None
+    type_: Optional[str] = Field(None, alias="type")
 
     def as_apply(self) -> FeaturesApply:
         """Convert this read version of feature to a write version."""
@@ -51,7 +51,7 @@ class Features(DomainModel):
             external_id=self.external_id,
             bbox=self.bbox,
             geometry=self.geometry,
-            type=self.type,
+            type_=self.type_,
         )
 
 
@@ -65,7 +65,7 @@ class FeaturesApply(DomainModelApply):
         external_id: The external id of the feature.
         bbox: The bbox field.
         geometry: The geometry field.
-        type: The type field.
+        type_: The type field.
         existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
@@ -75,7 +75,7 @@ class FeaturesApply(DomainModelApply):
     space: str = "IntegrationTestsImmutable"
     bbox: Optional[list[float]] = None
     geometry: Union[GeometryApply, str, None] = Field(None, repr=False)
-    type: Optional[str] = None
+    type_: Optional[str] = Field(None, alias="type")
 
     def _to_instances_apply(
         self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
@@ -92,8 +92,8 @@ class FeaturesApply(DomainModelApply):
                 "space": self.space if isinstance(self.geometry, str) else self.geometry.space,
                 "externalId": self.geometry if isinstance(self.geometry, str) else self.geometry.external_id,
             }
-        if self.type is not None:
-            properties["type"] = self.type
+        if self.type_ is not None:
+            properties["type"] = self.type_
         if properties:
             source = dm.NodeOrEdgeData(
                 source=write_view or dm.ViewId("IntegrationTestsImmutable", "Features", "df91e0a3bad68c"),

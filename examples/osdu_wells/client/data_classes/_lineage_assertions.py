@@ -17,11 +17,11 @@ __all__ = [
 ]
 
 
-LineageAssertionsTextFields = Literal["id", "lineage_relationship_type"]
-LineageAssertionsFields = Literal["id", "lineage_relationship_type"]
+LineageAssertionsTextFields = Literal["id_", "lineage_relationship_type"]
+LineageAssertionsFields = Literal["id_", "lineage_relationship_type"]
 
 _LINEAGEASSERTIONS_PROPERTIES_BY_FIELD = {
-    "id": "ID",
+    "id_": "ID",
     "lineage_relationship_type": "LineageRelationshipType",
 }
 
@@ -34,7 +34,7 @@ class LineageAssertions(DomainModel):
     Args:
         space: The space where the node is located.
         external_id: The external id of the lineage assertion.
-        id: The id field.
+        id_: The id field.
         lineage_relationship_type: The lineage relationship type field.
         created_time: The created time of the lineage assertion node.
         last_updated_time: The last updated time of the lineage assertion node.
@@ -43,7 +43,7 @@ class LineageAssertions(DomainModel):
     """
 
     space: str = "IntegrationTestsImmutable"
-    id: Optional[str] = Field(None, alias="ID")
+    id_: Optional[str] = Field(None, alias="ID")
     lineage_relationship_type: Optional[str] = Field(None, alias="LineageRelationshipType")
 
     def as_apply(self) -> LineageAssertionsApply:
@@ -51,7 +51,7 @@ class LineageAssertions(DomainModel):
         return LineageAssertionsApply(
             space=self.space,
             external_id=self.external_id,
-            id=self.id,
+            id_=self.id_,
             lineage_relationship_type=self.lineage_relationship_type,
         )
 
@@ -64,7 +64,7 @@ class LineageAssertionsApply(DomainModelApply):
     Args:
         space: The space where the node is located.
         external_id: The external id of the lineage assertion.
-        id: The id field.
+        id_: The id field.
         lineage_relationship_type: The lineage relationship type field.
         existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
@@ -73,7 +73,7 @@ class LineageAssertionsApply(DomainModelApply):
     """
 
     space: str = "IntegrationTestsImmutable"
-    id: Optional[str] = Field(None, alias="ID")
+    id_: Optional[str] = Field(None, alias="ID")
     lineage_relationship_type: Optional[str] = Field(None, alias="LineageRelationshipType")
 
     def _to_instances_apply(
@@ -84,8 +84,8 @@ class LineageAssertionsApply(DomainModelApply):
         write_view = view_by_write_class and view_by_write_class.get(type(self))
 
         properties = {}
-        if self.id is not None:
-            properties["ID"] = self.id
+        if self.id_ is not None:
+            properties["ID"] = self.id_
         if self.lineage_relationship_type is not None:
             properties["LineageRelationshipType"] = self.lineage_relationship_type
         if properties:

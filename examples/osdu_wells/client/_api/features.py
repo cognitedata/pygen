@@ -131,7 +131,7 @@ class FeaturesAPI(TypeAPI[Features, FeaturesApply, FeaturesList]):
         query: str,
         properties: FeaturesTextFields | Sequence[FeaturesTextFields] | None = None,
         geometry: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        type: str | list[str] | None = None,
+        type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -144,7 +144,7 @@ class FeaturesAPI(TypeAPI[Features, FeaturesApply, FeaturesList]):
             query: The search query,
             properties: The property to search, if nothing is passed all text fields will be searched.
             geometry: The geometry to filter on.
-            type: The type to filter on.
+            type_: The type to filter on.
             type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
@@ -166,7 +166,7 @@ class FeaturesAPI(TypeAPI[Features, FeaturesApply, FeaturesList]):
         filter_ = _create_filter(
             self._view_id,
             geometry,
-            type,
+            type_,
             type_prefix,
             external_id_prefix,
             space,
@@ -186,7 +186,7 @@ class FeaturesAPI(TypeAPI[Features, FeaturesApply, FeaturesList]):
         query: str | None = None,
         search_properties: FeaturesTextFields | Sequence[FeaturesTextFields] | None = None,
         geometry: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        type: str | list[str] | None = None,
+        type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -207,7 +207,7 @@ class FeaturesAPI(TypeAPI[Features, FeaturesApply, FeaturesList]):
         query: str | None = None,
         search_properties: FeaturesTextFields | Sequence[FeaturesTextFields] | None = None,
         geometry: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        type: str | list[str] | None = None,
+        type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -227,7 +227,7 @@ class FeaturesAPI(TypeAPI[Features, FeaturesApply, FeaturesList]):
         query: str | None = None,
         search_property: FeaturesTextFields | Sequence[FeaturesTextFields] | None = None,
         geometry: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        type: str | list[str] | None = None,
+        type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -243,7 +243,7 @@ class FeaturesAPI(TypeAPI[Features, FeaturesApply, FeaturesList]):
             query: The query to search for in the text field.
             search_property: The text field to search in.
             geometry: The geometry to filter on.
-            type: The type to filter on.
+            type_: The type to filter on.
             type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
@@ -266,7 +266,7 @@ class FeaturesAPI(TypeAPI[Features, FeaturesApply, FeaturesList]):
         filter_ = _create_filter(
             self._view_id,
             geometry,
-            type,
+            type_,
             type_prefix,
             external_id_prefix,
             space,
@@ -291,7 +291,7 @@ class FeaturesAPI(TypeAPI[Features, FeaturesApply, FeaturesList]):
         query: str | None = None,
         search_property: FeaturesTextFields | Sequence[FeaturesTextFields] | None = None,
         geometry: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        type: str | list[str] | None = None,
+        type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -306,7 +306,7 @@ class FeaturesAPI(TypeAPI[Features, FeaturesApply, FeaturesList]):
             query: The query to search for in the text field.
             search_property: The text field to search in.
             geometry: The geometry to filter on.
-            type: The type to filter on.
+            type_: The type to filter on.
             type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
@@ -320,7 +320,7 @@ class FeaturesAPI(TypeAPI[Features, FeaturesApply, FeaturesList]):
         filter_ = _create_filter(
             self._view_id,
             geometry,
-            type,
+            type_,
             type_prefix,
             external_id_prefix,
             space,
@@ -340,7 +340,7 @@ class FeaturesAPI(TypeAPI[Features, FeaturesApply, FeaturesList]):
     def list(
         self,
         geometry: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        type: str | list[str] | None = None,
+        type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -351,7 +351,7 @@ class FeaturesAPI(TypeAPI[Features, FeaturesApply, FeaturesList]):
 
         Args:
             geometry: The geometry to filter on.
-            type: The type to filter on.
+            type_: The type to filter on.
             type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
@@ -373,7 +373,7 @@ class FeaturesAPI(TypeAPI[Features, FeaturesApply, FeaturesList]):
         filter_ = _create_filter(
             self._view_id,
             geometry,
-            type,
+            type_,
             type_prefix,
             external_id_prefix,
             space,
@@ -386,7 +386,7 @@ class FeaturesAPI(TypeAPI[Features, FeaturesApply, FeaturesList]):
 def _create_filter(
     view_id: dm.ViewId,
     geometry: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-    type: str | list[str] | None = None,
+    type_: str | list[str] | None = None,
     type_prefix: str | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
@@ -420,10 +420,10 @@ def _create_filter(
                 values=[{"space": item[0], "externalId": item[1]} for item in geometry],
             )
         )
-    if type and isinstance(type, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("type"), value=type))
-    if type and isinstance(type, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("type"), values=type))
+    if type_ and isinstance(type_, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("type"), value=type_))
+    if type_ and isinstance(type_, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("type"), values=type_))
     if type_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("type"), value=type_prefix))
     if external_id_prefix:

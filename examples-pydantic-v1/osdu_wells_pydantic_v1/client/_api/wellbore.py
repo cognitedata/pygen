@@ -239,7 +239,7 @@ class WellboreAPI(TypeAPI[Wellbore, WellboreApply, WellboreList]):
         create_user: str | list[str] | None = None,
         create_user_prefix: str | None = None,
         data: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        id: str | list[str] | None = None,
+        id_: str | list[str] | None = None,
         id_prefix: str | None = None,
         kind: str | list[str] | None = None,
         kind_prefix: str | None = None,
@@ -249,8 +249,8 @@ class WellboreAPI(TypeAPI[Wellbore, WellboreApply, WellboreList]):
         modify_user: str | list[str] | None = None,
         modify_user_prefix: str | None = None,
         tags: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        min_version: int | None = None,
-        max_version: int | None = None,
+        min_version_: int | None = None,
+        max_version_: int | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -268,7 +268,7 @@ class WellboreAPI(TypeAPI[Wellbore, WellboreApply, WellboreList]):
             create_user: The create user to filter on.
             create_user_prefix: The prefix of the create user to filter on.
             data: The datum to filter on.
-            id: The id to filter on.
+            id_: The id to filter on.
             id_prefix: The prefix of the id to filter on.
             kind: The kind to filter on.
             kind_prefix: The prefix of the kind to filter on.
@@ -278,8 +278,8 @@ class WellboreAPI(TypeAPI[Wellbore, WellboreApply, WellboreList]):
             modify_user: The modify user to filter on.
             modify_user_prefix: The prefix of the modify user to filter on.
             tags: The tag to filter on.
-            min_version: The minimum value of the version to filter on.
-            max_version: The maximum value of the version to filter on.
+            min_version_: The minimum value of the version to filter on.
+            max_version_: The maximum value of the version to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of wellbores to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -307,7 +307,7 @@ class WellboreAPI(TypeAPI[Wellbore, WellboreApply, WellboreList]):
             create_user,
             create_user_prefix,
             data,
-            id,
+            id_,
             id_prefix,
             kind,
             kind_prefix,
@@ -317,8 +317,8 @@ class WellboreAPI(TypeAPI[Wellbore, WellboreApply, WellboreList]):
             modify_user,
             modify_user_prefix,
             tags,
-            min_version,
-            max_version,
+            min_version_,
+            max_version_,
             external_id_prefix,
             space,
             filter,
@@ -343,7 +343,7 @@ class WellboreAPI(TypeAPI[Wellbore, WellboreApply, WellboreList]):
         create_user: str | list[str] | None = None,
         create_user_prefix: str | None = None,
         data: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        id: str | list[str] | None = None,
+        id_: str | list[str] | None = None,
         id_prefix: str | None = None,
         kind: str | list[str] | None = None,
         kind_prefix: str | None = None,
@@ -353,8 +353,8 @@ class WellboreAPI(TypeAPI[Wellbore, WellboreApply, WellboreList]):
         modify_user: str | list[str] | None = None,
         modify_user_prefix: str | None = None,
         tags: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        min_version: int | None = None,
-        max_version: int | None = None,
+        min_version_: int | None = None,
+        max_version_: int | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -380,7 +380,7 @@ class WellboreAPI(TypeAPI[Wellbore, WellboreApply, WellboreList]):
         create_user: str | list[str] | None = None,
         create_user_prefix: str | None = None,
         data: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        id: str | list[str] | None = None,
+        id_: str | list[str] | None = None,
         id_prefix: str | None = None,
         kind: str | list[str] | None = None,
         kind_prefix: str | None = None,
@@ -390,8 +390,8 @@ class WellboreAPI(TypeAPI[Wellbore, WellboreApply, WellboreList]):
         modify_user: str | list[str] | None = None,
         modify_user_prefix: str | None = None,
         tags: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        min_version: int | None = None,
-        max_version: int | None = None,
+        min_version_: int | None = None,
+        max_version_: int | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -416,7 +416,7 @@ class WellboreAPI(TypeAPI[Wellbore, WellboreApply, WellboreList]):
         create_user: str | list[str] | None = None,
         create_user_prefix: str | None = None,
         data: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        id: str | list[str] | None = None,
+        id_: str | list[str] | None = None,
         id_prefix: str | None = None,
         kind: str | list[str] | None = None,
         kind_prefix: str | None = None,
@@ -426,8 +426,8 @@ class WellboreAPI(TypeAPI[Wellbore, WellboreApply, WellboreList]):
         modify_user: str | list[str] | None = None,
         modify_user_prefix: str | None = None,
         tags: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        min_version: int | None = None,
-        max_version: int | None = None,
+        min_version_: int | None = None,
+        max_version_: int | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -448,7 +448,7 @@ class WellboreAPI(TypeAPI[Wellbore, WellboreApply, WellboreList]):
             create_user: The create user to filter on.
             create_user_prefix: The prefix of the create user to filter on.
             data: The datum to filter on.
-            id: The id to filter on.
+            id_: The id to filter on.
             id_prefix: The prefix of the id to filter on.
             kind: The kind to filter on.
             kind_prefix: The prefix of the kind to filter on.
@@ -458,8 +458,8 @@ class WellboreAPI(TypeAPI[Wellbore, WellboreApply, WellboreList]):
             modify_user: The modify user to filter on.
             modify_user_prefix: The prefix of the modify user to filter on.
             tags: The tag to filter on.
-            min_version: The minimum value of the version to filter on.
-            max_version: The maximum value of the version to filter on.
+            min_version_: The minimum value of the version to filter on.
+            max_version_: The maximum value of the version to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of wellbores to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -488,7 +488,7 @@ class WellboreAPI(TypeAPI[Wellbore, WellboreApply, WellboreList]):
             create_user,
             create_user_prefix,
             data,
-            id,
+            id_,
             id_prefix,
             kind,
             kind_prefix,
@@ -498,8 +498,8 @@ class WellboreAPI(TypeAPI[Wellbore, WellboreApply, WellboreList]):
             modify_user,
             modify_user_prefix,
             tags,
-            min_version,
-            max_version,
+            min_version_,
+            max_version_,
             external_id_prefix,
             space,
             filter,
@@ -529,7 +529,7 @@ class WellboreAPI(TypeAPI[Wellbore, WellboreApply, WellboreList]):
         create_user: str | list[str] | None = None,
         create_user_prefix: str | None = None,
         data: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        id: str | list[str] | None = None,
+        id_: str | list[str] | None = None,
         id_prefix: str | None = None,
         kind: str | list[str] | None = None,
         kind_prefix: str | None = None,
@@ -539,8 +539,8 @@ class WellboreAPI(TypeAPI[Wellbore, WellboreApply, WellboreList]):
         modify_user: str | list[str] | None = None,
         modify_user_prefix: str | None = None,
         tags: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        min_version: int | None = None,
-        max_version: int | None = None,
+        min_version_: int | None = None,
+        max_version_: int | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -560,7 +560,7 @@ class WellboreAPI(TypeAPI[Wellbore, WellboreApply, WellboreList]):
             create_user: The create user to filter on.
             create_user_prefix: The prefix of the create user to filter on.
             data: The datum to filter on.
-            id: The id to filter on.
+            id_: The id to filter on.
             id_prefix: The prefix of the id to filter on.
             kind: The kind to filter on.
             kind_prefix: The prefix of the kind to filter on.
@@ -570,8 +570,8 @@ class WellboreAPI(TypeAPI[Wellbore, WellboreApply, WellboreList]):
             modify_user: The modify user to filter on.
             modify_user_prefix: The prefix of the modify user to filter on.
             tags: The tag to filter on.
-            min_version: The minimum value of the version to filter on.
-            max_version: The maximum value of the version to filter on.
+            min_version_: The minimum value of the version to filter on.
+            max_version_: The maximum value of the version to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of wellbores to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -591,7 +591,7 @@ class WellboreAPI(TypeAPI[Wellbore, WellboreApply, WellboreList]):
             create_user,
             create_user_prefix,
             data,
-            id,
+            id_,
             id_prefix,
             kind,
             kind_prefix,
@@ -601,8 +601,8 @@ class WellboreAPI(TypeAPI[Wellbore, WellboreApply, WellboreList]):
             modify_user,
             modify_user_prefix,
             tags,
-            min_version,
-            max_version,
+            min_version_,
+            max_version_,
             external_id_prefix,
             space,
             filter,
@@ -627,7 +627,7 @@ class WellboreAPI(TypeAPI[Wellbore, WellboreApply, WellboreList]):
         create_user: str | list[str] | None = None,
         create_user_prefix: str | None = None,
         data: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        id: str | list[str] | None = None,
+        id_: str | list[str] | None = None,
         id_prefix: str | None = None,
         kind: str | list[str] | None = None,
         kind_prefix: str | None = None,
@@ -637,8 +637,8 @@ class WellboreAPI(TypeAPI[Wellbore, WellboreApply, WellboreList]):
         modify_user: str | list[str] | None = None,
         modify_user_prefix: str | None = None,
         tags: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        min_version: int | None = None,
-        max_version: int | None = None,
+        min_version_: int | None = None,
+        max_version_: int | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -655,7 +655,7 @@ class WellboreAPI(TypeAPI[Wellbore, WellboreApply, WellboreList]):
             create_user: The create user to filter on.
             create_user_prefix: The prefix of the create user to filter on.
             data: The datum to filter on.
-            id: The id to filter on.
+            id_: The id to filter on.
             id_prefix: The prefix of the id to filter on.
             kind: The kind to filter on.
             kind_prefix: The prefix of the kind to filter on.
@@ -665,8 +665,8 @@ class WellboreAPI(TypeAPI[Wellbore, WellboreApply, WellboreList]):
             modify_user: The modify user to filter on.
             modify_user_prefix: The prefix of the modify user to filter on.
             tags: The tag to filter on.
-            min_version: The minimum value of the version to filter on.
-            max_version: The maximum value of the version to filter on.
+            min_version_: The minimum value of the version to filter on.
+            max_version_: The maximum value of the version to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of wellbores to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -694,7 +694,7 @@ class WellboreAPI(TypeAPI[Wellbore, WellboreApply, WellboreList]):
             create_user,
             create_user_prefix,
             data,
-            id,
+            id_,
             id_prefix,
             kind,
             kind_prefix,
@@ -704,8 +704,8 @@ class WellboreAPI(TypeAPI[Wellbore, WellboreApply, WellboreList]):
             modify_user,
             modify_user_prefix,
             tags,
-            min_version,
-            max_version,
+            min_version_,
+            max_version_,
             external_id_prefix,
             space,
             filter,
@@ -743,7 +743,7 @@ def _create_filter(
     create_user: str | list[str] | None = None,
     create_user_prefix: str | None = None,
     data: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-    id: str | list[str] | None = None,
+    id_: str | list[str] | None = None,
     id_prefix: str | None = None,
     kind: str | list[str] | None = None,
     kind_prefix: str | None = None,
@@ -753,8 +753,8 @@ def _create_filter(
     modify_user: str | list[str] | None = None,
     modify_user_prefix: str | None = None,
     tags: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-    min_version: int | None = None,
-    max_version: int | None = None,
+    min_version_: int | None = None,
+    max_version_: int | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
@@ -843,10 +843,10 @@ def _create_filter(
                 view_id.as_property_ref("data"), values=[{"space": item[0], "externalId": item[1]} for item in data]
             )
         )
-    if id and isinstance(id, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("id"), value=id))
-    if id and isinstance(id, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("id"), values=id))
+    if id_ and isinstance(id_, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("id"), value=id_))
+    if id_ and isinstance(id_, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("id"), values=id_))
     if id_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("id"), value=id_prefix))
     if kind and isinstance(kind, str):
@@ -913,8 +913,8 @@ def _create_filter(
                 view_id.as_property_ref("tags"), values=[{"space": item[0], "externalId": item[1]} for item in tags]
             )
         )
-    if min_version or max_version:
-        filters.append(dm.filters.Range(view_id.as_property_ref("version"), gte=min_version, lte=max_version))
+    if min_version_ or max_version_:
+        filters.append(dm.filters.Range(view_id.as_property_ref("version"), gte=min_version_, lte=max_version_))
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if space and isinstance(space, str):

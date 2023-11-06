@@ -18,17 +18,17 @@ if TYPE_CHECKING:
 __all__ = ["Well", "WellApply", "WellList", "WellApplyList", "WellFields", "WellTextFields"]
 
 
-WellTextFields = Literal["create_time", "create_user", "id", "kind", "modify_time", "modify_user"]
-WellFields = Literal["create_time", "create_user", "id", "kind", "modify_time", "modify_user", "version"]
+WellTextFields = Literal["create_time", "create_user", "id_", "kind", "modify_time", "modify_user"]
+WellFields = Literal["create_time", "create_user", "id_", "kind", "modify_time", "modify_user", "version_"]
 
 _WELL_PROPERTIES_BY_FIELD = {
     "create_time": "createTime",
     "create_user": "createUser",
-    "id": "id",
+    "id_": "id",
     "kind": "kind",
     "modify_time": "modifyTime",
     "modify_user": "modifyUser",
-    "version": "version",
+    "version_": "version",
 }
 
 
@@ -45,14 +45,14 @@ class Well(DomainModel):
         create_time: The create time field.
         create_user: The create user field.
         data: The datum field.
-        id: The id field.
+        id_: The id field.
         kind: The kind field.
         legal: The legal field.
         meta: The meta field.
         modify_time: The modify time field.
         modify_user: The modify user field.
         tags: The tag field.
-        version: The version field.
+        version_: The version field.
         created_time: The created time of the well node.
         last_updated_time: The last updated time of the well node.
         deleted_time: If present, the deleted time of the well node.
@@ -65,14 +65,14 @@ class Well(DomainModel):
     create_time: Optional[str] = Field(None, alias="createTime")
     create_user: Optional[str] = Field(None, alias="createUser")
     data: Optional[str] = None
-    id: Optional[str] = None
+    id_: Optional[str] = Field(None, alias="id")
     kind: Optional[str] = None
     legal: Optional[str] = None
     meta: Optional[list[str]] = None
     modify_time: Optional[str] = Field(None, alias="modifyTime")
     modify_user: Optional[str] = Field(None, alias="modifyUser")
     tags: Optional[str] = None
-    version: Optional[int] = None
+    version_: Optional[int] = Field(None, alias="version")
 
     def as_apply(self) -> WellApply:
         """Convert this read version of well to a write version."""
@@ -84,14 +84,14 @@ class Well(DomainModel):
             create_time=self.create_time,
             create_user=self.create_user,
             data=self.data,
-            id=self.id,
+            id_=self.id_,
             kind=self.kind,
             legal=self.legal,
             meta=self.meta,
             modify_time=self.modify_time,
             modify_user=self.modify_user,
             tags=self.tags,
-            version=self.version,
+            version_=self.version_,
         )
 
 
@@ -108,14 +108,14 @@ class WellApply(DomainModelApply):
         create_time: The create time field.
         create_user: The create user field.
         data: The datum field.
-        id: The id field.
+        id_: The id field.
         kind: The kind field.
         legal: The legal field.
         meta: The meta field.
         modify_time: The modify time field.
         modify_user: The modify user field.
         tags: The tag field.
-        version: The version field.
+        version_: The version field.
         existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
@@ -128,14 +128,14 @@ class WellApply(DomainModelApply):
     create_time: Optional[str] = Field(None, alias="createTime")
     create_user: Optional[str] = Field(None, alias="createUser")
     data: Union[WellDataApply, str, None] = Field(None, repr=False)
-    id: Optional[str] = None
+    id_: Optional[str] = Field(None, alias="id")
     kind: Optional[str] = None
     legal: Union[LegalApply, str, None] = Field(None, repr=False)
     meta: Union[list[MetaApply], list[str], None] = Field(default=None, repr=False)
     modify_time: Optional[str] = Field(None, alias="modifyTime")
     modify_user: Optional[str] = Field(None, alias="modifyUser")
     tags: Union[TagsApply, str, None] = Field(None, repr=False)
-    version: Optional[int] = None
+    version_: Optional[int] = Field(None, alias="version")
 
     def _to_instances_apply(
         self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
@@ -164,8 +164,8 @@ class WellApply(DomainModelApply):
                 "space": self.space if isinstance(self.data, str) else self.data.space,
                 "externalId": self.data if isinstance(self.data, str) else self.data.external_id,
             }
-        if self.id is not None:
-            properties["id"] = self.id
+        if self.id_ is not None:
+            properties["id"] = self.id_
         if self.kind is not None:
             properties["kind"] = self.kind
         if self.legal is not None:
@@ -182,8 +182,8 @@ class WellApply(DomainModelApply):
                 "space": self.space if isinstance(self.tags, str) else self.tags.space,
                 "externalId": self.tags if isinstance(self.tags, str) else self.tags.external_id,
             }
-        if self.version is not None:
-            properties["version"] = self.version
+        if self.version_ is not None:
+            properties["version"] = self.version_
         if properties:
             source = dm.NodeOrEdgeData(
                 source=write_view or dm.ViewId("IntegrationTestsImmutable", "Well", "952d7e55cdf2cc"),

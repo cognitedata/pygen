@@ -252,7 +252,7 @@ class AsIngestedCoordinatesAPI(TypeAPI[AsIngestedCoordinates, AsIngestedCoordina
         persistable_reference_unit_z_prefix: str | None = None,
         persistable_reference_vertical_crs: str | list[str] | None = None,
         persistable_reference_vertical_crs_prefix: str | None = None,
-        type: str | list[str] | None = None,
+        type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -276,7 +276,7 @@ class AsIngestedCoordinatesAPI(TypeAPI[AsIngestedCoordinates, AsIngestedCoordina
             persistable_reference_unit_z_prefix: The prefix of the persistable reference unit z to filter on.
             persistable_reference_vertical_crs: The persistable reference vertical cr to filter on.
             persistable_reference_vertical_crs_prefix: The prefix of the persistable reference vertical cr to filter on.
-            type: The type to filter on.
+            type_: The type to filter on.
             type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
@@ -310,7 +310,7 @@ class AsIngestedCoordinatesAPI(TypeAPI[AsIngestedCoordinates, AsIngestedCoordina
             persistable_reference_unit_z_prefix,
             persistable_reference_vertical_crs,
             persistable_reference_vertical_crs_prefix,
-            type,
+            type_,
             type_prefix,
             external_id_prefix,
             space,
@@ -343,7 +343,7 @@ class AsIngestedCoordinatesAPI(TypeAPI[AsIngestedCoordinates, AsIngestedCoordina
         persistable_reference_unit_z_prefix: str | None = None,
         persistable_reference_vertical_crs: str | list[str] | None = None,
         persistable_reference_vertical_crs_prefix: str | None = None,
-        type: str | list[str] | None = None,
+        type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -375,7 +375,7 @@ class AsIngestedCoordinatesAPI(TypeAPI[AsIngestedCoordinates, AsIngestedCoordina
         persistable_reference_unit_z_prefix: str | None = None,
         persistable_reference_vertical_crs: str | list[str] | None = None,
         persistable_reference_vertical_crs_prefix: str | None = None,
-        type: str | list[str] | None = None,
+        type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -406,7 +406,7 @@ class AsIngestedCoordinatesAPI(TypeAPI[AsIngestedCoordinates, AsIngestedCoordina
         persistable_reference_unit_z_prefix: str | None = None,
         persistable_reference_vertical_crs: str | list[str] | None = None,
         persistable_reference_vertical_crs_prefix: str | None = None,
-        type: str | list[str] | None = None,
+        type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -433,7 +433,7 @@ class AsIngestedCoordinatesAPI(TypeAPI[AsIngestedCoordinates, AsIngestedCoordina
             persistable_reference_unit_z_prefix: The prefix of the persistable reference unit z to filter on.
             persistable_reference_vertical_crs: The persistable reference vertical cr to filter on.
             persistable_reference_vertical_crs_prefix: The prefix of the persistable reference vertical cr to filter on.
-            type: The type to filter on.
+            type_: The type to filter on.
             type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
@@ -468,7 +468,7 @@ class AsIngestedCoordinatesAPI(TypeAPI[AsIngestedCoordinates, AsIngestedCoordina
             persistable_reference_unit_z_prefix,
             persistable_reference_vertical_crs,
             persistable_reference_vertical_crs_prefix,
-            type,
+            type_,
             type_prefix,
             external_id_prefix,
             space,
@@ -504,7 +504,7 @@ class AsIngestedCoordinatesAPI(TypeAPI[AsIngestedCoordinates, AsIngestedCoordina
         persistable_reference_unit_z_prefix: str | None = None,
         persistable_reference_vertical_crs: str | list[str] | None = None,
         persistable_reference_vertical_crs_prefix: str | None = None,
-        type: str | list[str] | None = None,
+        type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -530,7 +530,7 @@ class AsIngestedCoordinatesAPI(TypeAPI[AsIngestedCoordinates, AsIngestedCoordina
             persistable_reference_unit_z_prefix: The prefix of the persistable reference unit z to filter on.
             persistable_reference_vertical_crs: The persistable reference vertical cr to filter on.
             persistable_reference_vertical_crs_prefix: The prefix of the persistable reference vertical cr to filter on.
-            type: The type to filter on.
+            type_: The type to filter on.
             type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
@@ -556,7 +556,7 @@ class AsIngestedCoordinatesAPI(TypeAPI[AsIngestedCoordinates, AsIngestedCoordina
             persistable_reference_unit_z_prefix,
             persistable_reference_vertical_crs,
             persistable_reference_vertical_crs_prefix,
-            type,
+            type_,
             type_prefix,
             external_id_prefix,
             space,
@@ -587,7 +587,7 @@ class AsIngestedCoordinatesAPI(TypeAPI[AsIngestedCoordinates, AsIngestedCoordina
         persistable_reference_unit_z_prefix: str | None = None,
         persistable_reference_vertical_crs: str | list[str] | None = None,
         persistable_reference_vertical_crs_prefix: str | None = None,
-        type: str | list[str] | None = None,
+        type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -610,7 +610,7 @@ class AsIngestedCoordinatesAPI(TypeAPI[AsIngestedCoordinates, AsIngestedCoordina
             persistable_reference_unit_z_prefix: The prefix of the persistable reference unit z to filter on.
             persistable_reference_vertical_crs: The persistable reference vertical cr to filter on.
             persistable_reference_vertical_crs_prefix: The prefix of the persistable reference vertical cr to filter on.
-            type: The type to filter on.
+            type_: The type to filter on.
             type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
@@ -644,7 +644,7 @@ class AsIngestedCoordinatesAPI(TypeAPI[AsIngestedCoordinates, AsIngestedCoordina
             persistable_reference_unit_z_prefix,
             persistable_reference_vertical_crs,
             persistable_reference_vertical_crs_prefix,
-            type,
+            type_,
             type_prefix,
             external_id_prefix,
             space,
@@ -688,7 +688,7 @@ def _create_filter(
     persistable_reference_unit_z_prefix: str | None = None,
     persistable_reference_vertical_crs: str | list[str] | None = None,
     persistable_reference_vertical_crs_prefix: str | None = None,
-    type: str | list[str] | None = None,
+    type_: str | list[str] | None = None,
     type_prefix: str | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
@@ -785,10 +785,10 @@ def _create_filter(
                 value=persistable_reference_vertical_crs_prefix,
             )
         )
-    if type and isinstance(type, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("type"), value=type))
-    if type and isinstance(type, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("type"), values=type))
+    if type_ and isinstance(type_, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("type"), value=type_))
+    if type_ and isinstance(type_, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("type"), values=type_))
     if type_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("type"), value=type_prefix))
     if external_id_prefix:

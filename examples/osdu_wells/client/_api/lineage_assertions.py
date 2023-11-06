@@ -132,7 +132,7 @@ class LineageAssertionsAPI(TypeAPI[LineageAssertions, LineageAssertionsApply, Li
         self,
         query: str,
         properties: LineageAssertionsTextFields | Sequence[LineageAssertionsTextFields] | None = None,
-        id: str | list[str] | None = None,
+        id_: str | list[str] | None = None,
         id_prefix: str | None = None,
         lineage_relationship_type: str | list[str] | None = None,
         lineage_relationship_type_prefix: str | None = None,
@@ -146,7 +146,7 @@ class LineageAssertionsAPI(TypeAPI[LineageAssertions, LineageAssertionsApply, Li
         Args:
             query: The search query,
             properties: The property to search, if nothing is passed all text fields will be searched.
-            id: The id to filter on.
+            id_: The id to filter on.
             id_prefix: The prefix of the id to filter on.
             lineage_relationship_type: The lineage relationship type to filter on.
             lineage_relationship_type_prefix: The prefix of the lineage relationship type to filter on.
@@ -169,7 +169,7 @@ class LineageAssertionsAPI(TypeAPI[LineageAssertions, LineageAssertionsApply, Li
         """
         filter_ = _create_filter(
             self._view_id,
-            id,
+            id_,
             id_prefix,
             lineage_relationship_type,
             lineage_relationship_type_prefix,
@@ -190,7 +190,7 @@ class LineageAssertionsAPI(TypeAPI[LineageAssertions, LineageAssertionsApply, Li
         group_by: None = None,
         query: str | None = None,
         search_properties: LineageAssertionsTextFields | Sequence[LineageAssertionsTextFields] | None = None,
-        id: str | list[str] | None = None,
+        id_: str | list[str] | None = None,
         id_prefix: str | None = None,
         lineage_relationship_type: str | list[str] | None = None,
         lineage_relationship_type_prefix: str | None = None,
@@ -212,7 +212,7 @@ class LineageAssertionsAPI(TypeAPI[LineageAssertions, LineageAssertionsApply, Li
         group_by: LineageAssertionsFields | Sequence[LineageAssertionsFields] = None,
         query: str | None = None,
         search_properties: LineageAssertionsTextFields | Sequence[LineageAssertionsTextFields] | None = None,
-        id: str | list[str] | None = None,
+        id_: str | list[str] | None = None,
         id_prefix: str | None = None,
         lineage_relationship_type: str | list[str] | None = None,
         lineage_relationship_type_prefix: str | None = None,
@@ -233,7 +233,7 @@ class LineageAssertionsAPI(TypeAPI[LineageAssertions, LineageAssertionsApply, Li
         group_by: LineageAssertionsFields | Sequence[LineageAssertionsFields] | None = None,
         query: str | None = None,
         search_property: LineageAssertionsTextFields | Sequence[LineageAssertionsTextFields] | None = None,
-        id: str | list[str] | None = None,
+        id_: str | list[str] | None = None,
         id_prefix: str | None = None,
         lineage_relationship_type: str | list[str] | None = None,
         lineage_relationship_type_prefix: str | None = None,
@@ -250,7 +250,7 @@ class LineageAssertionsAPI(TypeAPI[LineageAssertions, LineageAssertionsApply, Li
             group_by: The property to group by when doing the aggregation.
             query: The query to search for in the text field.
             search_property: The text field to search in.
-            id: The id to filter on.
+            id_: The id to filter on.
             id_prefix: The prefix of the id to filter on.
             lineage_relationship_type: The lineage relationship type to filter on.
             lineage_relationship_type_prefix: The prefix of the lineage relationship type to filter on.
@@ -274,7 +274,7 @@ class LineageAssertionsAPI(TypeAPI[LineageAssertions, LineageAssertionsApply, Li
 
         filter_ = _create_filter(
             self._view_id,
-            id,
+            id_,
             id_prefix,
             lineage_relationship_type,
             lineage_relationship_type_prefix,
@@ -300,7 +300,7 @@ class LineageAssertionsAPI(TypeAPI[LineageAssertions, LineageAssertionsApply, Li
         interval: float,
         query: str | None = None,
         search_property: LineageAssertionsTextFields | Sequence[LineageAssertionsTextFields] | None = None,
-        id: str | list[str] | None = None,
+        id_: str | list[str] | None = None,
         id_prefix: str | None = None,
         lineage_relationship_type: str | list[str] | None = None,
         lineage_relationship_type_prefix: str | None = None,
@@ -316,7 +316,7 @@ class LineageAssertionsAPI(TypeAPI[LineageAssertions, LineageAssertionsApply, Li
             interval: The interval to use for the histogram bins.
             query: The query to search for in the text field.
             search_property: The text field to search in.
-            id: The id to filter on.
+            id_: The id to filter on.
             id_prefix: The prefix of the id to filter on.
             lineage_relationship_type: The lineage relationship type to filter on.
             lineage_relationship_type_prefix: The prefix of the lineage relationship type to filter on.
@@ -331,7 +331,7 @@ class LineageAssertionsAPI(TypeAPI[LineageAssertions, LineageAssertionsApply, Li
         """
         filter_ = _create_filter(
             self._view_id,
-            id,
+            id_,
             id_prefix,
             lineage_relationship_type,
             lineage_relationship_type_prefix,
@@ -352,7 +352,7 @@ class LineageAssertionsAPI(TypeAPI[LineageAssertions, LineageAssertionsApply, Li
 
     def list(
         self,
-        id: str | list[str] | None = None,
+        id_: str | list[str] | None = None,
         id_prefix: str | None = None,
         lineage_relationship_type: str | list[str] | None = None,
         lineage_relationship_type_prefix: str | None = None,
@@ -364,7 +364,7 @@ class LineageAssertionsAPI(TypeAPI[LineageAssertions, LineageAssertionsApply, Li
         """List/filter lineage assertions
 
         Args:
-            id: The id to filter on.
+            id_: The id to filter on.
             id_prefix: The prefix of the id to filter on.
             lineage_relationship_type: The lineage relationship type to filter on.
             lineage_relationship_type_prefix: The prefix of the lineage relationship type to filter on.
@@ -387,7 +387,7 @@ class LineageAssertionsAPI(TypeAPI[LineageAssertions, LineageAssertionsApply, Li
         """
         filter_ = _create_filter(
             self._view_id,
-            id,
+            id_,
             id_prefix,
             lineage_relationship_type,
             lineage_relationship_type_prefix,
@@ -401,7 +401,7 @@ class LineageAssertionsAPI(TypeAPI[LineageAssertions, LineageAssertionsApply, Li
 
 def _create_filter(
     view_id: dm.ViewId,
-    id: str | list[str] | None = None,
+    id_: str | list[str] | None = None,
     id_prefix: str | None = None,
     lineage_relationship_type: str | list[str] | None = None,
     lineage_relationship_type_prefix: str | None = None,
@@ -410,10 +410,10 @@ def _create_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
-    if id and isinstance(id, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("ID"), value=id))
-    if id and isinstance(id, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("ID"), values=id))
+    if id_ and isinstance(id_, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("ID"), value=id_))
+    if id_ and isinstance(id_, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("ID"), values=id_))
     if id_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("ID"), value=id_prefix))
     if lineage_relationship_type and isinstance(lineage_relationship_type, str):

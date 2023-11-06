@@ -3,19 +3,20 @@ from __future__ import annotations
 from typing import Literal, Optional
 
 from cognite.client import data_modeling as dm
+from pydantic import Field
 
 from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
 
 __all__ = ["Geometry", "GeometryApply", "GeometryList", "GeometryApplyList", "GeometryFields", "GeometryTextFields"]
 
 
-GeometryTextFields = Literal["type"]
-GeometryFields = Literal["bbox", "coordinates", "type"]
+GeometryTextFields = Literal["type_"]
+GeometryFields = Literal["bbox", "coordinates", "type_"]
 
 _GEOMETRY_PROPERTIES_BY_FIELD = {
     "bbox": "bbox",
     "coordinates": "coordinates",
-    "type": "type",
+    "type_": "type",
 }
 
 
@@ -29,7 +30,7 @@ class Geometry(DomainModel):
         external_id: The external id of the geometry.
         bbox: The bbox field.
         coordinates: The coordinate field.
-        type: The type field.
+        type_: The type field.
         created_time: The created time of the geometry node.
         last_updated_time: The last updated time of the geometry node.
         deleted_time: If present, the deleted time of the geometry node.
@@ -39,7 +40,7 @@ class Geometry(DomainModel):
     space: str = "IntegrationTestsImmutable"
     bbox: Optional[list[float]] = None
     coordinates: Optional[list[float]] = None
-    type: Optional[str] = None
+    type_: Optional[str] = Field(None, alias="type")
 
     def as_apply(self) -> GeometryApply:
         """Convert this read version of geometry to a write version."""
@@ -48,7 +49,7 @@ class Geometry(DomainModel):
             external_id=self.external_id,
             bbox=self.bbox,
             coordinates=self.coordinates,
-            type=self.type,
+            type_=self.type_,
         )
 
 
@@ -62,7 +63,7 @@ class GeometryApply(DomainModelApply):
         external_id: The external id of the geometry.
         bbox: The bbox field.
         coordinates: The coordinate field.
-        type: The type field.
+        type_: The type field.
         existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
@@ -72,7 +73,7 @@ class GeometryApply(DomainModelApply):
     space: str = "IntegrationTestsImmutable"
     bbox: Optional[list[float]] = None
     coordinates: Optional[list[float]] = None
-    type: Optional[str] = None
+    type_: Optional[str] = Field(None, alias="type")
 
     def _to_instances_apply(
         self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
@@ -86,8 +87,8 @@ class GeometryApply(DomainModelApply):
             properties["bbox"] = self.bbox
         if self.coordinates is not None:
             properties["coordinates"] = self.coordinates
-        if self.type is not None:
-            properties["type"] = self.type
+        if self.type_ is not None:
+            properties["type"] = self.type_
         if properties:
             source = dm.NodeOrEdgeData(
                 source=write_view or dm.ViewId("IntegrationTestsImmutable", "Geometry", "fc702ec6877c79"),

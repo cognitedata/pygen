@@ -20,12 +20,12 @@ __all__ = [
 ]
 
 
-WgsCoordinatesTextFields = Literal["type"]
-WgsCoordinatesFields = Literal["bbox", "type"]
+WgsCoordinatesTextFields = Literal["type_"]
+WgsCoordinatesFields = Literal["bbox", "type_"]
 
 _WGSCOORDINATES_PROPERTIES_BY_FIELD = {
     "bbox": "bbox",
-    "type": "type",
+    "type_": "type",
 }
 
 
@@ -39,7 +39,7 @@ class WgsCoordinates(DomainModel):
         external_id: The external id of the wgs 84 coordinate.
         bbox: The bbox field.
         features: The feature field.
-        type: The type field.
+        type_: The type field.
         created_time: The created time of the wgs 84 coordinate node.
         last_updated_time: The last updated time of the wgs 84 coordinate node.
         deleted_time: If present, the deleted time of the wgs 84 coordinate node.
@@ -49,7 +49,7 @@ class WgsCoordinates(DomainModel):
     space: str = "IntegrationTestsImmutable"
     bbox: Optional[list[float]] = None
     features: Optional[list[str]] = None
-    type: Optional[str] = None
+    type_: Optional[str] = Field(None, alias="type")
 
     def as_apply(self) -> WgsCoordinatesApply:
         """Convert this read version of wgs 84 coordinate to a write version."""
@@ -58,7 +58,7 @@ class WgsCoordinates(DomainModel):
             external_id=self.external_id,
             bbox=self.bbox,
             features=self.features,
-            type=self.type,
+            type_=self.type_,
         )
 
 
@@ -72,7 +72,7 @@ class WgsCoordinatesApply(DomainModelApply):
         external_id: The external id of the wgs 84 coordinate.
         bbox: The bbox field.
         features: The feature field.
-        type: The type field.
+        type_: The type field.
         existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
@@ -82,7 +82,7 @@ class WgsCoordinatesApply(DomainModelApply):
     space: str = "IntegrationTestsImmutable"
     bbox: Optional[list[float]] = None
     features: Union[list[FeaturesApply], list[str], None] = Field(default=None, repr=False)
-    type: Optional[str] = None
+    type_: Optional[str] = Field(None, alias="type")
 
     def _to_instances_apply(
         self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
@@ -94,8 +94,8 @@ class WgsCoordinatesApply(DomainModelApply):
         properties = {}
         if self.bbox is not None:
             properties["bbox"] = self.bbox
-        if self.type is not None:
-            properties["type"] = self.type
+        if self.type_ is not None:
+            properties["type"] = self.type_
         if properties:
             source = dm.NodeOrEdgeData(
                 source=write_view or dm.ViewId("IntegrationTestsImmutable", "Wgs84Coordinates", "d6030081373896"),
