@@ -56,7 +56,6 @@ __all__ = [
     "CdfEntityApply",
     "CdfEntityList",
     "CdfEntityApplyList",
-    "CdfEntityFields",
     "CdfModel",
     "CdfModelApply",
     "CdfModelList",
