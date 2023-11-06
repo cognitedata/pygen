@@ -22,7 +22,7 @@ class NameCollisionWarning(PygenWarning, RuntimeWarning):
             return ParameterNameCollisionWarning(word)
 
     def warn(self):
-        warnings.warn(self, stacklevel=3)
+        warnings.warn(self, stacklevel=2)
 
 
 class ViewNameCollisionWarning(NameCollisionWarning):
@@ -32,8 +32,8 @@ class ViewNameCollisionWarning(NameCollisionWarning):
 
     def __str__(self) -> str:
         return (
-            f"Name collision detected in {self.view_id}: {self.word}. "
-            f"An underscore will be added to the {self.word} to avoid name collision."
+            f"Name collision detected in {self.view_id}: {self.word!r}. "
+            f"An underscore will be added to the {self.word!r} to avoid name collision."
         )
 
 
@@ -45,8 +45,8 @@ class ViewPropertyNameCollisionWarning(NameCollisionWarning):
 
     def __str__(self) -> str:
         return (
-            f"Name collision detected in {self.view_id}: {self.property_name}. "
-            f"An underscore will be added to the {self.word} to avoid name collision."
+            f"Name collision detected in {self.view_id}: {self.property_name!r}. "
+            f"An underscore will be added to the {self.word!r} to avoid name collision."
         )
 
 
@@ -56,6 +56,6 @@ class ParameterNameCollisionWarning(NameCollisionWarning):
 
     def __str__(self) -> str:
         return (
-            f"Name collision detected. The following filter parameter {self.word} name is used by pygen."
-            "An underscore will be added to the parameter to avoid name collision."
+            f"Name collision detected. The following filter parameter {self.word!r} name is used by pygen."
+            "An underscore will be added to this parameter to avoid name collision."
         )

@@ -236,7 +236,7 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
         self,
         query: str,
         properties: WgsCoordinatesTextFields | Sequence[WgsCoordinatesTextFields] | None = None,
-        type: str | list[str] | None = None,
+        type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -248,7 +248,7 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
         Args:
             query: The search query,
             properties: The property to search, if nothing is passed all text fields will be searched.
-            type: The type to filter on.
+            type_: The type to filter on.
             type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
@@ -270,7 +270,7 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
         """
         filter_ = _create_filter(
             self._view_id,
-            type,
+            type_,
             type_prefix,
             external_id_prefix,
             space,
@@ -289,7 +289,7 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
         group_by: None = None,
         query: str | None = None,
         search_properties: WgsCoordinatesTextFields | Sequence[WgsCoordinatesTextFields] | None = None,
-        type: str | list[str] | None = None,
+        type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -309,7 +309,7 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
         group_by: WgsCoordinatesFields | Sequence[WgsCoordinatesFields] = None,
         query: str | None = None,
         search_properties: WgsCoordinatesTextFields | Sequence[WgsCoordinatesTextFields] | None = None,
-        type: str | list[str] | None = None,
+        type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -328,7 +328,7 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
         group_by: WgsCoordinatesFields | Sequence[WgsCoordinatesFields] | None = None,
         query: str | None = None,
         search_property: WgsCoordinatesTextFields | Sequence[WgsCoordinatesTextFields] | None = None,
-        type: str | list[str] | None = None,
+        type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -343,7 +343,7 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
             group_by: The property to group by when doing the aggregation.
             query: The query to search for in the text field.
             search_property: The text field to search in.
-            type: The type to filter on.
+            type_: The type to filter on.
             type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
@@ -366,7 +366,7 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
 
         filter_ = _create_filter(
             self._view_id,
-            type,
+            type_,
             type_prefix,
             external_id_prefix,
             space,
@@ -390,7 +390,7 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
         interval: float,
         query: str | None = None,
         search_property: WgsCoordinatesTextFields | Sequence[WgsCoordinatesTextFields] | None = None,
-        type: str | list[str] | None = None,
+        type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -404,7 +404,7 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
             interval: The interval to use for the histogram bins.
             query: The query to search for in the text field.
             search_property: The text field to search in.
-            type: The type to filter on.
+            type_: The type to filter on.
             type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
@@ -418,7 +418,7 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
         """
         filter_ = _create_filter(
             self._view_id,
-            type,
+            type_,
             type_prefix,
             external_id_prefix,
             space,
@@ -437,7 +437,7 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
 
     def list(
         self,
-        type: str | list[str] | None = None,
+        type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -448,7 +448,7 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
         """List/filter wgs 84 coordinates
 
         Args:
-            type: The type to filter on.
+            type_: The type to filter on.
             type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
@@ -470,7 +470,7 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
         """
         filter_ = _create_filter(
             self._view_id,
-            type,
+            type_,
             type_prefix,
             external_id_prefix,
             space,
@@ -502,17 +502,17 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
 
 def _create_filter(
     view_id: dm.ViewId,
-    type: str | list[str] | None = None,
+    type_: str | list[str] | None = None,
     type_prefix: str | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
-    if type and isinstance(type, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("type"), value=type))
-    if type and isinstance(type, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("type"), values=type))
+    if type_ and isinstance(type_, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("type"), value=type_))
+    if type_ and isinstance(type_, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("type"), values=type_))
     if type_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("type"), value=type_prefix))
     if external_id_prefix:

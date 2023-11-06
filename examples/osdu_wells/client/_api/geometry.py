@@ -132,7 +132,7 @@ class GeometryAPI(TypeAPI[Geometry, GeometryApply, GeometryList]):
         self,
         query: str,
         properties: GeometryTextFields | Sequence[GeometryTextFields] | None = None,
-        type: str | list[str] | None = None,
+        type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -144,7 +144,7 @@ class GeometryAPI(TypeAPI[Geometry, GeometryApply, GeometryList]):
         Args:
             query: The search query,
             properties: The property to search, if nothing is passed all text fields will be searched.
-            type: The type to filter on.
+            type_: The type to filter on.
             type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
@@ -165,7 +165,7 @@ class GeometryAPI(TypeAPI[Geometry, GeometryApply, GeometryList]):
         """
         filter_ = _create_filter(
             self._view_id,
-            type,
+            type_,
             type_prefix,
             external_id_prefix,
             space,
@@ -184,7 +184,7 @@ class GeometryAPI(TypeAPI[Geometry, GeometryApply, GeometryList]):
         group_by: None = None,
         query: str | None = None,
         search_properties: GeometryTextFields | Sequence[GeometryTextFields] | None = None,
-        type: str | list[str] | None = None,
+        type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -204,7 +204,7 @@ class GeometryAPI(TypeAPI[Geometry, GeometryApply, GeometryList]):
         group_by: GeometryFields | Sequence[GeometryFields] = None,
         query: str | None = None,
         search_properties: GeometryTextFields | Sequence[GeometryTextFields] | None = None,
-        type: str | list[str] | None = None,
+        type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -223,7 +223,7 @@ class GeometryAPI(TypeAPI[Geometry, GeometryApply, GeometryList]):
         group_by: GeometryFields | Sequence[GeometryFields] | None = None,
         query: str | None = None,
         search_property: GeometryTextFields | Sequence[GeometryTextFields] | None = None,
-        type: str | list[str] | None = None,
+        type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -238,7 +238,7 @@ class GeometryAPI(TypeAPI[Geometry, GeometryApply, GeometryList]):
             group_by: The property to group by when doing the aggregation.
             query: The query to search for in the text field.
             search_property: The text field to search in.
-            type: The type to filter on.
+            type_: The type to filter on.
             type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
@@ -260,7 +260,7 @@ class GeometryAPI(TypeAPI[Geometry, GeometryApply, GeometryList]):
 
         filter_ = _create_filter(
             self._view_id,
-            type,
+            type_,
             type_prefix,
             external_id_prefix,
             space,
@@ -284,7 +284,7 @@ class GeometryAPI(TypeAPI[Geometry, GeometryApply, GeometryList]):
         interval: float,
         query: str | None = None,
         search_property: GeometryTextFields | Sequence[GeometryTextFields] | None = None,
-        type: str | list[str] | None = None,
+        type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -298,7 +298,7 @@ class GeometryAPI(TypeAPI[Geometry, GeometryApply, GeometryList]):
             interval: The interval to use for the histogram bins.
             query: The query to search for in the text field.
             search_property: The text field to search in.
-            type: The type to filter on.
+            type_: The type to filter on.
             type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
@@ -311,7 +311,7 @@ class GeometryAPI(TypeAPI[Geometry, GeometryApply, GeometryList]):
         """
         filter_ = _create_filter(
             self._view_id,
-            type,
+            type_,
             type_prefix,
             external_id_prefix,
             space,
@@ -330,7 +330,7 @@ class GeometryAPI(TypeAPI[Geometry, GeometryApply, GeometryList]):
 
     def list(
         self,
-        type: str | list[str] | None = None,
+        type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -340,7 +340,7 @@ class GeometryAPI(TypeAPI[Geometry, GeometryApply, GeometryList]):
         """List/filter geometries
 
         Args:
-            type: The type to filter on.
+            type_: The type to filter on.
             type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
@@ -361,7 +361,7 @@ class GeometryAPI(TypeAPI[Geometry, GeometryApply, GeometryList]):
         """
         filter_ = _create_filter(
             self._view_id,
-            type,
+            type_,
             type_prefix,
             external_id_prefix,
             space,
@@ -373,17 +373,17 @@ class GeometryAPI(TypeAPI[Geometry, GeometryApply, GeometryList]):
 
 def _create_filter(
     view_id: dm.ViewId,
-    type: str | list[str] | None = None,
+    type_: str | list[str] | None = None,
     type_prefix: str | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
-    if type and isinstance(type, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("type"), value=type))
-    if type and isinstance(type, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("type"), values=type))
+    if type_ and isinstance(type_, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("type"), value=type_))
+    if type_ and isinstance(type_, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("type"), values=type_))
     if type_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("type"), value=type_prefix))
     if external_id_prefix:

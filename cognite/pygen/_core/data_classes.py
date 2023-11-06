@@ -863,7 +863,7 @@ class ListMethod:
                         )
                     elif selected_filter is dm.filters.Prefix:
                         parameter = FilterParameter(
-                            name=f"{field_.name}_prefix",
+                            name=f"{field_.name}_prefix" if field_.name[-1] != "_" else f"{field_.name}prefix",
                             type_=field_.type_,
                             description=f"The prefix of the {field_.doc_name} to filter on.",
                         )
