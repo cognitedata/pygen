@@ -418,6 +418,9 @@ class DataClass:
         if variable_name == variable_list:
             variable_list = f"{variable_list}_list"
         file_name = f"_{create_name(view_name, data_class.file)}"
+        if is_reserved_word(file_name, "filename", view.as_id()):
+            file_name = f"{file_name}_"
+
         return cls(
             view_name=view_name,
             read_name=class_name,
