@@ -8,7 +8,7 @@ __all__ = [
     "{{ class_.read_name }}",
     "{{ class_.write_name }}",
     "{{ class_.read_list_name }}",
-    "{{ class_.write_list_name }}",
-    "{{ class_.field_names }}",{% if class_.has_text_field %}
+    "{{ class_.write_list_name }}",{% if data_class.has_primitive_fields %}
+    "{{ class_.field_names }}",{% endif %}{% if class_.has_text_field %}
     "{{ class_.text_field_names }}", {% endif %}{% endfor %}
 ]
