@@ -476,7 +476,7 @@ class DataClass:
     @property
     def init_import(self) -> str:
         import_classes = [self.read_name, self.write_name, self.read_list_name, self.write_list_name]
-        if not self.has_only_one_to_many_edges:
+        if self.has_primitive_fields:
             import_classes.append(self.field_names)
         if self.has_text_field:
             import_classes.append(self.text_field_names)

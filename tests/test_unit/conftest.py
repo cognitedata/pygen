@@ -1,4 +1,6 @@
 import pytest
+from cognite.client import CogniteClient
+from cognite.client.testing import monkeypatch_cognite_client
 
 from cognite.pygen._generator import CodeFormatter
 from cognite.pygen.config import PygenConfig
@@ -12,3 +14,9 @@ def code_formatter() -> CodeFormatter:
 @pytest.fixture(scope="session")
 def pygen_config() -> PygenConfig:
     return PygenConfig()
+
+
+@pytest.fixture()
+def mock_cognite_client() -> CogniteClient:
+    with monkeypatch_cognite_client() as m:
+        yield m

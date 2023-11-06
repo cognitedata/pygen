@@ -115,7 +115,6 @@ __all__ = [
     "DateTransformationPairApply",
     "DateTransformationPairList",
     "DateTransformationPairApplyList",
-    "DateTransformationPairFields",
     "Market",
     "MarketApply",
     "MarketList",
