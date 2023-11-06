@@ -1,10 +1,9 @@
-import warnings
 from collections import defaultdict
 from typing import Any, cast
 
 from cognite.client import data_modeling as dm
 
-from cognite.pygen.exceptions import NameConflict, ReservedWordConflict
+from cognite.pygen.exceptions import NameConflict
 
 from .data_classes import APIClass, DataClass, MultiAPIClass
 
@@ -21,31 +20,21 @@ _APICLASS_UNIQUE_PROPERTIES = ["file_name", "name", "client_attribute"]
 _MULTIAPICLASS_UNIQUE_PROPERTIES = ["name", "client_attribute"]
 
 
-def validate_data_classes(data_classes: list[DataClass]) -> None:
+def validate_data_classes_unique_name(data_classes: list[DataClass]) -> None:
+    """Checks that fields that are used in shared namespaces the data classes have unique names."""
     _validate(data_classes, _DATACLASS_UNIQUE_PROPERTIES, "view_id", DataClass.__name__)
-    classes_with_version = [
-        data_class for data_class in data_classes if any(field.prop_name == "version" for field in data_class)
-    ]
-    if len(classes_with_version) > 1:
-        warnings.warn(
-            f"The view(s): {[c.view_id for c in classes_with_version]} have a field with property 'version'. "
-            "This field will overwrite the node.version thus making "
-            "it unavailable in the generated SDK.",
-            stacklevel=2,
-        )
-    if conflicts := [data_class.view_id for data_class in data_classes if data_class.view_name == "core"]:
-        raise ReservedWordConflict(conflicts, "core")
 
 
-def validate_api_classes(api_classes: list[APIClass]) -> None:
+def validate_api_classes_unique_names(api_classes: list[APIClass]) -> None:
     _validate(api_classes, _APICLASS_UNIQUE_PROPERTIES, "view_id", APIClass.__name__)
 
 
-def validate_multi_api_classes(multi_api_classes: list[MultiAPIClass]) -> None:
+def validate_multi_api_classes_unique_names(multi_api_classes: list[MultiAPIClass]) -> None:
     _validate(multi_api_classes, _MULTIAPICLASS_UNIQUE_PROPERTIES, "model_id", MultiAPIClass.__name__)
 
 
 def _validate(items: list[Any], attributes: list[str], id_attribute: str, class_name: str) -> None:
+    """Check that the given attributes are unique for each item in the list"""
     name_conflicts: list[tuple[str, list[dm.VersionedDataModelingId]]] = []
     for prop in attributes:
         ids_by_value = defaultdict(list)
