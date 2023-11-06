@@ -13,6 +13,10 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.30.4] - 06-11-23
+### Fixed
+* `pygen` now handles name collisions `pydantic` methods and the `DomainModel` and `DomainModelApply` classes.
+
 ## [0.30.3] - 06-11-23
 ### Fixed
 * `pygen` now handles name collisions with Python keywords, bulitins, and `pygen` reserved words.

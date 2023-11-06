@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from itertools import chain
 from unittest.mock import MagicMock
 
 import pytest
@@ -23,6 +24,12 @@ from cognite.pygen.warnings import (
     ViewNameCollisionWarning,
     ViewPropertyNameCollisionWarning,
 )
+from tests.constants import IS_PYDANTIC_V2
+
+if IS_PYDANTIC_V2:
+    from movie_domain.client.data_classes import DomainModel, DomainModelApply
+else:
+    from movie_domain_pydantic_v1.client.data_classes import DomainModel, DomainModelApply
 
 
 def load_field_test_cases():
@@ -352,6 +359,11 @@ def test_filter_condition(filter_condition: FilterCondition, expected_args: str)
         ("yield", "yield_"),
         ("len", "len_"),
         ("def", "def_"),
+        *{
+            (name, f"{name.casefold()}_")
+            for name in chain(dir(DomainModel), dir(DomainModelApply))
+            if not name.startswith("_")
+        },
     ],
 )
 def test_field_from_property_expect_warning(name: str, expected_name, pygen_config: PygenConfig) -> None:
