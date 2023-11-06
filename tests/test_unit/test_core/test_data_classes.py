@@ -359,8 +359,12 @@ def test_filter_condition(filter_condition: FilterCondition, expected_args: str)
         ("yield", "yield_"),
         ("len", "len_"),
         ("def", "def_"),
-    ]
-    + [(name, f"{name}_") for name in chain(dir(DomainModel), dir(DomainModelApply)) if not name.startswith("_")],
+        *{
+            (name, f"{name.casefold()}_")
+            for name in chain(dir(DomainModel), dir(DomainModelApply))
+            if not name.startswith("_")
+        },
+    ],
 )
 def test_field_from_property_expect_warning(name: str, expected_name, pygen_config: PygenConfig) -> None:
     # Arrange

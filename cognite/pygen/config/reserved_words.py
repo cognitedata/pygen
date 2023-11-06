@@ -5,21 +5,37 @@ import keyword
 from typing import Literal
 
 from cognite.client import data_modeling as dm
+from pydantic import BaseModel
 
 from cognite.pygen.warnings import NameCollisionWarning
 
 PYTHON_BUILTIN_NAMES = {name for name in vars(builtins) if not name.startswith("_")}
-FIELD_NAMES = {
-    "space",
-    "external_id",
-    "version",
-    "last_updated_time",
-    "created_time",
-    "deleted_time",
-    "existing_version",
-    "external_id_factory",
-    "replace",
-}
+FIELD_NAMES = (
+    {
+        "space",
+        "external_id",
+        "version",
+        "last_updated_time",
+        "created_time",
+        "deleted_time",
+        "existing_version",
+        "external_id_factory",
+        "replace",
+    }
+    | {f for f in dir(BaseModel)}
+    | {
+        # Pydantic from DomainModel and DomainModelApply
+        "id_tuple",
+        "to_pandas",
+        "_repr_html_",
+        "external_id_factory",
+        "to_instances_apply",
+        "_to_instances_apply",
+        "from_node",
+        "config",
+        "create_external_id_if_factory",
+    }
+)
 PARAMETER_NAMES = {
     "interval",
     "limit",
@@ -34,6 +50,7 @@ FILE_NAMES = {
     "__init__",
     "_core",
 }
+
 
 _NAMES_BY_TYPE = {
     "field": FIELD_NAMES,
