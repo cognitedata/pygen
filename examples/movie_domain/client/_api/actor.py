@@ -54,7 +54,7 @@ class ActorMoviesAPI:
 
     def list(
         self,
-        actor_id: str | list[str] | None = None,
+        actor_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
         limit=DEFAULT_LIMIT_READ,
         space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
@@ -86,10 +86,15 @@ class ActorMoviesAPI:
             )
         ]
         if actor_id:
-            actor_ids = [actor_id] if isinstance(actor_id, str) else actor_id
+            actor_ids = actor_id if isinstance(actor_id, list) else [actor_id]
             is_actors = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in actor_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in actor_ids
+                ],
             )
             filters.append(is_actors)
 
@@ -138,7 +143,7 @@ class ActorNominationAPI:
 
     def list(
         self,
-        actor_id: str | list[str] | None = None,
+        actor_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
         limit=DEFAULT_LIMIT_READ,
         space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
@@ -170,10 +175,15 @@ class ActorNominationAPI:
             )
         ]
         if actor_id:
-            actor_ids = [actor_id] if isinstance(actor_id, str) else actor_id
+            actor_ids = actor_id if isinstance(actor_id, list) else [actor_id]
             is_actors = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in actor_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in actor_ids
+                ],
             )
             filters.append(is_actors)
 
@@ -495,15 +505,17 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
         actors = self._list(limit=limit, filter=filter_)
 
         if retrieve_edges:
-            if len(external_ids := actors.as_external_ids()) > IN_FILTER_LIMIT:
-                movie_edges = self.movies.list(limit=-1, space=space)
+            if len(ids := actors.as_node_ids()) > IN_FILTER_LIMIT:
+                space_arg = {"space": space} if space else {}
+                movie_edges = self.movies.list(limit=-1, **space_arg)
             else:
-                movie_edges = self.movies.list(external_ids, limit=-1, space=space)
+                movie_edges = self.movies.list(ids, limit=-1)
             self._set_movies(actors, movie_edges)
-            if len(external_ids := actors.as_external_ids()) > IN_FILTER_LIMIT:
-                nomination_edges = self.nomination.list(limit=-1, space=space)
+            if len(ids := actors.as_external_ids()) > IN_FILTER_LIMIT:
+                space_arg = {"space": space} if space else {}
+                nomination_edges = self.nomination.list(limit=-1, **space_arg)
             else:
-                nomination_edges = self.nomination.list(external_ids, limit=-1, space=space)
+                nomination_edges = self.nomination.list(ids, limit=-1)
             self._set_nomination(actors, nomination_edges)
 
         return actors
