@@ -64,7 +64,7 @@ class WellboreTrajectoryMetaAPI:
 
     def list(
         self,
-        wellbore_trajectory_id: str | list[str] | None = None,
+        wellbore_trajectory_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
         limit=DEFAULT_LIMIT_READ,
         space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
@@ -97,11 +97,16 @@ class WellboreTrajectoryMetaAPI:
         ]
         if wellbore_trajectory_id:
             wellbore_trajectory_ids = (
-                [wellbore_trajectory_id] if isinstance(wellbore_trajectory_id, str) else wellbore_trajectory_id
+                wellbore_trajectory_id if isinstance(wellbore_trajectory_id, list) else [wellbore_trajectory_id]
             )
             is_wellbore_trajectories = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in wellbore_trajectory_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in wellbore_trajectory_ids
+                ],
             )
             filters.append(is_wellbore_trajectories)
 
@@ -227,7 +232,7 @@ class WellboreTrajectoryAPI(TypeAPI[WellboreTrajectory, WellboreTrajectoryApply,
         else:
             wellbore_trajectories = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            meta_edges = self.meta.retrieve(external_id, space=space)
+            meta_edges = self.meta.retrieve(wellbore_trajectories.as_node_ids())
             self._set_meta(wellbore_trajectories, meta_edges)
 
             return wellbore_trajectories
@@ -718,10 +723,11 @@ class WellboreTrajectoryAPI(TypeAPI[WellboreTrajectory, WellboreTrajectoryApply,
         wellbore_trajectories = self._list(limit=limit, filter=filter_)
 
         if retrieve_edges:
-            if len(external_ids := wellbore_trajectories.as_external_ids()) > IN_FILTER_LIMIT:
-                meta_edges = self.meta.list(limit=-1, space=space)
+            space_arg = {"space": space} if space else {}
+            if len(ids := wellbore_trajectories.as_node_ids()) > IN_FILTER_LIMIT:
+                meta_edges = self.meta.list(limit=-1, **space_arg)
             else:
-                meta_edges = self.meta.list(external_ids, limit=-1, space=space)
+                meta_edges = self.meta.list(ids, limit=-1)
             self._set_meta(wellbore_trajectories, meta_edges)
 
         return wellbore_trajectories

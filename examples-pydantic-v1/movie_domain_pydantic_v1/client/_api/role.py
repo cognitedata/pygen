@@ -60,7 +60,10 @@ class RoleMoviesAPI:
         return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_roles))
 
     def list(
-        self, role_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space: str = "IntegrationTestsImmutable"
+        self,
+        role_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        limit=DEFAULT_LIMIT_READ,
+        space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
         """List movies edges of a role.
 
@@ -90,10 +93,15 @@ class RoleMoviesAPI:
             )
         ]
         if role_id:
-            role_ids = [role_id] if isinstance(role_id, str) else role_id
+            role_ids = role_id if isinstance(role_id, list) else [role_id]
             is_roles = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in role_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in role_ids
+                ],
             )
             filters.append(is_roles)
 
@@ -141,7 +149,10 @@ class RoleNominationAPI:
         return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_roles))
 
     def list(
-        self, role_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space: str = "IntegrationTestsImmutable"
+        self,
+        role_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        limit=DEFAULT_LIMIT_READ,
+        space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
         """List nomination edges of a role.
 
@@ -171,10 +182,15 @@ class RoleNominationAPI:
             )
         ]
         if role_id:
-            role_ids = [role_id] if isinstance(role_id, str) else role_id
+            role_ids = role_id if isinstance(role_id, list) else [role_id]
             is_roles = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in role_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in role_ids
+                ],
             )
             filters.append(is_roles)
 
@@ -299,9 +315,9 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
         else:
             roles = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            movie_edges = self.movies.retrieve(external_id, space=space)
+            movie_edges = self.movies.retrieve(roles.as_node_ids())
             self._set_movies(roles, movie_edges)
-            nomination_edges = self.nomination.retrieve(external_id, space=space)
+            nomination_edges = self.nomination.retrieve(roles.as_node_ids())
             self._set_nomination(roles, nomination_edges)
 
             return roles
@@ -496,15 +512,16 @@ class RoleAPI(TypeAPI[Role, RoleApply, RoleList]):
         roles = self._list(limit=limit, filter=filter_)
 
         if retrieve_edges:
-            if len(external_ids := roles.as_external_ids()) > IN_FILTER_LIMIT:
-                movie_edges = self.movies.list(limit=-1, space=space)
+            space_arg = {"space": space} if space else {}
+            if len(ids := roles.as_node_ids()) > IN_FILTER_LIMIT:
+                movie_edges = self.movies.list(limit=-1, **space_arg)
             else:
-                movie_edges = self.movies.list(external_ids, limit=-1, space=space)
+                movie_edges = self.movies.list(ids, limit=-1)
             self._set_movies(roles, movie_edges)
-            if len(external_ids := roles.as_external_ids()) > IN_FILTER_LIMIT:
-                nomination_edges = self.nomination.list(limit=-1, space=space)
+            if len(ids := roles.as_node_ids()) > IN_FILTER_LIMIT:
+                nomination_edges = self.nomination.list(limit=-1, **space_arg)
             else:
-                nomination_edges = self.nomination.list(external_ids, limit=-1, space=space)
+                nomination_edges = self.nomination.list(ids, limit=-1)
             self._set_nomination(roles, nomination_edges)
 
         return roles

@@ -62,7 +62,7 @@ class WellboreMetaAPI:
 
     def list(
         self,
-        wellbore_id: str | list[str] | None = None,
+        wellbore_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
         limit=DEFAULT_LIMIT_READ,
         space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
@@ -94,10 +94,15 @@ class WellboreMetaAPI:
             )
         ]
         if wellbore_id:
-            wellbore_ids = [wellbore_id] if isinstance(wellbore_id, str) else wellbore_id
+            wellbore_ids = wellbore_id if isinstance(wellbore_id, list) else [wellbore_id]
             is_wellbores = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in wellbore_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in wellbore_ids
+                ],
             )
             filters.append(is_wellbores)
 
@@ -223,7 +228,7 @@ class WellboreAPI(TypeAPI[Wellbore, WellboreApply, WellboreList]):
         else:
             wellbores = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            meta_edges = self.meta.retrieve(external_id, space=space)
+            meta_edges = self.meta.retrieve(wellbores.as_node_ids())
             self._set_meta(wellbores, meta_edges)
 
             return wellbores
@@ -714,10 +719,11 @@ class WellboreAPI(TypeAPI[Wellbore, WellboreApply, WellboreList]):
         wellbores = self._list(limit=limit, filter=filter_)
 
         if retrieve_edges:
-            if len(external_ids := wellbores.as_external_ids()) > IN_FILTER_LIMIT:
-                meta_edges = self.meta.list(limit=-1, space=space)
+            space_arg = {"space": space} if space else {}
+            if len(ids := wellbores.as_node_ids()) > IN_FILTER_LIMIT:
+                meta_edges = self.meta.list(limit=-1, **space_arg)
             else:
-                meta_edges = self.meta.list(external_ids, limit=-1, space=space)
+                meta_edges = self.meta.list(ids, limit=-1)
             self._set_meta(wellbores, meta_edges)
 
         return wellbores

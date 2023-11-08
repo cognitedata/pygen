@@ -662,7 +662,10 @@ class AssetChildrenAPI:
         return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_assets))
 
     def list(
-        self, asset_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space: str = "tutorial_apm_simple"
+        self,
+        asset_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        limit=DEFAULT_LIMIT_READ,
+        space: str = "tutorial_apm_simple",
     ) -> dm.EdgeList:
         """List children edges of a asset.
 
@@ -692,10 +695,15 @@ class AssetChildrenAPI:
             )
         ]
         if asset_id:
-            asset_ids = [asset_id] if isinstance(asset_id, str) else asset_id
+            asset_ids = asset_id if isinstance(asset_id, list) else [asset_id]
             is_assets = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in asset_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in asset_ids
+                ],
             )
             filters.append(is_assets)
 
@@ -743,7 +751,10 @@ class AssetInModelAPI:
         return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_assets))
 
     def list(
-        self, asset_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space: str = "cdf_3d_schema"
+        self,
+        asset_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        limit=DEFAULT_LIMIT_READ,
+        space: str = "cdf_3d_schema",
     ) -> dm.EdgeList:
         """List in_model_3_d edges of a asset.
 
@@ -773,10 +784,15 @@ class AssetInModelAPI:
             )
         ]
         if asset_id:
-            asset_ids = [asset_id] if isinstance(asset_id, str) else asset_id
+            asset_ids = asset_id if isinstance(asset_id, list) else [asset_id]
             is_assets = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in asset_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in asset_ids
+                ],
             )
             filters.append(is_assets)
 
@@ -900,9 +916,9 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
         else:
             assets = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            child_edges = self.children.retrieve(external_id, space=space)
+            child_edges = self.children.retrieve(assets.as_node_ids())
             self._set_children(assets, child_edges)
-            in_model_3_d_edges = self.in_model_3_d.retrieve(external_id, space=space)
+            in_model_3_d_edges = self.in_model_3_d.retrieve(assets.as_node_ids())
             self._set_in_model_3_d(assets, in_model_3_d_edges)
 
             return assets
@@ -1365,15 +1381,16 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
         assets = self._list(limit=limit, filter=filter_)
 
         if retrieve_edges:
-            if len(external_ids := assets.as_external_ids()) > IN_FILTER_LIMIT:
-                child_edges = self.children.list(limit=-1, space=space)
+            space_arg = {"space": space} if space else {}
+            if len(ids := assets.as_node_ids()) > IN_FILTER_LIMIT:
+                child_edges = self.children.list(limit=-1, **space_arg)
             else:
-                child_edges = self.children.list(external_ids, limit=-1, space=space)
+                child_edges = self.children.list(ids, limit=-1)
             self._set_children(assets, child_edges)
-            if len(external_ids := assets.as_external_ids()) > IN_FILTER_LIMIT:
-                in_model_3_d_edges = self.in_model_3_d.list(limit=-1, space=space)
+            if len(ids := assets.as_node_ids()) > IN_FILTER_LIMIT:
+                in_model_3_d_edges = self.in_model_3_d.list(limit=-1, **space_arg)
             else:
-                in_model_3_d_edges = self.in_model_3_d.list(external_ids, limit=-1, space=space)
+                in_model_3_d_edges = self.in_model_3_d.list(ids, limit=-1)
             self._set_in_model_3_d(assets, in_model_3_d_edges)
 
         return assets

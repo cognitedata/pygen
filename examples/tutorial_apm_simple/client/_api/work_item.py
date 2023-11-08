@@ -61,7 +61,10 @@ class WorkItemLinkedAssetsAPI:
         return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_work_items))
 
     def list(
-        self, work_item_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space: str = "tutorial_apm_simple"
+        self,
+        work_item_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        limit=DEFAULT_LIMIT_READ,
+        space: str = "tutorial_apm_simple",
     ) -> dm.EdgeList:
         """List linked_assets edges of a work item.
 
@@ -91,10 +94,15 @@ class WorkItemLinkedAssetsAPI:
             )
         ]
         if work_item_id:
-            work_item_ids = [work_item_id] if isinstance(work_item_id, str) else work_item_id
+            work_item_ids = work_item_id if isinstance(work_item_id, list) else [work_item_id]
             is_work_items = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in work_item_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in work_item_ids
+                ],
             )
             filters.append(is_work_items)
 
@@ -216,7 +224,7 @@ class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
         else:
             work_items = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            linked_asset_edges = self.linked_assets.retrieve(external_id, space=space)
+            linked_asset_edges = self.linked_assets.retrieve(work_items.as_node_ids())
             self._set_linked_assets(work_items, linked_asset_edges)
 
             return work_items
@@ -651,10 +659,11 @@ class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
         work_items = self._list(limit=limit, filter=filter_)
 
         if retrieve_edges:
-            if len(external_ids := work_items.as_external_ids()) > IN_FILTER_LIMIT:
-                linked_asset_edges = self.linked_assets.list(limit=-1, space=space)
+            space_arg = {"space": space} if space else {}
+            if len(ids := work_items.as_node_ids()) > IN_FILTER_LIMIT:
+                linked_asset_edges = self.linked_assets.list(limit=-1, **space_arg)
             else:
-                linked_asset_edges = self.linked_assets.list(external_ids, limit=-1, space=space)
+                linked_asset_edges = self.linked_assets.list(ids, limit=-1)
             self._set_linked_assets(work_items, linked_asset_edges)
 
         return work_items

@@ -61,7 +61,10 @@ class WellMetaAPI:
         return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_wells))
 
     def list(
-        self, well_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space: str = "IntegrationTestsImmutable"
+        self,
+        well_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        limit=DEFAULT_LIMIT_READ,
+        space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
         """List meta edges of a well.
 
@@ -91,10 +94,15 @@ class WellMetaAPI:
             )
         ]
         if well_id:
-            well_ids = [well_id] if isinstance(well_id, str) else well_id
+            well_ids = well_id if isinstance(well_id, list) else [well_id]
             is_wells = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in well_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in well_ids
+                ],
             )
             filters.append(is_wells)
 
@@ -216,7 +224,7 @@ class WellAPI(TypeAPI[Well, WellApply, WellList]):
         else:
             wells = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            meta_edges = self.meta.retrieve(external_id, space=space)
+            meta_edges = self.meta.retrieve(wells.as_node_ids())
             self._set_meta(wells, meta_edges)
 
             return wells
@@ -707,10 +715,11 @@ class WellAPI(TypeAPI[Well, WellApply, WellList]):
         wells = self._list(limit=limit, filter=filter_)
 
         if retrieve_edges:
-            if len(external_ids := wells.as_external_ids()) > IN_FILTER_LIMIT:
-                meta_edges = self.meta.list(limit=-1, space=space)
+            space_arg = {"space": space} if space else {}
+            if len(ids := wells.as_node_ids()) > IN_FILTER_LIMIT:
+                meta_edges = self.meta.list(limit=-1, **space_arg)
             else:
-                meta_edges = self.meta.list(external_ids, limit=-1, space=space)
+                meta_edges = self.meta.list(ids, limit=-1)
             self._set_meta(wells, meta_edges)
 
         return wells
