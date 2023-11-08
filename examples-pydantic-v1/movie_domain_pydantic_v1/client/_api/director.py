@@ -23,7 +23,9 @@ class DirectorMoviesAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(
+        self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str = "IntegrationTestsImmutable"
+    ) -> dm.EdgeList:
         """Retrieve one or more movies edges by id(s) of a director.
 
         Args:
@@ -47,21 +49,28 @@ class DirectorMoviesAPI:
             ["edge", "type"],
             {"space": "IntegrationTestsImmutable", "externalId": "Role.movies"},
         )
-        if isinstance(external_id, str):
+        if isinstance(external_id, (str, dm.NodeId)):
             is_directors = f.Equals(
                 ["edge", "startNode"],
-                {"space": space, "externalId": external_id},
+                {"space": space, "externalId": external_id}
+                if isinstance(external_id, str)
+                else external_id.dump(camel_case=True, include_instance_type=False),
             )
         else:
             is_directors = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in external_id],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in external_id
+                ],
             )
         return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_directors))
 
     def list(
         self,
-        director_id: str | list[str] | None = None,
+        director_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
         limit=DEFAULT_LIMIT_READ,
         space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
@@ -93,10 +102,15 @@ class DirectorMoviesAPI:
             )
         ]
         if director_id:
-            director_ids = [director_id] if isinstance(director_id, str) else director_id
+            director_ids = director_id if isinstance(director_id, list) else [director_id]
             is_directors = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in director_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in director_ids
+                ],
             )
             filters.append(is_directors)
 
@@ -107,7 +121,9 @@ class DirectorNominationAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(
+        self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str = "IntegrationTestsImmutable"
+    ) -> dm.EdgeList:
         """Retrieve one or more nomination edges by id(s) of a director.
 
         Args:
@@ -131,21 +147,28 @@ class DirectorNominationAPI:
             ["edge", "type"],
             {"space": "IntegrationTestsImmutable", "externalId": "Role.nomination"},
         )
-        if isinstance(external_id, str):
+        if isinstance(external_id, (str, dm.NodeId)):
             is_directors = f.Equals(
                 ["edge", "startNode"],
-                {"space": space, "externalId": external_id},
+                {"space": space, "externalId": external_id}
+                if isinstance(external_id, str)
+                else external_id.dump(camel_case=True, include_instance_type=False),
             )
         else:
             is_directors = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in external_id],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in external_id
+                ],
             )
         return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_directors))
 
     def list(
         self,
-        director_id: str | list[str] | None = None,
+        director_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
         limit=DEFAULT_LIMIT_READ,
         space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
@@ -177,10 +200,15 @@ class DirectorNominationAPI:
             )
         ]
         if director_id:
-            director_ids = [director_id] if isinstance(director_id, str) else director_id
+            director_ids = director_id if isinstance(director_id, list) else [director_id]
             is_directors = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in director_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in director_ids
+                ],
             )
             filters.append(is_directors)
 
@@ -309,9 +337,9 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
         else:
             directors = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            movie_edges = self.movies.retrieve(external_id, space=space)
+            movie_edges = self.movies.retrieve(directors.as_node_ids())
             self._set_movies(directors, movie_edges)
-            nomination_edges = self.nomination.retrieve(external_id, space=space)
+            nomination_edges = self.nomination.retrieve(directors.as_node_ids())
             self._set_nomination(directors, nomination_edges)
 
             return directors
@@ -506,15 +534,16 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
         directors = self._list(limit=limit, filter=filter_)
 
         if retrieve_edges:
-            if len(external_ids := directors.as_external_ids()) > IN_FILTER_LIMIT:
-                movie_edges = self.movies.list(limit=-1, space=space)
+            space_arg = {"space": space} if space else {}
+            if len(ids := directors.as_node_ids()) > IN_FILTER_LIMIT:
+                movie_edges = self.movies.list(limit=-1, **space_arg)
             else:
-                movie_edges = self.movies.list(external_ids, limit=-1, space=space)
+                movie_edges = self.movies.list(ids, limit=-1)
             self._set_movies(directors, movie_edges)
-            if len(external_ids := directors.as_external_ids()) > IN_FILTER_LIMIT:
-                nomination_edges = self.nomination.list(limit=-1, space=space)
+            if len(ids := directors.as_node_ids()) > IN_FILTER_LIMIT:
+                nomination_edges = self.nomination.list(limit=-1, **space_arg)
             else:
-                nomination_edges = self.nomination.list(external_ids, limit=-1, space=space)
+                nomination_edges = self.nomination.list(ids, limit=-1)
             self._set_nomination(directors, nomination_edges)
 
         return directors

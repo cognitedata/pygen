@@ -258,6 +258,8 @@ class AssetPressureQuery:
         *,
         aggregates: Aggregate | Sequence[Aggregate] | None = None,
         granularity: str | None = None,
+        target_unit: str | None = None,
+        target_unit_system: str | None = None,
         uniform_index: bool = False,
         include_aggregate_name: bool = True,
         include_granularity_name: bool = False,
@@ -625,7 +627,9 @@ class AssetChildrenAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space: str = "tutorial_apm_simple") -> dm.EdgeList:
+    def retrieve(
+        self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str = "tutorial_apm_simple"
+    ) -> dm.EdgeList:
         """Retrieve one or more children edges by id(s) of a asset.
 
         Args:
@@ -649,20 +653,30 @@ class AssetChildrenAPI:
             ["edge", "type"],
             {"space": "tutorial_apm_simple", "externalId": "Asset.children"},
         )
-        if isinstance(external_id, str):
+        if isinstance(external_id, (str, dm.NodeId)):
             is_assets = f.Equals(
                 ["edge", "startNode"],
-                {"space": space, "externalId": external_id},
+                {"space": space, "externalId": external_id}
+                if isinstance(external_id, str)
+                else external_id.dump(camel_case=True, include_instance_type=False),
             )
         else:
             is_assets = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in external_id],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in external_id
+                ],
             )
         return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_assets))
 
     def list(
-        self, asset_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space: str = "tutorial_apm_simple"
+        self,
+        asset_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        limit=DEFAULT_LIMIT_READ,
+        space: str = "tutorial_apm_simple",
     ) -> dm.EdgeList:
         """List children edges of a asset.
 
@@ -692,10 +706,15 @@ class AssetChildrenAPI:
             )
         ]
         if asset_id:
-            asset_ids = [asset_id] if isinstance(asset_id, str) else asset_id
+            asset_ids = asset_id if isinstance(asset_id, list) else [asset_id]
             is_assets = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in asset_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in asset_ids
+                ],
             )
             filters.append(is_assets)
 
@@ -706,7 +725,9 @@ class AssetInModelAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space: str = "cdf_3d_schema") -> dm.EdgeList:
+    def retrieve(
+        self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str = "cdf_3d_schema"
+    ) -> dm.EdgeList:
         """Retrieve one or more in_model_3_d edges by id(s) of a asset.
 
         Args:
@@ -730,20 +751,30 @@ class AssetInModelAPI:
             ["edge", "type"],
             {"space": "tutorial_apm_simple", "externalId": "cdf3dEntityConnection"},
         )
-        if isinstance(external_id, str):
+        if isinstance(external_id, (str, dm.NodeId)):
             is_assets = f.Equals(
                 ["edge", "startNode"],
-                {"space": space, "externalId": external_id},
+                {"space": space, "externalId": external_id}
+                if isinstance(external_id, str)
+                else external_id.dump(camel_case=True, include_instance_type=False),
             )
         else:
             is_assets = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in external_id],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in external_id
+                ],
             )
         return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_assets))
 
     def list(
-        self, asset_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space: str = "cdf_3d_schema"
+        self,
+        asset_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        limit=DEFAULT_LIMIT_READ,
+        space: str = "cdf_3d_schema",
     ) -> dm.EdgeList:
         """List in_model_3_d edges of a asset.
 
@@ -773,10 +804,15 @@ class AssetInModelAPI:
             )
         ]
         if asset_id:
-            asset_ids = [asset_id] if isinstance(asset_id, str) else asset_id
+            asset_ids = asset_id if isinstance(asset_id, list) else [asset_id]
             is_assets = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in asset_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in asset_ids
+                ],
             )
             filters.append(is_assets)
 
@@ -900,9 +936,9 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
         else:
             assets = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            child_edges = self.children.retrieve(external_id, space=space)
+            child_edges = self.children.retrieve(assets.as_node_ids())
             self._set_children(assets, child_edges)
-            in_model_3_d_edges = self.in_model_3_d.retrieve(external_id, space=space)
+            in_model_3_d_edges = self.in_model_3_d.retrieve(assets.as_node_ids())
             self._set_in_model_3_d(assets, in_model_3_d_edges)
 
             return assets
@@ -1365,15 +1401,16 @@ class AssetAPI(TypeAPI[Asset, AssetApply, AssetList]):
         assets = self._list(limit=limit, filter=filter_)
 
         if retrieve_edges:
-            if len(external_ids := assets.as_external_ids()) > IN_FILTER_LIMIT:
-                child_edges = self.children.list(limit=-1, space=space)
+            space_arg = {"space": space} if space else {}
+            if len(ids := assets.as_node_ids()) > IN_FILTER_LIMIT:
+                child_edges = self.children.list(limit=-1, **space_arg)
             else:
-                child_edges = self.children.list(external_ids, limit=-1, space=space)
+                child_edges = self.children.list(ids, limit=-1)
             self._set_children(assets, child_edges)
-            if len(external_ids := assets.as_external_ids()) > IN_FILTER_LIMIT:
-                in_model_3_d_edges = self.in_model_3_d.list(limit=-1, space=space)
+            if len(ids := assets.as_node_ids()) > IN_FILTER_LIMIT:
+                in_model_3_d_edges = self.in_model_3_d.list(limit=-1, **space_arg)
             else:
-                in_model_3_d_edges = self.in_model_3_d.list(external_ids, limit=-1, space=space)
+                in_model_3_d_edges = self.in_model_3_d.list(ids, limit=-1)
             self._set_in_model_3_d(assets, in_model_3_d_edges)
 
         return assets

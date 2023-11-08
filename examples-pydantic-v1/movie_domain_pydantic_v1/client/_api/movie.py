@@ -24,7 +24,9 @@ class MovieActorsAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(
+        self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str = "IntegrationTestsImmutable"
+    ) -> dm.EdgeList:
         """Retrieve one or more actors edges by id(s) of a movie.
 
         Args:
@@ -48,21 +50,28 @@ class MovieActorsAPI:
             ["edge", "type"],
             {"space": "IntegrationTestsImmutable", "externalId": "Movie.actors"},
         )
-        if isinstance(external_id, str):
+        if isinstance(external_id, (str, dm.NodeId)):
             is_movies = f.Equals(
                 ["edge", "startNode"],
-                {"space": space, "externalId": external_id},
+                {"space": space, "externalId": external_id}
+                if isinstance(external_id, str)
+                else external_id.dump(camel_case=True, include_instance_type=False),
             )
         else:
             is_movies = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in external_id],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in external_id
+                ],
             )
         return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_movies))
 
     def list(
         self,
-        movie_id: str | list[str] | None = None,
+        movie_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
         limit=DEFAULT_LIMIT_READ,
         space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
@@ -94,10 +103,15 @@ class MovieActorsAPI:
             )
         ]
         if movie_id:
-            movie_ids = [movie_id] if isinstance(movie_id, str) else movie_id
+            movie_ids = movie_id if isinstance(movie_id, list) else [movie_id]
             is_movies = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in movie_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in movie_ids
+                ],
             )
             filters.append(is_movies)
 
@@ -108,7 +122,9 @@ class MovieDirectorsAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(
+        self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str = "IntegrationTestsImmutable"
+    ) -> dm.EdgeList:
         """Retrieve one or more directors edges by id(s) of a movie.
 
         Args:
@@ -132,21 +148,28 @@ class MovieDirectorsAPI:
             ["edge", "type"],
             {"space": "IntegrationTestsImmutable", "externalId": "Movie.directors"},
         )
-        if isinstance(external_id, str):
+        if isinstance(external_id, (str, dm.NodeId)):
             is_movies = f.Equals(
                 ["edge", "startNode"],
-                {"space": space, "externalId": external_id},
+                {"space": space, "externalId": external_id}
+                if isinstance(external_id, str)
+                else external_id.dump(camel_case=True, include_instance_type=False),
             )
         else:
             is_movies = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in external_id],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in external_id
+                ],
             )
         return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_movies))
 
     def list(
         self,
-        movie_id: str | list[str] | None = None,
+        movie_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
         limit=DEFAULT_LIMIT_READ,
         space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
@@ -178,10 +201,15 @@ class MovieDirectorsAPI:
             )
         ]
         if movie_id:
-            movie_ids = [movie_id] if isinstance(movie_id, str) else movie_id
+            movie_ids = movie_id if isinstance(movie_id, list) else [movie_id]
             is_movies = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in movie_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in movie_ids
+                ],
             )
             filters.append(is_movies)
 
@@ -306,9 +334,9 @@ class MovieAPI(TypeAPI[Movie, MovieApply, MovieList]):
         else:
             movies = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            actor_edges = self.actors.retrieve(external_id, space=space)
+            actor_edges = self.actors.retrieve(movies.as_node_ids())
             self._set_actors(movies, actor_edges)
-            director_edges = self.directors.retrieve(external_id, space=space)
+            director_edges = self.directors.retrieve(movies.as_node_ids())
             self._set_directors(movies, director_edges)
 
             return movies
@@ -631,15 +659,16 @@ class MovieAPI(TypeAPI[Movie, MovieApply, MovieList]):
         movies = self._list(limit=limit, filter=filter_)
 
         if retrieve_edges:
-            if len(external_ids := movies.as_external_ids()) > IN_FILTER_LIMIT:
-                actor_edges = self.actors.list(limit=-1, space=space)
+            space_arg = {"space": space} if space else {}
+            if len(ids := movies.as_node_ids()) > IN_FILTER_LIMIT:
+                actor_edges = self.actors.list(limit=-1, **space_arg)
             else:
-                actor_edges = self.actors.list(external_ids, limit=-1, space=space)
+                actor_edges = self.actors.list(ids, limit=-1)
             self._set_actors(movies, actor_edges)
-            if len(external_ids := movies.as_external_ids()) > IN_FILTER_LIMIT:
-                director_edges = self.directors.list(limit=-1, space=space)
+            if len(ids := movies.as_node_ids()) > IN_FILTER_LIMIT:
+                director_edges = self.directors.list(limit=-1, **space_arg)
             else:
-                director_edges = self.directors.list(external_ids, limit=-1, space=space)
+                director_edges = self.directors.list(ids, limit=-1)
             self._set_directors(movies, director_edges)
 
         return movies

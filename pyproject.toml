@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cognite-pygen"
-version = "0.30.4"
+version = "0.30.5"
 description = "Cognite Python SDK Generator"
 readme = "README.md"
 authors = ["Cognite <support@cognite.com>"]
@@ -58,11 +58,11 @@ pygen = "cognite.pygen.cli:main"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-cognite-sdk = {version = ">=6.25.2"}
+cognite-sdk = {version = ">=6.39.3"}
 pydantic = ">=1.10.7"
 Jinja2 = ">=3.1"
 inflect = ">=6.0"
-typing_extensions = ">=4.5"
+typing_extensions = ">=4.4"
 
 toml = {version=">=0.10", optional=true}
 packaging = {version=">=21.3", optional=true}

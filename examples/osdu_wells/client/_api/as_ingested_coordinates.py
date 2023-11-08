@@ -24,7 +24,9 @@ class AsIngestedCoordinatesFeaturesAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(
+        self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str = "IntegrationTestsImmutable"
+    ) -> dm.EdgeList:
         """Retrieve one or more features edges by id(s) of a as ingested coordinate.
 
         Args:
@@ -48,15 +50,22 @@ class AsIngestedCoordinatesFeaturesAPI:
             ["edge", "type"],
             {"space": "IntegrationTestsImmutable", "externalId": "AsIngestedCoordinates.features"},
         )
-        if isinstance(external_id, str):
+        if isinstance(external_id, (str, dm.NodeId)):
             is_as_ingested_coordinates = f.Equals(
                 ["edge", "startNode"],
-                {"space": space, "externalId": external_id},
+                {"space": space, "externalId": external_id}
+                if isinstance(external_id, str)
+                else external_id.dump(camel_case=True, include_instance_type=False),
             )
         else:
             is_as_ingested_coordinates = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in external_id],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in external_id
+                ],
             )
         return self._client.data_modeling.instances.list(
             "edge", limit=-1, filter=f.And(is_edge_type, is_as_ingested_coordinates)
@@ -64,7 +73,7 @@ class AsIngestedCoordinatesFeaturesAPI:
 
     def list(
         self,
-        as_ingested_coordinate_id: str | list[str] | None = None,
+        as_ingested_coordinate_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
         limit=DEFAULT_LIMIT_READ,
         space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
@@ -97,11 +106,18 @@ class AsIngestedCoordinatesFeaturesAPI:
         ]
         if as_ingested_coordinate_id:
             as_ingested_coordinate_ids = (
-                [as_ingested_coordinate_id] if isinstance(as_ingested_coordinate_id, str) else as_ingested_coordinate_id
+                as_ingested_coordinate_id
+                if isinstance(as_ingested_coordinate_id, list)
+                else [as_ingested_coordinate_id]
             )
             is_as_ingested_coordinates = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in as_ingested_coordinate_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in as_ingested_coordinate_ids
+                ],
             )
             filters.append(is_as_ingested_coordinates)
 
@@ -231,7 +247,7 @@ class AsIngestedCoordinatesAPI(TypeAPI[AsIngestedCoordinates, AsIngestedCoordina
         else:
             as_ingested_coordinates = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            feature_edges = self.features.retrieve(external_id, space=space)
+            feature_edges = self.features.retrieve(as_ingested_coordinates.as_node_ids())
             self._set_features(as_ingested_coordinates, feature_edges)
 
             return as_ingested_coordinates
@@ -654,10 +670,11 @@ class AsIngestedCoordinatesAPI(TypeAPI[AsIngestedCoordinates, AsIngestedCoordina
         as_ingested_coordinates = self._list(limit=limit, filter=filter_)
 
         if retrieve_edges:
-            if len(external_ids := as_ingested_coordinates.as_external_ids()) > IN_FILTER_LIMIT:
-                feature_edges = self.features.list(limit=-1, space=space)
+            space_arg = {"space": space} if space else {}
+            if len(ids := as_ingested_coordinates.as_node_ids()) > IN_FILTER_LIMIT:
+                feature_edges = self.features.list(limit=-1, **space_arg)
             else:
-                feature_edges = self.features.list(external_ids, limit=-1, space=space)
+                feature_edges = self.features.list(ids, limit=-1)
             self._set_features(as_ingested_coordinates, feature_edges)
 
         return as_ingested_coordinates

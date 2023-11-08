@@ -24,7 +24,9 @@ class WellboreDataDrillingReasonsAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(
+        self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str = "IntegrationTestsImmutable"
+    ) -> dm.EdgeList:
         """Retrieve one or more drilling_reasons edges by id(s) of a wellbore datum.
 
         Args:
@@ -48,21 +50,28 @@ class WellboreDataDrillingReasonsAPI:
             ["edge", "type"],
             {"space": "IntegrationTestsImmutable", "externalId": "WellboreData.DrillingReasons"},
         )
-        if isinstance(external_id, str):
+        if isinstance(external_id, (str, dm.NodeId)):
             is_wellbore_data = f.Equals(
                 ["edge", "startNode"],
-                {"space": space, "externalId": external_id},
+                {"space": space, "externalId": external_id}
+                if isinstance(external_id, str)
+                else external_id.dump(camel_case=True, include_instance_type=False),
             )
         else:
             is_wellbore_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in external_id],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in external_id
+                ],
             )
         return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_data))
 
     def list(
         self,
-        wellbore_datum_id: str | list[str] | None = None,
+        wellbore_datum_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
         limit=DEFAULT_LIMIT_READ,
         space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
@@ -94,10 +103,15 @@ class WellboreDataDrillingReasonsAPI:
             )
         ]
         if wellbore_datum_id:
-            wellbore_datum_ids = [wellbore_datum_id] if isinstance(wellbore_datum_id, str) else wellbore_datum_id
+            wellbore_datum_ids = wellbore_datum_id if isinstance(wellbore_datum_id, list) else [wellbore_datum_id]
             is_wellbore_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in wellbore_datum_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in wellbore_datum_ids
+                ],
             )
             filters.append(is_wellbore_data)
 
@@ -108,7 +122,9 @@ class WellboreDataFacilityEventsAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(
+        self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str = "IntegrationTestsImmutable"
+    ) -> dm.EdgeList:
         """Retrieve one or more facility_events edges by id(s) of a wellbore datum.
 
         Args:
@@ -132,21 +148,28 @@ class WellboreDataFacilityEventsAPI:
             ["edge", "type"],
             {"space": "IntegrationTestsImmutable", "externalId": "WellboreData.FacilityEvents"},
         )
-        if isinstance(external_id, str):
+        if isinstance(external_id, (str, dm.NodeId)):
             is_wellbore_data = f.Equals(
                 ["edge", "startNode"],
-                {"space": space, "externalId": external_id},
+                {"space": space, "externalId": external_id}
+                if isinstance(external_id, str)
+                else external_id.dump(camel_case=True, include_instance_type=False),
             )
         else:
             is_wellbore_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in external_id],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in external_id
+                ],
             )
         return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_data))
 
     def list(
         self,
-        wellbore_datum_id: str | list[str] | None = None,
+        wellbore_datum_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
         limit=DEFAULT_LIMIT_READ,
         space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
@@ -178,10 +201,15 @@ class WellboreDataFacilityEventsAPI:
             )
         ]
         if wellbore_datum_id:
-            wellbore_datum_ids = [wellbore_datum_id] if isinstance(wellbore_datum_id, str) else wellbore_datum_id
+            wellbore_datum_ids = wellbore_datum_id if isinstance(wellbore_datum_id, list) else [wellbore_datum_id]
             is_wellbore_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in wellbore_datum_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in wellbore_datum_ids
+                ],
             )
             filters.append(is_wellbore_data)
 
@@ -192,7 +220,9 @@ class WellboreDataFacilityOperatorsAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(
+        self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str = "IntegrationTestsImmutable"
+    ) -> dm.EdgeList:
         """Retrieve one or more facility_operators edges by id(s) of a wellbore datum.
 
         Args:
@@ -216,21 +246,28 @@ class WellboreDataFacilityOperatorsAPI:
             ["edge", "type"],
             {"space": "IntegrationTestsImmutable", "externalId": "WellboreData.FacilityOperators"},
         )
-        if isinstance(external_id, str):
+        if isinstance(external_id, (str, dm.NodeId)):
             is_wellbore_data = f.Equals(
                 ["edge", "startNode"],
-                {"space": space, "externalId": external_id},
+                {"space": space, "externalId": external_id}
+                if isinstance(external_id, str)
+                else external_id.dump(camel_case=True, include_instance_type=False),
             )
         else:
             is_wellbore_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in external_id],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in external_id
+                ],
             )
         return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_data))
 
     def list(
         self,
-        wellbore_datum_id: str | list[str] | None = None,
+        wellbore_datum_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
         limit=DEFAULT_LIMIT_READ,
         space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
@@ -262,10 +299,15 @@ class WellboreDataFacilityOperatorsAPI:
             )
         ]
         if wellbore_datum_id:
-            wellbore_datum_ids = [wellbore_datum_id] if isinstance(wellbore_datum_id, str) else wellbore_datum_id
+            wellbore_datum_ids = wellbore_datum_id if isinstance(wellbore_datum_id, list) else [wellbore_datum_id]
             is_wellbore_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in wellbore_datum_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in wellbore_datum_ids
+                ],
             )
             filters.append(is_wellbore_data)
 
@@ -276,7 +318,9 @@ class WellboreDataFacilitySpecificationsAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(
+        self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str = "IntegrationTestsImmutable"
+    ) -> dm.EdgeList:
         """Retrieve one or more facility_specifications edges by id(s) of a wellbore datum.
 
         Args:
@@ -300,21 +344,28 @@ class WellboreDataFacilitySpecificationsAPI:
             ["edge", "type"],
             {"space": "IntegrationTestsImmutable", "externalId": "WellboreData.FacilitySpecifications"},
         )
-        if isinstance(external_id, str):
+        if isinstance(external_id, (str, dm.NodeId)):
             is_wellbore_data = f.Equals(
                 ["edge", "startNode"],
-                {"space": space, "externalId": external_id},
+                {"space": space, "externalId": external_id}
+                if isinstance(external_id, str)
+                else external_id.dump(camel_case=True, include_instance_type=False),
             )
         else:
             is_wellbore_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in external_id],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in external_id
+                ],
             )
         return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_data))
 
     def list(
         self,
-        wellbore_datum_id: str | list[str] | None = None,
+        wellbore_datum_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
         limit=DEFAULT_LIMIT_READ,
         space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
@@ -346,10 +397,15 @@ class WellboreDataFacilitySpecificationsAPI:
             )
         ]
         if wellbore_datum_id:
-            wellbore_datum_ids = [wellbore_datum_id] if isinstance(wellbore_datum_id, str) else wellbore_datum_id
+            wellbore_datum_ids = wellbore_datum_id if isinstance(wellbore_datum_id, list) else [wellbore_datum_id]
             is_wellbore_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in wellbore_datum_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in wellbore_datum_ids
+                ],
             )
             filters.append(is_wellbore_data)
 
@@ -360,7 +416,9 @@ class WellboreDataFacilityStatesAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(
+        self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str = "IntegrationTestsImmutable"
+    ) -> dm.EdgeList:
         """Retrieve one or more facility_states edges by id(s) of a wellbore datum.
 
         Args:
@@ -384,21 +442,28 @@ class WellboreDataFacilityStatesAPI:
             ["edge", "type"],
             {"space": "IntegrationTestsImmutable", "externalId": "WellboreData.FacilityStates"},
         )
-        if isinstance(external_id, str):
+        if isinstance(external_id, (str, dm.NodeId)):
             is_wellbore_data = f.Equals(
                 ["edge", "startNode"],
-                {"space": space, "externalId": external_id},
+                {"space": space, "externalId": external_id}
+                if isinstance(external_id, str)
+                else external_id.dump(camel_case=True, include_instance_type=False),
             )
         else:
             is_wellbore_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in external_id],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in external_id
+                ],
             )
         return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_data))
 
     def list(
         self,
-        wellbore_datum_id: str | list[str] | None = None,
+        wellbore_datum_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
         limit=DEFAULT_LIMIT_READ,
         space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
@@ -430,10 +495,15 @@ class WellboreDataFacilityStatesAPI:
             )
         ]
         if wellbore_datum_id:
-            wellbore_datum_ids = [wellbore_datum_id] if isinstance(wellbore_datum_id, str) else wellbore_datum_id
+            wellbore_datum_ids = wellbore_datum_id if isinstance(wellbore_datum_id, list) else [wellbore_datum_id]
             is_wellbore_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in wellbore_datum_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in wellbore_datum_ids
+                ],
             )
             filters.append(is_wellbore_data)
 
@@ -444,7 +514,9 @@ class WellboreDataGeoContextsAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(
+        self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str = "IntegrationTestsImmutable"
+    ) -> dm.EdgeList:
         """Retrieve one or more geo_contexts edges by id(s) of a wellbore datum.
 
         Args:
@@ -468,21 +540,28 @@ class WellboreDataGeoContextsAPI:
             ["edge", "type"],
             {"space": "IntegrationTestsImmutable", "externalId": "WellboreData.GeoContexts"},
         )
-        if isinstance(external_id, str):
+        if isinstance(external_id, (str, dm.NodeId)):
             is_wellbore_data = f.Equals(
                 ["edge", "startNode"],
-                {"space": space, "externalId": external_id},
+                {"space": space, "externalId": external_id}
+                if isinstance(external_id, str)
+                else external_id.dump(camel_case=True, include_instance_type=False),
             )
         else:
             is_wellbore_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in external_id],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in external_id
+                ],
             )
         return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_data))
 
     def list(
         self,
-        wellbore_datum_id: str | list[str] | None = None,
+        wellbore_datum_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
         limit=DEFAULT_LIMIT_READ,
         space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
@@ -514,10 +593,15 @@ class WellboreDataGeoContextsAPI:
             )
         ]
         if wellbore_datum_id:
-            wellbore_datum_ids = [wellbore_datum_id] if isinstance(wellbore_datum_id, str) else wellbore_datum_id
+            wellbore_datum_ids = wellbore_datum_id if isinstance(wellbore_datum_id, list) else [wellbore_datum_id]
             is_wellbore_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in wellbore_datum_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in wellbore_datum_ids
+                ],
             )
             filters.append(is_wellbore_data)
 
@@ -528,7 +612,9 @@ class WellboreDataHistoricalInterestsAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(
+        self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str = "IntegrationTestsImmutable"
+    ) -> dm.EdgeList:
         """Retrieve one or more historical_interests edges by id(s) of a wellbore datum.
 
         Args:
@@ -552,21 +638,28 @@ class WellboreDataHistoricalInterestsAPI:
             ["edge", "type"],
             {"space": "IntegrationTestsImmutable", "externalId": "WellboreData.HistoricalInterests"},
         )
-        if isinstance(external_id, str):
+        if isinstance(external_id, (str, dm.NodeId)):
             is_wellbore_data = f.Equals(
                 ["edge", "startNode"],
-                {"space": space, "externalId": external_id},
+                {"space": space, "externalId": external_id}
+                if isinstance(external_id, str)
+                else external_id.dump(camel_case=True, include_instance_type=False),
             )
         else:
             is_wellbore_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in external_id],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in external_id
+                ],
             )
         return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_data))
 
     def list(
         self,
-        wellbore_datum_id: str | list[str] | None = None,
+        wellbore_datum_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
         limit=DEFAULT_LIMIT_READ,
         space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
@@ -598,10 +691,15 @@ class WellboreDataHistoricalInterestsAPI:
             )
         ]
         if wellbore_datum_id:
-            wellbore_datum_ids = [wellbore_datum_id] if isinstance(wellbore_datum_id, str) else wellbore_datum_id
+            wellbore_datum_ids = wellbore_datum_id if isinstance(wellbore_datum_id, list) else [wellbore_datum_id]
             is_wellbore_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in wellbore_datum_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in wellbore_datum_ids
+                ],
             )
             filters.append(is_wellbore_data)
 
@@ -612,7 +710,9 @@ class WellboreDataNameAliasesAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(
+        self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str = "IntegrationTestsImmutable"
+    ) -> dm.EdgeList:
         """Retrieve one or more name_aliases edges by id(s) of a wellbore datum.
 
         Args:
@@ -636,21 +736,28 @@ class WellboreDataNameAliasesAPI:
             ["edge", "type"],
             {"space": "IntegrationTestsImmutable", "externalId": "WellboreData.NameAliases"},
         )
-        if isinstance(external_id, str):
+        if isinstance(external_id, (str, dm.NodeId)):
             is_wellbore_data = f.Equals(
                 ["edge", "startNode"],
-                {"space": space, "externalId": external_id},
+                {"space": space, "externalId": external_id}
+                if isinstance(external_id, str)
+                else external_id.dump(camel_case=True, include_instance_type=False),
             )
         else:
             is_wellbore_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in external_id],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in external_id
+                ],
             )
         return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_data))
 
     def list(
         self,
-        wellbore_datum_id: str | list[str] | None = None,
+        wellbore_datum_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
         limit=DEFAULT_LIMIT_READ,
         space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
@@ -682,10 +789,15 @@ class WellboreDataNameAliasesAPI:
             )
         ]
         if wellbore_datum_id:
-            wellbore_datum_ids = [wellbore_datum_id] if isinstance(wellbore_datum_id, str) else wellbore_datum_id
+            wellbore_datum_ids = wellbore_datum_id if isinstance(wellbore_datum_id, list) else [wellbore_datum_id]
             is_wellbore_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in wellbore_datum_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in wellbore_datum_ids
+                ],
             )
             filters.append(is_wellbore_data)
 
@@ -696,7 +808,9 @@ class WellboreDataTechnicalAssurancesAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(
+        self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str = "IntegrationTestsImmutable"
+    ) -> dm.EdgeList:
         """Retrieve one or more technical_assurances edges by id(s) of a wellbore datum.
 
         Args:
@@ -720,21 +834,28 @@ class WellboreDataTechnicalAssurancesAPI:
             ["edge", "type"],
             {"space": "IntegrationTestsImmutable", "externalId": "WellboreData.TechnicalAssurances"},
         )
-        if isinstance(external_id, str):
+        if isinstance(external_id, (str, dm.NodeId)):
             is_wellbore_data = f.Equals(
                 ["edge", "startNode"],
-                {"space": space, "externalId": external_id},
+                {"space": space, "externalId": external_id}
+                if isinstance(external_id, str)
+                else external_id.dump(camel_case=True, include_instance_type=False),
             )
         else:
             is_wellbore_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in external_id],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in external_id
+                ],
             )
         return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_data))
 
     def list(
         self,
-        wellbore_datum_id: str | list[str] | None = None,
+        wellbore_datum_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
         limit=DEFAULT_LIMIT_READ,
         space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
@@ -766,10 +887,15 @@ class WellboreDataTechnicalAssurancesAPI:
             )
         ]
         if wellbore_datum_id:
-            wellbore_datum_ids = [wellbore_datum_id] if isinstance(wellbore_datum_id, str) else wellbore_datum_id
+            wellbore_datum_ids = wellbore_datum_id if isinstance(wellbore_datum_id, list) else [wellbore_datum_id]
             is_wellbore_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in wellbore_datum_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in wellbore_datum_ids
+                ],
             )
             filters.append(is_wellbore_data)
 
@@ -780,7 +906,9 @@ class WellboreDataVerticalMeasurementsAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(
+        self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str = "IntegrationTestsImmutable"
+    ) -> dm.EdgeList:
         """Retrieve one or more vertical_measurements edges by id(s) of a wellbore datum.
 
         Args:
@@ -804,21 +932,28 @@ class WellboreDataVerticalMeasurementsAPI:
             ["edge", "type"],
             {"space": "IntegrationTestsImmutable", "externalId": "WellboreData.VerticalMeasurements"},
         )
-        if isinstance(external_id, str):
+        if isinstance(external_id, (str, dm.NodeId)):
             is_wellbore_data = f.Equals(
                 ["edge", "startNode"],
-                {"space": space, "externalId": external_id},
+                {"space": space, "externalId": external_id}
+                if isinstance(external_id, str)
+                else external_id.dump(camel_case=True, include_instance_type=False),
             )
         else:
             is_wellbore_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in external_id],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in external_id
+                ],
             )
         return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_data))
 
     def list(
         self,
-        wellbore_datum_id: str | list[str] | None = None,
+        wellbore_datum_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
         limit=DEFAULT_LIMIT_READ,
         space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
@@ -850,10 +985,15 @@ class WellboreDataVerticalMeasurementsAPI:
             )
         ]
         if wellbore_datum_id:
-            wellbore_datum_ids = [wellbore_datum_id] if isinstance(wellbore_datum_id, str) else wellbore_datum_id
+            wellbore_datum_ids = wellbore_datum_id if isinstance(wellbore_datum_id, list) else [wellbore_datum_id]
             is_wellbore_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in wellbore_datum_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in wellbore_datum_ids
+                ],
             )
             filters.append(is_wellbore_data)
 
@@ -864,7 +1004,9 @@ class WellboreDataWellboreCostsAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(
+        self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str = "IntegrationTestsImmutable"
+    ) -> dm.EdgeList:
         """Retrieve one or more wellbore_costs edges by id(s) of a wellbore datum.
 
         Args:
@@ -888,21 +1030,28 @@ class WellboreDataWellboreCostsAPI:
             ["edge", "type"],
             {"space": "IntegrationTestsImmutable", "externalId": "WellboreData.WellboreCosts"},
         )
-        if isinstance(external_id, str):
+        if isinstance(external_id, (str, dm.NodeId)):
             is_wellbore_data = f.Equals(
                 ["edge", "startNode"],
-                {"space": space, "externalId": external_id},
+                {"space": space, "externalId": external_id}
+                if isinstance(external_id, str)
+                else external_id.dump(camel_case=True, include_instance_type=False),
             )
         else:
             is_wellbore_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in external_id],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in external_id
+                ],
             )
         return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_wellbore_data))
 
     def list(
         self,
-        wellbore_datum_id: str | list[str] | None = None,
+        wellbore_datum_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
         limit=DEFAULT_LIMIT_READ,
         space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
@@ -934,10 +1083,15 @@ class WellboreDataWellboreCostsAPI:
             )
         ]
         if wellbore_datum_id:
-            wellbore_datum_ids = [wellbore_datum_id] if isinstance(wellbore_datum_id, str) else wellbore_datum_id
+            wellbore_datum_ids = wellbore_datum_id if isinstance(wellbore_datum_id, list) else [wellbore_datum_id]
             is_wellbore_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in wellbore_datum_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in wellbore_datum_ids
+                ],
             )
             filters.append(is_wellbore_data)
 
@@ -1095,27 +1249,27 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
         else:
             wellbore_data = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            drilling_reason_edges = self.drilling_reasons.retrieve(external_id, space=space)
+            drilling_reason_edges = self.drilling_reasons.retrieve(wellbore_data.as_node_ids())
             self._set_drilling_reasons(wellbore_data, drilling_reason_edges)
-            facility_event_edges = self.facility_events.retrieve(external_id, space=space)
+            facility_event_edges = self.facility_events.retrieve(wellbore_data.as_node_ids())
             self._set_facility_events(wellbore_data, facility_event_edges)
-            facility_operator_edges = self.facility_operators.retrieve(external_id, space=space)
+            facility_operator_edges = self.facility_operators.retrieve(wellbore_data.as_node_ids())
             self._set_facility_operators(wellbore_data, facility_operator_edges)
-            facility_specification_edges = self.facility_specifications.retrieve(external_id, space=space)
+            facility_specification_edges = self.facility_specifications.retrieve(wellbore_data.as_node_ids())
             self._set_facility_specifications(wellbore_data, facility_specification_edges)
-            facility_state_edges = self.facility_states.retrieve(external_id, space=space)
+            facility_state_edges = self.facility_states.retrieve(wellbore_data.as_node_ids())
             self._set_facility_states(wellbore_data, facility_state_edges)
-            geo_context_edges = self.geo_contexts.retrieve(external_id, space=space)
+            geo_context_edges = self.geo_contexts.retrieve(wellbore_data.as_node_ids())
             self._set_geo_contexts(wellbore_data, geo_context_edges)
-            historical_interest_edges = self.historical_interests.retrieve(external_id, space=space)
+            historical_interest_edges = self.historical_interests.retrieve(wellbore_data.as_node_ids())
             self._set_historical_interests(wellbore_data, historical_interest_edges)
-            name_alias_edges = self.name_aliases.retrieve(external_id, space=space)
+            name_alias_edges = self.name_aliases.retrieve(wellbore_data.as_node_ids())
             self._set_name_aliases(wellbore_data, name_alias_edges)
-            technical_assurance_edges = self.technical_assurances.retrieve(external_id, space=space)
+            technical_assurance_edges = self.technical_assurances.retrieve(wellbore_data.as_node_ids())
             self._set_technical_assurances(wellbore_data, technical_assurance_edges)
-            vertical_measurement_edges = self.vertical_measurements.retrieve(external_id, space=space)
+            vertical_measurement_edges = self.vertical_measurements.retrieve(wellbore_data.as_node_ids())
             self._set_vertical_measurements(wellbore_data, vertical_measurement_edges)
-            wellbore_cost_edges = self.wellbore_costs.retrieve(external_id, space=space)
+            wellbore_cost_edges = self.wellbore_costs.retrieve(wellbore_data.as_node_ids())
             self._set_wellbore_costs(wellbore_data, wellbore_cost_edges)
 
             return wellbore_data
@@ -2446,60 +2600,61 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
         wellbore_data = self._list(limit=limit, filter=filter_)
 
         if retrieve_edges:
-            if len(external_ids := wellbore_data.as_external_ids()) > IN_FILTER_LIMIT:
-                drilling_reason_edges = self.drilling_reasons.list(limit=-1, space=space)
+            space_arg = {"space": space} if space else {}
+            if len(ids := wellbore_data.as_node_ids()) > IN_FILTER_LIMIT:
+                drilling_reason_edges = self.drilling_reasons.list(limit=-1, **space_arg)
             else:
-                drilling_reason_edges = self.drilling_reasons.list(external_ids, limit=-1, space=space)
+                drilling_reason_edges = self.drilling_reasons.list(ids, limit=-1)
             self._set_drilling_reasons(wellbore_data, drilling_reason_edges)
-            if len(external_ids := wellbore_data.as_external_ids()) > IN_FILTER_LIMIT:
-                facility_event_edges = self.facility_events.list(limit=-1, space=space)
+            if len(ids := wellbore_data.as_node_ids()) > IN_FILTER_LIMIT:
+                facility_event_edges = self.facility_events.list(limit=-1, **space_arg)
             else:
-                facility_event_edges = self.facility_events.list(external_ids, limit=-1, space=space)
+                facility_event_edges = self.facility_events.list(ids, limit=-1)
             self._set_facility_events(wellbore_data, facility_event_edges)
-            if len(external_ids := wellbore_data.as_external_ids()) > IN_FILTER_LIMIT:
-                facility_operator_edges = self.facility_operators.list(limit=-1, space=space)
+            if len(ids := wellbore_data.as_node_ids()) > IN_FILTER_LIMIT:
+                facility_operator_edges = self.facility_operators.list(limit=-1, **space_arg)
             else:
-                facility_operator_edges = self.facility_operators.list(external_ids, limit=-1, space=space)
+                facility_operator_edges = self.facility_operators.list(ids, limit=-1)
             self._set_facility_operators(wellbore_data, facility_operator_edges)
-            if len(external_ids := wellbore_data.as_external_ids()) > IN_FILTER_LIMIT:
-                facility_specification_edges = self.facility_specifications.list(limit=-1, space=space)
+            if len(ids := wellbore_data.as_node_ids()) > IN_FILTER_LIMIT:
+                facility_specification_edges = self.facility_specifications.list(limit=-1, **space_arg)
             else:
-                facility_specification_edges = self.facility_specifications.list(external_ids, limit=-1, space=space)
+                facility_specification_edges = self.facility_specifications.list(ids, limit=-1)
             self._set_facility_specifications(wellbore_data, facility_specification_edges)
-            if len(external_ids := wellbore_data.as_external_ids()) > IN_FILTER_LIMIT:
-                facility_state_edges = self.facility_states.list(limit=-1, space=space)
+            if len(ids := wellbore_data.as_node_ids()) > IN_FILTER_LIMIT:
+                facility_state_edges = self.facility_states.list(limit=-1, **space_arg)
             else:
-                facility_state_edges = self.facility_states.list(external_ids, limit=-1, space=space)
+                facility_state_edges = self.facility_states.list(ids, limit=-1)
             self._set_facility_states(wellbore_data, facility_state_edges)
-            if len(external_ids := wellbore_data.as_external_ids()) > IN_FILTER_LIMIT:
-                geo_context_edges = self.geo_contexts.list(limit=-1, space=space)
+            if len(ids := wellbore_data.as_node_ids()) > IN_FILTER_LIMIT:
+                geo_context_edges = self.geo_contexts.list(limit=-1, **space_arg)
             else:
-                geo_context_edges = self.geo_contexts.list(external_ids, limit=-1, space=space)
+                geo_context_edges = self.geo_contexts.list(ids, limit=-1)
             self._set_geo_contexts(wellbore_data, geo_context_edges)
-            if len(external_ids := wellbore_data.as_external_ids()) > IN_FILTER_LIMIT:
-                historical_interest_edges = self.historical_interests.list(limit=-1, space=space)
+            if len(ids := wellbore_data.as_node_ids()) > IN_FILTER_LIMIT:
+                historical_interest_edges = self.historical_interests.list(limit=-1, **space_arg)
             else:
-                historical_interest_edges = self.historical_interests.list(external_ids, limit=-1, space=space)
+                historical_interest_edges = self.historical_interests.list(ids, limit=-1)
             self._set_historical_interests(wellbore_data, historical_interest_edges)
-            if len(external_ids := wellbore_data.as_external_ids()) > IN_FILTER_LIMIT:
-                name_alias_edges = self.name_aliases.list(limit=-1, space=space)
+            if len(ids := wellbore_data.as_node_ids()) > IN_FILTER_LIMIT:
+                name_alias_edges = self.name_aliases.list(limit=-1, **space_arg)
             else:
-                name_alias_edges = self.name_aliases.list(external_ids, limit=-1, space=space)
+                name_alias_edges = self.name_aliases.list(ids, limit=-1)
             self._set_name_aliases(wellbore_data, name_alias_edges)
-            if len(external_ids := wellbore_data.as_external_ids()) > IN_FILTER_LIMIT:
-                technical_assurance_edges = self.technical_assurances.list(limit=-1, space=space)
+            if len(ids := wellbore_data.as_node_ids()) > IN_FILTER_LIMIT:
+                technical_assurance_edges = self.technical_assurances.list(limit=-1, **space_arg)
             else:
-                technical_assurance_edges = self.technical_assurances.list(external_ids, limit=-1, space=space)
+                technical_assurance_edges = self.technical_assurances.list(ids, limit=-1)
             self._set_technical_assurances(wellbore_data, technical_assurance_edges)
-            if len(external_ids := wellbore_data.as_external_ids()) > IN_FILTER_LIMIT:
-                vertical_measurement_edges = self.vertical_measurements.list(limit=-1, space=space)
+            if len(ids := wellbore_data.as_node_ids()) > IN_FILTER_LIMIT:
+                vertical_measurement_edges = self.vertical_measurements.list(limit=-1, **space_arg)
             else:
-                vertical_measurement_edges = self.vertical_measurements.list(external_ids, limit=-1, space=space)
+                vertical_measurement_edges = self.vertical_measurements.list(ids, limit=-1)
             self._set_vertical_measurements(wellbore_data, vertical_measurement_edges)
-            if len(external_ids := wellbore_data.as_external_ids()) > IN_FILTER_LIMIT:
-                wellbore_cost_edges = self.wellbore_costs.list(limit=-1, space=space)
+            if len(ids := wellbore_data.as_node_ids()) > IN_FILTER_LIMIT:
+                wellbore_cost_edges = self.wellbore_costs.list(limit=-1, **space_arg)
             else:
-                wellbore_cost_edges = self.wellbore_costs.list(external_ids, limit=-1, space=space)
+                wellbore_cost_edges = self.wellbore_costs.list(ids, limit=-1)
             self._set_wellbore_costs(wellbore_data, wellbore_cost_edges)
 
         return wellbore_data

@@ -23,7 +23,7 @@ class {{ field.edge_api_class }}:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space: str ="{{ field.prop.type.space }}") -> dm.EdgeList:
+    def retrieve(self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str ="{{ field.prop.type.space }}") -> dm.EdgeList:
         """Retrieve one or more {{field.edge_api_attribute}} edges by id(s) of a {{ data_class.doc_name }}.
 
         Args:
@@ -47,19 +47,26 @@ class {{ field.edge_api_class }}:
             ["edge", "type"],
             {"space": "{{ data_class.view_id.space }}", "externalId": "{{ field.prop.type.external_id }}"},
         )
-        if isinstance(external_id, str):
+        if isinstance(external_id, (str, dm.NodeId)):
             is_{{ data_class.variable_list }} = f.Equals(
                 ["edge", "startNode"],
-                {"space": space, "externalId": external_id},
+                {"space": space, "externalId": external_id}
+                if isinstance(external_id, str)
+                else external_id.dump(camel_case=True, include_instance_type=False),
             )
         else:
             is_{{ data_class.variable_list }} = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in external_id],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in external_id
+                ],
             )
         return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_{{ data_class.variable_list }}))
 
-    def list(self, {{ data_class.variable }}_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space: str ="{{ field.prop.type.space }}") -> dm.EdgeList:
+    def list(self, {{ data_class.variable }}_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None, limit=DEFAULT_LIMIT_READ, space: str ="{{ field.prop.type.space }}") -> dm.EdgeList:
         """List {{field.edge_api_attribute}} edges of a {{ data_class.doc_name }}.
 
         Args:
@@ -88,10 +95,15 @@ class {{ field.edge_api_class }}:
             )
         ]
         if {{ data_class.variable }}_id:
-            {{ data_class.variable }}_ids = [{{ data_class.variable }}_id] if isinstance({{ data_class.variable }}_id, str) else {{ data_class.variable }}_id
+            {{ data_class.variable }}_ids = {{ data_class.variable }}_id if isinstance({{ data_class.variable }}_id, list) else [{{ data_class.variable }}_id]
             is_{{ data_class.variable_list }} = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in {{ data_class.variable }}_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in {{ data_class.variable }}_ids
+                ]
             )
             filters.append(is_{{ data_class.variable_list }})
 

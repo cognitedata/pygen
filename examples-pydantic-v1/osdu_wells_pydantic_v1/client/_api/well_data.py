@@ -24,7 +24,9 @@ class WellDataFacilityEventsAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(
+        self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str = "IntegrationTestsImmutable"
+    ) -> dm.EdgeList:
         """Retrieve one or more facility_events edges by id(s) of a well datum.
 
         Args:
@@ -48,21 +50,28 @@ class WellDataFacilityEventsAPI:
             ["edge", "type"],
             {"space": "IntegrationTestsImmutable", "externalId": "WellData.FacilityEvents"},
         )
-        if isinstance(external_id, str):
+        if isinstance(external_id, (str, dm.NodeId)):
             is_well_data = f.Equals(
                 ["edge", "startNode"],
-                {"space": space, "externalId": external_id},
+                {"space": space, "externalId": external_id}
+                if isinstance(external_id, str)
+                else external_id.dump(camel_case=True, include_instance_type=False),
             )
         else:
             is_well_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in external_id],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in external_id
+                ],
             )
         return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_well_data))
 
     def list(
         self,
-        well_datum_id: str | list[str] | None = None,
+        well_datum_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
         limit=DEFAULT_LIMIT_READ,
         space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
@@ -94,10 +103,15 @@ class WellDataFacilityEventsAPI:
             )
         ]
         if well_datum_id:
-            well_datum_ids = [well_datum_id] if isinstance(well_datum_id, str) else well_datum_id
+            well_datum_ids = well_datum_id if isinstance(well_datum_id, list) else [well_datum_id]
             is_well_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in well_datum_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in well_datum_ids
+                ],
             )
             filters.append(is_well_data)
 
@@ -108,7 +122,9 @@ class WellDataFacilityOperatorsAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(
+        self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str = "IntegrationTestsImmutable"
+    ) -> dm.EdgeList:
         """Retrieve one or more facility_operators edges by id(s) of a well datum.
 
         Args:
@@ -132,21 +148,28 @@ class WellDataFacilityOperatorsAPI:
             ["edge", "type"],
             {"space": "IntegrationTestsImmutable", "externalId": "WellData.FacilityOperators"},
         )
-        if isinstance(external_id, str):
+        if isinstance(external_id, (str, dm.NodeId)):
             is_well_data = f.Equals(
                 ["edge", "startNode"],
-                {"space": space, "externalId": external_id},
+                {"space": space, "externalId": external_id}
+                if isinstance(external_id, str)
+                else external_id.dump(camel_case=True, include_instance_type=False),
             )
         else:
             is_well_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in external_id],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in external_id
+                ],
             )
         return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_well_data))
 
     def list(
         self,
-        well_datum_id: str | list[str] | None = None,
+        well_datum_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
         limit=DEFAULT_LIMIT_READ,
         space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
@@ -178,10 +201,15 @@ class WellDataFacilityOperatorsAPI:
             )
         ]
         if well_datum_id:
-            well_datum_ids = [well_datum_id] if isinstance(well_datum_id, str) else well_datum_id
+            well_datum_ids = well_datum_id if isinstance(well_datum_id, list) else [well_datum_id]
             is_well_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in well_datum_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in well_datum_ids
+                ],
             )
             filters.append(is_well_data)
 
@@ -192,7 +220,9 @@ class WellDataFacilitySpecificationsAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(
+        self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str = "IntegrationTestsImmutable"
+    ) -> dm.EdgeList:
         """Retrieve one or more facility_specifications edges by id(s) of a well datum.
 
         Args:
@@ -216,21 +246,28 @@ class WellDataFacilitySpecificationsAPI:
             ["edge", "type"],
             {"space": "IntegrationTestsImmutable", "externalId": "WellData.FacilitySpecifications"},
         )
-        if isinstance(external_id, str):
+        if isinstance(external_id, (str, dm.NodeId)):
             is_well_data = f.Equals(
                 ["edge", "startNode"],
-                {"space": space, "externalId": external_id},
+                {"space": space, "externalId": external_id}
+                if isinstance(external_id, str)
+                else external_id.dump(camel_case=True, include_instance_type=False),
             )
         else:
             is_well_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in external_id],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in external_id
+                ],
             )
         return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_well_data))
 
     def list(
         self,
-        well_datum_id: str | list[str] | None = None,
+        well_datum_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
         limit=DEFAULT_LIMIT_READ,
         space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
@@ -262,10 +299,15 @@ class WellDataFacilitySpecificationsAPI:
             )
         ]
         if well_datum_id:
-            well_datum_ids = [well_datum_id] if isinstance(well_datum_id, str) else well_datum_id
+            well_datum_ids = well_datum_id if isinstance(well_datum_id, list) else [well_datum_id]
             is_well_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in well_datum_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in well_datum_ids
+                ],
             )
             filters.append(is_well_data)
 
@@ -276,7 +318,9 @@ class WellDataFacilityStatesAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(
+        self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str = "IntegrationTestsImmutable"
+    ) -> dm.EdgeList:
         """Retrieve one or more facility_states edges by id(s) of a well datum.
 
         Args:
@@ -300,21 +344,28 @@ class WellDataFacilityStatesAPI:
             ["edge", "type"],
             {"space": "IntegrationTestsImmutable", "externalId": "WellData.FacilityStates"},
         )
-        if isinstance(external_id, str):
+        if isinstance(external_id, (str, dm.NodeId)):
             is_well_data = f.Equals(
                 ["edge", "startNode"],
-                {"space": space, "externalId": external_id},
+                {"space": space, "externalId": external_id}
+                if isinstance(external_id, str)
+                else external_id.dump(camel_case=True, include_instance_type=False),
             )
         else:
             is_well_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in external_id],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in external_id
+                ],
             )
         return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_well_data))
 
     def list(
         self,
-        well_datum_id: str | list[str] | None = None,
+        well_datum_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
         limit=DEFAULT_LIMIT_READ,
         space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
@@ -346,10 +397,15 @@ class WellDataFacilityStatesAPI:
             )
         ]
         if well_datum_id:
-            well_datum_ids = [well_datum_id] if isinstance(well_datum_id, str) else well_datum_id
+            well_datum_ids = well_datum_id if isinstance(well_datum_id, list) else [well_datum_id]
             is_well_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in well_datum_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in well_datum_ids
+                ],
             )
             filters.append(is_well_data)
 
@@ -360,7 +416,9 @@ class WellDataGeoContextsAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(
+        self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str = "IntegrationTestsImmutable"
+    ) -> dm.EdgeList:
         """Retrieve one or more geo_contexts edges by id(s) of a well datum.
 
         Args:
@@ -384,21 +442,28 @@ class WellDataGeoContextsAPI:
             ["edge", "type"],
             {"space": "IntegrationTestsImmutable", "externalId": "WellData.GeoContexts"},
         )
-        if isinstance(external_id, str):
+        if isinstance(external_id, (str, dm.NodeId)):
             is_well_data = f.Equals(
                 ["edge", "startNode"],
-                {"space": space, "externalId": external_id},
+                {"space": space, "externalId": external_id}
+                if isinstance(external_id, str)
+                else external_id.dump(camel_case=True, include_instance_type=False),
             )
         else:
             is_well_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in external_id],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in external_id
+                ],
             )
         return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_well_data))
 
     def list(
         self,
-        well_datum_id: str | list[str] | None = None,
+        well_datum_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
         limit=DEFAULT_LIMIT_READ,
         space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
@@ -430,10 +495,15 @@ class WellDataGeoContextsAPI:
             )
         ]
         if well_datum_id:
-            well_datum_ids = [well_datum_id] if isinstance(well_datum_id, str) else well_datum_id
+            well_datum_ids = well_datum_id if isinstance(well_datum_id, list) else [well_datum_id]
             is_well_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in well_datum_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in well_datum_ids
+                ],
             )
             filters.append(is_well_data)
 
@@ -444,7 +514,9 @@ class WellDataHistoricalInterestsAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(
+        self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str = "IntegrationTestsImmutable"
+    ) -> dm.EdgeList:
         """Retrieve one or more historical_interests edges by id(s) of a well datum.
 
         Args:
@@ -468,21 +540,28 @@ class WellDataHistoricalInterestsAPI:
             ["edge", "type"],
             {"space": "IntegrationTestsImmutable", "externalId": "WellData.HistoricalInterests"},
         )
-        if isinstance(external_id, str):
+        if isinstance(external_id, (str, dm.NodeId)):
             is_well_data = f.Equals(
                 ["edge", "startNode"],
-                {"space": space, "externalId": external_id},
+                {"space": space, "externalId": external_id}
+                if isinstance(external_id, str)
+                else external_id.dump(camel_case=True, include_instance_type=False),
             )
         else:
             is_well_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in external_id],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in external_id
+                ],
             )
         return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_well_data))
 
     def list(
         self,
-        well_datum_id: str | list[str] | None = None,
+        well_datum_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
         limit=DEFAULT_LIMIT_READ,
         space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
@@ -514,10 +593,15 @@ class WellDataHistoricalInterestsAPI:
             )
         ]
         if well_datum_id:
-            well_datum_ids = [well_datum_id] if isinstance(well_datum_id, str) else well_datum_id
+            well_datum_ids = well_datum_id if isinstance(well_datum_id, list) else [well_datum_id]
             is_well_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in well_datum_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in well_datum_ids
+                ],
             )
             filters.append(is_well_data)
 
@@ -528,7 +612,9 @@ class WellDataNameAliasesAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(
+        self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str = "IntegrationTestsImmutable"
+    ) -> dm.EdgeList:
         """Retrieve one or more name_aliases edges by id(s) of a well datum.
 
         Args:
@@ -552,21 +638,28 @@ class WellDataNameAliasesAPI:
             ["edge", "type"],
             {"space": "IntegrationTestsImmutable", "externalId": "WellData.NameAliases"},
         )
-        if isinstance(external_id, str):
+        if isinstance(external_id, (str, dm.NodeId)):
             is_well_data = f.Equals(
                 ["edge", "startNode"],
-                {"space": space, "externalId": external_id},
+                {"space": space, "externalId": external_id}
+                if isinstance(external_id, str)
+                else external_id.dump(camel_case=True, include_instance_type=False),
             )
         else:
             is_well_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in external_id],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in external_id
+                ],
             )
         return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_well_data))
 
     def list(
         self,
-        well_datum_id: str | list[str] | None = None,
+        well_datum_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
         limit=DEFAULT_LIMIT_READ,
         space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
@@ -598,10 +691,15 @@ class WellDataNameAliasesAPI:
             )
         ]
         if well_datum_id:
-            well_datum_ids = [well_datum_id] if isinstance(well_datum_id, str) else well_datum_id
+            well_datum_ids = well_datum_id if isinstance(well_datum_id, list) else [well_datum_id]
             is_well_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in well_datum_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in well_datum_ids
+                ],
             )
             filters.append(is_well_data)
 
@@ -612,7 +710,9 @@ class WellDataTechnicalAssurancesAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(
+        self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str = "IntegrationTestsImmutable"
+    ) -> dm.EdgeList:
         """Retrieve one or more technical_assurances edges by id(s) of a well datum.
 
         Args:
@@ -636,21 +736,28 @@ class WellDataTechnicalAssurancesAPI:
             ["edge", "type"],
             {"space": "IntegrationTestsImmutable", "externalId": "WellData.TechnicalAssurances"},
         )
-        if isinstance(external_id, str):
+        if isinstance(external_id, (str, dm.NodeId)):
             is_well_data = f.Equals(
                 ["edge", "startNode"],
-                {"space": space, "externalId": external_id},
+                {"space": space, "externalId": external_id}
+                if isinstance(external_id, str)
+                else external_id.dump(camel_case=True, include_instance_type=False),
             )
         else:
             is_well_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in external_id],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in external_id
+                ],
             )
         return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_well_data))
 
     def list(
         self,
-        well_datum_id: str | list[str] | None = None,
+        well_datum_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
         limit=DEFAULT_LIMIT_READ,
         space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
@@ -682,10 +789,15 @@ class WellDataTechnicalAssurancesAPI:
             )
         ]
         if well_datum_id:
-            well_datum_ids = [well_datum_id] if isinstance(well_datum_id, str) else well_datum_id
+            well_datum_ids = well_datum_id if isinstance(well_datum_id, list) else [well_datum_id]
             is_well_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in well_datum_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in well_datum_ids
+                ],
             )
             filters.append(is_well_data)
 
@@ -696,7 +808,9 @@ class WellDataVerticalMeasurementsAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> dm.EdgeList:
+    def retrieve(
+        self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str = "IntegrationTestsImmutable"
+    ) -> dm.EdgeList:
         """Retrieve one or more vertical_measurements edges by id(s) of a well datum.
 
         Args:
@@ -720,21 +834,28 @@ class WellDataVerticalMeasurementsAPI:
             ["edge", "type"],
             {"space": "IntegrationTestsImmutable", "externalId": "WellData.VerticalMeasurements"},
         )
-        if isinstance(external_id, str):
+        if isinstance(external_id, (str, dm.NodeId)):
             is_well_data = f.Equals(
                 ["edge", "startNode"],
-                {"space": space, "externalId": external_id},
+                {"space": space, "externalId": external_id}
+                if isinstance(external_id, str)
+                else external_id.dump(camel_case=True, include_instance_type=False),
             )
         else:
             is_well_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in external_id],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in external_id
+                ],
             )
         return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_well_data))
 
     def list(
         self,
-        well_datum_id: str | list[str] | None = None,
+        well_datum_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
         limit=DEFAULT_LIMIT_READ,
         space: str = "IntegrationTestsImmutable",
     ) -> dm.EdgeList:
@@ -766,10 +887,15 @@ class WellDataVerticalMeasurementsAPI:
             )
         ]
         if well_datum_id:
-            well_datum_ids = [well_datum_id] if isinstance(well_datum_id, str) else well_datum_id
+            well_datum_ids = well_datum_id if isinstance(well_datum_id, list) else [well_datum_id]
             is_well_data = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in well_datum_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in well_datum_ids
+                ],
             )
             filters.append(is_well_data)
 
@@ -919,23 +1045,23 @@ class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
         else:
             well_data = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            facility_event_edges = self.facility_events.retrieve(external_id, space=space)
+            facility_event_edges = self.facility_events.retrieve(well_data.as_node_ids())
             self._set_facility_events(well_data, facility_event_edges)
-            facility_operator_edges = self.facility_operators.retrieve(external_id, space=space)
+            facility_operator_edges = self.facility_operators.retrieve(well_data.as_node_ids())
             self._set_facility_operators(well_data, facility_operator_edges)
-            facility_specification_edges = self.facility_specifications.retrieve(external_id, space=space)
+            facility_specification_edges = self.facility_specifications.retrieve(well_data.as_node_ids())
             self._set_facility_specifications(well_data, facility_specification_edges)
-            facility_state_edges = self.facility_states.retrieve(external_id, space=space)
+            facility_state_edges = self.facility_states.retrieve(well_data.as_node_ids())
             self._set_facility_states(well_data, facility_state_edges)
-            geo_context_edges = self.geo_contexts.retrieve(external_id, space=space)
+            geo_context_edges = self.geo_contexts.retrieve(well_data.as_node_ids())
             self._set_geo_contexts(well_data, geo_context_edges)
-            historical_interest_edges = self.historical_interests.retrieve(external_id, space=space)
+            historical_interest_edges = self.historical_interests.retrieve(well_data.as_node_ids())
             self._set_historical_interests(well_data, historical_interest_edges)
-            name_alias_edges = self.name_aliases.retrieve(external_id, space=space)
+            name_alias_edges = self.name_aliases.retrieve(well_data.as_node_ids())
             self._set_name_aliases(well_data, name_alias_edges)
-            technical_assurance_edges = self.technical_assurances.retrieve(external_id, space=space)
+            technical_assurance_edges = self.technical_assurances.retrieve(well_data.as_node_ids())
             self._set_technical_assurances(well_data, technical_assurance_edges)
-            vertical_measurement_edges = self.vertical_measurements.retrieve(external_id, space=space)
+            vertical_measurement_edges = self.vertical_measurements.retrieve(well_data.as_node_ids())
             self._set_vertical_measurements(well_data, vertical_measurement_edges)
 
             return well_data
@@ -1902,50 +2028,51 @@ class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
         well_data = self._list(limit=limit, filter=filter_)
 
         if retrieve_edges:
-            if len(external_ids := well_data.as_external_ids()) > IN_FILTER_LIMIT:
-                facility_event_edges = self.facility_events.list(limit=-1, space=space)
+            space_arg = {"space": space} if space else {}
+            if len(ids := well_data.as_node_ids()) > IN_FILTER_LIMIT:
+                facility_event_edges = self.facility_events.list(limit=-1, **space_arg)
             else:
-                facility_event_edges = self.facility_events.list(external_ids, limit=-1, space=space)
+                facility_event_edges = self.facility_events.list(ids, limit=-1)
             self._set_facility_events(well_data, facility_event_edges)
-            if len(external_ids := well_data.as_external_ids()) > IN_FILTER_LIMIT:
-                facility_operator_edges = self.facility_operators.list(limit=-1, space=space)
+            if len(ids := well_data.as_node_ids()) > IN_FILTER_LIMIT:
+                facility_operator_edges = self.facility_operators.list(limit=-1, **space_arg)
             else:
-                facility_operator_edges = self.facility_operators.list(external_ids, limit=-1, space=space)
+                facility_operator_edges = self.facility_operators.list(ids, limit=-1)
             self._set_facility_operators(well_data, facility_operator_edges)
-            if len(external_ids := well_data.as_external_ids()) > IN_FILTER_LIMIT:
-                facility_specification_edges = self.facility_specifications.list(limit=-1, space=space)
+            if len(ids := well_data.as_node_ids()) > IN_FILTER_LIMIT:
+                facility_specification_edges = self.facility_specifications.list(limit=-1, **space_arg)
             else:
-                facility_specification_edges = self.facility_specifications.list(external_ids, limit=-1, space=space)
+                facility_specification_edges = self.facility_specifications.list(ids, limit=-1)
             self._set_facility_specifications(well_data, facility_specification_edges)
-            if len(external_ids := well_data.as_external_ids()) > IN_FILTER_LIMIT:
-                facility_state_edges = self.facility_states.list(limit=-1, space=space)
+            if len(ids := well_data.as_node_ids()) > IN_FILTER_LIMIT:
+                facility_state_edges = self.facility_states.list(limit=-1, **space_arg)
             else:
-                facility_state_edges = self.facility_states.list(external_ids, limit=-1, space=space)
+                facility_state_edges = self.facility_states.list(ids, limit=-1)
             self._set_facility_states(well_data, facility_state_edges)
-            if len(external_ids := well_data.as_external_ids()) > IN_FILTER_LIMIT:
-                geo_context_edges = self.geo_contexts.list(limit=-1, space=space)
+            if len(ids := well_data.as_node_ids()) > IN_FILTER_LIMIT:
+                geo_context_edges = self.geo_contexts.list(limit=-1, **space_arg)
             else:
-                geo_context_edges = self.geo_contexts.list(external_ids, limit=-1, space=space)
+                geo_context_edges = self.geo_contexts.list(ids, limit=-1)
             self._set_geo_contexts(well_data, geo_context_edges)
-            if len(external_ids := well_data.as_external_ids()) > IN_FILTER_LIMIT:
-                historical_interest_edges = self.historical_interests.list(limit=-1, space=space)
+            if len(ids := well_data.as_node_ids()) > IN_FILTER_LIMIT:
+                historical_interest_edges = self.historical_interests.list(limit=-1, **space_arg)
             else:
-                historical_interest_edges = self.historical_interests.list(external_ids, limit=-1, space=space)
+                historical_interest_edges = self.historical_interests.list(ids, limit=-1)
             self._set_historical_interests(well_data, historical_interest_edges)
-            if len(external_ids := well_data.as_external_ids()) > IN_FILTER_LIMIT:
-                name_alias_edges = self.name_aliases.list(limit=-1, space=space)
+            if len(ids := well_data.as_node_ids()) > IN_FILTER_LIMIT:
+                name_alias_edges = self.name_aliases.list(limit=-1, **space_arg)
             else:
-                name_alias_edges = self.name_aliases.list(external_ids, limit=-1, space=space)
+                name_alias_edges = self.name_aliases.list(ids, limit=-1)
             self._set_name_aliases(well_data, name_alias_edges)
-            if len(external_ids := well_data.as_external_ids()) > IN_FILTER_LIMIT:
-                technical_assurance_edges = self.technical_assurances.list(limit=-1, space=space)
+            if len(ids := well_data.as_node_ids()) > IN_FILTER_LIMIT:
+                technical_assurance_edges = self.technical_assurances.list(limit=-1, **space_arg)
             else:
-                technical_assurance_edges = self.technical_assurances.list(external_ids, limit=-1, space=space)
+                technical_assurance_edges = self.technical_assurances.list(ids, limit=-1)
             self._set_technical_assurances(well_data, technical_assurance_edges)
-            if len(external_ids := well_data.as_external_ids()) > IN_FILTER_LIMIT:
-                vertical_measurement_edges = self.vertical_measurements.list(limit=-1, space=space)
+            if len(ids := well_data.as_node_ids()) > IN_FILTER_LIMIT:
+                vertical_measurement_edges = self.vertical_measurements.list(limit=-1, **space_arg)
             else:
-                vertical_measurement_edges = self.vertical_measurements.list(external_ids, limit=-1, space=space)
+                vertical_measurement_edges = self.vertical_measurements.list(ids, limit=-1)
             self._set_vertical_measurements(well_data, vertical_measurement_edges)
 
         return well_data

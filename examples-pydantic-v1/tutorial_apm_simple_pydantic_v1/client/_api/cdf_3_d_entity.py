@@ -19,7 +19,9 @@ class CdfEntityInModelAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
 
-    def retrieve(self, external_id: str | Sequence[str], space: str = "cdf_3d_schema") -> dm.EdgeList:
+    def retrieve(
+        self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str = "cdf_3d_schema"
+    ) -> dm.EdgeList:
         """Retrieve one or more in_model_3_d edges by id(s) of a cdf 3 d entity.
 
         Args:
@@ -43,22 +45,32 @@ class CdfEntityInModelAPI:
             ["edge", "type"],
             {"space": "cdf_3d_schema", "externalId": "cdf3dEntityConnection"},
         )
-        if isinstance(external_id, str):
+        if isinstance(external_id, (str, dm.NodeId)):
             is_cdf_3_d_entities = f.Equals(
                 ["edge", "startNode"],
-                {"space": space, "externalId": external_id},
+                {"space": space, "externalId": external_id}
+                if isinstance(external_id, str)
+                else external_id.dump(camel_case=True, include_instance_type=False),
             )
         else:
             is_cdf_3_d_entities = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in external_id],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in external_id
+                ],
             )
         return self._client.data_modeling.instances.list(
             "edge", limit=-1, filter=f.And(is_edge_type, is_cdf_3_d_entities)
         )
 
     def list(
-        self, cdf_3_d_entity_id: str | list[str] | None = None, limit=DEFAULT_LIMIT_READ, space: str = "cdf_3d_schema"
+        self,
+        cdf_3_d_entity_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        limit=DEFAULT_LIMIT_READ,
+        space: str = "cdf_3d_schema",
     ) -> dm.EdgeList:
         """List in_model_3_d edges of a cdf 3 d entity.
 
@@ -88,10 +100,15 @@ class CdfEntityInModelAPI:
             )
         ]
         if cdf_3_d_entity_id:
-            cdf_3_d_entity_ids = [cdf_3_d_entity_id] if isinstance(cdf_3_d_entity_id, str) else cdf_3_d_entity_id
+            cdf_3_d_entity_ids = cdf_3_d_entity_id if isinstance(cdf_3_d_entity_id, list) else [cdf_3_d_entity_id]
             is_cdf_3_d_entities = f.In(
                 ["edge", "startNode"],
-                [{"space": space, "externalId": ext_id} for ext_id in cdf_3_d_entity_ids],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in cdf_3_d_entity_ids
+                ],
             )
             filters.append(is_cdf_3_d_entities)
 
@@ -213,7 +230,7 @@ class CdfEntityAPI(TypeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
         else:
             cdf_3_d_entities = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            in_model_3_d_edges = self.in_model_3_d.retrieve(external_id, space=space)
+            in_model_3_d_edges = self.in_model_3_d.retrieve(cdf_3_d_entities.as_node_ids())
             self._set_in_model_3_d(cdf_3_d_entities, in_model_3_d_edges)
 
             return cdf_3_d_entities
@@ -257,10 +274,11 @@ class CdfEntityAPI(TypeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
         cdf_3_d_entities = self._list(limit=limit, filter=filter_)
 
         if retrieve_edges:
-            if len(external_ids := cdf_3_d_entities.as_external_ids()) > IN_FILTER_LIMIT:
-                in_model_3_d_edges = self.in_model_3_d.list(limit=-1, space=space)
+            space_arg = {"space": space} if space else {}
+            if len(ids := cdf_3_d_entities.as_node_ids()) > IN_FILTER_LIMIT:
+                in_model_3_d_edges = self.in_model_3_d.list(limit=-1, **space_arg)
             else:
-                in_model_3_d_edges = self.in_model_3_d.list(external_ids, limit=-1, space=space)
+                in_model_3_d_edges = self.in_model_3_d.list(ids, limit=-1)
             self._set_in_model_3_d(cdf_3_d_entities, in_model_3_d_edges)
 
         return cdf_3_d_entities
