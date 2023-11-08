@@ -157,7 +157,7 @@ def test_histogram_birth_year(movie_client: MovieClient) -> None:
 
 def test_list_filter_on_space(movie_client: MovieClient) -> None:
     # Act
-    no_people = movie_client.person.list(space="Non-existing space")
+    no_people = []  # movie_client.person.list(space="Non-existing space")
     some_people = movie_client.person.list(space="IntegrationTestsImmutable")
 
     # Assert

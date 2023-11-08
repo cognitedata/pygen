@@ -15,8 +15,8 @@ Changes are grouped as follows
 
 ## [0.30.5] - 06-11-23
 ### Fixed
-* Bug when calling `.list()` in generated NodeAPI classes, caused a `CogniteAPIError` with `400` status code. This is
-  now fixed.
+* Bug when calling `.list()` and `.retrieve` in generated NodeAPI classes, caused a `CogniteAPIError` with `400` status code due
+  to invalid filter. This is now fixed.
 * Bug when generating from views with timeseries, the method `.retrieve_dataframe_in_tz` was missing arguments
   `target_unit` and `target_unit_system`. This is now fixed.
 * Lowered required version of `typing_extensions` to `>=4.4`.
