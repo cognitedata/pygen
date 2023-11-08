@@ -505,14 +505,13 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
         actors = self._list(limit=limit, filter=filter_)
 
         if retrieve_edges:
+            space_arg = {"space": space} if space else {}
             if len(ids := actors.as_node_ids()) > IN_FILTER_LIMIT:
-                space_arg = {"space": space} if space else {}
                 movie_edges = self.movies.list(limit=-1, **space_arg)
             else:
                 movie_edges = self.movies.list(ids, limit=-1)
             self._set_movies(actors, movie_edges)
-            if len(ids := actors.as_external_ids()) > IN_FILTER_LIMIT:
-                space_arg = {"space": space} if space else {}
+            if len(ids := actors.as_node_ids()) > IN_FILTER_LIMIT:
                 nomination_edges = self.nomination.list(limit=-1, **space_arg)
             else:
                 nomination_edges = self.nomination.list(ids, limit=-1)
