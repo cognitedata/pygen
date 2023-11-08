@@ -258,6 +258,8 @@ class AssetPressureQuery:
         *,
         aggregates: Aggregate | Sequence[Aggregate] | None = None,
         granularity: str | None = None,
+        target_unit: str | None = None,
+        target_unit_system: str | None = None,
         uniform_index: bool = False,
         include_aggregate_name: bool = True,
         include_granularity_name: bool = False,
