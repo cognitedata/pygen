@@ -13,6 +13,14 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.30.5] - 06-11-23
+### Fixed
+* Bug when calling `.list()` in generated NodeAPI classes, caused a `CogniteAPIError` with `400` status code. This is
+  now fixed.
+* Bug when generating from views with timeseries, the method `.retrieve_dataframe_in_tz` was missing arguments
+  `target_unit` and `target_unit_system`. This is now fixed.
+* Lowered required version of `typing_extensions` to `>=4.4`.
+
 ## [0.30.4] - 06-11-23
 ### Fixed
 * `pygen` now handles name collisions `pydantic` methods and the `DomainModel` and `DomainModelApply` classes.
