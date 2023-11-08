@@ -3688,4 +3688,4 @@ format = ["black"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "6d45e109f8284e4603754b04a92301bd1ff31719768f8de76b256f2e901eff19"
+content-hash = "ca6e93d51fc4dad127d313f11fa576e89fdc38efcc3923a9d8bc27ace2216238"
