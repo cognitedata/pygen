@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from collections import defaultdict
 from typing import Dict, List, Sequence, Tuple, overload
 
@@ -16,6 +17,7 @@ from equipment_unit.client.data_classes import (
     UnitProcedureFields,
     UnitProcedureTextFields,
     DomainModelApply,
+    StartEndTimeList,
 )
 from equipment_unit.client.data_classes._unit_procedure import _UNITPROCEDURE_PROPERTIES_BY_FIELD
 
@@ -26,7 +28,7 @@ class UnitProcedureWorkUnitsAPI:
 
     def retrieve(
         self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str = "IntegrationTestsImmutable"
-    ) -> dm.EdgeList:
+    ) -> StartEndTimeList:
         """Retrieve one or more work_units edges by id(s) of a unit procedure.
 
         Args:
@@ -73,14 +75,19 @@ class UnitProcedureWorkUnitsAPI:
 
     def list(
         self,
-        unit_procedure_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        unit_procedure: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        equipment_module: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        min_start_time: datetime.datetime | None = None,
+        max_start_time: datetime.datetime | None = None,
+        min_end_time: datetime.datetime | None = None,
+        max_end_time: datetime.datetime | None = None,
         limit=DEFAULT_LIMIT_READ,
         space: str = "IntegrationTestsImmutable",
-    ) -> dm.EdgeList:
+    ) -> StartEndTimeList:
         """List work_units edges of a unit procedure.
 
         Args:
-            unit_procedure_id: ID of the source unit procedure.
+            unit_procedure: ID of the source unit procedure.
             limit: Maximum number of work unit edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
             space: The space where all the work unit edges are located.
@@ -104,8 +111,8 @@ class UnitProcedureWorkUnitsAPI:
                 {"space": "IntegrationTestsImmutable", "externalId": "UnitProcedure.equipment_module"},
             )
         ]
-        if unit_procedure_id:
-            unit_procedure_ids = unit_procedure_id if isinstance(unit_procedure_id, list) else [unit_procedure_id]
+        if unit_procedure:
+            unit_procedure_ids = unit_procedure if isinstance(unit_procedure, list) else [unit_procedure]
             is_unit_procedures = f.In(
                 ["edge", "startNode"],
                 [
