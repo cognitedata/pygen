@@ -5,7 +5,7 @@ from typing import Literal, TYPE_CHECKING, Optional, Union
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
+from ._core import DomainModel, DomainModelApply, NodeList, TypeApplyList
 
 if TYPE_CHECKING:
     from ._equipment_module import EquipmentModuleApply, EquipmentModuleWithStartEndTime
@@ -146,7 +146,7 @@ class UnitProcedureApply(DomainModelApply):
         )
 
 
-class UnitProcedureList(TypeList[UnitProcedure]):
+class UnitProcedureList(NodeList[UnitProcedure]):
     """List of unit procedures in read version."""
 
     _NODE = UnitProcedure

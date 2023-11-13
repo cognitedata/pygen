@@ -1,15 +1,15 @@
 from __future__ import annotations
 
 import datetime
-from typing import Literal, Optional, TYPE_CHECKING
+from typing import Literal, Optional
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
+from ._core import DomainModel, DomainModelApply, NodeList, TypeApplyList
 
-if TYPE_CHECKING:
-    from ._start_end_time import StartEndTimeApply
+from ._start_end_time import StartEndTimeApply
+
 
 __all__ = [
     "EquipmentModule",
@@ -133,7 +133,7 @@ class EquipmentModuleWithStartEndTime(EquipmentModuleApply, StartEndTimeApply):
     ...
 
 
-class EquipmentModuleList(TypeList[EquipmentModule]):
+class EquipmentModuleList(NodeList[EquipmentModule]):
     """List of equipment modules in read version."""
 
     _NODE = EquipmentModule
@@ -147,13 +147,3 @@ class EquipmentModuleApplyList(TypeApplyList[EquipmentModuleApply]):
     """List of equipment modules in write version."""
 
     _NODE = EquipmentModuleApply
-
-
-module = EquipmentModuleWithStartEndTime(
-    space="IntegrationTestsImmutable",
-    external_id="EquipmentModule",
-    name="EquipmentModule",
-    type_="EquipmentModule",
-    start_time=datetime.datetime(2021, 1, 1, 0, 0, tzinfo=datetime.timezone.utc),
-    end_time=datetime.datetime(2021, 1, 1, 0, 0, tzinfo=datetime.timezone.utc),
-)

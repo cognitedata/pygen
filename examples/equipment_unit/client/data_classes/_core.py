@@ -40,8 +40,8 @@ class DomainModel(DomainModelCore):
     def from_node(cls: type[T_TypeNode], node: dm.Node) -> T_TypeNode:
         data = node.dump(camel_case=False)
         # Extra unpacking to avoid crashing between core and property fields
-        # can happening in there is a field named 'version' in the DominModel.
-        return cls(**{**data, **unpack_properties(node.properties)})  # type: ignore[arg-type]
+        # can happen if there is a field named 'version' in the DomainModel.
+        return cls(**{**data, **unpack_properties(node.properties)})
 
 
 T_TypeNode = TypeVar("T_TypeNode", bound=DomainModel)
@@ -158,21 +158,6 @@ class TypeApplyList(NodeList[T_TypeApplyNode]):
         return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
 
 
-def unpack_properties(properties: Properties) -> Mapping[str, PropertyValue]:
-    unpacked: dict[str, PropertyValue] = {}
-    for view_properties in properties.values():
-        for prop_name, prop_value in view_properties.items():
-            if isinstance(prop_value, (str, int, float, bool, list)):
-                unpacked[prop_name] = prop_value
-            elif isinstance(prop_value, dict) and "externalId" in prop_value and "space" in prop_value:
-                # Assumed to be reference properties
-                unpacked[prop_name] = prop_value["externalId"]
-            else:
-                # JSON field
-                unpacked[prop_name] = prop_value
-    return unpacked
-
-
 class DomainRelationCore(DomainModelCore):
     type: dm.NodeId
     start_node: dm.NodeId
@@ -188,12 +173,17 @@ class DomainRelation(DomainRelationCore):
     created_time: datetime.datetime
     deleted_time: Optional[datetime.datetime] = None
 
+    @classmethod
+    def from_edge(cls: type[T_DomainRelation], edge: dm.Edge) -> T_DomainRelation:
+        data = edge.dump(camel_case=False)
+        return cls(**{**data, **unpack_properties(edge.properties)})
+
+
+T_DomainRelation = TypeVar("T_DomainRelation", bound=DomainRelation)
+
 
 class DomainRelationApply(DomainRelationCore):
     existing_version: Optional[int] = None
-
-
-T_DomainRelationApply = TypeVar("T_DomainRelationApply", bound=DomainRelationApply)
 
 
 class EdgeList(CoreList[T_DomainRelationCore]):
@@ -201,3 +191,18 @@ class EdgeList(CoreList[T_DomainRelationCore]):
 
     def as_edge_ids(self) -> list[dm.EdgeId]:
         return [dm.EdgeId(space=edge.space, external_id=edge.external_id) for edge in self.data]
+
+
+def unpack_properties(properties: Properties) -> Mapping[str, PropertyValue]:
+    unpacked: dict[str, PropertyValue] = {}
+    for view_properties in properties.values():
+        for prop_name, prop_value in view_properties.items():
+            if isinstance(prop_value, (str, int, float, bool, list)):
+                unpacked[prop_name] = prop_value
+            elif isinstance(prop_value, dict) and "externalId" in prop_value and "space" in prop_value:
+                # Assumed to be reference properties
+                unpacked[prop_name] = prop_value["externalId"]
+            else:
+                # JSON field
+                unpacked[prop_name] = prop_value
+    return unpacked
