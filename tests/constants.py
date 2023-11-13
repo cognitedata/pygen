@@ -146,6 +146,12 @@ APM_APP_DATA_SINK = ExampleSDK(
     has_container_file=True,
 )
 
+EquipmentUnit = ExampleSDK(
+    data_models=[DataModelId("IntegrationTestsImmutable", "EquipmentUnit", "1")],
+    _top_level_package="equipment_unit.client",
+    client_name="EquipmentUnitClient",
+)
+
 
 # The following files are manually controlled and should not be overwritten by the generator by default.
 
