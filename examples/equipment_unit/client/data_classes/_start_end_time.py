@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import datetime
-from typing import Literal, Optional
+from typing import Literal, Optional, Union
 
 from ._core import DomainRelation, EdgeList, DomainRelationApply
+
+from ._equipment_module import EquipmentModuleApply
 
 __all__ = ["StartEndTime", "StartEndTimeList", "StartEndTimeFields"]
 StartEndTimeFields = Literal["end_time", "start_time"]
@@ -47,14 +49,11 @@ class StartEndTimeApply(DomainRelationApply):
     space: str = "IntegrationTestsImmutable"
     end_time: Optional[datetime.datetime] = None
     start_time: Optional[datetime.datetime] = None
+    equipment_module: Optional[Union[EquipmentModuleApply, str]] = None
 
     @property
     def unit_procedure(self) -> str:
         return self.start_node.external_id
-
-    @property
-    def equipment_module(self) -> str:
-        return self.end_node.external_id
 
 
 class StartEndTimeList(EdgeList[StartEndTime]):

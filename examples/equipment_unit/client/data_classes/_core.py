@@ -182,7 +182,7 @@ class DomainRelation(DomainRelationCore):
 T_DomainRelation = TypeVar("T_DomainRelation", bound=DomainRelation)
 
 
-class DomainRelationApply(DomainRelationCore):
+class DomainRelationApply:
     existing_version: Optional[int] = None
 
 

@@ -1,14 +1,11 @@
 from __future__ import annotations
 
-import datetime
 from typing import Literal, Optional
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from ._core import DomainModel, DomainModelApply, NodeList, TypeApplyList
-
-from ._start_end_time import StartEndTimeApply
 
 
 __all__ = [
@@ -127,10 +124,6 @@ class EquipmentModuleApply(DomainModelApply):
         cache.add(self.external_id)
 
         return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
-
-
-class EquipmentModuleWithStartEndTime(EquipmentModuleApply, StartEndTimeApply):
-    ...
 
 
 class EquipmentModuleList(NodeList[EquipmentModule]):

@@ -8,7 +8,8 @@ from pydantic import Field
 from ._core import DomainModel, DomainModelApply, NodeList, TypeApplyList
 
 if TYPE_CHECKING:
-    from ._equipment_module import EquipmentModuleApply, EquipmentModuleWithStartEndTime
+    from ._equipment_module import EquipmentModuleApply
+    from ._start_end_time import StartEndTimeApply
 
 __all__ = [
     "UnitProcedure",
@@ -82,7 +83,7 @@ class UnitProcedureApply(DomainModelApply):
     space: str = "IntegrationTestsImmutable"
     name: Optional[str] = None
     type_: Optional[str] = Field(None, alias="type")
-    work_units: Union[list[EquipmentModuleApply], list[EquipmentModuleWithStartEndTime], list[str], None] = Field(
+    work_units: Union[list[EquipmentModuleApply], list[StartEndTimeApply], list[str], None] = Field(
         default=None, repr=False
     )
 
