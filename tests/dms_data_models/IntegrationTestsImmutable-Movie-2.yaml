@@ -1,597 +1,597 @@
-- space: IntegrationTestsImmutable
-  externalId: Movie
+- createdTime: 1684079344620
   description: 'The movie domain data model used in integration testing. This model
     should only be populated through transformations. '
+  externalId: Movie
+  isGlobal: false
+  lastUpdatedTime: 1689262760507
   name: Movie
+  space: IntegrationTestsImmutable
   version: '2'
   views:
-  - space: IntegrationTestsImmutable
+  - createdTime: 1684079343668
     externalId: Person
+    isGlobal: false
+    lastUpdatedTime: 1684079343668
     name: Person
-    version: '2'
-    writable: true
-    usedFor: node
-    isGlobal: false
     properties:
-      name:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Person
-        containerPropertyIdentifier: name
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: false
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: name
-        description: null
       birthYear:
+        autoIncrement: false
         container:
-          space: IntegrationTestsImmutable
           externalId: Person
+          space: IntegrationTestsImmutable
         containerPropertyIdentifier: birthYear
-        type:
-          list: false
-          type: int32
-        nullable: true
-        autoIncrement: false
-        source: null
         defaultValue: null
+        description: null
         name: birthYear
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: int32
+      name:
+        autoIncrement: false
+        container:
+          externalId: Person
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: name
+        defaultValue: null
         description: null
+        name: name
+        nullable: false
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
       roles:
-        type:
-          space: IntegrationTestsImmutable
-          externalId: Person.roles
-        source:
-          space: IntegrationTestsImmutable
-          externalId: Role
-          version: '2'
-          type: view
+        connectionType: multi_edge_connection
+        description: null
+        direction: outwards
+        edgeSource: null
         name: roles
-        description: null
-        edgeSource: null
-        direction: outwards
-        connectionType: multi_edge_connection
-    lastUpdatedTime: 1684079343668
-    createdTime: 1684079343668
-  - space: IntegrationTestsImmutable
+        source:
+          externalId: Role
+          space: IntegrationTestsImmutable
+          type: view
+          version: '2'
+        type:
+          externalId: Person.roles
+          space: IntegrationTestsImmutable
+    space: IntegrationTestsImmutable
+    usedFor: node
+    version: '2'
+    writable: true
+  - createdTime: 1684079343668
     externalId: Nomination
+    isGlobal: false
+    lastUpdatedTime: 1684079343668
     name: Nomination
-    version: '2'
-    writable: true
-    usedFor: node
-    isGlobal: false
     properties:
       name:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Nomination
-        containerPropertyIdentifier: name
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: false
         autoIncrement: false
-        source: null
-        defaultValue: null
-        name: name
-        description: null
-      year:
         container:
-          space: IntegrationTestsImmutable
           externalId: Nomination
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: name
+        defaultValue: null
+        description: null
+        name: name
+        nullable: false
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      year:
+        autoIncrement: false
+        container:
+          externalId: Nomination
+          space: IntegrationTestsImmutable
         containerPropertyIdentifier: year
+        defaultValue: null
+        description: null
+        name: year
+        nullable: false
+        source: null
         type:
           list: false
           type: int32
-        nullable: false
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: year
-        description: null
-    lastUpdatedTime: 1684079343668
-    createdTime: 1684079343668
-  - space: IntegrationTestsImmutable
+    space: IntegrationTestsImmutable
+    usedFor: node
+    version: '2'
+    writable: true
+  - createdTime: 1684079343668
     externalId: BestDirector
+    implements:
+    - externalId: Nomination
+      space: IntegrationTestsImmutable
+      type: view
+      version: '2'
+    isGlobal: false
+    lastUpdatedTime: 1684079343668
     name: BestDirector
-    implements:
-    - space: IntegrationTestsImmutable
-      externalId: Nomination
-      version: '2'
-      type: view
-    version: '2'
-    writable: true
-    usedFor: node
-    isGlobal: false
     properties:
       name:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Nomination
-        containerPropertyIdentifier: name
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: false
         autoIncrement: false
-        source: null
-        defaultValue: null
-        name: name
-        description: null
-      year:
         container:
-          space: IntegrationTestsImmutable
           externalId: Nomination
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: name
+        defaultValue: null
+        description: null
+        name: name
+        nullable: false
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      year:
+        autoIncrement: false
+        container:
+          externalId: Nomination
+          space: IntegrationTestsImmutable
         containerPropertyIdentifier: year
+        defaultValue: null
+        description: null
+        name: year
+        nullable: false
+        source: null
         type:
           list: false
           type: int32
-        nullable: false
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: year
-        description: null
-    lastUpdatedTime: 1684079343668
-    createdTime: 1684079343668
-  - space: IntegrationTestsImmutable
+    space: IntegrationTestsImmutable
+    usedFor: node
+    version: '2'
+    writable: true
+  - createdTime: 1684079343668
     externalId: BestLeadingActor
+    implements:
+    - externalId: Nomination
+      space: IntegrationTestsImmutable
+      type: view
+      version: '2'
+    isGlobal: false
+    lastUpdatedTime: 1684079343668
     name: BestLeadingActor
-    implements:
-    - space: IntegrationTestsImmutable
-      externalId: Nomination
-      version: '2'
-      type: view
-    version: '2'
-    writable: true
-    usedFor: node
-    isGlobal: false
     properties:
       name:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Nomination
-        containerPropertyIdentifier: name
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: false
         autoIncrement: false
-        source: null
-        defaultValue: null
-        name: name
-        description: null
-      year:
         container:
-          space: IntegrationTestsImmutable
           externalId: Nomination
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: name
+        defaultValue: null
+        description: null
+        name: name
+        nullable: false
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      year:
+        autoIncrement: false
+        container:
+          externalId: Nomination
+          space: IntegrationTestsImmutable
         containerPropertyIdentifier: year
+        defaultValue: null
+        description: null
+        name: year
+        nullable: false
+        source: null
         type:
           list: false
           type: int32
-        nullable: false
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: year
-        description: null
-    lastUpdatedTime: 1684079343668
-    createdTime: 1684079343668
-  - space: IntegrationTestsImmutable
+    space: IntegrationTestsImmutable
+    usedFor: node
+    version: '2'
+    writable: true
+  - createdTime: 1684079343668
     externalId: BestLeadingActress
-    name: BestLeadingActress
     implements:
-    - space: IntegrationTestsImmutable
-      externalId: Nomination
-      version: '2'
+    - externalId: Nomination
+      space: IntegrationTestsImmutable
       type: view
-    version: '2'
-    writable: true
-    usedFor: node
+      version: '2'
     isGlobal: false
+    lastUpdatedTime: 1684079343668
+    name: BestLeadingActress
     properties:
       name:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Nomination
-        containerPropertyIdentifier: name
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: false
         autoIncrement: false
-        source: null
-        defaultValue: null
-        name: name
-        description: null
-      year:
         container:
-          space: IntegrationTestsImmutable
           externalId: Nomination
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: name
+        defaultValue: null
+        description: null
+        name: name
+        nullable: false
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      year:
+        autoIncrement: false
+        container:
+          externalId: Nomination
+          space: IntegrationTestsImmutable
         containerPropertyIdentifier: year
+        defaultValue: null
+        description: null
+        name: year
+        nullable: false
+        source: null
         type:
           list: false
           type: int32
-        nullable: false
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: year
-        description: null
-    lastUpdatedTime: 1684079343668
-    createdTime: 1684079343668
-  - space: IntegrationTestsImmutable
+    space: IntegrationTestsImmutable
+    usedFor: node
+    version: '2'
+    writable: true
+  - createdTime: 1684079343668
     externalId: Role
+    isGlobal: false
+    lastUpdatedTime: 1684079343668
     name: Role
-    version: '2'
-    writable: true
-    usedFor: node
-    isGlobal: false
     properties:
-      wonOscar:
-        container:
+      movies:
+        connectionType: multi_edge_connection
+        description: null
+        direction: outwards
+        edgeSource: null
+        name: movies
+        source:
+          externalId: Movie
           space: IntegrationTestsImmutable
+          type: view
+          version: '2'
+        type:
+          externalId: Role.movies
+          space: IntegrationTestsImmutable
+      nomination:
+        connectionType: multi_edge_connection
+        description: null
+        direction: outwards
+        edgeSource: null
+        name: nomination
+        source:
+          externalId: Nomination
+          space: IntegrationTestsImmutable
+          type: view
+          version: '2'
+        type:
+          externalId: Role.nomination
+          space: IntegrationTestsImmutable
+      person:
+        autoIncrement: false
+        container:
           externalId: Role
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: person
+        defaultValue: null
+        description: null
+        name: person
+        nullable: true
+        type:
+          source:
+            externalId: Person
+            space: IntegrationTestsImmutable
+            version: '2'
+          type: direct
+      wonOscar:
+        autoIncrement: false
+        container:
+          externalId: Role
+          space: IntegrationTestsImmutable
         containerPropertyIdentifier: wonOscar
+        defaultValue: null
+        description: null
+        name: wonOscar
+        nullable: true
+        source: null
         type:
           list: false
           type: boolean
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: wonOscar
-        description: null
-      person:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Role
-        containerPropertyIdentifier: person
-        type:
-          type: direct
-          source:
-            space: IntegrationTestsImmutable
-            externalId: Person
-            version: '2'
-        nullable: true
-        autoIncrement: false
-        defaultValue: null
-        name: person
-        description: null
-      movies:
-        type:
-          space: IntegrationTestsImmutable
-          externalId: Role.movies
-        source:
-          space: IntegrationTestsImmutable
-          externalId: Movie
-          version: '2'
-          type: view
-        name: movies
-        description: null
-        edgeSource: null
-        direction: outwards
-        connectionType: multi_edge_connection
-      nomination:
-        type:
-          space: IntegrationTestsImmutable
-          externalId: Role.nomination
-        source:
-          space: IntegrationTestsImmutable
-          externalId: Nomination
-          version: '2'
-          type: view
-        name: nomination
-        description: null
-        edgeSource: null
-        direction: outwards
-        connectionType: multi_edge_connection
-    lastUpdatedTime: 1684079343668
-    createdTime: 1684079343668
-  - space: IntegrationTestsImmutable
+    space: IntegrationTestsImmutable
+    usedFor: node
+    version: '2'
+    writable: true
+  - createdTime: 1684079343668
     externalId: Actor
+    implements:
+    - externalId: Role
+      space: IntegrationTestsImmutable
+      type: view
+      version: '2'
+    isGlobal: false
+    lastUpdatedTime: 1684079343668
     name: Actor
-    implements:
-    - space: IntegrationTestsImmutable
-      externalId: Role
-      version: '2'
-      type: view
-    version: '2'
-    writable: true
-    usedFor: node
-    isGlobal: false
     properties:
-      wonOscar:
-        container:
+      movies:
+        connectionType: multi_edge_connection
+        description: null
+        direction: outwards
+        edgeSource: null
+        name: movies
+        source:
+          externalId: Movie
           space: IntegrationTestsImmutable
+          type: view
+          version: '2'
+        type:
+          externalId: Role.movies
+          space: IntegrationTestsImmutable
+      nomination:
+        connectionType: multi_edge_connection
+        description: null
+        direction: outwards
+        edgeSource: null
+        name: nomination
+        source:
+          externalId: Nomination
+          space: IntegrationTestsImmutable
+          type: view
+          version: '2'
+        type:
+          externalId: Role.nomination
+          space: IntegrationTestsImmutable
+      person:
+        autoIncrement: false
+        container:
           externalId: Role
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: person
+        defaultValue: null
+        description: null
+        name: person
+        nullable: true
+        type:
+          source:
+            externalId: Person
+            space: IntegrationTestsImmutable
+            version: '2'
+          type: direct
+      wonOscar:
+        autoIncrement: false
+        container:
+          externalId: Role
+          space: IntegrationTestsImmutable
         containerPropertyIdentifier: wonOscar
+        defaultValue: null
+        description: null
+        name: wonOscar
+        nullable: true
+        source: null
         type:
           list: false
           type: boolean
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: wonOscar
-        description: null
-      person:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Role
-        containerPropertyIdentifier: person
-        type:
-          type: direct
-          source:
-            space: IntegrationTestsImmutable
-            externalId: Person
-            version: '2'
-        nullable: true
-        autoIncrement: false
-        defaultValue: null
-        name: person
-        description: null
-      movies:
-        type:
-          space: IntegrationTestsImmutable
-          externalId: Role.movies
-        source:
-          space: IntegrationTestsImmutable
-          externalId: Movie
-          version: '2'
-          type: view
-        name: movies
-        description: null
-        edgeSource: null
-        direction: outwards
-        connectionType: multi_edge_connection
-      nomination:
-        type:
-          space: IntegrationTestsImmutable
-          externalId: Role.nomination
-        source:
-          space: IntegrationTestsImmutable
-          externalId: Nomination
-          version: '2'
-          type: view
-        name: nomination
-        description: null
-        edgeSource: null
-        direction: outwards
-        connectionType: multi_edge_connection
-    lastUpdatedTime: 1684079343668
-    createdTime: 1684079343668
-  - space: IntegrationTestsImmutable
+    space: IntegrationTestsImmutable
+    usedFor: node
+    version: '2'
+    writable: true
+  - createdTime: 1684079343668
     externalId: Director
-    name: Director
     implements:
-    - space: IntegrationTestsImmutable
-      externalId: Role
-      version: '2'
+    - externalId: Role
+      space: IntegrationTestsImmutable
       type: view
-    version: '2'
-    writable: true
-    usedFor: node
+      version: '2'
     isGlobal: false
+    lastUpdatedTime: 1684079343668
+    name: Director
     properties:
-      wonOscar:
-        container:
+      movies:
+        connectionType: multi_edge_connection
+        description: null
+        direction: outwards
+        edgeSource: null
+        name: movies
+        source:
+          externalId: Movie
           space: IntegrationTestsImmutable
+          type: view
+          version: '2'
+        type:
+          externalId: Role.movies
+          space: IntegrationTestsImmutable
+      nomination:
+        connectionType: multi_edge_connection
+        description: null
+        direction: outwards
+        edgeSource: null
+        name: nomination
+        source:
+          externalId: Nomination
+          space: IntegrationTestsImmutable
+          type: view
+          version: '2'
+        type:
+          externalId: Role.nomination
+          space: IntegrationTestsImmutable
+      person:
+        autoIncrement: false
+        container:
           externalId: Role
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: person
+        defaultValue: null
+        description: null
+        name: person
+        nullable: true
+        type:
+          source:
+            externalId: Person
+            space: IntegrationTestsImmutable
+            version: '2'
+          type: direct
+      wonOscar:
+        autoIncrement: false
+        container:
+          externalId: Role
+          space: IntegrationTestsImmutable
         containerPropertyIdentifier: wonOscar
+        defaultValue: null
+        description: null
+        name: wonOscar
+        nullable: true
+        source: null
         type:
           list: false
           type: boolean
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: wonOscar
-        description: null
-      person:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Role
-        containerPropertyIdentifier: person
-        type:
-          type: direct
-          source:
-            space: IntegrationTestsImmutable
-            externalId: Person
-            version: '2'
-        nullable: true
-        autoIncrement: false
-        defaultValue: null
-        name: person
-        description: null
-      movies:
-        type:
-          space: IntegrationTestsImmutable
-          externalId: Role.movies
-        source:
-          space: IntegrationTestsImmutable
-          externalId: Movie
-          version: '2'
-          type: view
-        name: movies
-        description: null
-        edgeSource: null
-        direction: outwards
-        connectionType: multi_edge_connection
-      nomination:
-        type:
-          space: IntegrationTestsImmutable
-          externalId: Role.nomination
-        source:
-          space: IntegrationTestsImmutable
-          externalId: Nomination
-          version: '2'
-          type: view
-        name: nomination
-        description: null
-        edgeSource: null
-        direction: outwards
-        connectionType: multi_edge_connection
-    lastUpdatedTime: 1684079343668
-    createdTime: 1684079343668
-  - space: IntegrationTestsImmutable
-    externalId: Rating
-    name: Rating
+    space: IntegrationTestsImmutable
+    usedFor: node
     version: '2'
     writable: true
-    usedFor: node
+  - createdTime: 1684079343668
+    externalId: Rating
     isGlobal: false
+    lastUpdatedTime: 1684079343668
+    name: Rating
     properties:
       score:
+        autoIncrement: false
         container:
-          space: IntegrationTestsImmutable
           externalId: Rating
+          space: IntegrationTestsImmutable
         containerPropertyIdentifier: score
-        type:
-          list: false
-          type: timeseries
-        nullable: true
-        autoIncrement: false
-        source: null
         defaultValue: null
+        description: null
         name: score
-        description: null
-      votes:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Rating
-        containerPropertyIdentifier: votes
+        nullable: true
+        source: null
         type:
           list: false
           type: timeseries
-        nullable: true
+      votes:
         autoIncrement: false
-        source: null
+        container:
+          externalId: Rating
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: votes
         defaultValue: null
-        name: votes
         description: null
-    lastUpdatedTime: 1684079343668
-    createdTime: 1684079343668
-  - space: IntegrationTestsImmutable
-    externalId: Movie
-    name: Movie
+        name: votes
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: timeseries
+    space: IntegrationTestsImmutable
+    usedFor: node
     version: '2'
     writable: true
-    usedFor: node
+  - createdTime: 1684079343668
+    externalId: Movie
     isGlobal: false
+    lastUpdatedTime: 1684079343668
+    name: Movie
     properties:
-      title:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Movie
-        containerPropertyIdentifier: title
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: false
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: title
+      actors:
+        connectionType: multi_edge_connection
         description: null
-      releaseYear:
-        container:
+        direction: outwards
+        edgeSource: null
+        name: actors
+        source:
+          externalId: Actor
           space: IntegrationTestsImmutable
-          externalId: Movie
-        containerPropertyIdentifier: releaseYear
+          type: view
+          version: '2'
         type:
-          list: false
-          type: int32
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: releaseYear
-        description: null
-      rating:
-        container:
+          externalId: Movie.actors
           space: IntegrationTestsImmutable
-          externalId: Movie
-        containerPropertyIdentifier: rating
-        type:
-          type: direct
-          source:
-            space: IntegrationTestsImmutable
-            externalId: Rating
-            version: '2'
-        nullable: true
-        autoIncrement: false
-        defaultValue: null
-        name: rating
+      directors:
+        connectionType: multi_edge_connection
         description: null
-      runTimeMinutes:
-        container:
+        direction: outwards
+        edgeSource: null
+        name: directors
+        source:
+          externalId: Director
           space: IntegrationTestsImmutable
-          externalId: Movie
-        containerPropertyIdentifier: runTimeMinutes
+          type: view
+          version: '2'
         type:
-          list: false
-          type: float64
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: runTimeMinutes
-        description: null
+          externalId: Movie.directors
+          space: IntegrationTestsImmutable
       meta:
+        autoIncrement: false
         container:
-          space: IntegrationTestsImmutable
           externalId: Movie
+          space: IntegrationTestsImmutable
         containerPropertyIdentifier: meta
+        defaultValue: null
+        description: null
+        name: meta
+        nullable: true
+        source: null
         type:
           list: false
           type: json
-        nullable: true
+      rating:
         autoIncrement: false
-        source: null
+        container:
+          externalId: Movie
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: rating
         defaultValue: null
-        name: meta
         description: null
-      actors:
+        name: rating
+        nullable: true
         type:
+          source:
+            externalId: Rating
+            space: IntegrationTestsImmutable
+            version: '2'
+          type: direct
+      releaseYear:
+        autoIncrement: false
+        container:
+          externalId: Movie
           space: IntegrationTestsImmutable
-          externalId: Movie.actors
-        source:
-          space: IntegrationTestsImmutable
-          externalId: Actor
-          version: '2'
-          type: view
-        name: actors
+        containerPropertyIdentifier: releaseYear
+        defaultValue: null
         description: null
-        edgeSource: null
-        direction: outwards
-        connectionType: multi_edge_connection
-      directors:
+        name: releaseYear
+        nullable: true
+        source: null
         type:
+          list: false
+          type: int32
+      runTimeMinutes:
+        autoIncrement: false
+        container:
+          externalId: Movie
           space: IntegrationTestsImmutable
-          externalId: Movie.directors
-        source:
-          space: IntegrationTestsImmutable
-          externalId: Director
-          version: '2'
-          type: view
-        name: directors
+        containerPropertyIdentifier: runTimeMinutes
+        defaultValue: null
         description: null
-        edgeSource: null
-        direction: outwards
-        connectionType: multi_edge_connection
-    lastUpdatedTime: 1684079343668
-    createdTime: 1684079343668
-  isGlobal: false
-  lastUpdatedTime: 1689262760507
-  createdTime: 1684079344620
+        name: runTimeMinutes
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: float64
+      title:
+        autoIncrement: false
+        container:
+          externalId: Movie
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: title
+        defaultValue: null
+        description: null
+        name: title
+        nullable: false
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+    space: IntegrationTestsImmutable
+    usedFor: node
+    version: '2'
+    writable: true

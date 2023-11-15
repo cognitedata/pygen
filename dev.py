@@ -9,7 +9,7 @@ import typer
 from cognite.client._version import __version__ as cognite_sdk_version
 from cognite.client.data_classes.data_modeling import DataModel, SpaceApply
 from pydantic.version import VERSION as PYDANTIC_VERSION
-from yaml import safe_load
+from yaml import safe_dump, safe_load
 
 from cognite.pygen._generator import SDKGenerator, write_sdk_to_disk
 from cognite.pygen.utils.cdf import _user_options, load_cognite_client_from_toml
@@ -71,7 +71,7 @@ def download():
             dms_model = client.data_modeling.data_models.retrieve(datamodel_id, inline_views=True)
             if not dms_model:
                 raise ValueError(f"Failed to retrieve {datamodel_id}")
-            dms_file.write_text(dms_model.dump_yaml())
+            dms_file.write_text(safe_dump(dms_model.dump(camel_case=True), sort_keys=True))
             typer.echo(f"Downloaded {dms_file.relative_to(REPO_ROOT)}")
 
 

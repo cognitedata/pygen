@@ -1,1713 +1,1713 @@
-- space: IntegrationTestsImmutable
-  externalId: ApmAppData
+- createdTime: 1699196213952
   description: APM data models within the cognite applications space
+  externalId: ApmAppData
+  isGlobal: false
+  lastUpdatedTime: 1699197495077
   name: ApmAppData
+  space: IntegrationTestsImmutable
   version: v3
   views:
-  - space: IntegrationTestsImmutable
-    externalId: Checklist
+  - createdTime: 1699196213142
     description: The Checklist view provides functionality for executing maintenance
       and inspection work. It maintains a list of checklist items (tasks) associated
       with specific maintenance and inspection activities.
-    name: Checklist
-    version: v3
-    writable: true
-    usedFor: node
+    externalId: Checklist
     isGlobal: false
+    lastUpdatedTime: 1699196213142
+    name: Checklist
     properties:
-      sourceId:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Checklist
-        containerPropertyIdentifier: sourceId
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
+      assignedTo:
         autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: ID as the node appears in the Source system
-      source:
         container:
-          space: IntegrationTestsImmutable
           externalId: Checklist
-        containerPropertyIdentifier: source
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: assignedTo
+        defaultValue: null
+        description: List of users or disciplines assigned to the checklist
+        name: null
         nullable: true
-        autoIncrement: false
         source: null
-        defaultValue: null
-        name: null
-        description: Name of the source system node comes from
-      title:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Checklist
-        containerPropertyIdentifier: title
         type:
-          list: false
           collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Title or name of the node
-      description:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Checklist
-        containerPropertyIdentifier: description
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Long description of the node
-      labels:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Checklist
-        containerPropertyIdentifier: labels
-        type:
           list: true
-          collation: ucs_basic
           type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
+      checklistItems:
+        connectionType: multi_edge_connection
+        description: List of checklist items / tasks within the checklist
+        direction: outwards
+        edgeSource: null
         name: null
-        description: Text based labels for generic use
-      startTime:
-        container:
+        source:
+          externalId: ChecklistItem
           space: IntegrationTestsImmutable
-          externalId: Checklist
-        containerPropertyIdentifier: startTime
+          type: view
+          version: v3
         type:
-          list: false
-          type: timestamp
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Start time of node
-      endTime:
-        container:
+          externalId: referenceChecklistItems
           space: IntegrationTestsImmutable
-          externalId: Checklist
-        containerPropertyIdentifier: endTime
-        type:
-          list: false
-          type: timestamp
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: End time of node
-      visibility:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Checklist
-        containerPropertyIdentifier: visibility
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Visibility of node (PUBLIC, PRIVATE, PROTECTED)
       createdBy:
+        autoIncrement: false
         container:
-          space: IntegrationTestsImmutable
           externalId: Checklist
+          space: IntegrationTestsImmutable
         containerPropertyIdentifier: createdBy
-        type:
-          type: direct
-        nullable: true
-        autoIncrement: false
-        source: null
         defaultValue: null
-        name: null
         description: Who created this node?
-      updatedBy:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Checklist
-        containerPropertyIdentifier: updatedBy
+        name: null
+        nullable: true
+        source: null
         type:
           type: direct
-        nullable: true
+      description:
         autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Who was the last person to update this node?
-      isArchived:
         container:
-          space: IntegrationTestsImmutable
           externalId: Checklist
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: description
+        defaultValue: null
+        description: Long description of the node
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      endTime:
+        autoIncrement: false
+        container:
+          externalId: Checklist
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: endTime
+        defaultValue: null
+        description: End time of node
+        name: null
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: timestamp
+      isArchived:
+        autoIncrement: false
+        container:
+          externalId: Checklist
+          space: IntegrationTestsImmutable
         containerPropertyIdentifier: isArchived
+        defaultValue: null
+        description: Is this item archived, and therefore hidden from most UIs?
+        name: null
+        nullable: true
+        source: null
         type:
           list: false
           type: boolean
-        nullable: true
+      labels:
         autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Is this item archived, and therefore hidden from most UIs?
-      type:
         container:
-          space: IntegrationTestsImmutable
           externalId: Checklist
-        containerPropertyIdentifier: type
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: The type of the checklist, eg Maintenance, Inspection, etc.
-      status:
-        container:
           space: IntegrationTestsImmutable
-          externalId: Checklist
-        containerPropertyIdentifier: status
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
+        containerPropertyIdentifier: labels
         defaultValue: null
+        description: Text based labels for generic use
         name: null
-        description: The status of the checklist
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: true
+          type: text
       rootLocation:
+        autoIncrement: false
         container:
-          space: IntegrationTestsImmutable
           externalId: Checklist
+          space: IntegrationTestsImmutable
         containerPropertyIdentifier: rootLocation
+        defaultValue: null
+        description: External ID of the root location associated with the checklist
+        name: null
+        nullable: true
+        source: null
         type:
           type: direct
-        nullable: true
+      source:
         autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: External ID of the root location associated with the checklist
-      assignedTo:
         container:
-          space: IntegrationTestsImmutable
           externalId: Checklist
-        containerPropertyIdentifier: assignedTo
-        type:
-          list: true
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: source
         defaultValue: null
+        description: Name of the source system node comes from
         name: null
-        description: List of users or disciplines assigned to the checklist
-      checklistItems:
+        nullable: true
+        source: null
         type:
+          collation: ucs_basic
+          list: false
+          type: text
+      sourceId:
+        autoIncrement: false
+        container:
+          externalId: Checklist
           space: IntegrationTestsImmutable
-          externalId: referenceChecklistItems
-        source:
-          space: IntegrationTestsImmutable
-          externalId: ChecklistItem
-          version: v3
-          type: view
+        containerPropertyIdentifier: sourceId
+        defaultValue: null
+        description: ID as the node appears in the Source system
         name: null
-        description: List of checklist items / tasks within the checklist
-        edgeSource: null
-        direction: outwards
-        connectionType: multi_edge_connection
-    lastUpdatedTime: 1699196213142
-    createdTime: 1699196213142
-  - space: IntegrationTestsImmutable
-    externalId: ChecklistItem
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      startTime:
+        autoIncrement: false
+        container:
+          externalId: Checklist
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: startTime
+        defaultValue: null
+        description: Start time of node
+        name: null
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: timestamp
+      status:
+        autoIncrement: false
+        container:
+          externalId: Checklist
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: status
+        defaultValue: null
+        description: The status of the checklist
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      title:
+        autoIncrement: false
+        container:
+          externalId: Checklist
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: title
+        defaultValue: null
+        description: Title or name of the node
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      type:
+        autoIncrement: false
+        container:
+          externalId: Checklist
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: type
+        defaultValue: null
+        description: The type of the checklist, eg Maintenance, Inspection, etc.
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      updatedBy:
+        autoIncrement: false
+        container:
+          externalId: Checklist
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: updatedBy
+        defaultValue: null
+        description: Who was the last person to update this node?
+        name: null
+        nullable: true
+        source: null
+        type:
+          type: direct
+      visibility:
+        autoIncrement: false
+        container:
+          externalId: Checklist
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: visibility
+        defaultValue: null
+        description: Visibility of node (PUBLIC, PRIVATE, PROTECTED)
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+    space: IntegrationTestsImmutable
+    usedFor: node
+    version: v3
+    writable: true
+  - createdTime: 1699196213142
     description: The checklist item view is used for managing individual maintenance
       and inspection tasks within a checklist. It allows users to track the execution
       order, status, notes, associated assets, and related observations for each task.
-    name: Checklist item
-    version: v3
-    writable: true
-    usedFor: node
+    externalId: ChecklistItem
     isGlobal: false
+    lastUpdatedTime: 1699196213142
+    name: Checklist item
     properties:
-      sourceId:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: ChecklistItem
-        containerPropertyIdentifier: sourceId
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: ID as the node appears in the Source system
-      source:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: ChecklistItem
-        containerPropertyIdentifier: source
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Name of the source system node comes from
-      title:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: ChecklistItem
-        containerPropertyIdentifier: title
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Title or name of the node
-      description:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: ChecklistItem
-        containerPropertyIdentifier: description
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Long description of the node
-      labels:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: ChecklistItem
-        containerPropertyIdentifier: labels
-        type:
-          list: true
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Text based labels for generic use
-      startTime:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: ChecklistItem
-        containerPropertyIdentifier: startTime
-        type:
-          list: false
-          type: timestamp
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Start time of node
-      endTime:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: ChecklistItem
-        containerPropertyIdentifier: endTime
-        type:
-          list: false
-          type: timestamp
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: End time of node
-      visibility:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: ChecklistItem
-        containerPropertyIdentifier: visibility
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Visibility of node (PUBLIC, PRIVATE, PROTECTED)
-      createdBy:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: ChecklistItem
-        containerPropertyIdentifier: createdBy
-        type:
-          type: direct
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Who created this node?
-      updatedBy:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: ChecklistItem
-        containerPropertyIdentifier: updatedBy
-        type:
-          type: direct
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Who was the last person to update this node?
-      isArchived:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: ChecklistItem
-        containerPropertyIdentifier: isArchived
-        type:
-          list: false
-          type: boolean
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Is this item archived, and therefore hidden from most UIs?
-      order:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: ChecklistItem
-        containerPropertyIdentifier: order
-        type:
-          list: false
-          type: int32
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: The execution order of the checklist item
-      status:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: ChecklistItem
-        containerPropertyIdentifier: status
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: The status of the checklist item
-      note:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: ChecklistItem
-        containerPropertyIdentifier: note
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Additional notes for the checklist item
       asset:
+        autoIncrement: false
         container:
-          space: IntegrationTestsImmutable
           externalId: ChecklistItem
+          space: IntegrationTestsImmutable
         containerPropertyIdentifier: asset
+        defaultValue: null
+        description: External ID of the associated CDF Asset
+        name: null
+        nullable: true
+        source: null
         type:
           type: direct
-        nullable: true
+      createdBy:
         autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: External ID of the associated CDF Asset
-      files:
         container:
-          space: IntegrationTestsImmutable
           externalId: ChecklistItem
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: createdBy
+        defaultValue: null
+        description: Who created this node?
+        name: null
+        nullable: true
+        source: null
+        type:
+          type: direct
+      description:
+        autoIncrement: false
+        container:
+          externalId: ChecklistItem
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: description
+        defaultValue: null
+        description: Long description of the node
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      endTime:
+        autoIncrement: false
+        container:
+          externalId: ChecklistItem
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: endTime
+        defaultValue: null
+        description: End time of node
+        name: null
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: timestamp
+      files:
+        autoIncrement: false
+        container:
+          externalId: ChecklistItem
+          space: IntegrationTestsImmutable
         containerPropertyIdentifier: files
+        defaultValue: null
+        description: List of associated files
+        name: null
+        nullable: true
+        source: null
         type:
           list: true
           type: file
-        nullable: true
+      isArchived:
         autoIncrement: false
-        source: null
+        container:
+          externalId: ChecklistItem
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: isArchived
         defaultValue: null
+        description: Is this item archived, and therefore hidden from most UIs?
         name: null
-        description: List of associated files
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: boolean
+      labels:
+        autoIncrement: false
+        container:
+          externalId: ChecklistItem
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: labels
+        defaultValue: null
+        description: Text based labels for generic use
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: true
+          type: text
       measurements:
-        type:
-          space: IntegrationTestsImmutable
-          externalId: referenceMeasurements
-        source:
-          space: IntegrationTestsImmutable
-          externalId: MeasurementReading
-          version: v3
-          type: view
-        name: null
+        connectionType: multi_edge_connection
         description: List of associated measurements
-        edgeSource: null
         direction: outwards
-        connectionType: multi_edge_connection
-      observations:
-        type:
-          space: IntegrationTestsImmutable
-          externalId: referenceObservations
-        source:
-          space: IntegrationTestsImmutable
-          externalId: Observation
-          version: v3
-          type: view
+        edgeSource: null
         name: null
-        description: List of observations associated with the checklist item
-        edgeSource: null
-        direction: outwards
+        source:
+          externalId: MeasurementReading
+          space: IntegrationTestsImmutable
+          type: view
+          version: v3
+        type:
+          externalId: referenceMeasurements
+          space: IntegrationTestsImmutable
+      note:
+        autoIncrement: false
+        container:
+          externalId: ChecklistItem
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: note
+        defaultValue: null
+        description: Additional notes for the checklist item
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      observations:
         connectionType: multi_edge_connection
-    lastUpdatedTime: 1699196213142
-    createdTime: 1699196213142
-  - space: IntegrationTestsImmutable
-    externalId: Observation
+        description: List of observations associated with the checklist item
+        direction: outwards
+        edgeSource: null
+        name: null
+        source:
+          externalId: Observation
+          space: IntegrationTestsImmutable
+          type: view
+          version: v3
+        type:
+          externalId: referenceObservations
+          space: IntegrationTestsImmutable
+      order:
+        autoIncrement: false
+        container:
+          externalId: ChecklistItem
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: order
+        defaultValue: null
+        description: The execution order of the checklist item
+        name: null
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: int32
+      source:
+        autoIncrement: false
+        container:
+          externalId: ChecklistItem
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: source
+        defaultValue: null
+        description: Name of the source system node comes from
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      sourceId:
+        autoIncrement: false
+        container:
+          externalId: ChecklistItem
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: sourceId
+        defaultValue: null
+        description: ID as the node appears in the Source system
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      startTime:
+        autoIncrement: false
+        container:
+          externalId: ChecklistItem
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: startTime
+        defaultValue: null
+        description: Start time of node
+        name: null
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: timestamp
+      status:
+        autoIncrement: false
+        container:
+          externalId: ChecklistItem
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: status
+        defaultValue: null
+        description: The status of the checklist item
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      title:
+        autoIncrement: false
+        container:
+          externalId: ChecklistItem
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: title
+        defaultValue: null
+        description: Title or name of the node
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      updatedBy:
+        autoIncrement: false
+        container:
+          externalId: ChecklistItem
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: updatedBy
+        defaultValue: null
+        description: Who was the last person to update this node?
+        name: null
+        nullable: true
+        source: null
+        type:
+          type: direct
+      visibility:
+        autoIncrement: false
+        container:
+          externalId: ChecklistItem
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: visibility
+        defaultValue: null
+        description: Visibility of node (PUBLIC, PRIVATE, PROTECTED)
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+    space: IntegrationTestsImmutable
+    usedFor: node
+    version: v3
+    writable: true
+  - createdTime: 1699196213142
     description: The Observation view captures anomaly reports created by field operators.
       It records information about the status, associated assets, related files, root
       locations, troubleshooting details, priority, and the type of observation (e.g.,
       Malfunction report, Maintenance request).
-    name: Observation
-    version: v3
-    writable: true
-    usedFor: node
+    externalId: Observation
     isGlobal: false
+    lastUpdatedTime: 1699196213142
+    name: Observation
     properties:
-      sourceId:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Observation
-        containerPropertyIdentifier: sourceId
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: ID as the node appears in the Source system
-      source:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Observation
-        containerPropertyIdentifier: source
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Name of the source system node comes from
-      title:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Observation
-        containerPropertyIdentifier: title
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Title or name of the node
-      description:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Observation
-        containerPropertyIdentifier: description
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Long description of the node
-      labels:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Observation
-        containerPropertyIdentifier: labels
-        type:
-          list: true
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Text based labels for generic use
-      visibility:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Observation
-        containerPropertyIdentifier: visibility
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Visibility of node (PUBLIC, PRIVATE, PROTECTED)
-      createdBy:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Observation
-        containerPropertyIdentifier: createdBy
-        type:
-          type: direct
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Who created this node?
-      updatedBy:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Observation
-        containerPropertyIdentifier: updatedBy
-        type:
-          type: direct
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Who was the last person to update this node?
-      isArchived:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Observation
-        containerPropertyIdentifier: isArchived
-        type:
-          list: false
-          type: boolean
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Is this item archived, and therefore hidden from most UIs?
-      status:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Observation
-        containerPropertyIdentifier: status
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: The status of the observation (draft, completed, sent)
       asset:
+        autoIncrement: false
         container:
-          space: IntegrationTestsImmutable
           externalId: Observation
+          space: IntegrationTestsImmutable
         containerPropertyIdentifier: asset
+        defaultValue: null
+        description: External ID of the associated CDF Asset
+        name: null
+        nullable: true
+        source: null
         type:
           type: direct
-        nullable: true
+      createdBy:
         autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: External ID of the associated CDF Asset
-      files:
         container:
-          space: IntegrationTestsImmutable
           externalId: Observation
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: createdBy
+        defaultValue: null
+        description: Who created this node?
+        name: null
+        nullable: true
+        source: null
+        type:
+          type: direct
+      description:
+        autoIncrement: false
+        container:
+          externalId: Observation
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: description
+        defaultValue: null
+        description: Long description of the node
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      files:
+        autoIncrement: false
+        container:
+          externalId: Observation
+          space: IntegrationTestsImmutable
         containerPropertyIdentifier: files
+        defaultValue: null
+        description: List of associated files
+        name: null
+        nullable: true
+        source: null
         type:
           list: true
           type: file
-        nullable: true
+      isArchived:
         autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: List of associated files
-      rootLocation:
         container:
-          space: IntegrationTestsImmutable
           externalId: Observation
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: isArchived
+        defaultValue: null
+        description: Is this item archived, and therefore hidden from most UIs?
+        name: null
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: boolean
+      labels:
+        autoIncrement: false
+        container:
+          externalId: Observation
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: labels
+        defaultValue: null
+        description: Text based labels for generic use
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: true
+          type: text
+      priority:
+        autoIncrement: false
+        container:
+          externalId: Observation
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: priority
+        defaultValue: null
+        description: Priority of the observation (Urgent, High ...)
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      rootLocation:
+        autoIncrement: false
+        container:
+          externalId: Observation
+          space: IntegrationTestsImmutable
         containerPropertyIdentifier: rootLocation
+        defaultValue: null
+        description: External ID of the root location associated with the observation
+        name: null
+        nullable: true
+        source: null
         type:
           type: direct
-        nullable: true
+      source:
         autoIncrement: false
-        source: null
+        container:
+          externalId: Observation
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: source
         defaultValue: null
+        description: Name of the source system node comes from
         name: null
-        description: External ID of the root location associated with the observation
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      sourceId:
+        autoIncrement: false
+        container:
+          externalId: Observation
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: sourceId
+        defaultValue: null
+        description: ID as the node appears in the Source system
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      status:
+        autoIncrement: false
+        container:
+          externalId: Observation
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: status
+        defaultValue: null
+        description: The status of the observation (draft, completed, sent)
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      title:
+        autoIncrement: false
+        container:
+          externalId: Observation
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: title
+        defaultValue: null
+        description: Title or name of the node
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
       troubleshooting:
+        autoIncrement: false
         container:
-          space: IntegrationTestsImmutable
           externalId: Observation
+          space: IntegrationTestsImmutable
         containerPropertyIdentifier: troubleshooting
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
         defaultValue: null
-        name: null
         description: description of how the observation was troubleshooted
-      priority:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Observation
-        containerPropertyIdentifier: priority
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
         name: null
-        description: Priority of the observation (Urgent, High ...)
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
       type:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Observation
-        containerPropertyIdentifier: type
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
         autoIncrement: false
-        source: null
+        container:
+          externalId: Observation
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: type
         defaultValue: null
-        name: null
         description: The observation type (Malfunction report, Maintenance request,
           etc.)
-    lastUpdatedTime: 1699196213142
-    createdTime: 1699196213142
-  - space: IntegrationTestsImmutable
-    externalId: Template
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      updatedBy:
+        autoIncrement: false
+        container:
+          externalId: Observation
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: updatedBy
+        defaultValue: null
+        description: Who was the last person to update this node?
+        name: null
+        nullable: true
+        source: null
+        type:
+          type: direct
+      visibility:
+        autoIncrement: false
+        container:
+          externalId: Observation
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: visibility
+        defaultValue: null
+        description: Visibility of node (PUBLIC, PRIVATE, PROTECTED)
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+    space: IntegrationTestsImmutable
+    usedFor: node
+    version: v3
+    writable: true
+  - createdTime: 1699196213142
     description: The Template view is used for creating standardized maintenance and
       inspection tasks. It defines the status of the template (e.g., draft, ready)
       and includes a list of template items (tasks) that can be reused for various
       maintenance and inspection activities.
-    name: Template
-    version: v3
-    writable: true
-    usedFor: node
+    externalId: Template
     isGlobal: false
+    lastUpdatedTime: 1699196213142
+    name: Template
     properties:
-      title:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Template
-        containerPropertyIdentifier: title
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
+      assignedTo:
         autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Title or name of the node
-      description:
         container:
-          space: IntegrationTestsImmutable
           externalId: Template
-        containerPropertyIdentifier: description
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: assignedTo
+        defaultValue: null
+        description: List of users or disciplines assigned to the template
+        name: null
         nullable: true
-        autoIncrement: false
         source: null
-        defaultValue: null
-        name: null
-        description: Long description of the node
-      labels:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Template
-        containerPropertyIdentifier: labels
         type:
+          collation: ucs_basic
           list: true
-          collation: ucs_basic
           type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Text based labels for generic use
-      visibility:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Template
-        containerPropertyIdentifier: visibility
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Visibility of node (PUBLIC, PRIVATE, PROTECTED)
       createdBy:
+        autoIncrement: false
         container:
-          space: IntegrationTestsImmutable
           externalId: Template
+          space: IntegrationTestsImmutable
         containerPropertyIdentifier: createdBy
-        type:
-          type: direct
-        nullable: true
-        autoIncrement: false
-        source: null
         defaultValue: null
-        name: null
         description: Who created this node?
-      updatedBy:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Template
-        containerPropertyIdentifier: updatedBy
+        name: null
+        nullable: true
+        source: null
         type:
           type: direct
-        nullable: true
+      description:
         autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Who was the last person to update this node?
-      isArchived:
         container:
-          space: IntegrationTestsImmutable
           externalId: Template
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: description
+        defaultValue: null
+        description: Long description of the node
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      isArchived:
+        autoIncrement: false
+        container:
+          externalId: Template
+          space: IntegrationTestsImmutable
         containerPropertyIdentifier: isArchived
+        defaultValue: null
+        description: Is this item archived, and therefore hidden from most UIs?
+        name: null
+        nullable: true
+        source: null
         type:
           list: false
           type: boolean
-        nullable: true
+      labels:
         autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Is this item archived, and therefore hidden from most UIs?
-      status:
         container:
-          space: IntegrationTestsImmutable
           externalId: Template
-        containerPropertyIdentifier: status
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: labels
+        defaultValue: null
+        description: Text based labels for generic use
+        name: null
+        nullable: true
+        source: null
         type:
-          list: false
           collation: ucs_basic
+          list: true
           type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Status of the template eg. draft, ready, etc.
       rootLocation:
+        autoIncrement: false
         container:
-          space: IntegrationTestsImmutable
           externalId: Template
+          space: IntegrationTestsImmutable
         containerPropertyIdentifier: rootLocation
+        defaultValue: null
+        description: Root location (asset) associated with the checklist
+        name: null
+        nullable: true
+        source: null
         type:
           type: direct
-        nullable: true
+      status:
         autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Root location (asset) associated with the checklist
-      assignedTo:
         container:
-          space: IntegrationTestsImmutable
           externalId: Template
-        containerPropertyIdentifier: assignedTo
-        type:
-          list: true
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: status
         defaultValue: null
+        description: Status of the template eg. draft, ready, etc.
         name: null
-        description: List of users or disciplines assigned to the template
-      templateItems:
+        nullable: true
+        source: null
         type:
-          space: IntegrationTestsImmutable
-          externalId: referenceTemplateItems
-        source:
-          space: IntegrationTestsImmutable
-          externalId: TemplateItem
-          version: v3
-          type: view
-        name: null
-        description: List of template items / tasks within the template
-        edgeSource: null
-        direction: outwards
+          collation: ucs_basic
+          list: false
+          type: text
+      templateItems:
         connectionType: multi_edge_connection
-    lastUpdatedTime: 1699196213142
-    createdTime: 1699196213142
-  - space: IntegrationTestsImmutable
-    externalId: TemplateItem
+        description: List of template items / tasks within the template
+        direction: outwards
+        edgeSource: null
+        name: null
+        source:
+          externalId: TemplateItem
+          space: IntegrationTestsImmutable
+          type: view
+          version: v3
+        type:
+          externalId: referenceTemplateItems
+          space: IntegrationTestsImmutable
+      title:
+        autoIncrement: false
+        container:
+          externalId: Template
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: title
+        defaultValue: null
+        description: Title or name of the node
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      updatedBy:
+        autoIncrement: false
+        container:
+          externalId: Template
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: updatedBy
+        defaultValue: null
+        description: Who was the last person to update this node?
+        name: null
+        nullable: true
+        source: null
+        type:
+          type: direct
+      visibility:
+        autoIncrement: false
+        container:
+          externalId: Template
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: visibility
+        defaultValue: null
+        description: Visibility of node (PUBLIC, PRIVATE, PROTECTED)
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+    space: IntegrationTestsImmutable
+    usedFor: node
+    version: v3
+    writable: true
+  - createdTime: 1699196213142
     description: The template item view is designed for creating individual maintenance
       and inspection tasks within a template. It specifies the execution order, associated
       assets, measurements, schedules, and other relevant details for each task.
-    name: Template item
-    version: v3
-    writable: true
-    usedFor: node
+    externalId: TemplateItem
     isGlobal: false
+    lastUpdatedTime: 1699196213142
+    name: Template item
     properties:
-      title:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: TemplateItem
-        containerPropertyIdentifier: title
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
+      asset:
         autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Title or name of the node
-      description:
         container:
-          space: IntegrationTestsImmutable
           externalId: TemplateItem
-        containerPropertyIdentifier: description
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Long description of the node
-      labels:
-        container:
           space: IntegrationTestsImmutable
-          externalId: TemplateItem
-        containerPropertyIdentifier: labels
-        type:
-          list: true
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
+        containerPropertyIdentifier: asset
         defaultValue: null
+        description: Associated asset
         name: null
-        description: Text based labels for generic use
-      visibility:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: TemplateItem
-        containerPropertyIdentifier: visibility
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
         nullable: true
-        autoIncrement: false
         source: null
-        defaultValue: null
-        name: null
-        description: Visibility of node (PUBLIC, PRIVATE, PROTECTED)
+        type:
+          type: direct
       createdBy:
+        autoIncrement: false
         container:
-          space: IntegrationTestsImmutable
           externalId: TemplateItem
+          space: IntegrationTestsImmutable
         containerPropertyIdentifier: createdBy
-        type:
-          type: direct
-        nullable: true
-        autoIncrement: false
-        source: null
         defaultValue: null
-        name: null
         description: Who created this node?
-      updatedBy:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: TemplateItem
-        containerPropertyIdentifier: updatedBy
+        name: null
+        nullable: true
+        source: null
         type:
           type: direct
-        nullable: true
+      description:
         autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Who was the last person to update this node?
-      isArchived:
         container:
-          space: IntegrationTestsImmutable
           externalId: TemplateItem
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: description
+        defaultValue: null
+        description: Long description of the node
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      isArchived:
+        autoIncrement: false
+        container:
+          externalId: TemplateItem
+          space: IntegrationTestsImmutable
         containerPropertyIdentifier: isArchived
+        defaultValue: null
+        description: Is this item archived, and therefore hidden from most UIs?
+        name: null
+        nullable: true
+        source: null
         type:
           list: false
           type: boolean
-        nullable: true
+      labels:
         autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Is this item archived, and therefore hidden from most UIs?
-      order:
         container:
-          space: IntegrationTestsImmutable
           externalId: TemplateItem
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: labels
+        defaultValue: null
+        description: Text based labels for generic use
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: true
+          type: text
+      measurements:
+        connectionType: multi_edge_connection
+        description: List of associated measurements
+        direction: outwards
+        edgeSource: null
+        name: null
+        source:
+          externalId: MeasurementReading
+          space: IntegrationTestsImmutable
+          type: view
+          version: v3
+        type:
+          externalId: referenceMeasurements
+          space: IntegrationTestsImmutable
+      order:
+        autoIncrement: false
+        container:
+          externalId: TemplateItem
+          space: IntegrationTestsImmutable
         containerPropertyIdentifier: order
+        defaultValue: null
+        description: The execution order of the template item
+        name: null
+        nullable: true
+        source: null
         type:
           list: false
           type: int32
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
+      schedules:
+        connectionType: multi_edge_connection
+        description: List of associated schedules
+        direction: outwards
+        edgeSource: null
         name: null
-        description: The execution order of the template item
-      asset:
-        container:
+        source:
+          externalId: Schedule
           space: IntegrationTestsImmutable
+          type: view
+          version: v3
+        type:
+          externalId: referenceSchedules
+          space: IntegrationTestsImmutable
+      title:
+        autoIncrement: false
+        container:
           externalId: TemplateItem
-        containerPropertyIdentifier: asset
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: title
+        defaultValue: null
+        description: Title or name of the node
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      updatedBy:
+        autoIncrement: false
+        container:
+          externalId: TemplateItem
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: updatedBy
+        defaultValue: null
+        description: Who was the last person to update this node?
+        name: null
+        nullable: true
+        source: null
         type:
           type: direct
-        nullable: true
+      visibility:
         autoIncrement: false
-        source: null
+        container:
+          externalId: TemplateItem
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: visibility
         defaultValue: null
+        description: Visibility of node (PUBLIC, PRIVATE, PROTECTED)
         name: null
-        description: Associated asset
-      schedules:
+        nullable: true
+        source: null
         type:
-          space: IntegrationTestsImmutable
-          externalId: referenceSchedules
-        source:
-          space: IntegrationTestsImmutable
-          externalId: Schedule
-          version: v3
-          type: view
-        name: null
-        description: List of associated schedules
-        edgeSource: null
-        direction: outwards
-        connectionType: multi_edge_connection
-      measurements:
-        type:
-          space: IntegrationTestsImmutable
-          externalId: referenceMeasurements
-        source:
-          space: IntegrationTestsImmutable
-          externalId: MeasurementReading
-          version: v3
-          type: view
-        name: null
-        description: List of associated measurements
-        edgeSource: null
-        direction: outwards
-        connectionType: multi_edge_connection
-    lastUpdatedTime: 1699196213142
-    createdTime: 1699196213142
-  - space: IntegrationTestsImmutable
-    externalId: MeasurementReading
+          collation: ucs_basic
+          list: false
+          type: text
+    space: IntegrationTestsImmutable
+    usedFor: node
+    version: v3
+    writable: true
+  - createdTime: 1699196213142
     description: The Measurement reading view facilitates the collection of field
       data by making readings. It supports various measurement types (e.g., numerical,
       label) and includes information about execution order, associated time series,
       value ranges, and the timestamp of the last reading.
-    name: Measurement reading
-    version: v3
-    writable: true
-    usedFor: node
+    externalId: MeasurementReading
     isGlobal: false
+    lastUpdatedTime: 1699196213142
+    name: Measurement reading
     properties:
-      visibility:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: MeasurementReading
-        containerPropertyIdentifier: visibility
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Visibility of node (PUBLIC, PRIVATE, PROTECTED)
       createdBy:
+        autoIncrement: false
         container:
-          space: IntegrationTestsImmutable
           externalId: MeasurementReading
+          space: IntegrationTestsImmutable
         containerPropertyIdentifier: createdBy
-        type:
-          type: direct
-        nullable: true
-        autoIncrement: false
-        source: null
         defaultValue: null
-        name: null
         description: Who created this node?
-      updatedBy:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: MeasurementReading
-        containerPropertyIdentifier: updatedBy
+        name: null
+        nullable: true
+        source: null
         type:
           type: direct
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Who was the last person to update this node?
       isArchived:
+        autoIncrement: false
         container:
-          space: IntegrationTestsImmutable
           externalId: MeasurementReading
+          space: IntegrationTestsImmutable
         containerPropertyIdentifier: isArchived
+        defaultValue: null
+        description: Is this item archived, and therefore hidden from most UIs?
+        name: null
+        nullable: true
+        source: null
         type:
           list: false
           type: boolean
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Is this item archived, and therefore hidden from most UIs?
-      type:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: MeasurementReading
-        containerPropertyIdentifier: type
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Measurement type, eg numerical, label, etc.
-      order:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: MeasurementReading
-        containerPropertyIdentifier: order
-        type:
-          list: false
-          type: int32
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Determines the execution order
-      timeseries:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: MeasurementReading
-        containerPropertyIdentifier: timeseries
-        type:
-          list: false
-          type: timeseries
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Timeseries associated with the measurement
-      min:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: MeasurementReading
-        containerPropertyIdentifier: min
-        type:
-          list: false
-          type: float64
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Min range of the reading, reading lower than `min` is possibly
-          bad
       max:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: MeasurementReading
-        containerPropertyIdentifier: max
-        type:
-          list: false
-          type: float64
-        nullable: true
         autoIncrement: false
-        source: null
+        container:
+          externalId: MeasurementReading
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: max
         defaultValue: null
-        name: null
         description: Max range of the reading, reading higher than `max` is possibly
           bad
-      options:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: MeasurementReading
-        containerPropertyIdentifier: options
-        type:
-          list: true
-          type: json
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
         name: null
-        description: Configuring options for label measurements
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: float64
       measuredAt:
+        autoIncrement: false
         container:
-          space: IntegrationTestsImmutable
           externalId: MeasurementReading
+          space: IntegrationTestsImmutable
         containerPropertyIdentifier: measuredAt
+        defaultValue: null
+        description: Timestamp of when the last reading was made
+        name: null
+        nullable: true
+        source: null
         type:
           list: false
           type: timestamp
-        nullable: true
+      min:
         autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Timestamp of when the last reading was made
-      numericReading:
         container:
-          space: IntegrationTestsImmutable
           externalId: MeasurementReading
-        containerPropertyIdentifier: numericReading
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: min
+        defaultValue: null
+        description: Min range of the reading, reading lower than `min` is possibly
+          bad
+        name: null
+        nullable: true
+        source: null
         type:
           list: false
           type: float64
-        nullable: true
+      numericReading:
         autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Value of the last reading if it was a numeric reading
-      stringReading:
         container:
-          space: IntegrationTestsImmutable
           externalId: MeasurementReading
-        containerPropertyIdentifier: stringReading
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: numericReading
+        defaultValue: null
+        description: Value of the last reading if it was a numeric reading
+        name: null
+        nullable: true
+        source: null
         type:
           list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
+          type: float64
+      options:
         autoIncrement: false
-        source: null
+        container:
+          externalId: MeasurementReading
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: options
         defaultValue: null
+        description: Configuring options for label measurements
         name: null
+        nullable: true
+        source: null
+        type:
+          list: true
+          type: json
+      order:
+        autoIncrement: false
+        container:
+          externalId: MeasurementReading
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: order
+        defaultValue: null
+        description: Determines the execution order
+        name: null
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: int32
+      stringReading:
+        autoIncrement: false
+        container:
+          externalId: MeasurementReading
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: stringReading
+        defaultValue: null
         description: Value of the last reading if it was a string reading
-    lastUpdatedTime: 1699196213142
-    createdTime: 1699196213142
-  - space: IntegrationTestsImmutable
-    externalId: Schedule
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      timeseries:
+        autoIncrement: false
+        container:
+          externalId: MeasurementReading
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: timeseries
+        defaultValue: null
+        description: Timeseries associated with the measurement
+        name: null
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: timeseries
+      type:
+        autoIncrement: false
+        container:
+          externalId: MeasurementReading
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: type
+        defaultValue: null
+        description: Measurement type, eg numerical, label, etc.
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      updatedBy:
+        autoIncrement: false
+        container:
+          externalId: MeasurementReading
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: updatedBy
+        defaultValue: null
+        description: Who was the last person to update this node?
+        name: null
+        nullable: true
+        source: null
+        type:
+          type: direct
+      visibility:
+        autoIncrement: false
+        container:
+          externalId: MeasurementReading
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: visibility
+        defaultValue: null
+        description: Visibility of node (PUBLIC, PRIVATE, PROTECTED)
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+    space: IntegrationTestsImmutable
+    usedFor: node
+    version: v3
+    writable: true
+  - createdTime: 1699196213142
     description: The Schedule view provides a flexible scheduling framework that can
       be applied across different models, such as Templates, Robotics Missions, and
       Template Tasks. It aligns with the ICS calendar format and offers features like
       status tracking, time zone configuration, exception dates, frequency settings,
       and end date.
-    name: Schedule
-    version: v3
-    writable: true
-    usedFor: node
+    externalId: Schedule
     isGlobal: false
+    lastUpdatedTime: 1699196213142
+    name: Schedule
     properties:
-      startTime:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Schedule
-        containerPropertyIdentifier: startTime
-        type:
-          list: false
-          type: timestamp
-        nullable: true
+      byDay:
         autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Start time of node
-      endTime:
         container:
-          space: IntegrationTestsImmutable
           externalId: Schedule
-        containerPropertyIdentifier: endTime
-        type:
-          list: false
-          type: timestamp
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: byDay
+        defaultValue: null
+        description: Specifies the days of the week when the schedule occurs. Part
+          of the RRULE property in ICS format.
+        name: null
         nullable: true
-        autoIncrement: false
         source: null
-        defaultValue: null
-        name: null
-        description: End time of node
-      visibility:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Schedule
-        containerPropertyIdentifier: visibility
         type:
-          list: false
           collation: ucs_basic
+          list: true
           type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Visibility of node (PUBLIC, PRIVATE, PROTECTED)
       createdBy:
+        autoIncrement: false
         container:
-          space: IntegrationTestsImmutable
           externalId: Schedule
+          space: IntegrationTestsImmutable
         containerPropertyIdentifier: createdBy
-        type:
-          type: direct
-        nullable: true
-        autoIncrement: false
-        source: null
         defaultValue: null
-        name: null
         description: Who created this node?
-      updatedBy:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Schedule
-        containerPropertyIdentifier: updatedBy
+        name: null
+        nullable: true
+        source: null
         type:
           type: direct
-        nullable: true
+      endTime:
         autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Who was the last person to update this node?
-      isArchived:
         container:
-          space: IntegrationTestsImmutable
           externalId: Schedule
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: endTime
+        defaultValue: null
+        description: End time of node
+        name: null
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: timestamp
+      exceptionDates:
+        autoIncrement: false
+        container:
+          externalId: Schedule
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: exceptionDates
+        defaultValue: null
+        description: Specifies the dates where the schedule does not apply. Corresponds
+          to the EXDATE property in ICS format.
+        name: null
+        nullable: true
+        source: null
+        type:
+          list: true
+          type: timestamp
+      freq:
+        autoIncrement: false
+        container:
+          externalId: Schedule
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: freq
+        defaultValue: null
+        description: Defines the frequency of occurrence for the schedule (e.g., daily,
+          weekly). Part of the RRULE property in ICS format.
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      interval:
+        autoIncrement: false
+        container:
+          externalId: Schedule
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: interval
+        defaultValue: null
+        description: Defines the interval of the schedule, eg. biweekly, once every
+          three weeks, etc. Similar to the TZID parameter in ICS format.
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      isArchived:
+        autoIncrement: false
+        container:
+          externalId: Schedule
+          space: IntegrationTestsImmutable
         containerPropertyIdentifier: isArchived
+        defaultValue: null
+        description: Is this item archived, and therefore hidden from most UIs?
+        name: null
+        nullable: true
+        source: null
         type:
           list: false
           type: boolean
-        nullable: true
+      startTime:
         autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Is this item archived, and therefore hidden from most UIs?
-      status:
         container:
-          space: IntegrationTestsImmutable
           externalId: Schedule
-        containerPropertyIdentifier: status
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: startTime
+        defaultValue: null
+        description: Start time of node
+        name: null
+        nullable: true
+        source: null
         type:
           list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
+          type: timestamp
+      status:
         autoIncrement: false
-        source: null
+        container:
+          externalId: Schedule
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: status
         defaultValue: null
-        name: null
         description: Indicates the current status of the schedule (e.g., confirmed,
           cancelled). Similar to the STATUS property in ICS format.
-      timezone:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Schedule
-        containerPropertyIdentifier: timezone
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
         name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      timezone:
+        autoIncrement: false
+        container:
+          externalId: Schedule
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: timezone
+        defaultValue: null
         description: Defines the time zone for the start and end date/time. Similar
           to the TZID parameter in ICS format.
-      exceptionDates:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Schedule
-        containerPropertyIdentifier: exceptionDates
-        type:
-          list: true
-          type: timestamp
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
         name: null
-        description: Specifies the dates where the schedule does not apply. Corresponds
-          to the EXDATE property in ICS format.
-      freq:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Schedule
-        containerPropertyIdentifier: freq
+        nullable: true
+        source: null
         type:
+          collation: ucs_basic
           list: false
-          collation: ucs_basic
           type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Defines the frequency of occurrence for the schedule (e.g., daily,
-          weekly). Part of the RRULE property in ICS format.
-      interval:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Schedule
-        containerPropertyIdentifier: interval
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Defines the interval of the schedule, eg. biweekly, once every
-          three weeks, etc. Similar to the TZID parameter in ICS format.
-      byDay:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Schedule
-        containerPropertyIdentifier: byDay
-        type:
-          list: true
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Specifies the days of the week when the schedule occurs. Part
-          of the RRULE property in ICS format.
       until:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Schedule
-        containerPropertyIdentifier: until
-        type:
-          list: false
-          type: timestamp
-        nullable: true
         autoIncrement: false
-        source: null
+        container:
+          externalId: Schedule
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: until
         defaultValue: null
-        name: null
         description: Indicates the date and time until which the schedule is valid.
           Part of the RRULE property in ICS format.
-    lastUpdatedTime: 1699196213142
-    createdTime: 1699196213142
-  - space: IntegrationTestsImmutable
-    externalId: CDF_User
-    version: v1
-    writable: true
-    usedFor: node
-    isGlobal: false
-    properties:
-      email:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: CDF_User
-        containerPropertyIdentifier: email
+        name: null
+        nullable: true
+        source: null
         type:
           list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
+          type: timestamp
+      updatedBy:
         autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Email of user
-      preferences:
         container:
+          externalId: Schedule
           space: IntegrationTestsImmutable
-          externalId: CDF_User
-        containerPropertyIdentifier: preferences
+        containerPropertyIdentifier: updatedBy
+        defaultValue: null
+        description: Who was the last person to update this node?
+        name: null
+        nullable: true
+        source: null
         type:
           type: direct
-        nullable: true
+      visibility:
         autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Holds user preferences across and within applications
-      name:
         container:
+          externalId: Schedule
           space: IntegrationTestsImmutable
-          externalId: CDF_User
-        containerPropertyIdentifier: name
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
+        containerPropertyIdentifier: visibility
         defaultValue: null
+        description: Visibility of node (PUBLIC, PRIVATE, PROTECTED)
         name: null
-        description: Name of user
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+    space: IntegrationTestsImmutable
+    usedFor: node
+    version: v3
+    writable: true
+  - createdTime: 1699196213142
+    externalId: CDF_User
+    isGlobal: false
     lastUpdatedTime: 1699196213142
-    createdTime: 1699196213142
-  - space: IntegrationTestsImmutable
-    externalId: CDF_UserPreferences
+    properties:
+      email:
+        autoIncrement: false
+        container:
+          externalId: CDF_User
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: email
+        defaultValue: null
+        description: Email of user
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      name:
+        autoIncrement: false
+        container:
+          externalId: CDF_User
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: name
+        defaultValue: null
+        description: Name of user
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      preferences:
+        autoIncrement: false
+        container:
+          externalId: CDF_User
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: preferences
+        defaultValue: null
+        description: Holds user preferences across and within applications
+        name: null
+        nullable: true
+        source: null
+        type:
+          type: direct
+    space: IntegrationTestsImmutable
+    usedFor: node
     version: v1
     writable: true
-    usedFor: node
+  - createdTime: 1699196213142
+    externalId: CDF_UserPreferences
     isGlobal: false
+    lastUpdatedTime: 1699196213142
     properties:
-      language:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: CDF_UserPreferences
-        containerPropertyIdentifier: language
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: The users selected language
       apmAppConfig:
+        autoIncrement: false
         container:
-          space: IntegrationTestsImmutable
           externalId: CDF_UserPreferences
+          space: IntegrationTestsImmutable
         containerPropertyIdentifier: apmAppConfig
+        defaultValue: null
+        description: User preferences related to APM apps, like selected config
+        name: null
+        nullable: true
+        source: null
         type:
           list: false
           type: json
-        nullable: true
+      language:
         autoIncrement: false
-        source: null
+        container:
+          externalId: CDF_UserPreferences
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: language
         defaultValue: null
+        description: The users selected language
         name: null
-        description: User preferences related to APM apps, like selected config
-    lastUpdatedTime: 1699196213142
-    createdTime: 1699196213142
-  - space: IntegrationTestsImmutable
-    externalId: Asset
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+    space: IntegrationTestsImmutable
+    usedFor: node
     version: v1
     writable: true
-    usedFor: node
+  - createdTime: 1699196213142
+    externalId: Asset
     isGlobal: false
-    properties:
-      sourceId:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Asset
-        containerPropertyIdentifier: sourceId
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: ID as the node appears in the Source system
-      source:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Asset
-        containerPropertyIdentifier: source
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Name of the source system node comes from
-      title:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Asset
-        containerPropertyIdentifier: title
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Title or name of the node
-      description:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Asset
-        containerPropertyIdentifier: description
-        type:
-          list: false
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Long description of the node
-      labels:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Asset
-        containerPropertyIdentifier: labels
-        type:
-          list: true
-          collation: ucs_basic
-          type: text
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Text based labels for generic use
-      parent:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Asset
-        containerPropertyIdentifier: parent
-        type:
-          type: direct
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Parent of this asset
-      root:
-        container:
-          space: IntegrationTestsImmutable
-          externalId: Asset
-        containerPropertyIdentifier: root
-        type:
-          type: direct
-        nullable: true
-        autoIncrement: false
-        source: null
-        defaultValue: null
-        name: null
-        description: Root location - asset at the top of the hierarchy.
     lastUpdatedTime: 1699196213142
-    createdTime: 1699196213142
-  isGlobal: false
-  lastUpdatedTime: 1699197495077
-  createdTime: 1699196213952
+    properties:
+      description:
+        autoIncrement: false
+        container:
+          externalId: Asset
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: description
+        defaultValue: null
+        description: Long description of the node
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      labels:
+        autoIncrement: false
+        container:
+          externalId: Asset
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: labels
+        defaultValue: null
+        description: Text based labels for generic use
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: true
+          type: text
+      parent:
+        autoIncrement: false
+        container:
+          externalId: Asset
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: parent
+        defaultValue: null
+        description: Parent of this asset
+        name: null
+        nullable: true
+        source: null
+        type:
+          type: direct
+      root:
+        autoIncrement: false
+        container:
+          externalId: Asset
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: root
+        defaultValue: null
+        description: Root location - asset at the top of the hierarchy.
+        name: null
+        nullable: true
+        source: null
+        type:
+          type: direct
+      source:
+        autoIncrement: false
+        container:
+          externalId: Asset
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: source
+        defaultValue: null
+        description: Name of the source system node comes from
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      sourceId:
+        autoIncrement: false
+        container:
+          externalId: Asset
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: sourceId
+        defaultValue: null
+        description: ID as the node appears in the Source system
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      title:
+        autoIncrement: false
+        container:
+          externalId: Asset
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: title
+        defaultValue: null
+        description: Title or name of the node
+        name: null
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+    space: IntegrationTestsImmutable
+    usedFor: node
+    version: v1
+    writable: true
