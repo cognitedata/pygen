@@ -233,6 +233,7 @@ def person_apply_to_instances_test_cases():
             "endNode": {"externalId": "actor:quentin_tarantino", "space": "IntegrationTestsImmutable"},
             "externalId": "person:quentin_tarantino:actor:quentin_tarantino",
             "instanceType": "edge",
+            "source": None,
             "space": "IntegrationTestsImmutable",
             "startNode": {"externalId": "person:quentin_tarantino", "space": "IntegrationTestsImmutable"},
             "type": {"externalId": "Person.roles", "space": "IntegrationTestsImmutable"},
@@ -278,12 +279,13 @@ def person_apply_to_instances_test_cases():
             "endNode": {"space": "IntegrationTestsImmutable", "externalId": "director:quentin_tarantino:pulp_fiction"},
         },
     ]
+    expected_edges = dm.EdgeApplyList.load(expected_edges)
+    for edge in expected_edges:
+        edge.sources = None
 
     yield pytest.param(
         person,
-        dm.InstancesApply(
-            nodes=[dm.NodeApply.load(e) for e in expected_nodes], edges=[dm.EdgeApply.load(e) for e in expected_edges]
-        ),
+        dm.InstancesApply(nodes=dm.NodeApplyList.load(expected_nodes), edges=expected_edges),
         id="Person with extra dependencies",
     )
 
@@ -294,8 +296,8 @@ def test_person_to_apply_instances(person: movie.PersonApply, expected: dm.Insta
     actual = person.to_instances_apply()
 
     # Assert
-    assert [n.dump(camel_case=True) for n in actual.nodes] == [n.dump(camel_case=True) for n in expected.nodes]
-    assert [e.dump(camel_case=True) for e in actual.edges] == [e.dump(camel_case=True) for e in expected.edges]
+    assert actual.nodes.dump(camel_case=True) == expected.nodes.dump(camel_case=True)
+    assert actual.edges.dump(camel_case=True) == expected.edges.dump(camel_case=True)
 
 
 def unpack_properties_test_cases():
