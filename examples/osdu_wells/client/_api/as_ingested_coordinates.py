@@ -298,7 +298,6 @@ class AsIngestedCoordinatesAPI(TypeAPI[AsIngestedCoordinates, AsIngestedCoordina
             space: The space to filter on.
             limit: Maximum number of as ingested coordinates to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            retrieve_edges: Whether to retrieve `features` external ids for the as ingested coordinates. Defaults to True.
 
         Returns:
             Search results as ingested coordinates matching the query.
@@ -455,7 +454,6 @@ class AsIngestedCoordinatesAPI(TypeAPI[AsIngestedCoordinates, AsIngestedCoordina
             space: The space to filter on.
             limit: Maximum number of as ingested coordinates to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            retrieve_edges: Whether to retrieve `features` external ids for the as ingested coordinates. Defaults to True.
 
         Returns:
             Aggregation results.

@@ -490,7 +490,6 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
             space: The space to filter on.
             limit: Maximum number of technical assurances to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            retrieve_edges: Whether to retrieve `acceptable_usage`, `reviewers` or `unacceptable_usage` external ids for the technical assurances. Defaults to True.
 
         Returns:
             Search results technical assurances matching the query.
@@ -605,7 +604,6 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
             space: The space to filter on.
             limit: Maximum number of technical assurances to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            retrieve_edges: Whether to retrieve `acceptable_usage`, `reviewers` or `unacceptable_usage` external ids for the technical assurances. Defaults to True.
 
         Returns:
             Aggregation results.

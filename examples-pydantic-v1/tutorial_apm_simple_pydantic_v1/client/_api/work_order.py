@@ -430,7 +430,6 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
             space: The space to filter on.
             limit: Maximum number of work orders to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            retrieve_edges: Whether to retrieve `linked_assets` or `work_items` external ids for the work orders. Defaults to True.
 
         Returns:
             Search results work orders matching the query.
@@ -685,7 +684,6 @@ class WorkOrderAPI(TypeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
             space: The space to filter on.
             limit: Maximum number of work orders to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            retrieve_edges: Whether to retrieve `linked_assets` or `work_items` external ids for the work orders. Defaults to True.
 
         Returns:
             Aggregation results.

@@ -1190,7 +1190,6 @@ class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
             space: The space to filter on.
             limit: Maximum number of well data to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            retrieve_edges: Whether to retrieve `facility_events`, `facility_operators`, `facility_specifications`, `facility_states`, `geo_contexts`, `historical_interests`, `name_aliases`, `technical_assurances` or `vertical_measurements` external ids for the well data. Defaults to True.
 
         Returns:
             Search results well data matching the query.
@@ -1540,7 +1539,6 @@ class WellDataAPI(TypeAPI[WellData, WellDataApply, WellDataList]):
             space: The space to filter on.
             limit: Maximum number of well data to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            retrieve_edges: Whether to retrieve `facility_events`, `facility_operators`, `facility_specifications`, `facility_states`, `geo_contexts`, `historical_interests`, `name_aliases`, `technical_assurances` or `vertical_measurements` external ids for the well data. Defaults to True.
 
         Returns:
             Aggregation results.

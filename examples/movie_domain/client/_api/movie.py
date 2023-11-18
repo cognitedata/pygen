@@ -373,7 +373,6 @@ class MovieAPI(TypeAPI[Movie, MovieApply, MovieList]):
             space: The space to filter on.
             limit: Maximum number of movies to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            retrieve_edges: Whether to retrieve `actors` or `directors` external ids for the movies. Defaults to True.
 
         Returns:
             Search results movies matching the query.
@@ -493,7 +492,6 @@ class MovieAPI(TypeAPI[Movie, MovieApply, MovieList]):
             space: The space to filter on.
             limit: Maximum number of movies to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            retrieve_edges: Whether to retrieve `actors` or `directors` external ids for the movies. Defaults to True.
 
         Returns:
             Aggregation results.
