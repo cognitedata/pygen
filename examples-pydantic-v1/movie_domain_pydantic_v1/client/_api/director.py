@@ -407,7 +407,6 @@ class DirectorAPI(TypeAPI[Director, DirectorApply, DirectorList]):
             space: The space to filter on.
             limit: Maximum number of directors to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            retrieve_edges: Whether to retrieve `movies` or `nomination` external ids for the directors. Defaults to True.
 
         Returns:
             Aggregation results.

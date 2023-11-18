@@ -1,38 +1,39 @@
-- created_time: 1694968715176
+- createdTime: 1694968715176
   description: Constructed case for causing issues for pygen
-  external_id: Pumps
-  is_global: false
-  last_updated_time: 1694968753532
+  externalId: Pumps
+  isGlobal: false
+  lastUpdatedTime: 1694968753532
   name: Pumps
   space: IntegrationTestsImmutable
   version: '1'
   views:
-  - created_time: 1694968752489
-    external_id: Pumps
-    is_global: false
-    last_updated_time: 1694968752489
+  - createdTime: 1694968752489
+    externalId: Pumps
+    isGlobal: false
+    lastUpdatedTime: 1694968752489
     name: Pumps
     properties:
       contains:
+        connectionType: multi_edge_connection
         description: null
         direction: outwards
-        edge_source: null
+        edgeSource: null
         name: contains
         source:
-          external_id: Pump
+          externalId: Pump
           space: IntegrationTestsImmutable
           type: view
           version: ed1171a2f52bc5
         type:
-          external_id: Pumps.contains
+          externalId: Pumps.contains
           space: IntegrationTestsImmutable
       name:
-        auto_increment: false
+        autoIncrement: false
         container:
-          external_id: Pumps
+          externalId: Pumps
           space: IntegrationTestsImmutable
-        container_property_identifier: name
-        default_value: null
+        containerPropertyIdentifier: name
+        defaultValue: null
         description: null
         name: name
         nullable: true
@@ -42,22 +43,22 @@
           list: false
           type: text
     space: IntegrationTestsImmutable
-    used_for: node
+    usedFor: node
     version: b11435aac1b0a4
     writable: true
-  - created_time: 1694968752489
-    external_id: Pump
-    is_global: false
-    last_updated_time: 1694968752489
+  - createdTime: 1694968752489
+    externalId: Pump
+    isGlobal: false
+    lastUpdatedTime: 1694968752489
     name: Pump
     properties:
       name:
-        auto_increment: false
+        autoIncrement: false
         container:
-          external_id: Pump
+          externalId: Pump
           space: IntegrationTestsImmutable
-        container_property_identifier: name
-        default_value: null
+        containerPropertyIdentifier: name
+        defaultValue: null
         description: null
         name: name
         nullable: false
@@ -67,6 +68,6 @@
           list: false
           type: text
     space: IntegrationTestsImmutable
-    used_for: node
+    usedFor: node
     version: ed1171a2f52bc5
     writable: true

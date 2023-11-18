@@ -286,7 +286,6 @@ class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
             space: The space to filter on.
             limit: Maximum number of work items to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            retrieve_edges: Whether to retrieve `linked_assets` external ids for the work items. Defaults to True.
 
         Returns:
             Search results work items matching the query.
@@ -446,7 +445,6 @@ class WorkItemAPI(TypeAPI[WorkItem, WorkItemApply, WorkItemList]):
             space: The space to filter on.
             limit: Maximum number of work items to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            retrieve_edges: Whether to retrieve `linked_assets` external ids for the work items. Defaults to True.
 
         Returns:
             Aggregation results.

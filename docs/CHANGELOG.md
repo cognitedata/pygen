@@ -13,6 +13,10 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.31.0] - 18-11-23
+### Fixed
+* Upgrade `pygen` to use `cognite-sdk` v7.
+
 ## [0.30.5] - 06-11-23
 ### Fixed
 * Bug when calling `.list()` and `.retrieve` in generated NodeAPI classes, caused a `CogniteAPIError` with `400` status code due

@@ -1450,7 +1450,6 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
             space: The space to filter on.
             limit: Maximum number of wellbore data to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            retrieve_edges: Whether to retrieve `drilling_reasons`, `facility_events`, `facility_operators`, `facility_specifications`, `facility_states`, `geo_contexts`, `historical_interests`, `name_aliases`, `technical_assurances`, `vertical_measurements` or `wellbore_costs` external ids for the wellbore data. Defaults to True.
 
         Returns:
             Search results wellbore data matching the query.
@@ -1930,7 +1929,6 @@ class WellboreDataAPI(TypeAPI[WellboreData, WellboreDataApply, WellboreDataList]
             space: The space to filter on.
             limit: Maximum number of wellbore data to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            retrieve_edges: Whether to retrieve `drilling_reasons`, `facility_events`, `facility_operators`, `facility_specifications`, `facility_states`, `geo_contexts`, `historical_interests`, `name_aliases`, `technical_assurances`, `vertical_measurements` or `wellbore_costs` external ids for the wellbore data. Defaults to True.
 
         Returns:
             Aggregation results.

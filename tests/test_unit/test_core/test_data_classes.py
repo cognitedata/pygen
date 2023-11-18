@@ -63,14 +63,14 @@ def load_field_test_cases():
     )
     raw_data = {
         "container": {"space": "cogShop", "external_id": "Scenario"},
-        "container_property_identifier": "modelTemplate",
+        "containerPropertyIdentifier": "modelTemplate",
         "type": {
             "container": None,
             "type": "direct",
             "source": {"space": "cogShop", "external_id": "ModelTemplate", "version": "8ae35635bb3f8a"},
         },
         "nullable": True,
-        "auto_increment": False,
+        "autoIncrement": False,
         "default_value": None,
         "name": "modelTemplate",
         "description": None,
@@ -95,12 +95,12 @@ def load_field_test_cases():
         id="EdgeField that require alias.",
     )
     raw_data = """
-    auto_increment: false
+    autoIncrement: false
     container:
-      external_id: Market
+      externalId: Market
       space: market
-    container_property_identifier: name
-    default_value: null
+    containerPropertyIdentifier: name
+    defaultValue: null
     description: null
     name: name
     nullable: true
