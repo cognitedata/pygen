@@ -1,11 +1,19 @@
 from __future__ import annotations
 
-from typing import Literal, TYPE_CHECKING, Optional, Union, Any
+from typing import Literal, TYPE_CHECKING, Optional, Union
 
 from cognite.client import data_modeling as dm
-from pydantic import Field, model_validator
+from cognite.client.data_classes import TimeSeriesList
+from pydantic import Field
 
-from ._core import DomainModel, DomainModelApply, NodeList, TypeApplyList
+from ._core import (
+    DomainModel,
+    DomainModelApply,
+    DomainModelList,
+    DomainModelApplyList,
+    DomainsApply,
+    DomainRelationApply,
+)
 
 if TYPE_CHECKING:
     from ._equipment_module import EquipmentModuleApply
@@ -50,7 +58,7 @@ class UnitProcedure(DomainModel):
     space: str = "IntegrationTestsImmutable"
     name: Optional[str] = None
     type_: Optional[str] = Field(None, alias="type")
-    work_units: Optional[Union[list[StartEndTime], list[str]]] = None
+    work_units: Union[list[StartEndTime], list[str], None] = None
 
     def as_apply(self) -> UnitProcedureApply:
         """Convert this read version of unit procedure to the writing version."""
@@ -59,7 +67,7 @@ class UnitProcedure(DomainModel):
             external_id=self.external_id,
             name=self.name,
             type_=self.type_,
-            work_units=self.work_units,
+            work_units=[work_unit.as_apply() for work_unit in self.work_units or []],
         )
 
 
@@ -83,79 +91,61 @@ class UnitProcedureApply(DomainModelApply):
     space: str = "IntegrationTestsImmutable"
     name: Optional[str] = None
     type_: Optional[str] = Field(None, alias="type")
-    work_units: Union[list[StartEndTimeApply], list[str], None] = Field(default=None, repr=False)
+    work_units: Optional[list[StartEndTimeApply]] = Field(default=None, repr=False)
 
     def _to_instances_apply(
-        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
-    ) -> dm.InstancesApply:
-        if self.external_id in cache:
-            return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
-        write_view = view_by_write_class and view_by_write_class.get(type(self))
+        self,
+        cache: set[tuple[str, str]],
+        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+    ) -> DomainsApply:
+        if self.id_tuple() in cache:
+            return DomainsApply()
+        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
+            "IntegrationTestsImmutable", "UnitProcedure", "f16810a7105c44"
+        )
+
+        this_instances = DomainsApply()
 
         properties = {}
         if self.name is not None:
             properties["name"] = self.name
         if self.type_ is not None:
             properties["type"] = self.type_
+
         if properties:
-            source = dm.NodeOrEdgeData(
-                source=write_view or dm.ViewId("IntegrationTestsImmutable", "UnitProcedure", "f16810a7105c44"),
-                properties=properties,
-            )
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=[source],
+                sources=[
+                    dm.NodeOrEdgeData(
+                        source=write_view,
+                        properties=properties,
+                    )
+                ],
             )
-            nodes = [this_node]
-        else:
-            nodes = []
-
-        edges = []
-        cache.add(self.external_id)
+            this_instances.nodes.append(this_node)
+            cache.add(self.id_tuple())
 
         for work_unit in self.work_units or []:
-            edge = self._create_work_unit_edge(work_unit)
-            if edge.external_id not in cache:
-                edges.append(edge)
-                cache.add(edge.external_id)
-
-            if isinstance(work_unit, DomainModelApply):
+            if isinstance(work_unit, StartEndTimeApply):
                 instances = work_unit._to_instances_apply(cache, view_by_write_class)
-                nodes.extend(instances.nodes)
-                edges.extend(instances.edges)
+                this_instances.extend(instances)
 
-        return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
-
-    def _create_work_unit_edge(self, work_unit: Union[str, EquipmentModuleApply]) -> dm.EdgeApply:
-        if isinstance(work_unit, str):
-            end_space, end_node_ext_id = self.space, work_unit
-        elif isinstance(work_unit, DomainModelApply):
-            end_space, end_node_ext_id = work_unit.space, work_unit.external_id
-        else:
-            raise TypeError(f"Expected str or EquipmentModuleApply, got {type(work_unit)}")
-
-        return dm.EdgeApply(
-            space=self.space,
-            external_id=f"{self.external_id}:{end_node_ext_id}",
-            type=dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.equipment_module"),
-            start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
-        )
+        return this_instances
 
 
-class UnitProcedureList(NodeList[UnitProcedure]):
-    """List of unit procedures in read version."""
+class UnitProcedureList(DomainModelList[UnitProcedure]):
+    """List of unit procedures in the read version."""
 
     _INSTANCE = UnitProcedure
 
     def as_apply(self) -> UnitProcedureApplyList:
-        """Convert this read version of unit procedure to a write version."""
+        """Convert this read versions of unit procedure to the writing versions."""
         return UnitProcedureApplyList([node.as_apply() for node in self.data])
 
 
-class UnitProcedureApplyList(TypeApplyList[UnitProcedureApply]):
-    """List of unit procedures in write version."""
+class UnitProcedureApplyList(DomainModelApplyList[UnitProcedureApply]):
+    """List of unit procedures in the writing version."""
 
     _INSTANCE = UnitProcedureApply

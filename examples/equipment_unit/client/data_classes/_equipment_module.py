@@ -1,11 +1,18 @@
 from __future__ import annotations
 
-from typing import Literal, Optional
+from typing import Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
-
-from ._core import DomainModel, DomainModelApply, NodeList, TypeApplyList
+from cognite.client.data_classes import TimeSeries
+from ._core import (
+    DomainModel,
+    DomainModelApply,
+    DomainModelList,
+    DomainModelApplyList,
+    DomainsApply,
+    DomainRelationApply,
+)
 
 
 __all__ = [
@@ -50,7 +57,7 @@ class EquipmentModule(DomainModel):
     space: str = "IntegrationTestsImmutable"
     description: Optional[str] = None
     name: Optional[str] = None
-    sensor_value: Optional[str] = None
+    sensor_value: Union[TimeSeries, str, None] = None
     type_: Optional[str] = Field(None, alias="type")
 
     def as_apply(self) -> EquipmentModuleApply:
@@ -86,15 +93,20 @@ class EquipmentModuleApply(DomainModelApply):
     space: str = "IntegrationTestsImmutable"
     description: Optional[str] = None
     name: Optional[str] = None
-    sensor_value: Optional[str] = None
+    sensor_value: Union[TimeSeries, str, None] = None
     type_: Optional[str] = Field(None, alias="type")
 
     def _to_instances_apply(
-        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
-    ) -> dm.InstancesApply:
+        self,
+        cache: set[tuple[str, str]],
+        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+    ) -> DomainsApply:
+        this_instances = DomainsApply()
         if self.external_id in cache:
-            return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
-        write_view = view_by_write_class and view_by_write_class.get(type(self))
+            return this_instances
+        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
+            "IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33"
+        )
 
         properties = {}
         if self.description is not None:
@@ -102,31 +114,34 @@ class EquipmentModuleApply(DomainModelApply):
         if self.name is not None:
             properties["name"] = self.name
         if self.sensor_value is not None:
-            properties["sensor_value"] = self.sensor_value
+            properties["sensor_value"] = (
+                self.sensor_value.external_id if isinstance(self.sensor_value, TimeSeries) else self.sensor_value
+            )
         if self.type_ is not None:
             properties["type"] = self.type_
         if properties:
-            source = dm.NodeOrEdgeData(
-                source=write_view or dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33"),
-                properties=properties,
-            )
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=[source],
+                sources=[
+                    dm.NodeOrEdgeData(
+                        source=write_view,
+                        properties=properties,
+                    )
+                ],
             )
-            nodes = [this_node]
-        else:
-            nodes = []
+            this_instances.nodes.append(this_node)
+            cache.add((self.space, self.external_id))
 
-        edges = []
-        cache.add(self.external_id)
+        if isinstance(self.sensor_value, TimeSeries):
+            this_instances.time_series.append(self.sensor_value)
+            cache.add(("", self.sensor_value.external_id))
 
-        return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
+        return this_instances
 
 
-class EquipmentModuleList(NodeList[EquipmentModule]):
+class EquipmentModuleList(DomainModelList[EquipmentModule]):
     """List of equipment modules in read version."""
 
     _INSTANCE = EquipmentModule
@@ -136,7 +151,7 @@ class EquipmentModuleList(NodeList[EquipmentModule]):
         return EquipmentModuleApplyList([node.as_apply() for node in self.data])
 
 
-class EquipmentModuleApplyList(TypeApplyList[EquipmentModuleApply]):
+class EquipmentModuleApplyList(DomainModelApplyList[EquipmentModuleApply]):
     """List of equipment modules in write version."""
 
     _INSTANCE = EquipmentModuleApply

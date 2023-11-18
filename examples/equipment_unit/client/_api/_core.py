@@ -7,7 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from equipment_unit.client.data_classes._core import T_TypeApplyNode, T_TypeNode, T_TypeNodeList
+from equipment_unit.client.data_classes._core import T_TypeApplyNode, T_DomainModel, T_TypeNodeList
 
 
 DEFAULT_LIMIT_READ = 25
@@ -25,12 +25,12 @@ _METRIC_AGGREGATIONS_BY_NAME = {
 }
 
 
-class TypeAPI(Generic[T_TypeNode, T_TypeApplyNode, T_TypeNodeList]):
+class TypeAPI(Generic[T_DomainModel, T_TypeApplyNode, T_TypeNodeList]):
     def __init__(
         self,
         client: CogniteClient,
         sources: dm.ViewIdentifier | Sequence[dm.ViewIdentifier] | dm.View | Sequence[dm.View],
-        class_type: type[T_TypeNode],
+        class_type: type[T_DomainModel],
         class_apply_type: type[T_TypeApplyNode],
         class_list: type[T_TypeNodeList],
     ):
@@ -41,7 +41,7 @@ class TypeAPI(Generic[T_TypeNode, T_TypeApplyNode, T_TypeNodeList]):
         self._class_list = class_list
 
     @overload
-    def _retrieve(self, external_id: str) -> T_TypeNode:
+    def _retrieve(self, external_id: str) -> T_DomainModel:
         ...
 
     @overload
@@ -50,7 +50,7 @@ class TypeAPI(Generic[T_TypeNode, T_TypeApplyNode, T_TypeNodeList]):
 
     def _retrieve(
         self, nodes: dm.NodeId | Sequence[dm.NodeId] | tuple[str, str] | Sequence[tuple[str, str]]
-    ) -> T_TypeNode | T_TypeNodeList:
+    ) -> T_DomainModel | T_TypeNodeList:
         is_multiple = (
             isinstance(nodes, Sequence)
             and not isinstance(nodes, str)

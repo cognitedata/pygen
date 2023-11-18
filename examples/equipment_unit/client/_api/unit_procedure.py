@@ -26,6 +26,7 @@ from equipment_unit.client.data_classes import (
 )
 from equipment_unit.client.data_classes._unit_procedure import _UNITPROCEDURE_PROPERTIES_BY_FIELD
 from equipment_unit.client.data_classes._equipment_module import _EQUIPMENTMODULE_PROPERTIES_BY_FIELD
+from equipment_unit.client.data_classes._start_end_time import _STARTENDTIME_PROPERTIES_BY_FIELD
 
 
 class UnitProcedureWorkUnitsQuery:
@@ -98,7 +99,7 @@ class UnitProcedureWorkUnitsQuery:
             ),
             "edges": dm.query.Select(
                 # Todo replace start_end time with properties by fields as above
-                [dm.query.SourceSelector(self._edge_view, ["start_time", "end_time"])],
+                [dm.query.SourceSelector(self._edge_view, list(_STARTENDTIME_PROPERTIES_BY_FIELD.values()))],
             ),
         }
         if retrieve_equipment_module:

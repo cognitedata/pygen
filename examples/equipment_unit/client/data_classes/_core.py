@@ -4,12 +4,25 @@ import datetime
 from abc import abstractmethod
 from collections import UserList
 from collections.abc import Collection, Mapping, Iterator
-from typing import Any, Callable, ClassVar, Generic, Optional, TypeVar, overload
-
+from typing import Any, Callable, ClassVar, Generic, Optional, TypeVar, overload, Type
+from dataclasses import dataclass, field
+from cognite.client.data_classes import TimeSeriesList
 import pandas as pd
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Properties, PropertyValue
 from pydantic import BaseModel, Extra, Field, model_validator
+
+
+@dataclass
+class DomainsApply:
+    nodes: dm.NodeApplyList = field(default_factory=lambda: dm.NodeApplyList([]))
+    edges: dm.EdgeApplyList = field(default_factory=lambda: dm.EdgeApplyList([]))
+    time_series: TimeSeriesList = field(default_factory=lambda: TimeSeriesList([]))
+
+    def extend(self, other: DomainsApply) -> None:
+        self.nodes.extend(other.nodes)
+        self.edges.extend(other.edges)
+        self.time_series.extend(other.time_series)
 
 
 class Core(BaseModel):
@@ -32,7 +45,7 @@ class DomainModelCore(Core):
         return self.space, self.external_id
 
 
-T_TypeCore = TypeVar("T_TypeNodeCore", bound=DomainModelCore)
+T_DomainModelCore = TypeVar("T_DomainModelCore", bound=DomainModelCore)
 
 
 class DomainModel(DomainModelCore):
@@ -42,14 +55,14 @@ class DomainModel(DomainModelCore):
     deleted_time: Optional[datetime.datetime] = None
 
     @classmethod
-    def from_node(cls: type[T_TypeNode], node: dm.Node) -> T_TypeNode:
+    def from_node(cls: type[T_DomainModel], node: dm.Node) -> T_DomainModel:
         data = node.dump(camel_case=False)
         # Extra unpacking to avoid crashing between core and property fields
         # can happen if there is a field named 'version' in the DomainModel.
         return cls(**{**data, **unpack_properties(node.properties)})
 
 
-T_TypeNode = TypeVar("T_TypeNode", bound=DomainModel)
+T_DomainModel = TypeVar("T_DomainModel", bound=DomainModel)
 
 
 class DomainModelApply(DomainModelCore, extra=Extra.forbid, populate_by_name=True):
@@ -57,14 +70,16 @@ class DomainModelApply(DomainModelCore, extra=Extra.forbid, populate_by_name=Tru
     existing_version: Optional[int] = None
 
     def to_instances_apply(
-        self, view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None = None
-    ) -> dm.InstancesApply:
+        self, view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None = None
+    ) -> DomainsApply:
         return self._to_instances_apply(set(), view_by_write_class)
 
     @abstractmethod
     def _to_instances_apply(
-        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
-    ) -> dm.InstancesApply:
+        self,
+        cache: set[tuple[str, str]],
+        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+    ) -> DomainsApply:
         raise NotImplementedError()
 
     @model_validator(mode="before")
@@ -74,36 +89,29 @@ class DomainModelApply(DomainModelCore, extra=Extra.forbid, populate_by_name=Tru
         return data
 
 
-T_TypeNodeApply = TypeVar("T_TypeNodeApply", bound=DomainModelApply)
+T_DomainModelApply = TypeVar("T_DomainModelApply", bound=DomainModelApply)
 
 
-class DomainModelApplyResult(DomainModelCore):
-    version: int
-    was_modified: bool
-    last_updated_time: datetime.datetime
-    created_time: datetime.datetime
-
-
-class CoreList(UserList, Generic[T_TypeCore]):
-    _INSTANCE: type[T_TypeCore]
+class CoreList(UserList, Generic[T_DomainModelCore]):
+    _INSTANCE: type[T_DomainModelCore]
     _PARENT_CLASS: type[DomainModelCore]
 
-    def __init__(self, nodes: Collection[T_TypeCore] = None):
+    def __init__(self, nodes: Collection[T_DomainModelCore] = None):
         super().__init__(nodes or [])
 
     # The dunder implementations are to get proper type hints
-    def __iter__(self) -> Iterator[T_TypeCore]:
+    def __iter__(self) -> Iterator[T_DomainModelCore]:
         return super().__iter__()
 
     @overload
-    def __getitem__(self, item: int) -> T_TypeCore:
+    def __getitem__(self, item: int) -> T_DomainModelCore:
         ...
 
     @overload
     def __getitem__(self: type[T_TypeNodeList], item: slice) -> T_TypeNodeList:
         ...
 
-    def __getitem__(self, item: int | slice) -> T_TypeCore | T_TypeNodeList:
+    def __getitem__(self, item: int | slice) -> T_DomainModelCore | T_TypeNodeList:
         if isinstance(item, slice):
             return self.__class__(self.data[item])
         elif isinstance(item, int):
@@ -119,14 +127,14 @@ class CoreList(UserList, Generic[T_TypeCore]):
 
     def to_pandas(self, include_instance_properties: bool = False) -> pd.DataFrame:
         """
-        Convert the list of nodes to a pandas DataFrame.
+        Convert the list of nodes to a pandas.DataFrame.
 
         Args:
             include_instance_properties: Whether to include the properties from the instances in the columns
                 of the resulting DataFrame.
 
         Returns:
-            A pandas DataFrame with the nodes as rows.
+            A pandas.DataFrame with the nodes as rows.
         """
         df = pd.DataFrame(self.dump())
         if df.empty:
@@ -142,53 +150,44 @@ class CoreList(UserList, Generic[T_TypeCore]):
         return self.to_pandas(include_instance_properties=False)._repr_html_()  # type: ignore[operator]
 
 
-class NodeList(CoreList[T_TypeCore]):
+class DomainModelList(CoreList[T_DomainModelCore]):
     _PARENT_CLASS = DomainModel
 
-    def __init__(self, nodes: Collection[T_TypeCore] = None):
+    def __init__(self, nodes: Collection[T_DomainModelCore] = None):
         super().__init__(nodes or [])
 
     def as_node_ids(self) -> list[dm.NodeId]:
         return [dm.NodeId(space=node.space, external_id=node.external_id) for node in self]
 
 
-T_TypeApplyNode = TypeVar("T_TypeApplyNode", bound=DomainModelApply)
 T_TypeNodeList = TypeVar("T_TypeNodeList", bound=CoreList, covariant=True)
 
 
-class TypeApplyList(NodeList[T_TypeApplyNode]):
+class DomainModelApplyList(DomainModelList[T_DomainModelApply]):
     _PARENT_CLASS = DomainModelApply
 
     def to_instances_apply(
-        self, view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None = None
-    ) -> dm.InstancesApply:
-        cache: set[str] = set()
-        nodes: list[dm.NodeApply] = []
-        edges: list[dm.EdgeApply] = []
-        for node in self.data:
+        self, view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None = None
+    ) -> DomainsApply:
+        cache: set[tuple[str, str]] = set()
+        domains = DomainsApply()
+        for node in self:
             result = node._to_instances_apply(cache, view_by_write_class)
-            nodes.extend(result.nodes)
-            edges.extend(result.edges)
-        return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
+            domains.extend(result)
+        return domains
 
 
-class DomainRelationCore(DomainModelCore):
+class DomainRelation(DomainModelCore):
     type: dm.DirectRelationReference
     start_node: dm.DirectRelationReference
     end_node: dm.DirectRelationReference
-
-
-T_DomainRelationCore = TypeVar("T_DomainRelationCore", bound=DomainRelationCore)
-
-
-class DomainRelation(DomainRelationCore):
     version: int
     last_updated_time: datetime.datetime
     created_time: datetime.datetime
     deleted_time: Optional[datetime.datetime] = None
 
     @classmethod
-    def from_edge(cls: type[T_DomainRelation], edge: dm.Edge) -> T_DomainRelation:
+    def from_edge(cls: Type[T_DomainRelation], edge: dm.Edge) -> T_DomainRelation:
         data = edge.dump(camel_case=False)
         return cls(**{**data, **unpack_properties(edge.properties)})
 
@@ -203,19 +202,27 @@ def default_edge_factory(
 
 
 class DomainRelationApply(BaseModel, extra=Extra.forbid, populate_by_name=True):
-    external_id_factory: ClassVar[Callable[[type[DomainRelationApply], dict], str]] = default_edge_factory
-    space: Optional[str] = None
-    external_id: str = Field(None, min_length=1, max_length=255)
+    external_id_factory: ClassVar[
+        Callable[[type[DomainRelationApply], dm.DirectRelationReference, dm.DirectRelationReference], str]
+    ] = default_edge_factory
     existing_version: Optional[int] = None
-    start_node: Optional[dm.DirectRelationReference] = Field(None, alias="startNode")
-    end_node: Optional[dm.DirectRelationReference] = Field(None, alias="endNode")
+    external_id: Optional[str] = Field(None, min_length=1, max_length=255)
+
+    @abstractmethod
+    def _to_instances_apply(
+        self,
+        cache: set[tuple[str, str]],
+        start_node: dm.DirectRelationReference,
+        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+    ) -> DomainsApply:
+        raise NotImplementedError()
 
 
-class EdgeList(CoreList[T_DomainRelationCore]):
+class DomainRelationList(CoreList[T_DomainRelation]):
     _PARENT_CLASS = DomainRelation
 
     def as_edge_ids(self) -> list[dm.EdgeId]:
-        return [dm.EdgeId(space=edge.space, external_id=edge.external_id) for edge in self.data]
+        return [dm.EdgeId(space=edge.space, external_id=edge.external_id) for edge in self]
 
 
 def unpack_properties(properties: Properties) -> Mapping[str, PropertyValue]:

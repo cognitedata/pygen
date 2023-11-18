@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import datetime
-from typing import Literal, Optional, Union, ClassVar
+from typing import Literal, Optional, Union, ClassVar, Type
 
+from cognite.client.data_classes import data_modeling as dm, TimeSeriesList
 from cognite.client.data_classes.data_modeling import DirectRelationReference
 from pydantic import Field
-from ._core import DomainRelation, EdgeList, DomainRelationApply
+
+from . import DomainModelApply
+from ._core import DomainRelation, DomainRelationList, DomainRelationApply, DomainsApply
 
 from ._equipment_module import EquipmentModuleApply, EquipmentModule
 
@@ -19,7 +22,7 @@ _STARTENDTIME_PROPERTIES_BY_FIELD = {
 
 
 class StartEndTime(DomainRelation):
-    """This represent a read version of start end time.
+    """This represents the read version of start end time.
 
     It is used to when data is retrieved from CDF.
 
@@ -28,6 +31,7 @@ class StartEndTime(DomainRelation):
         external_id: The external id of the start end time.
         end_time: The end time field.
         start_time: The start time field.
+        equipment_module: The equipment module field.
         created_time: The created time of the start end time node.
         last_updated_time: The last updated time of the start end time node.
         deleted_time: If present, the deleted time of the start end time node.
@@ -35,13 +39,25 @@ class StartEndTime(DomainRelation):
     """
 
     space: str = "IntegrationTestsImmutable"
+    equipment_module: Union[EquipmentModule, str]
     end_time: Optional[datetime.datetime] = None
     start_time: Optional[datetime.datetime] = None
-    equipment_module: Union[EquipmentModule, str, None] = None
 
     @property
     def unit_procedure(self) -> str:
         return self.start_node.external_id
+
+    def as_apply(self) -> StartEndTimeApply:
+        """Convert this read version of start end time to the writing version."""
+        return StartEndTimeApply(
+            space=self.space,
+            external_id=self.external_id,
+            end_time=self.end_time,
+            start_time=self.start_time,
+            equipment_module=self.equipment_module.as_apply()
+            if isinstance(self.equipment_module, EquipmentModule)
+            else self.equipment_module,
+        )
 
 
 class StartEndTimeApply(DomainRelationApply):
@@ -51,16 +67,62 @@ class StartEndTimeApply(DomainRelationApply):
     space: str = "IntegrationTestsImmutable"
     end_time: Optional[datetime.datetime] = Field(None, alias="endTime")
     start_time: Optional[datetime.datetime] = Field(None, alias="startTime")
-    equipment_module: Optional[Union[EquipmentModuleApply, str]] = Field(None, alias="equipmentModule")
+    equipment_module: Union[EquipmentModuleApply, str] = Field(alias="equipmentModule")
 
-    @property
-    def unit_procedure(self) -> str:
-        if not self.start_node:
-            raise ValueError("Start node is not set")
-        return self.start_node.external_id
+    def _to_instances_apply(
+        self,
+        cache: set[tuple[str, str]],
+        start_node: dm.DirectRelationReference,
+        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+    ) -> DomainsApply:
+        if self.external_id and (self.space, self.external_id) in cache:
+            return DomainsApply()
+
+        if isinstance(self.equipment_module, DomainModelApply):
+            end_node = dm.DirectRelationReference(self.equipment_module.space, self.equipment_module.external_id)
+        elif isinstance(self.equipment_module, str):
+            end_node = dm.DirectRelationReference(self.space, self.equipment_module)
+        else:
+            raise ValueError(f"Invalid type for equipment_module: {type(self.equipment_module)}")
+        self.external_id = external_id = self.external_id_factory(type(self), start_node, end_node)
+
+        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
+            "IntegrationTestsImmutable", "StartEndTime", "d416e0ed98186b"
+        )
+
+        this_instances = DomainsApply()
+
+        properties = {}
+        if self.end_time is not None:
+            properties["end_time"] = self.end_time.isoformat(timespec="milliseconds")
+        if self.start_time is not None:
+            properties["start_time"] = self.start_time.isoformat(timespec="milliseconds")
+
+        if properties:
+            this_edge = dm.EdgeApply(
+                external_id=external_id,
+                space=self.space,
+                type=self.type,
+                start_node=start_node,
+                end_node=end_node,
+                existing_version=self.existing_version,
+                sources=[
+                    dm.NodeOrEdgeData(
+                        source=write_view,
+                        properties=properties,
+                    )
+                ],
+            )
+            this_instances.edges.append(this_edge)
+
+        if isinstance(self.equipment_module, DomainModelApply):
+            instances = self.equipment_module._to_instances_apply(cache, view_by_write_class)
+            this_instances.extend(instances)
+
+        return this_instances
 
 
-class StartEndTimeList(EdgeList[StartEndTime]):
+class StartEndTimeList(DomainRelationList[StartEndTime]):
     """List of start end time in read version."""
 
     _INSTANCE = StartEndTime
