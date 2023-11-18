@@ -2,7 +2,6 @@ from ._core import DomainModel, DomainModelApply
 from ._equipment_module import (
     EquipmentModule,
     EquipmentModuleApply,
-    EquipmentModuleWithStartEndTime,
     EquipmentModuleApplyList,
     EquipmentModuleFields,
     EquipmentModuleList,
@@ -23,7 +22,6 @@ from ._unit_procedure import (
     UnitProcedureTextFields,
 )
 
-EquipmentModuleWithStartEndTime.model_rebuild()
 UnitProcedureApply.model_rebuild()
 
 __all__ = [
@@ -31,7 +29,6 @@ __all__ = [
     "DomainModelApply",
     "EquipmentModule",
     "EquipmentModuleApply",
-    "EquipmentModuleWithStartEndTime",
     "EquipmentModuleList",
     "EquipmentModuleApplyList",
     "EquipmentModuleFields",

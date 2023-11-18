@@ -74,7 +74,7 @@ class UnitProcedureApply(DomainModelApply):
         name: The name field.
         type_: The type field.
         work_units: The work unit field.
-        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+        existing_version: Fail the ingestion request if the version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
@@ -83,9 +83,7 @@ class UnitProcedureApply(DomainModelApply):
     space: str = "IntegrationTestsImmutable"
     name: Optional[str] = None
     type_: Optional[str] = Field(None, alias="type")
-    work_units: Union[list[EquipmentModuleApply], list[StartEndTimeApply], list[str], None] = Field(
-        default=None, repr=False
-    )
+    work_units: Union[list[StartEndTimeApply], list[str], None] = Field(default=None, repr=False)
 
     def _to_instances_apply(
         self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None

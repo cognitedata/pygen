@@ -111,23 +111,29 @@ class CoreList(UserList, Generic[T_TypeCore]):
     def as_external_ids(self) -> list[str]:
         return [node.external_id for node in self.data]
 
-    def to_pandas(self) -> pd.DataFrame:
+    def to_pandas(self, include_instance_properties: bool = False) -> pd.DataFrame:
+        """
+        Convert the list of nodes to a pandas DataFrame.
+
+        Args:
+            include_instance_properties: Whether to include the properties from the instances in the columns
+                of the resulting DataFrame.
+
+        Returns:
+            A pandas DataFrame with the nodes as rows.
+        """
         df = pd.DataFrame(self.dump())
         if df.empty:
             df = pd.DataFrame(columns=self._INSTANCE.model_fields)
         # Reorder columns to have the custom columns first
-        fixed_columns = set(
-            next(parent.model_fields for parent in type(self).__bases__ if issubclass(parent, DomainModelCore))
-        )
-        columns = (
-            ["external_id"]
-            + [col for col in df if col not in fixed_columns]
-            + [col for col in DomainModel.model_fields if col != "external_id"]
-        )
+        fixed_columns = set(self._INSTANCE.model_fields)
+        columns = ["external_id"] + [col for col in df if col not in fixed_columns]
+        if include_instance_properties:
+            columns += [col for col in DomainModel.model_fields if col != "external_id"]
         return df[columns]
 
     def _repr_html_(self) -> str:
-        return self.to_pandas()._repr_html_()  # type: ignore[operator]
+        return self.to_pandas(include_instance_properties=False)._repr_html_()  # type: ignore[operator]
 
 
 class NodeList(UserList, Generic[T_TypeCore]):
@@ -182,7 +188,7 @@ class DomainRelation(DomainRelationCore):
 T_DomainRelation = TypeVar("T_DomainRelation", bound=DomainRelation)
 
 
-class DomainRelationApply:
+class DomainRelationApply(BaseModel, extra=Extra.forbid, populate_by_name=True):
     existing_version: Optional[int] = None
 
 
@@ -197,12 +203,8 @@ def unpack_properties(properties: Properties) -> Mapping[str, PropertyValue]:
     unpacked: dict[str, PropertyValue] = {}
     for view_properties in properties.values():
         for prop_name, prop_value in view_properties.items():
-            if isinstance(prop_value, (str, int, float, bool, list)):
-                unpacked[prop_name] = prop_value
-            elif isinstance(prop_value, dict) and "externalId" in prop_value and "space" in prop_value:
-                # Assumed to be reference properties
+            if isinstance(prop_value, dict) and "externalId" in prop_value and "space" in prop_value:
                 unpacked[prop_name] = prop_value["externalId"]
             else:
-                # JSON field
                 unpacked[prop_name] = prop_value
     return unpacked

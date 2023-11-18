@@ -23,6 +23,11 @@ def start_end_time_edges(workorder: EquipmentUnitClient) -> StartEndTimeList:
     return edges
 
 
+def test_edges_to_pandas(start_end_time_edges: StartEndTimeList) -> None:
+    df = start_end_time_edges.to_pandas()
+    assert len(df) == len(start_end_time_edges)
+
+
 def test_filter_start_end_time_edges(start_end_time_edges: StartEndTimeList, workorder: EquipmentUnitClient) -> None:
     sorted_by_start_time = sorted(start_end_time_edges, key=lambda x: x.start_time)
 

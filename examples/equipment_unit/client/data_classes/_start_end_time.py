@@ -3,6 +3,7 @@ from __future__ import annotations
 import datetime
 from typing import Literal, Optional, Union
 
+from pydantic import Field
 from ._core import DomainRelation, EdgeList, DomainRelationApply
 
 from ._equipment_module import EquipmentModuleApply
@@ -47,13 +48,13 @@ class StartEndTime(DomainRelation):
 
 class StartEndTimeApply(DomainRelationApply):
     space: str = "IntegrationTestsImmutable"
-    end_time: Optional[datetime.datetime] = None
-    start_time: Optional[datetime.datetime] = None
-    equipment_module: Optional[Union[EquipmentModuleApply, str]] = None
+    end_time: Optional[datetime.datetime] = Field(None, alias="endTime")
+    start_time: Optional[datetime.datetime] = Field(None, alias="startTime")
+    equipment_module: Optional[Union[EquipmentModuleApply, str]] = Field(None, alias="equipmentModule")
 
-    @property
-    def unit_procedure(self) -> str:
-        return self.start_node.external_id
+    # @property
+    # def unit_procedure(self) -> str:
+    #     return self.start_node.external_id
 
 
 class StartEndTimeList(EdgeList[StartEndTime]):
