@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from typing import Literal, TYPE_CHECKING, Optional, Union
+from typing import Literal, TYPE_CHECKING, Optional, Union, Any
 
 from cognite.client import data_modeling as dm
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from ._core import DomainModel, DomainModelApply, NodeList, TypeApplyList
 

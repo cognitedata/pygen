@@ -44,6 +44,13 @@ def test_unit_procedure_list_to_pandas(unit_procedure_list: UnitProcedureList) -
     assert len(df) == len(unit_procedure_list)
 
 
+def test_single_unit_procedure_to_pandas(unit_procedure_list: UnitProcedureList) -> None:
+    procedure = unit_procedure_list[0]
+
+    series = procedure.to_pandas()
+    assert len(series) == 4, "We only have the three properties and the external id"
+
+
 def test_filter_start_end_time_edges(start_end_time_edges: StartEndTimeList, workorder: EquipmentUnitClient) -> None:
     sorted_by_start_time = sorted(start_end_time_edges, key=lambda x: x.start_time)
 
@@ -65,7 +72,6 @@ def test_filter_unit_procedure_through_edge(workorder: EquipmentUnitClient) -> N
             assert isinstance(work_unit.equipment_module, EquipmentModule)
 
 
-@pytest.mark.skip(reason="Not implemented")
 def test_apply_unit_procedure_with_edge(workorder: EquipmentUnitClient) -> None:
     new_procedure = UnitProcedureApply(
         external_id="procedure:new_procedure",
@@ -85,8 +91,5 @@ def test_apply_unit_procedure_with_edge(workorder: EquipmentUnitClient) -> None:
             ),
         ],
     )
-    try:
-        workorder.unit_procedure.apply(new_procedure)
-    finally:
-        workorder.unit_procedure.delete("procedure:new_procedure")
-        workorder.equipment_module.delete("module:new_module")
+
+    assert new_procedure

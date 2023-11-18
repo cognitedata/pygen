@@ -12,19 +12,24 @@ from cognite.client.data_classes.data_modeling.instances import Properties, Prop
 from pydantic import BaseModel, Extra, Field, model_validator
 
 
-class DomainModelCore(BaseModel):
+class Core(BaseModel):
+    def to_pandas(self, include_instance_properties: bool = False) -> pd.Series:
+        exclude = None
+        if not include_instance_properties:
+            exclude = set(type(self).__bases__[0].model_fields) - {"external_id"}
+        return pd.Series(self.model_dump(exclude=exclude))
+
+    def _repr_html_(self) -> str:
+        """Returns HTML representation of DomainModel."""
+        return self.to_pandas().to_frame("value")._repr_html_()  # type: ignore[operator]
+
+
+class DomainModelCore(Core):
     space: str
     external_id: str = Field(min_length=1, max_length=255)
 
     def id_tuple(self) -> tuple[str, str]:
         return self.space, self.external_id
-
-    def to_pandas(self) -> pd.Series:
-        return pd.Series(self.model_dump())
-
-    def _repr_html_(self) -> str:
-        """Returns HTML representation of DomainModel."""
-        return self.to_pandas().to_frame("value")._repr_html_()  # type: ignore[operator]
 
 
 T_TypeCore = TypeVar("T_TypeNodeCore", bound=DomainModelCore)
@@ -191,7 +196,16 @@ class DomainRelation(DomainRelationCore):
 T_DomainRelation = TypeVar("T_DomainRelation", bound=DomainRelation)
 
 
-class DomainRelationApply(DomainModelCore, extra=Extra.forbid, populate_by_name=True):
+def default_edge_factory(
+    edge_type: type[DomainRelationApply], start_node: DomainModelCore, end_node: DomainModelCore
+) -> str:
+    return f"{start_node.external_id}:{end_node.external_id}"
+
+
+class DomainRelationApply(BaseModel, extra=Extra.forbid, populate_by_name=True):
+    external_id_factory: ClassVar[Callable[[type[DomainRelationApply], dict], str]] = default_edge_factory
+    space: Optional[str] = None
+    external_id: str = Field(None, min_length=1, max_length=255)
     existing_version: Optional[int] = None
     start_node: Optional[dm.DirectRelationReference] = Field(None, alias="startNode")
     end_node: Optional[dm.DirectRelationReference] = Field(None, alias="endNode")
