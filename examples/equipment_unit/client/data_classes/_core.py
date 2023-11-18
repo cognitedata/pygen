@@ -108,10 +108,10 @@ class CoreList(UserList, Generic[T_DomainModelCore]):
         ...
 
     @overload
-    def __getitem__(self: type[T_TypeNodeList], item: slice) -> T_TypeNodeList:
+    def __getitem__(self: type[T_DomainModelList], item: slice) -> T_DomainModelList:
         ...
 
-    def __getitem__(self, item: int | slice) -> T_DomainModelCore | T_TypeNodeList:
+    def __getitem__(self, item: int | slice) -> T_DomainModelCore | T_DomainModelList:
         if isinstance(item, slice):
             return self.__class__(self.data[item])
         elif isinstance(item, int):
@@ -160,7 +160,7 @@ class DomainModelList(CoreList[T_DomainModelCore]):
         return [dm.NodeId(space=node.space, external_id=node.external_id) for node in self]
 
 
-T_TypeNodeList = TypeVar("T_TypeNodeList", bound=CoreList, covariant=True)
+T_DomainModelList = TypeVar("T_DomainModelList", bound=DomainModelList, covariant=True)
 
 
 class DomainModelApplyList(DomainModelList[T_DomainModelApply]):

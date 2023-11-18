@@ -7,7 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from equipment_unit.client.data_classes._core import T_TypeApplyNode, T_DomainModel, T_TypeNodeList
+from equipment_unit.client.data_classes._core import T_DomainModelApply, T_DomainModel, T_DomainModelList
 
 
 DEFAULT_LIMIT_READ = 25
@@ -25,14 +25,14 @@ _METRIC_AGGREGATIONS_BY_NAME = {
 }
 
 
-class TypeAPI(Generic[T_DomainModel, T_TypeApplyNode, T_TypeNodeList]):
+class TypeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
     def __init__(
         self,
         client: CogniteClient,
         sources: dm.ViewIdentifier | Sequence[dm.ViewIdentifier] | dm.View | Sequence[dm.View],
         class_type: type[T_DomainModel],
-        class_apply_type: type[T_TypeApplyNode],
-        class_list: type[T_TypeNodeList],
+        class_apply_type: type[T_DomainModelApply],
+        class_list: type[T_DomainModelList],
     ):
         self._client = client
         self._sources = sources
@@ -45,12 +45,12 @@ class TypeAPI(Generic[T_DomainModel, T_TypeApplyNode, T_TypeNodeList]):
         ...
 
     @overload
-    def _retrieve(self, external_id: Sequence[str]) -> T_TypeNodeList:
+    def _retrieve(self, external_id: Sequence[str]) -> T_DomainModelList:
         ...
 
     def _retrieve(
         self, nodes: dm.NodeId | Sequence[dm.NodeId] | tuple[str, str] | Sequence[tuple[str, str]]
-    ) -> T_DomainModel | T_TypeNodeList:
+    ) -> T_DomainModel | T_DomainModelList:
         is_multiple = (
             isinstance(nodes, Sequence)
             and not isinstance(nodes, str)
@@ -69,7 +69,7 @@ class TypeAPI(Generic[T_DomainModel, T_TypeApplyNode, T_TypeNodeList]):
         properties: str | Sequence[str],
         filter_: dm.Filter | None = None,
         limit: int = DEFAULT_LIMIT_READ,
-    ) -> T_TypeNodeList:
+    ) -> T_DomainModelList:
         if isinstance(properties, str):
             properties = [properties]
 
@@ -200,6 +200,6 @@ class TypeAPI(Generic[T_DomainModel, T_TypeApplyNode, T_TypeNodeList]):
             view_id, dm.aggregations.Histogram(property, interval), "node", query, search_properties, filter, limit
         )
 
-    def _list(self, limit: int = DEFAULT_LIMIT_READ, filter: dm.Filter | None = None) -> T_TypeNodeList:
+    def _list(self, limit: int = DEFAULT_LIMIT_READ, filter: dm.Filter | None = None) -> T_DomainModelList:
         nodes = self._client.data_modeling.instances.list("node", sources=self._sources, limit=limit, filter=filter)
         return self._class_list([self._class_type.from_node(node) for node in nodes])
