@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import datetime
-from typing import Literal, Optional, Union, ClassVar, Type
+from typing import Literal, Optional, Union, ClassVar, Any
 
 from cognite.client.data_classes import data_modeling as dm, TimeSeriesList
 from cognite.client.data_classes.data_modeling import DirectRelationReference
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from . import DomainModelApply
 from ._core import DomainRelation, DomainRelationList, DomainRelationApply, DomainsApply
@@ -46,6 +46,12 @@ class StartEndTime(DomainRelation):
     @property
     def unit_procedure(self) -> str:
         return self.start_node.external_id
+
+    @model_validator(mode="before")
+    def set_equipment_module_if_missing(cls, data: Any):
+        if isinstance(data, dict) and "equipment_module" not in data:
+            data["equipment_module"] = data["end_node"]["external_id"]
+        return data
 
     def as_apply(self) -> StartEndTimeApply:
         """Convert this read version of start end time to the writing version."""

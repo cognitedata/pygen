@@ -53,7 +53,7 @@ class UnitProcedureWorkUnitsQuery:
         min_end_time: datetime.datetime | None = None,
         max_end_time: datetime.datetime | None = None,
         space: str = "IntegrationTestsImmutable",
-        limit: int = -1,
+        limit: int | None = None,
         retrieve_equipment_module: bool = True,
     ) -> UnitProcedureList:
         """List unit procedures with work units.
@@ -94,6 +94,7 @@ class UnitProcedureWorkUnitsQuery:
                 {"space": "IntegrationTestsImmutable", "externalId": "UnitProcedure.equipment_module"},
             ),
         )
+        limit = float("inf") if limit is None or limit == -1 else limit
         cursors = {"nodes": None, "edges": None}
         results = {"nodes": [], "edges": []}
         total_retrieved = {"nodes": 0, "edges": 0}
@@ -123,7 +124,6 @@ class UnitProcedureWorkUnitsQuery:
                     [dm.query.SourceSelector(self._node_view, list(_UNITPROCEDURE_PROPERTIES_BY_FIELD.values()))],
                 ),
                 "edges": dm.query.Select(
-                    # Todo replace start_end time with properties by fields as above
                     [dm.query.SourceSelector(self._edge_view, list(_STARTENDTIME_PROPERTIES_BY_FIELD.values()))],
                 ),
             }
@@ -139,7 +139,9 @@ class UnitProcedureWorkUnitsQuery:
                 results[key].extend(batch[key])
                 cursors[key] = batch.cursors[key]
 
-            if all(total_retrieved[k] >= limits[k] or cursors[k] is None for k in total_retrieved):
+            if all(
+                total_retrieved[k] >= limits[k] or cursors[k] is None or len(batch[k]) == 0 for k in total_retrieved
+            ):
                 break
 
         if retrieve_equipment_module:

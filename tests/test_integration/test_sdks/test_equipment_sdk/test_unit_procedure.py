@@ -1,4 +1,5 @@
 import pytest
+from cognite.client.data_classes import TimeSeries
 
 from tests.constants import IS_PYDANTIC_V2
 
@@ -85,11 +86,13 @@ def test_apply_unit_procedure_with_edge(workorder: EquipmentUnitClient) -> None:
                     external_id="module:new_module",
                     name="New module",
                     type_="New type",
-                    sensor_value="timeseries:123",
+                    sensor_value=TimeSeries(external_id="timeseries:123"),
                     description="New description",
                 ),
             ),
         ],
     )
+
+    new_procedure.to_instances_apply()
 
     assert new_procedure
