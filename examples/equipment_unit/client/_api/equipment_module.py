@@ -497,6 +497,7 @@ def _retrieve_timeseries_external_ids_with_extra_sensor_value(
     limit: int,
     extra_properties: ColumnNames | list[ColumnNames] = "sensor_value",
 ) -> dict[str, list[str]]:
+    limit = float("inf") if limit is None or limit == -1 else limit
     properties = ["sensor_value"]
     if extra_properties == "sensor_value":
         ...
@@ -553,9 +554,9 @@ class EquipmentModuleAPI(TypeAPI[EquipmentModule, EquipmentModuleApply, Equipmen
             class_type=EquipmentModule,
             class_apply_type=EquipmentModuleApply,
             class_list=EquipmentModuleList,
+            view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self._view_by_write_class = view_by_write_class
         self.sensor_value = EquipmentModuleSensorValueAPI(client, view_id)
 
     def apply(
@@ -581,22 +582,7 @@ class EquipmentModuleAPI(TypeAPI[EquipmentModule, EquipmentModuleApply, Equipmen
                 >>> result = client.equipment_module.apply(equipment_module)
 
         """
-        if isinstance(equipment_module, EquipmentModuleApply):
-            instances = equipment_module.to_instances_apply(self._view_by_write_class)
-        else:
-            instances = EquipmentModuleApplyList(equipment_module).to_instances_apply(self._view_by_write_class)
-        result = self._client.data_modeling.instances.apply(
-            nodes=instances.nodes,
-            edges=instances.edges,
-            auto_create_start_nodes=True,
-            auto_create_end_nodes=True,
-            replace=replace,
-        )
-        time_series = []
-        if instances.time_series:
-            time_series = self._client.time_series.upsert(instances.time_series, mode="patch")
-
-        return DomainsApplyResult(result.nodes, result.edges, TimeSeriesList(time_series))
+        return self._apply(equipment_module, replace)
 
     def delete(
         self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"

@@ -5,9 +5,16 @@ from typing import Generic, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
+from cognite.client.data_classes import TimeSeriesList
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from equipment_unit.client.data_classes._core import T_DomainModelApply, T_DomainModel, T_DomainModelList
+from equipment_unit.client.data_classes._core import (
+    T_DomainModelApply,
+    T_DomainModel,
+    T_DomainModelList,
+    DomainsApplyResult,
+    DomainModelApply,
+)
 
 
 DEFAULT_LIMIT_READ = 25
@@ -33,24 +40,44 @@ class TypeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
         class_type: type[T_DomainModel],
         class_apply_type: type[T_DomainModelApply],
         class_list: type[T_DomainModelList],
+        view_by_write_class: dict[type[DomainModelApply], dm.ViewId],
     ):
         self._client = client
         self._sources = sources
         self._class_type = class_type
         self._class_apply_type = class_apply_type
         self._class_list = class_list
+        self._view_by_write_class = view_by_write_class
+
+    def _apply(
+        self, item: T_DomainModelApply | Sequence[T_DomainModelApply], replace: bool = False
+    ) -> DomainsApplyResult:
+        if isinstance(item, DomainModelApply):
+            instances = item.to_instances_apply(self._view_by_write_class)
+        else:
+            instances = self._class_list(item).to_instances_apply(self._view_by_write_class)
+        result = self._client.data_modeling.instances.apply(
+            nodes=instances.nodes,
+            edges=instances.edges,
+            auto_create_start_nodes=True,
+            auto_create_end_nodes=True,
+            replace=replace,
+        )
+        time_series = []
+        if instances.time_series:
+            time_series = self._client.time_series.upsert(instances.time_series, mode="patch")
+
+        return DomainsApplyResult(result.nodes, result.edges, TimeSeriesList(time_series))
 
     @overload
-    def _retrieve(self, external_id: str) -> T_DomainModel:
+    def _retrieve(self, nodes: tuple[str, str]) -> T_DomainModel:
         ...
 
     @overload
-    def _retrieve(self, external_id: Sequence[str]) -> T_DomainModelList:
+    def _retrieve(self, nodes: Sequence[tuple[str, str]]) -> T_DomainModelList:
         ...
 
-    def _retrieve(
-        self, nodes: dm.NodeId | Sequence[dm.NodeId] | tuple[str, str] | Sequence[tuple[str, str]]
-    ) -> T_DomainModel | T_DomainModelList:
+    def _retrieve(self, nodes: tuple[str, str] | Sequence[tuple[str, str]]) -> T_DomainModel | T_DomainModelList:
         is_multiple = (
             isinstance(nodes, Sequence)
             and not isinstance(nodes, str)

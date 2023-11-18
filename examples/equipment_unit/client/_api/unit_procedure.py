@@ -362,6 +362,7 @@ class UnitProcedureAPI(TypeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
             class_type=UnitProcedure,
             class_apply_type=UnitProcedureApply,
             class_list=UnitProcedureList,
+            view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
         self._view_by_write_class = view_by_write_class
@@ -394,22 +395,7 @@ class UnitProcedureAPI(TypeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
                 >>> result = client.unit_procedure.apply(unit_procedure)
 
         """
-        if isinstance(unit_procedure, UnitProcedureApply):
-            instances = unit_procedure.to_instances_apply(self._view_by_write_class)
-        else:
-            instances = UnitProcedureApplyList(unit_procedure).to_instances_apply(self._view_by_write_class)
-        result = self._client.data_modeling.instances.apply(
-            nodes=instances.nodes,
-            edges=instances.edges,
-            auto_create_start_nodes=True,
-            auto_create_end_nodes=True,
-            replace=replace,
-        )
-        time_series = []
-        if instances.time_series:
-            time_series = self._client.time_series.upsert(instances.time_series, mode="patch")
-
-        return DomainsApplyResult(result.nodes, result.edges, TimeSeriesList(time_series))
+        return self._apply(unit_procedure, replace)
 
     def delete(
         self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
@@ -470,14 +456,14 @@ class UnitProcedureAPI(TypeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
         if isinstance(external_id, str):
             unit_procedure = self._retrieve((space, external_id))
 
-            work_unit_edges = self.work_units.retrieve(external_id, space=space)
+            work_unit_edges = self.work_units.list(external_id, space=space)
             unit_procedure.work_units = [edge.end_node.external_id for edge in work_unit_edges]
 
             return unit_procedure
         else:
             unit_procedures = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            work_unit_edges = self.work_units.retrieve(unit_procedures.as_node_ids())
+            work_unit_edges = self.work_units.list(unit_procedures.as_node_ids())
             self._set_work_units(unit_procedures, work_unit_edges)
 
             return unit_procedures
