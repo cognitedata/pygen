@@ -171,12 +171,9 @@ class TypeAPI(Generic[T_TypeNode, T_TypeApplyNode, T_TypeNodeList]):
             else:
                 raise TypeError(f"Expected str or MetricAggregation, got {type(agg)}")
 
-        result = self._client.data_modeling.instances.aggregate(
-            view_id, aggregates, "node", group_by, query, search_properties, filter, limit
+        return self._client.data_modeling.instances.aggregate(
+            view_id, aggregates, group_by, "node", query, search_properties, filter, limit
         )
-        if group_by is None:
-            return result[0].aggregates
-        return result
 
     def _histogram(
         self,
