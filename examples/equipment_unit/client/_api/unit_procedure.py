@@ -17,17 +17,183 @@ from equipment_unit.client.data_classes import (
     UnitProcedureFields,
     UnitProcedureTextFields,
     DomainModelApply,
+    DomainRelationApply,
     StartEndTimeList,
     StartEndTime,
     StartEndTimeApply,
+    EquipmentModuleApply,
+    EquipmentModule,
 )
 from equipment_unit.client.data_classes._unit_procedure import _UNITPROCEDURE_PROPERTIES_BY_FIELD
+from equipment_unit.client.data_classes._equipment_module import _EQUIPMENTMODULE_PROPERTIES_BY_FIELD
+
+
+class UnitProcedureWorkUnitsQuery:
+    def __init__(
+        self,
+        client: CogniteClient,
+        node_view: dm.ViewId,
+        edge_view: dm.ViewId,
+        end_node_view: dm.ViewId,
+        node_limit: int = DEFAULT_LIMIT_READ,
+        node_filter: dm.Filter | None = None,
+    ):
+        self._client = client
+        self._node_view = node_view
+        self._edge_view = edge_view
+        self._end_node_view = end_node_view
+        self._node_limit = node_limit
+        self._node_filter = node_filter
+
+    def list(
+        self,
+        min_start_time: datetime.datetime | None = None,
+        max_start_time: datetime.datetime | None = None,
+        min_end_time: datetime.datetime | None = None,
+        max_end_time: datetime.datetime | None = None,
+        space: str = "IntegrationTestsImmutable",
+        limit: int = -1,
+        retrieve_equipment_module: bool = True,
+    ) -> UnitProcedureList:
+        """
+
+        Args:
+            min_start_time:
+            max_start_time:
+            min_end_time:
+            max_end_time:
+            space:
+            limit:
+
+        Returns:
+
+        """
+        f = dm.filters
+        edge_filter = _create_filter_work_units(
+            self._edge_view,
+            None,
+            None,
+            min_start_time,
+            max_start_time,
+            min_end_time,
+            max_end_time,
+            space,
+            f.Equals(
+                ["edge", "type"],
+                {"space": "IntegrationTestsImmutable", "externalId": "UnitProcedure.equipment_module"},
+            ),
+        )
+        selected_nodes = dm.query.NodeResultSetExpression(filter=self._node_filter, limit=5)
+        selected_edges = dm.query.EdgeResultSetExpression(from_="nodes", filter=edge_filter, limit=1000)
+        with_ = {
+            "nodes": selected_nodes,
+            "edges": selected_edges,
+        }
+        if retrieve_equipment_module:
+            with_["end_nodes"] = dm.query.NodeResultSetExpression(from_="edges", limit=1000)
+
+        select = {
+            "nodes": dm.query.Select(
+                [dm.query.SourceSelector(self._node_view, list(_UNITPROCEDURE_PROPERTIES_BY_FIELD.values()))],
+            ),
+            "edges": dm.query.Select(
+                # Todo replace start_end time with properties by fields as above
+                [dm.query.SourceSelector(self._edge_view, ["start_time", "end_time"])],
+            ),
+        }
+        if retrieve_equipment_module:
+            select["end_nodes"] = dm.query.Select(
+                [dm.query.SourceSelector(self._end_node_view, list(_EQUIPMENTMODULE_PROPERTIES_BY_FIELD.values()))]
+            )
+
+        query = dm.query.Query(with_=with_, select=select, cursors={"nodes": None, "edges": None})
+        result = self._client.data_modeling.instances.query(query)
+
+        if retrieve_equipment_module:
+            end_node_by_id = {
+                (node.space, node.external_id): EquipmentModule.from_node(node) for node in result["end_nodes"]
+            }
+        else:
+            end_node_by_id = {}
+
+        edge_by_start_node = defaultdict(list)
+        for edge in result["edges"]:
+            edge = StartEndTime.from_edge(edge)
+            edge.equipment_module = end_node_by_id.get((edge.end_node.space, edge.end_node.external_id))
+            edge_by_start_node[(edge.start_node.space, edge.start_node.external_id)].append(edge)
+
+        nodes = []
+        for node in result["nodes"]:
+            node = UnitProcedure.from_node(node)
+            node.work_units = edge_by_start_node.get((node.space, node.external_id), [])
+            nodes.append(node)
+
+        return UnitProcedureList(nodes)
 
 
 class UnitProcedureWorkUnitsAPI:
-    def __init__(self, client: CogniteClient, view_id: dm.ViewId):
+    def __init__(
+        self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId]
+    ):
         self._client = client
-        self._view_id = view_id
+        self._view_by_write_class = view_by_write_class
+        self._view_id = view_by_write_class[StartEndTimeApply]
+
+    def __call__(
+        self,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        type_: str | list[str] | None = None,
+        type_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> UnitProcedureWorkUnitsQuery:
+        """Query timeseries `equipment_module.sensor_value`
+
+        Args:
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            type_: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of unit procedures to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            A query object that can be used to retrieve datapoins for the  equipment_module.sensor_value timeseries
+            selected in this method.
+
+        Examples:
+
+            Retrieve all data for 5 equipment_module.sensor_value timeseries:
+
+                >>> from equipment_unit.client import EquipmentUnitClient
+                >>> client = EquipmentUnitClient()
+                >>> equipment_modules = client.equipment_module.sensor_value(limit=5).retrieve()
+
+        """
+        node_view = self._view_by_write_class[UnitProcedureApply]
+        filter_ = _create_filter(
+            node_view,
+            name,
+            name_prefix,
+            type_,
+            type_prefix,
+            external_id_prefix,
+            space,
+        )
+
+        return UnitProcedureWorkUnitsQuery(
+            client=self._client,
+            node_view=node_view,
+            edge_view=self._view_id,
+            end_node_view=self._view_by_write_class[EquipmentModuleApply],
+            node_limit=limit,
+            node_filter=filter_,
+        )
 
     def list(
         self,
@@ -157,7 +323,7 @@ class UnitProcedureAPI(TypeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
         )
         self._view_id = view_id
         self._view_by_write_class = view_by_write_class
-        self.work_units = UnitProcedureWorkUnitsAPI(client, view_by_write_class[StartEndTimeApply])
+        self.work_units = UnitProcedureWorkUnitsAPI(client, view_by_write_class)
 
     def apply(
         self, unit_procedure: UnitProcedureApply | Sequence[UnitProcedureApply], replace: bool = False

@@ -1,4 +1,4 @@
-from ._core import DomainModel, DomainModelApply
+from ._core import DomainModel, DomainModelApply, DomainRelationApply
 from ._equipment_module import (
     EquipmentModule,
     EquipmentModuleApply,
@@ -23,10 +23,14 @@ from ._unit_procedure import (
 )
 
 UnitProcedureApply.model_rebuild()
+UnitProcedure.model_rebuild()
+StartEndTimeApply.model_rebuild()
+StartEndTime.model_rebuild()
 
 __all__ = [
     "DomainModel",
     "DomainModelApply",
+    "DomainRelationApply",
     "EquipmentModule",
     "EquipmentModuleApply",
     "EquipmentModuleList",

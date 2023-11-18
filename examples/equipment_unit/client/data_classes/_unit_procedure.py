@@ -9,7 +9,7 @@ from ._core import DomainModel, DomainModelApply, NodeList, TypeApplyList
 
 if TYPE_CHECKING:
     from ._equipment_module import EquipmentModuleApply
-    from ._start_end_time import StartEndTimeApply
+    from ._start_end_time import StartEndTimeApply, StartEndTime
 
 __all__ = [
     "UnitProcedure",
@@ -50,7 +50,7 @@ class UnitProcedure(DomainModel):
     space: str = "IntegrationTestsImmutable"
     name: Optional[str] = None
     type_: Optional[str] = Field(None, alias="type")
-    work_units: Optional[list[str]] = None
+    work_units: Optional[Union[list[StartEndTime], list[str]]] = None
 
     def as_apply(self) -> UnitProcedureApply:
         """Convert this read version of unit procedure to the writing version."""

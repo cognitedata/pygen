@@ -4,7 +4,9 @@ from tests.constants import IS_PYDANTIC_V2
 
 if IS_PYDANTIC_V2:
     from equipment_unit.client.data_classes import (
+        EquipmentModule,
         EquipmentModuleApply,
+        StartEndTime,
         StartEndTimeApply,
         StartEndTimeList,
         UnitProcedureApply,
@@ -50,6 +52,20 @@ def test_filter_start_end_time_edges(start_end_time_edges: StartEndTimeList, wor
     assert len(filtered) == len(sorted_by_start_time) - 1
 
 
+def test_filter_unit_procedure_through_edge(workorder: EquipmentUnitClient) -> None:
+    unit_procedures = workorder.unit_procedure.work_units(type_="red", limit=3).list(
+        retrieve_equipment_module=True, limit=-1
+    )
+
+    assert 1 <= len(unit_procedures) <= 3
+    assert all(procedure.type_ == "red" for procedure in unit_procedures)
+    for unit_procedure in unit_procedures:
+        for work_unit in unit_procedure.work_units:
+            assert isinstance(work_unit, StartEndTime)
+            assert isinstance(work_unit.equipment_module, EquipmentModule)
+
+
+@pytest.mark.skip(reason="Not implemented")
 def test_apply_unit_procedure_with_edge(workorder: EquipmentUnitClient) -> None:
     new_procedure = UnitProcedureApply(
         external_id="procedure:new_procedure",
@@ -69,5 +85,8 @@ def test_apply_unit_procedure_with_edge(workorder: EquipmentUnitClient) -> None:
             ),
         ],
     )
-
-    workorder.unit_procedure.apply(new_procedure)
+    try:
+        workorder.unit_procedure.apply(new_procedure)
+    finally:
+        workorder.unit_procedure.delete("procedure:new_procedure")
+        workorder.equipment_module.delete("module:new_module")

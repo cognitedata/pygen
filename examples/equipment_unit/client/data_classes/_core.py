@@ -191,8 +191,10 @@ class DomainRelation(DomainRelationCore):
 T_DomainRelation = TypeVar("T_DomainRelation", bound=DomainRelation)
 
 
-class DomainRelationApply(BaseModel, extra=Extra.forbid, populate_by_name=True):
+class DomainRelationApply(DomainModelCore, extra=Extra.forbid, populate_by_name=True):
     existing_version: Optional[int] = None
+    start_node: Optional[dm.DirectRelationReference] = Field(None, alias="startNode")
+    end_node: Optional[dm.DirectRelationReference] = Field(None, alias="endNode")
 
 
 class EdgeList(CoreList[T_DomainRelationCore]):
