@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Literal, TYPE_CHECKING, Optional, Union
 
 from cognite.client import data_modeling as dm
-from cognite.client.data_classes import TimeSeriesList
 from pydantic import Field
 
 from ._core import (
@@ -16,8 +15,8 @@ from ._core import (
 )
 
 if TYPE_CHECKING:
-    from ._equipment_module import EquipmentModuleApply
     from ._start_end_time import StartEndTimeApply, StartEndTime
+
 
 __all__ = [
     "UnitProcedure",
@@ -98,8 +97,11 @@ class UnitProcedureApply(DomainModelApply):
         cache: set[tuple[str, str]],
         view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
     ) -> DomainsApply:
+        from ._start_end_time import StartEndTimeApply
+
         if self.id_tuple() in cache:
             return DomainsApply()
+
         write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
             "IntegrationTestsImmutable", "UnitProcedure", "f16810a7105c44"
         )
@@ -129,7 +131,9 @@ class UnitProcedureApply(DomainModelApply):
 
         for work_unit in self.work_units or []:
             if isinstance(work_unit, StartEndTimeApply):
-                instances = work_unit._to_instances_apply(cache, view_by_write_class)
+                instances = work_unit._to_instances_apply(
+                    cache, dm.DirectRelationReference(self.space, self.external_id), view_by_write_class
+                )
                 this_instances.extend(instances)
 
         return this_instances

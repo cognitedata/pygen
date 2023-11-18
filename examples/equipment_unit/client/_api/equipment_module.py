@@ -20,6 +20,7 @@ from equipment_unit.client.data_classes import (
     EquipmentModuleFields,
     EquipmentModuleTextFields,
     DomainModelApply,
+    DomainsApplyResult,
 )
 from equipment_unit.client.data_classes._equipment_module import _EQUIPMENTMODULE_PROPERTIES_BY_FIELD
 
@@ -559,7 +560,7 @@ class EquipmentModuleAPI(TypeAPI[EquipmentModule, EquipmentModuleApply, Equipmen
 
     def apply(
         self, equipment_module: EquipmentModuleApply | Sequence[EquipmentModuleApply], replace: bool = False
-    ) -> dm.InstancesApplyResult:
+    ) -> DomainsApplyResult:
         """Add or update (upsert) equipment modules.
 
         Args:
@@ -567,7 +568,7 @@ class EquipmentModuleAPI(TypeAPI[EquipmentModule, EquipmentModuleApply, Equipmen
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes, edges, and time series.
 
         Examples:
 
@@ -584,13 +585,18 @@ class EquipmentModuleAPI(TypeAPI[EquipmentModule, EquipmentModuleApply, Equipmen
             instances = equipment_module.to_instances_apply(self._view_by_write_class)
         else:
             instances = EquipmentModuleApplyList(equipment_module).to_instances_apply(self._view_by_write_class)
-        return self._client.data_modeling.instances.apply(
+        result = self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
             auto_create_start_nodes=True,
             auto_create_end_nodes=True,
             replace=replace,
         )
+        time_series = []
+        if instances.time_series:
+            time_series = self._client.time_series.upsert(instances.time_series, mode="patch")
+
+        return DomainsApplyResult(result.nodes, result.edges, TimeSeriesList(time_series))
 
     def delete(
         self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"

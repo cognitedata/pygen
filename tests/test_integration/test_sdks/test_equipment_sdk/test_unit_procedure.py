@@ -1,4 +1,5 @@
 import pytest
+from cognite.client import CogniteClient
 from cognite.client.data_classes import TimeSeries
 
 from tests.constants import IS_PYDANTIC_V2
@@ -73,7 +74,7 @@ def test_filter_unit_procedure_through_edge(workorder: EquipmentUnitClient) -> N
             assert isinstance(work_unit.equipment_module, EquipmentModule)
 
 
-def test_apply_unit_procedure_with_edge(workorder: EquipmentUnitClient) -> None:
+def test_apply_unit_procedure_with_edge(workorder: EquipmentUnitClient, cognite_client: CogniteClient) -> None:
     new_procedure = UnitProcedureApply(
         external_id="procedure:new_procedure",
         name="New procedure",
@@ -93,6 +94,13 @@ def test_apply_unit_procedure_with_edge(workorder: EquipmentUnitClient) -> None:
         ],
     )
 
-    new_procedure.to_instances_apply()
+    instances = new_procedure.to_instances_apply()
+    try:
+        created = workorder.unit_procedure.apply(new_procedure)
 
-    assert new_procedure
+        assert len(created.nodes) == 2
+        assert len(created.edges) == 1
+        assert len(created.time_series) == 1
+    finally:
+        cognite_client.data_modeling.instances.delete(instances.nodes.as_ids(), instances.edges.as_ids())
+        cognite_client.time_series.delete(external_id=instances.time_series.as_external_ids(), ignore_unknown_ids=True)

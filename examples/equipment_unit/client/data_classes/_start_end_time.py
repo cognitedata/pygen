@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import Literal, Optional, Union, ClassVar, Any
+from typing import Literal, Optional, Union, ClassVar, Any, Type
 
 from cognite.client.data_classes import data_modeling as dm, TimeSeriesList
 from cognite.client.data_classes.data_modeling import DirectRelationReference
@@ -79,7 +79,7 @@ class StartEndTimeApply(DomainRelationApply):
         self,
         cache: set[tuple[str, str]],
         start_node: dm.DirectRelationReference,
-        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+        view_by_write_class: dict[Type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
     ) -> DomainsApply:
         if self.external_id and (self.space, self.external_id) in cache:
             return DomainsApply()
@@ -90,7 +90,7 @@ class StartEndTimeApply(DomainRelationApply):
             end_node = dm.DirectRelationReference(self.space, self.equipment_module)
         else:
             raise ValueError(f"Invalid type for equipment_module: {type(self.equipment_module)}")
-        self.external_id = external_id = self.external_id_factory(type(self), start_node, end_node)
+        self.external_id = external_id = type(self).external_id_factory(type(self), start_node, end_node)
 
         write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
             "IntegrationTestsImmutable", "StartEndTime", "d416e0ed98186b"

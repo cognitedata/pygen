@@ -34,6 +34,13 @@ class DomainsApply:
         self.time_series.extend(other.time_series)
 
 
+@dataclass
+class DomainsApplyResult:
+    nodes: dm.NodeApplyResultList
+    edges: dm.EdgeApplyResultList
+    time_series: TimeSeriesList
+
+
 # Arbitrary types are allowed to be able to use the TimeSeries class
 class Core(BaseModel, arbitrary_types_allowed=True):
     def to_pandas(self, include_instance_properties: bool = False) -> pd.Series:

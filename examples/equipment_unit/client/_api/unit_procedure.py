@@ -6,7 +6,8 @@ from typing import Dict, List, Sequence, Tuple, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
-from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
+from cognite.client.data_classes import TimeSeriesList
+from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstancesApplyResult
 
 from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT, INSTANCE_QUERY_LIMIT
 from equipment_unit.client.data_classes import (
@@ -17,6 +18,7 @@ from equipment_unit.client.data_classes import (
     UnitProcedureFields,
     UnitProcedureTextFields,
     DomainModelApply,
+    DomainsApplyResult,
     DomainRelationApply,
     StartEndTimeList,
     StartEndTime,
@@ -367,7 +369,7 @@ class UnitProcedureAPI(TypeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
 
     def apply(
         self, unit_procedure: UnitProcedureApply | Sequence[UnitProcedureApply], replace: bool = False
-    ) -> dm.InstancesApplyResult:
+    ) -> DomainsApplyResult:
         """Add or update (upsert) unit procedures.
 
         Note: This method iterates through all nodes linked to unit_procedure and create them including the edges
@@ -379,7 +381,7 @@ class UnitProcedureAPI(TypeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes, edges, and time series.
 
         Examples:
 
@@ -396,13 +398,18 @@ class UnitProcedureAPI(TypeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
             instances = unit_procedure.to_instances_apply(self._view_by_write_class)
         else:
             instances = UnitProcedureApplyList(unit_procedure).to_instances_apply(self._view_by_write_class)
-        return self._client.data_modeling.instances.apply(
+        result = self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
             auto_create_start_nodes=True,
             auto_create_end_nodes=True,
             replace=replace,
         )
+        time_series = []
+        if instances.time_series:
+            time_series = self._client.time_series.upsert(instances.time_series, mode="patch")
+
+        return DomainsApplyResult(result.nodes, result.edges, TimeSeriesList(time_series))
 
     def delete(
         self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
