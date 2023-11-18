@@ -60,4 +60,4 @@ class StartEndTimeApply(DomainRelationApply):
 class StartEndTimeList(EdgeList[StartEndTime]):
     """List of start end time in read version."""
 
-    _NODE = StartEndTime
+    _INSTANCE = StartEndTime

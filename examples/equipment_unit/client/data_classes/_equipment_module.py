@@ -129,7 +129,7 @@ class EquipmentModuleApply(DomainModelApply):
 class EquipmentModuleList(NodeList[EquipmentModule]):
     """List of equipment modules in read version."""
 
-    _NODE = EquipmentModule
+    _INSTANCE = EquipmentModule
 
     def as_apply(self) -> EquipmentModuleApplyList:
         """Convert this read version of equipment module to a write version."""
@@ -139,4 +139,4 @@ class EquipmentModuleList(NodeList[EquipmentModule]):
 class EquipmentModuleApplyList(TypeApplyList[EquipmentModuleApply]):
     """List of equipment modules in write version."""
 
-    _NODE = EquipmentModuleApply
+    _INSTANCE = EquipmentModuleApply

@@ -8,6 +8,7 @@ if IS_PYDANTIC_V2:
         StartEndTimeApply,
         StartEndTimeList,
         UnitProcedureApply,
+        UnitProcedureList,
     )
 
     from examples.equipment_unit.client import EquipmentUnitClient
@@ -23,9 +24,22 @@ def start_end_time_edges(workorder: EquipmentUnitClient) -> StartEndTimeList:
     return edges
 
 
+@pytest.fixture
+def unit_procedure_list(workorder: EquipmentUnitClient) -> UnitProcedureList:
+    nodes = workorder.unit_procedure.list(limit=5)
+    assert len(nodes) > 2, "There should be at least three node in the list"
+    assert isinstance(nodes, UnitProcedureList)
+    return nodes
+
+
 def test_edges_to_pandas(start_end_time_edges: StartEndTimeList) -> None:
     df = start_end_time_edges.to_pandas()
     assert len(df) == len(start_end_time_edges)
+
+
+def test_unit_procedure_list_to_pandas(unit_procedure_list: UnitProcedureList) -> None:
+    df = unit_procedure_list.to_pandas()
+    assert len(df) == len(unit_procedure_list)
 
 
 def test_filter_start_end_time_edges(start_end_time_edges: StartEndTimeList, workorder: EquipmentUnitClient) -> None:

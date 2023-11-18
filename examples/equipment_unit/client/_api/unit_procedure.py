@@ -29,55 +29,6 @@ class UnitProcedureWorkUnitsAPI:
         self._client = client
         self._view_id = view_id
 
-    def retrieve(
-        self,
-        unit_procedure: str | Sequence[str] | dm.NodeId | list[dm.NodeId],
-        space: str = "IntegrationTestsImmutable",
-    ) -> StartEndTimeList:
-        """Retrieve one or more work_units edges by id(s) of a unit procedure.
-
-        Args:
-            unit_procedure: External id or list of external ids source unit procedure.
-            space: The space where all the work unit edges are located.
-
-        Returns:
-            The requested work unit edges.
-
-        Examples:
-
-            Retrieve work_units edge by id:
-
-                >>> from equipment_unit.client import EquipmentUnitClient
-                >>> client = EquipmentUnitClient()
-                >>> unit_procedure = client.unit_procedure.work_units.retrieve("my_work_units")
-
-        """
-        f = dm.filters
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": "IntegrationTestsImmutable", "externalId": "UnitProcedure.equipment_module"},
-        )
-        if isinstance(unit_procedure, (str, dm.NodeId)):
-            is_unit_procedures = f.Equals(
-                ["edge", "startNode"],
-                {"space": space, "externalId": unit_procedure}
-                if isinstance(unit_procedure, str)
-                else unit_procedure.dump(camel_case=True, include_instance_type=False),
-            )
-        else:
-            is_unit_procedures = f.In(
-                ["edge", "startNode"],
-                [
-                    {"space": space, "externalId": ext_id}
-                    if isinstance(ext_id, str)
-                    else ext_id.dump(camel_case=True, include_instance_type=False)
-                    for ext_id in unit_procedure
-                ],
-            )
-        return self._client.data_modeling.instances.list(
-            "edge", limit=-1, filter=f.And(is_edge_type, is_unit_procedures), sources=[self._view_id]
-        )
-
     def list(
         self,
         unit_procedure: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,

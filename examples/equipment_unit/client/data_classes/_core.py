@@ -81,6 +81,7 @@ class DomainModelApplyResult(DomainModelCore):
 
 class CoreList(UserList, Generic[T_TypeCore]):
     _INSTANCE: type[T_TypeCore]
+    _PARENT_CLASS: type[DomainModelCore]
 
     def __init__(self, nodes: Collection[T_TypeCore] = None):
         super().__init__(nodes or [])
@@ -126,24 +127,24 @@ class CoreList(UserList, Generic[T_TypeCore]):
         if df.empty:
             df = pd.DataFrame(columns=self._INSTANCE.model_fields)
         # Reorder columns to have the custom columns first
-        fixed_columns = set(self._INSTANCE.model_fields)
+        fixed_columns = set(self._PARENT_CLASS.model_fields)
         columns = ["external_id"] + [col for col in df if col not in fixed_columns]
         if include_instance_properties:
-            columns += [col for col in DomainModel.model_fields if col != "external_id"]
+            columns += [col for col in self._PARENT_CLASS.model_fields if col != "external_id"]
         return df[columns]
 
     def _repr_html_(self) -> str:
         return self.to_pandas(include_instance_properties=False)._repr_html_()  # type: ignore[operator]
 
 
-class NodeList(UserList, Generic[T_TypeCore]):
-    _INSTANCE: type[T_TypeCore]
+class NodeList(CoreList[T_TypeCore]):
+    _PARENT_CLASS = DomainModel
 
     def __init__(self, nodes: Collection[T_TypeCore] = None):
         super().__init__(nodes or [])
 
     def as_node_ids(self) -> list[dm.NodeId]:
-        return [dm.NodeId(space=node.space, external_id=node.external_id) for node in self.data]
+        return [dm.NodeId(space=node.space, external_id=node.external_id) for node in self]
 
 
 T_TypeApplyNode = TypeVar("T_TypeApplyNode", bound=DomainModelApply)
@@ -151,6 +152,8 @@ T_TypeNodeList = TypeVar("T_TypeNodeList", bound=CoreList, covariant=True)
 
 
 class TypeApplyList(NodeList[T_TypeApplyNode]):
+    _PARENT_CLASS = DomainModelApply
+
     def to_instances_apply(
         self, view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None = None
     ) -> dm.InstancesApply:
@@ -165,9 +168,9 @@ class TypeApplyList(NodeList[T_TypeApplyNode]):
 
 
 class DomainRelationCore(DomainModelCore):
-    type: dm.NodeId
-    start_node: dm.NodeId
-    end_node: dm.NodeId
+    type: dm.DirectRelationReference
+    start_node: dm.DirectRelationReference
+    end_node: dm.DirectRelationReference
 
 
 T_DomainRelationCore = TypeVar("T_DomainRelationCore", bound=DomainRelationCore)
@@ -193,7 +196,7 @@ class DomainRelationApply(BaseModel, extra=Extra.forbid, populate_by_name=True):
 
 
 class EdgeList(CoreList[T_DomainRelationCore]):
-    _INSTANCE = DomainRelation
+    _PARENT_CLASS = DomainRelation
 
     def as_edge_ids(self) -> list[dm.EdgeId]:
         return [dm.EdgeId(space=edge.space, external_id=edge.external_id) for edge in self.data]

@@ -148,7 +148,7 @@ class UnitProcedureApply(DomainModelApply):
 class UnitProcedureList(NodeList[UnitProcedure]):
     """List of unit procedures in read version."""
 
-    _NODE = UnitProcedure
+    _INSTANCE = UnitProcedure
 
     def as_apply(self) -> UnitProcedureApplyList:
         """Convert this read version of unit procedure to a write version."""
@@ -158,4 +158,4 @@ class UnitProcedureList(NodeList[UnitProcedure]):
 class UnitProcedureApplyList(TypeApplyList[UnitProcedureApply]):
     """List of unit procedures in write version."""
 
-    _NODE = UnitProcedureApply
+    _INSTANCE = UnitProcedureApply
