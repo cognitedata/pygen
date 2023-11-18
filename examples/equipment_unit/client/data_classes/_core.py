@@ -4,13 +4,22 @@ import datetime
 from abc import abstractmethod
 from collections import UserList
 from collections.abc import Collection, Mapping, Iterator
-from typing import Any, Callable, ClassVar, Generic, Optional, TypeVar, overload, Type
+from typing import Any, Callable, ClassVar, Generic, Optional, TypeVar, overload, Type, Annotated
 from dataclasses import dataclass, field
-from cognite.client.data_classes import TimeSeriesList
+from cognite.client.data_classes import TimeSeriesList, TimeSeries as CogniteTimeSeries
 import pandas as pd
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Properties, PropertyValue
 from pydantic import BaseModel, Extra, Field, model_validator
+from pydantic.functional_serializers import PlainSerializer
+from pydantic import BeforeValidator
+
+
+TimeSeries = Annotated[
+    CogniteTimeSeries,
+    PlainSerializer(lambda v: v.dump(camel_case=True), return_type=dict, when_used="unless-none"),
+    BeforeValidator(lambda v: CogniteTimeSeries.load(v) if isinstance(v, dict) else v),
+]
 
 
 @dataclass
@@ -25,7 +34,8 @@ class DomainsApply:
         self.time_series.extend(other.time_series)
 
 
-class Core(BaseModel):
+# Arbitrary types are allowed to be able to use the TimeSeries class
+class Core(BaseModel, arbitrary_types_allowed=True):
     def to_pandas(self, include_instance_properties: bool = False) -> pd.Series:
         exclude = None
         if not include_instance_properties:

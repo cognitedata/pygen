@@ -3,8 +3,8 @@ from __future__ import annotations
 from typing import Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
+from cognite.client import data_classes
 from pydantic import Field
-from cognite.client.data_classes import TimeSeries
 from ._core import (
     DomainModel,
     DomainModelApply,
@@ -12,6 +12,7 @@ from ._core import (
     DomainModelApplyList,
     DomainsApply,
     DomainRelationApply,
+    TimeSeries,
 )
 
 
@@ -115,7 +116,9 @@ class EquipmentModuleApply(DomainModelApply):
             properties["name"] = self.name
         if self.sensor_value is not None:
             properties["sensor_value"] = (
-                self.sensor_value.external_id if isinstance(self.sensor_value, TimeSeries) else self.sensor_value
+                self.sensor_value.external_id
+                if isinstance(self.sensor_value, data_classes.TimeSeries)
+                else self.sensor_value
             )
         if self.type_ is not None:
             properties["type"] = self.type_
@@ -134,7 +137,7 @@ class EquipmentModuleApply(DomainModelApply):
             this_instances.nodes.append(this_node)
             cache.add((self.space, self.external_id))
 
-        if isinstance(self.sensor_value, TimeSeries):
+        if isinstance(self.sensor_value, data_classes.TimeSeries):
             this_instances.time_series.append(self.sensor_value)
             cache.add(("", self.sensor_value.external_id))
 
