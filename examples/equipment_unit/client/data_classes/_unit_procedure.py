@@ -99,14 +99,13 @@ class UnitProcedureApply(DomainModelApply):
     ) -> ResourcesApply:
         from ._start_end_time import StartEndTimeApply
 
+        resources = ResourcesApply()
         if self.id_tuple() in cache:
-            return ResourcesApply()
+            return resources
 
         write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
             "IntegrationTestsImmutable", "UnitProcedure", "f16810a7105c44"
         )
-
-        this_instances = ResourcesApply()
 
         properties = {}
         if self.name is not None:
@@ -126,17 +125,17 @@ class UnitProcedureApply(DomainModelApply):
                     )
                 ],
             )
-            this_instances.nodes.append(this_node)
+            resources.nodes.append(this_node)
             cache.add(self.id_tuple())
 
         for work_unit in self.work_units or []:
             if isinstance(work_unit, StartEndTimeApply):
-                instances = work_unit._to_instances_apply(
+                other_resources = work_unit._to_instances_apply(
                     cache, dm.DirectRelationReference(self.space, self.external_id), view_by_write_class
                 )
-                this_instances.extend(instances)
+                resources.extend(other_resources)
 
-        return this_instances
+        return resources
 
 
 class UnitProcedureList(DomainModelList[UnitProcedure]):
