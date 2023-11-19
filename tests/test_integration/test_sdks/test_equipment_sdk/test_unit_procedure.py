@@ -22,7 +22,7 @@ else:
 
 @pytest.fixture
 def start_end_time_edges(workorder: EquipmentUnitClient) -> StartEndTimeList:
-    edges = workorder.unit_procedure.work_units.list(limit=-1)
+    edges = workorder.unit_procedure.work_units_edge.list(limit=-1)
     assert len(edges) > 2, "There should be at least three edge in the list"
     assert isinstance(edges, StartEndTimeList)
     return edges
@@ -56,7 +56,9 @@ def test_single_unit_procedure_to_pandas(unit_procedure_list: UnitProcedureList)
 def test_filter_start_end_time_edges(start_end_time_edges: StartEndTimeList, workorder: EquipmentUnitClient) -> None:
     sorted_by_start_time = sorted(start_end_time_edges, key=lambda x: x.start_time)
 
-    filtered = workorder.unit_procedure.work_units.list(min_start_time=sorted_by_start_time[1].start_time, limit=-1)
+    filtered = workorder.unit_procedure.work_units_edge.list(
+        min_start_time=sorted_by_start_time[1].start_time, limit=-1
+    )
 
     assert len(filtered) == len(sorted_by_start_time) - 1
 

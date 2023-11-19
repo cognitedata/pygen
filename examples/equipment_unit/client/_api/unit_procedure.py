@@ -6,15 +6,12 @@ from typing import Dict, List, Sequence, Tuple, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
-from cognite.client.data_classes import TimeSeriesList
-from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstancesApplyResult
+from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT, INSTANCE_QUERY_LIMIT
 from equipment_unit.client.data_classes import (
     UnitProcedure,
     UnitProcedureApply,
     UnitProcedureList,
-    UnitProcedureApplyList,
     UnitProcedureFields,
     UnitProcedureTextFields,
     DomainModelApply,
@@ -26,9 +23,10 @@ from equipment_unit.client.data_classes import (
     EquipmentModuleApply,
     EquipmentModule,
 )
-from equipment_unit.client.data_classes._unit_procedure import _UNITPROCEDURE_PROPERTIES_BY_FIELD
 from equipment_unit.client.data_classes._equipment_module import _EQUIPMENTMODULE_PROPERTIES_BY_FIELD
 from equipment_unit.client.data_classes._start_end_time import _STARTENDTIME_PROPERTIES_BY_FIELD
+from equipment_unit.client.data_classes._unit_procedure import _UNITPROCEDURE_PROPERTIES_BY_FIELD
+from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT, INSTANCE_QUERY_LIMIT
 
 
 class UnitProcedureWorkUnitsQuery:
@@ -232,6 +230,15 @@ class UnitProcedureWorkUnitsAPI:
             node_filter=filter_,
         )
 
+
+class UnitProcedureWorkUnitsEdgeAPI:
+    def __init__(
+        self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId]
+    ):
+        self._client = client
+        self._view_by_write_class = view_by_write_class
+        self._view_id = view_by_write_class[StartEndTimeApply]
+
     def list(
         self,
         unit_procedure: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
@@ -367,6 +374,7 @@ class UnitProcedureAPI(TypeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
         self._view_id = view_id
         self._view_by_write_class = view_by_write_class
         self.work_units = UnitProcedureWorkUnitsAPI(client, view_by_write_class)
+        self.work_units_edge = UnitProcedureWorkUnitsEdgeAPI(client, view_by_write_class)
 
     def apply(
         self, unit_procedure: UnitProcedureApply | Sequence[UnitProcedureApply], replace: bool = False
@@ -456,14 +464,14 @@ class UnitProcedureAPI(TypeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
         if isinstance(external_id, str):
             unit_procedure = self._retrieve((space, external_id))
 
-            work_unit_edges = self.work_units.list(external_id, space=space)
+            work_unit_edges = self.work_units_edge.list(external_id, space=space)
             unit_procedure.work_units = [edge.end_node.external_id for edge in work_unit_edges]
 
             return unit_procedure
         else:
             unit_procedures = self._retrieve([(space, ext_id) for ext_id in external_id])
 
-            work_unit_edges = self.work_units.list(unit_procedures.as_node_ids())
+            work_unit_edges = self.work_units_edge.list(unit_procedures.as_node_ids())
             self._set_work_units(unit_procedures, work_unit_edges)
 
             return unit_procedures
@@ -743,9 +751,9 @@ class UnitProcedureAPI(TypeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
         if retrieve_edges:
             space_arg = {"space": space} if space else {}
             if len(ids := unit_procedures.as_node_ids()) > IN_FILTER_LIMIT:
-                work_unit_edges = self.work_units.list(limit=-1, **space_arg)
+                work_unit_edges = self.work_units_edge.list(limit=-1, **space_arg)
             else:
-                work_unit_edges = self.work_units.list(ids, limit=-1)
+                work_unit_edges = self.work_units_edge.list(ids, limit=-1)
             self._set_work_units(unit_procedures, work_unit_edges)
 
         return unit_procedures
