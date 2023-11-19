@@ -1,9 +1,9 @@
-from pprint import pprint
+import random
+
+from cognite.client import data_modeling as dm
+from faker import Faker
 
 from cognite.pygen import load_cognite_client_from_toml
-import random
-from faker import Faker
-from cognite.client import data_modeling as dm
 from cognite.pygen.utils.helper import chdir
 from tests.constants import REPO_ROOT
 

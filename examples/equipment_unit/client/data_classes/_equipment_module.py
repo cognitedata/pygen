@@ -2,19 +2,19 @@ from __future__ import annotations
 
 from typing import Literal, Optional, Union
 
-from cognite.client import data_modeling as dm
 from cognite.client import data_classes
+from cognite.client import data_modeling as dm
 from pydantic import Field
+
 from ._core import (
     DomainModel,
     DomainModelApply,
-    DomainModelList,
     DomainModelApplyList,
-    DomainsApply,
+    DomainModelList,
     DomainRelationApply,
+    ResourcesApply,
     TimeSeries,
 )
-
 
 __all__ = [
     "EquipmentModule",
@@ -101,8 +101,8 @@ class EquipmentModuleApply(DomainModelApply):
         self,
         cache: set[tuple[str, str]],
         view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
-    ) -> DomainsApply:
-        this_instances = DomainsApply()
+    ) -> ResourcesApply:
+        this_instances = ResourcesApply()
         if self.external_id in cache:
             return this_instances
         write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(

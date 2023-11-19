@@ -3,17 +3,17 @@ from __future__ import annotations
 import datetime
 from abc import abstractmethod
 from collections import UserList
-from collections.abc import Collection, Mapping, Iterator
-from typing import Any, Callable, ClassVar, Generic, Optional, TypeVar, overload, Type, Annotated
+from collections.abc import Collection, Iterator, Mapping
 from dataclasses import dataclass, field
-from cognite.client.data_classes import TimeSeriesList, TimeSeries as CogniteTimeSeries
+from typing import Annotated, Any, Callable, ClassVar, Generic, Optional, TypeVar, overload
+
 import pandas as pd
 from cognite.client import data_modeling as dm
+from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
+from cognite.client.data_classes import TimeSeriesList
 from cognite.client.data_classes.data_modeling.instances import Properties, PropertyValue
-from pydantic import BaseModel, Extra, Field, model_validator
+from pydantic import BaseModel, BeforeValidator, Extra, Field, model_validator
 from pydantic.functional_serializers import PlainSerializer
-from pydantic import BeforeValidator
-
 
 TimeSeries = Annotated[
     CogniteTimeSeries,
@@ -23,19 +23,19 @@ TimeSeries = Annotated[
 
 
 @dataclass
-class DomainsApply:
+class ResourcesApply:
     nodes: dm.NodeApplyList = field(default_factory=lambda: dm.NodeApplyList([]))
     edges: dm.EdgeApplyList = field(default_factory=lambda: dm.EdgeApplyList([]))
     time_series: TimeSeriesList = field(default_factory=lambda: TimeSeriesList([]))
 
-    def extend(self, other: DomainsApply) -> None:
+    def extend(self, other: ResourcesApply) -> None:
         self.nodes.extend(other.nodes)
         self.edges.extend(other.edges)
         self.time_series.extend(other.time_series)
 
 
 @dataclass
-class DomainsApplyResult:
+class ResourcesApplyResult:
     nodes: dm.NodeApplyResultList
     edges: dm.EdgeApplyResultList
     time_series: TimeSeriesList
@@ -88,7 +88,7 @@ class DomainModelApply(DomainModelCore, extra=Extra.forbid, populate_by_name=Tru
 
     def to_instances_apply(
         self, view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None = None
-    ) -> DomainsApply:
+    ) -> ResourcesApply:
         return self._to_instances_apply(set(), view_by_write_class)
 
     @abstractmethod
@@ -96,7 +96,7 @@ class DomainModelApply(DomainModelCore, extra=Extra.forbid, populate_by_name=Tru
         self,
         cache: set[tuple[str, str]],
         view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
-    ) -> DomainsApply:
+    ) -> ResourcesApply:
         raise NotImplementedError()
 
     @model_validator(mode="before")
@@ -185,9 +185,9 @@ class DomainModelApplyList(DomainModelList[T_DomainModelApply]):
 
     def to_instances_apply(
         self, view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None = None
-    ) -> DomainsApply:
+    ) -> ResourcesApply:
         cache: set[tuple[str, str]] = set()
-        domains = DomainsApply()
+        domains = ResourcesApply()
         for node in self:
             result = node._to_instances_apply(cache, view_by_write_class)
             domains.extend(result)
@@ -204,7 +204,7 @@ class DomainRelation(DomainModelCore):
     deleted_time: Optional[datetime.datetime] = None
 
     @classmethod
-    def from_edge(cls: Type[T_DomainRelation], edge: dm.Edge) -> T_DomainRelation:
+    def from_edge(cls: type[T_DomainRelation], edge: dm.Edge) -> T_DomainRelation:
         data = edge.dump(camel_case=False)
         return cls(**{**data, **unpack_properties(edge.properties)})
 
@@ -231,7 +231,7 @@ class DomainRelationApply(BaseModel, extra=Extra.forbid, populate_by_name=True):
         cache: set[tuple[str, str]],
         start_node: dm.DirectRelationReference,
         view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
-    ) -> DomainsApply:
+    ) -> ResourcesApply:
         raise NotImplementedError()
 
 

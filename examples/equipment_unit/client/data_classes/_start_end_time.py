@@ -1,16 +1,15 @@
 from __future__ import annotations
 
 import datetime
-from typing import Literal, Optional, Union, ClassVar, Any, Type
+from typing import Any, ClassVar, Literal, Optional, Union
 
-from cognite.client.data_classes import data_modeling as dm, TimeSeriesList
+from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.data_modeling import DirectRelationReference
 from pydantic import Field, model_validator
 
 from . import DomainModelApply
-from ._core import DomainRelation, DomainRelationList, DomainRelationApply, DomainsApply
-
-from ._equipment_module import EquipmentModuleApply, EquipmentModule
+from ._core import DomainRelation, DomainRelationApply, DomainRelationList, ResourcesApply
+from ._equipment_module import EquipmentModule, EquipmentModuleApply
 
 __all__ = ["StartEndTime", "StartEndTimeList", "StartEndTimeFields"]
 StartEndTimeFields = Literal["end_time", "start_time"]
@@ -79,10 +78,10 @@ class StartEndTimeApply(DomainRelationApply):
         self,
         cache: set[tuple[str, str]],
         start_node: dm.DirectRelationReference,
-        view_by_write_class: dict[Type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
-    ) -> DomainsApply:
+        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+    ) -> ResourcesApply:
         if self.external_id and (self.space, self.external_id) in cache:
-            return DomainsApply()
+            return ResourcesApply()
 
         if isinstance(self.equipment_module, DomainModelApply):
             end_node = dm.DirectRelationReference(self.equipment_module.space, self.equipment_module.external_id)
@@ -96,7 +95,7 @@ class StartEndTimeApply(DomainRelationApply):
             "IntegrationTestsImmutable", "StartEndTime", "d416e0ed98186b"
         )
 
-        this_instances = DomainsApply()
+        this_instances = ResourcesApply()
 
         properties = {}
         if self.end_time is not None:

@@ -7,15 +7,13 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
-
 from equipment_unit.client.data_classes._core import (
-    T_DomainModelApply,
-    T_DomainModel,
-    T_DomainModelList,
-    DomainsApplyResult,
     DomainModelApply,
+    ResourcesApplyResult,
+    T_DomainModel,
+    T_DomainModelApply,
+    T_DomainModelList,
 )
-
 
 DEFAULT_LIMIT_READ = 25
 INSTANCE_QUERY_LIMIT = 1_000
@@ -51,7 +49,7 @@ class TypeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
 
     def _apply(
         self, item: T_DomainModelApply | Sequence[T_DomainModelApply], replace: bool = False
-    ) -> DomainsApplyResult:
+    ) -> ResourcesApplyResult:
         if isinstance(item, DomainModelApply):
             instances = item.to_instances_apply(self._view_by_write_class)
         else:
@@ -67,7 +65,7 @@ class TypeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
         if instances.time_series:
             time_series = self._client.time_series.upsert(instances.time_series, mode="patch")
 
-        return DomainsApplyResult(result.nodes, result.edges, TimeSeriesList(time_series))
+        return ResourcesApplyResult(result.nodes, result.edges, TimeSeriesList(time_series))
 
     @overload
     def _retrieve(self, nodes: tuple[str, str]) -> T_DomainModel:

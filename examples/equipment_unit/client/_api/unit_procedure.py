@@ -2,31 +2,32 @@ from __future__ import annotations
 
 import datetime
 from collections import defaultdict
-from typing import Dict, List, Sequence, Tuple, overload
+from collections.abc import Sequence
+from typing import overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
-
 from equipment_unit.client.data_classes import (
-    UnitProcedure,
-    UnitProcedureApply,
-    UnitProcedureList,
-    UnitProcedureFields,
-    UnitProcedureTextFields,
     DomainModelApply,
-    DomainsApplyResult,
     DomainRelationApply,
-    StartEndTimeList,
+    ResourcesApplyResult,
+    EquipmentModule,
+    EquipmentModuleApply,
     StartEndTime,
     StartEndTimeApply,
-    EquipmentModuleApply,
-    EquipmentModule,
+    StartEndTimeList,
+    UnitProcedure,
+    UnitProcedureApply,
+    UnitProcedureFields,
+    UnitProcedureList,
+    UnitProcedureTextFields,
 )
 from equipment_unit.client.data_classes._equipment_module import _EQUIPMENTMODULE_PROPERTIES_BY_FIELD
 from equipment_unit.client.data_classes._start_end_time import _STARTENDTIME_PROPERTIES_BY_FIELD
 from equipment_unit.client.data_classes._unit_procedure import _UNITPROCEDURE_PROPERTIES_BY_FIELD
-from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT, INSTANCE_QUERY_LIMIT
+
+from ._core import DEFAULT_LIMIT_READ, IN_FILTER_LIMIT, INSTANCE_QUERY_LIMIT, Aggregations, TypeAPI
 
 
 class UnitProcedureWorkUnitsQuery:
@@ -378,7 +379,7 @@ class UnitProcedureAPI(TypeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
 
     def apply(
         self, unit_procedure: UnitProcedureApply | Sequence[UnitProcedureApply], replace: bool = False
-    ) -> DomainsApplyResult:
+    ) -> ResourcesApplyResult:
         """Add or update (upsert) unit procedures.
 
         Note: This method iterates through all nodes linked to unit_procedure and create them including the edges
@@ -760,7 +761,7 @@ class UnitProcedureAPI(TypeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
 
     @staticmethod
     def _set_work_units(unit_procedures: Sequence[UnitProcedure], work_unit_edges: Sequence[dm.Edge]):
-        edges_by_start_node: Dict[Tuple, List] = defaultdict(list)
+        edges_by_start_node: dict[tuple, list] = defaultdict(list)
         for edge in work_unit_edges:
             edges_by_start_node[edge.start_node.as_tuple()].append(edge)
 

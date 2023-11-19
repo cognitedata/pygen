@@ -1,29 +1,27 @@
 from __future__ import annotations
 
 import datetime
-import warnings
-from typing import Sequence, overload, Literal
+from collections.abc import Sequence
+from typing import Literal, overload
 
 import pandas as pd
 from cognite.client import CogniteClient
-from cognite.client.data_classes import TimeSeriesList, DatapointsList, Datapoints, DatapointsArrayList
-from cognite.client.data_classes.datapoints import Aggregate
 from cognite.client import data_modeling as dm
+from cognite.client.data_classes import Datapoints, DatapointsArrayList, DatapointsList, TimeSeriesList
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
-
-from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT, INSTANCE_QUERY_LIMIT
+from cognite.client.data_classes.datapoints import Aggregate
 from equipment_unit.client.data_classes import (
+    DomainModelApply,
+    ResourcesApplyResult,
     EquipmentModule,
     EquipmentModuleApply,
-    EquipmentModuleList,
-    EquipmentModuleApplyList,
     EquipmentModuleFields,
+    EquipmentModuleList,
     EquipmentModuleTextFields,
-    DomainModelApply,
-    DomainsApplyResult,
 )
 from equipment_unit.client.data_classes._equipment_module import _EQUIPMENTMODULE_PROPERTIES_BY_FIELD
 
+from ._core import DEFAULT_LIMIT_READ, INSTANCE_QUERY_LIMIT, Aggregations, TypeAPI
 
 ColumnNames = Literal["description", "name", "sensor_value", "type"]
 
@@ -561,7 +559,7 @@ class EquipmentModuleAPI(TypeAPI[EquipmentModule, EquipmentModuleApply, Equipmen
 
     def apply(
         self, equipment_module: EquipmentModuleApply | Sequence[EquipmentModuleApply], replace: bool = False
-    ) -> DomainsApplyResult:
+    ) -> ResourcesApplyResult:
         """Add or update (upsert) equipment modules.
 
         Args:

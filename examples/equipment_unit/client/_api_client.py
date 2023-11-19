@@ -2,12 +2,13 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
+from cognite.client import ClientConfig, CogniteClient
+from cognite.client import data_modeling as dm
 from cognite.client.credentials import OAuthClientCredentials
 
+from . import data_classes
 from ._api.equipment_module import EquipmentModuleAPI
 from ._api.unit_procedure import UnitProcedureAPI
-from . import data_classes
 
 
 class EquipmentUnitClient:

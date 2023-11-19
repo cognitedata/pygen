@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -8,14 +8,14 @@ from pydantic import Field
 from ._core import (
     DomainModel,
     DomainModelApply,
-    DomainModelList,
     DomainModelApplyList,
-    DomainsApply,
+    DomainModelList,
     DomainRelationApply,
+    ResourcesApply,
 )
 
 if TYPE_CHECKING:
-    from ._start_end_time import StartEndTimeApply, StartEndTime
+    from ._start_end_time import StartEndTime, StartEndTimeApply
 
 
 __all__ = [
@@ -96,17 +96,17 @@ class UnitProcedureApply(DomainModelApply):
         self,
         cache: set[tuple[str, str]],
         view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
-    ) -> DomainsApply:
+    ) -> ResourcesApply:
         from ._start_end_time import StartEndTimeApply
 
         if self.id_tuple() in cache:
-            return DomainsApply()
+            return ResourcesApply()
 
         write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
             "IntegrationTestsImmutable", "UnitProcedure", "f16810a7105c44"
         )
 
-        this_instances = DomainsApply()
+        this_instances = ResourcesApply()
 
         properties = {}
         if self.name is not None:
