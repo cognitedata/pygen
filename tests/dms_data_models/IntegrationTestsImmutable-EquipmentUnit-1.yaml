@@ -1,25 +1,25 @@
-- created_time: 1699895856544
+- createdTime: 1699895856544
   description: Used for testing an edge property
-  external_id: EquipmentUnit
-  is_global: false
-  last_updated_time: 1699895901152
+  externalId: EquipmentUnit
+  isGlobal: false
+  lastUpdatedTime: 1699895901152
   name: EquipmentUnit
   space: IntegrationTestsImmutable
   version: '1'
   views:
-  - created_time: 1699895900210
-    external_id: StartEndTime
-    is_global: false
-    last_updated_time: 1699895900210
+  - createdTime: 1699895900210
+    externalId: StartEndTime
+    isGlobal: false
+    lastUpdatedTime: 1699895900210
     name: StartEndTime
     properties:
       end_time:
-        auto_increment: false
+        autoIncrement: false
         container:
-          external_id: StartEndTime
+          externalId: StartEndTime
           space: IntegrationTestsImmutable
-        container_property_identifier: end_time
-        default_value: null
+        containerPropertyIdentifier: end_time
+        defaultValue: null
         description: null
         name: end_time
         nullable: true
@@ -28,12 +28,12 @@
           list: false
           type: timestamp
       start_time:
-        auto_increment: false
+        autoIncrement: false
         container:
-          external_id: StartEndTime
+          externalId: StartEndTime
           space: IntegrationTestsImmutable
-        container_property_identifier: start_time
-        default_value: null
+        containerPropertyIdentifier: start_time
+        defaultValue: null
         description: null
         name: start_time
         nullable: true
@@ -42,22 +42,22 @@
           list: false
           type: timestamp
     space: IntegrationTestsImmutable
-    used_for: edge
+    usedFor: edge
     version: d416e0ed98186b
     writable: true
-  - created_time: 1699895900210
-    external_id: UnitProcedure
-    is_global: false
-    last_updated_time: 1699895900210
+  - createdTime: 1699895900210
+    externalId: UnitProcedure
+    isGlobal: false
+    lastUpdatedTime: 1699895900210
     name: UnitProcedure
     properties:
       name:
-        auto_increment: false
+        autoIncrement: false
         container:
-          external_id: UnitProcedure
+          externalId: UnitProcedure
           space: IntegrationTestsImmutable
-        container_property_identifier: name
-        default_value: null
+        containerPropertyIdentifier: name
+        defaultValue: null
         description: null
         name: name
         nullable: true
@@ -67,12 +67,12 @@
           list: false
           type: text
       type:
-        auto_increment: false
+        autoIncrement: false
         container:
-          external_id: UnitProcedure
+          externalId: UnitProcedure
           space: IntegrationTestsImmutable
-        container_property_identifier: type
-        default_value: null
+        containerPropertyIdentifier: type
+        defaultValue: null
         description: null
         name: type
         nullable: true
@@ -82,40 +82,40 @@
           list: false
           type: text
       work_units:
-        connection_type: multi_edge_connection
+        connectionType: multi_edge_connection
         description: null
         direction: outwards
-        edge_source:
-          external_id: StartEndTime
+        edgeSource:
+          externalId: StartEndTime
           space: IntegrationTestsImmutable
           type: view
           version: d416e0ed98186b
         name: work_units
         source:
-          external_id: EquipmentModule
+          externalId: EquipmentModule
           space: IntegrationTestsImmutable
           type: view
           version: b1cd4bf14a7a33
         type:
-          external_id: UnitProcedure.equipment_module
+          externalId: UnitProcedure.equipment_module
           space: IntegrationTestsImmutable
     space: IntegrationTestsImmutable
-    used_for: node
+    usedFor: node
     version: f16810a7105c44
     writable: true
-  - created_time: 1699895900210
-    external_id: EquipmentModule
-    is_global: false
-    last_updated_time: 1699895900210
+  - createdTime: 1699895900210
+    externalId: EquipmentModule
+    isGlobal: false
+    lastUpdatedTime: 1699895900210
     name: EquipmentModule
     properties:
       description:
-        auto_increment: false
+        autoIncrement: false
         container:
-          external_id: EquipmentModule
+          externalId: EquipmentModule
           space: IntegrationTestsImmutable
-        container_property_identifier: description
-        default_value: null
+        containerPropertyIdentifier: description
+        defaultValue: null
         description: null
         name: description
         nullable: true
@@ -125,12 +125,12 @@
           list: false
           type: text
       name:
-        auto_increment: false
+        autoIncrement: false
         container:
-          external_id: EquipmentModule
+          externalId: EquipmentModule
           space: IntegrationTestsImmutable
-        container_property_identifier: name
-        default_value: null
+        containerPropertyIdentifier: name
+        defaultValue: null
         description: null
         name: name
         nullable: true
@@ -140,12 +140,12 @@
           list: false
           type: text
       sensor_value:
-        auto_increment: false
+        autoIncrement: false
         container:
-          external_id: EquipmentModule
+          externalId: EquipmentModule
           space: IntegrationTestsImmutable
-        container_property_identifier: sensor_value
-        default_value: null
+        containerPropertyIdentifier: sensor_value
+        defaultValue: null
         description: null
         name: sensor_value
         nullable: true
@@ -154,12 +154,12 @@
           list: false
           type: timeseries
       type:
-        auto_increment: false
+        autoIncrement: false
         container:
-          external_id: EquipmentModule
+          externalId: EquipmentModule
           space: IntegrationTestsImmutable
-        container_property_identifier: type
-        default_value: null
+        containerPropertyIdentifier: type
+        defaultValue: null
         description: null
         name: type
         nullable: true
@@ -169,6 +169,6 @@
           list: false
           type: text
     space: IntegrationTestsImmutable
-    used_for: node
+    usedFor: node
     version: b1cd4bf14a7a33
     writable: true
