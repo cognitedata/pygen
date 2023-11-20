@@ -212,6 +212,12 @@ class Field(ABC):
         raise NotImplementedError
 
     @property
+    @abstractmethod
+    def as_apply(self) -> str:
+        """Used in the .as_apply() method for the read version of the data class."""
+        raise NotImplementedError
+
+    @property
     def argument_documentation(self) -> str:
         if self.description:
             return self.description
@@ -240,6 +246,10 @@ class PrimitiveFieldCore(Field, ABC):
     @property
     def description(self) -> str | None:
         return self.prop.description
+
+    @property
+    def as_apply(self) -> str:
+        return f"self.{self.name}"
 
 
 @dataclass(frozen=True)
@@ -344,13 +354,13 @@ class EdgeOneToOne(EdgeField):
     prop: dm.MappedProperty
 
     def as_read_type_hint(self) -> str:
-        if self.need_alias:
-            return f'Optional[str] = {self.pydantic_field}(None, alias="{self.prop_name}")'
-        else:
-            return "Optional[str] = None"
+        return self._type_hint(self.data_class.read_name)
 
     def as_write_type_hint(self) -> str:
-        left_side = f"Union[{self.data_class.write_name}, str, None] ="
+        return self._type_hint(self.data_class.write_name)
+
+    def _type_hint(self, data_class_name: str) -> str:
+        left_side = f"Union[{data_class_name}, str, None] ="
         # Edge fields are always nullable
         if self.need_alias:
             return f'{left_side} {self.pydantic_field}(None, repr=False, alias="{self.prop_name}")'
@@ -360,6 +370,10 @@ class EdgeOneToOne(EdgeField):
     @property
     def description(self) -> str | None:
         return self.prop.description
+
+    @property
+    def as_apply(self) -> str:
+        return f"self.{self.name}.as_apply() if isinstance(self.{self.name}, DomainModel) else self.{self.name}"
 
 
 @dataclass(frozen=True)
@@ -381,14 +395,27 @@ class EdgeOneToMany(EdgeField):
     def is_property_edge(self) -> bool:
         return self.data_class.used_for == "edge"
 
-    def as_read_type_hint(self) -> str:
-        if self.need_alias:
-            return f"Optional[list[str]] = {self.pydantic_field}(None, alias='{self.prop_name}')"
+    @property
+    def as_apply(self) -> str:
+        if self.is_property_edge:
+            return f"[{self.variable}.as_apply() for {self.variable} in self.{self.name} or []]"
         else:
-            return "Optional[list[str]] = None"
+            return (
+                f"[{self.variable}.as_apply() if isinstance({self.variable}, DomainModel) else {self.variable} "
+                f"for {self.variable} in self.{self.name} or []]"
+            )
+
+    def as_read_type_hint(self) -> str:
+        return self._type_hint(self.data_class.read_name)
 
     def as_write_type_hint(self) -> str:
-        left_side = f"Union[list[{self.data_class.write_name}], list[str], None]"
+        return self._type_hint(self.data_class.write_name)
+
+    def _type_hint(self, data_class_name: str) -> str:
+        if self.is_property_edge:
+            left_side = f"Optional[list[{data_class_name}]]"
+        else:
+            left_side = f"Union[list[{data_class_name}], list[str], None]"
         # Edge fields are always nullable
         if self.need_alias:
             return f'{left_side} = {self.pydantic_field}(default=None, repr=False, alias="{self.prop_name}")'
