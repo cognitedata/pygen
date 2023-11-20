@@ -48,7 +48,7 @@ class {{ data_class.read_name }}(DomainModel):
     {{ field.name }}: {{ field.as_read_type_hint() }}{% endfor %}
 
     def as_apply(self) -> {{ data_class.write_name }}:
-        """Convert this read version of {{ data_class.doc_name }} the writing version."""
+        """Convert this read version of {{ data_class.doc_name }} to the writing version."""
         return {{ data_class.write_name }}(
             space=self.space,
             external_id=self.external_id,{% for field in data_class %}
@@ -81,8 +81,9 @@ class {{ data_class.write_name }}(DomainModelApply):
         from .{{ dependency_class.file_name }} import {{ dependency_class.write_name }}{% endfor %}
 {% endif %}
         resources = ResourcesApply()
-        if self.id_tuple() in cache:
+        if self.as_tuple_id() in cache:
             return resources
+
         write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
             "{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_version }}"
         )
@@ -93,6 +94,7 @@ class {{ data_class.write_name }}(DomainModelApply):
                 "space":  self.space if isinstance(self.{{ field.name }}, str) else self.{{ field.name }}.space,
                 "externalId": self.{{ field.name }} if isinstance(self.{{ field.name }}, str) else self.{{ field.name }}.external_id,
             }{% else %}self.{{ field.name }}{% if field.is_time_field %}.isoformat({% if field.is_timestamp %}timespec="milliseconds"{% endif %}){% endif %}{% endif %}{% endfor %}
+
         if properties:
             this_node = dm.NodeApply(
                 space=self.space,
@@ -105,56 +107,39 @@ class {{ data_class.write_name }}(DomainModelApply):
                 )],
             )
             resources.nodes.append(this_node)
-            cache.add(self.id_tuple())
+            cache.add(self.as_tuple_id())
         {% endif %}
 
-{%  for field in data_class.one_to_many_edges %}
+{%  for field in data_class.one_to_many_edges %}{% if field.is_property_edge %}
         for {{ field.variable }} in self.{{ field.name }} or []:
-            edge = self._create_{{field.variable}}_edge({{ field.variable }})
-            if edge.external_id not in cache:
-                edges.append(edge)
-                cache.add(edge.external_id)
-
-            if isinstance({{ field.variable }}, DomainModelApply):
-                instances = {{ field.variable }}._to_instances_apply(cache, view_by_write_class)
-                nodes.extend(instances.nodes)
-                edges.extend(instances.edges)
+            if isinstance({{ field.variable }}, DomainRelationApply):
+                other_resources = {{ field.variable }}._to_instances_apply(cache, self.as_direct_reference(), view_by_write_class)
+                resources.extend(other_resources){% else %}
+        edge_type = dm.DirectRelationReference("{{ field.prop.type.space }}", "{{ field.prop.type.external_id }}")
+        for {{ field.variable }} in self.{{ field.name }} or []:
+            other_resources = DomainRelationApply._from_edge_to_resources(
+                cache, self, {{field.variable}}, edge_type, view_by_write_class
+            )
+            resources.extend(other_resources){% endif %}
 {% endfor %}{% for field in data_class.one_to_one_edges %}
         if isinstance(self.{{ field.name }}, DomainModelApply):
-            instances = self.{{ field.name }}._to_instances_apply(cache, view_by_write_class)
-            nodes.extend(instances.nodes)
-            edges.extend(instances.edges)
+            other_resources = self.{{ field.name }}._to_instances_apply(cache, view_by_write_class)
+            resources.extend(other_resources)
 {% endfor %}
-        return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
-{%  for field in data_class.one_to_many_edges %}
-    def _create_{{ field.variable }}_edge(self, {{ field.variable }}: Union[str, {{ field.data_class.write_name }}]) -> dm.EdgeApply:
-        if isinstance({{ field.variable }}, str):
-            end_space, end_node_ext_id = self.space, {{ field.variable }}
-        elif isinstance({{ field.variable }}, DomainModelApply):
-            end_space, end_node_ext_id = {{ field.variable }}.space, {{ field.variable }}.external_id
-        else:
-            raise TypeError(f"Expected str or {{ field.data_class.write_name }}, got {type({{ field.variable }})}")
+        return resources
 
-        return dm.EdgeApply(
-            space=self.space,
-            external_id=f"{self.external_id}:{end_node_ext_id}",
-            type=dm.DirectRelationReference("{{ field.prop.type.space }}", "{{ field.prop.type.external_id }}"),
-            start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
-        )
-{% endfor %}
 
-class {{ data_class.read_list_name }}(TypeList[{{ data_class.read_name }}]):
+class {{ data_class.read_list_name }}(DomainModelList[{{ data_class.read_name }}]):
     """List of {{ data_class.doc_list_name }} in the read version."""
 
     _INSTANCE = {{ data_class.read_name }}
 
     def as_apply(self) -> {{ data_class.write_list_name }}:
-        """Convert this read version of {{ data_class.doc_name }} to the writing versions."""
+        """Convert these read versions of {{ data_class.doc_name }} to the writing versions."""
         return {{ data_class.write_list_name }}([node.as_apply() for node in self.data])
 
 
-class {{ data_class.write_list_name }}(TypeApplyList[{{ data_class.write_name }}]):
+class {{ data_class.write_list_name }}(DomainModelApplyList[{{ data_class.write_name }}]):
     """List of {{ data_class.doc_list_name }} in the writing version."""
 
     _INSTANCE = {{ data_class.write_name }}

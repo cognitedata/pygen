@@ -377,6 +377,10 @@ class EdgeOneToMany(EdgeField):
     def description(self) -> str | None:
         return self.prop.description
 
+    @property
+    def is_property_edge(self) -> bool:
+        return self.data_class.used_for == "edge"
+
     def as_read_type_hint(self) -> str:
         if self.need_alias:
             return f"Optional[list[str]] = {self.pydantic_field}(None, alias='{self.prop_name}')"

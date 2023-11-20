@@ -81,7 +81,7 @@ class UnitProcedureApply(DomainModelApply):
         name: The name field.
         type_: The type field.
         work_units: The work unit field.
-        existing_version: Fail the ingestion request if the version is greater than or equal to this value.
+        existing_version: Fail the ingestion request if the unit procedure version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
@@ -129,7 +129,7 @@ class UnitProcedureApply(DomainModelApply):
             cache.add(self.as_tuple_id())
 
         for work_unit in self.work_units or []:
-            if isinstance(work_unit, StartEndTimeApply):
+            if isinstance(work_unit, DomainRelationApply):
                 other_resources = work_unit._to_instances_apply(cache, self.as_direct_reference(), view_by_write_class)
                 resources.extend(other_resources)
 
@@ -142,7 +142,7 @@ class UnitProcedureList(DomainModelList[UnitProcedure]):
     _INSTANCE = UnitProcedure
 
     def as_apply(self) -> UnitProcedureApplyList:
-        """Convert this read versions of unit procedure to the writing versions."""
+        """Convert these read versions of unit procedure to the writing versions."""
         return UnitProcedureApplyList([node.as_apply() for node in self.data])
 
 
