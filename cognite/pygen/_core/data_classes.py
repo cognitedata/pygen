@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import itertools
+import warnings
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass, field
+from typing import Literal
 
 from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.data_modeling.data_types import ListablePropertyType
@@ -84,12 +86,18 @@ class Field(ABC):
             edge_api_class_input = f"{view_name}_{prop_name}"
             edge_api_class = f"{create_name(edge_api_class_input, field_naming.edge_api_class)}API"
             edge_api_attribute = create_name(prop_name, field_naming.api_class_attribute)
+            if prop.edge_source:
+                # The edge has properties, i.e., it has its own view
+                edge_id = prop.edge_source.space, prop.edge_source.external_id
+            else:
+                edge_id = prop.source.space, prop.source.external_id
+            data_class = data_class_by_view_id[ViewSpaceExternalId(*edge_id)]
             return EdgeOneToMany(
                 name=name,
                 doc_name=doc_name,
                 prop_name=prop_name,
                 prop=prop,
-                data_class=data_class_by_view_id[ViewSpaceExternalId(prop.source.space, prop.source.external_id)],
+                data_class=data_class,
                 variable=variable,
                 pydantic_field=pydantic_field,
                 edge_api_class=edge_api_class,
@@ -402,6 +410,7 @@ class DataClass:
     file_name: str
     view_id: ViewSpaceExternalId
     view_version: str
+    used_for: Literal["node", "edge"]
     fields: list[Field] = field(default_factory=list)
 
     @classmethod
@@ -421,6 +430,11 @@ class DataClass:
         if is_reserved_word(file_name, "filename", view.as_id()):
             file_name = f"{file_name}_"
 
+        used_for = view.used_for
+        if used_for == "all":
+            used_for = "node"
+            warnings.warn("View used_for is set to 'all'. This is not supported. Using 'node' instead.", stacklevel=2)
+
         return cls(
             view_name=view_name,
             read_name=class_name,
@@ -434,6 +448,7 @@ class DataClass:
             file_name=file_name,
             view_id=ViewSpaceExternalId.from_(view),
             view_version=view.version,
+            used_for=used_for,
         )
 
     def update_fields(

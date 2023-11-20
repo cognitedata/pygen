@@ -259,7 +259,12 @@ class APIGenerator:
         self._config = config
 
     def generate_data_class_file(self) -> str:
-        type_data = self._env.get_template("data_class.py.jinja")
+        if self.data_class.used_for == "node":
+            type_data = self._env.get_template("data_class_node.py.jinja")
+        elif self.data_class.used_for == "edge":
+            type_data = self._env.get_template("data_class_edge.py.jinja")
+        else:
+            raise ValueError(f"Unknown data class used_for {self.data_class.used_for}")
 
         return type_data.render(data_class=self.data_class, space=self.view_identifier.space) + "\n"
 

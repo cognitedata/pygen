@@ -1,0 +1,160 @@
+from __future__ import annotations
+{% if data_class.has_time_field %}
+import datetime{% endif %}
+{% if data_class.has_edges %}from typing import TYPE_CHECKING, Literal, Optional, Union{% else %}from typing import Literal, Optional{% endif %}{% if not data_class.use_optional_type %}  # noqa: F401{% endif %}
+
+from cognite.client import data_modeling as dm{% if data_class.use_pydantic_field %}
+{{ data_class.import_pydantic_field }}{% endif %}
+
+from ._core import (
+    DomainModel,
+    DomainModelApply,
+    DomainModelApplyList,
+    DomainModelList,
+    DomainRelationApply,
+    ResourcesApply,
+)
+{% if data_class.has_edges %}
+if TYPE_CHECKING:{% for dependency_class in data_class.dependencies %}
+    from .{{ dependency_class.file_name }} import {{ dependency_class.read_name }}, {{ dependency_class.write_name }}{% endfor %}
+{% endif %}
+
+__all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data_class.read_list_name }}", "{{ data_class.write_list_name }}"{% if data_class.has_primitive_fields %}, "{{ data_class.field_names }}"{% endif %}{% if data_class.has_text_field %}, "{{ data_class.text_field_names }}"{% endif %}]
+{% if data_class.has_text_field %}
+
+{{ data_class.text_field_names }} = Literal[{{ data_class.text_fields_literals }}]
+{% endif %}{% if data_class.has_primitive_fields %}{{ data_class.field_names }} = Literal[{{ data_class.fields_literals }}]
+
+{{ data_class.properties_dict_name }} = {% raw %}{{% endraw %}{% for field in data_class.primitive_core_fields %}
+    "{{ field.name }}": "{{ field.prop_name }}",{% endfor %}
+{% raw %}}{% endraw %}{% endif %}
+
+
+class {{ data_class.read_name }}(DomainModel):
+    """This represents the reading version of {{ data_class.doc_name }}.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the {{ data_class.doc_name }}.{% for field in data_class %}
+        {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
+        created_time: The created time of the {{ data_class.doc_name }} node.
+        last_updated_time: The last updated time of the {{ data_class.doc_name }} node.
+        deleted_time: If present, the deleted time of the {{ data_class.doc_name }} node.
+        version: The version of the {{ data_class.doc_name }} node.
+    """
+    space: str = "{{ space }}"{% for field in data_class %}
+    {{ field.name }}: {{ field.as_read_type_hint() }}{% endfor %}
+
+    def as_apply(self) -> {{ data_class.write_name }}:
+        """Convert this read version of {{ data_class.doc_name }} the writing version."""
+        return {{ data_class.write_name }}(
+            space=self.space,
+            external_id=self.external_id,{% for field in data_class %}
+            {{ field.name }}=self.{{ field.name }},{% endfor %}
+        )
+
+
+class {{ data_class.write_name }}(DomainModelApply):
+    """This represents the writing version of {{ data_class.doc_name }}.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the {{ data_class.doc_name }}.{% for field in data_class %}
+        {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
+        existing_version: Fail the ingestion request if the {{ data_class.doc_name }} version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+    space: str = "{{ space }}"{% for field in data_class %}
+    {{ field.name }}: {{ field.as_write_type_hint() }}{% endfor %}
+
+    def _to_instances_apply(
+        self,
+        cache: set[tuple[str, str]],
+        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+    ) -> ResourcesApply:{% if data_class.has_edges %}{% for dependency_class in data_class.dependencies %}
+        from .{{ dependency_class.file_name }} import {{ dependency_class.write_name }}{% endfor %}
+{% endif %}
+        resources = ResourcesApply()
+        if self.id_tuple() in cache:
+            return resources
+        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
+            "{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_version }}"
+        )
+{% if not data_class.has_only_one_to_many_edges %}
+        properties = {}{% for field in data_class.property_fields %}
+        if self.{{ field.name }} is not None:
+            properties["{{ field.prop_name }}"] = {% if field.is_edge %}{
+                "space":  self.space if isinstance(self.{{ field.name }}, str) else self.{{ field.name }}.space,
+                "externalId": self.{{ field.name }} if isinstance(self.{{ field.name }}, str) else self.{{ field.name }}.external_id,
+            }{% else %}self.{{ field.name }}{% if field.is_time_field %}.isoformat({% if field.is_timestamp %}timespec="milliseconds"{% endif %}){% endif %}{% endif %}{% endfor %}
+        if properties:
+            this_node = dm.NodeApply(
+                space=self.space,
+                external_id=self.external_id,
+                existing_version=self.existing_version,
+                sources=[
+                    dm.NodeOrEdgeData(
+                        source=write_view,
+                        properties=properties,
+                )],
+            )
+            resources.nodes.append(this_node)
+            cache.add(self.id_tuple())
+        {% endif %}
+
+{%  for field in data_class.one_to_many_edges %}
+        for {{ field.variable }} in self.{{ field.name }} or []:
+            edge = self._create_{{field.variable}}_edge({{ field.variable }})
+            if edge.external_id not in cache:
+                edges.append(edge)
+                cache.add(edge.external_id)
+
+            if isinstance({{ field.variable }}, DomainModelApply):
+                instances = {{ field.variable }}._to_instances_apply(cache, view_by_write_class)
+                nodes.extend(instances.nodes)
+                edges.extend(instances.edges)
+{% endfor %}{% for field in data_class.one_to_one_edges %}
+        if isinstance(self.{{ field.name }}, DomainModelApply):
+            instances = self.{{ field.name }}._to_instances_apply(cache, view_by_write_class)
+            nodes.extend(instances.nodes)
+            edges.extend(instances.edges)
+{% endfor %}
+        return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
+{%  for field in data_class.one_to_many_edges %}
+    def _create_{{ field.variable }}_edge(self, {{ field.variable }}: Union[str, {{ field.data_class.write_name }}]) -> dm.EdgeApply:
+        if isinstance({{ field.variable }}, str):
+            end_space, end_node_ext_id = self.space, {{ field.variable }}
+        elif isinstance({{ field.variable }}, DomainModelApply):
+            end_space, end_node_ext_id = {{ field.variable }}.space, {{ field.variable }}.external_id
+        else:
+            raise TypeError(f"Expected str or {{ field.data_class.write_name }}, got {type({{ field.variable }})}")
+
+        return dm.EdgeApply(
+            space=self.space,
+            external_id=f"{self.external_id}:{end_node_ext_id}",
+            type=dm.DirectRelationReference("{{ field.prop.type.space }}", "{{ field.prop.type.external_id }}"),
+            start_node=dm.DirectRelationReference(self.space, self.external_id),
+            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
+        )
+{% endfor %}
+
+class {{ data_class.read_list_name }}(TypeList[{{ data_class.read_name }}]):
+    """List of {{ data_class.doc_list_name }} in the read version."""
+
+    _INSTANCE = {{ data_class.read_name }}
+
+    def as_apply(self) -> {{ data_class.write_list_name }}:
+        """Convert this read version of {{ data_class.doc_name }} to the writing versions."""
+        return {{ data_class.write_list_name }}([node.as_apply() for node in self.data])
+
+
+class {{ data_class.write_list_name }}(TypeApplyList[{{ data_class.write_name }}]):
+    """List of {{ data_class.doc_list_name }} in the writing version."""
+
+    _INSTANCE = {{ data_class.write_name }}

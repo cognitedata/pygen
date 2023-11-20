@@ -57,7 +57,7 @@ class UnitProcedure(DomainModel):
     space: str = "IntegrationTestsImmutable"
     name: Optional[str] = None
     type_: Optional[str] = Field(None, alias="type")
-    work_units: Union[list[StartEndTime], list[str], None] = None
+    work_units: Optional[list[StartEndTime]] = Field(default=None, repr=False)
 
     def as_apply(self) -> UnitProcedureApply:
         """Convert this read version of unit procedure to the writing version."""
@@ -100,7 +100,7 @@ class UnitProcedureApply(DomainModelApply):
         from ._start_end_time import StartEndTimeApply
 
         resources = ResourcesApply()
-        if self.id_tuple() in cache:
+        if self.as_tuple_id() in cache:
             return resources
 
         write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
@@ -126,13 +126,11 @@ class UnitProcedureApply(DomainModelApply):
                 ],
             )
             resources.nodes.append(this_node)
-            cache.add(self.id_tuple())
+            cache.add(self.as_tuple_id())
 
         for work_unit in self.work_units or []:
             if isinstance(work_unit, StartEndTimeApply):
-                other_resources = work_unit._to_instances_apply(
-                    cache, dm.DirectRelationReference(self.space, self.external_id), view_by_write_class
-                )
+                other_resources = work_unit._to_instances_apply(cache, self.as_direct_reference(), view_by_write_class)
                 resources.extend(other_resources)
 
         return resources

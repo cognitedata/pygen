@@ -766,7 +766,7 @@ class UnitProcedureAPI(TypeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
             edges_by_start_node[edge.start_node.as_tuple()].append(edge)
 
         for unit_procedure in unit_procedures:
-            node_id = unit_procedure.id_tuple()
+            node_id = unit_procedure.as_tuple_id()
             if node_id in edges_by_start_node:
                 unit_procedure.work_units = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
 

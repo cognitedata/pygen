@@ -5,12 +5,19 @@ from typing import Literal, TYPE_CHECKING, Optional, Union
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
+from ._core import (
+    DomainModel,
+    DomainModelApply,
+    DomainModelApplyList,
+    DomainModelList,
+    DomainRelationApply,
+    ResourcesApply,
+)
 
 if TYPE_CHECKING:
-    from ._movie import MovieApply
-    from ._nomination import NominationApply
-    from ._person import PersonApply
+    from ._movie import Movie, MovieApply
+    from ._nomination import Nomination, NominationApply
+    from ._person import Person, PersonApply
 
 __all__ = ["Actor", "ActorApply", "ActorList", "ActorApplyList", "ActorFields"]
 ActorFields = Literal["won_oscar"]
@@ -21,7 +28,7 @@ _ACTOR_PROPERTIES_BY_FIELD = {
 
 
 class Actor(DomainModel):
-    """This represent a read version of actor.
+    """This represents the reading version of actor.
 
     It is used to when data is retrieved from CDF.
 
@@ -39,25 +46,28 @@ class Actor(DomainModel):
     """
 
     space: str = "IntegrationTestsImmutable"
-    movies: Optional[list[str]] = None
-    nomination: Optional[list[str]] = None
-    person: Optional[str] = None
+    movies: Union[list[Movie], list[str], None] = Field(default=None, repr=False)
+    nomination: Union[list[Nomination], list[str], None] = Field(default=None, repr=False)
+    person: Union[Person, str, None] = Field(default=None, repr=False)
     won_oscar: Optional[bool] = Field(None, alias="wonOscar")
 
     def as_apply(self) -> ActorApply:
-        """Convert this read version of actor to a write version."""
+        """Convert this read version of actor to the writing version."""
         return ActorApply(
             space=self.space,
             external_id=self.external_id,
-            movies=self.movies,
-            nomination=self.nomination,
-            person=self.person,
+            movies=[movie.as_apply() if isinstance(movie, DomainModel) else movie for movie in self.movies or []],
+            nomination=[
+                nomination.as_apply() if isinstance(nomination, DomainModel) else nomination
+                for nomination in self.nomination or []
+            ],
+            person=self.person.as_apply() if isinstance(self.person, DomainModel) else self.person,
             won_oscar=self.won_oscar,
         )
 
 
 class ActorApply(DomainModelApply):
-    """This represent a write version of actor.
+    """This represents the writing version of actor.
 
     It is used to when data is sent to CDF.
 
@@ -81,11 +91,17 @@ class ActorApply(DomainModelApply):
     won_oscar: Optional[bool] = Field(None, alias="wonOscar")
 
     def _to_instances_apply(
-        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
-    ) -> dm.InstancesApply:
-        if self.external_id in cache:
-            return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
-        write_view = view_by_write_class and view_by_write_class.get(type(self))
+        self,
+        cache: set[tuple[str, str]],
+        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+    ) -> ResourcesApply:
+        resources = ResourcesApply()
+        if self.as_tuple_id() in cache:
+            return resources
+
+        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
+            "IntegrationTestsImmutable", "Actor", "2"
+        )
 
         properties = {}
         if self.person is not None:
@@ -96,96 +112,52 @@ class ActorApply(DomainModelApply):
         if self.won_oscar is not None:
             properties["wonOscar"] = self.won_oscar
         if properties:
-            source = dm.NodeOrEdgeData(
-                source=write_view or dm.ViewId("IntegrationTestsImmutable", "Actor", "2"),
-                properties=properties,
-            )
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=[source],
+                sources=[
+                    dm.NodeOrEdgeData(
+                        source=write_view,
+                        properties=properties,
+                    )
+                ],
             )
-            nodes = [this_node]
-        else:
-            nodes = []
+            resources.nodes.append(this_node)
+            cache.add(self.as_tuple_id())
 
-        edges = []
-        cache.add(self.external_id)
-
+        edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "Role.movies")
         for movie in self.movies or []:
-            edge = self._create_movie_edge(movie)
-            if edge.external_id not in cache:
-                edges.append(edge)
-                cache.add(edge.external_id)
+            other_resources = DomainRelationApply._from_edge_to_resources(
+                cache, self, movie, edge_type, view_by_write_class
+            )
+            resources.extend(other_resources)
 
-            if isinstance(movie, DomainModelApply):
-                instances = movie._to_instances_apply(cache, view_by_write_class)
-                nodes.extend(instances.nodes)
-                edges.extend(instances.edges)
-
+        edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "Role.nomination")
         for nomination in self.nomination or []:
-            edge = self._create_nomination_edge(nomination)
-            if edge.external_id not in cache:
-                edges.append(edge)
-                cache.add(edge.external_id)
-
-            if isinstance(nomination, DomainModelApply):
-                instances = nomination._to_instances_apply(cache, view_by_write_class)
-                nodes.extend(instances.nodes)
-                edges.extend(instances.edges)
+            other_resources = DomainRelationApply._from_edge_to_resources(
+                cache, self, nomination, edge_type, view_by_write_class
+            )
+            resources.extend(other_resources)
 
         if isinstance(self.person, DomainModelApply):
-            instances = self.person._to_instances_apply(cache, view_by_write_class)
-            nodes.extend(instances.nodes)
-            edges.extend(instances.edges)
+            other_resources = self.person._to_instances_apply(cache, view_by_write_class)
+            resources.extend(other_resources)
 
-        return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
-
-    def _create_movie_edge(self, movie: Union[str, MovieApply]) -> dm.EdgeApply:
-        if isinstance(movie, str):
-            end_space, end_node_ext_id = self.space, movie
-        elif isinstance(movie, DomainModelApply):
-            end_space, end_node_ext_id = movie.space, movie.external_id
-        else:
-            raise TypeError(f"Expected str or MovieApply, got {type(movie)}")
-
-        return dm.EdgeApply(
-            space=self.space,
-            external_id=f"{self.external_id}:{end_node_ext_id}",
-            type=dm.DirectRelationReference("IntegrationTestsImmutable", "Role.movies"),
-            start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
-        )
-
-    def _create_nomination_edge(self, nomination: Union[str, NominationApply]) -> dm.EdgeApply:
-        if isinstance(nomination, str):
-            end_space, end_node_ext_id = self.space, nomination
-        elif isinstance(nomination, DomainModelApply):
-            end_space, end_node_ext_id = nomination.space, nomination.external_id
-        else:
-            raise TypeError(f"Expected str or NominationApply, got {type(nomination)}")
-
-        return dm.EdgeApply(
-            space=self.space,
-            external_id=f"{self.external_id}:{end_node_ext_id}",
-            type=dm.DirectRelationReference("IntegrationTestsImmutable", "Role.nomination"),
-            start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
-        )
+        return resources
 
 
-class ActorList(TypeList[Actor]):
+class ActorList(DomainModelList[Actor]):
     """List of actors in read version."""
 
-    _NODE = Actor
+    _INSTANCE = Actor
 
     def as_apply(self) -> ActorApplyList:
-        """Convert this read version of actor to a write version."""
+        """Convert this read version of actor to the writing version."""
         return ActorApplyList([node.as_apply() for node in self.data])
 
 
-class ActorApplyList(TypeApplyList[ActorApply]):
-    """List of actors in write version."""
+class ActorApplyList(DomainModelApplyList[ActorApply]):
+    """List of actors in the writing version."""
 
-    _NODE = ActorApply
+    _INSTANCE = ActorApply
