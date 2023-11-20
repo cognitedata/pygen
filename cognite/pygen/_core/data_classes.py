@@ -122,7 +122,7 @@ class Field(ABC):
                 # are handled above.
                 edge_api_class_input = f"{view_name}_{prop_name}"
                 edge_api_class = f"{create_name(edge_api_class_input, field_naming.edge_api_class)}"
-                edge_api_attribute = create_name(prop_name, field_naming.api_class_attribute)
+                edge_api_attribute = f"{create_name(prop_name, field_naming.api_class_attribute)}_edge"
                 return CDFExternalField(
                     name=name,
                     prop_name=prop_name,
@@ -622,7 +622,7 @@ class DataClass:
         return any(isinstance(field_, EdgeField) for field_ in self.fields)
 
     @property
-    def has_edges_with_property(self) -> bool:
+    def has_edge_with_property(self) -> bool:
         return any(isinstance(field_, EdgeOneToMany) and field_.is_property_edge for field_ in self.fields)
 
     @property
@@ -672,6 +672,10 @@ class DataClass:
                 # however, this is not a problem as all data classes are uniquely identified by their view id
                 unique[field_.data_class.view_id] = field_.data_class
         return sorted(unique.values(), key=lambda x: x.write_name)
+
+    @property
+    def dependencies_edges(self) -> list[EdgeDataClass]:
+        return [data_class for data_class in self.dependencies if isinstance(data_class, EdgeDataClass)]
 
     @property
     def has_single_timeseries_fields(self) -> bool:
@@ -737,10 +741,6 @@ class EdgeDataClass(DataClass):
             raise ValueError("EdgeDataClass has not been initialized.")
         return self._edge_type
 
-    @property
-    def dependencies_edges(self) -> list[EdgeDataClass]:
-        return [data_class for data_class in self.dependencies if isinstance(data_class, EdgeDataClass)]
-
     def update_nodes(
         self,
         data_class_by_view_id: dict[ViewSpaceExternalId, DataClass],
@@ -765,7 +765,7 @@ class EdgeDataClass(DataClass):
 
         edge_api_class_input = f"{self.view_name}_{end_class.view_name}"
         edge_api_class = f"{create_name(edge_api_class_input, field_naming.edge_api_class)}API"
-        edge_api_attribute = create_name(end_class.view_name, field_naming.api_class_attribute)
+        edge_api_attribute = f"{create_name(end_class.view_name, field_naming.api_class_attribute)}_edge"
 
         self.fields.append(
             RequiredEdgeOneToOne(

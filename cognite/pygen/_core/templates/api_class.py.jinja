@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime{% endif %}{% if data_class.has_single_timeseries_fields %}
 import warnings{% endif %}
 {% if data_class.has_one_to_many_edges %}from collections import defaultdict
-from typing import Dict, List, Sequence, Tuple, overload{% else %}from typing import Sequence, overload{% endif %}{% if data_class.has_single_timeseries_fields %}, Literal{% endif %}
+from typing import Sequence, overload{% else %}from typing import Sequence, overload{% endif %}{% if data_class.has_single_timeseries_fields %}, Literal{% endif %}
 {% if data_class.has_single_timeseries_fields %}
 import pandas as pd{% endif %}
 from cognite.client import CogniteClient{% if data_class.has_single_timeseries_fields %}
@@ -139,12 +139,12 @@ class {{ api_class.name }}(TypeAPI[{{ data_class.read_name }}, {{ data_class.wri
 {% for field in data_class.one_to_many_edges %}
     @staticmethod
     def _set_{{ field.name }}({{ data_class.variable_list }}: Sequence[{{ data_class.read_name }}], {{ field.variable }}_edges: Sequence[dm.Edge]):
-        edges_by_start_node: Dict[Tuple, List] = defaultdict(list)
+        edges_by_start_node: dict[guple, list] = defaultdict(list)
         for edge in {{ field.variable }}_edges:
             edges_by_start_node[edge.start_node.as_tuple()].append(edge)
 
         for {{ data_class.variable }} in {{ data_class.variable_list }}:
-            node_id = {{ data_class.variable }}.id_tuple()
+            node_id = {{ data_class.variable }}.as_tuple_id()
             if node_id in edges_by_start_node:
                 {{ data_class.variable }}.{{ field.name }} = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
 {% endfor %}

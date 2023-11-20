@@ -115,7 +115,9 @@ def test_create_view_api_classes_equipment_module(
     assert actual == expected
 
 
-def test_create_view_api_classes_persons(unit_procedure_api_generator: APIGenerator, code_formatter: CodeFormatter):
+def test_create_view_api_classes_unit_procedure(
+    unit_procedure_api_generator: APIGenerator, code_formatter: CodeFormatter
+):
     # Arrange
     expected = EquipmentSDKFiles.unit_procedure_api.read_text()
 

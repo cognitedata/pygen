@@ -77,7 +77,7 @@ class {{ data_class.write_name }}(DomainModelApply):
         self,
         cache: set[tuple[str, str]],
         view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
-    ) -> ResourcesApply:{% if data_class.has_edges_with_property %}{% for dependency_class in data_class.dependencies_edges %}
+    ) -> ResourcesApply:{% if data_class.has_edge_with_property %}{% for dependency_class in data_class.dependencies_edges %}
         from .{{ dependency_class.file_name }} import {{ dependency_class.write_name }}{% endfor %}
 {% endif %}
         resources = ResourcesApply()
