@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -18,6 +18,7 @@ if TYPE_CHECKING:
     from ._movie import Movie, MovieApply
     from ._nomination import Nomination, NominationApply
     from ._person import Person, PersonApply
+
 
 __all__ = ["Actor", "ActorApply", "ActorList", "ActorApplyList", "ActorFields"]
 ActorFields = Literal["won_oscar"]
@@ -48,7 +49,7 @@ class Actor(DomainModel):
     space: str = "IntegrationTestsImmutable"
     movies: Union[list[Movie], list[str], None] = Field(default=None, repr=False)
     nomination: Union[list[Nomination], list[str], None] = Field(default=None, repr=False)
-    person: Union[Person, str, None] = Field(default=None, repr=False)
+    person: Union[Person, str, None] = Field(None, repr=False)
     won_oscar: Optional[bool] = Field(None, alias="wonOscar")
 
     def as_apply(self) -> ActorApply:
@@ -78,7 +79,7 @@ class ActorApply(DomainModelApply):
         nomination: The nomination field.
         person: The person field.
         won_oscar: The won oscar field.
-        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+        existing_version: Fail the ingestion request if the actor version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
@@ -111,6 +112,7 @@ class ActorApply(DomainModelApply):
             }
         if self.won_oscar is not None:
             properties["wonOscar"] = self.won_oscar
+
         if properties:
             this_node = dm.NodeApply(
                 space=self.space,
@@ -148,12 +150,12 @@ class ActorApply(DomainModelApply):
 
 
 class ActorList(DomainModelList[Actor]):
-    """List of actors in read version."""
+    """List of actors in the read version."""
 
     _INSTANCE = Actor
 
     def as_apply(self) -> ActorApplyList:
-        """Convert this read version of actor to the writing version."""
+        """Convert these read versions of actor to the writing versions."""
         return ActorApplyList([node.as_apply() for node in self.data])
 
 

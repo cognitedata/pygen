@@ -93,7 +93,7 @@ def create_fields_test_cases():
     }
     prop = ViewProperty.load(prop)
     data_class = DataClass(
-        read_name="Role",
+        read_name="Role,",
         write_name="RoleApply",
         read_list_name="RoleList",
         write_list_name="RoleListApply",
@@ -105,6 +105,7 @@ def create_fields_test_cases():
         view_id=ViewSpaceExternalId("IntegrationTestsImmutable", "Role"),
         view_version="2",
         view_name="Role",
+        used_for="node",
     )
 
     data_class_by_view_id = {ViewSpaceExternalId("IntegrationTestsImmutable", "Role"): data_class}
@@ -186,6 +187,7 @@ def create_fields_test_cases():
         view_version="2",
         variable_list="persons",
         view_name="Person",
+        used_for="node",
     )
     data_class_by_view_id = {ViewSpaceExternalId("IntegrationTestsImmutable", "Person"): data_class}
 

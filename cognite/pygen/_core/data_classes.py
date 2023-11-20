@@ -571,6 +571,10 @@ class DataClass:
         return any(isinstance(field_, EdgeField) for field_ in self.fields)
 
     @property
+    def has_edges_with_property(self) -> bool:
+        return any(isinstance(field_, EdgeOneToMany) and field_.is_property_edge for field_ in self.fields)
+
+    @property
     def has_primitive_fields(self) -> bool:
         return any(isinstance(field_, PrimitiveFieldCore) for field_ in self.fields)
 
@@ -624,6 +628,10 @@ class DataClass:
                 # however, this is not a problem as all data classes are uniquely identified by their view id
                 unique[field_.data_class.view_id] = field_.data_class
         return sorted(unique.values(), key=lambda x: x.write_name)
+
+    @property
+    def dependencies_edges(self) -> list[DataClass]:
+        return [data_class for data_class in self.dependencies if data_class.used_for == "edge"]
 
     @property
     def has_single_timeseries_fields(self) -> bool:
