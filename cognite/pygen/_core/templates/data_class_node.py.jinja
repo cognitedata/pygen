@@ -52,7 +52,7 @@ class {{ data_class.read_name }}(DomainModel):
         return {{ data_class.write_name }}(
             space=self.space,
             external_id=self.external_id,{% for field in data_class %}
-            {{ field.name }}={{ field.as_apply }},{% endfor %}
+            {{ field.name }}={{ field.as_apply() }},{% endfor %}
         )
 
 

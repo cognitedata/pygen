@@ -211,7 +211,6 @@ class Field(ABC):
     def description(self) -> str | None:
         raise NotImplementedError
 
-    @property
     @abstractmethod
     def as_apply(self) -> str:
         """Used in the .as_apply() method for the read version of the data class."""
@@ -247,7 +246,6 @@ class PrimitiveFieldCore(Field, ABC):
     def description(self) -> str | None:
         return self.prop.description
 
-    @property
     def as_apply(self) -> str:
         return f"self.{self.name}"
 
@@ -371,7 +369,6 @@ class EdgeOneToOne(EdgeField):
     def description(self) -> str | None:
         return self.prop.description
 
-    @property
     def as_apply(self) -> str:
         return f"self.{self.name}.as_apply() if isinstance(self.{self.name}, DomainModel) else self.{self.name}"
 
@@ -395,7 +392,6 @@ class EdgeOneToMany(EdgeField):
     def is_property_edge(self) -> bool:
         return self.data_class.used_for == "edge"
 
-    @property
     def as_apply(self) -> str:
         if self.is_property_edge:
             return f"[{self.variable}.as_apply() for {self.variable} in self.{self.name} or []]"
