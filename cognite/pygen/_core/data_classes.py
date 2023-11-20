@@ -6,6 +6,7 @@ from abc import ABC, abstractmethod
 from collections import defaultdict
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass, field
+from typing import cast
 
 from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.data_modeling.data_types import ListablePropertyType
@@ -418,7 +419,7 @@ class EdgeOneToMany(EdgeField):
             return f"{left_side} = {self.pydantic_field}(default=None, repr=False)"
 
 
-@dataclass(frozen=True)
+@dataclass
 class DataClass:
     """
     This represents a data class. It is created from a view.
@@ -663,16 +664,58 @@ class DataClass:
         return ", ".join(f'"{field_.name}"' for field_ in self if isinstance(field_, PrimitiveFieldCore))
 
 
-@dataclass(frozen=True)
+@dataclass
 class NodeDataClass(DataClass):
     ...
 
 
-@dataclass(frozen=True)
+@dataclass
 class EdgeDataClass(DataClass):
+    _start_class: NodeDataClass | None = None
+    _end_class: NodeDataClass | None = None
+    _edge_type: dm.DirectRelationReference | None = None
+
+    @property
+    def start_class(self) -> NodeDataClass:
+        if self._start_class is None:
+            raise ValueError("EdgeDataClass has not been initialized.")
+        return self._start_class
+
+    @property
+    def end_class(self) -> NodeDataClass:
+        if self._end_class is None:
+            raise ValueError("EdgeDataClass has not been initialized.")
+        return self._end_class
+
+    @property
+    def edge_type(self) -> dm.DirectRelationReference:
+        if self._edge_type is None:
+            raise ValueError("EdgeDataClass has not been initialized.")
+        return self._edge_type
+
     @property
     def dependencies_edges(self) -> list[EdgeDataClass]:
         return [data_class for data_class in self.dependencies if isinstance(data_class, EdgeDataClass)]
+
+    def update_nodes(self, data_class_by_view_id: dict[ViewSpaceExternalId, DataClass], views: Iterable[dm.View]):
+        source_view, source_property = self._find_source_view_and_property(views)
+        self._start_class = cast(NodeDataClass, data_class_by_view_id[ViewSpaceExternalId.from_(source_view.as_id())])
+        self._end_class = cast(NodeDataClass, data_class_by_view_id[ViewSpaceExternalId.from_(source_property.source)])
+        self._edge_type = source_property.type
+
+    def _find_source_view_and_property(
+        self, views: Iterable[dm.View]
+    ) -> tuple[dm.View, dm.SingleHopConnectionDefinition]:
+        for view in views:
+            for _prop_name, prop in view.properties.items():
+                if (
+                    isinstance(prop, dm.SingleHopConnectionDefinition)
+                    and prop.edge_source
+                    and prop.edge_source.space == self.view_id.space
+                    and prop.edge_source.external_id == self.view_id.external_id
+                ):
+                    return view, prop
+        raise ValueError("Could not find source view and property")
 
 
 @dataclass(frozen=True)

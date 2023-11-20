@@ -64,7 +64,7 @@ class StartEndTime(DomainRelation):
 
 
 class StartEndTimeApply(DomainRelationApply):
-    type: ClassVar[dm.DirectRelationReference] = dm.DirectRelationReference(
+    edge_type: dm.DirectRelationReference = dm.DirectRelationReference(
         "IntegrationTestsImmutable", "UnitProcedure.equipment_module"
     )
     space: str = "IntegrationTestsImmutable"
@@ -89,7 +89,7 @@ class StartEndTimeApply(DomainRelationApply):
         else:
             raise ValueError(f"Invalid type for equipment_module: {type(self.equipment_module)}")
 
-        self.external_id = external_id = self.external_id_factory(start_node, end_node, self.type)
+        self.external_id = external_id = self.external_id_factory(start_node, end_node, self.edge_type)
 
         write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
             "IntegrationTestsImmutable", "StartEndTime", "d416e0ed98186b"
