@@ -203,6 +203,11 @@ class Field(ABC):
 
     @property
     @abstractmethod
+    def is_timestamp(self) -> bool:
+        raise NotImplementedError()
+
+    @property
+    @abstractmethod
     def is_text_field(self) -> bool:
         raise NotImplementedError()
 
@@ -237,6 +242,10 @@ class PrimitiveFieldCore(Field, ABC):
     @property
     def is_time_field(self) -> bool:
         return self.type_ in ("datetime.datetime", "datetime.date")
+
+    @property
+    def is_timestamp(self) -> bool:
+        return self.type_ in ("datetime.datetime",)
 
     @property
     def is_text_field(self) -> bool:
@@ -336,6 +345,10 @@ class EdgeField(Field, ABC):
 
     @property
     def is_time_field(self) -> bool:
+        return False
+
+    @property
+    def is_timestamp(self) -> bool:
         return False
 
     @property
@@ -618,13 +631,6 @@ class DataClass:
         return any(pydantic_field in hint for hint in self._field_type_hints)
 
     @property
-    def import_pydantic_field(self) -> str:
-        if self.pydantic_field == "Field":
-            return "from pydantic import Field"
-        else:
-            return "import pydantic"
-
-    @property
     def dependencies(self) -> list[DataClass]:
         unique: dict[ViewSpaceExternalId, DataClass] = {}
         for field_ in self.fields:
@@ -666,7 +672,12 @@ class DataClass:
 
 @dataclass
 class NodeDataClass(DataClass):
-    ...
+    @property
+    def import_pydantic_field(self) -> str:
+        if self.pydantic_field == "Field":
+            return "from pydantic import Field"
+        else:
+            return "import pydantic"
 
 
 @dataclass
@@ -716,6 +727,13 @@ class EdgeDataClass(DataClass):
                 ):
                     return view, prop
         raise ValueError("Could not find source view and property")
+
+    @property
+    def import_pydantic_field(self) -> str:
+        if self.pydantic_field == "Field":
+            return "from pydantic import Field, model_validator"
+        else:
+            return "import pydantic"
 
 
 @dataclass(frozen=True)

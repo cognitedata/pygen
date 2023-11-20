@@ -1,15 +1,15 @@
 from __future__ import annotations
 
 import datetime
-from typing import Any, ClassVar, Literal, Optional, Union, Type
+from typing import Any, Literal, Optional, Union
 
-from cognite.client.data_classes import data_modeling as dm
+from cognite.client import data_modeling as dm
 from pydantic import Field, model_validator
 
 from ._core import DomainModelApply, DomainRelation, DomainRelationApply, DomainRelationList, ResourcesApply
 from ._equipment_module import EquipmentModule, EquipmentModuleApply
 
-__all__ = ["StartEndTime", "StartEndTimeList", "StartEndTimeFields"]
+__all__ = ["StartEndTime", "StartEndTimeApply", "StartEndTimeList", "StartEndTimeFields"]
 StartEndTimeFields = Literal["end_time", "start_time"]
 
 _STARTENDTIME_PROPERTIES_BY_FIELD = {
@@ -19,16 +19,16 @@ _STARTENDTIME_PROPERTIES_BY_FIELD = {
 
 
 class StartEndTime(DomainRelation):
-    """This represents the read version of start end time.
+    """This represents the reading version of start end time.
 
     It is used to when data is retrieved from CDF.
 
     Args:
         space: The space where the node is located.
         external_id: The external id of the start end time.
+        equipment_module: The equipment module field.
         end_time: The end time field.
         start_time: The start time field.
-        equipment_module: The equipment module field.
         created_time: The created time of the start end time node.
         last_updated_time: The last updated time of the start end time node.
         deleted_time: If present, the deleted time of the start end time node.
@@ -64,19 +64,36 @@ class StartEndTime(DomainRelation):
 
 
 class StartEndTimeApply(DomainRelationApply):
+    """This represents the writing version of start end time.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        edge_type: The edge type of the start end time.
+        space: The space where the node is located.
+        external_id: The external id of the start end time.
+        equipment_module: The equipment module field.
+        end_time: The end time field.
+        start_time: The start time field.
+        existing_version: Fail the ingestion request if the start end time version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+
     edge_type: dm.DirectRelationReference = dm.DirectRelationReference(
         "IntegrationTestsImmutable", "UnitProcedure.equipment_module"
     )
     space: str = "IntegrationTestsImmutable"
-    end_time: Optional[datetime.datetime] = Field(None, alias="endTime")
-    start_time: Optional[datetime.datetime] = Field(None, alias="startTime")
     equipment_module: Union[EquipmentModuleApply, str] = Field(alias="equipmentModule")
+    end_time: Optional[datetime.datetime] = None
+    start_time: Optional[datetime.datetime] = None
 
     def _to_instances_apply(
         self,
         cache: set[tuple[str, str]],
         start_node: DomainModelApply,
-        view_by_write_class: dict[Type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.external_id and (self.space, self.external_id) in cache:
@@ -117,6 +134,7 @@ class StartEndTimeApply(DomainRelationApply):
                 ],
             )
             resources.edges.append(this_edge)
+            cache.add((self.space, external_id))
 
         if isinstance(self.equipment_module, DomainModelApply):
             other_resources = self.equipment_module._to_instances_apply(cache, view_by_write_class)
@@ -126,6 +144,6 @@ class StartEndTimeApply(DomainRelationApply):
 
 
 class StartEndTimeList(DomainRelationList[StartEndTime]):
-    """List of start end time in the reading version."""
+    """List of start end times in the reading version."""
 
     _INSTANCE = StartEndTime
