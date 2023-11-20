@@ -232,7 +232,7 @@ class DomainRelationApply(BaseModel, extra=Extra.forbid, populate_by_name=True):
     def _to_instances_apply(
         self,
         cache: set[tuple[str, str]],
-        start_node: dm.DirectRelationReference,
+        start_node: DomainModelApply,
         view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
     ) -> ResourcesApply:
         raise NotImplementedError()

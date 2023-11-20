@@ -1,24 +1,16 @@
 from __future__ import annotations
 {% if data_class.has_time_field %}
 import datetime{% endif %}
-{% if data_class.has_edges %}from typing import TYPE_CHECKING, Literal, Optional, Union{% else %}from typing import Literal, Optional{% endif %}{% if not data_class.use_optional_type %}  # noqa: F401{% endif %}
+from typing import Any, ClassVar, Literal, Optional, Union, Type
 
 from cognite.client import data_modeling as dm{% if data_class.use_pydantic_field %}
 {{ data_class.import_pydantic_field }}{% endif %}
 
-from ._core import (
-    DomainModel,
-    DomainModelApply,
-    DomainModelApplyList,
-    DomainModelList,
-    DomainRelationApply,
-    ResourcesApply,
-)
-{% if data_class.has_edges %}
-if TYPE_CHECKING:{% for dependency_class in data_class.dependencies %}
+from ._core import DomainModelApply, DomainRelation, DomainRelationApply, DomainRelationList, ResourcesApply
+{% for dependency_class in data_class.dependencies %}
     from .{{ dependency_class.file_name }} import {{ dependency_class.write_name }}{% endfor %}
-{% endif %}
-__all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data_class.read_list_name }}", "{{ data_class.write_list_name }}"{% if data_class.has_primitive_fields %}, "{{ data_class.field_names }}"{% endif %}{% if data_class.has_text_field %}, "{{ data_class.text_field_names }}"{% endif %}]
+
+__all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data_class.read_list_name }}"{% if data_class.has_primitive_fields %}, "{{ data_class.field_names }}"{% endif %}{% if data_class.has_text_field %}, "{{ data_class.text_field_names }}"{% endif %}]
 {% if data_class.has_text_field %}
 
 {{ data_class.text_field_names }} = Literal[{{ data_class.text_fields_literals }}]
@@ -29,7 +21,7 @@ __all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data
 {% raw %}}{% endraw %}{% endif %}
 
 
-class {{ data_class.read_name }}(DomainModel):
+class {{ data_class.read_name }}(DomainRelation):
     """This represents the reading version of {{ data_class.doc_name }}.
 
     It is used to when data is retrieved from CDF.
@@ -47,15 +39,15 @@ class {{ data_class.read_name }}(DomainModel):
     {{ field.name }}: {{ field.as_read_type_hint() }}{% endfor %}
 
     def as_apply(self) -> {{ data_class.write_name }}:
-        """Convert this read version of {{ data_class.doc_name }} to a write version."""
+        """Convert this read version of {{ data_class.doc_name }} to the writing version."""
         return {{ data_class.write_name }}(
             space=self.space,
             external_id=self.external_id,{% for field in data_class %}
-            {{ field.name }}=self.{{ field.name }},{% endfor %}
+            {{ field.name }}={{ field.as_apply() }},{% endfor %}
         )
 
 
-class {{ data_class.write_name }}(DomainModelApply):
+class {{ data_class.write_name }}(DomainRelationApply):
     """This represents the writing version of {{ data_class.doc_name }}.
 
     It is used to when data is sent to CDF.
@@ -69,18 +61,22 @@ class {{ data_class.write_name }}(DomainModelApply):
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
+    type: ClassVar[dm.DirectRelationReference] = dm.DirectRelationReference(
+        "", ""
+    )
     space: str = "{{ space }}"{% for field in data_class %}
     {{ field.name }}: {{ field.as_write_type_hint() }}{% endfor %}
 
     def _to_instances_apply(
         self,
         cache: set[tuple[str, str]],
+        start_node: DomainModelApply,
         view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
     ) -> ResourcesApply:{% if data_class.has_edges %}{% for dependency_class in data_class.dependencies %}
         from .{{ dependency_class.file_name }} import {{ dependency_class.write_name }}{% endfor %}
 {% endif %}
         resources = ResourcesApply()
-        if self.id_tuple() in cache:
+        if self.external_id and (self.space, self.external_id) in cache:
             return resources
         write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
             "{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_version }}"
@@ -93,7 +89,7 @@ class {{ data_class.write_name }}(DomainModelApply):
                 "externalId": self.{{ field.name }} if isinstance(self.{{ field.name }}, str) else self.{{ field.name }}.external_id,
             }{% else %}self.{{ field.name }}{% if field.is_time_field %}.isoformat({% if field.is_timestamp %}timespec="milliseconds"{% endif %}){% endif %}{% endif %}{% endfor %}
         if properties:
-            this_node = dm.NodeApply(
+            this_node = dm.EdgeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,

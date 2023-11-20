@@ -9,11 +9,11 @@ from cognite.client import data_modeling as dm
 from yaml import safe_load
 
 from cognite.pygen._core.data_classes import (
-    DataClass,
     EdgeOneToOne,
     Field,
     FilterCondition,
     FilterParameter,
+    NodeDataClass,
     PrimitiveField,
     PrimitiveListField,
     ViewSpaceExternalId,
@@ -76,7 +76,7 @@ def load_field_test_cases():
         "description": None,
     }
     mapped = dm.MappedProperty.load(raw_data)
-    data_class = MagicMock(spec=DataClass)
+    data_class = MagicMock(spec=NodeDataClass)
     data_class.write_name = "ModelTemplateApply"
 
     yield pytest.param(
@@ -136,7 +136,7 @@ def load_field_test_cases():
 def test_load_field(
     property_: dm.MappedProperty | dm.ConnectionDefinition,
     expected: Field,
-    data_class_by_id: dict[ViewSpaceExternalId, DataClass],
+    data_class_by_id: dict[ViewSpaceExternalId, NodeDataClass],
     read_type_hint: str,
     write_type_hint: str,
     pygen_config: PygenConfig,
@@ -218,7 +218,7 @@ def load_data_classes_test_cases():
     view = dm.View.load(raw_data)
     yield pytest.param(
         view,
-        DataClass(
+        NodeDataClass(
             read_name="Series",
             write_name="SeriesApply",
             write_list_name="SeriesApplyList",
@@ -238,9 +238,9 @@ def load_data_classes_test_cases():
 
 
 @pytest.mark.parametrize("view, expected", load_data_classes_test_cases())
-def test_load_data_class(view: dm.View, expected: DataClass, pygen_config: PygenConfig) -> None:
+def test_load_data_class(view: dm.View, expected: NodeDataClass, pygen_config: PygenConfig) -> None:
     # Act
-    actual = DataClass.from_view(view, pygen_config.naming.data_class)
+    actual = NodeDataClass.from_view(view, pygen_config.naming.data_class)
 
     # Assert
     assert actual == expected
@@ -318,8 +318,10 @@ def test_data_class_is_time(pygen_config: PygenConfig) -> None:
     view = dm.View.load(raw_data)
 
     # Act
-    data_class = DataClass.from_view(view, pygen_config.naming.data_class)
-    data_class.update_fields(view.properties, defaultdict(lambda: MagicMock(spec=DataClass)), pygen_config.naming.field)
+    data_class = NodeDataClass.from_view(view, pygen_config.naming.data_class)
+    data_class.update_fields(
+        view.properties, defaultdict(lambda: MagicMock(spec=NodeDataClass)), pygen_config.naming.field
+    )
 
     # Assert
     assert data_class.has_single_timeseries_fields is True
@@ -399,7 +401,7 @@ def test_data_class_from_view_expected_warning(name: str, expected_name: str, py
 
     # Act
     with pytest.warns(ViewNameCollisionWarning):
-        actual = DataClass.from_view(view, pygen_config.naming.data_class)
+        actual = NodeDataClass.from_view(view, pygen_config.naming.data_class)
     # Assert
     assert actual.read_name == expected_name
 
@@ -425,7 +427,7 @@ def test_data_class_from_view_expected_warning_file_name(
 
     # Act
     with pytest.warns(ViewNameCollisionWarning):
-        actual = DataClass.from_view(view, pygen_config.naming.data_class)
+        actual = NodeDataClass.from_view(view, pygen_config.naming.data_class)
     # Assert
     assert actual.file_name == expected_name
 

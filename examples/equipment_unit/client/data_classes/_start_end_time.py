@@ -1,14 +1,12 @@
 from __future__ import annotations
 
 import datetime
-from typing import Any, ClassVar, Literal, Optional, Union
+from typing import Any, ClassVar, Literal, Optional, Union, Type
 
 from cognite.client.data_classes import data_modeling as dm
-from cognite.client.data_classes.data_modeling import DirectRelationReference
 from pydantic import Field, model_validator
 
-from . import DomainModelApply
-from ._core import DomainRelation, DomainRelationApply, DomainRelationList, ResourcesApply
+from ._core import DomainModelApply, DomainRelation, DomainRelationApply, DomainRelationList, ResourcesApply
 from ._equipment_module import EquipmentModule, EquipmentModuleApply
 
 __all__ = ["StartEndTime", "StartEndTimeList", "StartEndTimeFields"]
@@ -66,7 +64,7 @@ class StartEndTime(DomainRelation):
 
 
 class StartEndTimeApply(DomainRelationApply):
-    type: ClassVar[DirectRelationReference] = DirectRelationReference(
+    type: ClassVar[dm.DirectRelationReference] = dm.DirectRelationReference(
         "IntegrationTestsImmutable", "UnitProcedure.equipment_module"
     )
     space: str = "IntegrationTestsImmutable"
@@ -77,25 +75,25 @@ class StartEndTimeApply(DomainRelationApply):
     def _to_instances_apply(
         self,
         cache: set[tuple[str, str]],
-        start_node: dm.DirectRelationReference,
-        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+        start_node: DomainModelApply,
+        view_by_write_class: dict[Type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
     ) -> ResourcesApply:
+        resources = ResourcesApply()
         if self.external_id and (self.space, self.external_id) in cache:
-            return ResourcesApply()
+            return resources
 
         if isinstance(self.equipment_module, DomainModelApply):
-            end_node = dm.DirectRelationReference(self.equipment_module.space, self.equipment_module.external_id)
+            end_node = self.equipment_module.as_direct_reference()
         elif isinstance(self.equipment_module, str):
             end_node = dm.DirectRelationReference(self.space, self.equipment_module)
         else:
             raise ValueError(f"Invalid type for equipment_module: {type(self.equipment_module)}")
-        self.external_id = external_id = type(self).external_id_factory(type(self), start_node, end_node)
+
+        self.external_id = external_id = self.external_id_factory(start_node, end_node, self.type)
 
         write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
             "IntegrationTestsImmutable", "StartEndTime", "d416e0ed98186b"
         )
-
-        this_instances = ResourcesApply()
 
         properties = {}
         if self.end_time is not None:
@@ -105,10 +103,10 @@ class StartEndTimeApply(DomainRelationApply):
 
         if properties:
             this_edge = dm.EdgeApply(
-                external_id=external_id,
                 space=self.space,
+                external_id=external_id,
                 type=self.type,
-                start_node=start_node,
+                start_node=start_node.as_direct_reference(),
                 end_node=end_node,
                 existing_version=self.existing_version,
                 sources=[
@@ -118,16 +116,16 @@ class StartEndTimeApply(DomainRelationApply):
                     )
                 ],
             )
-            this_instances.edges.append(this_edge)
+            resources.edges.append(this_edge)
 
         if isinstance(self.equipment_module, DomainModelApply):
-            instances = self.equipment_module._to_instances_apply(cache, view_by_write_class)
-            this_instances.extend(instances)
+            other_resources = self.equipment_module._to_instances_apply(cache, view_by_write_class)
+            resources.extend(other_resources)
 
-        return this_instances
+        return resources
 
 
 class StartEndTimeList(DomainRelationList[StartEndTime]):
-    """List of start end time in read version."""
+    """List of start end time in the reading version."""
 
     _INSTANCE = StartEndTime

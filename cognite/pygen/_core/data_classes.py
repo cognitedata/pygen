@@ -6,7 +6,6 @@ from abc import ABC, abstractmethod
 from collections import defaultdict
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass, field
-from typing import Literal
 
 from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.data_modeling.data_types import ListablePropertyType
@@ -390,7 +389,7 @@ class EdgeOneToMany(EdgeField):
 
     @property
     def is_property_edge(self) -> bool:
-        return self.data_class.used_for == "edge"
+        return isinstance(self.data_class, EdgeDataClass)
 
     def as_apply(self) -> str:
         if self.is_property_edge:
@@ -437,11 +436,10 @@ class DataClass:
     file_name: str
     view_id: ViewSpaceExternalId
     view_version: str
-    used_for: Literal["node", "edge"]
     fields: list[Field] = field(default_factory=list)
 
     @classmethod
-    def from_view(cls, view: dm.View, data_class: pygen_config.DataClassNaming) -> Self:
+    def from_view(cls, view: dm.View, data_class: pygen_config.DataClassNaming) -> DataClass:
         view_name = (view.name or view.external_id).replace(" ", "_")
         class_name = create_name(view_name, data_class.name)
         if is_reserved_word(class_name, "data class", view.as_id()):
@@ -462,7 +460,7 @@ class DataClass:
             used_for = "node"
             warnings.warn("View used_for is set to 'all'. This is not supported. Using 'node' instead.", stacklevel=2)
 
-        return cls(
+        args = dict(
             view_name=view_name,
             read_name=class_name,
             write_name=f"{class_name}Apply",
@@ -475,8 +473,14 @@ class DataClass:
             file_name=file_name,
             view_id=ViewSpaceExternalId.from_(view),
             view_version=view.version,
-            used_for=used_for,
         )
+
+        if used_for == "node":
+            return NodeDataClass(**args)
+        elif used_for == "edge":
+            return EdgeDataClass(**args)
+        else:
+            raise ValueError(f"Unsupported used_for={used_for}")
 
     def update_fields(
         self,
@@ -630,10 +634,6 @@ class DataClass:
         return sorted(unique.values(), key=lambda x: x.write_name)
 
     @property
-    def dependencies_edges(self) -> list[DataClass]:
-        return [data_class for data_class in self.dependencies if data_class.used_for == "edge"]
-
-    @property
     def has_single_timeseries_fields(self) -> bool:
         return any(
             isinstance(field_.prop.type, dm.TimeSeriesReference) and not isinstance(field_, PrimitiveListField)
@@ -661,6 +661,18 @@ class DataClass:
     @property
     def fields_literals(self) -> str:
         return ", ".join(f'"{field_.name}"' for field_ in self if isinstance(field_, PrimitiveFieldCore))
+
+
+@dataclass(frozen=True)
+class NodeDataClass(DataClass):
+    ...
+
+
+@dataclass(frozen=True)
+class EdgeDataClass(DataClass):
+    @property
+    def dependencies_edges(self) -> list[EdgeDataClass]:
+        return [data_class for data_class in self.dependencies if isinstance(data_class, EdgeDataClass)]
 
 
 @dataclass(frozen=True)

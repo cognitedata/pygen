@@ -9,7 +9,6 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.views import ViewProperty
 
 from cognite.pygen._core.data_classes import (
-    DataClass,
     EdgeOneToMany,
     EdgeOneToOne,
     Field,
@@ -17,6 +16,7 @@ from cognite.pygen._core.data_classes import (
     FilterConditionOnetoOneEdge,
     FilterParameter,
     ListMethod,
+    NodeDataClass,
     PrimitiveField,
     PrimitiveListField,
     ViewSpaceExternalId,
@@ -92,7 +92,7 @@ def create_fields_test_cases():
         "direction": "outwards",
     }
     prop = ViewProperty.load(prop)
-    data_class = DataClass(
+    data_class = NodeDataClass(
         read_name="Role,",
         write_name="RoleApply",
         read_list_name="RoleList",
@@ -174,7 +174,7 @@ def create_fields_test_cases():
         "name": "person",
         "description": None,
     }
-    data_class = DataClass(
+    data_class = NodeDataClass(
         read_name="Person",
         write_name="PersonApply",
         read_list_name="PersonList",
@@ -252,7 +252,7 @@ def create_fields_test_cases():
 def test_fields_from_property(
     prop_name: str,
     property_: dm.MappedProperty | dm.ConnectionDefinition,
-    data_class_by_view_id: dict[ViewSpaceExternalId, DataClass],
+    data_class_by_view_id: dict[ViewSpaceExternalId, NodeDataClass],
     view_name: str,
     expected: Field,
     expected_read_type_hint: str,
@@ -398,11 +398,11 @@ def test_generate_data_class_core_file(multi_api_generator: MultiAPIGenerator) -
 
 def test_create_list_method(person_view: dm.View, pygen_config: PygenConfig) -> None:
     # Arrange
-    data_class = DataClass.from_view(person_view, pygen_config.naming.data_class)
+    data_class = NodeDataClass.from_view(person_view, pygen_config.naming.data_class)
 
     data_class.update_fields(
         person_view.properties,
-        {ViewSpaceExternalId(space="IntegrationTestsImmutable", external_id="Role"): MagicMock(spec=DataClass)},
+        {ViewSpaceExternalId(space="IntegrationTestsImmutable", external_id="Role"): MagicMock(spec=NodeDataClass)},
         field_naming=pygen_config.naming.field,
     )
     parameters = [
@@ -441,15 +441,17 @@ def test_create_list_method(person_view: dm.View, pygen_config: PygenConfig) -> 
 
 def test_create_list_method_actors(actor_view: dm.View, pygen_config: PygenConfig) -> None:
     # Arrange
-    data_class = DataClass.from_view(actor_view, pygen_config.naming.data_class)
+    data_class = NodeDataClass.from_view(actor_view, pygen_config.naming.data_class)
 
-    person_data_class = MagicMock(spec=DataClass)
+    person_data_class = MagicMock(spec=NodeDataClass)
     person_data_class.view_id = ViewSpaceExternalId(space="IntegrationTestsImmutable", external_id="Person")
     data_class.update_fields(
         actor_view.properties,
         {
-            ViewSpaceExternalId(space="IntegrationTestsImmutable", external_id="Movie"): MagicMock(spec=DataClass),
-            ViewSpaceExternalId(space="IntegrationTestsImmutable", external_id="Nomination"): MagicMock(spec=DataClass),
+            ViewSpaceExternalId(space="IntegrationTestsImmutable", external_id="Movie"): MagicMock(spec=NodeDataClass),
+            ViewSpaceExternalId(space="IntegrationTestsImmutable", external_id="Nomination"): MagicMock(
+                spec=NodeDataClass
+            ),
             ViewSpaceExternalId(space="IntegrationTestsImmutable", external_id="Person"): person_data_class,
         },
         field_naming=pygen_config.naming.field,
