@@ -55,11 +55,11 @@ class StartEndTime(DomainRelation):
         return StartEndTimeApply(
             space=self.space,
             external_id=self.external_id,
-            end_time=self.end_time,
-            start_time=self.start_time,
             equipment_module=self.equipment_module.as_apply()
             if isinstance(self.equipment_module, EquipmentModule)
             else self.equipment_module,
+            end_time=self.end_time,
+            start_time=self.start_time,
         )
 
 
@@ -85,7 +85,7 @@ class StartEndTimeApply(DomainRelationApply):
         "IntegrationTestsImmutable", "UnitProcedure.equipment_module"
     )
     space: str = "IntegrationTestsImmutable"
-    equipment_module: Union[EquipmentModuleApply, str] = Field(alias="equipmentModule")
+    equipment_module: Union[EquipmentModuleApply, str]
     end_time: Optional[datetime.datetime] = None
     start_time: Optional[datetime.datetime] = None
 

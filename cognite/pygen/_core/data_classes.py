@@ -387,6 +387,39 @@ class EdgeOneToOne(EdgeField):
 
 
 @dataclass(frozen=True)
+class RequiredEdgeOneToOne(EdgeField):
+    variable: str
+    edge_api_class: str
+    edge_api_attribute: str
+    prop: dm.SingleHopConnectionDefinition
+
+    def as_read_type_hint(self) -> str:
+        return self._type_hint(self.data_class.read_name)
+
+    def as_write_type_hint(self) -> str:
+        return self._type_hint(self.data_class.write_name)
+
+    def _type_hint(self, data_class_name: str) -> str:
+        left_side = f"Union[{data_class_name}, str]"
+        # Required Edge fields cannot be nulled
+        if self.need_alias:
+            return f'{left_side} = {self.pydantic_field}(alias="{self.prop_name}")'
+        else:
+            return left_side
+
+    @property
+    def description(self) -> str | None:
+        return self.prop.description
+
+    def as_apply(self) -> str:
+        return (
+            f"self.{self.variable}.as_apply() "
+            f"if isinstance(self.{self.variable}, {self.data_class.read_name}) "
+            f"else self.{self.variable}"
+        )
+
+
+@dataclass(frozen=True)
 class EdgeOneToMany(EdgeField):
     """
     This represents a list of edge fields linking to another data class.
@@ -708,24 +741,58 @@ class EdgeDataClass(DataClass):
     def dependencies_edges(self) -> list[EdgeDataClass]:
         return [data_class for data_class in self.dependencies if isinstance(data_class, EdgeDataClass)]
 
-    def update_nodes(self, data_class_by_view_id: dict[ViewSpaceExternalId, DataClass], views: Iterable[dm.View]):
-        source_view, source_property = self._find_source_view_and_property(views)
+    def update_nodes(
+        self,
+        data_class_by_view_id: dict[ViewSpaceExternalId, DataClass],
+        views: Iterable[dm.View],
+        field_naming: pygen_config.FieldNaming,
+    ):
+        source_view, source_property, prop_name = self._find_source_view_and_property(views)
         self._start_class = cast(NodeDataClass, data_class_by_view_id[ViewSpaceExternalId.from_(source_view.as_id())])
         self._end_class = cast(NodeDataClass, data_class_by_view_id[ViewSpaceExternalId.from_(source_property.source)])
         self._edge_type = source_property.type
 
+        end_class = self._end_class
+        # Todo avoid repeating the code below here and the load method
+        name = create_name(end_class.view_name, field_naming.name)
+        view_id = dm.ViewId(end_class.view_id.space, end_class.view_id.external_id, end_class.view_version)
+        if is_reserved_word(name, "field", view_id, end_class.view_name):
+            name = f"{name}_"
+
+        doc_name = to_words(name, singularize=True)
+
+        variable = create_name(end_class.view_name, field_naming.variable)
+
+        edge_api_class_input = f"{self.view_name}_{end_class.view_name}"
+        edge_api_class = f"{create_name(edge_api_class_input, field_naming.edge_api_class)}API"
+        edge_api_attribute = create_name(end_class.view_name, field_naming.api_class_attribute)
+
+        self.fields.append(
+            RequiredEdgeOneToOne(
+                name=name,
+                doc_name=doc_name,
+                prop_name=name,
+                pydantic_field=self.pydantic_field,
+                data_class=self.end_class,
+                prop=source_property,
+                variable=variable,
+                edge_api_class=edge_api_class,
+                edge_api_attribute=edge_api_attribute,
+            )
+        )
+
     def _find_source_view_and_property(
         self, views: Iterable[dm.View]
-    ) -> tuple[dm.View, dm.SingleHopConnectionDefinition]:
+    ) -> tuple[dm.View, dm.SingleHopConnectionDefinition, str]:
         for view in views:
-            for _prop_name, prop in view.properties.items():
+            for prop_name, prop in view.properties.items():
                 if (
                     isinstance(prop, dm.SingleHopConnectionDefinition)
                     and prop.edge_source
                     and prop.edge_source.space == self.view_id.space
                     and prop.edge_source.external_id == self.view_id.external_id
                 ):
-                    return view, prop
+                    return view, prop, prop_name
         raise ValueError("Could not find source view and property")
 
     @property

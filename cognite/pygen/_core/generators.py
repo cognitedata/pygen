@@ -179,9 +179,9 @@ class MultiAPIGenerator:
             api.view_identifier: api.data_class for api in self.sub_apis
         }
         for api, view in zip(self.sub_apis, views):
-            api.data_class.update_fields(view.properties, data_class_by_view_id, config.naming.field)
             if isinstance(api.data_class, EdgeDataClass):
-                api.data_class.update_nodes(data_class_by_view_id, views)
+                api.data_class.update_nodes(data_class_by_view_id, views, config.naming.field)
+            api.data_class.update_fields(view.properties, data_class_by_view_id, config.naming.field)
 
         validation.validate_data_classes_unique_name([api.data_class for api in self.sub_apis])
         validation.validate_api_classes_unique_names([api.api_class for api in self.sub_apis])

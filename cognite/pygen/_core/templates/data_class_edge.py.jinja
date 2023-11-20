@@ -27,16 +27,14 @@ class {{ data_class.read_name }}(DomainRelation):
 
     Args:
         space: The space where the node is located.
-        external_id: The external id of the {{ data_class.doc_name }}.
-        {{ data_class.end_class.variable }}: The {{ data_class.end_class.doc_name }} field.{% for field in data_class %}
+        external_id: The external id of the {{ data_class.doc_name }}.{% for field in data_class %}
         {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
         created_time: The created time of the {{ data_class.doc_name }} node.
         last_updated_time: The last updated time of the {{ data_class.doc_name }} node.
         deleted_time: If present, the deleted time of the {{ data_class.doc_name }} node.
         version: The version of the {{ data_class.doc_name }} node.
     """
-    space: str = "{{ space }}"
-    {{ data_class.end_class.variable }}: Union[{{ data_class.end_class.read_name }}, str]{% for field in data_class %}
+    space: str = "{{ space }}"{% for field in data_class %}
     {{ field.name }}: {{ field.as_read_type_hint() }}{% endfor %}
 
     @property
@@ -64,6 +62,7 @@ class {{ data_class.write_name }}(DomainRelationApply):
     It is used to when data is sent to CDF.
 
     Args:
+        edge_type: The edge type of the {{ data_class.doc_name }}.
         space: The space where the node is located.
         external_id: The external id of the {{ data_class.doc_name }}.{% for field in data_class %}
         {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
