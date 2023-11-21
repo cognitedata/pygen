@@ -150,3 +150,37 @@ class UnitProcedureApplyList(DomainModelApplyList[UnitProcedureApply]):
     """List of unit procedures in the writing version."""
 
     _INSTANCE = UnitProcedureApply
+
+
+def _create_unit_procedure_filter(
+    view_id: dm.ViewId,
+    name: str | list[str] | None = None,
+    name_prefix: str | None = None,
+    type_: str | list[str] | None = None,
+    type_prefix: str | None = None,
+    external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if name and isinstance(name, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
+    if name and isinstance(name, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("name"), values=name))
+    if name_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
+    if type_ and isinstance(type_, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("type"), value=type_))
+    if type_ and isinstance(type_, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("type"), values=type_))
+    if type_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("type"), value=type_prefix))
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

@@ -1,13 +1,15 @@
 from __future__ import annotations
 
+from collections import defaultdict
 from collections.abc import Sequence
-from typing import Generic, Literal, overload
+from typing import Generic, Literal, Any, Iterator, Protocol, SupportsIndex, TypeVar, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 from equipment_unit.client.data_classes._core import (
+    DomainModel,
     DomainModelApply,
     ResourcesApplyResult,
     T_DomainModel,
@@ -29,8 +31,40 @@ _METRIC_AGGREGATIONS_BY_NAME = {
     "sum": dm.aggregations.Sum,
 }
 
+_T_co = TypeVar("_T_co", covariant=True)
 
-class TypeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
+
+# Source from https://github.com/python/typing/issues/256#issuecomment-1442633430
+# This works because str.__contains__ does not accept object (either in typeshed or at runtime)
+class SequenceNotStr(Protocol[_T_co]):
+    @overload
+    def __getitem__(self, index: SupportsIndex, /) -> _T_co:
+        ...
+
+    @overload
+    def __getitem__(self, index: slice, /) -> Sequence[_T_co]:
+        ...
+
+    def __contains__(self, value: object, /) -> bool:
+        ...
+
+    def __len__(self) -> int:
+        ...
+
+    def __iter__(self) -> Iterator[_T_co]:
+        ...
+
+    def index(self, value: Any, /, start: int = 0, stop: int = ...) -> int:
+        ...
+
+    def count(self, value: Any, /) -> int:
+        ...
+
+    def __reversed__(self) -> Iterator[_T_co]:
+        ...
+
+
+class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
     def __init__(
         self,
         client: CogniteClient,
@@ -67,24 +101,58 @@ class TypeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
 
         return ResourcesApplyResult(result.nodes, result.edges, TimeSeriesList(time_series))
 
+    def _delete(self, external_id: str | Sequence[str], space: str) -> dm.InstancesDeleteResult:
+        if isinstance(external_id, str):
+            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
+        else:
+            return self._client.data_modeling.instances.delete(
+                nodes=[(space, id) for id in external_id],
+            )
+
     @overload
-    def _retrieve(self, nodes: tuple[str, str]) -> T_DomainModel:
+    def _retrieve(
+        self,
+        external_id: str,
+        space: str,
+        retrieve_edges: bool = False,
+        edge_api_names: list[tuple[EdgeAPI, str]] | None = None,
+    ) -> T_DomainModel:
         ...
 
     @overload
-    def _retrieve(self, nodes: Sequence[tuple[str, str]]) -> T_DomainModelList:
+    def _retrieve(
+        self,
+        external_id: SequenceNotStr[str],
+        space: str,
+        retrieve_edges: bool = False,
+        edge_api_names: list[tuple[EdgeAPI, str]] | None = None,
+    ) -> T_DomainModelList:
         ...
 
-    def _retrieve(self, nodes: tuple[str, str] | Sequence[tuple[str, str]]) -> T_DomainModel | T_DomainModelList:
-        is_multiple = (
-            isinstance(nodes, Sequence)
-            and not isinstance(nodes, str)
-            and not (isinstance(nodes, tuple) and isinstance(nodes[0], str))
-        )
-        instances = self._client.data_modeling.instances.retrieve(nodes=nodes, sources=self._sources)
+    def _retrieve(
+        self,
+        external_id: str | SequenceNotStr[str],
+        space: str,
+        retrieve_edges: bool = False,
+        edge_api_names: list[tuple[EdgeAPI, str]] = None,
+    ) -> T_DomainModel | T_DomainModelList:
+        is_multiple = True
+        if isinstance(external_id, str):
+            node_ids = (space, external_id)
+            is_multiple = False
+        else:
+            node_ids = [(space, ext_id) for ext_id in external_id]
+
+        instances = self._client.data_modeling.instances.retrieve(nodes=node_ids, sources=self._sources)
+        nodes = self._class_list([self._class_type.from_node(node) for node in instances.nodes])
+
+        if retrieve_edges:
+            self._retrieve_and_set_edge_types(nodes, space, edge_api_names)
+
         if is_multiple:
-            return self._class_list([self._class_type.from_node(node) for node in instances.nodes])
-        return self._class_type.from_node(instances.nodes[0])
+            return nodes
+        else:
+            return nodes[0]
 
     def _search(
         self,
@@ -225,6 +293,45 @@ class TypeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
             view_id, dm.aggregations.Histogram(property, interval), "node", query, search_properties, filter, limit
         )
 
-    def _list(self, limit: int = DEFAULT_LIMIT_READ, filter: dm.Filter | None = None) -> T_DomainModelList:
+    def _list(
+        self,
+        limit: int,
+        filter: dm.Filter,
+        retrieve_edges: bool = False,
+        space: str | None = None,
+        edge_api_names: list[tuple[EdgeAPI, str]] | None = None,
+    ) -> T_DomainModelList:
         nodes = self._client.data_modeling.instances.list("node", sources=self._sources, limit=limit, filter=filter)
-        return self._class_list([self._class_type.from_node(node) for node in nodes])
+        node_list = self._class_list([self._class_type.from_node(node) for node in nodes])
+        if retrieve_edges:
+            self._retrieve_and_set_edge_types(node_list, space, edge_api_names)
+
+        return node_list
+
+    @classmethod
+    def _retrieve_and_set_edge_types(
+        cls, nodes: T_DomainModelList, space: str | None, edge_api_names: list[tuple[EdgeAPI, str]] | None = None
+    ):
+        for edge_api, edge_name in edge_api_names or []:
+            space_arg = {"space": space} if space else {}
+            if len(ids := nodes.as_node_ids()) > IN_FILTER_LIMIT:
+                edges = edge_api._list(limit=-1, **space_arg)
+            else:
+                edges = edge_api._list(ids, limit=-1)
+            cls._set_edges(nodes, edges, edge_name)
+
+    @staticmethod
+    def _set_edges(nodes: Sequence[DomainModel], edges: Sequence[dm.Edge], edge_name: str):
+        edges_by_start_node: dict[tuple, list] = defaultdict(list)
+        for edge in edges:
+            edges_by_start_node[edge.start_node.as_tuple()].append(edge)
+
+        for node in nodes:
+            node_id = node.as_tuple_id()
+            if node_id in edges_by_start_node:
+                setattr(node, edge_name, [edge.end_node.external_id for edge in edges_by_start_node[node_id]])
+
+
+class EdgeAPI(Generic[T_DomainModel]):
+    def _list(self) -> dm.EdgeList:
+        ...

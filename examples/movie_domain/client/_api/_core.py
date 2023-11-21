@@ -5,11 +5,15 @@ from typing import Generic, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
-from cognite.client.data_classes.aggregations import AggregatedNumberedValue
+from cognite.client.data_classes import TimeSeriesList
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
-
-from movie_domain.client.data_classes._core import T_TypeApplyNode, T_TypeNode, T_TypeNodeList
-
+from movie_domain.client.data_classes._core import (
+    DomainModelApply,
+    ResourcesApplyResult,
+    T_DomainModel,
+    T_DomainModelApply,
+    T_DomainModelList,
+)
 
 DEFAULT_LIMIT_READ = 25
 INSTANCE_QUERY_LIMIT = 1_000
@@ -26,32 +30,52 @@ _METRIC_AGGREGATIONS_BY_NAME = {
 }
 
 
-class TypeAPI(Generic[T_TypeNode, T_TypeApplyNode, T_TypeNodeList]):
+class TypeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
     def __init__(
         self,
         client: CogniteClient,
         sources: dm.ViewIdentifier | Sequence[dm.ViewIdentifier] | dm.View | Sequence[dm.View],
-        class_type: type[T_TypeNode],
-        class_apply_type: type[T_TypeApplyNode],
-        class_list: type[T_TypeNodeList],
+        class_type: type[T_DomainModel],
+        class_apply_type: type[T_DomainModelApply],
+        class_list: type[T_DomainModelList],
+        view_by_write_class: dict[type[DomainModelApply], dm.ViewId],
     ):
         self._client = client
         self._sources = sources
         self._class_type = class_type
         self._class_apply_type = class_apply_type
         self._class_list = class_list
+        self._view_by_write_class = view_by_write_class
+
+    def _apply(
+        self, item: T_DomainModelApply | Sequence[T_DomainModelApply], replace: bool = False
+    ) -> ResourcesApplyResult:
+        if isinstance(item, DomainModelApply):
+            instances = item.to_instances_apply(self._view_by_write_class)
+        else:
+            instances = self._class_list(item).to_instances_apply(self._view_by_write_class)
+        result = self._client.data_modeling.instances.apply(
+            nodes=instances.nodes,
+            edges=instances.edges,
+            auto_create_start_nodes=True,
+            auto_create_end_nodes=True,
+            replace=replace,
+        )
+        time_series = []
+        if instances.time_series:
+            time_series = self._client.time_series.upsert(instances.time_series, mode="patch")
+
+        return ResourcesApplyResult(result.nodes, result.edges, TimeSeriesList(time_series))
 
     @overload
-    def _retrieve(self, external_id: str) -> T_TypeNode:
+    def _retrieve(self, nodes: tuple[str, str]) -> T_DomainModel:
         ...
 
     @overload
-    def _retrieve(self, external_id: Sequence[str]) -> T_TypeNodeList:
+    def _retrieve(self, nodes: Sequence[tuple[str, str]]) -> T_DomainModelList:
         ...
 
-    def _retrieve(
-        self, nodes: dm.NodeId | Sequence[dm.NodeId] | tuple[str, str] | Sequence[tuple[str, str]]
-    ) -> T_TypeNode | T_TypeNodeList:
+    def _retrieve(self, nodes: tuple[str, str] | Sequence[tuple[str, str]]) -> T_DomainModel | T_DomainModelList:
         is_multiple = (
             isinstance(nodes, Sequence)
             and not isinstance(nodes, str)
@@ -70,7 +94,7 @@ class TypeAPI(Generic[T_TypeNode, T_TypeApplyNode, T_TypeNodeList]):
         properties: str | Sequence[str],
         filter_: dm.Filter | None = None,
         limit: int = DEFAULT_LIMIT_READ,
-    ) -> T_TypeNodeList:
+    ) -> T_DomainModelList:
         if isinstance(properties, str):
             properties = [properties]
 
@@ -95,7 +119,7 @@ class TypeAPI(Generic[T_TypeNode, T_TypeApplyNode, T_TypeNodeList]):
         search_properties: str | Sequence[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[AggregatedNumberedValue]:
+    ) -> list[dm.aggregations.AggregatedNumberedValue]:
         ...
 
     @overload
@@ -130,7 +154,7 @@ class TypeAPI(Generic[T_TypeNode, T_TypeApplyNode, T_TypeNodeList]):
         search_properties: str | Sequence[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> list[AggregatedNumberedValue] | InstanceAggregationResultList:
+    ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
         if isinstance(group_by, str):
             group_by = [group_by]
 
@@ -172,16 +196,12 @@ class TypeAPI(Generic[T_TypeNode, T_TypeApplyNode, T_TypeNodeList]):
             else:
                 raise TypeError(f"Expected str or MetricAggregation, got {type(agg)}")
 
-        return self._client.data_modeling.instances.aggregate(
-            view=view_id,
-            aggregates=aggregates,
-            group_by=group_by,
-            instance_type="node",
-            query=query,
-            properties=search_properties,
-            filter=filter,
-            limit=limit,
+        result = self._client.data_modeling.instances.aggregate(
+            view_id, aggregates, "node", group_by, query, search_properties, filter, limit
         )
+        if group_by is None:
+            return result[0].aggregates
+        return result
 
     def _histogram(
         self,
@@ -205,6 +225,6 @@ class TypeAPI(Generic[T_TypeNode, T_TypeApplyNode, T_TypeNodeList]):
             view_id, dm.aggregations.Histogram(property, interval), "node", query, search_properties, filter, limit
         )
 
-    def _list(self, limit: int = DEFAULT_LIMIT_READ, filter: dm.Filter | None = None) -> T_TypeNodeList:
+    def _list(self, limit: int = DEFAULT_LIMIT_READ, filter: dm.Filter | None = None) -> T_DomainModelList:
         nodes = self._client.data_modeling.instances.list("node", sources=self._sources, limit=limit, filter=filter)
         return self._class_list([self._class_type.from_node(node) for node in nodes])

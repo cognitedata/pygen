@@ -3,9 +3,22 @@ from __future__ import annotations
 import datetime
 from abc import abstractmethod
 from collections import UserList
-from collections.abc import Collection, Iterator, Mapping
+from collections.abc import Collection, Mapping
 from dataclasses import dataclass, field
-from typing import Annotated, Any, Callable, ClassVar, Generic, Optional, TypeVar, overload
+from typing import (
+    Annotated,
+    Callable,
+    ClassVar,
+    Generic,
+    Optional,
+    Any,
+    Iterator,
+    Protocol,
+    Sequence,
+    SupportsIndex,
+    TypeVar,
+    overload,
+)
 
 import pandas as pd
 from cognite.client import data_modeling as dm
