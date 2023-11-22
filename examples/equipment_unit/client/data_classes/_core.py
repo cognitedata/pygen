@@ -24,7 +24,7 @@ import pandas as pd
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
 from cognite.client.data_classes import TimeSeriesList
-from cognite.client.data_classes.data_modeling.instances import Properties, PropertyValue
+from cognite.client.data_classes.data_modeling.instances import Properties, PropertyValue, Instance
 from pydantic import BaseModel, BeforeValidator, Extra, Field, model_validator
 from pydantic.functional_serializers import PlainSerializer
 
@@ -77,6 +77,11 @@ class DomainModelCore(Core):
     def as_direct_reference(self) -> dm.DirectRelationReference:
         return dm.DirectRelationReference(space=self.space, external_id=self.external_id)
 
+    @classmethod
+    def from_instance(cls: type[T_DomainModelCore], instance: Instance) -> T_DomainModelCore:
+        data = instance.dump(camel_case=False)
+        return cls(**{**data, **unpack_properties(instance.properties)})
+
 
 T_DomainModelCore = TypeVar("T_DomainModelCore", bound=DomainModelCore)
 
@@ -87,12 +92,8 @@ class DomainModel(DomainModelCore):
     created_time: datetime.datetime
     deleted_time: Optional[datetime.datetime] = None
 
-    @classmethod
-    def from_node(cls: type[T_DomainModel], node: dm.Node) -> T_DomainModel:
-        data = node.dump(camel_case=False)
-        # Extra unpacking to avoid crashing between core and property fields
-        # can happen if there is a field named 'version' in the DomainModel.
-        return cls(**{**data, **unpack_properties(node.properties)})
+    def as_id(self) -> dm.NodeId:
+        return dm.NodeId(space=self.space, external_id=self.external_id)
 
 
 T_DomainModel = TypeVar("T_DomainModel", bound=DomainModel)
@@ -192,6 +193,10 @@ class DomainModelList(CoreList[T_DomainModelCore]):
     def as_node_ids(self) -> list[dm.NodeId]:
         return [dm.NodeId(space=node.space, external_id=node.external_id) for node in self]
 
+    @classmethod
+    def load(cls: type[T_DomainModelList], resource: list) -> T_DomainModelList:
+        raise NotImplementedError()
+
 
 T_DomainModelList = TypeVar("T_DomainModelList", bound=DomainModelList, covariant=True)
 
@@ -218,11 +223,6 @@ class DomainRelation(DomainModelCore):
     last_updated_time: datetime.datetime
     created_time: datetime.datetime
     deleted_time: Optional[datetime.datetime] = None
-
-    @classmethod
-    def from_edge(cls: type[T_DomainRelation], edge: dm.Edge) -> T_DomainRelation:
-        data = edge.dump(camel_case=False)
-        return cls(**{**data, **unpack_properties(edge.properties)})
 
 
 T_DomainRelation = TypeVar("T_DomainRelation", bound=DomainRelation)

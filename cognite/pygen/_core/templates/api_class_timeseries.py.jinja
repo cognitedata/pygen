@@ -451,7 +451,7 @@ def _retrieve_timeseries_external_ids_with_extra_{{ timeseries.name }}(
     while True:
         query_limit = min(INSTANCE_QUERY_LIMIT, limit - total_retrieved)
         selected_nodes = dm.query.NodeResultSetExpression(filter=filter_, limit=query_limit)
-        query = dm.query.Query(
+        query = dm.query.QueryExpression(
             with_={
                 "nodes": selected_nodes,
             },

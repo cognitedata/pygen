@@ -64,7 +64,9 @@ def test_filter_start_end_time_edges(start_end_time_edges: StartEndTimeList, wor
 
 
 def test_filter_unit_procedure_through_edge(workorder: EquipmentUnitClient) -> None:
-    unit_procedures = workorder.unit_procedure(limit=5).work_units(type_="red", limit=3).query()
+    unit_procedures = (
+        workorder.unit_procedure(type_="red", limit=3).work_units(limit=5).query(retrieve_equipment_module=True)
+    )
 
     assert 1 <= len(unit_procedures) <= 3
     assert all(procedure.type_ == "red" for procedure in unit_procedures)

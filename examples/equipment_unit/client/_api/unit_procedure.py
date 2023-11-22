@@ -23,9 +23,9 @@ from equipment_unit.client.data_classes._unit_procedure import (
     _UNITPROCEDURE_PROPERTIES_BY_FIELD,
     _create_unit_procedure_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr
+from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryBuilder, QueryExpression
 from .unit_procedure_work_units import UnitProcedureWorkUnitsEdgeAPI
-from .unit_procedure_query import UnitProcedureQuery
+from .unit_procedure_query import UnitProcedureQueryAPI
 
 
 class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureList]):
@@ -55,7 +55,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> UnitProcedureQuery:
+    ) -> UnitProcedureQueryAPI:
         filter_ = _create_unit_procedure_filter(
             self._view_id,
             name,
@@ -66,7 +66,23 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
             space,
             filter,
         )
-        return UnitProcedureQuery(filter)
+        builder = QueryBuilder(
+            UnitProcedureList,
+            [
+                QueryExpression(
+                    name="unit_procedure",
+                    filter=filter_,
+                    select=dm.query.Select(
+                        [dm.query.SourceSelector(self._view_id, list(_UNITPROCEDURE_PROPERTIES_BY_FIELD.values()))]
+                    ),
+                    expression_cls=dm.query.NodeResultSetExpression,
+                    from_=None,
+                )
+            ],
+        )
+        return UnitProcedureQueryAPI(
+            self._client, builder, "unit_procedure", self._view_by_write_class[StartEndTimeApply]
+        )
 
     def apply(
         self, unit_procedure: UnitProcedureApply | Sequence[UnitProcedureApply], replace: bool = False
