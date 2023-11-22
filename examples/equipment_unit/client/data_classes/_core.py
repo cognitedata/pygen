@@ -290,11 +290,17 @@ class DomainRelationApply(BaseModel, extra=Extra.forbid, populate_by_name=True):
         return resources
 
 
+T_DomainRelationApply = TypeVar("T_DomainRelationApply", bound=DomainRelationApply)
+
+
 class DomainRelationList(CoreList[T_DomainRelation]):
     _PARENT_CLASS = DomainRelation
 
     def as_edge_ids(self) -> list[dm.EdgeId]:
         return [dm.EdgeId(space=edge.space, external_id=edge.external_id) for edge in self]
+
+
+T_DomainRelationList = TypeVar("T_DomainRelationList", bound=DomainRelationList)
 
 
 def unpack_properties(properties: Properties) -> Mapping[str, PropertyValue]:

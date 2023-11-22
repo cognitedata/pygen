@@ -1,4 +1,11 @@
-from ._core import DomainModel, DomainModelApply, DomainRelationApply, ResourcesApply, ResourcesApplyResult
+from ._core import (
+    DomainModel,
+    DomainModelApply,
+    DomainModelList,
+    DomainRelationApply,
+    ResourcesApply,
+    ResourcesApplyResult,
+)
 from ._equipment_module import (
     EquipmentModule,
     EquipmentModuleApply,
@@ -31,6 +38,7 @@ __all__ = [
     "ResourcesApply",
     "DomainModel",
     "DomainModelApply",
+    "DomainModelList",
     "DomainRelationApply",
     "ResourcesApplyResult",
     "EquipmentModule",

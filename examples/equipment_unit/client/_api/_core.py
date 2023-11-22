@@ -11,11 +11,16 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from equipment_unit.client.data_classes._core import (
     DomainModel,
     DomainModelApply,
+    DomainRelationApply,
     ResourcesApplyResult,
     T_DomainModel,
     T_DomainModelApply,
     T_DomainModelList,
+    T_DomainRelation,
+    T_DomainRelationApply,
+    T_DomainRelationList,
 )
+
 
 DEFAULT_LIMIT_READ = 25
 INSTANCE_QUERY_LIMIT = 1_000
@@ -35,7 +40,7 @@ _T_co = TypeVar("_T_co", covariant=True)
 
 
 # Source from https://github.com/python/typing/issues/256#issuecomment-1442633430
-# This works because str.__contains__ does not accept object (either in typeshed or at runtime)
+# This works because str.__contains__ does not accept an object (either in typeshed or at runtime)
 class SequenceNotStr(Protocol[_T_co]):
     @overload
     def __getitem__(self, index: SupportsIndex, /) -> _T_co:
@@ -115,7 +120,7 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
         external_id: str,
         space: str,
         retrieve_edges: bool = False,
-        edge_api_names: list[tuple[EdgeAPI, str]] | None = None,
+        edge_api_name_pairs: list[tuple[EdgeAPI, str]] | None = None,
     ) -> T_DomainModel:
         ...
 
@@ -125,7 +130,7 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
         external_id: SequenceNotStr[str],
         space: str,
         retrieve_edges: bool = False,
-        edge_api_names: list[tuple[EdgeAPI, str]] | None = None,
+        edge_api_name_pairs: list[tuple[EdgeAPI, str]] | None = None,
     ) -> T_DomainModelList:
         ...
 
@@ -134,7 +139,7 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
         external_id: str | SequenceNotStr[str],
         space: str,
         retrieve_edges: bool = False,
-        edge_api_names: list[tuple[EdgeAPI, str]] = None,
+        edge_api_name_pairs: list[tuple[EdgeAPI, str]] = None,
     ) -> T_DomainModel | T_DomainModelList:
         is_multiple = True
         if isinstance(external_id, str):
@@ -147,7 +152,7 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
         nodes = self._class_list([self._class_type.from_node(node) for node in instances.nodes])
 
         if retrieve_edges:
-            self._retrieve_and_set_edge_types(nodes, space, edge_api_names)
+            self._retrieve_and_set_edge_types(nodes, space, edge_api_name_pairs)
 
         if is_multiple:
             return nodes
@@ -299,25 +304,25 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
         filter: dm.Filter,
         retrieve_edges: bool = False,
         space: str | None = None,
-        edge_api_names: list[tuple[EdgeAPI, str]] | None = None,
+        edge_api_name_pairs: list[tuple[EdgeAPI, str]] | None = None,
     ) -> T_DomainModelList:
         nodes = self._client.data_modeling.instances.list("node", sources=self._sources, limit=limit, filter=filter)
         node_list = self._class_list([self._class_type.from_node(node) for node in nodes])
         if retrieve_edges:
-            self._retrieve_and_set_edge_types(node_list, space, edge_api_names)
+            self._retrieve_and_set_edge_types(node_list, space, edge_api_name_pairs)
 
         return node_list
 
     @classmethod
     def _retrieve_and_set_edge_types(
-        cls, nodes: T_DomainModelList, space: str | None, edge_api_names: list[tuple[EdgeAPI, str]] | None = None
+        cls, nodes: T_DomainModelList, space: str | None, edge_api_name_pairs: list[tuple[EdgeAPI, str]] | None = None
     ):
-        for edge_api, edge_name in edge_api_names or []:
+        for edge_api, edge_name in edge_api_name_pairs or []:
             space_arg = {"space": space} if space else {}
             if len(ids := nodes.as_node_ids()) > IN_FILTER_LIMIT:
                 edges = edge_api._list(limit=-1, **space_arg)
             else:
-                edges = edge_api._list(ids, limit=-1)
+                edges = edge_api._list(node_ids=ids, limit=-1)
             cls._set_edges(nodes, edges, edge_name)
 
     @staticmethod
@@ -332,6 +337,53 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
                 setattr(node, edge_name, [edge.end_node.external_id for edge in edges_by_start_node[node_id]])
 
 
-class EdgeAPI(Generic[T_DomainModel]):
-    def _list(self) -> dm.EdgeList:
-        ...
+class EdgeAPI(Generic[T_DomainRelation, T_DomainRelationApply, T_DomainRelationList]):
+    def __init__(
+        self,
+        client: CogniteClient,
+        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId],
+        class_type: type[T_DomainRelation],
+        class_apply_type: type[T_DomainRelationApply],
+        class_list: type[T_DomainRelationList],
+    ):
+        self._client = client
+        self._view_by_write_class = view_by_write_class
+        self._view_id = view_by_write_class[class_apply_type]
+        self._class_type = class_type
+        self._class_apply_type = class_apply_type
+        self._class_list = class_list
+
+    def _list(
+        self,
+        node_ids: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filters: list[dm.Filter] | None = None,
+        space: str | None = None,
+    ) -> T_DomainRelationList:
+        filters = filters or []
+        if node_ids and isinstance(node_ids, str):
+            filters.append(dm.filters.Equals(["edge", "startNode"], value={"space": space, "externalId": node_ids}))
+        elif node_ids and isinstance(node_ids, dm.NodeId):
+            filters.append(
+                dm.filters.Equals(
+                    ["edge", "startNode"], value=node_ids.dump(camel_case=True, include_instance_type=False)
+                )
+            )
+        if node_ids and isinstance(node_ids, list):
+            filters.append(
+                dm.filters.In(
+                    ["edge", "startNode"],
+                    values=[
+                        {"space": space, "externalId": ext_id}
+                        if isinstance(ext_id, str)
+                        else ext_id.dump(camel_case=True, include_instance_type=False)
+                        for ext_id in node_ids
+                    ],
+                )
+            )
+        if space and isinstance(space, str):
+            filters.append(dm.filters.Equals(["edge", "space"], value=space))
+        edges = self._client.data_modeling.instances.list(
+            "edge", limit=limit, filter=dm.filters.And(*filters), sources=[self._view_id]
+        )
+        return self._class_list([self._class_type.from_edge(edge) for edge in edges])

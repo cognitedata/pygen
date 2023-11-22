@@ -30,7 +30,7 @@ from equipment_unit.client.data_classes._equipment_module import (
 from equipment_unit.client.data_classes._start_end_time import _STARTENDTIME_PROPERTIES_BY_FIELD
 from equipment_unit.client.data_classes._unit_procedure import _UNITPROCEDURE_PROPERTIES_BY_FIELD
 
-from ._core import DEFAULT_LIMIT_READ, IN_FILTER_LIMIT, INSTANCE_QUERY_LIMIT, Aggregations, EdgeAPI
+from ._core import DEFAULT_LIMIT_READ, INSTANCE_QUERY_LIMIT, EdgeAPI
 
 
 class UnitProcedureWorkUnitsQuery:
@@ -72,7 +72,7 @@ class UnitProcedureWorkUnitsQuery:
             retrieve_equipment_module: Whether to retrieve `equipment_module` for each work unit. Defaults to True.
 
         Returns:
-            List of unit procedures with work units and optionally equipment module.
+            List of unit procedures with work units and optional equipment module.
 
         Examples:
 
@@ -84,9 +84,8 @@ class UnitProcedureWorkUnitsQuery:
 
         """
         f = dm.filters
-        edge_filter = _create_filter_work_units(
+        edge_filters = _create_filter_work_units(
             self._edge_view,
-            None,
             None,
             min_start_time,
             max_start_time,
@@ -114,7 +113,7 @@ class UnitProcedureWorkUnitsQuery:
 
             selected_nodes = dm.query.NodeResultSetExpression(filter=self._node_filter, limit=query_limits["nodes"])
             selected_edges = dm.query.EdgeResultSetExpression(
-                from_="nodes", filter=edge_filter, limit=query_limits["edges"]
+                from_="nodes", filter=f.And(*edge_filters), limit=query_limits["edges"]
             )
             with_ = {
                 "nodes": selected_nodes,
@@ -236,13 +235,6 @@ class UnitProcedureWorkUnitsAPI:
 
 
 class UnitProcedureWorkUnitsEdgeAPI(EdgeAPI):
-    def __init__(
-        self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId]
-    ):
-        self._client = client
-        self._view_by_write_class = view_by_write_class
-        self._view_id = view_by_write_class[StartEndTimeApply]
-
     def list(
         self,
         unit_procedure: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
@@ -280,9 +272,8 @@ class UnitProcedureWorkUnitsEdgeAPI(EdgeAPI):
 
         """
         f = dm.filters
-        filter = _create_filter_work_units(
+        filters = _create_filter_work_units(
             self._view_id,
-            unit_procedure,
             equipment_module,
             min_start_time,
             max_start_time,
@@ -294,37 +285,20 @@ class UnitProcedureWorkUnitsEdgeAPI(EdgeAPI):
                 {"space": "IntegrationTestsImmutable", "externalId": "UnitProcedure.equipment_module"},
             ),
         )
-
-        edges = self._client.data_modeling.instances.list("edge", limit=limit, filter=filter, sources=[self._view_id])
-        return StartEndTimeList([StartEndTime.from_edge(edge) for edge in edges])
+        return self._list(unit_procedure, filters=filters, limit=limit, space=space)
 
 
 def _create_filter_work_units(
     view_id: dm.ViewId,
-    unit_procedure: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
     equipment_module: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
     min_start_time: datetime.datetime | None = None,
     max_start_time: datetime.datetime | None = None,
     min_end_time: datetime.datetime | None = None,
     max_end_time: datetime.datetime | None = None,
-    space: str | None = None,
+    space: str = "IntegrationTestsImmutable",
     filter: dm.Filter | None = None,
-) -> dm.Filter | None:
-    filters = []
-    if unit_procedure and isinstance(unit_procedure, str):
-        filters.append(dm.filters.Equals(["edge", "startNode"], value={"space": space, "externalId": unit_procedure}))
-    if unit_procedure and isinstance(unit_procedure, list):
-        filters.append(
-            dm.filters.In(
-                ["edge", "startNode"],
-                values=[
-                    {"space": space, "externalId": ext_id}
-                    if isinstance(ext_id, str)
-                    else ext_id.dump(camel_case=True, include_instance_type=False)
-                    for ext_id in unit_procedure
-                ],
-            )
-        )
+) -> list[dm.Filter]:
+    filters: list[dm.Filter] = []
     if equipment_module and isinstance(equipment_module, str):
         filters.append(dm.filters.Equals(["edge", "endNode"], value={"space": space, "externalId": equipment_module}))
     if equipment_module and isinstance(equipment_module, list):
@@ -355,10 +329,6 @@ def _create_filter_work_units(
                 lte=max_end_time.isoformat(timespec="milliseconds") if max_end_time else None,
             )
         )
-    if space and isinstance(space, str):
-        filters.append(dm.filters.Equals(["edge", "space"], value=space))
-    if space and isinstance(space, list):
-        filters.append(dm.filters.In(["edge", "space"], values=space))
     if filter:
         filters.append(filter)
-    return dm.filters.And(*filters) if filters else None
+    return filters

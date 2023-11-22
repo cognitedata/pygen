@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from collections import defaultdict
 from collections.abc import Sequence
 from typing import overload
 
@@ -16,13 +15,17 @@ from equipment_unit.client.data_classes import (
     UnitProcedureFields,
     UnitProcedureList,
     UnitProcedureTextFields,
+    StartEndTimeApply,
+    StartEndTime,
+    StartEndTimeList,
 )
 from equipment_unit.client.data_classes._unit_procedure import (
     _UNITPROCEDURE_PROPERTIES_BY_FIELD,
     _create_unit_procedure_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, IN_FILTER_LIMIT, Aggregations, NodeAPI, SequenceNotStr
-from .unit_procedure_work_units import UnitProcedureWorkUnitsAPI, UnitProcedureWorkUnitsEdgeAPI
+from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr
+from .unit_procedure_work_units import UnitProcedureWorkUnitsEdgeAPI
+from .unit_procedure_query import UnitProcedureQuery
 
 
 class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureList]):
@@ -38,8 +41,32 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
         )
         self._view_id = view_id
         self._view_by_write_class = view_by_write_class
-        self.work_units = UnitProcedureWorkUnitsAPI(client, view_by_write_class)
-        self.work_units_edge = UnitProcedureWorkUnitsEdgeAPI(client, view_by_write_class)
+        self.work_units_edge = UnitProcedureWorkUnitsEdgeAPI(
+            client, view_by_write_class, StartEndTime, StartEndTimeApply, StartEndTimeList
+        )
+
+    def __call__(
+        self,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        type_: str | list[str] | None = None,
+        type_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> UnitProcedureQuery:
+        filter_ = _create_unit_procedure_filter(
+            self._view_id,
+            name,
+            name_prefix,
+            type_,
+            type_prefix,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        return UnitProcedureQuery(filter)
 
     def apply(
         self, unit_procedure: UnitProcedureApply | Sequence[UnitProcedureApply], replace: bool = False
@@ -125,7 +152,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_names=[(self.work_units_edge, "work_units")],
+            edge_api_name_pairs=[(self.work_units_edge, "work_units")],
         )
 
     def search(
@@ -403,5 +430,5 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
             filter=filter_,
             space=space,
             retrieve_edges=retrieve_edges,
-            edge_api_names=[(self.work_units_edge, "work_units")],
+            edge_api_name_pairs=[(self.work_units_edge, "work_units")],
         )
