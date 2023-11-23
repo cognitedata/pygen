@@ -3,7 +3,7 @@ from cognite.client import data_modeling as dm
 from tests.constants import IS_PYDANTIC_V2
 
 if IS_PYDANTIC_V2:
-    from equipment_unit.client._api._core import QueryBuilder, QueryExpression
+    from equipment_unit.client._api._core import QueryBuilder, QueryStep
     from equipment_unit.client.data_classes import (
         StartEndTime,
         UnitProcedure,
@@ -117,7 +117,7 @@ properties:
         builder = QueryBuilder(
             UnitProcedureList,
             [
-                QueryExpression(
+                QueryStep(
                     name="unit_procedure",
                     filter=None,
                     select=dm.query.Select(
@@ -132,7 +132,7 @@ properties:
                     from_=None,
                     max_retrieve_limit=-1,
                 ),
-                QueryExpression(
+                QueryStep(
                     name="work_units",
                     filter=None,
                     select=dm.query.Select(

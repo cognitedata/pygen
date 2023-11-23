@@ -23,7 +23,7 @@ from equipment_unit.client.data_classes._unit_procedure import (
     _UNITPROCEDURE_PROPERTIES_BY_FIELD,
     _create_unit_procedure_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryBuilder, QueryExpression
+from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
 from .unit_procedure_work_units import UnitProcedureWorkUnitsEdgeAPI
 from .unit_procedure_query import UnitProcedureQueryAPI
 
@@ -69,20 +69,21 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
         builder = QueryBuilder(
             UnitProcedureList,
             [
-                QueryExpression(
+                QueryStep(
                     name="unit_procedure",
-                    filter=filter_,
+                    expression=dm.query.NodeResultSetExpression(
+                        from_=None,
+                        filter=filter_,
+                    ),
                     select=dm.query.Select(
                         [dm.query.SourceSelector(self._view_id, list(_UNITPROCEDURE_PROPERTIES_BY_FIELD.values()))]
                     ),
-                    expression_cls=dm.query.NodeResultSetExpression,
-                    from_=None,
+                    result_cls=UnitProcedure,
+                    max_retrieve_limit=limit,
                 )
             ],
         )
-        return UnitProcedureQueryAPI(
-            self._client, builder, "unit_procedure", self._view_by_write_class[StartEndTimeApply]
-        )
+        return UnitProcedureQueryAPI(self._client, builder, "unit_procedure", self._view_by_write_class)
 
     def apply(
         self, unit_procedure: UnitProcedureApply | Sequence[UnitProcedureApply], replace: bool = False

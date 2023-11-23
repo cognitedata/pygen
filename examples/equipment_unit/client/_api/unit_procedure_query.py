@@ -3,21 +3,24 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING
 from cognite.client import data_modeling as dm
-from equipment_unit.client.data_classes import UnitProcedureList, DomainModelList
-from ._core import QueryBuilder, QueryExpression, QueryAPI
-from equipment_unit.client.data_classes._start_end_time import _STARTENDTIME_PROPERTIES_BY_FIELD
-from cognite.client import CogniteClient
+from equipment_unit.client.data_classes import DomainModelList, EquipmentModule
+from ._core import QueryBuilder, QueryStep, QueryAPI
+from equipment_unit.client.data_classes._start_end_time import (
+    _STARTENDTIME_PROPERTIES_BY_FIELD,
+    StartEndTimeApply,
+    StartEndTime,
+)
+from equipment_unit.client.data_classes._equipment_module import (
+    _EQUIPMENTMODULE_PROPERTIES_BY_FIELD,
+    EquipmentModuleApply,
+)
+
 
 if TYPE_CHECKING:
     from .equipment_module_query import EquipmentModuleQueryAPI
 
 
 class UnitProcedureQueryAPI(QueryAPI):
-    def __init__(self, client: CogniteClient, builder: QueryBuilder, from_: str, edge_view: dm.ViewId):
-        super().__init__(client, builder, from_)
-
-        self._edge_view = edge_view
-
     def work_units(
         self,
         min_start_time: datetime.datetime | None = None,
@@ -30,8 +33,9 @@ class UnitProcedureQueryAPI(QueryAPI):
         from .equipment_module_query import EquipmentModuleQueryAPI
 
         f = dm.filters
+        edge_view = self._view_by_write_class[StartEndTimeApply]
         edge_filters = _create_filter_work_units(
-            self._edge_view,
+            edge_view,
             None,
             min_start_time,
             max_start_time,
@@ -44,21 +48,43 @@ class UnitProcedureQueryAPI(QueryAPI):
             ),
         )
         self._builder.append(
-            QueryExpression(
+            QueryStep(
                 name="work_units",
-                filter=f.And(*edge_filters),
-                select=dm.query.Select(
-                    [dm.query.SourceSelector(self._edge_view, list(_STARTENDTIME_PROPERTIES_BY_FIELD.values()))]
+                expression=dm.query.EdgeResultSetExpression(
+                    filter=f.And(*edge_filters),
+                    from_=self._builder[-1].name,
                 ),
-                expression_cls=dm.query.EdgeResultSetExpression,
-                from_=self._from,
+                select=dm.query.Select(
+                    [dm.query.SourceSelector(edge_view, list(_STARTENDTIME_PROPERTIES_BY_FIELD.values()))]
+                ),
+                result_cls=StartEndTime,
                 max_retrieve_limit=limit,
             )
         )
-        return EquipmentModuleQueryAPI(self._client, self._builder, "work_units", self._edge_view)
+        return EquipmentModuleQueryAPI(self._client, self._builder, "work_units", self._view_by_write_class)
 
     def query(self, retrieve_unit_procedure: bool = True) -> DomainModelList:
-        # Todo add unit procedure to builder if retrieve_unit_procedure
+        if retrieve_unit_procedure:
+            raise NotImplementedError
+            # self._builder.append(
+            #     QueryStep(
+            #         name="equipment_module",
+            #         filter=None,
+            #         select=dm.query.Select(
+            #             [
+            #                 dm.query.SourceSelector(
+            #                     self._view_by_write_class[EquipmentModuleApply],
+            #                     list(_EQUIPMENTMODULE_PROPERTIES_BY_FIELD.values()),
+            #                 )
+            #             ]
+            #         ),
+            #         expression_cls=dm.query.NodeResultSetExpression,
+            #         result_cls=EquipmentModule,
+            #         from_=None,
+            #         max_retrieve_limit=-1,
+            #     )
+            # )
+
         return self._query()
 
 

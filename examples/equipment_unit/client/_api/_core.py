@@ -394,13 +394,11 @@ class EdgeAPI(Generic[T_DomainRelation, T_DomainRelationApply, T_DomainRelationL
 
 
 @dataclass
-class QueryExpression:
+class QueryStep:
     # Setup Variables
     name: str
-    filter: dm.Filter | None
+    expression: dm.query.ResultSetExpression
     select: dm.query.Select
-    from_: str | None
-    expression_cls: type[dm.query.ResultSetExpression]
     result_cls: type[DomainModelCore] | None
     max_retrieve_limit: int
 
@@ -410,9 +408,11 @@ class QueryExpression:
     results: list[Instance] = field(default_factory=list)
     last_batch_count: int = 0
 
-    @property
-    def limit(self) -> int:
-        return min(INSTANCE_QUERY_LIMIT, self.max_retrieve_limit - self.total_retrieved)
+    def update_expression_limit(self) -> None:
+        if self.max_retrieve_limit == -1:
+            self.expression.limit = None
+        else:
+            self.expression.limit = min(INSTANCE_QUERY_LIMIT, self.max_retrieve_limit - self.total_retrieved)
 
 
 @dataclass
@@ -422,23 +422,23 @@ class EdgeLike(Protocol):
 
 
 class QueryBuilder(UserList, Generic[T_DomainModelList]):
-    def __init__(self, result_cls: type[T_DomainModelList], nodes: Collection[QueryExpression] = None):
+    def __init__(self, result_cls: type[T_DomainModelList], nodes: Collection[QueryStep] = None):
         super().__init__(nodes or [])
         self._result_cls = result_cls
 
     # The dunder implementations are to get proper type hints
-    def __iter__(self) -> Iterator[QueryExpression]:
+    def __iter__(self) -> Iterator[QueryStep]:
         return super().__iter__()
 
     @overload
-    def __getitem__(self, item: int) -> QueryExpression:
+    def __getitem__(self, item: int) -> QueryStep:
         ...
 
     @overload
     def __getitem__(self: type[QueryBuilder[T_DomainModelList]], item: slice) -> QueryBuilder[T_DomainModelList]:
         ...
 
-    def __getitem__(self, item: int | slice) -> QueryExpression | QueryBuilder[T_DomainModelList]:
+    def __getitem__(self, item: int | slice) -> QueryStep | QueryBuilder[T_DomainModelList]:
         if isinstance(item, slice):
             return self.__class__(self.data[item])
         elif isinstance(item, int):
@@ -452,17 +452,20 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
             expression.cursor = None
             expression.results = []
 
+    def update_expression_limits(self) -> None:
+        for expression in self:
+            expression.update_expression_limit()
+
     def build(self) -> dm.query.Query:
-        with_ = {
-            expression.name: expression.expression_cls(
-                from_=expression.from_, filter=expression.filter, limit=expression.limit, sort=None
-            )
-            for expression in self
-        }
+        with_ = {expression.name: expression.expression for expression in self}
         select = {expression.name: expression.select for expression in self}
-        cursors = {expression.name: expression.cursor for expression in self}
+        cursors = self.cursors
 
         return dm.query.Query(with_=with_, select=select, cursors=cursors)
+
+    @property
+    def cursors(self) -> dict[str, str | None]:
+        return {expression.name: expression.cursor for expression in self}
 
     def update(self, batch: dm.query.QueryResult):
         for expression in self:
@@ -507,15 +510,25 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
 
 
 class QueryAPI:
-    def __init__(self, client: CogniteClient, builder: QueryBuilder, from_: str):
+    def __init__(
+        self,
+        client: CogniteClient,
+        builder: QueryBuilder,
+        from_: str,
+        view_by_write_class: dict[type[DomainModelApply], dm.ViewId],
+    ):
         self._client = client
         self._builder = builder
         self._from = from_
+        self._view_by_write_class = view_by_write_class
 
     def _query(self) -> DomainModelList:
         self._builder.reset()
+        query = self._builder.build()
+
         while True:
-            query = self._builder.build()
+            self._builder.update_expression_limits()
+            query.cursors = self._builder.cursors
             batch = self._client.data_modeling.instances.query(query)
             self._builder.update(batch)
             if self._builder.is_finished:
