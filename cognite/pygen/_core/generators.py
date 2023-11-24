@@ -321,4 +321,17 @@ class APIGenerator:
         raise NotImplementedError("This method is not implemented yet")
 
     def generate_timeseries_api_files(self, top_level_package: str, client_name: str) -> Iterator[str]:
-        raise NotImplementedError("This method is not implemented yet")
+        timeseries_api = self._env.get_template("api_class_timeseries.py.jinja")
+        for timeseries in self.data_class.single_timeseries_fields:
+            yield (
+                timeseries_api.render(
+                    top_level_package=top_level_package,
+                    client_name=client_name,
+                    timeseries=timeseries,
+                    api_class=self.api_class,
+                    data_class=self.data_class,
+                    list_method=ListMethod.from_fields(self.data_class.fields, self._config.filtering),
+                )
+                + "\n"
+            )
+        return ()

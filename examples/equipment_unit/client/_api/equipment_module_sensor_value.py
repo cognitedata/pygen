@@ -54,7 +54,7 @@ class EquipmentModuleSensorValueQuery:
             end: Exclusive end. Default: "now"
             aggregates: Single aggregate or list of aggregates to retrieve. Default: None (raw datapoints returned)
             granularity The granularity to fetch aggregates at. e.g. '15s', '2h', '10d'. Default: None.
-            target_unit: The unit_external_id of the data points returned. If the time series does not have a unit_external_id that can be converted to the target_unit, an error will be returned. Cannot be used with target_unit_system.
+            target_unit: The unit_external_id of the data points returned. If the time series does not have an unit_external_id that can be converted to the target_unit, an error will be returned. Cannot be used with target_unit_system.
             target_unit_system: The unit system of the data points returned. Cannot be used with target_unit.
             limit (int | None): Maximum number of datapoints to return for each time series. Default: None (no limit)
             include_outside_points (bool): Whether to include outside points. Not allowed when fetching aggregates. Default: False
