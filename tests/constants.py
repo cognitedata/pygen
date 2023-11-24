@@ -208,7 +208,11 @@ class EquipmentSDKFiles:
 
     api = client_dir / "_api"
     equipment_api = api / "equipment_module.py"
+    equipment_module_sensor_value_api = api / "equipment_module_sensor_value.py"
+
     unit_procedure_api = api / "unit_procedure.py"
+    unit_procedure_quepy = api / "unit_procedure_query.py"
+    unit_procedure_work_units = api / "unit_procedure_work_units.py"
     core_api = api / "_core.py"
 
     data_init = data_classes / "__init__.py"

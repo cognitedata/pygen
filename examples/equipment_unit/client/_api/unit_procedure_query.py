@@ -77,7 +77,7 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
                 max_retrieve_limit=limit,
             )
         )
-        return EquipmentModuleQueryAPI(self._client, self._builder, "work_units", self._view_by_write_class)
+        return EquipmentModuleQueryAPI(self._client, self._builder, self._view_by_write_class)
 
     def query(self, retrieve_unit_procedure: bool = True) -> T_DomainModelList:
         """Execute query and return the result.

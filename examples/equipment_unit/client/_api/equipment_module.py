@@ -99,7 +99,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleApply, Equipmen
                 )
             ],
         )
-        return EquipmentModuleQueryAPI(self._client, builder, "equipment_module", self._view_by_write_class)
+        return EquipmentModuleQueryAPI(self._client, builder, self._view_by_write_class)
 
     def apply(
         self, equipment_module: EquipmentModuleApply | Sequence[EquipmentModuleApply], replace: bool = False

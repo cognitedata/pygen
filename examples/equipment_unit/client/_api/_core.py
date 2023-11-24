@@ -398,7 +398,7 @@ class QueryStep:
     # Setup Variables
     name: str
     expression: dm.query.ResultSetExpression
-    select: dm.query.Select
+    select: dm.query.Select | None
     result_cls: type[DomainModelCore] | None
     max_retrieve_limit: int
 
@@ -527,12 +527,10 @@ class QueryAPI(Generic[T_DomainModelList]):
         self,
         client: CogniteClient,
         builder: QueryBuilder[T_DomainModelList],
-        from_: str,
         view_by_write_class: dict[type[DomainModelApply], dm.ViewId],
     ):
         self._client = client
         self._builder = builder
-        self._from = from_
         self._view_by_write_class = view_by_write_class
 
     def _query(self) -> T_DomainModelList:

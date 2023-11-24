@@ -100,7 +100,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
                 )
             ],
         )
-        return UnitProcedureQueryAPI(self._client, builder, "unit_procedure", self._view_by_write_class)
+        return UnitProcedureQueryAPI(self._client, builder, self._view_by_write_class)
 
     def apply(
         self, unit_procedure: UnitProcedureApply | Sequence[UnitProcedureApply], replace: bool = False
