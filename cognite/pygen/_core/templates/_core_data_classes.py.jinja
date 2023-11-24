@@ -3,15 +3,25 @@ from __future__ import annotations
 import datetime
 from abc import abstractmethod
 from collections import UserList
-from collections.abc import Collection, Iterator, Mapping
+from collections.abc import Collection, Mapping
 from dataclasses import dataclass, field
-from typing import Annotated, Any, Callable, ClassVar, Generic, Optional, TypeVar, overload
+from typing import (
+    Annotated,
+    Callable,
+    ClassVar,
+    Generic,
+    Optional,
+    Any,
+    Iterator,
+    TypeVar,
+    overload,
+)
 
 import pandas as pd
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
 from cognite.client.data_classes import TimeSeriesList
-from cognite.client.data_classes.data_modeling.instances import Properties, PropertyValue
+from cognite.client.data_classes.data_modeling.instances import Instance, Properties, PropertyValue
 from pydantic import BaseModel, BeforeValidator, Extra, Field{% if is_pydantic_v2 %}, model_validator{% else %}, root_validator{% endif %}
 from pydantic.functional_serializers import PlainSerializer
 
@@ -64,6 +74,11 @@ class DomainModelCore(Core):
     def as_direct_reference(self) -> dm.DirectRelationReference:
         return dm.DirectRelationReference(space=self.space, external_id=self.external_id)
 
+    @classmethod
+    def from_instance(cls: type[T_DomainModelCore], instance: Instance) -> T_DomainModelCore:
+        data = instance.dump(camel_case=False)
+        return cls(**{**data, **unpack_properties(instance.properties)})
+
 
 T_DomainModelCore = TypeVar("T_DomainModelCore", bound=DomainModelCore)
 
@@ -74,12 +89,8 @@ class DomainModel(DomainModelCore):
     created_time: datetime.datetime
     deleted_time: Optional[datetime.datetime] = None
 
-    @classmethod
-    def from_node(cls: type[T_DomainModel], node: dm.Node) -> T_DomainModel:
-        data = node.dump(camel_case=False)
-        # Extra unpacking to avoid crashing between core and property fields
-        # can happen if there is a field named 'version' in the DomainModel.
-        return cls(**{**data, **unpack_properties(node.properties)})
+    def as_id(self) -> dm.NodeId:
+        return dm.NodeId(space=self.space, external_id=self.external_id)
 
 
 T_DomainModel = TypeVar("T_DomainModel", bound=DomainModel)
@@ -215,11 +226,6 @@ class DomainRelation(DomainModelCore):
     created_time: datetime.datetime
     deleted_time: Optional[datetime.datetime] = None
 
-    @classmethod
-    def from_edge(cls: type[T_DomainRelation], edge: dm.Edge) -> T_DomainRelation:
-        data = edge.dump(camel_case=False)
-        return cls(**{**data, **unpack_properties(edge.properties)})
-
 
 T_DomainRelation = TypeVar("T_DomainRelation", bound=DomainRelation)
 
@@ -286,11 +292,17 @@ class DomainRelationApply(BaseModel, extra=Extra.forbid, populate_by_name=True):
         return resources
 
 
+T_DomainRelationApply = TypeVar("T_DomainRelationApply", bound=DomainRelationApply)
+
+
 class DomainRelationList(CoreList[T_DomainRelation]):
     _PARENT_CLASS = DomainRelation
 
     def as_edge_ids(self) -> list[dm.EdgeId]:
         return [dm.EdgeId(space=edge.space, external_id=edge.external_id) for edge in self]
+
+
+T_DomainRelationList = TypeVar("T_DomainRelationList", bound=DomainRelationList)
 
 
 def unpack_properties(properties: Properties) -> Mapping[str, PropertyValue]:

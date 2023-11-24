@@ -13,9 +13,6 @@ from typing import (
     Optional,
     Any,
     Iterator,
-    Protocol,
-    Sequence,
-    SupportsIndex,
     TypeVar,
     overload,
 )
@@ -24,7 +21,7 @@ import pandas as pd
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
 from cognite.client.data_classes import TimeSeriesList
-from cognite.client.data_classes.data_modeling.instances import Properties, PropertyValue, Instance
+from cognite.client.data_classes.data_modeling.instances import Instance, Properties, PropertyValue
 from pydantic import BaseModel, BeforeValidator, Extra, Field, model_validator
 from pydantic.functional_serializers import PlainSerializer
 
@@ -192,10 +189,6 @@ class DomainModelList(CoreList[T_DomainModelCore]):
 
     def as_node_ids(self) -> list[dm.NodeId]:
         return [dm.NodeId(space=node.space, external_id=node.external_id) for node in self]
-
-    @classmethod
-    def load(cls: type[T_DomainModelList], resource: list) -> T_DomainModelList:
-        raise NotImplementedError()
 
 
 T_DomainModelList = TypeVar("T_DomainModelList", bound=DomainModelList, covariant=True)
