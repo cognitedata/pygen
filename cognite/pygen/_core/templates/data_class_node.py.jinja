@@ -113,7 +113,7 @@ class {{ data_class.write_name }}(DomainModelApply):
 {%  for field in data_class.one_to_many_edges %}{% if field.is_property_edge %}
         for {{ field.variable }} in self.{{ field.name }} or []:
             if isinstance({{ field.variable }}, DomainRelationApply):
-                other_resources = {{ field.variable }}._to_instances_apply(cache, self.as_direct_reference(), view_by_write_class)
+                other_resources = {{ field.variable }}._to_instances_apply(cache, self, view_by_write_class)
                 resources.extend(other_resources){% else %}
         edge_type = dm.DirectRelationReference("{{ field.prop.type.space }}", "{{ field.prop.type.external_id }}")
         for {{ field.variable }} in self.{{ field.name }} or []:
@@ -143,3 +143,16 @@ class {{ data_class.write_list_name }}(DomainModelApplyList[{{ data_class.write_
     """List of {{ data_class.doc_list_name }} in the writing version."""
 
     _INSTANCE = {{ data_class.write_name }}
+
+
+def _create_{{ data_class.variable }}_filter(
+    view_id: dm.ViewId,{% for parm in list_method.parameters %}
+    {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []{% for filter in list_method.filters %}
+    if {{ filter.condition }}:
+        filters.append({{ filter.filter_call }}({{ filter.arguments }})){% endfor %}
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

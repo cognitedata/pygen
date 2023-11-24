@@ -280,7 +280,14 @@ class APIGenerator:
         else:
             raise ValueError(f"Unknown data class {type(self.data_class)}")
 
-        return type_data.render(data_class=self.data_class, space=self.view_identifier.space) + "\n"
+        return (
+            type_data.render(
+                data_class=self.data_class,
+                space=self.view_identifier.space,
+                list_method=ListMethod.from_fields(self.data_class.fields, self._config.filtering),
+            )
+            + "\n"
+        )
 
     def generate_api_file(self, top_level_package: str, client_name: str) -> str:
         type_api = self._env.get_template("api_class.py.jinja")
