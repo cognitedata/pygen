@@ -125,7 +125,8 @@ class Field(ABC):
                 # are handled above.
                 edge_api_class_input = f"{view_name}_{prop_name}"
                 edge_api_class = f"{create_name(edge_api_class_input, field_naming.edge_api_class)}"
-                edge_api_attribute = f"{create_name(prop_name, field_naming.api_class_attribute)}_edge"
+                edge_api_attribute = f"{create_name(prop_name, field_naming.api_class_attribute)}"
+                edge_api_file_name = f"{create_name(edge_api_class_input, field_naming.edge_api_file)}"
                 return CDFExternalField(
                     name=name,
                     prop_name=prop_name,
@@ -134,6 +135,7 @@ class Field(ABC):
                     is_nullable=prop.nullable,
                     prop=prop,
                     pydantic_field=pydantic_field,
+                    edge_api_file_name=edge_api_file_name,
                     edge_api_class=edge_api_class,
                     edge_api_attribute=edge_api_attribute,
                 )
@@ -315,6 +317,7 @@ class PrimitiveListField(PrimitiveFieldCore):
 
 @dataclass(frozen=True)
 class CDFExternalField(PrimitiveFieldCore):
+    edge_api_file_name: str
     edge_api_class: str
     edge_api_attribute: str
 

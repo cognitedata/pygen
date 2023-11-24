@@ -11,20 +11,19 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from {{ top_level_package }}.data_classes import (
     ResourcesApplyResult,
     {{ data_class.read_name }},
-    {{ data_class.write_name }}{% if data_class.has_primitive_fields %},
-    {{ data_class.read_list_name }},
-    {{ data_class.field_names }}{% endif %}{% if data_class.has_text_field %},
-    {{ data_class.text_field_names }}{% endif %},
+    {{ data_class.write_name }},{% if data_class.has_primitive_fields %}
+    {{ data_class.field_names }},{% endif %}
+    {{ data_class.read_list_name }},{% if data_class.has_text_field %}
+    {{ data_class.text_field_names }},{% endif %}
     DomainModelApply,
 )
 from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import (
     {{ data_class.properties_dict_name }},
     {{ data_class.filter_name }},
 )
-
 from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, QueryStep, QueryBuilder{% for field in data_class.one_to_many_edges %}
 from .{{ field.edge_api_file_name }} import {{ field.edge_api_class }}{% endfor %}{% for field in data_class.single_timeseries_fields %}
-from .{{ field_edge_api_file_name }}_timeseries import {{ field.edge_api_class }}API{% endfor %}
+from .{{ field.edge_api_file_name }} import {{ field.edge_api_class }}API{% endfor %}
 from .{{ api_class.query_file_name }} import {{ api_class.query_class_name }}
 
 
@@ -37,9 +36,9 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
             class_type={{ data_class.read_name }},
             class_apply_type={{ data_class.write_name }},
             class_list={{ data_class.read_list_name }},
+            view_by_write_class=view_by_write_class,
         )
-        self._view_id = view_id
-        self._view_by_write_class = view_by_write_class{% for field in data_class.one_to_many_edges %}
+        self._view_id = view_id{% for field in data_class.one_to_many_edges %}
         self.{{ field.edge_api_attribute }} = {{ field.edge_api_class }}(client){% endfor %}{% for timeseries in data_class.single_timeseries_fields %}
         self.{{ timeseries.edge_api_attribute }} = {{ timeseries.edge_api_class }}API(client, view_id){% endfor %}
 
@@ -49,7 +48,7 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
             limit: int = DEFAULT_LIMIT_READ,
             filter: dm.Filter | None = None,
     ) -> {{ api_class.query_class_name }}[{{ data_class.read_list_name }}]:
-        """Query starting at {{ data_class.doc_list_name }}
+        """Query starting at {{ data_class.doc_list_name }}.
 
         Args:{% for parm in list_method.parameters %}
             {{ parm.name }}: {{ parm.description }}{% endfor %}
@@ -57,10 +56,10 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
-            A query API for {{ data_class.doc_list_name}}
+            A query API for {{ data_class.doc_list_name}}.
 
         """
-        filter_ = _create_filter(
+        filter_ = {{ data_class.filter_name }}(
             self._view_id,{% for parm in list_method.parameters %}
             {{ parm.name }},{% endfor %}
             filter,
@@ -130,12 +129,7 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
                 >>> client = {{ client_name }}()
                 >>> client.{{ api_class.client_attribute }}.delete("my_{{ data_class.variable }}")
         """
-        if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
-        else:
-            return self._client.data_modeling.instances.delete(
-                nodes=[(space, id) for id in external_id],
-            )
+        return self._delete(external_id, space=space)
 
     @overload
     def retrieve(self, external_id: str) -> {{ data_class.read_name }}:
@@ -164,20 +158,7 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
                 >>> {{ data_class.variable }} = client.{{ api_class.client_attribute }}.retrieve("my_{{ data_class.variable }}")
 
         """
-        if isinstance(external_id, str):
-            {% if data_class.has_one_to_many_edges %}{{ data_class.variable }} = self._retrieve((space, external_id))
-{% for field in data_class.one_to_many_edges %}
-            {{ field.variable }}_edges = self.{{ field.edge_api_attribute }}.retrieve(external_id, space=space)
-            {{ data_class.variable }}.{{ field.name }} = [edge.end_node.external_id for edge in {{ field.variable }}_edges]{% endfor %}
-
-            return {{ data_class.variable }}{% else %}return self._retrieve((space, external_id)){% endif %}
-        else:
-            {% if data_class.has_one_to_many_edges %}{{ data_class.variable_list }} = self._retrieve([(space, ext_id) for ext_id in external_id])
-{% for field in data_class.one_to_many_edges %}
-            {{ field.variable }}_edges = self.{{ field.edge_api_attribute }}.retrieve({{ data_class.variable_list }}.as_node_ids())
-            self._set_{{ field.name }}({{ data_class.variable_list }}, {{ field.variable }}_edges){% endfor %}
-
-            return {{ data_class.variable_list }}{% else %}return self._retrieve([(space, ext_id) for ext_id in external_id]){% endif %}
+        return self._retrieve(external_id, space=space)
 {% if data_class.has_text_field %}
     def search(
         self,
@@ -208,7 +189,7 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
                 >>> {{ data_class.variable_list }} = client.{{ api_class.client_attribute }}.search('my_{{ data_class.variable }}')
 
         """
-        filter_ = _create_filter(
+        filter_ = {{ data_class.filter_name }}(
             self._view_id,{% for parm in list_method.parameters %}
             {{ parm.name }},{% endfor %}
             filter,
@@ -288,7 +269,7 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
 
         """
 
-        filter_ = _create_filter(
+        filter_ = {{ data_class.filter_name }}(
             self._view_id,{% for parm in list_method.parameters %}
             {{ parm.name }},{% endfor %}
             filter,
@@ -333,7 +314,7 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
             Bucketed histogram results.
 
         """
-        filter_ = _create_filter(
+        filter_ = {{ data_class.filter_name }}(
             self._view_id,{% for parm in list_method.parameters %}
             {{ parm.name }},{% endfor %}
             filter,
@@ -379,7 +360,7 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
                 >>> {{ data_class.variable_list }} = client.{{ api_class.client_attribute }}.list(limit=5)
 
         """
-        filter_ = _create_filter(
+        filter_ = {{ data_class.filter_name }}(
             self._view_id,{% for parm in list_method.parameters %}
             {{ parm.name }},{% endfor %}
             filter,
