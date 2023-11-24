@@ -2,16 +2,17 @@ from __future__ import annotations
 
 from collections import defaultdict, UserList
 from collections.abc import Sequence, Collection
-from typing import Generic, Literal, Any, Iterator, Protocol, SupportsIndex, TypeVar, overload, cast
 from dataclasses import dataclass, field
+from typing import Generic, Literal, Any, Iterator, Protocol, SupportsIndex, TypeVar, overload, cast
+
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList
 from cognite.client.data_classes.data_modeling.instances import Instance
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
+
 from equipment_unit.client.data_classes._core import (
     DomainModel,
-    DomainModelList,
     DomainModelApply,
     DomainRelationApply,
     ResourcesApplyResult,
@@ -24,7 +25,6 @@ from equipment_unit.client.data_classes._core import (
     DomainModelCore,
     DomainRelation,
 )
-
 
 DEFAULT_LIMIT_READ = 25
 INSTANCE_QUERY_LIMIT = 1_000
