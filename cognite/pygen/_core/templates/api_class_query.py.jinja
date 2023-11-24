@@ -1,0 +1,29 @@
+from __future__ import annotations
+
+import datetime
+from typing import TYPE_CHECKING
+from cognite.client import data_modeling as dm
+from ._core import QueryStep, QueryAPI, T_DomainModelList
+from equipment_unit.client.data_classes import (
+# for end node and property fields
+    UnitProcedure,
+    UnitProcedureApply,
+    StartEndTime,
+    StartEndTimeApply,
+)
+## for each property field
+from equipment_unit.client.data_classes._start_end_time import (
+    _STARTENDTIME_PROPERTIES_BY_FIELD,
+)
+## for each end node
+from equipment_unit.client.data_classes._unit_procedure import (
+    _UNITPROCEDURE_PROPERTIES_BY_FIELD,
+)
+
+{% if data_class.has_one_to_many_edges %}
+if TYPE_CHECKING:{% for field in data_class.one_to_many_edges %}
+    from .equipment_module_query import EquipmentModuleQueryAPI
+
+
+class {{ api_class.query_class_name }}(QueryAPI[T_DomainModelList]):
+    ...

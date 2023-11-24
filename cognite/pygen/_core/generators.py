@@ -210,7 +210,7 @@ class MultiAPIGenerator:
             file_name = api.api_class.file_name
             sdk[data_classes_dir / f"_{file_name}.py"] = api.generate_data_class_file()
             sdk[api_dir / f"{file_name}.py"] = api.generate_api_file(self.top_level_package, self.client_name)
-            sdk[api_dir / f"{file_name}_query.py"] = api.generate_api_query_file(
+            sdk[api_dir / f"{api.api_class.query_file_name}.py"] = api.generate_api_query_file(
                 self.top_level_package, self.client_name
             )
             raise NotImplementedError("This method is not implemented yet")
@@ -304,7 +304,18 @@ class APIGenerator:
         )
 
     def generate_api_query_file(self, top_level_package: str, client_name: str) -> str:
-        raise NotImplementedError("This method is not implemented yet")
+        query_api = self._env.get_template("api_class_query.py.jinja")
+
+        return (
+            query_api.render(
+                top_level_package=top_level_package,
+                client_name=client_name,
+                api_class=self.api_class,
+                data_class=self.data_class,
+                list_method=ListMethod.from_fields(self.data_class.fields, self._config.filtering),
+            )
+            + "\n"
+        )
 
     def generate_edge_api_files(self, top_level_package: str, client_name: str) -> Iterator[str]:
         raise NotImplementedError("This method is not implemented yet")

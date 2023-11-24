@@ -3,19 +3,20 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING
 from cognite.client import data_modeling as dm
-from ._core import QueryBuilder, QueryStep, QueryAPI, T_DomainModelList
-from equipment_unit.client.data_classes._start_end_time import (
-    _STARTENDTIME_PROPERTIES_BY_FIELD,
-)
+from ._core import QueryStep, QueryAPI, T_DomainModelList
 from equipment_unit.client.data_classes import (
     UnitProcedure,
-    StartEndTimeApply,
-    StartEndTime,
     UnitProcedureApply,
+    StartEndTime,
+    StartEndTimeApply,
+)
+from equipment_unit.client.data_classes._start_end_time import (
+    _STARTENDTIME_PROPERTIES_BY_FIELD,
 )
 from equipment_unit.client.data_classes._unit_procedure import (
     _UNITPROCEDURE_PROPERTIES_BY_FIELD,
 )
+from .unit_procedure_work_units import _create_filter_work_units
 
 
 if TYPE_CHECKING:
@@ -89,7 +90,7 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
             The list of the source nodes of the query.
 
         """
-        if retrieve_unit_procedure:
+        if retrieve_unit_procedure and not self._builder[-1].name.startswith("unit_procedure"):
             self._builder.append(
                 QueryStep(
                     name="unit_procedure",
@@ -111,49 +112,3 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
             )
 
         return self._query()
-
-
-def _create_filter_work_units(
-    view_id: dm.ViewId,
-    equipment_module: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-    min_start_time: datetime.datetime | None = None,
-    max_start_time: datetime.datetime | None = None,
-    min_end_time: datetime.datetime | None = None,
-    max_end_time: datetime.datetime | None = None,
-    space: str = "IntegrationTestsImmutable",
-    filter: dm.Filter | None = None,
-) -> list[dm.Filter]:
-    filters: list[dm.Filter] = []
-    if equipment_module and isinstance(equipment_module, str):
-        filters.append(dm.filters.Equals(["edge", "endNode"], value={"space": space, "externalId": equipment_module}))
-    if equipment_module and isinstance(equipment_module, list):
-        filters.append(
-            dm.filters.In(
-                ["edge", "endNode"],
-                values=[
-                    {"space": space, "externalId": ext_id}
-                    if isinstance(ext_id, str)
-                    else ext_id.dump(camel_case=True, include_instance_type=False)
-                    for ext_id in equipment_module
-                ],
-            )
-        )
-    if min_start_time or max_start_time:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("start_time"),
-                gte=min_start_time.isoformat(timespec="milliseconds") if min_start_time else None,
-                lte=max_start_time.isoformat(timespec="milliseconds") if max_start_time else None,
-            )
-        )
-    if min_end_time or max_end_time:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("end_time"),
-                gte=min_end_time.isoformat(timespec="milliseconds") if min_end_time else None,
-                lte=max_end_time.isoformat(timespec="milliseconds") if max_end_time else None,
-            )
-        )
-    if filter:
-        filters.append(filter)
-    return filters
