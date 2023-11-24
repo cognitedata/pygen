@@ -20,7 +20,7 @@ from equipment_unit.client.data_classes._equipment_module import (
     _EQUIPMENTMODULE_PROPERTIES_BY_FIELD,
     _create_equipment_module_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, QueryStep, QueryBuilder
+from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
 from .equipment_module_sensor_value import EquipmentModuleSensorValueAPI
 from .equipment_module_query import EquipmentModuleQueryAPI
 
@@ -127,7 +127,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleApply, Equipmen
         return self._apply(equipment_module, replace)
 
     def delete(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> dm.InstancesDeleteResult:
         """Delete one or more equipment module.
 
@@ -146,18 +146,18 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleApply, Equipmen
                 >>> client = EquipmentUnitClient()
                 >>> client.equipment_module.delete("my_equipment_module")
         """
-        return self._delete(external_id, space=space)
+        return self._delete(external_id, space)
 
     @overload
     def retrieve(self, external_id: str) -> EquipmentModule:
         ...
 
     @overload
-    def retrieve(self, external_id: Sequence[str]) -> EquipmentModuleList:
+    def retrieve(self, external_id: SequenceNotStr[str]) -> EquipmentModuleList:
         ...
 
     def retrieve(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> EquipmentModule | EquipmentModuleList:
         """Retrieve one or more equipment modules by id(s).
 
@@ -177,7 +177,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleApply, Equipmen
                 >>> equipment_module = client.equipment_module.retrieve("my_equipment_module")
 
         """
-        return self._retrieve(external_id, space=space)
+        return self._retrieve(external_id, space)
 
     def search(
         self,
@@ -474,5 +474,4 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleApply, Equipmen
             space,
             filter,
         )
-
         return self._list(limit=limit, filter=filter_)

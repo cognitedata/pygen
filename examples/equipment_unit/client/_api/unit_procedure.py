@@ -458,6 +458,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
             space,
             filter,
         )
+
         return self._list(
             limit=limit,
             filter=filter_,

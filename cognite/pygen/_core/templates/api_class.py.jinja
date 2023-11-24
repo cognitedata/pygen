@@ -45,7 +45,7 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
         self.{{ field.edge_api_attribute }} = {{ field.edge_api_class }}(
             client, view_by_write_class, {{ field.data_class.read_name }}, {{ field.data_class.write_name }}, {{ field.data_class.read_list_name }}
         ){% endfor %}{% for timeseries in data_class.single_timeseries_fields %}
-        self.{{ timeseries.edge_api_attribute }} = {{ timeseries.edge_api_class }}API(client, view_by_write_class){% endfor %}
+        self.{{ timeseries.edge_api_attribute }} = {{ timeseries.edge_api_class }}API(client, view_id){% endfor %}
 
     def __call__(
             self,{% for parm in list_method.parameters %}
@@ -171,7 +171,8 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
                 (self.{{ field.edge_api_attribute }}, "{{ field.name }}"),{% endfor %}
             ]
         )
-        {% else %}return self._retrieve(external_id, space){% endif %}
+        {% else %}
+        return self._retrieve(external_id, space){% endif %}
 {% if data_class.has_text_field %}
     def search(
         self,
@@ -376,7 +377,8 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
             self._view_id,{% for parm in list_method.parameters %}
             {{ parm.name }},{% endfor %}
             filter,
-        ){% if data_class.has_one_to_many_edges %}
+        )
+        {% if data_class.has_one_to_many_edges %}
         return self._list(
             limit=limit,
             filter=filter_,
