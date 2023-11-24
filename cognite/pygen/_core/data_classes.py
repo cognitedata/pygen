@@ -84,14 +84,16 @@ class Field(ABC):
             variable = create_name(prop_name, field_naming.variable)
 
             edge_api_class_input = f"{view_name}_{prop_name}"
+            edge_api_file_name = f"{create_name(edge_api_class_input, field_naming.edge_api_file)}"
             edge_api_class = f"{create_name(edge_api_class_input, field_naming.edge_api_class)}API"
-            edge_api_attribute = create_name(prop_name, field_naming.api_class_attribute)
+            edge_api_attribute = f"{create_name(prop_name, field_naming.api_class_attribute)}_edge"
             if prop.edge_source:
                 # The edge has properties, i.e., it has its own view
                 edge_id = prop.edge_source.space, prop.edge_source.external_id
             else:
                 edge_id = prop.source.space, prop.source.external_id
             data_class = data_class_by_view_id[ViewSpaceExternalId(*edge_id)]
+
             return EdgeOneToMany(
                 name=name,
                 doc_name=doc_name,
@@ -100,6 +102,7 @@ class Field(ABC):
                 data_class=data_class,
                 variable=variable,
                 pydantic_field=pydantic_field,
+                edge_api_file_name=edge_api_file_name,
                 edge_api_class=edge_api_class,
                 edge_api_attribute=edge_api_attribute,
             )
@@ -426,6 +429,7 @@ class EdgeOneToMany(EdgeField):
     """
 
     variable: str
+    edge_api_file_name: str
     edge_api_class: str
     edge_api_attribute: str
     prop: dm.SingleHopConnectionDefinition
@@ -706,6 +710,10 @@ class DataClass:
     def fields_literals(self) -> str:
         return ", ".join(f'"{field_.name}"' for field_ in self if isinstance(field_, PrimitiveFieldCore))
 
+    @property
+    def filter_name(self) -> str:
+        return f"_create_{self.variable}_filter"
+
 
 @dataclass
 class NodeDataClass(DataClass):
@@ -808,6 +816,8 @@ class APIClass:
     client_attribute: str
     name: str
     file_name: str
+    query_file_name: str
+    query_class_name: str
     view_id: ViewSpaceExternalId
     data_class: DataClass
 
@@ -816,11 +826,15 @@ class APIClass:
         raw_name = view.name or view.external_id
 
         raw_name = raw_name.replace(" ", "_")
-
+        file_name = create_name(raw_name, api_class.file_name)
+        query_file_name = f"{file_name}_query"
+        class_name = create_name(raw_name, api_class.name)
         return cls(
             client_attribute=create_name(raw_name, api_class.client_attribute),
-            name=f"{create_name(raw_name, api_class.name)}API",
-            file_name=create_name(raw_name, api_class.file_name),
+            name=f"{class_name}API",
+            file_name=file_name,
+            query_file_name=query_file_name,
+            query_class_name=f"{class_name}QueryAPI",
             view_id=ViewSpaceExternalId.from_(view),
             data_class=data_class,
         )

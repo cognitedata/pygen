@@ -1,0 +1,162 @@
+from __future__ import annotations
+{% if data_class.has_time_field or data_class.has_single_timeseries_fields %}
+import datetime{% endif %}{% if data_class.has_single_timeseries_fields %}
+import warnings{% endif %}
+{% if data_class.has_one_to_many_edges %}from collections import defaultdict
+from typing import Sequence, overload{% else %}from typing import Sequence, overload{% endif %}{% if data_class.has_single_timeseries_fields %}, Literal{% endif %}
+{% if data_class.has_single_timeseries_fields %}
+import pandas as pd{% endif %}
+from cognite.client import CogniteClient{% if data_class.has_single_timeseries_fields %}
+from cognite.client.data_classes import TimeSeriesList, DatapointsList, Datapoints, DatapointsArrayList
+from cognite.client.data_classes.datapoints import Aggregate{% endif %}
+from cognite.client import data_modeling as dm{% if data_class.has_primitive_fields %}
+from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList{% endif %}
+
+from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT{% if data_class.has_single_timeseries_fields %}, INSTANCE_QUERY_LIMIT{% endif %}
+from {{ top_level_package }}.data_classes import {{ data_class.read_name }}, {{ data_class.write_name }}, {{ data_class.read_list_name }}, {{ data_class.write_list_name }}{% if data_class.has_primitive_fields %}, {{ data_class.field_names }}{% endif %}{% if data_class.has_text_field %}, {{ data_class.text_field_names }}{% endif %}{% if data_class.has_primitive_fields %}, DomainModelApply
+from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import {{ data_class.properties_dict_name }}{% endif %}
+
+
+{% if data_class.has_single_timeseries_fields %}{% include "api_class_timeseries.py.jinja" %}{% endif %}
+{% for field in data_class.one_to_many_edges %}
+class {{ field.edge_api_class }}:
+    def __init__(self, client: CogniteClient):
+        self._client = client
+
+    def retrieve(self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str ="{{ field.prop.type.space }}") -> dm.EdgeList:
+        """Retrieve one or more {{field.edge_api_attribute}} edges by id(s) of a {{ data_class.doc_name }}.
+
+        Args:
+            external_id: External id or list of external ids source {{ data_class.doc_name }}.
+            space: The space where all the {{ field.doc_name }} edges are located.
+
+        Returns:
+            The requested {{ field.doc_name }} edges.
+
+        Examples:
+
+            Retrieve {{ field.name }} edge by id:
+
+                >>> from {{ top_level_package }} import {{ client_name }}
+                >>> client = {{ client_name }}()
+                >>> {{ data_class.variable }} = client.{{ api_class.client_attribute }}.{{ field.edge_api_attribute }}.retrieve("my_{{ field.name }}")
+
+        """
+        f = dm.filters
+        is_edge_type = f.Equals(
+            ["edge", "type"],
+            {"space": "{{ data_class.view_id.space }}", "externalId": "{{ field.prop.type.external_id }}"},
+        )
+        if isinstance(external_id, (str, dm.NodeId)):
+            is_{{ data_class.variable_list }} = f.Equals(
+                ["edge", "startNode"],
+                {"space": space, "externalId": external_id}
+                if isinstance(external_id, str)
+                else external_id.dump(camel_case=True, include_instance_type=False),
+            )
+        else:
+            is_{{ data_class.variable_list }} = f.In(
+                ["edge", "startNode"],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in external_id
+                ],
+            )
+        return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_{{ data_class.variable_list }}))
+
+    def list(self, {{ data_class.variable }}_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None, limit=DEFAULT_LIMIT_READ, space: str ="{{ field.prop.type.space }}") -> dm.EdgeList:
+        """List {{field.edge_api_attribute}} edges of a {{ data_class.doc_name }}.
+
+        Args:
+            {{ data_class.variable }}_id: ID of the source {{ data_class.doc_name }}.
+            limit: Maximum number of {{ field.doc_name }} edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+            space: The space where all the {{ field.doc_name }} edges are located.
+
+        Returns:
+            The requested {{ field.doc_name }} edges.
+
+        Examples:
+
+            List 5 {{field.edge_api_attribute}} edges connected to "my_{{ data_class.variable }}":
+
+                >>> from {{ top_level_package }} import {{ client_name }}
+                >>> client = {{ client_name }}()
+                >>> {{ data_class.variable }} = client.{{ api_class.client_attribute }}.{{ field.edge_api_attribute }}.list("my_{{ data_class.variable }}", limit=5)
+
+        """
+        f = dm.filters
+        filters = [
+            f.Equals(
+                ["edge", "type"],
+                {"space": "{{ data_class.view_id.space }}", "externalId": "{{ field.prop.type.external_id }}"},
+            )
+        ]
+        if {{ data_class.variable }}_id:
+            {{ data_class.variable }}_ids = {{ data_class.variable }}_id if isinstance({{ data_class.variable }}_id, list) else [{{ data_class.variable }}_id]
+            is_{{ data_class.variable_list }} = f.In(
+                ["edge", "startNode"],
+                [
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in {{ data_class.variable }}_ids
+                ]
+            )
+            filters.append(is_{{ data_class.variable_list }})
+
+        return self._client.data_modeling.instances.list("edge", limit=limit, filter=f.And(*filters))
+
+{% endfor %}
+class {{ api_class.name }}(TypeAPI[{{ data_class.read_name }}, {{ data_class.write_name }}, {{ data_class.read_list_name }}]):
+    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_write_class[{{ data_class.write_name }}]
+        super().__init__(
+            client=client,
+            sources=view_id,
+            class_type={{ data_class.read_name }},
+            class_apply_type={{ data_class.write_name }},
+            class_list={{ data_class.read_list_name }},
+        )
+        self._view_id = view_id
+        self._view_by_write_class = view_by_write_class{% for field in data_class.one_to_many_edges %}
+        self.{{ field.edge_api_attribute }} = {{ field.edge_api_class }}(client){% endfor %}{% for timeseries in data_class.single_timeseries_fields %}
+        self.{{ timeseries.edge_api_attribute }} = {{ timeseries.edge_api_class }}API(client, view_id){% endfor %}
+
+{% include 'api_class_apply_method.py.jinja' %}
+
+{% include 'api_class_delete_method.py.jinja' %}
+
+{% include 'api_class_retrieve_method.py.jinja' %}
+{% if data_class.has_text_field %}
+{% include 'api_class_search_method.py.jinja' %}{% endif %}
+{% if data_class.has_primitive_fields %}
+{% include 'api_class_aggregate_methods.py.jinja' %}{% endif %}
+
+{% include 'api_class_list_method.py.jinja' %}
+{% for field in data_class.one_to_many_edges %}
+    @staticmethod
+    def _set_{{ field.name }}({{ data_class.variable_list }}: Sequence[{{ data_class.read_name }}], {{ field.variable }}_edges: Sequence[dm.Edge]):
+        edges_by_start_node: dict[guple, list] = defaultdict(list)
+        for edge in {{ field.variable }}_edges:
+            edges_by_start_node[edge.start_node.as_tuple()].append(edge)
+
+        for {{ data_class.variable }} in {{ data_class.variable_list }}:
+            node_id = {{ data_class.variable }}.as_tuple_id()
+            if node_id in edges_by_start_node:
+                {{ data_class.variable }}.{{ field.name }} = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
+{% endfor %}
+
+def _create_filter(
+    view_id: dm.ViewId,{% for parm in list_method.parameters %}
+    {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []{% for filter in list_method.filters %}
+    if {{ filter.condition }}:
+        filters.append({{ filter.filter_call }}({{ filter.arguments }})){% endfor %}
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

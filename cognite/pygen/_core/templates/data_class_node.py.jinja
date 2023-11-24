@@ -145,7 +145,7 @@ class {{ data_class.write_list_name }}(DomainModelApplyList[{{ data_class.write_
     _INSTANCE = {{ data_class.write_name }}
 
 
-def _create_{{ data_class.variable }}_filter(
+def {{ data_class.filter_name }}(
     view_id: dm.ViewId,{% for parm in list_method.parameters %}
     {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
     filter: dm.Filter | None = None,

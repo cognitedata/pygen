@@ -8,13 +8,13 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
 from equipment_unit.client.data_classes import (
-    DomainModelApply,
     ResourcesApplyResult,
     EquipmentModule,
     EquipmentModuleApply,
     EquipmentModuleFields,
     EquipmentModuleList,
     EquipmentModuleTextFields,
+    DomainModelApply,
 )
 from equipment_unit.client.data_classes._equipment_module import (
     _EQUIPMENTMODULE_PROPERTIES_BY_FIELD,
