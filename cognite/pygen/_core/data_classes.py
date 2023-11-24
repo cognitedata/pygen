@@ -798,7 +798,7 @@ class EdgeDataClass(DataClass):
     @property
     def import_pydantic_field(self) -> str:
         if self.pydantic_field == "Field":
-            return "from pydantic import Field, model_validator"
+            return "from pydantic import model_validator"
         else:
             return "import pydantic"
 
