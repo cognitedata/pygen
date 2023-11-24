@@ -1,21 +1,26 @@
 from cognite.client import data_modeling as dm
+
 from equipment_unit.client.data_classes import (
-    DomainModelList,
-    StartEndTimeApply,
-    StartEndTime,
     EquipmentModuleApply,
     EquipmentModule,
-    UnitProcedureApply,
 )
-from ._core import QueryStep, QueryBuilder, QueryAPI
-from cognite.client import CogniteClient
-from equipment_unit.client.data_classes._start_end_time import _STARTENDTIME_PROPERTIES_BY_FIELD
 from equipment_unit.client.data_classes._equipment_module import _EQUIPMENTMODULE_PROPERTIES_BY_FIELD
+from ._core import QueryStep, QueryAPI, T_DomainModelList
 
 
-class EquipmentModuleQueryAPI(QueryAPI):
-    def query(self, retrieve_equipment_module: bool = True) -> DomainModelList:
-        if retrieve_equipment_module:
+class EquipmentModuleQueryAPI(QueryAPI[T_DomainModelList]):
+    def query(self, retrieve_equipment_module: bool = True) -> T_DomainModelList:
+        """Execute query and return the result.
+
+        Args:
+            retrieve_equipment_module: Whether to retrieve the equipment module or not.
+
+        Returns:
+            The list of the source nodes of the query.
+
+        """
+        # If the last step is equipment_module, we already have it in the query.
+        if retrieve_equipment_module and self._builder[-1].name != "equipment_module":
             self._builder.append(
                 QueryStep(
                     name="equipment_module",

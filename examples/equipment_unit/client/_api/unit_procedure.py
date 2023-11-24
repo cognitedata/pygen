@@ -55,7 +55,24 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> UnitProcedureQueryAPI:
+    ) -> UnitProcedureQueryAPI[UnitProcedureList]:
+        """Query starting at unit procedure
+
+        Args:
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            type_: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of unit procedures to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            A query API for unit procedures.
+
+        """
+
         filter_ = _create_unit_procedure_filter(
             self._view_id,
             name,

@@ -20,8 +20,9 @@ from equipment_unit.client.data_classes._equipment_module import (
     _EQUIPMENTMODULE_PROPERTIES_BY_FIELD,
     _create_equipment_module_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI
+from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, QueryStep, QueryBuilder
 from .equipment_module_sensor_value import EquipmentModuleSensorValueAPI
+from .equipment_module_query import EquipmentModuleQueryAPI
 
 
 class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleApply, EquipmentModuleList]):
@@ -37,6 +38,68 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleApply, Equipmen
         )
         self._view_id = view_id
         self.sensor_value = EquipmentModuleSensorValueAPI(client, view_id)
+
+    def __call__(
+        self,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        type_: str | list[str] | None = None,
+        type_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> EquipmentModuleQueryAPI[EquipmentModuleList]:
+        """Query starting at equipment modules.
+
+        Args:
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            type_: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of equipment modules to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            A query API for equipment modules.
+
+        """
+        filter_ = _create_equipment_module_filter(
+            self._view_id,
+            description,
+            description_prefix,
+            name,
+            name_prefix,
+            type_,
+            type_prefix,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        builder = QueryBuilder(
+            EquipmentModuleList,
+            [
+                QueryStep(
+                    name="equipment_module",
+                    expression=dm.query.NodeResultSetExpression(
+                        from_=None,
+                        filter=filter_,
+                    ),
+                    select=dm.query.Select(
+                        [dm.query.SourceSelector(self._view_id, list(_EQUIPMENTMODULE_PROPERTIES_BY_FIELD.values()))]
+                    ),
+                    result_cls=EquipmentModule,
+                    max_retrieve_limit=limit,
+                )
+            ],
+        )
+        return EquipmentModuleQueryAPI(self._client, builder, "equipment_module", self._view_by_write_class)
 
     def apply(
         self, equipment_module: EquipmentModuleApply | Sequence[EquipmentModuleApply], replace: bool = False

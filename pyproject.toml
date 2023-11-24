@@ -110,7 +110,7 @@ Faker = "*"
 
 [tool.pytest.ini_options]
 filterwarnings = [
-  "ignore::DeprecationWarning:pkg_resources",  # TODO check again with dynaconf>=3.2.0 (introduced in setuptools==67.5.0)
+  "ignore::DeprecationWarning:pkg_resources",
 ]
 addopts = "--doctest-modules"
 markers = [

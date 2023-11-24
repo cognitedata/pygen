@@ -522,11 +522,11 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
         return self._result_cls(nodes_by_type[self[0].name].values())
 
 
-class QueryAPI:
+class QueryAPI(Generic[T_DomainModelList]):
     def __init__(
         self,
         client: CogniteClient,
-        builder: QueryBuilder,
+        builder: QueryBuilder[T_DomainModelList],
         from_: str,
         view_by_write_class: dict[type[DomainModelApply], dm.ViewId],
     ):
@@ -535,7 +535,7 @@ class QueryAPI:
         self._from = from_
         self._view_by_write_class = view_by_write_class
 
-    def _query(self) -> DomainModelList:
+    def _query(self) -> T_DomainModelList:
         self._builder.reset()
         query = self._builder.build()
 

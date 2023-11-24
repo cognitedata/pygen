@@ -3,16 +3,18 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING
 from cognite.client import data_modeling as dm
-from equipment_unit.client.data_classes import DomainModelList, EquipmentModule
-from ._core import QueryBuilder, QueryStep, QueryAPI
+from ._core import QueryBuilder, QueryStep, QueryAPI, T_DomainModelList
 from equipment_unit.client.data_classes._start_end_time import (
     _STARTENDTIME_PROPERTIES_BY_FIELD,
+)
+from equipment_unit.client.data_classes import (
+    UnitProcedure,
     StartEndTimeApply,
     StartEndTime,
+    UnitProcedureApply,
 )
-from equipment_unit.client.data_classes._equipment_module import (
-    _EQUIPMENTMODULE_PROPERTIES_BY_FIELD,
-    EquipmentModuleApply,
+from equipment_unit.client.data_classes._unit_procedure import (
+    _UNITPROCEDURE_PROPERTIES_BY_FIELD,
 )
 
 
@@ -20,7 +22,7 @@ if TYPE_CHECKING:
     from .equipment_module_query import EquipmentModuleQueryAPI
 
 
-class UnitProcedureQueryAPI(QueryAPI):
+class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
     def work_units(
         self,
         min_start_time: datetime.datetime | None = None,
@@ -29,7 +31,21 @@ class UnitProcedureQueryAPI(QueryAPI):
         max_end_time: datetime.datetime | None = None,
         space: str = "IntegrationTestsImmutable",
         limit: int | None = None,
-    ) -> EquipmentModuleQueryAPI:
+    ) -> EquipmentModuleQueryAPI[T_DomainModelList]:
+        """Query along the work_units edges of the unit procedure.
+
+        Args:
+            min_start_time: The minimum start time of the work unit edges.
+            max_start_time: The maximum start time of the work unit edges.
+            min_end_time: The minimum end time of the work unit edges.
+            max_end_time: The maximum end time of the work unit edges.
+            space: The space where all the work unit edges are located.
+            limit: Maximum number of work unit edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+
+        Returns:
+            EquipmentModuleQueryAPI: The query API for the equipment module.
+        """
         from .equipment_module_query import EquipmentModuleQueryAPI
 
         f = dm.filters
@@ -63,27 +79,36 @@ class UnitProcedureQueryAPI(QueryAPI):
         )
         return EquipmentModuleQueryAPI(self._client, self._builder, "work_units", self._view_by_write_class)
 
-    def query(self, retrieve_unit_procedure: bool = True) -> DomainModelList:
+    def query(self, retrieve_unit_procedure: bool = True) -> T_DomainModelList:
+        """Execute query and return the result.
+
+        Args:
+            retrieve_unit_procedure: Whether to retrieve the unit procedure or not.
+
+        Returns:
+            The list of the source nodes of the query.
+
+        """
         if retrieve_unit_procedure:
-            raise NotImplementedError
-            # self._builder.append(
-            #     QueryStep(
-            #         name="equipment_module",
-            #         filter=None,
-            #         select=dm.query.Select(
-            #             [
-            #                 dm.query.SourceSelector(
-            #                     self._view_by_write_class[EquipmentModuleApply],
-            #                     list(_EQUIPMENTMODULE_PROPERTIES_BY_FIELD.values()),
-            #                 )
-            #             ]
-            #         ),
-            #         expression_cls=dm.query.NodeResultSetExpression,
-            #         result_cls=EquipmentModule,
-            #         from_=None,
-            #         max_retrieve_limit=-1,
-            #     )
-            # )
+            self._builder.append(
+                QueryStep(
+                    name="unit_procedure",
+                    expression=dm.query.NodeResultSetExpression(
+                        filter=None,
+                        from_=self._builder[-1].name,
+                    ),
+                    select=dm.query.Select(
+                        [
+                            dm.query.SourceSelector(
+                                self._view_by_write_class[UnitProcedureApply],
+                                list(_UNITPROCEDURE_PROPERTIES_BY_FIELD.values()),
+                            )
+                        ]
+                    ),
+                    result_cls=UnitProcedure,
+                    max_retrieve_limit=-1,
+                ),
+            )
 
         return self._query()
 
