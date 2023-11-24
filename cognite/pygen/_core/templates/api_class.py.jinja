@@ -9,19 +9,22 @@ from cognite.client import data_modeling as dm{% if data_class.has_primitive_fie
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList{% endif %}
 
 from {{ top_level_package }}.data_classes import (
+    DomainModelApply,
     ResourcesApplyResult,
     {{ data_class.read_name }},
     {{ data_class.write_name }},{% if data_class.has_primitive_fields %}
     {{ data_class.field_names }},{% endif %}
     {{ data_class.read_list_name }},{% if data_class.has_text_field %}
-    {{ data_class.text_field_names }},{% endif %}
-    DomainModelApply,
+    {{ data_class.text_field_names }},{% endif %}{% for field in data_class.property_edges %}
+    {{ field.data_class.read_name }},
+    {{ field.data_class.write_name }},
+    {{ field.data_class.read_list_name }},{% endfor %}
 )
 from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import (
     {{ data_class.properties_dict_name }},
     {{ data_class.filter_name }},
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, QueryStep, QueryBuilder{% for field in data_class.one_to_many_edges %}
+from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder{% for field in data_class.one_to_many_edges %}
 from .{{ field.edge_api_file_name }} import {{ field.edge_api_class }}{% endfor %}{% for field in data_class.single_timeseries_fields %}
 from .{{ field.edge_api_file_name }} import {{ field.edge_api_class }}API{% endfor %}
 from .{{ api_class.query_file_name }} import {{ api_class.query_class_name }}
@@ -39,8 +42,10 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id{% for field in data_class.one_to_many_edges %}
-        self.{{ field.edge_api_attribute }} = {{ field.edge_api_class }}(client){% endfor %}{% for timeseries in data_class.single_timeseries_fields %}
-        self.{{ timeseries.edge_api_attribute }} = {{ timeseries.edge_api_class }}API(client, view_id){% endfor %}
+        self.{{ field.edge_api_attribute }} = {{ field.edge_api_class }}(
+            client, view_by_write_class, {{ field.data_class.read_name }}, {{ field.data_class.write_name }}, {{ field.data_class.read_list_name }}
+        ){% endfor %}{% for timeseries in data_class.single_timeseries_fields %}
+        self.{{ timeseries.edge_api_attribute }} = {{ timeseries.edge_api_class }}API(client, view_by_write_class){% endfor %}
 
     def __call__(
             self,{% for parm in list_method.parameters %}
@@ -87,7 +92,7 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
     def apply(self, {{ data_class.variable }}: {{ data_class.write_name }} | Sequence[{{ data_class.write_name }}], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) {{data_class.doc_list_name}}.{% if data_class.has_one_to_many_edges %}
 
-        Note: This method iterates through all nodes linked to {{ data_class.variable }} and create them including the edges
+        Note: This method iterates through all nodes and timeseries linked to {{ data_class.variable }} and creates them including the edges
         between the nodes. For example, if any of {{ data_class.one_to_many_edges_docs }} are set, then these
         nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.{% endif %}
 
@@ -111,7 +116,7 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
         """
         return self._apply({{ data_class.variable }}, replace)
 
-    def delete(self, external_id: str | Sequence[str], space: str ="{{ data_class.view_id.space }}") -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | SequenceNotStr[str], space: str ="{{ data_class.view_id.space }}") -> dm.InstancesDeleteResult:
         """Delete one or more {{ data_class.doc_name }}.
 
         Args:
@@ -129,17 +134,17 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
                 >>> client = {{ client_name }}()
                 >>> client.{{ api_class.client_attribute }}.delete("my_{{ data_class.variable }}")
         """
-        return self._delete(external_id, space=space)
+        return self._delete(external_id, space)
 
     @overload
     def retrieve(self, external_id: str) -> {{ data_class.read_name }}:
         ...
 
     @overload
-    def retrieve(self, external_id: Sequence[str]) -> {{ data_class.read_list_name }}:
+    def retrieve(self, external_id: SequenceNotStr[str]) -> {{ data_class.read_list_name }}:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str], space: str ="{{ data_class.view_id.space }}") -> {{ data_class.read_name }} | {{ data_class.read_list_name }}:
+    def retrieve(self, external_id: str | SequenceNotStr[str], space: str ="{{ data_class.view_id.space }}") -> {{ data_class.read_name }} | {{ data_class.read_list_name }}:
         """Retrieve one or more {{data_class.doc_list_name}} by id(s).
 
         Args:
@@ -157,8 +162,16 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
                 >>> client = {{ client_name }}()
                 >>> {{ data_class.variable }} = client.{{ api_class.client_attribute }}.retrieve("my_{{ data_class.variable }}")
 
-        """
-        return self._retrieve(external_id, space=space)
+        """{% if data_class.has_one_to_many_edges %}
+        return self._retrieve(
+            external_id,
+            space,
+            retrieve_edges=True,
+            edge_api_name_pairs=[{% for field in data_class.one_to_many_edges %}
+                (self.{{ field.edge_api_attribute }}, "{{ field.name }}"),{% endfor %}
+            ]
+        )
+        {% else %}return self._retrieve(external_id, space){% endif %}
 {% if data_class.has_text_field %}
     def search(
         self,
@@ -307,8 +320,7 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
             search_property: The text field to search in.{% endif %}{% for parm in list_method.parameters %}
             {{ parm.name }}: {{ parm.description }}{% endfor %}
             limit: Maximum number of {{ data_class.doc_list_name }} to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above. {% if data_class.has_one_to_many_edges %}
-            retrieve_edges: Whether to retrieve {{ data_class.one_to_many_edges_docs }} external ids for the {{ data_class.doc_list_name }}. Defaults to True.{% endif %}
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             Bucketed histogram results.
@@ -364,16 +376,14 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
             self._view_id,{% for parm in list_method.parameters %}
             {{ parm.name }},{% endfor %}
             filter,
+        ){% if data_class.has_one_to_many_edges %}
+        return self._list(
+            limit=limit,
+            filter=filter_,
+            space=space,
+            retrieve_edges=retrieve_edges,
+            edge_api_name_pairs=[{% for field in data_class.one_to_many_edges %}
+                (self.{{ field.edge_api_attribute }}, "{{ field.name }}"),{% endfor %}
+            ]
         )
-
-        {% if data_class.has_one_to_many_edges %}{{ data_class.variable_list }} = self._list(limit=limit, filter=filter_)
-
-        if retrieve_edges:
-            space_arg = {"space": space} if space else {}{% for field in data_class.one_to_many_edges %}
-            if len(ids := {{ data_class.variable_list }}.as_node_ids()) > IN_FILTER_LIMIT:
-                {{ field.variable }}_edges = self.{{ field.edge_api_attribute }}.list(limit=-1, **space_arg)
-            else:
-                {{ field.variable }}_edges = self.{{ field.edge_api_attribute }}.list(ids, limit=-1)
-            self._set_{{ field.name }}({{ data_class.variable_list }}, {{ field.variable }}_edges){% endfor %}
-
-        return {{ data_class.variable_list }}{% else %}return self._list(limit=limit, filter=filter_){% endif %}
+        {% else %}return self._list(limit=limit, filter=filter_){% endif %}

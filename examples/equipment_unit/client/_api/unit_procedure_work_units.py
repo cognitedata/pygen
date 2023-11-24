@@ -10,7 +10,7 @@ from equipment_unit.client.data_classes import (
 from ._core import DEFAULT_LIMIT_READ, EdgeAPI
 
 
-class UnitProcedureWorkUnitsEdgeAPI(EdgeAPI):
+class UnitProcedureWorkUnitsAPI(EdgeAPI):
     def list(
         self,
         unit_procedure: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,

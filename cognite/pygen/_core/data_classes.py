@@ -633,6 +633,10 @@ class DataClass:
         return any(isinstance(field_, EdgeOneToMany) and field_.is_property_edge for field_ in self.fields)
 
     @property
+    def property_edges(self) -> Iterable[EdgeOneToMany]:
+        return (field_ for field_ in self.fields if isinstance(field_, EdgeOneToMany) and field_.is_property_edge)
+
+    @property
     def has_primitive_fields(self) -> bool:
         return any(isinstance(field_, PrimitiveFieldCore) for field_ in self.fields)
 

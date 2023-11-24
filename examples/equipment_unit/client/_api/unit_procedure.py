@@ -15,8 +15,8 @@ from equipment_unit.client.data_classes import (
     UnitProcedureFields,
     UnitProcedureList,
     UnitProcedureTextFields,
-    StartEndTimeApply,
     StartEndTime,
+    StartEndTimeApply,
     StartEndTimeList,
 )
 from equipment_unit.client.data_classes._unit_procedure import (
@@ -24,7 +24,7 @@ from equipment_unit.client.data_classes._unit_procedure import (
     _create_unit_procedure_filter,
 )
 from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
-from .unit_procedure_work_units import UnitProcedureWorkUnitsEdgeAPI
+from .unit_procedure_work_units import UnitProcedureWorkUnitsAPI
 from .unit_procedure_query import UnitProcedureQueryAPI
 
 
@@ -40,8 +40,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self._view_by_write_class = view_by_write_class
-        self.work_units_edge = UnitProcedureWorkUnitsEdgeAPI(
+        self.work_units_edge = UnitProcedureWorkUnitsAPI(
             client, view_by_write_class, StartEndTime, StartEndTimeApply, StartEndTimeList
         )
 
@@ -56,7 +55,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> UnitProcedureQueryAPI[UnitProcedureList]:
-        """Query starting at unit procedure
+        """Query starting at unit procedures.
 
         Args:
             name: The name to filter on.
@@ -72,7 +71,6 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
             A query API for unit procedures.
 
         """
-
         filter_ = _create_unit_procedure_filter(
             self._view_id,
             name,
@@ -186,7 +184,9 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_pairs=[(self.work_units_edge, "work_units")],
+            edge_api_name_pairs=[
+                (self.work_units_edge, "work_units"),
+            ],
         )
 
     def search(
@@ -458,11 +458,12 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
             space,
             filter,
         )
-
         return self._list(
             limit=limit,
             filter=filter_,
             space=space,
             retrieve_edges=retrieve_edges,
-            edge_api_name_pairs=[(self.work_units_edge, "work_units")],
+            edge_api_name_pairs=[
+                (self.work_units_edge, "work_units"),
+            ],
         )
