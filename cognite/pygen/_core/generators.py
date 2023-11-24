@@ -239,17 +239,23 @@ class MultiAPIGenerator:
         data_class_init = self.env.get_template("data_classes_init.py.jinja")
 
         data_classes_with_dependencies = sorted(
-            (api.data_class for api in self.sub_apis if api.data_class.has_edges), key=lambda d: d.read_name
+            (
+                api.data_class
+                for api in self.sub_apis
+                if api.data_class.has_edges or api.data_class.has_edge_with_property
+            ),
+            key=lambda d: d.read_name,
         )
-        dependencies_by_data_class_write_name = {
-            data_class.write_name: sorted(data_class.dependencies, key=lambda d: d.read_name)
-            for data_class in data_classes_with_dependencies
-        }
+        dependencies_by_data_class_name: dict[str, list[DataClass]] = {}
+        for data_class in data_classes_with_dependencies:
+            dependencies = sorted(data_class.dependencies, key=lambda d: d.read_name)
+            dependencies_by_data_class_name[data_class.read_name] = dependencies
+            dependencies_by_data_class_name[data_class.write_name] = dependencies
 
         return (
             data_class_init.render(
                 classes=sorted((api.data_class for api in self.sub_apis), key=lambda d: d.read_name),
-                dependencies_by_data_class_write_name=dependencies_by_data_class_write_name,
+                dependencies_by_data_class_name=dependencies_by_data_class_name,
                 top_level_package=self.top_level_package,
                 import_file={
                     "v2": "data_classes_init_import.py.jinja",

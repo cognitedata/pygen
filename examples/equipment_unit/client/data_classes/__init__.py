@@ -17,6 +17,7 @@ from ._equipment_module import (
 from ._start_end_time import (
     StartEndTime,
     StartEndTimeApply,
+    StartEndTimeApplyList,
     StartEndTimeFields,
     StartEndTimeList,
 )
@@ -29,10 +30,10 @@ from ._unit_procedure import (
     UnitProcedureTextFields,
 )
 
-UnitProcedureApply.model_rebuild()
-UnitProcedure.model_rebuild()
-StartEndTimeApply.model_rebuild()
 StartEndTime.model_rebuild()
+StartEndTimeApply.model_rebuild()
+UnitProcedure.model_rebuild()
+UnitProcedureApply.model_rebuild()
 
 __all__ = [
     "ResourcesApply",
@@ -50,6 +51,7 @@ __all__ = [
     "StartEndTime",
     "StartEndTimeApply",
     "StartEndTimeList",
+    "StartEndTimeApplyList",
     "StartEndTimeFields",
     "UnitProcedure",
     "UnitProcedureApply",

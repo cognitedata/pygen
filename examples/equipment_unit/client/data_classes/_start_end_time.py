@@ -9,7 +9,7 @@ from pydantic import model_validator
 from ._core import DomainModelApply, DomainRelation, DomainRelationApply, DomainRelationList, ResourcesApply
 from ._equipment_module import EquipmentModule, EquipmentModuleApply
 
-__all__ = ["StartEndTime", "StartEndTimeApply", "StartEndTimeList", "StartEndTimeFields"]
+__all__ = ["StartEndTime", "StartEndTimeApply", "StartEndTimeList", "StartEndTimeApplyList", "StartEndTimeFields"]
 StartEndTimeFields = Literal["end_time", "start_time"]
 
 _STARTENDTIME_PROPERTIES_BY_FIELD = {
@@ -147,3 +147,9 @@ class StartEndTimeList(DomainRelationList[StartEndTime]):
     """List of start end times in the reading version."""
 
     _INSTANCE = StartEndTime
+
+
+class StartEndTimeApplyList(DomainRelationList[StartEndTimeApply]):
+    """List of start end times in the writing version."""
+
+    _INSTANCE = StartEndTimeApply
