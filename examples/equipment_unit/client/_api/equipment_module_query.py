@@ -5,6 +5,7 @@ from equipment_unit.client.data_classes import (
     StartEndTime,
     EquipmentModuleApply,
     EquipmentModule,
+    UnitProcedureApply,
 )
 from ._core import QueryStep, QueryBuilder, QueryAPI
 from cognite.client import CogniteClient
@@ -18,7 +19,10 @@ class EquipmentModuleQueryAPI(QueryAPI):
             self._builder.append(
                 QueryStep(
                     name="equipment_module",
-                    filter=None,
+                    expression=dm.query.NodeResultSetExpression(
+                        filter=None,
+                        from_=self._builder[-1].name,
+                    ),
                     select=dm.query.Select(
                         [
                             dm.query.SourceSelector(
@@ -27,9 +31,7 @@ class EquipmentModuleQueryAPI(QueryAPI):
                             )
                         ]
                     ),
-                    expression_cls=dm.query.NodeResultSetExpression,
                     result_cls=EquipmentModule,
-                    from_=None,
                     max_retrieve_limit=-1,
                 ),
             )

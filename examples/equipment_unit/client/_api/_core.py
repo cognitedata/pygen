@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections import defaultdict, UserList
 from collections.abc import Sequence, Collection
-from typing import Generic, Literal, Any, Iterator, Protocol, SupportsIndex, TypeVar, overload
+from typing import Generic, Literal, Any, Iterator, Protocol, SupportsIndex, TypeVar, overload, cast
 from dataclasses import dataclass, field
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -415,12 +415,6 @@ class QueryStep:
             self.expression.limit = min(INSTANCE_QUERY_LIMIT, self.max_retrieve_limit - self.total_retrieved)
 
 
-@dataclass
-class EdgeLike(Protocol):
-    start_node: dm.DirectRelationReference
-    end_node: dm.DirectRelationReference
-
-
 class QueryBuilder(UserList, Generic[T_DomainModelList]):
     def __init__(self, result_cls: type[T_DomainModelList], nodes: Collection[QueryStep] = None):
         super().__init__(nodes or [])
@@ -485,26 +479,45 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
 
     def unpack(self) -> T_DomainModelList:
         nodes_by_type: dict[str | None, dict[tuple[str, str], DomainModel]] = defaultdict(dict)
-        edges_by_type_by_start_node: dict[tuple[str, str], dict[tuple[str, str], list[EdgeLike]]] = defaultdict(
+        edges_by_type_by_start_node: dict[tuple[str, str], dict[tuple[str, str], list[dm.Edge]]] = defaultdict(
             lambda: defaultdict(list)
         )
+        relation_by_type_by_start_node: dict[
+            tuple[str, str], dict[tuple[str, str], list[DomainRelation]]
+        ] = defaultdict(lambda: defaultdict(list))
 
-        for expression in self:
-            if issubclass(expression.result_cls, DomainModel):
-                for node in expression.results:
-                    domain = expression.result_cls.from_instance(node)
+        for step in self:
+            if issubclass(step.result_cls, DomainModel):
+                for node in step.results:
+                    domain = step.result_cls.from_instance(node)
                     # Circular dependencies will overwrite here, so we always get the last one
-                    nodes_by_type[expression.name][domain.as_tuple_id()] = domain
-            elif issubclass(expression.result_cls, DomainRelation) or expression.result_cls is None:
-                for edge in expression.results:
-                    domain = expression.result_cls.from_instance(edge) if expression.result_cls else edge
-                    edges_by_type_by_start_node[(expression.from_, expression.name)][
+                    nodes_by_type[step.name][domain.as_tuple_id()] = domain
+            elif issubclass(step.result_cls, DomainRelation):
+                for edge in step.results:
+                    domain = step.result_cls.from_instance(edge) if step.result_cls else edge
+                    relation_by_type_by_start_node[(step.expression.from_, step.name)][
                         domain.start_node.as_tuple()
                     ].append(domain)
+            elif step.result_cls is None:  # This is a data model edge.
+                for edge in step.results:
+                    edge = cast(dm.Edge, edge)
+                    edges_by_type_by_start_node[(step.expression.from_, step.name)][
+                        (edge.space, edge.external_id)
+                    ].append(edge)
 
-        for (node_name, node_attribute), edges_by_start_node in edges_by_type_by_start_node.items():
+        for (node_name, node_attribute), relations_by_start_node in relation_by_type_by_start_node.items():
             for node in nodes_by_type[node_name].values():
-                setattr(node, node_attribute, edges_by_start_node.get(node.as_tuple_id(), []))
+                setattr(node, node_attribute, relations_by_start_node.get(node.as_tuple_id(), []))
+            for relations in relations_by_start_node.values():
+                for relation in relations:
+                    edge_name = relation.type.external_id.split(".")[-1]
+                    if (nodes := nodes_by_type.get(edge_name)) and (
+                        node := nodes.get((relation.end_node.space, relation.end_node.external_id))
+                    ):
+                        setattr(relation, edge_name, node)
+
+        if edges_by_type_by_start_node:
+            raise NotImplementedError()
 
         return self._result_cls(nodes_by_type[self[0].name].values())
 
