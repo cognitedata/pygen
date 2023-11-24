@@ -106,7 +106,7 @@ class StartEndTimeApply(DomainRelationApply):
         else:
             raise ValueError(f"Invalid type for equipment_module: {type(self.equipment_module)}")
 
-        self.external_id = external_id = self.external_id_factory(start_node, end_node, self.edge_type)
+        self.external_id = external_id = DomainRelationApply.external_id_factory(start_node, end_node, self.edge_type)
 
         write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
             "IntegrationTestsImmutable", "StartEndTime", "d416e0ed98186b"
@@ -122,7 +122,7 @@ class StartEndTimeApply(DomainRelationApply):
             this_edge = dm.EdgeApply(
                 space=self.space,
                 external_id=external_id,
-                type=self.type,
+                type=self.edge_type,
                 start_node=start_node.as_direct_reference(),
                 end_node=end_node,
                 existing_version=self.existing_version,

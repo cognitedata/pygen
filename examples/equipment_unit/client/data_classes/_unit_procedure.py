@@ -130,7 +130,7 @@ class UnitProcedureApply(DomainModelApply):
 
         for work_unit in self.work_units or []:
             if isinstance(work_unit, DomainRelationApply):
-                other_resources = work_unit._to_instances_apply(cache, self.as_direct_reference(), view_by_write_class)
+                other_resources = work_unit._to_instances_apply(cache, self, view_by_write_class)
                 resources.extend(other_resources)
 
         return resources

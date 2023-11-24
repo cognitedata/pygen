@@ -311,7 +311,7 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
         edge_api_name_pairs: list[tuple[EdgeAPI, str]] | None = None,
     ) -> T_DomainModelList:
         nodes = self._client.data_modeling.instances.list("node", sources=self._sources, limit=limit, filter=filter)
-        node_list = self._class_list([self._class_type.from_node(node) for node in nodes])
+        node_list = self._class_list([self._class_type.from_instance(node) for node in nodes])
         if retrieve_edges:
             self._retrieve_and_set_edge_types(node_list, space, edge_api_name_pairs)
 
@@ -390,7 +390,7 @@ class EdgeAPI(Generic[T_DomainRelation, T_DomainRelationApply, T_DomainRelationL
         edges = self._client.data_modeling.instances.list(
             "edge", limit=limit, filter=dm.filters.And(*filters), sources=[self._view_id]
         )
-        return self._class_list([self._class_type.from_edge(edge) for edge in edges])
+        return self._class_list([self._class_type.from_instance(edge) for edge in edges])
 
 
 @dataclass
