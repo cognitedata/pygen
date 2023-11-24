@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
 from pathlib import Path
 from typing import Callable, Literal
 
@@ -210,6 +210,10 @@ class MultiAPIGenerator:
             file_name = api.api_class.file_name
             sdk[data_classes_dir / f"_{file_name}.py"] = api.generate_data_class_file()
             sdk[api_dir / f"{file_name}.py"] = api.generate_api_file(self.top_level_package, self.client_name)
+            sdk[api_dir / f"{file_name}_query.py"] = api.generate_api_query_file(
+                self.top_level_package, self.client_name
+            )
+            raise NotImplementedError("This method is not implemented yet")
 
         sdk[client_dir / "__init__.py"] = self.generate_client_init_file()
         sdk[data_classes_dir / "__init__.py"] = self.generate_data_classes_init_file()
@@ -291,3 +295,12 @@ class APIGenerator:
             )
             + "\n"
         )
+
+    def generate_api_query_file(self, top_level_package: str, client_name: str) -> str:
+        raise NotImplementedError("This method is not implemented yet")
+
+    def generate_edge_api_files(self, top_level_package: str, client_name: str) -> Iterator[str]:
+        raise NotImplementedError("This method is not implemented yet")
+
+    def generate_timeseries_api_files(self, top_level_package: str, client_name: str) -> Iterator[str]:
+        raise NotImplementedError("This method is not implemented yet")

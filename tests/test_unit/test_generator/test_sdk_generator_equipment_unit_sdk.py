@@ -85,7 +85,7 @@ def test_generate_data_class_file_unit_procedure(
     assert actual == expected
 
 
-def test_create_view_data_class_start_end_time(
+def test_generate_data_class_start_end_time(
     start_end_time_api_generator: APIGenerator, pygen_config: PygenConfig, code_formatter: CodeFormatter
 ):
     # Arrange
@@ -115,6 +115,26 @@ def test_create_view_api_classes_equipment_module(
     assert actual == expected
 
 
+def test_generate_equipment_module_sensor_value_api(
+    equipment_module_api_generator: APIGenerator, code_formatter: CodeFormatter
+):
+    # Arrange
+    expected = EquipmentSDKFiles.equipment_module_sensor_value_api.read_text()
+
+    # Act
+    actual = next(
+        iter(
+            equipment_module_api_generator.generate_timeseries_api_files(
+                EQUIPMENT_UNIT_SDK.top_level_package, EQUIPMENT_UNIT_SDK.client_name
+            )
+        )
+    )
+    actual = code_formatter.format_code(actual)
+
+    # Assert
+    assert actual == expected
+
+
 def test_create_view_api_classes_unit_procedure(
     unit_procedure_api_generator: APIGenerator, code_formatter: CodeFormatter
 ):
@@ -124,6 +144,40 @@ def test_create_view_api_classes_unit_procedure(
     # Act
     actual = unit_procedure_api_generator.generate_api_file(
         EQUIPMENT_UNIT_SDK.top_level_package, EQUIPMENT_UNIT_SDK.client_name
+    )
+    actual = code_formatter.format_code(actual)
+
+    # Assert
+    assert actual == expected
+
+
+def test_create_view_api_classes_unit_procedure_query(
+    unit_procedure_api_generator: APIGenerator, code_formatter: CodeFormatter
+):
+    # Arrange
+    expected = EquipmentSDKFiles.unit_procedure_query.read_text()
+
+    # Act
+    actual = unit_procedure_api_generator.generate_api_query_file(
+        EQUIPMENT_UNIT_SDK.top_level_package, EQUIPMENT_UNIT_SDK.client_name
+    )
+    actual = code_formatter.format_code(actual)
+
+    # Assert
+    assert actual == expected
+
+
+def test_create_view_api_classes_unit_procedure_work_units(
+    unit_procedure_api_generator: APIGenerator, code_formatter: CodeFormatter
+):
+    # Arrange
+    expected = EquipmentSDKFiles.unit_procedure_query.read_text()
+
+    # Act
+    actual = next(
+        unit_procedure_api_generator.generate_edge_api_files(
+            EQUIPMENT_UNIT_SDK.top_level_package, EQUIPMENT_UNIT_SDK.client_name
+        )
     )
     actual = code_formatter.format_code(actual)
 
