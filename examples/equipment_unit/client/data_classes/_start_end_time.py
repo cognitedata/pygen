@@ -170,7 +170,6 @@ def _create_start_end_time_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters: list[dm.Filter] = []
-    filters = filters or []
     if start_node and isinstance(start_node, str):
         filters.append(
             dm.filters.Equals(["edge", "startNode"], value={"space": start_node_space, "externalId": start_node})

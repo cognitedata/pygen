@@ -359,37 +359,10 @@ class EdgeAPI(Generic[T_DomainRelation, T_DomainRelationApply, T_DomainRelationL
 
     def _list(
         self,
-        node_ids: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
-        filters: list[dm.Filter] | None = None,
-        space: str | None = None,
+        filter_: dm.Filter | None = None,
     ) -> T_DomainRelationList:
-        filters = filters or []
-        if node_ids and isinstance(node_ids, str):
-            filters.append(dm.filters.Equals(["edge", "startNode"], value={"space": space, "externalId": node_ids}))
-        elif node_ids and isinstance(node_ids, dm.NodeId):
-            filters.append(
-                dm.filters.Equals(
-                    ["edge", "startNode"], value=node_ids.dump(camel_case=True, include_instance_type=False)
-                )
-            )
-        if node_ids and isinstance(node_ids, list):
-            filters.append(
-                dm.filters.In(
-                    ["edge", "startNode"],
-                    values=[
-                        {"space": space, "externalId": ext_id}
-                        if isinstance(ext_id, str)
-                        else ext_id.dump(camel_case=True, include_instance_type=False)
-                        for ext_id in node_ids
-                    ],
-                )
-            )
-        if space and isinstance(space, str):
-            filters.append(dm.filters.Equals(["edge", "space"], value=space))
-        edges = self._client.data_modeling.instances.list(
-            "edge", limit=limit, filter=dm.filters.And(*filters), sources=[self._view_id]
-        )
+        edges = self._client.data_modeling.instances.list("edge", limit=limit, filter=filter_, sources=[self._view_id])
         return self._class_list([self._class_type.from_instance(edge) for edge in edges])
 
 

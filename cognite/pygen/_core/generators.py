@@ -290,6 +290,7 @@ class APIGenerator:
                 data_class=self.data_class,
                 space=self.view_identifier.space,
                 list_method=self.data_class.list_method,
+                instance_space=self.view_identifier.space,
             )
             + "\n"
         )
