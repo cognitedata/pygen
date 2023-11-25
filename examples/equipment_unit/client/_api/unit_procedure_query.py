@@ -25,21 +25,23 @@ if TYPE_CHECKING:
 class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
     def work_units(
         self,
-        min_start_time: datetime.datetime | None = None,
-        max_start_time: datetime.datetime | None = None,
         min_end_time: datetime.datetime | None = None,
         max_end_time: datetime.datetime | None = None,
-        space: str = "IntegrationTestsImmutable",
+        min_start_time: datetime.datetime | None = None,
+        max_start_time: datetime.datetime | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int | None = None,
     ) -> EquipmentModuleQueryAPI[T_DomainModelList]:
         """Query along the work unit edges of the unit procedure.
 
         Args:
-            min_start_time: The minimum start time of the work unit edges.
-            max_start_time: The maximum start time of the work unit edges.
-            min_end_time: The minimum end time of the work unit edges.
-            max_end_time: The maximum end time of the work unit edges.
-            space: The space where all the work unit edges are located.
+            min_end_time: The minimum value of the end time to filter on.
+            max_end_time: The maximum value of the end time to filter on.
+            min_start_time: The minimum value of the start time to filter on.
+            max_start_time: The maximum value of the start time to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
             limit: Maximum number of work unit edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
 
@@ -50,13 +52,15 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
 
         f = dm.filters
         edge_view = self._view_by_write_class[StartEndTimeApply]
-        edge_filters = _create_start_end_time_filter(
+        edge_filter = _create_start_end_time_filter(
             edge_view,
             None,
-            min_start_time,
-            max_start_time,
+            None,
             min_end_time,
             max_end_time,
+            min_start_time,
+            max_start_time,
+            external_id_prefix,
             space,
             f.Equals(
                 ["edge", "type"],
@@ -67,7 +71,7 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
             QueryStep(
                 name="work_units",
                 expression=dm.query.EdgeResultSetExpression(
-                    filter=f.And(*edge_filters),
+                    filter=edge_filter,
                     from_=self._builder[-1].name,
                 ),
                 select=dm.query.Select(

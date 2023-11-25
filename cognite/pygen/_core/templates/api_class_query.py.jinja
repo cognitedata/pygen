@@ -27,30 +27,28 @@ class {{ data_class.query_class_name }}(QueryAPI[T_DomainModelList]):{% for fiel
     def {{ field.name }}(
         self,{% if field.data_class.is_edge_class %}{% for parm in field.data_class.list_method.parameters %}
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}{% endif %}
-        space: str = "{{ data_class.view_id.space }}",
         limit: int | None = None,
     ) -> {% if field.data_class.is_edge_class %}{{ field.data_class.end_class.query_class_name }}{% else %}{{ field.data_class.query_class_name }}{% endif %}[T_DomainModelList]:
-        """Query along the {{ field.doc_name }} edges of the {{ data_class.doc_list_name}}.
+        """Query along the {{ field.doc_name }} edges of the {{ data_class.doc_name}}.
 
         Args:{% if field.data_class.is_edge_class %}{% for parm in field.data_class.list_method.parameters %}
             {{ parm.name }}: {{ parm.description }}{% endfor %}{% endif %}
-            space: The space where all the work unit edges are located.
             limit: Maximum number of work unit edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
 
         Returns:
-            {% if field.data_class.is_edge_class %}{{ field.data_class.end_class.query_class_name }}{% else %}{{ field.data_class.query_class_name }}{% endif %}: The query API for the {{ field.data_class.doc_name }}.
+            {% if field.data_class.is_edge_class %}{{ field.data_class.end_class.query_class_name }}{% else %}{{ field.data_class.query_class_name }}{% endif %}: The query API for the {% if field.data_class.is_edge_class %}{{ field.data_class.end_class.doc_name }}{% else %}{{ field.data_class.doc_name }}{% endif %}.
         """
         {% if field.data_class.is_edge_class %}from .{{ field.data_class.end_class.query_file_name}} import {{ field.data_class.end_class.query_class_name}}{% else %}
     from {{ field.data_class.query_file_name }} import {{ field.data_class.query_class_name }}{% endif %}
 
         f = dm.filters
         edge_view = self._view_by_write_class[{{ field.data_class.write_name }}]
-        edge_filters = {{ field.data_class.filter_name }}(
+        edge_filter = {{ field.data_class.filter_name }}(
             edge_view,
+            None,
             None,{% if field.data_class.is_edge_class %}{% for parm in field.data_class.list_method.parameters %}
             {{ parm.name }},{% endfor %}{% endif %}
-            space,
             f.Equals(
                 ["edge", "type"],
                 {"space": "{{ field.data_class.edge_type.space }}", "externalId": "{{ field.data_class.edge_type.external_id }}"},
@@ -60,7 +58,7 @@ class {{ data_class.query_class_name }}(QueryAPI[T_DomainModelList]):{% for fiel
             QueryStep(
                 name="{{ field.name }}",
                 expression=dm.query.EdgeResultSetExpression(
-                    filter=f.And(*edge_filters),
+                    filter=edge_filter,
                     from_=self._builder[-1].name,
                 ),{% if field.data_class.is_edge_class %}
                 select=dm.query.Select(
