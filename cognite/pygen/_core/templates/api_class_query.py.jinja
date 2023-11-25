@@ -4,7 +4,7 @@ import datetime
 from typing import TYPE_CHECKING
 from cognite.client import data_modeling as dm
 from ._core import QueryStep, QueryAPI, T_DomainModelList
-from equipment_unit.client.data_classes import (
+from {{ top_level_package }}.data_classes import (
     {{ data_class.read_name }},
     {{ data_class.write_name }},{% for field in data_class.property_edges %}
     {{ field.data_class.read_name }},
