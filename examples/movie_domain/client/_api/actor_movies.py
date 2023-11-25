@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import datetime
 
 from cognite.client import data_modeling as dm
 
@@ -10,8 +9,8 @@ from ._core import DEFAULT_LIMIT_READ, EdgeAPI
 class ActorMoviesAPI(EdgeAPI):
     def list(
         self,
-        movie: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        movie_space: str = "IntegrationTestsImmutable",
+        actor: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        actor_space: str = "IntegrationTestsImmutable",
         movie: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
         movie_space: str = "IntegrationTestsImmutable",
         rating: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
@@ -24,7 +23,7 @@ class ActorMoviesAPI(EdgeAPI):
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit=DEFAULT_LIMIT_READ,
-    ) -> MovieList:
+    ) -> dm.EdgeList:
         """List movie edges of a actor.
 
         Args:
