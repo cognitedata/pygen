@@ -493,6 +493,13 @@ class DataClass:
     view_id: ViewSpaceExternalId
     view_version: str
     fields: list[Field] = field(default_factory=list)
+    _list_method: ListMethod | None = None
+
+    @property
+    def list_method(self) -> ListMethod:
+        if self._list_method is None:
+            raise ValueError("DataClass has not been initialized.")
+        return self._list_method
 
     @classmethod
     def from_view(cls, view: dm.View, data_class: pygen_config.DataClassNaming) -> DataClass:
@@ -548,6 +555,7 @@ class DataClass:
         properties: dict[str, dm.MappedProperty | dm.ConnectionDefinition],
         data_class_by_view_id: dict[ViewSpaceExternalId, DataClass],
         field_naming: pygen_config.FieldNaming,
+        filter_naming: pygen_config.Filtering,
     ) -> None:
         pydantic_field = self.pydantic_field
         for prop_name, prop in properties.items():
@@ -561,6 +569,7 @@ class DataClass:
                 pydantic_field=pydantic_field,
             )
             self.fields.append(field_)
+        self._list_method = ListMethod.from_fields(self.fields, filter_naming)
 
     @property
     def text_field_names(self) -> str:
