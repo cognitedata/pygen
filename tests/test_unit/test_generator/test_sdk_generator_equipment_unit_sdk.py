@@ -122,11 +122,9 @@ def test_generate_equipment_module_sensor_value_api(
     expected = EquipmentSDKFiles.equipment_module_sensor_value_api.read_text()
 
     # Act
-    actual = next(
-        iter(
-            equipment_module_api_generator.generate_timeseries_api_files(
-                EQUIPMENT_UNIT_SDK.top_level_package, EQUIPMENT_UNIT_SDK.client_name
-            )
+    _, actual = next(
+        equipment_module_api_generator.generate_timeseries_api_files(
+            EQUIPMENT_UNIT_SDK.top_level_package, EQUIPMENT_UNIT_SDK.client_name
         )
     )
     actual = code_formatter.format_code(actual)
@@ -174,7 +172,7 @@ def test_create_view_api_classes_unit_procedure_work_units(
     expected = EquipmentSDKFiles.unit_procedure_work_units.read_text()
 
     # Act
-    actual = next(
+    _, actual = next(
         unit_procedure_api_generator.generate_edge_api_files(
             EQUIPMENT_UNIT_SDK.top_level_package, EQUIPMENT_UNIT_SDK.client_name
         )

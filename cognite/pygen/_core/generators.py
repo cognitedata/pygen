@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import itertools
 from collections.abc import Iterator, Sequence
 from pathlib import Path
 from typing import Callable, Literal
@@ -212,7 +213,11 @@ class MultiAPIGenerator:
             sdk[api_dir / f"{api.data_class.query_file_name}.py"] = api.generate_api_query_file(
                 self.top_level_package, self.client_name
             )
-            raise NotImplementedError("This method is not implemented yet")
+            for file_name, file_content in itertools.chain(
+                api.generate_edge_api_files(self.top_level_package, self.client_name),
+                api.generate_timeseries_api_files(self.top_level_package, self.client_name),
+            ):
+                sdk[api_dir / file_name] = file_content
 
         sdk[client_dir / "__init__.py"] = self.generate_client_init_file()
         sdk[data_classes_dir / "__init__.py"] = self.generate_data_classes_init_file()
@@ -324,10 +329,10 @@ class APIGenerator:
             + "\n"
         )
 
-    def generate_edge_api_files(self, top_level_package: str, client_name: str) -> Iterator[str]:
+    def generate_edge_api_files(self, top_level_package: str, client_name: str) -> Iterator[tuple[str, str]]:
         edge_api = self._env.get_template("api_class_edge.py.jinja")
         for field in self.data_class.one_to_many_edges:
-            yield (
+            yield field.edge_api_file_name, (
                 edge_api.render(
                     top_level_package=top_level_package,
                     client_name=client_name,
@@ -340,10 +345,10 @@ class APIGenerator:
                 + "\n"
             )
 
-    def generate_timeseries_api_files(self, top_level_package: str, client_name: str) -> Iterator[str]:
+    def generate_timeseries_api_files(self, top_level_package: str, client_name: str) -> Iterator[tuple[str, str]]:
         timeseries_api = self._env.get_template("api_class_timeseries.py.jinja")
         for timeseries in self.data_class.single_timeseries_fields:
-            yield (
+            yield timeseries.edge_api_file_name, (
                 timeseries_api.render(
                     top_level_package=top_level_package,
                     client_name=client_name,
