@@ -27,7 +27,7 @@ from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import (
 from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder{% for field in data_class.one_to_many_edges %}
 from .{{ field.edge_api_file_name }} import {{ field.edge_api_class }}{% endfor %}{% for field in data_class.single_timeseries_fields %}
 from .{{ field.edge_api_file_name }} import {{ field.edge_api_class }}API{% endfor %}
-from .{{ api_class.query_file_name }} import {{ api_class.query_class_name }}
+from .{{ data_class.query_file_name }} import {{ data_class.query_class_name }}
 
 
 class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.write_name }}, {{ data_class.read_list_name }}]):
@@ -52,7 +52,7 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
             {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
             limit: int = DEFAULT_LIMIT_READ,
             filter: dm.Filter | None = None,
-    ) -> {{ api_class.query_class_name }}[{{ data_class.read_list_name }}]:
+    ) -> {{ data_class.query_class_name }}[{{ data_class.read_list_name }}]:
         """Query starting at {{ data_class.doc_list_name }}.
 
         Args:{% for parm in list_method.parameters %}
@@ -86,7 +86,7 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
                 )
             ],
         )
-        return {{ api_class.query_class_name }}(self._client, builder, self._view_by_write_class)
+        return {{ data_class.query_class_name }}(self._client, builder, self._view_by_write_class)
 
 
     def apply(self, {{ data_class.variable }}: {{ data_class.write_name }} | Sequence[{{ data_class.write_name }}], replace: bool = False) -> ResourcesApplyResult:

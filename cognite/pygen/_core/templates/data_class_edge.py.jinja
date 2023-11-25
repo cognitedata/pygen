@@ -139,6 +139,6 @@ class {{ data_class.read_list_name }}(DomainRelationList[{{ data_class.read_name
 
 
 class {{ data_class.write_list_name }}(DomainRelationList[{{ data_class.write_name }}]):
-    """List of {{ data_class.doc_list_name }} in the reading version."""
+    """List of {{ data_class.doc_list_name }} in the writing version."""
 
     _INSTANCE = {{ data_class.write_name }}

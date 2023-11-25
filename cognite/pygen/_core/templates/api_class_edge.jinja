@@ -17,7 +17,7 @@ from {{ top_level_package }}.data_classes import {{ data_class.read_name }}, {{ 
 from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import {{ data_class.properties_dict_name }}{% endif %}
 
 
-{% if data_class.has_single_timeseries_fields %}{% include "api_class_timeseries.py.jinja" %}{% endif %}
+
 {% for field in data_class.one_to_many_edges %}
 class {{ field.edge_api_class }}:
     def __init__(self, client: CogniteClient):

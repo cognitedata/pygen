@@ -210,7 +210,7 @@ class MultiAPIGenerator:
             file_name = api.api_class.file_name
             sdk[data_classes_dir / f"_{file_name}.py"] = api.generate_data_class_file()
             sdk[api_dir / f"{file_name}.py"] = api.generate_api_file(self.top_level_package, self.client_name)
-            sdk[api_dir / f"{api.api_class.query_file_name}.py"] = api.generate_api_query_file(
+            sdk[api_dir / f"{api.data_class.query_file_name}.py"] = api.generate_api_query_file(
                 self.top_level_package, self.client_name
             )
             raise NotImplementedError("This method is not implemented yet")

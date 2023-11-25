@@ -488,6 +488,8 @@ class DataClass:
     variable: str
     variable_list: str
     file_name: str
+    query_file_name: str
+    query_class_name: str
     view_id: ViewSpaceExternalId
     view_version: str
     fields: list[Field] = field(default_factory=list)
@@ -505,9 +507,12 @@ class DataClass:
         doc_list_name = to_words(view_name, pluralize=True)
         if variable_name == variable_list:
             variable_list = f"{variable_list}_list"
-        file_name = f"_{create_name(view_name, data_class.file)}"
+        raw_file_name = create_name(view_name, data_class.file)
+        file_name = f"_{raw_file_name}"
         if is_reserved_word(file_name, "filename", view.as_id()):
             file_name = f"{file_name}_"
+        query_file_name = f"{raw_file_name}_query"
+        query_class_name = f"{class_name.replace('_', '')}QueryAPI"
 
         used_for = view.used_for
         if used_for == "all":
@@ -525,6 +530,8 @@ class DataClass:
             variable=variable_name,
             variable_list=variable_list,
             file_name=file_name,
+            query_file_name=query_file_name,
+            query_class_name=query_class_name,
             view_id=ViewSpaceExternalId.from_(view),
             view_version=view.version,
         )
@@ -823,8 +830,6 @@ class APIClass:
     client_attribute: str
     name: str
     file_name: str
-    query_file_name: str
-    query_class_name: str
     view_id: ViewSpaceExternalId
     data_class: DataClass
 
@@ -834,14 +839,11 @@ class APIClass:
 
         raw_name = raw_name.replace(" ", "_")
         file_name = create_name(raw_name, api_class.file_name)
-        query_file_name = f"{file_name}_query"
         class_name = create_name(raw_name, api_class.name)
         return cls(
             client_attribute=create_name(raw_name, api_class.client_attribute),
             name=f"{class_name}API",
             file_name=file_name,
-            query_file_name=query_file_name,
-            query_class_name=f"{class_name}QueryAPI",
             view_id=ViewSpaceExternalId.from_(view),
             data_class=data_class,
         )
