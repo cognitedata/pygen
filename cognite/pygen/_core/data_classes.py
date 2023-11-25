@@ -745,27 +745,6 @@ class DataClass:
 
 @dataclass
 class NodeDataClass(DataClass):
-    # Todo: This should be deleted
-    edge_type: dm.DirectRelationReference = dm.DirectRelationReference("REPLACE", "REPLACE")
-    _end_class: NodeDataClass | None = None
-    _start_class: NodeDataClass | None = None
-
-    def __post_init__(self):
-        self._end_class = self
-        self._start_class = self
-
-    @property
-    def start_class(self) -> NodeDataClass:
-        if self._start_class is None:
-            raise ValueError("EdgeDataClass has not been initialized.")
-        return self._start_class
-
-    @property
-    def end_class(self) -> NodeDataClass:
-        if self._end_class is None:
-            raise ValueError("EdgeDataClass has not been initialized.")
-        return self._end_class
-
     @property
     def import_pydantic_field(self) -> str:
         if self.pydantic_field == "Field":
