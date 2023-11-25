@@ -163,3 +163,48 @@ class ActorApplyList(DomainModelApplyList[ActorApply]):
     """List of actors in the writing version."""
 
     _INSTANCE = ActorApply
+
+
+def _create_actor_filter(
+    view_id: dm.ViewId,
+    person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+    won_oscar: bool | None = None,
+    external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if person and isinstance(person, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("person"), value={"space": "IntegrationTestsImmutable", "externalId": person}
+            )
+        )
+    if person and isinstance(person, tuple):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("person"), value={"space": person[0], "externalId": person[1]})
+        )
+    if person and isinstance(person, list) and isinstance(person[0], str):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("person"),
+                values=[{"space": "IntegrationTestsImmutable", "externalId": item} for item in person],
+            )
+        )
+    if person and isinstance(person, list) and isinstance(person[0], tuple):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("person"), values=[{"space": item[0], "externalId": item[1]} for item in person]
+            )
+        )
+    if won_oscar and isinstance(won_oscar, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("wonOscar"), value=won_oscar))
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

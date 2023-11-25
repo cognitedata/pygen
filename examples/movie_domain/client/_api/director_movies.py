@@ -7,7 +7,7 @@ from cognite.client import data_modeling as dm
 from ._core import DEFAULT_LIMIT_READ, EdgeAPI
 
 
-class ActorMoviesAPI(EdgeAPI):
+class DirectorMoviesAPI(EdgeAPI):
     def list(
         self,
         movie: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
@@ -25,7 +25,7 @@ class ActorMoviesAPI(EdgeAPI):
         space: str | list[str] | None = None,
         limit=DEFAULT_LIMIT_READ,
     ) -> MovieList:
-        """List movie edges of a actor.
+        """List movie edges of a director.
 
         Args:
             movie: ID of the source movies.
@@ -49,11 +49,11 @@ class ActorMoviesAPI(EdgeAPI):
 
         Examples:
 
-            List 5 movie edges connected to "my_actor":
+            List 5 movie edges connected to "my_director":
 
                 >>> from movie_domain.client import MovieClient
                 >>> client = MovieClient()
-                >>> actor = client.actor.movies_edge.list("my_actor", limit=5)
+                >>> director = client.director.movies_edge.list("my_director", limit=5)
 
         """
         f = dm.filters

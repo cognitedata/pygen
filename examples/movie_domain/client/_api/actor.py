@@ -1,18 +1,31 @@
 from __future__ import annotations
 
-from collections import defaultdict
-from typing import Dict, List, Sequence, Tuple, overload
+from collections.abc import Sequence
+from typing import overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
-from movie_domain.client.data_classes import Actor, ActorApply, ActorList, ActorApplyList, ActorFields, DomainModelApply
-from movie_domain.client.data_classes._actor import _ACTOR_PROPERTIES_BY_FIELD
+from movie_domain.client.data_classes import (
+    DomainModelApply,
+    ResourcesApplyResult,
+    Actor,
+    ActorApply,
+    ActorFields,
+    ActorList,
+)
+from movie_domain.client.data_classes._actor import (
+    _ACTOR_PROPERTIES_BY_FIELD,
+    _create_actor_filter,
+)
+from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from .actor_movies import ActorMoviesAPI
+from .actor_nomination import ActorNominationAPI
+from .actor_query import ActorQueryAPI
 
 
-class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
+class ActorAPI(NodeAPI[Actor, ActorApply, ActorList]):
     def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
         view_id = view_by_write_class[ActorApply]
         super().__init__(
@@ -21,16 +34,68 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
             class_type=Actor,
             class_apply_type=ActorApply,
             class_list=ActorList,
+            view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self._view_by_write_class = view_by_write_class
-        self.movies = ActorMoviesAPI(client)
-        self.nomination = ActorNominationAPI(client)
+        self.movies_edge = ActorMoviesAPI(client, view_by_write_class, Movie, MovieApply, MovieList)
+        self.nomination_edge = ActorNominationAPI(
+            client, view_by_write_class, Nomination, NominationApply, NominationList
+        )
 
-    def apply(self, actor: ActorApply | Sequence[ActorApply], replace: bool = False) -> dm.InstancesApplyResult:
+    def __call__(
+        self,
+        person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        won_oscar: bool | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> ActorQueryAPI[ActorList]:
+        """Query starting at actors.
+
+        Args:
+            person: The person to filter on.
+            won_oscar: The won oscar to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of actors to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            A query API for actors.
+
+        """
+        filter_ = _create_actor_filter(
+            self._view_id,
+            person,
+            won_oscar,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        builder = QueryBuilder(
+            ActorList,
+            [
+                QueryStep(
+                    name="actor",
+                    expression=dm.query.NodeResultSetExpression(
+                        from_=None,
+                        filter=filter_,
+                    ),
+                    select=dm.query.Select(
+                        [dm.query.SourceSelector(self._view_id, list(_ACTOR_PROPERTIES_BY_FIELD.values()))]
+                    ),
+                    result_cls=Actor,
+                    max_retrieve_limit=limit,
+                )
+            ],
+        )
+        return ActorQueryAPI(self._client, builder, self._view_by_write_class)
+
+    def apply(self, actor: ActorApply | Sequence[ActorApply], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) actors.
 
-        Note: This method iterates through all nodes linked to actor and create them including the edges
+        Note: This method iterates through all nodes and timeseries linked to actor and creates them including the edges
         between the nodes. For example, if any of `movies` or `nomination` are set, then these
         nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
 
@@ -39,7 +104,7 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes, edges, and time series.
 
         Examples:
 
@@ -52,20 +117,10 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
                 >>> result = client.actor.apply(actor)
 
         """
-        if isinstance(actor, ActorApply):
-            instances = actor.to_instances_apply(self._view_by_write_class)
-        else:
-            instances = ActorApplyList(actor).to_instances_apply(self._view_by_write_class)
-        return self._client.data_modeling.instances.apply(
-            nodes=instances.nodes,
-            edges=instances.edges,
-            auto_create_start_nodes=True,
-            auto_create_end_nodes=True,
-            replace=replace,
-        )
+        return self._apply(actor, replace)
 
     def delete(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> dm.InstancesDeleteResult:
         """Delete one or more actor.
 
@@ -84,22 +139,19 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
                 >>> client = MovieClient()
                 >>> client.actor.delete("my_actor")
         """
-        if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
-        else:
-            return self._client.data_modeling.instances.delete(
-                nodes=[(space, id) for id in external_id],
-            )
+        return self._delete(external_id, space)
 
     @overload
     def retrieve(self, external_id: str) -> Actor:
         ...
 
     @overload
-    def retrieve(self, external_id: Sequence[str]) -> ActorList:
+    def retrieve(self, external_id: SequenceNotStr[str]) -> ActorList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> Actor | ActorList:
+    def retrieve(
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+    ) -> Actor | ActorList:
         """Retrieve one or more actors by id(s).
 
         Args:
@@ -118,24 +170,15 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
                 >>> actor = client.actor.retrieve("my_actor")
 
         """
-        if isinstance(external_id, str):
-            actor = self._retrieve((space, external_id))
-
-            movie_edges = self.movies.retrieve(external_id, space=space)
-            actor.movies = [edge.end_node.external_id for edge in movie_edges]
-            nomination_edges = self.nomination.retrieve(external_id, space=space)
-            actor.nomination = [edge.end_node.external_id for edge in nomination_edges]
-
-            return actor
-        else:
-            actors = self._retrieve([(space, ext_id) for ext_id in external_id])
-
-            movie_edges = self.movies.retrieve(actors.as_node_ids())
-            self._set_movies(actors, movie_edges)
-            nomination_edges = self.nomination.retrieve(actors.as_node_ids())
-            self._set_nomination(actors, nomination_edges)
-
-            return actors
+        return self._retrieve(
+            external_id,
+            space,
+            retrieve_edges=True,
+            edge_api_name_pairs=[
+                (self.movies_edge, "movies"),
+                (self.nomination_edge, "nomination"),
+            ],
+        )
 
     @overload
     def aggregate(
@@ -214,7 +257,7 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
 
         """
 
-        filter_ = _create_filter(
+        filter_ = _create_actor_filter(
             self._view_id,
             person,
             won_oscar,
@@ -256,13 +299,12 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
             space: The space to filter on.
             limit: Maximum number of actors to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            retrieve_edges: Whether to retrieve `movies` or `nomination` external ids for the actors. Defaults to True.
 
         Returns:
             Bucketed histogram results.
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_actor_filter(
             self._view_id,
             person,
             won_oscar,
@@ -314,7 +356,7 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
                 >>> actors = client.actor.list(limit=5)
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_actor_filter(
             self._view_id,
             person,
             won_oscar,
@@ -323,86 +365,13 @@ class ActorAPI(TypeAPI[Actor, ActorApply, ActorList]):
             filter,
         )
 
-        actors = self._list(limit=limit, filter=filter_)
-
-        if retrieve_edges:
-            space_arg = {"space": space} if space else {}
-            if len(ids := actors.as_node_ids()) > IN_FILTER_LIMIT:
-                movie_edges = self.movies.list(limit=-1, **space_arg)
-            else:
-                movie_edges = self.movies.list(ids, limit=-1)
-            self._set_movies(actors, movie_edges)
-            if len(ids := actors.as_node_ids()) > IN_FILTER_LIMIT:
-                nomination_edges = self.nomination.list(limit=-1, **space_arg)
-            else:
-                nomination_edges = self.nomination.list(ids, limit=-1)
-            self._set_nomination(actors, nomination_edges)
-
-        return actors
-
-    @staticmethod
-    def _set_movies(actors: Sequence[Actor], movie_edges: Sequence[dm.Edge]):
-        edges_by_start_node: Dict[Tuple, List] = defaultdict(list)
-        for edge in movie_edges:
-            edges_by_start_node[edge.start_node.as_tuple()].append(edge)
-
-        for actor in actors:
-            node_id = actor.id_tuple()
-            if node_id in edges_by_start_node:
-                actor.movies = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
-
-    @staticmethod
-    def _set_nomination(actors: Sequence[Actor], nomination_edges: Sequence[dm.Edge]):
-        edges_by_start_node: Dict[Tuple, List] = defaultdict(list)
-        for edge in nomination_edges:
-            edges_by_start_node[edge.start_node.as_tuple()].append(edge)
-
-        for actor in actors:
-            node_id = actor.id_tuple()
-            if node_id in edges_by_start_node:
-                actor.nomination = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
-
-
-def _create_filter(
-    view_id: dm.ViewId,
-    person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-    won_oscar: bool | None = None,
-    external_id_prefix: str | None = None,
-    space: str | list[str] | None = None,
-    filter: dm.Filter | None = None,
-) -> dm.Filter | None:
-    filters = []
-    if person and isinstance(person, str):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("person"), value={"space": "IntegrationTestsImmutable", "externalId": person}
-            )
+        return self._list(
+            limit=limit,
+            filter=filter_,
+            space=space,
+            retrieve_edges=retrieve_edges,
+            edge_api_name_pairs=[
+                (self.movies_edge, "movies"),
+                (self.nomination_edge, "nomination"),
+            ],
         )
-    if person and isinstance(person, tuple):
-        filters.append(
-            dm.filters.Equals(view_id.as_property_ref("person"), value={"space": person[0], "externalId": person[1]})
-        )
-    if person and isinstance(person, list) and isinstance(person[0], str):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("person"),
-                values=[{"space": "IntegrationTestsImmutable", "externalId": item} for item in person],
-            )
-        )
-    if person and isinstance(person, list) and isinstance(person[0], tuple):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("person"), values=[{"space": item[0], "externalId": item[1]} for item in person]
-            )
-        )
-    if won_oscar and isinstance(won_oscar, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("wonOscar"), value=won_oscar))
-    if external_id_prefix:
-        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
-        filters.append(dm.filters.Equals(["node", "space"], value=space))
-    if space and isinstance(space, list):
-        filters.append(dm.filters.In(["node", "space"], values=space))
-    if filter:
-        filters.append(filter)
-    return dm.filters.And(*filters) if filters else None

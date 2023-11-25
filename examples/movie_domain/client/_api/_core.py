@@ -1,22 +1,30 @@
 from __future__ import annotations
 
-from collections import defaultdict
-from collections.abc import Sequence
-from typing import Generic, Literal, Any, Iterator, Protocol, SupportsIndex, TypeVar, overload
+from collections import defaultdict, UserList
+from collections.abc import Sequence, Collection
+from dataclasses import dataclass, field
+from typing import Generic, Literal, Any, Iterator, Protocol, SupportsIndex, TypeVar, overload, cast
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList
+from cognite.client.data_classes.data_modeling.instances import Instance
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
+
 from movie_domain.client.data_classes._core import (
     DomainModel,
     DomainModelApply,
+    DomainRelationApply,
     ResourcesApplyResult,
     T_DomainModel,
     T_DomainModelApply,
     T_DomainModelList,
+    T_DomainRelation,
+    T_DomainRelationApply,
+    T_DomainRelationList,
+    DomainModelCore,
+    DomainRelation,
 )
-
 
 DEFAULT_LIMIT_READ = 25
 INSTANCE_QUERY_LIMIT = 1_000
@@ -303,7 +311,7 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
         edge_api_name_pairs: list[tuple[EdgeAPI, str]] | None = None,
     ) -> T_DomainModelList:
         nodes = self._client.data_modeling.instances.list("node", sources=self._sources, limit=limit, filter=filter)
-        node_list = self._class_list([self._class_type.from_node(node) for node in nodes])
+        node_list = self._class_list([self._class_type.from_instance(node) for node in nodes])
         if retrieve_edges:
             self._retrieve_and_set_edge_types(node_list, space, edge_api_name_pairs)
 
@@ -318,7 +326,7 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
             if len(ids := nodes.as_node_ids()) > IN_FILTER_LIMIT:
                 edges = edge_api._list(limit=-1, **space_arg)
             else:
-                edges = edge_api._list(ids, limit=-1)
+                edges = edge_api._list(node_ids=ids, limit=-1)
             cls._set_edges(nodes, edges, edge_name)
 
     @staticmethod
@@ -333,6 +341,180 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
                 setattr(node, edge_name, [edge.end_node.external_id for edge in edges_by_start_node[node_id]])
 
 
-class EdgeAPI(Generic[T_DomainModel]):
-    def _list(self) -> dm.EdgeList:
+class EdgeAPI(Generic[T_DomainRelation, T_DomainRelationApply, T_DomainRelationList]):
+    def __init__(
+        self,
+        client: CogniteClient,
+        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId],
+        class_type: type[T_DomainRelation],
+        class_apply_type: type[T_DomainRelationApply],
+        class_list: type[T_DomainRelationList],
+    ):
+        self._client = client
+        self._view_by_write_class = view_by_write_class
+        self._view_id = view_by_write_class[class_apply_type]
+        self._class_type = class_type
+        self._class_apply_type = class_apply_type
+        self._class_list = class_list
+
+    def _list(
+        self,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter_: dm.Filter | None = None,
+    ) -> T_DomainRelationList:
+        edges = self._client.data_modeling.instances.list("edge", limit=limit, filter=filter_, sources=[self._view_id])
+        return self._class_list([self._class_type.from_instance(edge) for edge in edges])
+
+
+@dataclass
+class QueryStep:
+    # Setup Variables
+    name: str
+    expression: dm.query.ResultSetExpression
+    select: dm.query.Select | None
+    result_cls: type[DomainModelCore] | None
+    max_retrieve_limit: int
+
+    # Query Variables
+    cursor: str | None = None
+    total_retrieved: int = 0
+    results: list[Instance] = field(default_factory=list)
+    last_batch_count: int = 0
+
+    def update_expression_limit(self) -> None:
+        if self.max_retrieve_limit == -1:
+            self.expression.limit = None
+        else:
+            self.expression.limit = min(INSTANCE_QUERY_LIMIT, self.max_retrieve_limit - self.total_retrieved)
+
+
+class QueryBuilder(UserList, Generic[T_DomainModelList]):
+    def __init__(self, result_cls: type[T_DomainModelList], nodes: Collection[QueryStep] = None):
+        super().__init__(nodes or [])
+        self._result_cls = result_cls
+
+    # The dunder implementations are to get proper type hints
+    def __iter__(self) -> Iterator[QueryStep]:
+        return super().__iter__()
+
+    @overload
+    def __getitem__(self, item: int) -> QueryStep:
         ...
+
+    @overload
+    def __getitem__(self: type[QueryBuilder[T_DomainModelList]], item: slice) -> QueryBuilder[T_DomainModelList]:
+        ...
+
+    def __getitem__(self, item: int | slice) -> QueryStep | QueryBuilder[T_DomainModelList]:
+        if isinstance(item, slice):
+            return self.__class__(self.data[item])
+        elif isinstance(item, int):
+            return self.data[item]
+        else:
+            raise TypeError(f"Expected int or slice, got {type(item)}")
+
+    def reset(self):
+        for expression in self:
+            expression.total_retrieved = 0
+            expression.cursor = None
+            expression.results = []
+
+    def update_expression_limits(self) -> None:
+        for expression in self:
+            expression.update_expression_limit()
+
+    def build(self) -> dm.query.Query:
+        with_ = {expression.name: expression.expression for expression in self}
+        select = {expression.name: expression.select for expression in self}
+        cursors = self.cursors
+
+        return dm.query.Query(with_=with_, select=select, cursors=cursors)
+
+    @property
+    def cursors(self) -> dict[str, str | None]:
+        return {expression.name: expression.cursor for expression in self}
+
+    def update(self, batch: dm.query.QueryResult):
+        for expression in self:
+            expression.last_batch_count = len(batch[expression.name])
+            expression.total_retrieved += expression.last_batch_count
+            expression.cursor = batch.cursors.get(expression.name)
+            expression.results.extend(batch[expression.name].data)
+
+    @property
+    def is_finished(self):
+        return all(
+            expression.total_retrieved >= expression.max_retrieve_limit
+            or expression.cursor is None
+            or expression.last_batch_count == 0
+            for expression in self
+        )
+
+    def unpack(self) -> T_DomainModelList:
+        nodes_by_type: dict[str | None, dict[tuple[str, str], DomainModel]] = defaultdict(dict)
+        edges_by_type_by_start_node: dict[tuple[str, str], dict[tuple[str, str], list[dm.Edge]]] = defaultdict(
+            lambda: defaultdict(list)
+        )
+        relation_by_type_by_start_node: dict[
+            tuple[str, str], dict[tuple[str, str], list[DomainRelation]]
+        ] = defaultdict(lambda: defaultdict(list))
+
+        for step in self:
+            if issubclass(step.result_cls, DomainModel):
+                for node in step.results:
+                    domain = step.result_cls.from_instance(node)
+                    # Circular dependencies will overwrite here, so we always get the last one
+                    nodes_by_type[step.name][domain.as_tuple_id()] = domain
+            elif issubclass(step.result_cls, DomainRelation):
+                for edge in step.results:
+                    domain = step.result_cls.from_instance(edge) if step.result_cls else edge
+                    relation_by_type_by_start_node[(step.expression.from_, step.name)][
+                        domain.start_node.as_tuple()
+                    ].append(domain)
+            elif step.result_cls is None:  # This is a data model edge.
+                for edge in step.results:
+                    edge = cast(dm.Edge, edge)
+                    edges_by_type_by_start_node[(step.expression.from_, step.name)][
+                        (edge.space, edge.external_id)
+                    ].append(edge)
+
+        for (node_name, node_attribute), relations_by_start_node in relation_by_type_by_start_node.items():
+            for node in nodes_by_type[node_name].values():
+                setattr(node, node_attribute, relations_by_start_node.get(node.as_tuple_id(), []))
+            for relations in relations_by_start_node.values():
+                for relation in relations:
+                    edge_name = relation.type.external_id.split(".")[-1]
+                    if (nodes := nodes_by_type.get(edge_name)) and (
+                        node := nodes.get((relation.end_node.space, relation.end_node.external_id))
+                    ):
+                        setattr(relation, edge_name, node)
+
+        if edges_by_type_by_start_node:
+            raise NotImplementedError()
+
+        return self._result_cls(nodes_by_type[self[0].name].values())
+
+
+class QueryAPI(Generic[T_DomainModelList]):
+    def __init__(
+        self,
+        client: CogniteClient,
+        builder: QueryBuilder[T_DomainModelList],
+        view_by_write_class: dict[type[DomainModelApply], dm.ViewId],
+    ):
+        self._client = client
+        self._builder = builder
+        self._view_by_write_class = view_by_write_class
+
+    def _query(self) -> T_DomainModelList:
+        self._builder.reset()
+        query = self._builder.build()
+
+        while True:
+            self._builder.update_expression_limits()
+            query.cursors = self._builder.cursors
+            batch = self._client.data_modeling.instances.query(query)
+            self._builder.update(batch)
+            if self._builder.is_finished:
+                break
+        return self._builder.unpack()

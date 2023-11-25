@@ -7,7 +7,7 @@ from cognite.client import data_modeling as dm
 from ._core import DEFAULT_LIMIT_READ, EdgeAPI
 
 
-class ActorNominationAPI(EdgeAPI):
+class DirectorNominationAPI(EdgeAPI):
     def list(
         self,
         nomination: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
@@ -22,7 +22,7 @@ class ActorNominationAPI(EdgeAPI):
         space: str | list[str] | None = None,
         limit=DEFAULT_LIMIT_READ,
     ) -> NominationList:
-        """List nomination edges of a actor.
+        """List nomination edges of a director.
 
         Args:
             nomination: ID of the source nominations.
@@ -43,11 +43,11 @@ class ActorNominationAPI(EdgeAPI):
 
         Examples:
 
-            List 5 nomination edges connected to "my_actor":
+            List 5 nomination edges connected to "my_director":
 
                 >>> from movie_domain.client import MovieClient
                 >>> client = MovieClient()
-                >>> actor = client.actor.nomination_edge.list("my_actor", limit=5)
+                >>> director = client.director.nomination_edge.list("my_director", limit=5)
 
         """
         f = dm.filters

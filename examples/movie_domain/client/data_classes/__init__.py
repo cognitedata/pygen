@@ -1,4 +1,11 @@
-from ._core import DomainModel, DomainModelApply
+from ._core import (
+    DomainModel,
+    DomainModelApply,
+    DomainModelList,
+    DomainRelationApply,
+    ResourcesApply,
+    ResourcesApplyResult,
+)
 from ._actor import Actor, ActorApply, ActorApplyList, ActorFields, ActorList
 from ._best_director import (
     BestDirector,
@@ -38,15 +45,24 @@ from ._person import Person, PersonApply, PersonApplyList, PersonFields, PersonL
 from ._rating import Rating, RatingApply, RatingApplyList, RatingFields, RatingList, RatingTextFields
 from ._role import Role, RoleApply, RoleApplyList, RoleFields, RoleList
 
+Actor.model_rebuild()
 ActorApply.model_rebuild()
+Director.model_rebuild()
 DirectorApply.model_rebuild()
+Movie.model_rebuild()
 MovieApply.model_rebuild()
+Person.model_rebuild()
 PersonApply.model_rebuild()
+Role.model_rebuild()
 RoleApply.model_rebuild()
 
 __all__ = [
+    "ResourcesApply",
     "DomainModel",
     "DomainModelApply",
+    "DomainModelList",
+    "DomainRelationApply",
+    "ResourcesApplyResult",
     "Actor",
     "ActorApply",
     "ActorList",

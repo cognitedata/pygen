@@ -1,124 +1,31 @@
 from __future__ import annotations
 
-from collections import defaultdict
-from typing import Dict, List, Sequence, Tuple, overload
+from collections.abc import Sequence
+from typing import overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from movie_domain.client.data_classes import (
+    DomainModelApply,
+    ResourcesApplyResult,
     Person,
     PersonApply,
-    PersonList,
-    PersonApplyList,
     PersonFields,
+    PersonList,
     PersonTextFields,
-    DomainModelApply,
 )
-from movie_domain.client.data_classes._person import _PERSON_PROPERTIES_BY_FIELD
+from movie_domain.client.data_classes._person import (
+    _PERSON_PROPERTIES_BY_FIELD,
+    _create_person_filter,
+)
+from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from .person_roles import PersonRolesAPI
+from .person_query import PersonQueryAPI
 
 
-class PersonRolesAPI:
-    def __init__(self, client: CogniteClient):
-        self._client = client
-
-    def retrieve(
-        self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str = "IntegrationTestsImmutable"
-    ) -> dm.EdgeList:
-        """Retrieve one or more roles edges by id(s) of a person.
-
-        Args:
-            external_id: External id or list of external ids source person.
-            space: The space where all the role edges are located.
-
-        Returns:
-            The requested role edges.
-
-        Examples:
-
-            Retrieve roles edge by id:
-
-                >>> from movie_domain.client import MovieClient
-                >>> client = MovieClient()
-                >>> person = client.person.roles.retrieve("my_roles")
-
-        """
-        f = dm.filters
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": "IntegrationTestsImmutable", "externalId": "Person.roles"},
-        )
-        if isinstance(external_id, (str, dm.NodeId)):
-            is_persons = f.Equals(
-                ["edge", "startNode"],
-                {"space": space, "externalId": external_id}
-                if isinstance(external_id, str)
-                else external_id.dump(camel_case=True, include_instance_type=False),
-            )
-        else:
-            is_persons = f.In(
-                ["edge", "startNode"],
-                [
-                    {"space": space, "externalId": ext_id}
-                    if isinstance(ext_id, str)
-                    else ext_id.dump(camel_case=True, include_instance_type=False)
-                    for ext_id in external_id
-                ],
-            )
-        return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_persons))
-
-    def list(
-        self,
-        person_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        limit=DEFAULT_LIMIT_READ,
-        space: str = "IntegrationTestsImmutable",
-    ) -> dm.EdgeList:
-        """List roles edges of a person.
-
-        Args:
-            person_id: ID of the source person.
-            limit: Maximum number of role edges to return. Defaults to 25. Set to -1, float("inf") or None
-                to return all items.
-            space: The space where all the role edges are located.
-
-        Returns:
-            The requested role edges.
-
-        Examples:
-
-            List 5 roles edges connected to "my_person":
-
-                >>> from movie_domain.client import MovieClient
-                >>> client = MovieClient()
-                >>> person = client.person.roles.list("my_person", limit=5)
-
-        """
-        f = dm.filters
-        filters = [
-            f.Equals(
-                ["edge", "type"],
-                {"space": "IntegrationTestsImmutable", "externalId": "Person.roles"},
-            )
-        ]
-        if person_id:
-            person_ids = person_id if isinstance(person_id, list) else [person_id]
-            is_persons = f.In(
-                ["edge", "startNode"],
-                [
-                    {"space": space, "externalId": ext_id}
-                    if isinstance(ext_id, str)
-                    else ext_id.dump(camel_case=True, include_instance_type=False)
-                    for ext_id in person_ids
-                ],
-            )
-            filters.append(is_persons)
-
-        return self._client.data_modeling.instances.list("edge", limit=limit, filter=f.And(*filters))
-
-
-class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
+class PersonAPI(NodeAPI[Person, PersonApply, PersonList]):
     def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
         view_id = view_by_write_class[PersonApply]
         super().__init__(
@@ -127,15 +34,71 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
             class_type=Person,
             class_apply_type=PersonApply,
             class_list=PersonList,
+            view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self._view_by_write_class = view_by_write_class
-        self.roles = PersonRolesAPI(client)
+        self.roles_edge = PersonRolesAPI(client, view_by_write_class, Role, RoleApply, RoleList)
 
-    def apply(self, person: PersonApply | Sequence[PersonApply], replace: bool = False) -> dm.InstancesApplyResult:
+    def __call__(
+        self,
+        min_birth_year: int | None = None,
+        max_birth_year: int | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> PersonQueryAPI[PersonList]:
+        """Query starting at persons.
+
+        Args:
+            min_birth_year: The minimum value of the birth year to filter on.
+            max_birth_year: The maximum value of the birth year to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of persons to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            A query API for persons.
+
+        """
+        filter_ = _create_person_filter(
+            self._view_id,
+            min_birth_year,
+            max_birth_year,
+            name,
+            name_prefix,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        builder = QueryBuilder(
+            PersonList,
+            [
+                QueryStep(
+                    name="person",
+                    expression=dm.query.NodeResultSetExpression(
+                        from_=None,
+                        filter=filter_,
+                    ),
+                    select=dm.query.Select(
+                        [dm.query.SourceSelector(self._view_id, list(_PERSON_PROPERTIES_BY_FIELD.values()))]
+                    ),
+                    result_cls=Person,
+                    max_retrieve_limit=limit,
+                )
+            ],
+        )
+        return PersonQueryAPI(self._client, builder, self._view_by_write_class)
+
+    def apply(self, person: PersonApply | Sequence[PersonApply], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) persons.
 
-        Note: This method iterates through all nodes linked to person and create them including the edges
+        Note: This method iterates through all nodes and timeseries linked to person and creates them including the edges
         between the nodes. For example, if any of `roles` are set, then these
         nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
 
@@ -144,7 +107,7 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes, edges, and time series.
 
         Examples:
 
@@ -157,20 +120,10 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
                 >>> result = client.person.apply(person)
 
         """
-        if isinstance(person, PersonApply):
-            instances = person.to_instances_apply(self._view_by_write_class)
-        else:
-            instances = PersonApplyList(person).to_instances_apply(self._view_by_write_class)
-        return self._client.data_modeling.instances.apply(
-            nodes=instances.nodes,
-            edges=instances.edges,
-            auto_create_start_nodes=True,
-            auto_create_end_nodes=True,
-            replace=replace,
-        )
+        return self._apply(person, replace)
 
     def delete(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> dm.InstancesDeleteResult:
         """Delete one or more person.
 
@@ -189,23 +142,18 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
                 >>> client = MovieClient()
                 >>> client.person.delete("my_person")
         """
-        if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
-        else:
-            return self._client.data_modeling.instances.delete(
-                nodes=[(space, id) for id in external_id],
-            )
+        return self._delete(external_id, space)
 
     @overload
     def retrieve(self, external_id: str) -> Person:
         ...
 
     @overload
-    def retrieve(self, external_id: Sequence[str]) -> PersonList:
+    def retrieve(self, external_id: SequenceNotStr[str]) -> PersonList:
         ...
 
     def retrieve(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> Person | PersonList:
         """Retrieve one or more persons by id(s).
 
@@ -225,20 +173,14 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
                 >>> person = client.person.retrieve("my_person")
 
         """
-        if isinstance(external_id, str):
-            person = self._retrieve((space, external_id))
-
-            role_edges = self.roles.retrieve(external_id, space=space)
-            person.roles = [edge.end_node.external_id for edge in role_edges]
-
-            return person
-        else:
-            persons = self._retrieve([(space, ext_id) for ext_id in external_id])
-
-            role_edges = self.roles.retrieve(persons.as_node_ids())
-            self._set_roles(persons, role_edges)
-
-            return persons
+        return self._retrieve(
+            external_id,
+            space,
+            retrieve_edges=True,
+            edge_api_name_pairs=[
+                (self.roles_edge, "roles"),
+            ],
+        )
 
     def search(
         self,
@@ -279,7 +221,7 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
                 >>> persons = client.person.search('my_person')
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_person_filter(
             self._view_id,
             min_birth_year,
             max_birth_year,
@@ -384,7 +326,7 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
 
         """
 
-        filter_ = _create_filter(
+        filter_ = _create_person_filter(
             self._view_id,
             min_birth_year,
             max_birth_year,
@@ -436,13 +378,12 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
             space: The space to filter on.
             limit: Maximum number of persons to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            retrieve_edges: Whether to retrieve `roles` external ids for the persons. Defaults to True.
 
         Returns:
             Bucketed histogram results.
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_person_filter(
             self._view_id,
             min_birth_year,
             max_birth_year,
@@ -500,7 +441,7 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
                 >>> persons = client.person.list(limit=5)
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_person_filter(
             self._view_id,
             min_birth_year,
             max_birth_year,
@@ -511,55 +452,12 @@ class PersonAPI(TypeAPI[Person, PersonApply, PersonList]):
             filter,
         )
 
-        persons = self._list(limit=limit, filter=filter_)
-
-        if retrieve_edges:
-            space_arg = {"space": space} if space else {}
-            if len(ids := persons.as_node_ids()) > IN_FILTER_LIMIT:
-                role_edges = self.roles.list(limit=-1, **space_arg)
-            else:
-                role_edges = self.roles.list(ids, limit=-1)
-            self._set_roles(persons, role_edges)
-
-        return persons
-
-    @staticmethod
-    def _set_roles(persons: Sequence[Person], role_edges: Sequence[dm.Edge]):
-        edges_by_start_node: Dict[Tuple, List] = defaultdict(list)
-        for edge in role_edges:
-            edges_by_start_node[edge.start_node.as_tuple()].append(edge)
-
-        for person in persons:
-            node_id = person.id_tuple()
-            if node_id in edges_by_start_node:
-                person.roles = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
-
-
-def _create_filter(
-    view_id: dm.ViewId,
-    min_birth_year: int | None = None,
-    max_birth_year: int | None = None,
-    name: str | list[str] | None = None,
-    name_prefix: str | None = None,
-    external_id_prefix: str | None = None,
-    space: str | list[str] | None = None,
-    filter: dm.Filter | None = None,
-) -> dm.Filter | None:
-    filters = []
-    if min_birth_year or max_birth_year:
-        filters.append(dm.filters.Range(view_id.as_property_ref("birthYear"), gte=min_birth_year, lte=max_birth_year))
-    if name and isinstance(name, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
-    if name and isinstance(name, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("name"), values=name))
-    if name_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
-    if external_id_prefix:
-        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
-        filters.append(dm.filters.Equals(["node", "space"], value=space))
-    if space and isinstance(space, list):
-        filters.append(dm.filters.In(["node", "space"], values=space))
-    if filter:
-        filters.append(filter)
-    return dm.filters.And(*filters) if filters else None
+        return self._list(
+            limit=limit,
+            filter=filter_,
+            space=space,
+            retrieve_edges=retrieve_edges,
+            edge_api_name_pairs=[
+                (self.roles_edge, "roles"),
+            ],
+        )
