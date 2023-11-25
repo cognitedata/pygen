@@ -324,7 +324,20 @@ class APIGenerator:
         )
 
     def generate_edge_api_files(self, top_level_package: str, client_name: str) -> Iterator[str]:
-        raise NotImplementedError("This method is not implemented yet")
+        edge_api = self._env.get_template("api_class_edge.py.jinja")
+        for field in self.data_class.one_to_many_edges:
+            yield (
+                edge_api.render(
+                    top_level_package=top_level_package,
+                    client_name=client_name,
+                    field=field,
+                    api_class=self.api_class,
+                    data_class=self.data_class,
+                    list_method=self.data_class.list_method,
+                    instance_space=self.view_identifier.space,
+                )
+                + "\n"
+            )
 
     def generate_timeseries_api_files(self, top_level_package: str, client_name: str) -> Iterator[str]:
         timeseries_api = self._env.get_template("api_class_timeseries.py.jinja")
@@ -340,4 +353,3 @@ class APIGenerator:
                 )
                 + "\n"
             )
-        return ()

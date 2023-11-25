@@ -157,6 +157,8 @@ class StartEndTimeApplyList(DomainRelationList[StartEndTimeApply]):
 
 def _create_start_end_time_filter(
     view_id: dm.ViewId,
+    start_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+    start_node_space: str = "IntegrationTestsImmutable",
     end_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
     space_end_node: str = "IntegrationTestsImmutable",
     min_end_time: datetime.datetime | None = None,
@@ -168,8 +170,35 @@ def _create_start_end_time_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters: list[dm.Filter] = []
+    filters = filters or []
+    if start_node and isinstance(start_node, str):
+        filters.append(
+            dm.filters.Equals(["edge", "startNode"], value={"space": start_node_space, "externalId": start_node})
+        )
+    elif start_node and isinstance(start_node, dm.NodeId):
+        filters.append(
+            dm.filters.Equals(
+                ["edge", "startNode"], value=start_node.dump(camel_case=True, include_instance_type=False)
+            )
+        )
+    if start_node and isinstance(start_node, list):
+        filters.append(
+            dm.filters.In(
+                ["edge", "startNode"],
+                values=[
+                    {"space": start_node_space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in start_node
+                ],
+            )
+        )
     if end_node and isinstance(end_node, str):
         filters.append(dm.filters.Equals(["edge", "endNode"], value={"space": space_end_node, "externalId": end_node}))
+    elif end_node and isinstance(end_node, dm.NodeId):
+        filters.append(
+            dm.filters.Equals(["edge", "endNode"], value=end_node.dump(camel_case=True, include_instance_type=False))
+        )
     if end_node and isinstance(end_node, list):
         filters.append(
             dm.filters.In(

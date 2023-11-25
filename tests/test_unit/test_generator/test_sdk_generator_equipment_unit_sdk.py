@@ -171,7 +171,7 @@ def test_create_view_api_classes_unit_procedure_work_units(
     unit_procedure_api_generator: APIGenerator, code_formatter: CodeFormatter
 ):
     # Arrange
-    expected = EquipmentSDKFiles.unit_procedure_query.read_text()
+    expected = EquipmentSDKFiles.unit_procedure_work_units.read_text()
 
     # Act
     actual = next(

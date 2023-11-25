@@ -56,6 +56,8 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
             edge_view,
             None,
             None,
+            None,
+            None,
             min_end_time,
             max_end_time,
             min_start_time,

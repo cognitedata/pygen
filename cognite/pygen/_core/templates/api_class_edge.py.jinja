@@ -1,0 +1,62 @@
+from __future__ import annotations
+
+import datetime
+
+from cognite.client import data_modeling as dm
+{% if field.is_property_edge %}
+from {{ top_level_package }}.data_classes import (
+    {{ field.data_class.read_list_name }},
+)
+from {{ top_level_package }}.data_classes.{{ field.data_class.file_name }} import {{ field.data_class.filter_name }}
+{% endif %}
+from ._core import DEFAULT_LIMIT_READ, EdgeAPI
+
+
+
+class {{ field.edge_api_class }}(EdgeAPI):
+    def list(
+            self,
+            {{ field.data_class.start_class.variable }}: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+            {{ field.data_class.start_class.variable }}_space: str = "{{ instance_space }}",
+            {{ field.data_class.end_class.variable }}: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+            {{ field.data_class.end_class.variable }}_space: str = "{{ instance_space }}",{% for parm in field.data_class.list_method.parameters %}
+            {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
+            limit=DEFAULT_LIMIT_READ,
+    ) -> {{ field.data_class.read_list_name }}:
+        """List {{field.doc_name}} edges of a {{ data_class.doc_name }}.
+
+        Args:
+            {{ field.data_class.start_class.variable }}: ID of the source {{ field.data_class.start_class.doc_list_name }}.
+            {{ field.data_class.start_class.variable }}_space: Location of the {{ field.data_class.start_class.doc_list_name }}.
+            {{ field.data_class.end_class.variable }}: ID of the target {{ field.data_class.end_class.doc_list_name }}.
+            {{ field.data_class.end_class.variable }}_space: Location of the {{ field.data_class.end_class.doc_list_name }}.{% for parm in field.data_class.list_method.parameters %}
+            {{ parm.name }}: {{ parm.description }}{% endfor %}
+            limit: Maximum number of {{ field.doc_name }} edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+
+        Returns:
+            The requested {{ field.doc_name }} edges.
+
+        Examples:
+
+            List 5 {{field.doc_name}} edges connected to "my_{{ data_class.variable }}":
+
+                >>> from {{ top_level_package }} import {{ client_name }}
+                >>> client = {{ client_name }}()
+                >>> {{ data_class.variable }} = client.{{ api_class.client_attribute }}.{{ field.edge_api_attribute }}.list("my_{{ data_class.variable }}", limit=5)
+
+        """
+        f = dm.filters
+        filter_ = _create_start_end_time_filter(
+            self._view_id,
+            {{ field.data_class.start_class.variable }},
+            {{ field.data_class.start_class.variable }}_space,
+            {{ field.data_class.end_class.variable }},
+            {{ field.data_class.end_class.variable }}_space,{% for parm in field.data_class.list_method.parameters %}
+            {{ parm.name }},{% endfor %}
+            f.Equals(
+                ["edge", "type"],
+                {"space": "{{ data_class.view_id.space }}", "externalId": "{{ field.prop.type.external_id }}"},
+            ),
+        )
+        return self._list(filter_=filter_, limit=limit)
