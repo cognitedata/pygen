@@ -5,25 +5,103 @@ from typing import TYPE_CHECKING
 from cognite.client import data_modeling as dm
 from ._core import QueryStep, QueryAPI, T_DomainModelList
 from equipment_unit.client.data_classes import (
-# for end node and property fields
-    UnitProcedure,
-    UnitProcedureApply,
-    StartEndTime,
-    StartEndTimeApply,
+    {{ data_class.read_name }},
+    {{ data_class.write_name }},{% for field in data_class.property_edges %}
+    {{ field.data_class.read_name }},
+    {{ field.data_class.write_name }},{% endfor %}
 )
-## for each property field
-from equipment_unit.client.data_classes._start_end_time import (
-    _STARTENDTIME_PROPERTIES_BY_FIELD,
-)
-## for each end node
-from equipment_unit.client.data_classes._unit_procedure import (
-    _UNITPROCEDURE_PROPERTIES_BY_FIELD,
-)
-
-{% if data_class.has_one_to_many_edges %}
+from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import (
+    {{ data_class.properties_dict_name }},
+){% for field in data_class.property_edges %}
+from {{ top_level_package }}.data_classes.{{ field.data_class.file_name }} import (
+    {{ field.data_class.properties_dict_name }},
+    {{ field.data_class.filter_name }},
+){% endfor %}{% if data_class.has_one_to_many_edges %}
 if TYPE_CHECKING:{% for field in data_class.one_to_many_edges %}
-    from .equipment_module_query import EquipmentModuleQueryAPI
+    {% if field.data_class.is_edge_class %}from .{{ field.data_class.end_class.query_file_name}} import {{ field.data_class.end_class.query_class_name}}{% else %}
+    from {{ field.data_class.query_file_name }} import {{ field.data_class.query_class_name }}{% endif %}{% endfor %}
+{% endif %}
 
 
-class {{ api_class.query_class_name }}(QueryAPI[T_DomainModelList]):
-    ...
+class {{ data_class.query_class_name }}(QueryAPI[T_DomainModelList]):{% for field in data_class.one_to_many_edges %}
+    def {{ field.name }}(
+        self,
+        space: str = "{{ data_class.view_id.space }}",
+        limit: int | None = None,
+    ) -> {% if field.data_class.is_property_edge %}{{ field.data_class.end_class.query_class_name }}{% else %}{{ field.data_class.query_class_name }}{% endif %}[T_DomainModelList]:
+        """Query along the {{ field.doc_name }} edges of the {{ data_class.doc_list_name}}.
+
+        Args:
+            space: The space where all the work unit edges are located.
+            limit: Maximum number of work unit edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+
+        Returns:
+            {% if field.data_class.is_property_edge %}{{ field.data_class.end_class.query_class_name }}{% else %}{{ field.data_class.query_class_name }}{% endif %}: The query API for the {{ field.data_class.doc_name }}.
+        """
+        {% if field.data_class.is_edge_class %}from .{{ field.data_class.end_class.query_file_name}} import {{ field.data_class.end_class.query_class_name}}{% else %}
+    from {{ field.data_class.query_file_name }} import {{ field.data_class.query_class_name }}{% endif %}
+
+        f = dm.filters
+        edge_view = self._view_by_write_class[{{ field.data_class.write_name }}]
+        edge_filters = {{ field.data_class.filter_name }}(
+            edge_view,
+            None,
+            space,
+            f.Equals(
+                ["edge", "type"],
+                {"space": "{{ field.data_class.edge_type.space }}", "externalId": "{{ field.data_class.edge_type.external_id }}"},
+            ),
+        )
+        self._builder.append(
+            QueryStep(
+                name="{{ field.name }}",
+                expression=dm.query.EdgeResultSetExpression(
+                    filter=f.And(*edge_filters),
+                    from_=self._builder[-1].name,
+                ),{% if field.data_class.is_edge_class %}
+                select=dm.query.Select(
+                    [dm.query.SourceSelector(edge_view, list({{ field.data_class.properties_dict_name }}.values()))]
+                ),
+                result_cls= {{ field.data_class.read_name }},{% endif %}
+                max_retrieve_limit=limit,
+            )
+        )
+        return {% if field.data_class.is_property_edge %}{{ field.data_class.end_class.query_class_name }}{% else %}{{ field.data_class.query_class_name }}{% endif %}(self._client, self._builder, self._view_by_write_class)
+    {% endfor %}
+    def query(
+        self,
+        retrieve_{{ data_class.variable }}: bool = True,
+    ) -> T_DomainModelList:
+        """Execute query and return the result.
+
+        Args:
+            retrieve_{{ data_class.variable }}: Whether to retrieve the {{ data_class.doc_name }} or not.
+
+        Returns:
+            The list of the source nodes of the query.
+
+        """
+        from_ = self._builder[-1].name
+        if retrieve_{{ data_class.variable }} and not self._builder[-1].name.startswith("{{ data_class.variable }}"):
+            self._builder.append(
+                QueryStep(
+                    name="{{ data_class.variable }}",
+                    expression=dm.query.NodeResultSetExpression(
+                        filter=None,
+                        from_=from_,
+                    ),
+                    select=dm.query.Select(
+                        [
+                            dm.query.SourceSelector(
+                                self._view_by_write_class[{{ data_class.write_name }}],
+                                list({{ data_class.properties_dict_name }}.values()),
+                            )
+                        ]
+                    ),
+                    result_cls={{ data_class.read_name }},
+                    max_retrieve_limit=-1,
+                ),
+            )
+
+        return self._query()

@@ -18,7 +18,6 @@ from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import {{ d
 
 
 
-{% for field in data_class.one_to_many_edges %}
 class {{ field.edge_api_class }}:
     def __init__(self, client: CogniteClient):
         self._client = client
@@ -108,55 +107,3 @@ class {{ field.edge_api_class }}:
             filters.append(is_{{ data_class.variable_list }})
 
         return self._client.data_modeling.instances.list("edge", limit=limit, filter=f.And(*filters))
-
-{% endfor %}
-class {{ api_class.name }}(TypeAPI[{{ data_class.read_name }}, {{ data_class.write_name }}, {{ data_class.read_list_name }}]):
-    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
-        view_id = view_by_write_class[{{ data_class.write_name }}]
-        super().__init__(
-            client=client,
-            sources=view_id,
-            class_type={{ data_class.read_name }},
-            class_apply_type={{ data_class.write_name }},
-            class_list={{ data_class.read_list_name }},
-        )
-        self._view_id = view_id
-        self._view_by_write_class = view_by_write_class{% for field in data_class.one_to_many_edges %}
-        self.{{ field.edge_api_attribute }} = {{ field.edge_api_class }}(client){% endfor %}{% for timeseries in data_class.single_timeseries_fields %}
-        self.{{ timeseries.edge_api_attribute }} = {{ timeseries.edge_api_class }}API(client, view_id){% endfor %}
-
-{% include 'api_class_apply_method.py.jinja' %}
-
-{% include 'api_class_delete_method.py.jinja' %}
-
-{% include 'api_class_retrieve_method.py.jinja' %}
-{% if data_class.has_text_field %}
-{% include 'api_class_search_method.py.jinja' %}{% endif %}
-{% if data_class.has_primitive_fields %}
-{% include 'api_class_aggregate_methods.py.jinja' %}{% endif %}
-
-{% include 'api_class_list_method.py.jinja' %}
-{% for field in data_class.one_to_many_edges %}
-    @staticmethod
-    def _set_{{ field.name }}({{ data_class.variable_list }}: Sequence[{{ data_class.read_name }}], {{ field.variable }}_edges: Sequence[dm.Edge]):
-        edges_by_start_node: dict[guple, list] = defaultdict(list)
-        for edge in {{ field.variable }}_edges:
-            edges_by_start_node[edge.start_node.as_tuple()].append(edge)
-
-        for {{ data_class.variable }} in {{ data_class.variable_list }}:
-            node_id = {{ data_class.variable }}.as_tuple_id()
-            if node_id in edges_by_start_node:
-                {{ data_class.variable }}.{{ field.name }} = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
-{% endfor %}
-
-def _create_filter(
-    view_id: dm.ViewId,{% for parm in list_method.parameters %}
-    {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
-    filter: dm.Filter | None = None,
-) -> dm.Filter | None:
-    filters = []{% for filter in list_method.filters %}
-    if {{ filter.condition }}:
-        filters.append({{ filter.filter_call }}({{ filter.arguments }})){% endfor %}
-    if filter:
-        filters.append(filter)
-    return dm.filters.And(*filters) if filters else None

@@ -628,6 +628,10 @@ class DataClass:
         return (field_ for field_ in self.cdf_external_fields if isinstance(field_.prop.type, dm.TimeSeriesReference))
 
     @property
+    def property_edges(self) -> Iterable[EdgeOneToMany]:
+        return (field_ for field_ in self.fields if isinstance(field_, EdgeOneToMany) and field_.is_property_edge)
+
+    @property
     def has_one_to_many_edges(self) -> bool:
         return any(isinstance(field_, EdgeOneToMany) for field_ in self.fields)
 
@@ -638,10 +642,6 @@ class DataClass:
     @property
     def has_edge_with_property(self) -> bool:
         return any(isinstance(field_, EdgeOneToMany) and field_.is_property_edge for field_ in self.fields)
-
-    @property
-    def property_edges(self) -> Iterable[EdgeOneToMany]:
-        return (field_ for field_ in self.fields if isinstance(field_, EdgeOneToMany) and field_.is_property_edge)
 
     @property
     def has_primitive_fields(self) -> bool:
@@ -728,6 +728,11 @@ class DataClass:
     def filter_name(self) -> str:
         return f"_create_{self.variable}_filter"
 
+    @property
+    @abstractmethod
+    def is_edge_class(self) -> bool:
+        raise NotImplementedError()
+
 
 @dataclass
 class NodeDataClass(DataClass):
@@ -738,12 +743,20 @@ class NodeDataClass(DataClass):
         else:
             return "import pydantic"
 
+    @property
+    def is_edge_class(self) -> bool:
+        return False
+
 
 @dataclass
 class EdgeDataClass(DataClass):
     _start_class: NodeDataClass | None = None
     _end_class: NodeDataClass | None = None
     _edge_type: dm.DirectRelationReference | None = None
+
+    @property
+    def is_edge_class(self) -> bool:
+        return True
 
     @property
     def start_class(self) -> NodeDataClass:

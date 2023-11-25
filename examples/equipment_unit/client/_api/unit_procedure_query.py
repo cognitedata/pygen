@@ -10,14 +10,13 @@ from equipment_unit.client.data_classes import (
     StartEndTime,
     StartEndTimeApply,
 )
-from equipment_unit.client.data_classes._start_end_time import (
-    _STARTENDTIME_PROPERTIES_BY_FIELD,
-)
 from equipment_unit.client.data_classes._unit_procedure import (
     _UNITPROCEDURE_PROPERTIES_BY_FIELD,
 )
-from .unit_procedure_work_units import _create_filter_work_units
-
+from equipment_unit.client.data_classes._start_end_time import (
+    _STARTENDTIME_PROPERTIES_BY_FIELD,
+    _create_start_end_time_filter,
+)
 
 if TYPE_CHECKING:
     from .equipment_module_query import EquipmentModuleQueryAPI
@@ -33,7 +32,7 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
         space: str = "IntegrationTestsImmutable",
         limit: int | None = None,
     ) -> EquipmentModuleQueryAPI[T_DomainModelList]:
-        """Query along the work_units edges of the unit procedure.
+        """Query along the work unit edges of the unit procedure.
 
         Args:
             min_start_time: The minimum start time of the work unit edges.
@@ -51,7 +50,7 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
 
         f = dm.filters
         edge_view = self._view_by_write_class[StartEndTimeApply]
-        edge_filters = _create_filter_work_units(
+        edge_filters = _create_start_end_time_filter(
             edge_view,
             None,
             min_start_time,
@@ -80,7 +79,10 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
         )
         return EquipmentModuleQueryAPI(self._client, self._builder, self._view_by_write_class)
 
-    def query(self, retrieve_unit_procedure: bool = True) -> T_DomainModelList:
+    def query(
+        self,
+        retrieve_unit_procedure: bool = True,
+    ) -> T_DomainModelList:
         """Execute query and return the result.
 
         Args:
@@ -90,13 +92,14 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
             The list of the source nodes of the query.
 
         """
+        from_ = self._builder[-1].name
         if retrieve_unit_procedure and not self._builder[-1].name.startswith("unit_procedure"):
             self._builder.append(
                 QueryStep(
                     name="unit_procedure",
                     expression=dm.query.NodeResultSetExpression(
                         filter=None,
-                        from_=self._builder[-1].name,
+                        from_=from_,
                     ),
                     select=dm.query.Select(
                         [

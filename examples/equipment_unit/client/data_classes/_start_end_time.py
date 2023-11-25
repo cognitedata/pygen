@@ -153,3 +153,49 @@ class StartEndTimeApplyList(DomainRelationList[StartEndTimeApply]):
     """List of start end times in the writing version."""
 
     _INSTANCE = StartEndTimeApply
+
+
+def _create_start_end_time_filter(
+    view_id: dm.ViewId,
+    equipment_module: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+    min_start_time: datetime.datetime | None = None,
+    max_start_time: datetime.datetime | None = None,
+    min_end_time: datetime.datetime | None = None,
+    max_end_time: datetime.datetime | None = None,
+    space: str = "IntegrationTestsImmutable",
+    filter: dm.Filter | None = None,
+) -> list[dm.Filter]:
+    filters: list[dm.Filter] = []
+    if equipment_module and isinstance(equipment_module, str):
+        filters.append(dm.filters.Equals(["edge", "endNode"], value={"space": space, "externalId": equipment_module}))
+    if equipment_module and isinstance(equipment_module, list):
+        filters.append(
+            dm.filters.In(
+                ["edge", "endNode"],
+                values=[
+                    {"space": space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in equipment_module
+                ],
+            )
+        )
+    if min_start_time or max_start_time:
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("start_time"),
+                gte=min_start_time.isoformat(timespec="milliseconds") if min_start_time else None,
+                lte=max_start_time.isoformat(timespec="milliseconds") if max_start_time else None,
+            )
+        )
+    if min_end_time or max_end_time:
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("end_time"),
+                gte=min_end_time.isoformat(timespec="milliseconds") if min_end_time else None,
+                lte=max_end_time.isoformat(timespec="milliseconds") if max_end_time else None,
+            )
+        )
+    if filter:
+        filters.append(filter)
+    return filters
