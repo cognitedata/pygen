@@ -54,7 +54,7 @@ def generate_sdks(
                     typer.echo(f"Could not find {manual_path} in generated SDK", err=True, color=True)
                 else:
                     manual_files.append(manual_path)
-        write_sdk_to_disk(sdk, EXAMPLES_DIR, overwrite=True, format_code=True)
+        write_sdk_to_disk(sdk, EXAMPLES_DIR, overwrite=True, format_code=False)
         typer.echo(f"{example_sdk.client_name} SDK Created in {example_sdk.client_dir}")
         if manual_files:
             typer.echo(
