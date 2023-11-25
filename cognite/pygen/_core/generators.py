@@ -217,7 +217,7 @@ class MultiAPIGenerator:
                 api.generate_edge_api_files(self.top_level_package, self.client_name),
                 api.generate_timeseries_api_files(self.top_level_package, self.client_name),
             ):
-                sdk[api_dir / file_name] = file_content
+                sdk[api_dir / f"{file_name}.py"] = file_content
 
         sdk[client_dir / "__init__.py"] = self.generate_client_init_file()
         sdk[data_classes_dir / "__init__.py"] = self.generate_data_classes_init_file()
