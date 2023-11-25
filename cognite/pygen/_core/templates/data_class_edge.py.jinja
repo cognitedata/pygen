@@ -142,3 +142,32 @@ class {{ data_class.write_list_name }}(DomainRelationList[{{ data_class.write_na
     """List of {{ data_class.doc_list_name }} in the writing version."""
 
     _INSTANCE = {{ data_class.write_name }}
+
+
+def {{ data_class.filter_name }}(
+    view_id: dm.ViewId,
+    end_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+    space_end_node: str = "{{ space }}",{% for parm in list_method.parameters %}
+    {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters: list[dm.Filter] = []
+    if end_node and isinstance(end_node, str):
+        filters.append(dm.filters.Equals(["edge", "endNode"], value={"space": space_end_node, "externalId": end_node}))
+    if end_node and isinstance(end_node, list):
+        filters.append(
+            dm.filters.In(
+                ["edge", "endNode"],
+                values=[
+                    {"space": space_end_node, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in end_node
+                ],
+            )
+        ){% for filter in list_method.filters %}
+    if {{ filter.condition }}:
+        filters.append({{ filter.filter_call }}({{ filter.arguments }})){% endfor %}
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

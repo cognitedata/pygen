@@ -157,35 +157,29 @@ class StartEndTimeApplyList(DomainRelationList[StartEndTimeApply]):
 
 def _create_start_end_time_filter(
     view_id: dm.ViewId,
-    equipment_module: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-    min_start_time: datetime.datetime | None = None,
-    max_start_time: datetime.datetime | None = None,
+    end_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+    space_end_node: str = "IntegrationTestsImmutable",
     min_end_time: datetime.datetime | None = None,
     max_end_time: datetime.datetime | None = None,
-    space: str = "IntegrationTestsImmutable",
+    min_start_time: datetime.datetime | None = None,
+    max_start_time: datetime.datetime | None = None,
+    external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
-) -> list[dm.Filter]:
+) -> dm.Filter | None:
     filters: list[dm.Filter] = []
-    if equipment_module and isinstance(equipment_module, str):
-        filters.append(dm.filters.Equals(["edge", "endNode"], value={"space": space, "externalId": equipment_module}))
-    if equipment_module and isinstance(equipment_module, list):
+    if end_node and isinstance(end_node, str):
+        filters.append(dm.filters.Equals(["edge", "endNode"], value={"space": space_end_node, "externalId": end_node}))
+    if end_node and isinstance(end_node, list):
         filters.append(
             dm.filters.In(
                 ["edge", "endNode"],
                 values=[
-                    {"space": space, "externalId": ext_id}
+                    {"space": space_end_node, "externalId": ext_id}
                     if isinstance(ext_id, str)
                     else ext_id.dump(camel_case=True, include_instance_type=False)
-                    for ext_id in equipment_module
+                    for ext_id in end_node
                 ],
-            )
-        )
-    if min_start_time or max_start_time:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("start_time"),
-                gte=min_start_time.isoformat(timespec="milliseconds") if min_start_time else None,
-                lte=max_start_time.isoformat(timespec="milliseconds") if max_start_time else None,
             )
         )
     if min_end_time or max_end_time:
@@ -196,6 +190,20 @@ def _create_start_end_time_filter(
                 lte=max_end_time.isoformat(timespec="milliseconds") if max_end_time else None,
             )
         )
+    if min_start_time or max_start_time:
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("start_time"),
+                gte=min_start_time.isoformat(timespec="milliseconds") if min_start_time else None,
+                lte=max_start_time.isoformat(timespec="milliseconds") if max_start_time else None,
+            )
+        )
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["edge", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["edge", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["edge", "space"], values=space))
     if filter:
         filters.append(filter)
-    return filters
+    return dm.filters.And(*filters) if filters else None

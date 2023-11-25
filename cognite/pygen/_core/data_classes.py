@@ -569,7 +569,7 @@ class DataClass:
                 pydantic_field=pydantic_field,
             )
             self.fields.append(field_)
-        self._list_method = ListMethod.from_fields(self.fields, filter_naming)
+        self._list_method = ListMethod.from_fields(self.fields, filter_naming, self.is_edge_class)
 
     @property
     def text_field_names(self) -> str:
@@ -940,6 +940,7 @@ class FilterCondition:
     filter: type[dm.Filter]
     prop_name: str
     keyword_arguments: dict[str, FilterParameter]
+    is_edge_class: bool
 
     @property
     def condition(self) -> str:
@@ -955,7 +956,8 @@ class FilterCondition:
     @property
     def arguments(self) -> str:
         if self.prop_name in {"externalId", "space"}:
-            property_ref = f'["node", "{self.prop_name}"], '
+            instance_type = "edge" if self.is_edge_class else "node"
+            property_ref = f'["{instance_type}", "{self.prop_name}"], '
         else:
             property_ref = f'view_id.as_property_ref("{self.prop_name}"), '
 
@@ -1052,7 +1054,7 @@ class ListMethod:
     filters: list[FilterCondition]
 
     @classmethod
-    def from_fields(cls, fields: Iterable[Field], config: pygen_config.Filtering) -> Self:
+    def from_fields(cls, fields: Iterable[Field], config: pygen_config.Filtering, is_edge_class: bool = False) -> Self:
         parameters_by_name: dict[str, FilterParameter] = {}
         list_filters: list[FilterCondition] = []
 
@@ -1075,6 +1077,7 @@ class ListMethod:
                                 filter=selected_filter,
                                 prop_name=field_.prop_name,
                                 keyword_arguments=dict(value=parameter),
+                                is_edge_class=is_edge_class,
                             )
                         )
                     elif selected_filter is dm.filters.In:
@@ -1094,6 +1097,7 @@ class ListMethod:
                                 filter=selected_filter,
                                 prop_name=field_.prop_name,
                                 keyword_arguments=dict(values=parameter),
+                                is_edge_class=is_edge_class,
                             )
                         )
                     elif selected_filter is dm.filters.Prefix:
@@ -1108,6 +1112,7 @@ class ListMethod:
                                 filter=selected_filter,
                                 prop_name=field_.prop_name,
                                 keyword_arguments=dict(value=parameter),
+                                is_edge_class=is_edge_class,
                             )
                         )
                     elif selected_filter is dm.filters.Range:
@@ -1128,6 +1133,7 @@ class ListMethod:
                                 filter=selected_filter,
                                 prop_name=field_.prop_name,
                                 keyword_arguments=dict(gte=min_parameter, lte=max_parameter),
+                                is_edge_class=is_edge_class,
                             )
                         )
                     else:
@@ -1155,6 +1161,7 @@ class ListMethod:
                                     prop_name=field_.prop_name,
                                     keyword_arguments=dict(value=parameter),
                                     instance_type=condition_type,
+                                    is_edge_class=is_edge_class,
                                 )
                                 for condition_type in (str, tuple)
                             ]
@@ -1179,6 +1186,7 @@ class ListMethod:
                                     prop_name=field_.prop_name,
                                     keyword_arguments=dict(values=parameter),
                                     instance_type=condition_type,
+                                    is_edge_class=is_edge_class,
                                 )
                                 for condition_type in (str, tuple)
                             ]

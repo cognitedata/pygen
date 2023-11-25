@@ -18,7 +18,6 @@ from .data_classes import (
     APIClass,
     DataClass,
     EdgeDataClass,
-    ListMethod,
     MultiAPIClass,
     NodeDataClass,
     ViewSpaceExternalId,
@@ -290,7 +289,7 @@ class APIGenerator:
             type_data.render(
                 data_class=self.data_class,
                 space=self.view_identifier.space,
-                list_method=ListMethod.from_fields(self.data_class.fields, self._config.filtering),
+                list_method=self.data_class.list_method,
             )
             + "\n"
         )
@@ -304,7 +303,7 @@ class APIGenerator:
                 client_name=client_name,
                 api_class=self.api_class,
                 data_class=self.data_class,
-                list_method=ListMethod.from_fields(self.data_class.fields, self._config.filtering),
+                list_method=self.data_class.list_method,
             )
             + "\n"
         )
@@ -318,7 +317,7 @@ class APIGenerator:
                 client_name=client_name,
                 api_class=self.api_class,
                 data_class=self.data_class,
-                list_method=ListMethod.from_fields(self.data_class.fields, self._config.filtering),
+                list_method=self.data_class.list_method,
                 sorted=sorted,
             )
             + "\n"
@@ -337,7 +336,7 @@ class APIGenerator:
                     timeseries=timeseries,
                     api_class=self.api_class,
                     data_class=self.data_class,
-                    list_method=ListMethod.from_fields(self.data_class.fields, self._config.filtering),
+                    list_method=self.data_class.list_method,
                 )
                 + "\n"
             )
