@@ -86,3 +86,17 @@ def test_generate_date_transformation_pairs_data_api(
     # Assert
     actual = code_formatter.format_code(actual)
     assert actual == expected
+
+
+def test_generate_date_transformation_pairs_query_api(
+    date_transformation_generator: APIGenerator, top_level_package: str, client_name: str, code_formatter: CodeFormatter
+):
+    # Arrange
+    expected = MarketSDKFiles.date_transformation_pair_query_api.read_text()
+
+    # Act
+    actual = date_transformation_generator.generate_api_query_file(top_level_package, client_name)
+
+    # Assert
+    actual = code_formatter.format_code(actual)
+    assert actual == expected
