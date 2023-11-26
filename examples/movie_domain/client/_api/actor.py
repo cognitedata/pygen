@@ -37,10 +37,8 @@ class ActorAPI(NodeAPI[Actor, ActorApply, ActorList]):
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self.movies_edge = ActorMoviesAPI(client, view_by_write_class, Movie, MovieApply, MovieList)
-        self.nomination_edge = ActorNominationAPI(
-            client, view_by_write_class, Nomination, NominationApply, NominationList
-        )
+        self.movies_edge = ActorMoviesAPI(client)
+        self.nomination_edge = ActorNominationAPI(client)
 
     def __call__(
         self,

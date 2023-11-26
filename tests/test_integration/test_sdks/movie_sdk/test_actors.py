@@ -69,7 +69,7 @@ def test_actor_list_filter_on_direct_edge(
 
 
 def test_circular_query_from_actor(movie_client: MovieClient):
-    actors = movie_client.actor(person="person:quentin_tarantino", limit=-1).movies(limit=-1).actors(limit=-1).query()
+    actors = movie_client.actorz(person="person:quentin_tarantino", limit=-1).movies(limit=-1).actors(limit=-1).query()
 
     assert len(actors) > 0
     for actor in actors:

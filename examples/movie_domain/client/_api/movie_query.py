@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-import datetime
 from typing import TYPE_CHECKING
 from cognite.client import data_modeling as dm
-from ._core import QueryStep, QueryAPI, T_DomainModelList
+from ._core import QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
 from movie_domain.client.data_classes import (
     Movie,
     MovieApply,
@@ -11,22 +10,25 @@ from movie_domain.client.data_classes import (
 from movie_domain.client.data_classes._movie import (
     _MOVIE_PROPERTIES_BY_FIELD,
 )
-if TYPE_CHECKING:
 
+if TYPE_CHECKING:
     from actor_query import ActorQueryAPI
 
     from director_query import DirectorQueryAPI
 
 
-
 class MovieQueryAPI(QueryAPI[T_DomainModelList]):
     def actors(
         self,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int | None = None,
     ) -> ActorQueryAPI[T_DomainModelList]:
         """Query along the actor edges of the movie.
 
         Args:
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
             limit: Maximum number of work unit edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
 
@@ -34,20 +36,12 @@ class MovieQueryAPI(QueryAPI[T_DomainModelList]):
             ActorQueryAPI: The query API for the actor.
         """
 
-    from actor_query import ActorQueryAPI
+        from actor_query import ActorQueryAPI
 
-        f = dm.filters
-        edge_view = self._view_by_write_class[ActorApply]
-        edge_filter = _create_actor_filter(
-            edge_view,
-            None,
-            None,
-            None,
-            None,
-            f.Equals(
-                ["edge", "type"],
-                {"space": "REPLACE", "externalId": "REPLACE"},
-            ),
+        edge_filter = _create_edge_filter(
+            dm.DirectRelationReference("REPLACE", "REPLACE"),
+            external_id_prefix=external_id_prefix,
+            space=space,
         )
         self._builder.append(
             QueryStep(
@@ -63,11 +57,15 @@ class MovieQueryAPI(QueryAPI[T_DomainModelList]):
 
     def directors(
         self,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
         limit: int | None = None,
     ) -> DirectorQueryAPI[T_DomainModelList]:
         """Query along the director edges of the movie.
 
         Args:
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
             limit: Maximum number of work unit edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
 
@@ -75,20 +73,12 @@ class MovieQueryAPI(QueryAPI[T_DomainModelList]):
             DirectorQueryAPI: The query API for the director.
         """
 
-    from director_query import DirectorQueryAPI
+        from director_query import DirectorQueryAPI
 
-        f = dm.filters
-        edge_view = self._view_by_write_class[DirectorApply]
-        edge_filter = _create_director_filter(
-            edge_view,
-            None,
-            None,
-            None,
-            None,
-            f.Equals(
-                ["edge", "type"],
-                {"space": "REPLACE", "externalId": "REPLACE"},
-            ),
+        edge_filter = _create_edge_filter(
+            dm.DirectRelationReference("REPLACE", "REPLACE"),
+            external_id_prefix=external_id_prefix,
+            space=space,
         )
         self._builder.append(
             QueryStep(
