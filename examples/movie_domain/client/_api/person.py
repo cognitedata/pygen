@@ -37,7 +37,7 @@ class PersonAPI(NodeAPI[Person, PersonApply, PersonList]):
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self.roles_edge = PersonRolesAPI(client, view_by_write_class, Role, RoleApply, RoleList)
+        self.roles_edge = PersonRolesAPI(client)
 
     def __call__(
         self,
