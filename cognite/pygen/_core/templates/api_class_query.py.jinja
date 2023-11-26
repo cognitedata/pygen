@@ -6,16 +6,16 @@ from cognite.client import data_modeling as dm
 from ._core import QueryStep, QueryAPI, T_DomainModelList{% if not data_class.all_one_to_many_is_property_edges %}, _create_edge_filter{% endif %}
 from {{ top_level_package }}.data_classes import (
     {{ data_class.read_name }},
-    {{ data_class.write_name }},{% for field in data_class.property_edges %}
+    {{ data_class.write_name }},{% for field in data_class.one_to_many_edges %}
     {{ field.data_class.read_name }},
     {{ field.data_class.write_name }},{% endfor %}
 )
 from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import (
     {{ data_class.properties_dict_name }},
-){% for field in data_class.property_edges %}
+){% for field in data_class.one_to_many_edges %}
 from {{ top_level_package }}.data_classes.{{ field.data_class.file_name }} import (
-    {{ field.data_class.properties_dict_name }},
-    {{ field.data_class.filter_name }},
+    {{ field.data_class.properties_dict_name }},{% if field.is_property_edge %}
+    {{ field.data_class.filter_name }},{% endif %}
 ){% endfor %}{% if data_class.has_one_to_many_edges %}
 if TYPE_CHECKING:{% for field in data_class.one_to_many_edges %}{% if field.data_class.is_edge_class %}
     from .{{ field.data_class.end_class.query_file_name}} import {{ field.data_class.end_class.query_class_name}}{% else %}
@@ -58,10 +58,30 @@ class {{ data_class.query_class_name }}(QueryAPI[T_DomainModelList]):{% for fiel
                 select=dm.query.Select(
                     [dm.query.SourceSelector(edge_view, list({{ field.data_class.properties_dict_name }}.values()))]
                 ),
-                result_cls= {{ field.data_class.read_name }},{% endif %}
+                result_cls= {{ field.data_class.read_name }},{% else %}
+                select=dm.query.Select(),{% endif %}
                 max_retrieve_limit=limit,
             )
-        )
+        ){% if not field.is_property_edge %}
+        self._builder.append(
+            QueryStep(
+                name=self._builder.next_name("{{ field.data_class.variable }}"),
+                expression=dm.query.NodeResultSetExpression(
+                    filter=None,
+                    from_=self._builder[-1].name,
+                ),
+                select=dm.query.Select(
+                    [
+                        dm.query.SourceSelector(
+                            self._view_by_write_class[{{ field.data_class.write_name }}],
+                            list({{ field.data_class.properties_dict_name }}.values()),
+                        )
+                    ]
+                ),
+                result_cls={{ field.data_class.read_name }},
+                max_retrieve_limit=-1,
+            ),
+        ){% endif %}
         return {% if field.data_class.is_edge_class %}{{ field.data_class.end_class.query_class_name }}{% else %}{{ field.data_class.query_class_name }}{% endif %}(self._client, self._builder, self._view_by_write_class)
     {% endfor %}
     def query(
