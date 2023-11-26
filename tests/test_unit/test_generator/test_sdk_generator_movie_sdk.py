@@ -105,7 +105,8 @@ def create_fields_test_cases():
         view_id=ViewSpaceExternalId("IntegrationTestsImmutable", "Role"),
         view_version="2",
         view_name="Role",
-        used_for="node",
+        query_class_name="RoleQueryAPI",
+        query_file_name="role_query",
     )
 
     data_class_by_view_id = {ViewSpaceExternalId("IntegrationTestsImmutable", "Role"): data_class}
@@ -124,6 +125,7 @@ def create_fields_test_cases():
             pydantic_field="Field",
             edge_api_attribute="roles",
             edge_api_class="PersonRolesAPI",
+            edge_api_file_name="person_roles",
         ),
         "Optional[list[str]] = None",
         "Union[list[RoleApply], list[str], None] = Field(default=None, repr=False)",
@@ -187,7 +189,8 @@ def create_fields_test_cases():
         view_version="2",
         variable_list="persons",
         view_name="Person",
-        used_for="node",
+        query_class_name="PersonQueryAPI",
+        query_file_name="person_query",
     )
     data_class_by_view_id = {ViewSpaceExternalId("IntegrationTestsImmutable", "Person"): data_class}
 
@@ -326,6 +329,34 @@ def test_create_view_api_classes_actors(
 
     # Act
     actual = actor_api_generator.generate_api_file(top_level_package, client_name)
+    actual = code_formatter.format_code(actual)
+
+    # Assert
+    assert actual == expected
+
+
+def test_create_query_api_actors(
+    actor_api_generator: APIGenerator, top_level_package: str, client_name: str, code_formatter: CodeFormatter
+):
+    # Arrange
+    expected = MovieSDKFiles.actor_query_api.read_text()
+
+    # Act
+    actual = actor_api_generator.generate_api_query_file(top_level_package, client_name)
+    actual = code_formatter.format_code(actual)
+
+    # Assert
+    assert actual == expected
+
+
+def test_generate_actor_movie_edge_api(
+    actor_api_generator: APIGenerator, top_level_package: str, client_name: str, code_formatter: CodeFormatter
+):
+    # Arrange
+    expected = MovieSDKFiles.actor_movies_api.read_text()
+
+    # Act
+    _, actual = next(actor_api_generator.generate_edge_api_files(top_level_package, client_name))
     actual = code_formatter.format_code(actual)
 
     # Assert

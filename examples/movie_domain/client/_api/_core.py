@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from collections import defaultdict, UserList, Counter
+from collections import Counter, defaultdict, UserList
 from collections.abc import Sequence, Collection
 from dataclasses import dataclass, field
 from typing import Generic, Literal, Any, Iterator, Protocol, SupportsIndex, TypeVar, overload, cast
@@ -354,7 +354,7 @@ class EdgeAPI:
         return self._client.data_modeling.instances.list("edge", limit=limit, filter=filter_)
 
 
-class EdgePropertyAPI(Generic[T_DomainRelation, T_DomainRelationApply, T_DomainRelationList]):
+class EdgePropertyAPI(EdgeAPI, Generic[T_DomainRelation, T_DomainRelationApply, T_DomainRelationList]):
     def __init__(
         self,
         client: CogniteClient,
@@ -363,7 +363,7 @@ class EdgePropertyAPI(Generic[T_DomainRelation, T_DomainRelationApply, T_DomainR
         class_apply_type: type[T_DomainRelationApply],
         class_list: type[T_DomainRelationList],
     ):
-        self._client = client
+        super().__init__(client)
         self._view_by_write_class = view_by_write_class
         self._view_id = view_by_write_class[class_apply_type]
         self._class_type = class_type

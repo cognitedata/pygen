@@ -187,8 +187,11 @@ class MovieSDKFiles:
     actors_data = data_classes / "_actor.py"
 
     api = client_dir / "_api"
+    core_api = api / "_core.py"
     persons_api = api / "person.py"
     actors_api = api / "actor.py"
+    actor_query_api = api / "actor_query.py"
+    actor_movies_api = api / "actor_movies.py"
 
     client = client_dir / "_api_client.py"
     client_init = client_dir / "__init__.py"
