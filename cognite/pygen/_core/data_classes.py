@@ -665,6 +665,14 @@ class DataClass:
         return any(isinstance(field_, EdgeOneToMany) and field_.is_property_edge for field_ in self.fields)
 
     @property
+    def all_one_to_many_is_property_edges(self) -> bool:
+        return all(field_.is_property_edge for field_ in self.one_to_many_edges)
+
+    @property
+    def has_time_field_on_property_edge(self) -> bool:
+        return any(field_.is_time_field for edge in self.property_edges for field_ in edge.data_class.fields)
+
+    @property
     def has_primitive_fields(self) -> bool:
         return any(isinstance(field_, PrimitiveFieldCore) for field_ in self.fields)
 

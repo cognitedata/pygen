@@ -1,9 +1,9 @@
 from __future__ import annotations
-{% if data_class.has_time_field %}
+{% if data_class.has_time_field_on_property_edge %}
 import datetime{% endif %}
 from typing import TYPE_CHECKING
 from cognite.client import data_modeling as dm
-from ._core import QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
+from ._core import QueryStep, QueryAPI, T_DomainModelList{% if not data_class.all_one_to_many_is_property_edges %}, _create_edge_filter{% endif %}
 from {{ top_level_package }}.data_classes import (
     {{ data_class.read_name }},
     {{ data_class.write_name }},{% for field in data_class.property_edges %}

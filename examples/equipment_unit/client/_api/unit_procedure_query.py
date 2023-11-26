@@ -50,28 +50,20 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
         """
         from .equipment_module_query import EquipmentModuleQueryAPI
 
-        f = dm.filters
         edge_view = self._view_by_write_class[StartEndTimeApply]
         edge_filter = _create_start_end_time_filter(
+            dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.equipment_module"),
             edge_view,
-            None,
-            None,
-            None,
-            None,
-            min_end_time,
-            max_end_time,
-            min_start_time,
-            max_start_time,
-            external_id_prefix,
-            space,
-            f.Equals(
-                ["edge", "type"],
-                {"space": "IntegrationTestsImmutable", "externalId": "UnitProcedure.equipment_module"},
-            ),
+            min_end_time=min_end_time,
+            max_end_time=max_end_time,
+            min_start_time=min_start_time,
+            max_start_time=max_start_time,
+            external_id_prefix=external_id_prefix,
+            space=space,
         )
         self._builder.append(
             QueryStep(
-                name="work_units",
+                name=self._builder.next_name("work_units"),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
                     from_=self._builder[-1].name,
@@ -102,7 +94,7 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
         if retrieve_unit_procedure and not self._builder[-1].name.startswith("unit_procedure"):
             self._builder.append(
                 QueryStep(
-                    name="unit_procedure",
+                    name=self._builder.next_name("unit_procedure"),
                     expression=dm.query.NodeResultSetExpression(
                         filter=None,
                         from_=from_,
