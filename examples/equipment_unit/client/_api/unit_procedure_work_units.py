@@ -9,10 +9,10 @@ from equipment_unit.client.data_classes import (
 )
 from equipment_unit.client.data_classes._start_end_time import _create_start_end_time_filter
 
-from ._core import DEFAULT_LIMIT_READ, EdgeAPI
+from ._core import DEFAULT_LIMIT_READ, EdgePropertyAPI
 
 
-class UnitProcedureWorkUnitsAPI(EdgeAPI):
+class UnitProcedureWorkUnitsAPI(EdgePropertyAPI):
     def list(
         self,
         unit_procedure: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
@@ -55,8 +55,8 @@ class UnitProcedureWorkUnitsAPI(EdgeAPI):
                 >>> unit_procedure = client.unit_procedure.work_units_edge.list("my_unit_procedure", limit=5)
 
         """
-        f = dm.filters
         filter_ = _create_start_end_time_filter(
+            dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.equipment_module"),
             self._view_id,
             unit_procedure,
             unit_procedure_space,
@@ -68,9 +68,5 @@ class UnitProcedureWorkUnitsAPI(EdgeAPI):
             max_start_time,
             external_id_prefix,
             space,
-            f.Equals(
-                ["edge", "type"],
-                {"space": "IntegrationTestsImmutable", "externalId": "UnitProcedure.equipment_module"},
-            ),
         )
         return self._list(filter_=filter_, limit=limit)

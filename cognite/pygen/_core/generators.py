@@ -3,7 +3,7 @@ from __future__ import annotations
 import itertools
 from collections.abc import Iterator, Sequence
 from pathlib import Path
-from typing import Callable, Literal
+from typing import Callable, Literal, cast
 
 from cognite.client import data_modeling as dm
 from cognite.client._version import __version__ as cognite_sdk_version
@@ -333,14 +333,16 @@ class APIGenerator:
     def generate_edge_api_files(self, top_level_package: str, client_name: str) -> Iterator[tuple[str, str]]:
         edge_api = self._env.get_template("api_class_edge.py.jinja")
         for field in self.data_class.one_to_many_edges:
-            if isinstance(self.data_class, NodeDataClass):
+            if isinstance(field.data_class, NodeDataClass):
                 edge_class = EdgeDataClass.from_field_data_classes(
                     field,
-                    self.data_class,
+                    cast(NodeDataClass, self.data_class),
                     self._config,
                 )
-            elif isinstance(self.data_class, EdgeWithPropertyDataClass):
-                edge_class = self.data_class
+                list_method = edge_class.list_method
+            elif isinstance(field.data_class, EdgeWithPropertyDataClass):
+                edge_class = field.data_class
+                list_method = field.data_class.list_method
             else:
                 raise ValueError(f"Unknown data class {type(self.data_class)}")
             yield field.edge_api_file_name, (
@@ -350,7 +352,7 @@ class APIGenerator:
                     field=field,
                     api_class=self.api_class,
                     data_class=edge_class,
-                    list_method=edge_class.list_method,
+                    list_method=list_method,
                     instance_space=self.view_identifier.space,
                 )
                 + "\n"

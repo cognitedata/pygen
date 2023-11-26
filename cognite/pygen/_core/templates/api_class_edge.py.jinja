@@ -13,7 +13,7 @@ from ._core import DEFAULT_LIMIT_READ, {% if field.is_property_edge %}EdgeProper
 
 
 
-class {{ field.edge_api_class }}(EdgeAPI):
+class {{ field.edge_api_class }}({% if field.is_property_edge %}EdgePropertyAPI{% else %}EdgeAPI{% endif %}):
     def list(
             self,
             {{ data_class.start_class.variable }}: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
@@ -48,7 +48,7 @@ class {{ field.edge_api_class }}(EdgeAPI):
         """
         filter_ = {% if field.is_property_edge %}{{ field.data_class.filter_name }}{% else %}_create_edge_filter{% endif %}(
             dm.DirectRelationReference("{{ data_class.edge_type.space }}", "{{ data_class.edge_type.external_id }}"),
-            {%  if field.is_property_edge  %}self._view_id},{% endif %}
+            {%  if field.is_property_edge  %}self._view_id,{% endif %}
             {{ data_class.start_class.variable }},
             {{ data_class.start_class.variable }}_space,
             {{ data_class.end_class.variable }},

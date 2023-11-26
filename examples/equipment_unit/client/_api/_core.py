@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from collections import defaultdict, UserList
+import re
+from collections import Counter, defaultdict, UserList
 from collections.abc import Sequence, Collection
 from dataclasses import dataclass, field
 from typing import Generic, Literal, Any, Iterator, Protocol, SupportsIndex, TypeVar, overload, cast
@@ -341,7 +342,19 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
                 setattr(node, edge_name, [edge.end_node.external_id for edge in edges_by_start_node[node_id]])
 
 
-class EdgeAPI(Generic[T_DomainRelation, T_DomainRelationApply, T_DomainRelationList]):
+class EdgeAPI:
+    def __init__(self, client: CogniteClient):
+        self._client = client
+
+    def _list(
+        self,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter_: dm.Filter | None = None,
+    ) -> dm.EdgeList:
+        return self._client.data_modeling.instances.list("edge", limit=limit, filter=filter_)
+
+
+class EdgePropertyAPI(EdgeAPI, Generic[T_DomainRelation, T_DomainRelationApply, T_DomainRelationList]):
     def __init__(
         self,
         client: CogniteClient,
@@ -350,7 +363,7 @@ class EdgeAPI(Generic[T_DomainRelation, T_DomainRelationApply, T_DomainRelationL
         class_apply_type: type[T_DomainRelationApply],
         class_list: type[T_DomainRelationList],
     ):
-        self._client = client
+        super().__init__(client)
         self._view_by_write_class = view_by_write_class
         self._view_id = view_by_write_class[class_apply_type]
         self._class_type = class_type
@@ -371,9 +384,9 @@ class QueryStep:
     # Setup Variables
     name: str
     expression: dm.query.ResultSetExpression
-    select: dm.query.Select | None
-    result_cls: type[DomainModelCore] | None
     max_retrieve_limit: int
+    select: dm.query.Select | None = None
+    result_cls: type[DomainModelCore] | None = None
 
     # Query Variables
     cursor: str | None = None
@@ -413,6 +426,13 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
         else:
             raise TypeError(f"Expected int or slice, got {type(item)}")
 
+    def next_name(self, name: str) -> str:
+        pattern = re.compile(r"_(\d+)$")
+        counter = Counter(pattern.sub("", step) for step in self)
+        if name in counter:
+            return f"{name}_{counter[name]}"
+        return name
+
     def reset(self):
         for expression in self:
             expression.total_retrieved = 0
@@ -425,7 +445,7 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
 
     def build(self) -> dm.query.Query:
         with_ = {expression.name: expression.expression for expression in self}
-        select = {expression.name: expression.select for expression in self}
+        select = {expression.name: expression.select for expression in self if expression.select}
         cursors = self.cursors
 
         return dm.query.Query(with_=with_, select=select, cursors=cursors)
@@ -518,3 +538,70 @@ class QueryAPI(Generic[T_DomainModelList]):
             if self._builder.is_finished:
                 break
         return self._builder.unpack()
+
+
+def _create_edge_filter(
+    edge_type: dm.DirectRelationReference,
+    start_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+    start_node_space: str = "IntegrationTestsImmutable",
+    end_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+    space_end_node: str = "IntegrationTestsImmutable",
+    external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter:
+    filters: list[dm.Filter] = [
+        dm.filters.Equals(
+            ["edge", "type"],
+            {"space": edge_type.space, "externalId": edge_type.external_id},
+        )
+    ]
+    if start_node and isinstance(start_node, str):
+        filters.append(
+            dm.filters.Equals(["edge", "startNode"], value={"space": start_node_space, "externalId": start_node})
+        )
+    elif start_node and isinstance(start_node, dm.NodeId):
+        filters.append(
+            dm.filters.Equals(
+                ["edge", "startNode"], value=start_node.dump(camel_case=True, include_instance_type=False)
+            )
+        )
+    if start_node and isinstance(start_node, list):
+        filters.append(
+            dm.filters.In(
+                ["edge", "startNode"],
+                values=[
+                    {"space": start_node_space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in start_node
+                ],
+            )
+        )
+    if end_node and isinstance(end_node, str):
+        filters.append(dm.filters.Equals(["edge", "endNode"], value={"space": space_end_node, "externalId": end_node}))
+    elif end_node and isinstance(end_node, dm.NodeId):
+        filters.append(
+            dm.filters.Equals(["edge", "endNode"], value=end_node.dump(camel_case=True, include_instance_type=False))
+        )
+    if end_node and isinstance(end_node, list):
+        filters.append(
+            dm.filters.In(
+                ["edge", "endNode"],
+                values=[
+                    {"space": space_end_node, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in end_node
+                ],
+            )
+        )
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["edge", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["edge", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["edge", "space"], values=space))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters)

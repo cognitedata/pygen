@@ -156,6 +156,7 @@ class StartEndTimeApplyList(DomainRelationList[StartEndTimeApply]):
 
 
 def _create_start_end_time_filter(
+    edge_type: dm.DirectRelationReference,
     view_id: dm.ViewId,
     start_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
     start_node_space: str = "IntegrationTestsImmutable",
@@ -168,8 +169,13 @@ def _create_start_end_time_filter(
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
-) -> dm.Filter | None:
-    filters: list[dm.Filter] = []
+) -> dm.Filter:
+    filters: list[dm.Filter] = [
+        dm.filters.Equals(
+            ["edge", "type"],
+            {"space": edge_type.space, "externalId": edge_type.external_id},
+        )
+    ]
     if start_node and isinstance(start_node, str):
         filters.append(
             dm.filters.Equals(["edge", "startNode"], value={"space": start_node_space, "externalId": start_node})
@@ -234,4 +240,4 @@ def _create_start_end_time_filter(
         filters.append(dm.filters.In(["edge", "space"], values=space))
     if filter:
         filters.append(filter)
-    return dm.filters.And(*filters) if filters else None
+    return dm.filters.And(*filters)

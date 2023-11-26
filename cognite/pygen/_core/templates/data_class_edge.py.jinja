@@ -145,6 +145,7 @@ class {{ data_class.write_list_name }}(DomainRelationList[{{ data_class.write_na
 
 
 def {{ data_class.filter_name }}(
+    edge_type: dm.DirectRelationReference,
     view_id: dm.ViewId,
     start_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
     start_node_space: str = "{{ instance_space }}",
@@ -152,8 +153,13 @@ def {{ data_class.filter_name }}(
     space_end_node: str = "{{ instance_space }}",{% for parm in list_method.parameters %}
     {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
     filter: dm.Filter | None = None,
-) -> dm.Filter | None:
-    filters: list[dm.Filter] = []
+) -> dm.Filter:
+    filters: list[dm.Filter] = [
+        dm.filters.Equals(
+            ["edge", "type"],
+            {"space": edge_type.space, "externalId": edge_type.external_id},
+        )
+    ]
     if start_node and isinstance(start_node, str):
         filters.append(
             dm.filters.Equals(["edge", "startNode"], value={"space": start_node_space, "externalId": start_node})
@@ -198,4 +204,4 @@ def {{ data_class.filter_name }}(
         filters.append({{ filter.filter_call }}({{ filter.arguments }})){% endfor %}
     if filter:
         filters.append(filter)
-    return dm.filters.And(*filters) if filters else None
+    return dm.filters.And(*filters)
