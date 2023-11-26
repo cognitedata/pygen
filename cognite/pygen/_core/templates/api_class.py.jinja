@@ -382,7 +382,6 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
         return self._list(
             limit=limit,
             filter=filter_,
-            space=space,
             retrieve_edges=retrieve_edges,
             edge_api_name_pairs=[{% for field in data_class.one_to_many_edges %}
                 (self.{{ field.edge_api_attribute }}, "{{ field.name }}"),{% endfor %}
