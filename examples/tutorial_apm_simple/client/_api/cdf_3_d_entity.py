@@ -17,7 +17,6 @@ from tutorial_apm_simple.client.data_classes import (
     CdfConnectionPropertiesList,
 )
 from tutorial_apm_simple.client.data_classes._cdf_3_d_entity import (
-    _CDFENTITY_PROPERTIES_BY_FIELD,
     _create_cdf_3_d_entity_filter,
 )
 from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder

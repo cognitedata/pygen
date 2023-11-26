@@ -86,7 +86,7 @@ class DateTransformationPairApply(DomainModelApply):
             return resources
 
         write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
-            "market", "DateTransformationPair", "310f933a9aca9b"
+            "market", "DateTransformationPair", "bde9fd4428c26e"
         )
 
         edge_type = dm.DirectRelationReference("market", "DateTransformationPair.end")
