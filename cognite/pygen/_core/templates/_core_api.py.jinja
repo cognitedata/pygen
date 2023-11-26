@@ -385,7 +385,7 @@ class QueryStep:
     name: str
     expression: dm.query.ResultSetExpression
     max_retrieve_limit: int
-    select: dm.query.Select | None = None
+    select: dm.query.Select
     result_cls: type[DomainModelCore] | None = None
 
     # Query Variables

@@ -385,7 +385,7 @@ class QueryStep:
     name: str
     expression: dm.query.ResultSetExpression
     max_retrieve_limit: int
-    select: dm.query.Select | None = None
+    select: dm.query.Select
     result_cls: type[DomainModelCore] | None = None
 
     # Query Variables
@@ -402,6 +402,11 @@ class QueryStep:
 
 
 class QueryBuilder(UserList, Generic[T_DomainModelList]):
+    # The unique string is in case the data model has a field that ends with _\d+. This will make sure we don't
+    # clean the name of the field.
+    _unique_str = "a418"
+    _name_pattern = re.compile(r"_a418\d+$")
+
     def __init__(self, result_cls: type[T_DomainModelList], nodes: Collection[QueryStep] = None):
         super().__init__(nodes or [])
         self._result_cls = result_cls
@@ -427,11 +432,13 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
             raise TypeError(f"Expected int or slice, got {type(item)}")
 
     def next_name(self, name: str) -> str:
-        pattern = re.compile(r"_(\d+)$")
-        counter = Counter(pattern.sub("", step) for step in self)
+        counter = Counter(self._clean_name(step.name) for step in self)
         if name in counter:
-            return f"{name}_{counter[name]}"
+            return f"{name}_{self._unique_str}{counter[name]}"
         return name
+
+    def _clean_name(self, name: str) -> str:
+        return self._name_pattern.sub("", name)
 
     def reset(self):
         for expression in self:
@@ -456,6 +463,8 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
 
     def update(self, batch: dm.query.QueryResult):
         for expression in self:
+            if expression.name not in batch:
+                continue
             expression.last_batch_count = len(batch[expression.name])
             expression.total_retrieved += expression.last_batch_count
             expression.cursor = batch.cursors.get(expression.name)
@@ -478,25 +487,39 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
         relation_by_type_by_start_node: dict[
             tuple[str, str], dict[tuple[str, str], list[DomainRelation]]
         ] = defaultdict(lambda: defaultdict(list))
+        node_attribute_to_node_type: dict[str, str] = {}
+
+        return_nodes: list[DomainModel] = []
+        is_first = True
 
         for step in self:
-            if issubclass(step.result_cls, DomainModel):
-                for node in step.results:
-                    domain = step.result_cls.from_instance(node)
-                    # Circular dependencies will overwrite here, so we always get the last one
-                    nodes_by_type[step.name][domain.as_tuple_id()] = domain
-            elif issubclass(step.result_cls, DomainRelation):
-                for edge in step.results:
-                    domain = step.result_cls.from_instance(edge) if step.result_cls else edge
-                    relation_by_type_by_start_node[(step.expression.from_, step.name)][
-                        domain.start_node.as_tuple()
-                    ].append(domain)
-            elif step.result_cls is None:  # This is a data model edge.
+            name_clean = self._clean_name(step.name)
+            from_clean = step.expression.from_ and self._clean_name(step.expression.from_)
+
+            if isinstance(step.expression, dm.query.NodeResultSetExpression) and step.expression.from_:
+                node_attribute_to_node_type[from_clean] = name_clean
+
+            if step.result_cls is None:  # This is a data model edge.
                 for edge in step.results:
                     edge = cast(dm.Edge, edge)
-                    edges_by_type_by_start_node[(step.expression.from_, step.name)][
-                        (edge.space, edge.external_id)
+                    edges_by_type_by_start_node[(from_clean, name_clean)][
+                        (edge.start_node.space, edge.start_node.external_id)
                     ].append(edge)
+            elif issubclass(step.result_cls, DomainModel):
+                for node in step.results:
+                    domain = step.result_cls.from_instance(node)
+                    # Circular dependencies will be skipped here, so we always get the first one
+                    if (id_ := domain.as_tuple_id()) not in nodes_by_type[name_clean]:
+                        nodes_by_type[name_clean][id_] = domain
+                if is_first:
+                    return_nodes = list(nodes_by_type[name_clean].values())
+                    is_first = False
+            elif issubclass(step.result_cls, DomainRelation):
+                for edge in step.results:
+                    domain = step.result_cls.from_instance(edge)
+                    relation_by_type_by_start_node[(from_clean, name_clean)][domain.start_node.as_tuple()].append(
+                        domain
+                    )
 
         for (node_name, node_attribute), relations_by_start_node in relation_by_type_by_start_node.items():
             for node in nodes_by_type[node_name].values():
@@ -509,10 +532,13 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
                     ):
                         setattr(relation, edge_name, node)
 
-        if edges_by_type_by_start_node:
-            raise NotImplementedError()
+        for (node_name, node_attribute), edges_by_start_node in edges_by_type_by_start_node.items():
+            for node in nodes_by_type[node_name].values():
+                edges = edges_by_start_node.get(node.as_tuple_id(), [])
+                nodes = nodes_by_type.get(node_attribute_to_node_type.get(node_attribute), {})
+                setattr(node, node_attribute, [node for edge in edges if (node := nodes.get(edge.end_node.as_tuple()))])
 
-        return self._result_cls(nodes_by_type[self[0].name].values())
+        return self._result_cls(return_nodes)
 
 
 class QueryAPI(Generic[T_DomainModelList]):
