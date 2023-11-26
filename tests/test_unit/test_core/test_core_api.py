@@ -119,7 +119,10 @@ properties:
             [
                 QueryStep(
                     name="unit_procedure",
-                    filter=None,
+                    expression=dm.query.NodeResultSetExpression(
+                        from_=None,
+                        filter=None,
+                    ),
                     select=dm.query.Select(
                         [
                             dm.query.SourceSelector(
@@ -127,14 +130,12 @@ properties:
                             )
                         ]
                     ),
-                    expression_cls=dm.query.NodeResultSetExpression,
                     result_cls=UnitProcedure,
-                    from_=None,
                     max_retrieve_limit=-1,
                 ),
                 QueryStep(
                     name="work_units",
-                    filter=None,
+                    expression=dm.query.EdgeResultSetExpression(from_="unit_procedure", filter=None),
                     select=dm.query.Select(
                         [
                             dm.query.SourceSelector(
@@ -142,9 +143,7 @@ properties:
                             )
                         ]
                     ),
-                    expression_cls=dm.query.EdgeResultSetExpression,
                     result_cls=StartEndTime,
-                    from_="unit_procedure",
                     max_retrieve_limit=-1,
                 ),
             ],

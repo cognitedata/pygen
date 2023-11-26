@@ -229,6 +229,8 @@ def load_data_classes_test_cases():
             view_version=view.version,
             variable="series",
             variable_list="series_list",
+            query_class_name="SeriesQueryAPI",
+            query_file_name="series_query",
             view_name="Series",
             file_name="_series",
             fields=[],
@@ -338,6 +340,7 @@ def test_data_class_is_time(pygen_config: PygenConfig) -> None:
                     "gte": FilterParameter("min_end_time", "datetime.datetime", description="Dummy."),
                     "lte": FilterParameter("max_end_time", "datetime.datetime", description="Dummy."),
                 },
+                is_edge_class=False,
             ),
             'view_id.as_property_ref("end_time"), '
             'gte=min_end_time.isoformat(timespec="milliseconds") if min_end_time else None, '

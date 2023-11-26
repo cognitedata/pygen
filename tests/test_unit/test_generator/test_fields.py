@@ -14,7 +14,7 @@ def test_is_date_field(bid_view: dm.View, market_view: dm.View, pygen_config: Py
     gen.data_class.update_fields(
         bid_view.properties,
         {ViewSpaceExternalId(market_view.space, market_view.external_id): market_data_class},
-        pygen_config.naming.field,
+        pygen_config,
     )
 
     # Assert
