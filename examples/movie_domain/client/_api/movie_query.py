@@ -12,8 +12,8 @@ from movie_domain.client.data_classes._movie import (
 )
 
 if TYPE_CHECKING:
-    from actor_query import ActorQueryAPI
-    from director_query import DirectorQueryAPI
+    from .actor_query import ActorQueryAPI
+    from .director_query import DirectorQueryAPI
 
 
 class MovieQueryAPI(QueryAPI[T_DomainModelList]):
@@ -34,7 +34,7 @@ class MovieQueryAPI(QueryAPI[T_DomainModelList]):
         Returns:
             ActorQueryAPI: The query API for the actor.
         """
-        from actor_query import ActorQueryAPI
+        from .actor_query import ActorQueryAPI
 
         edge_filter = _create_edge_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "Movie.actors"),
@@ -70,7 +70,7 @@ class MovieQueryAPI(QueryAPI[T_DomainModelList]):
         Returns:
             DirectorQueryAPI: The query API for the director.
         """
-        from director_query import DirectorQueryAPI
+        from .director_query import DirectorQueryAPI
 
         edge_filter = _create_edge_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "Movie.directors"),

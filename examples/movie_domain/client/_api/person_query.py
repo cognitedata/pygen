@@ -12,7 +12,7 @@ from movie_domain.client.data_classes._person import (
 )
 
 if TYPE_CHECKING:
-    from role_query import RoleQueryAPI
+    from .role_query import RoleQueryAPI
 
 
 class PersonQueryAPI(QueryAPI[T_DomainModelList]):
@@ -33,7 +33,7 @@ class PersonQueryAPI(QueryAPI[T_DomainModelList]):
         Returns:
             RoleQueryAPI: The query API for the role.
         """
-        from role_query import RoleQueryAPI
+        from .role_query import RoleQueryAPI
 
         edge_filter = _create_edge_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "Person.roles"),
