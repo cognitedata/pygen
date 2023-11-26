@@ -43,7 +43,7 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
         )
         self._view_id = view_id{% for field in data_class.one_to_many_edges %}
         self.{{ field.edge_api_attribute }} = {{ field.edge_api_class }}(
-            client, view_by_write_class, {{ field.data_class.read_name }}, {{ field.data_class.write_name }}, {{ field.data_class.read_list_name }}
+            client{% if field.is_edge_property %}, view_by_write_class, {{ field.data_class.read_name }}, {{ field.data_class.write_name }}, {{ field.data_class.read_list_name }}{% endif %}
         ){% endfor %}{% for timeseries in data_class.single_timeseries_fields %}
         self.{{ timeseries.edge_api_attribute }} = {{ timeseries.edge_api_class }}API(client, view_id){% endfor %}
 
