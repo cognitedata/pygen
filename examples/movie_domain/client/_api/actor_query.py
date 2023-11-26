@@ -37,7 +37,7 @@ class ActorQueryAPI(QueryAPI[T_DomainModelList]):
         from movie_query import MovieQueryAPI
 
         edge_filter = _create_edge_filter(
-            dm.DirectRelationReference("REPLACE", "REPLACE"),
+            dm.DirectRelationReference("IntegrationTestsImmutable", "Role.movies"),
             external_id_prefix=external_id_prefix,
             space=space,
         )
@@ -73,13 +73,13 @@ class ActorQueryAPI(QueryAPI[T_DomainModelList]):
         from nomination_query import NominationQueryAPI
 
         edge_filter = _create_edge_filter(
-            dm.DirectRelationReference("REPLACE", "REPLACE"),
+            dm.DirectRelationReference("IntegrationTestsImmutable", "Role.nomination"),
             external_id_prefix=external_id_prefix,
             space=space,
         )
         self._builder.append(
             QueryStep(
-                name="nomination",
+                name=self._builder.next_name("nomination"),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
                     from_=self._builder[-1].name,

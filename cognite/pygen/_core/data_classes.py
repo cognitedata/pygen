@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 from collections import defaultdict
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass, field
-from typing import cast
+from typing import Any, cast
 
 from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.data_modeling.data_types import ListablePropertyType
@@ -70,11 +70,12 @@ class Field(ABC):
         prop_name: str,
         prop: dm.MappedProperty | dm.ConnectionDefinition,
         data_class_by_view_id: dict[ViewSpaceExternalId, DataClass],
-        field_naming: pygen_config.FieldNaming,
+        config: pygen_config.PygenConfig,
         view_name: str,
         view_id: dm.ViewId,
         pydantic_field: str = "Field",
     ) -> Field:
+        field_naming = config.naming.field
         name = create_name(prop_name, field_naming.name)
         if is_reserved_word(name, "field", view_id, prop_name):
             name = f"{name}_"
@@ -87,11 +88,13 @@ class Field(ABC):
             edge_api_file_name = f"{create_name(edge_api_class_input, field_naming.edge_api_file)}"
             edge_api_class = f"{create_name(edge_api_class_input, field_naming.edge_api_class)}API"
             edge_api_attribute = f"{create_name(prop_name, field_naming.api_class_attribute)}_edge"
+            args: dict[str, Any] = {"_list_method": None}
             if prop.edge_source:
                 # The edge has properties, i.e., it has its own view
                 edge_id = prop.edge_source.space, prop.edge_source.external_id
             else:
                 edge_id = prop.source.space, prop.source.external_id
+                args["_list_method"] = ListMethod.from_fields([], config.filtering, is_edge_class=True)
             data_class = data_class_by_view_id[ViewSpaceExternalId(*edge_id)]
 
             return EdgeOneToMany(
@@ -105,6 +108,7 @@ class Field(ABC):
                 edge_api_file_name=edge_api_file_name,
                 edge_api_class=edge_api_class,
                 edge_api_attribute=edge_api_attribute,
+                **args,
             )
         elif isinstance(prop, dm.MappedProperty) and (
             isinstance(prop.type, _PRIMITIVE_TYPES) or isinstance(prop.type, _EXTERNAL_TYPES)
@@ -436,6 +440,7 @@ class EdgeOneToMany(EdgeField):
     edge_api_class: str
     edge_api_attribute: str
     prop: dm.SingleHopConnectionDefinition
+    _list_method: ListMethod | None = None
 
     @property
     def description(self) -> str | None:
@@ -444,6 +449,14 @@ class EdgeOneToMany(EdgeField):
     @property
     def is_property_edge(self) -> bool:
         return isinstance(self.data_class, EdgeWithPropertyDataClass)
+
+    @property
+    def list_method(self) -> ListMethod:
+        if self.is_property_edge:
+            return self.data_class.list_method
+        if self._list_method is None:
+            raise ValueError("EdgeOneToMany has not been initialized.")
+        return self._list_method
 
     def as_apply(self) -> str:
         if self.is_property_edge:
@@ -554,8 +567,7 @@ class DataClass:
         self,
         properties: dict[str, dm.MappedProperty | dm.ConnectionDefinition],
         data_class_by_view_id: dict[ViewSpaceExternalId, DataClass],
-        field_naming: pygen_config.FieldNaming,
-        filter_naming: pygen_config.Filtering,
+        config: pygen_config.PygenConfig,
     ) -> None:
         pydantic_field = self.pydantic_field
         for prop_name, prop in properties.items():
@@ -563,13 +575,13 @@ class DataClass:
                 prop_name,
                 prop,
                 data_class_by_view_id,
-                field_naming,
+                config,
                 self.view_name,
                 dm.ViewId(self.view_id.space, self.view_id.external_id, self.view_version),
                 pydantic_field=pydantic_field,
             )
             self.fields.append(field_)
-        self._list_method = ListMethod.from_fields(self.fields, filter_naming, self.is_edge_class)
+        self._list_method = ListMethod.from_fields(self.fields, config.filtering, self.is_edge_class)
 
     @property
     def text_field_names(self) -> str:
