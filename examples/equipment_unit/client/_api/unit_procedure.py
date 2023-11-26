@@ -462,7 +462,6 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
         return self._list(
             limit=limit,
             filter=filter_,
-            space=space,
             retrieve_edges=retrieve_edges,
             edge_api_name_pairs=[
                 (self.work_units_edge, "work_units"),

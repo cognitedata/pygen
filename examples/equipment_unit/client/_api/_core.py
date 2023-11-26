@@ -157,7 +157,7 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
         nodes = self._class_list([self._class_type.from_node(node) for node in instances.nodes])
 
         if retrieve_edges:
-            self._retrieve_and_set_edge_types(nodes, space, edge_api_name_pairs)
+            self._retrieve_and_set_edge_types(nodes, edge_api_name_pairs)
 
         if is_multiple:
             return nodes
@@ -308,26 +308,28 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
         limit: int,
         filter: dm.Filter,
         retrieve_edges: bool = False,
-        space: str | None = None,
         edge_api_name_pairs: list[tuple[EdgeAPI, str]] | None = None,
     ) -> T_DomainModelList:
         nodes = self._client.data_modeling.instances.list("node", sources=self._sources, limit=limit, filter=filter)
         node_list = self._class_list([self._class_type.from_instance(node) for node in nodes])
         if retrieve_edges:
-            self._retrieve_and_set_edge_types(node_list, space, edge_api_name_pairs)
+            self._retrieve_and_set_edge_types(node_list, edge_api_name_pairs)
 
         return node_list
 
     @classmethod
     def _retrieve_and_set_edge_types(
-        cls, nodes: T_DomainModelList, space: str | None, edge_api_name_pairs: list[tuple[EdgeAPI, str]] | None = None
+        cls, nodes: T_DomainModelList, edge_api_name_pairs: list[tuple[EdgeAPI, str]] | None = None
     ):
         for edge_api, edge_name in edge_api_name_pairs or []:
-            space_arg = {"space": space} if space else {}
             if len(ids := nodes.as_node_ids()) > IN_FILTER_LIMIT:
-                edges = edge_api._list(limit=-1, **space_arg)
+                edges = edge_api._list(limit=-1)
             else:
-                edges = edge_api._list(node_ids=ids, limit=-1)
+                is_nodes = dm.filters.In(
+                    ["edge", "startNode"],
+                    values=[id_.dump(camel_case=True, include_instance_type=False) for id_ in ids],
+                )
+                edges = edge_api._list(limit=-1, filter_=is_nodes)
             cls._set_edges(nodes, edges, edge_name)
 
     @staticmethod
