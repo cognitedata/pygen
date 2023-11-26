@@ -6,7 +6,15 @@ from typing import Literal, Optional
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
+from ._core import (
+    DomainModel,
+    DomainModelApply,
+    DomainModelApplyList,
+    DomainModelList,
+    DomainRelationApply,
+    ResourcesApply,
+)
+
 
 __all__ = [
     "ScenarioInstance",
@@ -36,7 +44,7 @@ _SCENARIOINSTANCE_PROPERTIES_BY_FIELD = {
 
 
 class ScenarioInstance(DomainModel):
-    """This represent a read version of scenario instance.
+    """This represents the reading version of scenario instance.
 
     It is used to when data is retrieved from CDF.
 
@@ -68,7 +76,7 @@ class ScenarioInstance(DomainModel):
     start: Optional[datetime.datetime] = None
 
     def as_apply(self) -> ScenarioInstanceApply:
-        """Convert this read version of scenario instance to a write version."""
+        """Convert this read version of scenario instance to the writing version."""
         return ScenarioInstanceApply(
             space=self.space,
             external_id=self.external_id,
@@ -84,7 +92,7 @@ class ScenarioInstance(DomainModel):
 
 
 class ScenarioInstanceApply(DomainModelApply):
-    """This represent a write version of scenario instance.
+    """This represents the writing version of scenario instance.
 
     It is used to when data is sent to CDF.
 
@@ -99,7 +107,7 @@ class ScenarioInstanceApply(DomainModelApply):
         price_forecast: The price forecast field.
         scenario: The scenario field.
         start: The start field.
-        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+        existing_version: Fail the ingestion request if the scenario instance version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
@@ -116,11 +124,17 @@ class ScenarioInstanceApply(DomainModelApply):
     start: Optional[datetime.datetime] = None
 
     def _to_instances_apply(
-        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
-    ) -> dm.InstancesApply:
-        if self.external_id in cache:
-            return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
-        write_view = view_by_write_class and view_by_write_class.get(type(self))
+        self,
+        cache: set[tuple[str, str]],
+        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+    ) -> ResourcesApply:
+        resources = ResourcesApply()
+        if self.as_tuple_id() in cache:
+            return resources
+
+        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
+            "IntegrationTestsImmutable", "ScenarioInstance", "ee2b79fd98b5bb"
+        )
 
         properties = {}
         if self.aggregation is not None:
@@ -128,7 +142,7 @@ class ScenarioInstanceApply(DomainModelApply):
         if self.country is not None:
             properties["country"] = self.country
         if self.instance is not None:
-            properties["instance"] = self.instance.isoformat()
+            properties["instance"] = self.instance.isoformat(timespec="milliseconds")
         if self.market is not None:
             properties["market"] = self.market
         if self.price_area is not None:
@@ -138,39 +152,115 @@ class ScenarioInstanceApply(DomainModelApply):
         if self.scenario is not None:
             properties["scenario"] = self.scenario
         if self.start is not None:
-            properties["start"] = self.start.isoformat()
+            properties["start"] = self.start.isoformat(timespec="milliseconds")
+
         if properties:
-            source = dm.NodeOrEdgeData(
-                source=write_view or dm.ViewId("IntegrationTestsImmutable", "ScenarioInstance", "ee2b79fd98b5bb"),
-                properties=properties,
-            )
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=[source],
+                sources=[
+                    dm.NodeOrEdgeData(
+                        source=write_view,
+                        properties=properties,
+                    )
+                ],
             )
-            nodes = [this_node]
-        else:
-            nodes = []
+            resources.nodes.append(this_node)
+            cache.add(self.as_tuple_id())
 
-        edges = []
-        cache.add(self.external_id)
-
-        return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
+        return resources
 
 
-class ScenarioInstanceList(TypeList[ScenarioInstance]):
-    """List of scenario instances in read version."""
+class ScenarioInstanceList(DomainModelList[ScenarioInstance]):
+    """List of scenario instances in the read version."""
 
-    _NODE = ScenarioInstance
+    _INSTANCE = ScenarioInstance
 
     def as_apply(self) -> ScenarioInstanceApplyList:
-        """Convert this read version of scenario instance to a write version."""
+        """Convert these read versions of scenario instance to the writing versions."""
         return ScenarioInstanceApplyList([node.as_apply() for node in self.data])
 
 
-class ScenarioInstanceApplyList(TypeApplyList[ScenarioInstanceApply]):
-    """List of scenario instances in write version."""
+class ScenarioInstanceApplyList(DomainModelApplyList[ScenarioInstanceApply]):
+    """List of scenario instances in the writing version."""
 
-    _NODE = ScenarioInstanceApply
+    _INSTANCE = ScenarioInstanceApply
+
+
+def _create_scenario_instance_filter(
+    view_id: dm.ViewId,
+    aggregation: str | list[str] | None = None,
+    aggregation_prefix: str | None = None,
+    country: str | list[str] | None = None,
+    country_prefix: str | None = None,
+    min_instance: datetime.datetime | None = None,
+    max_instance: datetime.datetime | None = None,
+    market: str | list[str] | None = None,
+    market_prefix: str | None = None,
+    price_area: str | list[str] | None = None,
+    price_area_prefix: str | None = None,
+    scenario: str | list[str] | None = None,
+    scenario_prefix: str | None = None,
+    min_start: datetime.datetime | None = None,
+    max_start: datetime.datetime | None = None,
+    external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if aggregation and isinstance(aggregation, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("aggregation"), value=aggregation))
+    if aggregation and isinstance(aggregation, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("aggregation"), values=aggregation))
+    if aggregation_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("aggregation"), value=aggregation_prefix))
+    if country and isinstance(country, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("country"), value=country))
+    if country and isinstance(country, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("country"), values=country))
+    if country_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("country"), value=country_prefix))
+    if min_instance or max_instance:
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("instance"),
+                gte=min_instance.isoformat(timespec="milliseconds") if min_instance else None,
+                lte=max_instance.isoformat(timespec="milliseconds") if max_instance else None,
+            )
+        )
+    if market and isinstance(market, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("market"), value=market))
+    if market and isinstance(market, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("market"), values=market))
+    if market_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("market"), value=market_prefix))
+    if price_area and isinstance(price_area, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("priceArea"), value=price_area))
+    if price_area and isinstance(price_area, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("priceArea"), values=price_area))
+    if price_area_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("priceArea"), value=price_area_prefix))
+    if scenario and isinstance(scenario, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("scenario"), value=scenario))
+    if scenario and isinstance(scenario, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("scenario"), values=scenario))
+    if scenario_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("scenario"), value=scenario_prefix))
+    if min_start or max_start:
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("start"),
+                gte=min_start.isoformat(timespec="milliseconds") if min_start else None,
+                lte=max_start.isoformat(timespec="milliseconds") if max_start else None,
+            )
+        )
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

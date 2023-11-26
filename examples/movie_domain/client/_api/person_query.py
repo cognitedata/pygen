@@ -6,9 +6,14 @@ from ._core import QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
 from movie_domain.client.data_classes import (
     Person,
     PersonApply,
+    Role,
+    RoleApply,
 )
 from movie_domain.client.data_classes._person import (
     _PERSON_PROPERTIES_BY_FIELD,
+)
+from movie_domain.client.data_classes._role import (
+    _ROLE_PROPERTIES_BY_FIELD,
 )
 
 if TYPE_CHECKING:
@@ -47,8 +52,28 @@ class PersonQueryAPI(QueryAPI[T_DomainModelList]):
                     filter=edge_filter,
                     from_=self._builder[-1].name,
                 ),
+                select=dm.query.Select(),
                 max_retrieve_limit=limit,
             )
+        )
+        self._builder.append(
+            QueryStep(
+                name=self._builder.next_name("role"),
+                expression=dm.query.NodeResultSetExpression(
+                    filter=None,
+                    from_=self._builder[-1].name,
+                ),
+                select=dm.query.Select(
+                    [
+                        dm.query.SourceSelector(
+                            self._view_by_write_class[RoleApply],
+                            list(_ROLE_PROPERTIES_BY_FIELD.values()),
+                        )
+                    ]
+                ),
+                result_cls=Role,
+                max_retrieve_limit=-1,
+            ),
         )
         return RoleQueryAPI(self._client, self._builder, self._view_by_write_class)
 

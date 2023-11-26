@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-from typing import Literal, Optional
+from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
-from pydantic import Field
+from pydantic import model_validator
 
-from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
+from ._core import DomainModelApply, DomainRelation, DomainRelationApply, DomainRelationList, ResourcesApply
+from ._cdf_3_d_entity import CdfEntity, CdfEntityApply
 
 __all__ = [
     "CdfConnectionProperties",
@@ -22,14 +23,15 @@ _CDFCONNECTIONPROPERTIES_PROPERTIES_BY_FIELD = {
 }
 
 
-class CdfConnectionProperties(DomainModel):
-    """This represent a read version of cdf 3 d connection property.
+class CdfConnectionProperties(DomainRelation):
+    """This represents the reading version of cdf 3 d connection property.
 
     It is used to when data is retrieved from CDF.
 
     Args:
         space: The space where the node is located.
         external_id: The external id of the cdf 3 d connection property.
+        cdf_3_d_entity: Collection of Cdf3dEntity that are part of this Cdf3dModel
         revision_id: The revision id field.
         revision_node_id: The revision node id field.
         created_time: The created time of the cdf 3 d connection property node.
@@ -39,83 +41,200 @@ class CdfConnectionProperties(DomainModel):
     """
 
     space: str = "cdf_3d_schema"
+    cdf_3_d_entity: Union[CdfEntity, str]
     revision_id: Optional[int] = Field(None, alias="revisionId")
     revision_node_id: Optional[int] = Field(None, alias="revisionNodeId")
 
+    @property
+    def cdf_3_d_model(self) -> str:
+        return self.start_node.external_id
+
+    @model_validator(mode="before")
+    def set_cdf_3_d_entity_if_missing(cls, data: Any):
+        if isinstance(data, dict) and "cdf_3_d_entity" not in data:
+            data["cdf_3_d_entity"] = data["end_node"]["external_id"]
+        return data
+
     def as_apply(self) -> CdfConnectionPropertiesApply:
-        """Convert this read version of cdf 3 d connection property to a write version."""
+        """Convert this read version of cdf 3 d connection property to the writing version."""
         return CdfConnectionPropertiesApply(
             space=self.space,
             external_id=self.external_id,
+            cdf_3_d_entity=self.cdf_3_d_entity.as_apply()
+            if isinstance(self.cdf_3_d_entity, CdfEntity)
+            else self.cdf_3_d_entity,
             revision_id=self.revision_id,
             revision_node_id=self.revision_node_id,
         )
 
 
-class CdfConnectionPropertiesApply(DomainModelApply):
-    """This represent a write version of cdf 3 d connection property.
+class CdfConnectionPropertiesApply(DomainRelationApply):
+    """This represents the writing version of cdf 3 d connection property.
 
     It is used to when data is sent to CDF.
 
     Args:
+        edge_type: The edge type of the cdf 3 d connection property.
         space: The space where the node is located.
         external_id: The external id of the cdf 3 d connection property.
+        cdf_3_d_entity: Collection of Cdf3dEntity that are part of this Cdf3dModel
         revision_id: The revision id field.
         revision_node_id: The revision node id field.
-        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+        existing_version: Fail the ingestion request if the cdf 3 d connection property version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
+    edge_type: dm.DirectRelationReference = dm.DirectRelationReference("cdf_3d_schema", "cdf3dEntityConnection")
     space: str = "cdf_3d_schema"
+    cdf_3_d_entity: Union[CdfEntityApply, str]
     revision_id: int = Field(alias="revisionId")
     revision_node_id: int = Field(alias="revisionNodeId")
 
     def _to_instances_apply(
-        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
-    ) -> dm.InstancesApply:
-        if self.external_id in cache:
-            return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
-        write_view = view_by_write_class and view_by_write_class.get(type(self))
+        self,
+        cache: set[tuple[str, str]],
+        start_node: DomainModelApply,
+        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+    ) -> ResourcesApply:
+        resources = ResourcesApply()
+        if self.external_id and (self.space, self.external_id) in cache:
+            return resources
+
+        if isinstance(self.cdf_3_d_entity, DomainModelApply):
+            end_node = self.cdf_3_d_entity.as_direct_reference()
+        elif isinstance(self.cdf_3_d_entity, str):
+            end_node = dm.DirectRelationReference(self.space, self.cdf_3_d_entity)
+        else:
+            raise ValueError(f"Invalid type for equipment_module: {type(self.cdf_3_d_entity)}")
+
+        self.external_id = external_id = DomainRelationApply.external_id_factory(start_node, end_node, self.edge_type)
+
+        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
+            "cdf_3d_schema", "Cdf3dConnectionProperties", "1"
+        )
 
         properties = {}
         if self.revision_id is not None:
             properties["revisionId"] = self.revision_id
         if self.revision_node_id is not None:
             properties["revisionNodeId"] = self.revision_node_id
+
         if properties:
-            source = dm.NodeOrEdgeData(
-                source=write_view or dm.ViewId("cdf_3d_schema", "Cdf3dConnectionProperties", "1"),
-                properties=properties,
-            )
-            this_node = dm.NodeApply(
+            this_edge = dm.EdgeApply(
                 space=self.space,
-                external_id=self.external_id,
+                external_id=external_id,
+                type=self.edge_type,
+                start_node=start_node.as_direct_reference(),
+                end_node=end_node,
                 existing_version=self.existing_version,
-                sources=[source],
+                sources=[
+                    dm.NodeOrEdgeData(
+                        source=write_view,
+                        properties=properties,
+                    )
+                ],
             )
-            nodes = [this_node]
-        else:
-            nodes = []
+            resources.edges.append(this_edge)
+            cache.add((self.space, external_id))
 
-        edges = []
-        cache.add(self.external_id)
+        if isinstance(self.cdf_3_d_entity, DomainModelApply):
+            other_resources = self.cdf_3_d_entity._to_instances_apply(cache, view_by_write_class)
+            resources.extend(other_resources)
 
-        return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
-
-
-class CdfConnectionPropertiesList(TypeList[CdfConnectionProperties]):
-    """List of cdf 3 d connection properties in read version."""
-
-    _NODE = CdfConnectionProperties
-
-    def as_apply(self) -> CdfConnectionPropertiesApplyList:
-        """Convert this read version of cdf 3 d connection property to a write version."""
-        return CdfConnectionPropertiesApplyList([node.as_apply() for node in self.data])
+        return resources
 
 
-class CdfConnectionPropertiesApplyList(TypeApplyList[CdfConnectionPropertiesApply]):
-    """List of cdf 3 d connection properties in write version."""
+class CdfConnectionPropertiesList(DomainRelationList[CdfConnectionProperties]):
+    """List of cdf 3 d connection properties in the reading version."""
 
-    _NODE = CdfConnectionPropertiesApply
+    _INSTANCE = CdfConnectionProperties
+
+
+class CdfConnectionPropertiesApplyList(DomainRelationList[CdfConnectionPropertiesApply]):
+    """List of cdf 3 d connection properties in the writing version."""
+
+    _INSTANCE = CdfConnectionPropertiesApply
+
+
+def _create_cdf_3_d_connection_property_filter(
+    edge_type: dm.DirectRelationReference,
+    view_id: dm.ViewId,
+    start_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+    start_node_space: str = "cdf_3d_schema",
+    end_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+    space_end_node: str = "cdf_3d_schema",
+    min_revision_id: int | None = None,
+    max_revision_id: int | None = None,
+    min_revision_node_id: int | None = None,
+    max_revision_node_id: int | None = None,
+    external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter:
+    filters: list[dm.Filter] = [
+        dm.filters.Equals(
+            ["edge", "type"],
+            {"space": edge_type.space, "externalId": edge_type.external_id},
+        )
+    ]
+    if start_node and isinstance(start_node, str):
+        filters.append(
+            dm.filters.Equals(["edge", "startNode"], value={"space": start_node_space, "externalId": start_node})
+        )
+    elif start_node and isinstance(start_node, dm.NodeId):
+        filters.append(
+            dm.filters.Equals(
+                ["edge", "startNode"], value=start_node.dump(camel_case=True, include_instance_type=False)
+            )
+        )
+    if start_node and isinstance(start_node, list):
+        filters.append(
+            dm.filters.In(
+                ["edge", "startNode"],
+                values=[
+                    {"space": start_node_space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in start_node
+                ],
+            )
+        )
+    if end_node and isinstance(end_node, str):
+        filters.append(dm.filters.Equals(["edge", "endNode"], value={"space": space_end_node, "externalId": end_node}))
+    elif end_node and isinstance(end_node, dm.NodeId):
+        filters.append(
+            dm.filters.Equals(["edge", "endNode"], value=end_node.dump(camel_case=True, include_instance_type=False))
+        )
+    if end_node and isinstance(end_node, list):
+        filters.append(
+            dm.filters.In(
+                ["edge", "endNode"],
+                values=[
+                    {"space": space_end_node, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in end_node
+                ],
+            )
+        )
+    if min_revision_id or max_revision_id:
+        filters.append(
+            dm.filters.Range(view_id.as_property_ref("revisionId"), gte=min_revision_id, lte=max_revision_id)
+        )
+    if min_revision_node_id or max_revision_node_id:
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("revisionNodeId"), gte=min_revision_node_id, lte=max_revision_node_id
+            )
+        )
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["edge", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["edge", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["edge", "space"], values=space))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters)

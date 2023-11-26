@@ -1,128 +1,31 @@
 from __future__ import annotations
 
-from collections import defaultdict
-from typing import Dict, List, Sequence, Tuple, overload
+from collections.abc import Sequence
+from typing import overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from osdu_wells.client.data_classes import (
+    DomainModelApply,
+    ResourcesApplyResult,
     WgsCoordinates,
     WgsCoordinatesApply,
-    WgsCoordinatesList,
-    WgsCoordinatesApplyList,
     WgsCoordinatesFields,
+    WgsCoordinatesList,
     WgsCoordinatesTextFields,
-    DomainModelApply,
 )
-from osdu_wells.client.data_classes._wgs_84_coordinates import _WGSCOORDINATES_PROPERTIES_BY_FIELD
+from osdu_wells.client.data_classes._wgs_84_coordinates import (
+    _WGSCOORDINATES_PROPERTIES_BY_FIELD,
+    _create_wgs_84_coordinate_filter,
+)
+from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from .wgs_84_coordinates_features import WgsCoordinatesFeaturesAPI
+from .wgs_84_coordinates_query import WgsCoordinatesQueryAPI
 
 
-class WgsCoordinatesFeaturesAPI:
-    def __init__(self, client: CogniteClient):
-        self._client = client
-
-    def retrieve(
-        self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str = "IntegrationTestsImmutable"
-    ) -> dm.EdgeList:
-        """Retrieve one or more features edges by id(s) of a wgs 84 coordinate.
-
-        Args:
-            external_id: External id or list of external ids source wgs 84 coordinate.
-            space: The space where all the feature edges are located.
-
-        Returns:
-            The requested feature edges.
-
-        Examples:
-
-            Retrieve features edge by id:
-
-                >>> from osdu_wells.client import OSDUClient
-                >>> client = OSDUClient()
-                >>> wgs_84_coordinate = client.wgs_84_coordinates.features.retrieve("my_features")
-
-        """
-        f = dm.filters
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": "IntegrationTestsImmutable", "externalId": "Wgs84Coordinates.features"},
-        )
-        if isinstance(external_id, (str, dm.NodeId)):
-            is_wgs_84_coordinates = f.Equals(
-                ["edge", "startNode"],
-                {"space": space, "externalId": external_id}
-                if isinstance(external_id, str)
-                else external_id.dump(camel_case=True, include_instance_type=False),
-            )
-        else:
-            is_wgs_84_coordinates = f.In(
-                ["edge", "startNode"],
-                [
-                    {"space": space, "externalId": ext_id}
-                    if isinstance(ext_id, str)
-                    else ext_id.dump(camel_case=True, include_instance_type=False)
-                    for ext_id in external_id
-                ],
-            )
-        return self._client.data_modeling.instances.list(
-            "edge", limit=-1, filter=f.And(is_edge_type, is_wgs_84_coordinates)
-        )
-
-    def list(
-        self,
-        wgs_84_coordinate_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        limit=DEFAULT_LIMIT_READ,
-        space: str = "IntegrationTestsImmutable",
-    ) -> dm.EdgeList:
-        """List features edges of a wgs 84 coordinate.
-
-        Args:
-            wgs_84_coordinate_id: ID of the source wgs 84 coordinate.
-            limit: Maximum number of feature edges to return. Defaults to 25. Set to -1, float("inf") or None
-                to return all items.
-            space: The space where all the feature edges are located.
-
-        Returns:
-            The requested feature edges.
-
-        Examples:
-
-            List 5 features edges connected to "my_wgs_84_coordinate":
-
-                >>> from osdu_wells.client import OSDUClient
-                >>> client = OSDUClient()
-                >>> wgs_84_coordinate = client.wgs_84_coordinates.features.list("my_wgs_84_coordinate", limit=5)
-
-        """
-        f = dm.filters
-        filters = [
-            f.Equals(
-                ["edge", "type"],
-                {"space": "IntegrationTestsImmutable", "externalId": "Wgs84Coordinates.features"},
-            )
-        ]
-        if wgs_84_coordinate_id:
-            wgs_84_coordinate_ids = (
-                wgs_84_coordinate_id if isinstance(wgs_84_coordinate_id, list) else [wgs_84_coordinate_id]
-            )
-            is_wgs_84_coordinates = f.In(
-                ["edge", "startNode"],
-                [
-                    {"space": space, "externalId": ext_id}
-                    if isinstance(ext_id, str)
-                    else ext_id.dump(camel_case=True, include_instance_type=False)
-                    for ext_id in wgs_84_coordinate_ids
-                ],
-            )
-            filters.append(is_wgs_84_coordinates)
-
-        return self._client.data_modeling.instances.list("edge", limit=limit, filter=f.And(*filters))
-
-
-class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordinatesList]):
+class WgsCoordinatesAPI(NodeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordinatesList]):
     def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
         view_id = view_by_write_class[WgsCoordinatesApply]
         super().__init__(
@@ -131,17 +34,67 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
             class_type=WgsCoordinates,
             class_apply_type=WgsCoordinatesApply,
             class_list=WgsCoordinatesList,
+            view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self._view_by_write_class = view_by_write_class
-        self.features = WgsCoordinatesFeaturesAPI(client)
+        self.features_edge = WgsCoordinatesFeaturesAPI(client)
+
+    def __call__(
+        self,
+        type_: str | list[str] | None = None,
+        type_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> WgsCoordinatesQueryAPI[WgsCoordinatesList]:
+        """Query starting at wgs 84 coordinates.
+
+        Args:
+            type_: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of wgs 84 coordinates to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            A query API for wgs 84 coordinates.
+
+        """
+        filter_ = _create_wgs_84_coordinate_filter(
+            self._view_id,
+            type_,
+            type_prefix,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        builder = QueryBuilder(
+            WgsCoordinatesList,
+            [
+                QueryStep(
+                    name="wgs_84_coordinate",
+                    expression=dm.query.NodeResultSetExpression(
+                        from_=None,
+                        filter=filter_,
+                    ),
+                    select=dm.query.Select(
+                        [dm.query.SourceSelector(self._view_id, list(_WGSCOORDINATES_PROPERTIES_BY_FIELD.values()))]
+                    ),
+                    result_cls=WgsCoordinates,
+                    max_retrieve_limit=limit,
+                )
+            ],
+        )
+        return WgsCoordinatesQueryAPI(self._client, builder, self._view_by_write_class)
 
     def apply(
         self, wgs_84_coordinate: WgsCoordinatesApply | Sequence[WgsCoordinatesApply], replace: bool = False
-    ) -> dm.InstancesApplyResult:
+    ) -> ResourcesApplyResult:
         """Add or update (upsert) wgs 84 coordinates.
 
-        Note: This method iterates through all nodes linked to wgs_84_coordinate and create them including the edges
+        Note: This method iterates through all nodes and timeseries linked to wgs_84_coordinate and creates them including the edges
         between the nodes. For example, if any of `features` are set, then these
         nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
 
@@ -150,7 +103,7 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes, edges, and time series.
 
         Examples:
 
@@ -163,20 +116,10 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
                 >>> result = client.wgs_84_coordinates.apply(wgs_84_coordinate)
 
         """
-        if isinstance(wgs_84_coordinate, WgsCoordinatesApply):
-            instances = wgs_84_coordinate.to_instances_apply(self._view_by_write_class)
-        else:
-            instances = WgsCoordinatesApplyList(wgs_84_coordinate).to_instances_apply(self._view_by_write_class)
-        return self._client.data_modeling.instances.apply(
-            nodes=instances.nodes,
-            edges=instances.edges,
-            auto_create_start_nodes=True,
-            auto_create_end_nodes=True,
-            replace=replace,
-        )
+        return self._apply(wgs_84_coordinate, replace)
 
     def delete(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> dm.InstancesDeleteResult:
         """Delete one or more wgs 84 coordinate.
 
@@ -195,23 +138,18 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
                 >>> client = OSDUClient()
                 >>> client.wgs_84_coordinates.delete("my_wgs_84_coordinate")
         """
-        if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
-        else:
-            return self._client.data_modeling.instances.delete(
-                nodes=[(space, id) for id in external_id],
-            )
+        return self._delete(external_id, space)
 
     @overload
     def retrieve(self, external_id: str) -> WgsCoordinates:
         ...
 
     @overload
-    def retrieve(self, external_id: Sequence[str]) -> WgsCoordinatesList:
+    def retrieve(self, external_id: SequenceNotStr[str]) -> WgsCoordinatesList:
         ...
 
     def retrieve(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> WgsCoordinates | WgsCoordinatesList:
         """Retrieve one or more wgs 84 coordinates by id(s).
 
@@ -231,20 +169,14 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
                 >>> wgs_84_coordinate = client.wgs_84_coordinates.retrieve("my_wgs_84_coordinate")
 
         """
-        if isinstance(external_id, str):
-            wgs_84_coordinate = self._retrieve((space, external_id))
-
-            feature_edges = self.features.retrieve(external_id, space=space)
-            wgs_84_coordinate.features = [edge.end_node.external_id for edge in feature_edges]
-
-            return wgs_84_coordinate
-        else:
-            wgs_84_coordinates = self._retrieve([(space, ext_id) for ext_id in external_id])
-
-            feature_edges = self.features.retrieve(wgs_84_coordinates.as_node_ids())
-            self._set_features(wgs_84_coordinates, feature_edges)
-
-            return wgs_84_coordinates
+        return self._retrieve(
+            external_id,
+            space,
+            retrieve_edges=True,
+            edge_api_name_pairs=[
+                (self.features_edge, "features"),
+            ],
+        )
 
     def search(
         self,
@@ -281,7 +213,7 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
                 >>> wgs_84_coordinates = client.wgs_84_coordinates.search('my_wgs_84_coordinate')
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_wgs_84_coordinate_filter(
             self._view_id,
             type_,
             type_prefix,
@@ -376,7 +308,7 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
 
         """
 
-        filter_ = _create_filter(
+        filter_ = _create_wgs_84_coordinate_filter(
             self._view_id,
             type_,
             type_prefix,
@@ -422,13 +354,12 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
             space: The space to filter on.
             limit: Maximum number of wgs 84 coordinates to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            retrieve_edges: Whether to retrieve `features` external ids for the wgs 84 coordinates. Defaults to True.
 
         Returns:
             Bucketed histogram results.
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_wgs_84_coordinate_filter(
             self._view_id,
             type_,
             type_prefix,
@@ -480,7 +411,7 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
                 >>> wgs_84_coordinates = client.wgs_84_coordinates.list(limit=5)
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_wgs_84_coordinate_filter(
             self._view_id,
             type_,
             type_prefix,
@@ -489,51 +420,11 @@ class WgsCoordinatesAPI(TypeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
             filter,
         )
 
-        wgs_84_coordinates = self._list(limit=limit, filter=filter_)
-
-        if retrieve_edges:
-            space_arg = {"space": space} if space else {}
-            if len(ids := wgs_84_coordinates.as_node_ids()) > IN_FILTER_LIMIT:
-                feature_edges = self.features.list(limit=-1, **space_arg)
-            else:
-                feature_edges = self.features.list(ids, limit=-1)
-            self._set_features(wgs_84_coordinates, feature_edges)
-
-        return wgs_84_coordinates
-
-    @staticmethod
-    def _set_features(wgs_84_coordinates: Sequence[WgsCoordinates], feature_edges: Sequence[dm.Edge]):
-        edges_by_start_node: Dict[Tuple, List] = defaultdict(list)
-        for edge in feature_edges:
-            edges_by_start_node[edge.start_node.as_tuple()].append(edge)
-
-        for wgs_84_coordinate in wgs_84_coordinates:
-            node_id = wgs_84_coordinate.id_tuple()
-            if node_id in edges_by_start_node:
-                wgs_84_coordinate.features = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
-
-
-def _create_filter(
-    view_id: dm.ViewId,
-    type_: str | list[str] | None = None,
-    type_prefix: str | None = None,
-    external_id_prefix: str | None = None,
-    space: str | list[str] | None = None,
-    filter: dm.Filter | None = None,
-) -> dm.Filter | None:
-    filters = []
-    if type_ and isinstance(type_, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("type"), value=type_))
-    if type_ and isinstance(type_, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("type"), values=type_))
-    if type_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("type"), value=type_prefix))
-    if external_id_prefix:
-        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
-        filters.append(dm.filters.Equals(["node", "space"], value=space))
-    if space and isinstance(space, list):
-        filters.append(dm.filters.In(["node", "space"], values=space))
-    if filter:
-        filters.append(filter)
-    return dm.filters.And(*filters) if filters else None
+        return self._list(
+            limit=limit,
+            filter=filter_,
+            retrieve_edges=retrieve_edges,
+            edge_api_name_pairs=[
+                (self.features_edge, "features"),
+            ],
+        )

@@ -1,26 +1,31 @@
 from __future__ import annotations
 
-from typing import Sequence, overload
+from collections.abc import Sequence
+from typing import overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from osdu_wells.client.data_classes import (
+    DomainModelApply,
+    ResourcesApplyResult,
     FacilitySpecifications,
     FacilitySpecificationsApply,
-    FacilitySpecificationsList,
-    FacilitySpecificationsApplyList,
     FacilitySpecificationsFields,
+    FacilitySpecificationsList,
     FacilitySpecificationsTextFields,
-    DomainModelApply,
 )
-from osdu_wells.client.data_classes._facility_specifications import _FACILITYSPECIFICATIONS_PROPERTIES_BY_FIELD
+from osdu_wells.client.data_classes._facility_specifications import (
+    _FACILITYSPECIFICATIONS_PROPERTIES_BY_FIELD,
+    _create_facility_specification_filter,
+)
+from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from .facility_specifications_query import FacilitySpecificationsQueryAPI
 
 
 class FacilitySpecificationsAPI(
-    TypeAPI[FacilitySpecifications, FacilitySpecificationsApply, FacilitySpecificationsList]
+    NodeAPI[FacilitySpecifications, FacilitySpecificationsApply, FacilitySpecificationsList]
 ):
     def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
         view_id = view_by_write_class[FacilitySpecificationsApply]
@@ -30,15 +35,108 @@ class FacilitySpecificationsAPI(
             class_type=FacilitySpecifications,
             class_apply_type=FacilitySpecificationsApply,
             class_list=FacilitySpecificationsList,
+            view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self._view_by_write_class = view_by_write_class
+
+    def __call__(
+        self,
+        effective_date_time: str | list[str] | None = None,
+        effective_date_time_prefix: str | None = None,
+        facility_specification_date_time: str | list[str] | None = None,
+        facility_specification_date_time_prefix: str | None = None,
+        facility_specification_indicator: bool | None = None,
+        min_facility_specification_quantity: float | None = None,
+        max_facility_specification_quantity: float | None = None,
+        facility_specification_text: str | list[str] | None = None,
+        facility_specification_text_prefix: str | None = None,
+        parameter_type_id: str | list[str] | None = None,
+        parameter_type_id_prefix: str | None = None,
+        termination_date_time: str | list[str] | None = None,
+        termination_date_time_prefix: str | None = None,
+        unit_of_measure_id: str | list[str] | None = None,
+        unit_of_measure_id_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> FacilitySpecificationsQueryAPI[FacilitySpecificationsList]:
+        """Query starting at facility specifications.
+
+        Args:
+            effective_date_time: The effective date time to filter on.
+            effective_date_time_prefix: The prefix of the effective date time to filter on.
+            facility_specification_date_time: The facility specification date time to filter on.
+            facility_specification_date_time_prefix: The prefix of the facility specification date time to filter on.
+            facility_specification_indicator: The facility specification indicator to filter on.
+            min_facility_specification_quantity: The minimum value of the facility specification quantity to filter on.
+            max_facility_specification_quantity: The maximum value of the facility specification quantity to filter on.
+            facility_specification_text: The facility specification text to filter on.
+            facility_specification_text_prefix: The prefix of the facility specification text to filter on.
+            parameter_type_id: The parameter type id to filter on.
+            parameter_type_id_prefix: The prefix of the parameter type id to filter on.
+            termination_date_time: The termination date time to filter on.
+            termination_date_time_prefix: The prefix of the termination date time to filter on.
+            unit_of_measure_id: The unit of measure id to filter on.
+            unit_of_measure_id_prefix: The prefix of the unit of measure id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of facility specifications to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            A query API for facility specifications.
+
+        """
+        filter_ = _create_facility_specification_filter(
+            self._view_id,
+            effective_date_time,
+            effective_date_time_prefix,
+            facility_specification_date_time,
+            facility_specification_date_time_prefix,
+            facility_specification_indicator,
+            min_facility_specification_quantity,
+            max_facility_specification_quantity,
+            facility_specification_text,
+            facility_specification_text_prefix,
+            parameter_type_id,
+            parameter_type_id_prefix,
+            termination_date_time,
+            termination_date_time_prefix,
+            unit_of_measure_id,
+            unit_of_measure_id_prefix,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        builder = QueryBuilder(
+            FacilitySpecificationsList,
+            [
+                QueryStep(
+                    name="facility_specification",
+                    expression=dm.query.NodeResultSetExpression(
+                        from_=None,
+                        filter=filter_,
+                    ),
+                    select=dm.query.Select(
+                        [
+                            dm.query.SourceSelector(
+                                self._view_id, list(_FACILITYSPECIFICATIONS_PROPERTIES_BY_FIELD.values())
+                            )
+                        ]
+                    ),
+                    result_cls=FacilitySpecifications,
+                    max_retrieve_limit=limit,
+                )
+            ],
+        )
+        return FacilitySpecificationsQueryAPI(self._client, builder, self._view_by_write_class)
 
     def apply(
         self,
         facility_specification: FacilitySpecificationsApply | Sequence[FacilitySpecificationsApply],
         replace: bool = False,
-    ) -> dm.InstancesApplyResult:
+    ) -> ResourcesApplyResult:
         """Add or update (upsert) facility specifications.
 
         Args:
@@ -46,7 +144,7 @@ class FacilitySpecificationsAPI(
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes, edges, and time series.
 
         Examples:
 
@@ -59,22 +157,10 @@ class FacilitySpecificationsAPI(
                 >>> result = client.facility_specifications.apply(facility_specification)
 
         """
-        if isinstance(facility_specification, FacilitySpecificationsApply):
-            instances = facility_specification.to_instances_apply(self._view_by_write_class)
-        else:
-            instances = FacilitySpecificationsApplyList(facility_specification).to_instances_apply(
-                self._view_by_write_class
-            )
-        return self._client.data_modeling.instances.apply(
-            nodes=instances.nodes,
-            edges=instances.edges,
-            auto_create_start_nodes=True,
-            auto_create_end_nodes=True,
-            replace=replace,
-        )
+        return self._apply(facility_specification, replace)
 
     def delete(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> dm.InstancesDeleteResult:
         """Delete one or more facility specification.
 
@@ -93,23 +179,18 @@ class FacilitySpecificationsAPI(
                 >>> client = OSDUClient()
                 >>> client.facility_specifications.delete("my_facility_specification")
         """
-        if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
-        else:
-            return self._client.data_modeling.instances.delete(
-                nodes=[(space, id) for id in external_id],
-            )
+        return self._delete(external_id, space)
 
     @overload
     def retrieve(self, external_id: str) -> FacilitySpecifications:
         ...
 
     @overload
-    def retrieve(self, external_id: Sequence[str]) -> FacilitySpecificationsList:
+    def retrieve(self, external_id: SequenceNotStr[str]) -> FacilitySpecificationsList:
         ...
 
     def retrieve(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> FacilitySpecifications | FacilitySpecificationsList:
         """Retrieve one or more facility specifications by id(s).
 
@@ -129,10 +210,7 @@ class FacilitySpecificationsAPI(
                 >>> facility_specification = client.facility_specifications.retrieve("my_facility_specification")
 
         """
-        if isinstance(external_id, str):
-            return self._retrieve((space, external_id))
-        else:
-            return self._retrieve([(space, ext_id) for ext_id in external_id])
+        return self._retrieve(external_id, space)
 
     def search(
         self,
@@ -195,7 +273,7 @@ class FacilitySpecificationsAPI(
                 >>> facility_specifications = client.facility_specifications.search('my_facility_specification')
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_facility_specification_filter(
             self._view_id,
             effective_date_time,
             effective_date_time_prefix,
@@ -357,7 +435,7 @@ class FacilitySpecificationsAPI(
 
         """
 
-        filter_ = _create_filter(
+        filter_ = _create_facility_specification_filter(
             self._view_id,
             effective_date_time,
             effective_date_time_prefix,
@@ -447,7 +525,7 @@ class FacilitySpecificationsAPI(
             Bucketed histogram results.
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_facility_specification_filter(
             self._view_id,
             effective_date_time,
             effective_date_time_prefix,
@@ -536,7 +614,7 @@ class FacilitySpecificationsAPI(
                 >>> facility_specifications = client.facility_specifications.list(limit=5)
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_facility_specification_filter(
             self._view_id,
             effective_date_time,
             effective_date_time_prefix,
@@ -557,112 +635,4 @@ class FacilitySpecificationsAPI(
             space,
             filter,
         )
-
         return self._list(limit=limit, filter=filter_)
-
-
-def _create_filter(
-    view_id: dm.ViewId,
-    effective_date_time: str | list[str] | None = None,
-    effective_date_time_prefix: str | None = None,
-    facility_specification_date_time: str | list[str] | None = None,
-    facility_specification_date_time_prefix: str | None = None,
-    facility_specification_indicator: bool | None = None,
-    min_facility_specification_quantity: float | None = None,
-    max_facility_specification_quantity: float | None = None,
-    facility_specification_text: str | list[str] | None = None,
-    facility_specification_text_prefix: str | None = None,
-    parameter_type_id: str | list[str] | None = None,
-    parameter_type_id_prefix: str | None = None,
-    termination_date_time: str | list[str] | None = None,
-    termination_date_time_prefix: str | None = None,
-    unit_of_measure_id: str | list[str] | None = None,
-    unit_of_measure_id_prefix: str | None = None,
-    external_id_prefix: str | None = None,
-    space: str | list[str] | None = None,
-    filter: dm.Filter | None = None,
-) -> dm.Filter | None:
-    filters = []
-    if effective_date_time and isinstance(effective_date_time, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("EffectiveDateTime"), value=effective_date_time))
-    if effective_date_time and isinstance(effective_date_time, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("EffectiveDateTime"), values=effective_date_time))
-    if effective_date_time_prefix:
-        filters.append(
-            dm.filters.Prefix(view_id.as_property_ref("EffectiveDateTime"), value=effective_date_time_prefix)
-        )
-    if facility_specification_date_time and isinstance(facility_specification_date_time, str):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("FacilitySpecificationDateTime"), value=facility_specification_date_time
-            )
-        )
-    if facility_specification_date_time and isinstance(facility_specification_date_time, list):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("FacilitySpecificationDateTime"), values=facility_specification_date_time
-            )
-        )
-    if facility_specification_date_time_prefix:
-        filters.append(
-            dm.filters.Prefix(
-                view_id.as_property_ref("FacilitySpecificationDateTime"), value=facility_specification_date_time_prefix
-            )
-        )
-    if facility_specification_indicator and isinstance(facility_specification_indicator, str):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("FacilitySpecificationIndicator"), value=facility_specification_indicator
-            )
-        )
-    if min_facility_specification_quantity or max_facility_specification_quantity:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("FacilitySpecificationQuantity"),
-                gte=min_facility_specification_quantity,
-                lte=max_facility_specification_quantity,
-            )
-        )
-    if facility_specification_text and isinstance(facility_specification_text, str):
-        filters.append(
-            dm.filters.Equals(view_id.as_property_ref("FacilitySpecificationText"), value=facility_specification_text)
-        )
-    if facility_specification_text and isinstance(facility_specification_text, list):
-        filters.append(
-            dm.filters.In(view_id.as_property_ref("FacilitySpecificationText"), values=facility_specification_text)
-        )
-    if facility_specification_text_prefix:
-        filters.append(
-            dm.filters.Prefix(
-                view_id.as_property_ref("FacilitySpecificationText"), value=facility_specification_text_prefix
-            )
-        )
-    if parameter_type_id and isinstance(parameter_type_id, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("ParameterTypeID"), value=parameter_type_id))
-    if parameter_type_id and isinstance(parameter_type_id, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("ParameterTypeID"), values=parameter_type_id))
-    if parameter_type_id_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("ParameterTypeID"), value=parameter_type_id_prefix))
-    if termination_date_time and isinstance(termination_date_time, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("TerminationDateTime"), value=termination_date_time))
-    if termination_date_time and isinstance(termination_date_time, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("TerminationDateTime"), values=termination_date_time))
-    if termination_date_time_prefix:
-        filters.append(
-            dm.filters.Prefix(view_id.as_property_ref("TerminationDateTime"), value=termination_date_time_prefix)
-        )
-    if unit_of_measure_id and isinstance(unit_of_measure_id, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("UnitOfMeasureID"), value=unit_of_measure_id))
-    if unit_of_measure_id and isinstance(unit_of_measure_id, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("UnitOfMeasureID"), values=unit_of_measure_id))
-    if unit_of_measure_id_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("UnitOfMeasureID"), value=unit_of_measure_id_prefix))
-    if external_id_prefix:
-        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
-        filters.append(dm.filters.Equals(["node", "space"], value=space))
-    if space and isinstance(space, list):
-        filters.append(dm.filters.In(["node", "space"], values=space))
-    if filter:
-        filters.append(filter)
-    return dm.filters.And(*filters) if filters else None

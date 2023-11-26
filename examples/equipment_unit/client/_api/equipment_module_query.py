@@ -1,15 +1,22 @@
-from cognite.client import data_modeling as dm
+from __future__ import annotations
 
-from equipment_unit.client.data_classes import (
-    EquipmentModuleApply,
-    EquipmentModule,
-)
-from equipment_unit.client.data_classes._equipment_module import _EQUIPMENTMODULE_PROPERTIES_BY_FIELD
+from typing import TYPE_CHECKING
+from cognite.client import data_modeling as dm
 from ._core import QueryStep, QueryAPI, T_DomainModelList
+from equipment_unit.client.data_classes import (
+    EquipmentModule,
+    EquipmentModuleApply,
+)
+from equipment_unit.client.data_classes._equipment_module import (
+    _EQUIPMENTMODULE_PROPERTIES_BY_FIELD,
+)
 
 
 class EquipmentModuleQueryAPI(QueryAPI[T_DomainModelList]):
-    def query(self, retrieve_equipment_module: bool = True) -> T_DomainModelList:
+    def query(
+        self,
+        retrieve_equipment_module: bool = True,
+    ) -> T_DomainModelList:
         """Execute query and return the result.
 
         Args:
@@ -19,14 +26,14 @@ class EquipmentModuleQueryAPI(QueryAPI[T_DomainModelList]):
             The list of the source nodes of the query.
 
         """
-        # If the last step is equipment_module, we already have it in the query.
-        if retrieve_equipment_module and self._builder[-1].name != "equipment_module":
+        from_ = self._builder[-1].name
+        if retrieve_equipment_module and not self._builder[-1].name.startswith("equipment_module"):
             self._builder.append(
                 QueryStep(
-                    name="equipment_module",
+                    name=self._builder.next_name("equipment_module"),
                     expression=dm.query.NodeResultSetExpression(
                         filter=None,
-                        from_=self._builder[-1].name,
+                        from_=from_,
                     ),
                     select=dm.query.Select(
                         [

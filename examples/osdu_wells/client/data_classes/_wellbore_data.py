@@ -1,27 +1,35 @@
 from __future__ import annotations
 
-from typing import Literal, TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
+from ._core import (
+    DomainModel,
+    DomainModelApply,
+    DomainModelApplyList,
+    DomainModelList,
+    DomainRelationApply,
+    ResourcesApply,
+)
 
 if TYPE_CHECKING:
-    from ._drilling_reasons import DrillingReasonsApply
-    from ._facility_events import FacilityEventsApply
-    from ._facility_operators import FacilityOperatorsApply
-    from ._facility_specifications import FacilitySpecificationsApply
-    from ._facility_states import FacilityStatesApply
-    from ._geo_contexts import GeoContextsApply
-    from ._geographic_bottom_hole_location import GeographicBottomHoleLocationApply
-    from ._historical_interests import HistoricalInterestsApply
-    from ._name_aliases import NameAliasesApply
-    from ._projected_bottom_hole_location import ProjectedBottomHoleLocationApply
-    from ._spatial_location import SpatialLocationApply
-    from ._technical_assurances import TechnicalAssurancesApply
-    from ._vertical_measurements import VerticalMeasurementsApply
-    from ._wellbore_costs import WellboreCostsApply
+    from ._drilling_reasons import DrillingReasons, DrillingReasonsApply
+    from ._facility_events import FacilityEvents, FacilityEventsApply
+    from ._facility_operators import FacilityOperators, FacilityOperatorsApply
+    from ._facility_specifications import FacilitySpecifications, FacilitySpecificationsApply
+    from ._facility_states import FacilityStates, FacilityStatesApply
+    from ._geo_contexts import GeoContexts, GeoContextsApply
+    from ._geographic_bottom_hole_location import GeographicBottomHoleLocation, GeographicBottomHoleLocationApply
+    from ._historical_interests import HistoricalInterests, HistoricalInterestsApply
+    from ._name_aliases import NameAliases, NameAliasesApply
+    from ._projected_bottom_hole_location import ProjectedBottomHoleLocation, ProjectedBottomHoleLocationApply
+    from ._spatial_location import SpatialLocation, SpatialLocationApply
+    from ._technical_assurances import TechnicalAssurances, TechnicalAssurancesApply
+    from ._vertical_measurements import VerticalMeasurements, VerticalMeasurementsApply
+    from ._wellbore_costs import WellboreCosts, WellboreCostsApply
+
 
 __all__ = [
     "WellboreData",
@@ -161,7 +169,7 @@ _WELLBOREDATA_PROPERTIES_BY_FIELD = {
 
 
 class WellboreData(DomainModel):
-    """This represent a read version of wellbore datum.
+    """This represents the reading version of wellbore datum.
 
     It is used to when data is retrieved from CDF.
 
@@ -236,29 +244,45 @@ class WellboreData(DomainModel):
     data_source_organisation_id: Optional[str] = Field(None, alias="DataSourceOrganisationID")
     default_vertical_measurement_id: Optional[str] = Field(None, alias="DefaultVerticalMeasurementID")
     definitive_trajectory_id: Optional[str] = Field(None, alias="DefinitiveTrajectoryID")
-    drilling_reasons: Optional[list[str]] = Field(None, alias="DrillingReasons")
+    drilling_reasons: Union[list[DrillingReasons], list[str], None] = Field(
+        default=None, repr=False, alias="DrillingReasons"
+    )
     existence_kind: Optional[str] = Field(None, alias="ExistenceKind")
     facility_description: Optional[str] = Field(None, alias="FacilityDescription")
-    facility_events: Optional[list[str]] = Field(None, alias="FacilityEvents")
+    facility_events: Union[list[FacilityEvents], list[str], None] = Field(
+        default=None, repr=False, alias="FacilityEvents"
+    )
     facility_id: Optional[str] = Field(None, alias="FacilityID")
     facility_name: Optional[str] = Field(None, alias="FacilityName")
-    facility_operators: Optional[list[str]] = Field(None, alias="FacilityOperators")
-    facility_specifications: Optional[list[str]] = Field(None, alias="FacilitySpecifications")
-    facility_states: Optional[list[str]] = Field(None, alias="FacilityStates")
+    facility_operators: Union[list[FacilityOperators], list[str], None] = Field(
+        default=None, repr=False, alias="FacilityOperators"
+    )
+    facility_specifications: Union[list[FacilitySpecifications], list[str], None] = Field(
+        default=None, repr=False, alias="FacilitySpecifications"
+    )
+    facility_states: Union[list[FacilityStates], list[str], None] = Field(
+        default=None, repr=False, alias="FacilityStates"
+    )
     facility_type_id: Optional[str] = Field(None, alias="FacilityTypeID")
     fluid_direction_id: Optional[str] = Field(None, alias="FluidDirectionID")
     formation_name_at_total_depth: Optional[str] = Field(None, alias="FormationNameAtTotalDepth")
-    geo_contexts: Optional[list[str]] = Field(None, alias="GeoContexts")
-    geographic_bottom_hole_location: Optional[str] = Field(None, alias="GeographicBottomHoleLocation")
-    historical_interests: Optional[list[str]] = Field(None, alias="HistoricalInterests")
+    geo_contexts: Union[list[GeoContexts], list[str], None] = Field(default=None, repr=False, alias="GeoContexts")
+    geographic_bottom_hole_location: Union[GeographicBottomHoleLocation, str, None] = Field(
+        None, repr=False, alias="GeographicBottomHoleLocation"
+    )
+    historical_interests: Union[list[HistoricalInterests], list[str], None] = Field(
+        default=None, repr=False, alias="HistoricalInterests"
+    )
     initial_operator_id: Optional[str] = Field(None, alias="InitialOperatorID")
     interest_type_id: Optional[str] = Field(None, alias="InterestTypeID")
     kick_off_wellbore: Optional[str] = Field(None, alias="KickOffWellbore")
-    name_aliases: Optional[list[str]] = Field(None, alias="NameAliases")
+    name_aliases: Union[list[NameAliases], list[str], None] = Field(default=None, repr=False, alias="NameAliases")
     operating_environment_id: Optional[str] = Field(None, alias="OperatingEnvironmentID")
     outcome_id: Optional[str] = Field(None, alias="OutcomeID")
     primary_product_type_id: Optional[str] = Field(None, alias="PrimaryProductTypeID")
-    projected_bottom_hole_location: Optional[str] = Field(None, alias="ProjectedBottomHoleLocation")
+    projected_bottom_hole_location: Union[ProjectedBottomHoleLocation, str, None] = Field(
+        None, repr=False, alias="ProjectedBottomHoleLocation"
+    )
     resource_curation_status: Optional[str] = Field(None, alias="ResourceCurationStatus")
     resource_home_region_id: Optional[str] = Field(None, alias="ResourceHomeRegionID")
     resource_host_region_i_ds: Optional[list[str]] = Field(None, alias="ResourceHostRegionIDs")
@@ -269,15 +293,19 @@ class WellboreData(DomainModel):
     sequence_number: Optional[int] = Field(None, alias="SequenceNumber")
     show_product_type_id: Optional[str] = Field(None, alias="ShowProductTypeID")
     source: Optional[str] = Field(None, alias="Source")
-    spatial_location: Optional[str] = Field(None, alias="SpatialLocation")
+    spatial_location: Union[SpatialLocation, str, None] = Field(None, repr=False, alias="SpatialLocation")
     status_summary_id: Optional[str] = Field(None, alias="StatusSummaryID")
     target_formation: Optional[str] = Field(None, alias="TargetFormation")
     technical_assurance_type_id: Optional[str] = Field(None, alias="TechnicalAssuranceTypeID")
-    technical_assurances: Optional[list[str]] = Field(None, alias="TechnicalAssurances")
+    technical_assurances: Union[list[TechnicalAssurances], list[str], None] = Field(
+        default=None, repr=False, alias="TechnicalAssurances"
+    )
     tertiary_product_type_id: Optional[str] = Field(None, alias="TertiaryProductTypeID")
     trajectory_type_id: Optional[str] = Field(None, alias="TrajectoryTypeID")
     version_creation_reason: Optional[str] = Field(None, alias="VersionCreationReason")
-    vertical_measurements: Optional[list[str]] = Field(None, alias="VerticalMeasurements")
+    vertical_measurements: Union[list[VerticalMeasurements], list[str], None] = Field(
+        default=None, repr=False, alias="VerticalMeasurements"
+    )
     was_business_interest_financial_non_operated: Optional[bool] = Field(
         None, alias="WasBusinessInterestFinancialNonOperated"
     )
@@ -285,11 +313,11 @@ class WellboreData(DomainModel):
     was_business_interest_obligatory: Optional[bool] = Field(None, alias="WasBusinessInterestObligatory")
     was_business_interest_technical: Optional[bool] = Field(None, alias="WasBusinessInterestTechnical")
     well_id: Optional[str] = Field(None, alias="WellID")
-    wellbore_costs: Optional[list[str]] = Field(None, alias="WellboreCosts")
+    wellbore_costs: Union[list[WellboreCosts], list[str], None] = Field(default=None, repr=False, alias="WellboreCosts")
     wellbore_reason_id: Optional[str] = Field(None, alias="WellboreReasonID")
 
     def as_apply(self) -> WellboreDataApply:
-        """Convert this read version of wellbore datum to a write version."""
+        """Convert this read version of wellbore datum to the writing version."""
         return WellboreDataApply(
             space=self.space,
             external_id=self.external_id,
@@ -299,29 +327,59 @@ class WellboreData(DomainModel):
             data_source_organisation_id=self.data_source_organisation_id,
             default_vertical_measurement_id=self.default_vertical_measurement_id,
             definitive_trajectory_id=self.definitive_trajectory_id,
-            drilling_reasons=self.drilling_reasons,
+            drilling_reasons=[
+                drilling_reason.as_apply() if isinstance(drilling_reason, DomainModel) else drilling_reason
+                for drilling_reason in self.drilling_reasons or []
+            ],
             existence_kind=self.existence_kind,
             facility_description=self.facility_description,
-            facility_events=self.facility_events,
+            facility_events=[
+                facility_event.as_apply() if isinstance(facility_event, DomainModel) else facility_event
+                for facility_event in self.facility_events or []
+            ],
             facility_id=self.facility_id,
             facility_name=self.facility_name,
-            facility_operators=self.facility_operators,
-            facility_specifications=self.facility_specifications,
-            facility_states=self.facility_states,
+            facility_operators=[
+                facility_operator.as_apply() if isinstance(facility_operator, DomainModel) else facility_operator
+                for facility_operator in self.facility_operators or []
+            ],
+            facility_specifications=[
+                facility_specification.as_apply()
+                if isinstance(facility_specification, DomainModel)
+                else facility_specification
+                for facility_specification in self.facility_specifications or []
+            ],
+            facility_states=[
+                facility_state.as_apply() if isinstance(facility_state, DomainModel) else facility_state
+                for facility_state in self.facility_states or []
+            ],
             facility_type_id=self.facility_type_id,
             fluid_direction_id=self.fluid_direction_id,
             formation_name_at_total_depth=self.formation_name_at_total_depth,
-            geo_contexts=self.geo_contexts,
-            geographic_bottom_hole_location=self.geographic_bottom_hole_location,
-            historical_interests=self.historical_interests,
+            geo_contexts=[
+                geo_context.as_apply() if isinstance(geo_context, DomainModel) else geo_context
+                for geo_context in self.geo_contexts or []
+            ],
+            geographic_bottom_hole_location=self.geographic_bottom_hole_location.as_apply()
+            if isinstance(self.geographic_bottom_hole_location, DomainModel)
+            else self.geographic_bottom_hole_location,
+            historical_interests=[
+                historical_interest.as_apply() if isinstance(historical_interest, DomainModel) else historical_interest
+                for historical_interest in self.historical_interests or []
+            ],
             initial_operator_id=self.initial_operator_id,
             interest_type_id=self.interest_type_id,
             kick_off_wellbore=self.kick_off_wellbore,
-            name_aliases=self.name_aliases,
+            name_aliases=[
+                name_alias.as_apply() if isinstance(name_alias, DomainModel) else name_alias
+                for name_alias in self.name_aliases or []
+            ],
             operating_environment_id=self.operating_environment_id,
             outcome_id=self.outcome_id,
             primary_product_type_id=self.primary_product_type_id,
-            projected_bottom_hole_location=self.projected_bottom_hole_location,
+            projected_bottom_hole_location=self.projected_bottom_hole_location.as_apply()
+            if isinstance(self.projected_bottom_hole_location, DomainModel)
+            else self.projected_bottom_hole_location,
             resource_curation_status=self.resource_curation_status,
             resource_home_region_id=self.resource_home_region_id,
             resource_host_region_i_ds=self.resource_host_region_i_ds,
@@ -332,27 +390,40 @@ class WellboreData(DomainModel):
             sequence_number=self.sequence_number,
             show_product_type_id=self.show_product_type_id,
             source=self.source,
-            spatial_location=self.spatial_location,
+            spatial_location=self.spatial_location.as_apply()
+            if isinstance(self.spatial_location, DomainModel)
+            else self.spatial_location,
             status_summary_id=self.status_summary_id,
             target_formation=self.target_formation,
             technical_assurance_type_id=self.technical_assurance_type_id,
-            technical_assurances=self.technical_assurances,
+            technical_assurances=[
+                technical_assurance.as_apply() if isinstance(technical_assurance, DomainModel) else technical_assurance
+                for technical_assurance in self.technical_assurances or []
+            ],
             tertiary_product_type_id=self.tertiary_product_type_id,
             trajectory_type_id=self.trajectory_type_id,
             version_creation_reason=self.version_creation_reason,
-            vertical_measurements=self.vertical_measurements,
+            vertical_measurements=[
+                vertical_measurement.as_apply()
+                if isinstance(vertical_measurement, DomainModel)
+                else vertical_measurement
+                for vertical_measurement in self.vertical_measurements or []
+            ],
             was_business_interest_financial_non_operated=self.was_business_interest_financial_non_operated,
             was_business_interest_financial_operated=self.was_business_interest_financial_operated,
             was_business_interest_obligatory=self.was_business_interest_obligatory,
             was_business_interest_technical=self.was_business_interest_technical,
             well_id=self.well_id,
-            wellbore_costs=self.wellbore_costs,
+            wellbore_costs=[
+                wellbore_cost.as_apply() if isinstance(wellbore_cost, DomainModel) else wellbore_cost
+                for wellbore_cost in self.wellbore_costs or []
+            ],
             wellbore_reason_id=self.wellbore_reason_id,
         )
 
 
 class WellboreDataApply(DomainModelApply):
-    """This represent a write version of wellbore datum.
+    """This represents the writing version of wellbore datum.
 
     It is used to when data is sent to CDF.
 
@@ -414,7 +485,7 @@ class WellboreDataApply(DomainModelApply):
         well_id: The well id field.
         wellbore_costs: The wellbore cost field.
         wellbore_reason_id: The wellbore reason id field.
-        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+        existing_version: Fail the ingestion request if the wellbore datum version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
@@ -502,11 +573,17 @@ class WellboreDataApply(DomainModelApply):
     wellbore_reason_id: Optional[str] = Field(None, alias="WellboreReasonID")
 
     def _to_instances_apply(
-        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
-    ) -> dm.InstancesApply:
-        if self.external_id in cache:
-            return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
-        write_view = view_by_write_class and view_by_write_class.get(type(self))
+        self,
+        cache: set[tuple[str, str]],
+        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+    ) -> ResourcesApply:
+        resources = ResourcesApply()
+        if self.as_tuple_id() in cache:
+            return resources
+
+        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
+            "IntegrationTestsImmutable", "WellboreData", "6349cf734b294e"
+        )
 
         properties = {}
         if self.business_intention_id is not None:
@@ -616,358 +693,676 @@ class WellboreDataApply(DomainModelApply):
             properties["WellID"] = self.well_id
         if self.wellbore_reason_id is not None:
             properties["WellboreReasonID"] = self.wellbore_reason_id
+
         if properties:
-            source = dm.NodeOrEdgeData(
-                source=write_view or dm.ViewId("IntegrationTestsImmutable", "WellboreData", "6349cf734b294e"),
-                properties=properties,
-            )
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=[source],
+                sources=[
+                    dm.NodeOrEdgeData(
+                        source=write_view,
+                        properties=properties,
+                    )
+                ],
             )
-            nodes = [this_node]
-        else:
-            nodes = []
+            resources.nodes.append(this_node)
+            cache.add(self.as_tuple_id())
 
-        edges = []
-        cache.add(self.external_id)
-
+        edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.DrillingReasons")
         for drilling_reason in self.drilling_reasons or []:
-            edge = self._create_drilling_reason_edge(drilling_reason)
-            if edge.external_id not in cache:
-                edges.append(edge)
-                cache.add(edge.external_id)
+            other_resources = DomainRelationApply._from_edge_to_resources(
+                cache, self, drilling_reason, edge_type, view_by_write_class
+            )
+            resources.extend(other_resources)
 
-            if isinstance(drilling_reason, DomainModelApply):
-                instances = drilling_reason._to_instances_apply(cache, view_by_write_class)
-                nodes.extend(instances.nodes)
-                edges.extend(instances.edges)
-
+        edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.FacilityEvents")
         for facility_event in self.facility_events or []:
-            edge = self._create_facility_event_edge(facility_event)
-            if edge.external_id not in cache:
-                edges.append(edge)
-                cache.add(edge.external_id)
+            other_resources = DomainRelationApply._from_edge_to_resources(
+                cache, self, facility_event, edge_type, view_by_write_class
+            )
+            resources.extend(other_resources)
 
-            if isinstance(facility_event, DomainModelApply):
-                instances = facility_event._to_instances_apply(cache, view_by_write_class)
-                nodes.extend(instances.nodes)
-                edges.extend(instances.edges)
-
+        edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.FacilityOperators")
         for facility_operator in self.facility_operators or []:
-            edge = self._create_facility_operator_edge(facility_operator)
-            if edge.external_id not in cache:
-                edges.append(edge)
-                cache.add(edge.external_id)
+            other_resources = DomainRelationApply._from_edge_to_resources(
+                cache, self, facility_operator, edge_type, view_by_write_class
+            )
+            resources.extend(other_resources)
 
-            if isinstance(facility_operator, DomainModelApply):
-                instances = facility_operator._to_instances_apply(cache, view_by_write_class)
-                nodes.extend(instances.nodes)
-                edges.extend(instances.edges)
-
+        edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.FacilitySpecifications")
         for facility_specification in self.facility_specifications or []:
-            edge = self._create_facility_specification_edge(facility_specification)
-            if edge.external_id not in cache:
-                edges.append(edge)
-                cache.add(edge.external_id)
+            other_resources = DomainRelationApply._from_edge_to_resources(
+                cache, self, facility_specification, edge_type, view_by_write_class
+            )
+            resources.extend(other_resources)
 
-            if isinstance(facility_specification, DomainModelApply):
-                instances = facility_specification._to_instances_apply(cache, view_by_write_class)
-                nodes.extend(instances.nodes)
-                edges.extend(instances.edges)
-
+        edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.FacilityStates")
         for facility_state in self.facility_states or []:
-            edge = self._create_facility_state_edge(facility_state)
-            if edge.external_id not in cache:
-                edges.append(edge)
-                cache.add(edge.external_id)
+            other_resources = DomainRelationApply._from_edge_to_resources(
+                cache, self, facility_state, edge_type, view_by_write_class
+            )
+            resources.extend(other_resources)
 
-            if isinstance(facility_state, DomainModelApply):
-                instances = facility_state._to_instances_apply(cache, view_by_write_class)
-                nodes.extend(instances.nodes)
-                edges.extend(instances.edges)
-
+        edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.GeoContexts")
         for geo_context in self.geo_contexts or []:
-            edge = self._create_geo_context_edge(geo_context)
-            if edge.external_id not in cache:
-                edges.append(edge)
-                cache.add(edge.external_id)
+            other_resources = DomainRelationApply._from_edge_to_resources(
+                cache, self, geo_context, edge_type, view_by_write_class
+            )
+            resources.extend(other_resources)
 
-            if isinstance(geo_context, DomainModelApply):
-                instances = geo_context._to_instances_apply(cache, view_by_write_class)
-                nodes.extend(instances.nodes)
-                edges.extend(instances.edges)
-
+        edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.HistoricalInterests")
         for historical_interest in self.historical_interests or []:
-            edge = self._create_historical_interest_edge(historical_interest)
-            if edge.external_id not in cache:
-                edges.append(edge)
-                cache.add(edge.external_id)
+            other_resources = DomainRelationApply._from_edge_to_resources(
+                cache, self, historical_interest, edge_type, view_by_write_class
+            )
+            resources.extend(other_resources)
 
-            if isinstance(historical_interest, DomainModelApply):
-                instances = historical_interest._to_instances_apply(cache, view_by_write_class)
-                nodes.extend(instances.nodes)
-                edges.extend(instances.edges)
-
+        edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.NameAliases")
         for name_alias in self.name_aliases or []:
-            edge = self._create_name_alias_edge(name_alias)
-            if edge.external_id not in cache:
-                edges.append(edge)
-                cache.add(edge.external_id)
+            other_resources = DomainRelationApply._from_edge_to_resources(
+                cache, self, name_alias, edge_type, view_by_write_class
+            )
+            resources.extend(other_resources)
 
-            if isinstance(name_alias, DomainModelApply):
-                instances = name_alias._to_instances_apply(cache, view_by_write_class)
-                nodes.extend(instances.nodes)
-                edges.extend(instances.edges)
-
+        edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.TechnicalAssurances")
         for technical_assurance in self.technical_assurances or []:
-            edge = self._create_technical_assurance_edge(technical_assurance)
-            if edge.external_id not in cache:
-                edges.append(edge)
-                cache.add(edge.external_id)
+            other_resources = DomainRelationApply._from_edge_to_resources(
+                cache, self, technical_assurance, edge_type, view_by_write_class
+            )
+            resources.extend(other_resources)
 
-            if isinstance(technical_assurance, DomainModelApply):
-                instances = technical_assurance._to_instances_apply(cache, view_by_write_class)
-                nodes.extend(instances.nodes)
-                edges.extend(instances.edges)
-
+        edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.VerticalMeasurements")
         for vertical_measurement in self.vertical_measurements or []:
-            edge = self._create_vertical_measurement_edge(vertical_measurement)
-            if edge.external_id not in cache:
-                edges.append(edge)
-                cache.add(edge.external_id)
+            other_resources = DomainRelationApply._from_edge_to_resources(
+                cache, self, vertical_measurement, edge_type, view_by_write_class
+            )
+            resources.extend(other_resources)
 
-            if isinstance(vertical_measurement, DomainModelApply):
-                instances = vertical_measurement._to_instances_apply(cache, view_by_write_class)
-                nodes.extend(instances.nodes)
-                edges.extend(instances.edges)
-
+        edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.WellboreCosts")
         for wellbore_cost in self.wellbore_costs or []:
-            edge = self._create_wellbore_cost_edge(wellbore_cost)
-            if edge.external_id not in cache:
-                edges.append(edge)
-                cache.add(edge.external_id)
-
-            if isinstance(wellbore_cost, DomainModelApply):
-                instances = wellbore_cost._to_instances_apply(cache, view_by_write_class)
-                nodes.extend(instances.nodes)
-                edges.extend(instances.edges)
+            other_resources = DomainRelationApply._from_edge_to_resources(
+                cache, self, wellbore_cost, edge_type, view_by_write_class
+            )
+            resources.extend(other_resources)
 
         if isinstance(self.geographic_bottom_hole_location, DomainModelApply):
-            instances = self.geographic_bottom_hole_location._to_instances_apply(cache, view_by_write_class)
-            nodes.extend(instances.nodes)
-            edges.extend(instances.edges)
+            other_resources = self.geographic_bottom_hole_location._to_instances_apply(cache, view_by_write_class)
+            resources.extend(other_resources)
 
         if isinstance(self.projected_bottom_hole_location, DomainModelApply):
-            instances = self.projected_bottom_hole_location._to_instances_apply(cache, view_by_write_class)
-            nodes.extend(instances.nodes)
-            edges.extend(instances.edges)
+            other_resources = self.projected_bottom_hole_location._to_instances_apply(cache, view_by_write_class)
+            resources.extend(other_resources)
 
         if isinstance(self.spatial_location, DomainModelApply):
-            instances = self.spatial_location._to_instances_apply(cache, view_by_write_class)
-            nodes.extend(instances.nodes)
-            edges.extend(instances.edges)
+            other_resources = self.spatial_location._to_instances_apply(cache, view_by_write_class)
+            resources.extend(other_resources)
 
-        return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
-
-    def _create_drilling_reason_edge(self, drilling_reason: Union[str, DrillingReasonsApply]) -> dm.EdgeApply:
-        if isinstance(drilling_reason, str):
-            end_space, end_node_ext_id = self.space, drilling_reason
-        elif isinstance(drilling_reason, DomainModelApply):
-            end_space, end_node_ext_id = drilling_reason.space, drilling_reason.external_id
-        else:
-            raise TypeError(f"Expected str or DrillingReasonsApply, got {type(drilling_reason)}")
-
-        return dm.EdgeApply(
-            space=self.space,
-            external_id=f"{self.external_id}:{end_node_ext_id}",
-            type=dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.DrillingReasons"),
-            start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
-        )
-
-    def _create_facility_event_edge(self, facility_event: Union[str, FacilityEventsApply]) -> dm.EdgeApply:
-        if isinstance(facility_event, str):
-            end_space, end_node_ext_id = self.space, facility_event
-        elif isinstance(facility_event, DomainModelApply):
-            end_space, end_node_ext_id = facility_event.space, facility_event.external_id
-        else:
-            raise TypeError(f"Expected str or FacilityEventsApply, got {type(facility_event)}")
-
-        return dm.EdgeApply(
-            space=self.space,
-            external_id=f"{self.external_id}:{end_node_ext_id}",
-            type=dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.FacilityEvents"),
-            start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
-        )
-
-    def _create_facility_operator_edge(self, facility_operator: Union[str, FacilityOperatorsApply]) -> dm.EdgeApply:
-        if isinstance(facility_operator, str):
-            end_space, end_node_ext_id = self.space, facility_operator
-        elif isinstance(facility_operator, DomainModelApply):
-            end_space, end_node_ext_id = facility_operator.space, facility_operator.external_id
-        else:
-            raise TypeError(f"Expected str or FacilityOperatorsApply, got {type(facility_operator)}")
-
-        return dm.EdgeApply(
-            space=self.space,
-            external_id=f"{self.external_id}:{end_node_ext_id}",
-            type=dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.FacilityOperators"),
-            start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
-        )
-
-    def _create_facility_specification_edge(
-        self, facility_specification: Union[str, FacilitySpecificationsApply]
-    ) -> dm.EdgeApply:
-        if isinstance(facility_specification, str):
-            end_space, end_node_ext_id = self.space, facility_specification
-        elif isinstance(facility_specification, DomainModelApply):
-            end_space, end_node_ext_id = facility_specification.space, facility_specification.external_id
-        else:
-            raise TypeError(f"Expected str or FacilitySpecificationsApply, got {type(facility_specification)}")
-
-        return dm.EdgeApply(
-            space=self.space,
-            external_id=f"{self.external_id}:{end_node_ext_id}",
-            type=dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.FacilitySpecifications"),
-            start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
-        )
-
-    def _create_facility_state_edge(self, facility_state: Union[str, FacilityStatesApply]) -> dm.EdgeApply:
-        if isinstance(facility_state, str):
-            end_space, end_node_ext_id = self.space, facility_state
-        elif isinstance(facility_state, DomainModelApply):
-            end_space, end_node_ext_id = facility_state.space, facility_state.external_id
-        else:
-            raise TypeError(f"Expected str or FacilityStatesApply, got {type(facility_state)}")
-
-        return dm.EdgeApply(
-            space=self.space,
-            external_id=f"{self.external_id}:{end_node_ext_id}",
-            type=dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.FacilityStates"),
-            start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
-        )
-
-    def _create_geo_context_edge(self, geo_context: Union[str, GeoContextsApply]) -> dm.EdgeApply:
-        if isinstance(geo_context, str):
-            end_space, end_node_ext_id = self.space, geo_context
-        elif isinstance(geo_context, DomainModelApply):
-            end_space, end_node_ext_id = geo_context.space, geo_context.external_id
-        else:
-            raise TypeError(f"Expected str or GeoContextsApply, got {type(geo_context)}")
-
-        return dm.EdgeApply(
-            space=self.space,
-            external_id=f"{self.external_id}:{end_node_ext_id}",
-            type=dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.GeoContexts"),
-            start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
-        )
-
-    def _create_historical_interest_edge(
-        self, historical_interest: Union[str, HistoricalInterestsApply]
-    ) -> dm.EdgeApply:
-        if isinstance(historical_interest, str):
-            end_space, end_node_ext_id = self.space, historical_interest
-        elif isinstance(historical_interest, DomainModelApply):
-            end_space, end_node_ext_id = historical_interest.space, historical_interest.external_id
-        else:
-            raise TypeError(f"Expected str or HistoricalInterestsApply, got {type(historical_interest)}")
-
-        return dm.EdgeApply(
-            space=self.space,
-            external_id=f"{self.external_id}:{end_node_ext_id}",
-            type=dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.HistoricalInterests"),
-            start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
-        )
-
-    def _create_name_alias_edge(self, name_alias: Union[str, NameAliasesApply]) -> dm.EdgeApply:
-        if isinstance(name_alias, str):
-            end_space, end_node_ext_id = self.space, name_alias
-        elif isinstance(name_alias, DomainModelApply):
-            end_space, end_node_ext_id = name_alias.space, name_alias.external_id
-        else:
-            raise TypeError(f"Expected str or NameAliasesApply, got {type(name_alias)}")
-
-        return dm.EdgeApply(
-            space=self.space,
-            external_id=f"{self.external_id}:{end_node_ext_id}",
-            type=dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.NameAliases"),
-            start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
-        )
-
-    def _create_technical_assurance_edge(
-        self, technical_assurance: Union[str, TechnicalAssurancesApply]
-    ) -> dm.EdgeApply:
-        if isinstance(technical_assurance, str):
-            end_space, end_node_ext_id = self.space, technical_assurance
-        elif isinstance(technical_assurance, DomainModelApply):
-            end_space, end_node_ext_id = technical_assurance.space, technical_assurance.external_id
-        else:
-            raise TypeError(f"Expected str or TechnicalAssurancesApply, got {type(technical_assurance)}")
-
-        return dm.EdgeApply(
-            space=self.space,
-            external_id=f"{self.external_id}:{end_node_ext_id}",
-            type=dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.TechnicalAssurances"),
-            start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
-        )
-
-    def _create_vertical_measurement_edge(
-        self, vertical_measurement: Union[str, VerticalMeasurementsApply]
-    ) -> dm.EdgeApply:
-        if isinstance(vertical_measurement, str):
-            end_space, end_node_ext_id = self.space, vertical_measurement
-        elif isinstance(vertical_measurement, DomainModelApply):
-            end_space, end_node_ext_id = vertical_measurement.space, vertical_measurement.external_id
-        else:
-            raise TypeError(f"Expected str or VerticalMeasurementsApply, got {type(vertical_measurement)}")
-
-        return dm.EdgeApply(
-            space=self.space,
-            external_id=f"{self.external_id}:{end_node_ext_id}",
-            type=dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.VerticalMeasurements"),
-            start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
-        )
-
-    def _create_wellbore_cost_edge(self, wellbore_cost: Union[str, WellboreCostsApply]) -> dm.EdgeApply:
-        if isinstance(wellbore_cost, str):
-            end_space, end_node_ext_id = self.space, wellbore_cost
-        elif isinstance(wellbore_cost, DomainModelApply):
-            end_space, end_node_ext_id = wellbore_cost.space, wellbore_cost.external_id
-        else:
-            raise TypeError(f"Expected str or WellboreCostsApply, got {type(wellbore_cost)}")
-
-        return dm.EdgeApply(
-            space=self.space,
-            external_id=f"{self.external_id}:{end_node_ext_id}",
-            type=dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.WellboreCosts"),
-            start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
-        )
+        return resources
 
 
-class WellboreDataList(TypeList[WellboreData]):
-    """List of wellbore data in read version."""
+class WellboreDataList(DomainModelList[WellboreData]):
+    """List of wellbore data in the read version."""
 
-    _NODE = WellboreData
+    _INSTANCE = WellboreData
 
     def as_apply(self) -> WellboreDataApplyList:
-        """Convert this read version of wellbore datum to a write version."""
+        """Convert these read versions of wellbore datum to the writing versions."""
         return WellboreDataApplyList([node.as_apply() for node in self.data])
 
 
-class WellboreDataApplyList(TypeApplyList[WellboreDataApply]):
-    """List of wellbore data in write version."""
+class WellboreDataApplyList(DomainModelApplyList[WellboreDataApply]):
+    """List of wellbore data in the writing version."""
 
-    _NODE = WellboreDataApply
+    _INSTANCE = WellboreDataApply
+
+
+def _create_wellbore_datum_filter(
+    view_id: dm.ViewId,
+    business_intention_id: str | list[str] | None = None,
+    business_intention_id_prefix: str | None = None,
+    condition_id: str | list[str] | None = None,
+    condition_id_prefix: str | None = None,
+    current_operator_id: str | list[str] | None = None,
+    current_operator_id_prefix: str | None = None,
+    data_source_organisation_id: str | list[str] | None = None,
+    data_source_organisation_id_prefix: str | None = None,
+    default_vertical_measurement_id: str | list[str] | None = None,
+    default_vertical_measurement_id_prefix: str | None = None,
+    definitive_trajectory_id: str | list[str] | None = None,
+    definitive_trajectory_id_prefix: str | None = None,
+    existence_kind: str | list[str] | None = None,
+    existence_kind_prefix: str | None = None,
+    facility_description: str | list[str] | None = None,
+    facility_description_prefix: str | None = None,
+    facility_id: str | list[str] | None = None,
+    facility_id_prefix: str | None = None,
+    facility_name: str | list[str] | None = None,
+    facility_name_prefix: str | None = None,
+    facility_type_id: str | list[str] | None = None,
+    facility_type_id_prefix: str | None = None,
+    fluid_direction_id: str | list[str] | None = None,
+    fluid_direction_id_prefix: str | None = None,
+    formation_name_at_total_depth: str | list[str] | None = None,
+    formation_name_at_total_depth_prefix: str | None = None,
+    geographic_bottom_hole_location: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+    initial_operator_id: str | list[str] | None = None,
+    initial_operator_id_prefix: str | None = None,
+    interest_type_id: str | list[str] | None = None,
+    interest_type_id_prefix: str | None = None,
+    kick_off_wellbore: str | list[str] | None = None,
+    kick_off_wellbore_prefix: str | None = None,
+    operating_environment_id: str | list[str] | None = None,
+    operating_environment_id_prefix: str | None = None,
+    outcome_id: str | list[str] | None = None,
+    outcome_id_prefix: str | None = None,
+    primary_product_type_id: str | list[str] | None = None,
+    primary_product_type_id_prefix: str | None = None,
+    projected_bottom_hole_location: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+    resource_curation_status: str | list[str] | None = None,
+    resource_curation_status_prefix: str | None = None,
+    resource_home_region_id: str | list[str] | None = None,
+    resource_home_region_id_prefix: str | None = None,
+    resource_lifecycle_status: str | list[str] | None = None,
+    resource_lifecycle_status_prefix: str | None = None,
+    resource_security_classification: str | list[str] | None = None,
+    resource_security_classification_prefix: str | None = None,
+    role_id: str | list[str] | None = None,
+    role_id_prefix: str | None = None,
+    secondary_product_type_id: str | list[str] | None = None,
+    secondary_product_type_id_prefix: str | None = None,
+    min_sequence_number: int | None = None,
+    max_sequence_number: int | None = None,
+    show_product_type_id: str | list[str] | None = None,
+    show_product_type_id_prefix: str | None = None,
+    source: str | list[str] | None = None,
+    source_prefix: str | None = None,
+    spatial_location: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+    status_summary_id: str | list[str] | None = None,
+    status_summary_id_prefix: str | None = None,
+    target_formation: str | list[str] | None = None,
+    target_formation_prefix: str | None = None,
+    technical_assurance_type_id: str | list[str] | None = None,
+    technical_assurance_type_id_prefix: str | None = None,
+    tertiary_product_type_id: str | list[str] | None = None,
+    tertiary_product_type_id_prefix: str | None = None,
+    trajectory_type_id: str | list[str] | None = None,
+    trajectory_type_id_prefix: str | None = None,
+    version_creation_reason: str | list[str] | None = None,
+    version_creation_reason_prefix: str | None = None,
+    was_business_interest_financial_non_operated: bool | None = None,
+    was_business_interest_financial_operated: bool | None = None,
+    was_business_interest_obligatory: bool | None = None,
+    was_business_interest_technical: bool | None = None,
+    well_id: str | list[str] | None = None,
+    well_id_prefix: str | None = None,
+    wellbore_reason_id: str | list[str] | None = None,
+    wellbore_reason_id_prefix: str | None = None,
+    external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if business_intention_id and isinstance(business_intention_id, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("BusinessIntentionID"), value=business_intention_id))
+    if business_intention_id and isinstance(business_intention_id, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("BusinessIntentionID"), values=business_intention_id))
+    if business_intention_id_prefix:
+        filters.append(
+            dm.filters.Prefix(view_id.as_property_ref("BusinessIntentionID"), value=business_intention_id_prefix)
+        )
+    if condition_id and isinstance(condition_id, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("ConditionID"), value=condition_id))
+    if condition_id and isinstance(condition_id, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("ConditionID"), values=condition_id))
+    if condition_id_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("ConditionID"), value=condition_id_prefix))
+    if current_operator_id and isinstance(current_operator_id, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("CurrentOperatorID"), value=current_operator_id))
+    if current_operator_id and isinstance(current_operator_id, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("CurrentOperatorID"), values=current_operator_id))
+    if current_operator_id_prefix:
+        filters.append(
+            dm.filters.Prefix(view_id.as_property_ref("CurrentOperatorID"), value=current_operator_id_prefix)
+        )
+    if data_source_organisation_id and isinstance(data_source_organisation_id, str):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("DataSourceOrganisationID"), value=data_source_organisation_id)
+        )
+    if data_source_organisation_id and isinstance(data_source_organisation_id, list):
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("DataSourceOrganisationID"), values=data_source_organisation_id)
+        )
+    if data_source_organisation_id_prefix:
+        filters.append(
+            dm.filters.Prefix(
+                view_id.as_property_ref("DataSourceOrganisationID"), value=data_source_organisation_id_prefix
+            )
+        )
+    if default_vertical_measurement_id and isinstance(default_vertical_measurement_id, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("DefaultVerticalMeasurementID"), value=default_vertical_measurement_id
+            )
+        )
+    if default_vertical_measurement_id and isinstance(default_vertical_measurement_id, list):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("DefaultVerticalMeasurementID"), values=default_vertical_measurement_id
+            )
+        )
+    if default_vertical_measurement_id_prefix:
+        filters.append(
+            dm.filters.Prefix(
+                view_id.as_property_ref("DefaultVerticalMeasurementID"), value=default_vertical_measurement_id_prefix
+            )
+        )
+    if definitive_trajectory_id and isinstance(definitive_trajectory_id, str):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("DefinitiveTrajectoryID"), value=definitive_trajectory_id)
+        )
+    if definitive_trajectory_id and isinstance(definitive_trajectory_id, list):
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("DefinitiveTrajectoryID"), values=definitive_trajectory_id)
+        )
+    if definitive_trajectory_id_prefix:
+        filters.append(
+            dm.filters.Prefix(view_id.as_property_ref("DefinitiveTrajectoryID"), value=definitive_trajectory_id_prefix)
+        )
+    if existence_kind and isinstance(existence_kind, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("ExistenceKind"), value=existence_kind))
+    if existence_kind and isinstance(existence_kind, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("ExistenceKind"), values=existence_kind))
+    if existence_kind_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("ExistenceKind"), value=existence_kind_prefix))
+    if facility_description and isinstance(facility_description, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("FacilityDescription"), value=facility_description))
+    if facility_description and isinstance(facility_description, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("FacilityDescription"), values=facility_description))
+    if facility_description_prefix:
+        filters.append(
+            dm.filters.Prefix(view_id.as_property_ref("FacilityDescription"), value=facility_description_prefix)
+        )
+    if facility_id and isinstance(facility_id, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("FacilityID"), value=facility_id))
+    if facility_id and isinstance(facility_id, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("FacilityID"), values=facility_id))
+    if facility_id_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("FacilityID"), value=facility_id_prefix))
+    if facility_name and isinstance(facility_name, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("FacilityName"), value=facility_name))
+    if facility_name and isinstance(facility_name, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("FacilityName"), values=facility_name))
+    if facility_name_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("FacilityName"), value=facility_name_prefix))
+    if facility_type_id and isinstance(facility_type_id, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("FacilityTypeID"), value=facility_type_id))
+    if facility_type_id and isinstance(facility_type_id, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("FacilityTypeID"), values=facility_type_id))
+    if facility_type_id_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("FacilityTypeID"), value=facility_type_id_prefix))
+    if fluid_direction_id and isinstance(fluid_direction_id, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("FluidDirectionID"), value=fluid_direction_id))
+    if fluid_direction_id and isinstance(fluid_direction_id, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("FluidDirectionID"), values=fluid_direction_id))
+    if fluid_direction_id_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("FluidDirectionID"), value=fluid_direction_id_prefix))
+    if formation_name_at_total_depth and isinstance(formation_name_at_total_depth, str):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("FormationNameAtTotalDepth"), value=formation_name_at_total_depth)
+        )
+    if formation_name_at_total_depth and isinstance(formation_name_at_total_depth, list):
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("FormationNameAtTotalDepth"), values=formation_name_at_total_depth)
+        )
+    if formation_name_at_total_depth_prefix:
+        filters.append(
+            dm.filters.Prefix(
+                view_id.as_property_ref("FormationNameAtTotalDepth"), value=formation_name_at_total_depth_prefix
+            )
+        )
+    if geographic_bottom_hole_location and isinstance(geographic_bottom_hole_location, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("GeographicBottomHoleLocation"),
+                value={"space": "IntegrationTestsImmutable", "externalId": geographic_bottom_hole_location},
+            )
+        )
+    if geographic_bottom_hole_location and isinstance(geographic_bottom_hole_location, tuple):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("GeographicBottomHoleLocation"),
+                value={"space": geographic_bottom_hole_location[0], "externalId": geographic_bottom_hole_location[1]},
+            )
+        )
+    if (
+        geographic_bottom_hole_location
+        and isinstance(geographic_bottom_hole_location, list)
+        and isinstance(geographic_bottom_hole_location[0], str)
+    ):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("GeographicBottomHoleLocation"),
+                values=[
+                    {"space": "IntegrationTestsImmutable", "externalId": item}
+                    for item in geographic_bottom_hole_location
+                ],
+            )
+        )
+    if (
+        geographic_bottom_hole_location
+        and isinstance(geographic_bottom_hole_location, list)
+        and isinstance(geographic_bottom_hole_location[0], tuple)
+    ):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("GeographicBottomHoleLocation"),
+                values=[{"space": item[0], "externalId": item[1]} for item in geographic_bottom_hole_location],
+            )
+        )
+    if initial_operator_id and isinstance(initial_operator_id, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("InitialOperatorID"), value=initial_operator_id))
+    if initial_operator_id and isinstance(initial_operator_id, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("InitialOperatorID"), values=initial_operator_id))
+    if initial_operator_id_prefix:
+        filters.append(
+            dm.filters.Prefix(view_id.as_property_ref("InitialOperatorID"), value=initial_operator_id_prefix)
+        )
+    if interest_type_id and isinstance(interest_type_id, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("InterestTypeID"), value=interest_type_id))
+    if interest_type_id and isinstance(interest_type_id, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("InterestTypeID"), values=interest_type_id))
+    if interest_type_id_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("InterestTypeID"), value=interest_type_id_prefix))
+    if kick_off_wellbore and isinstance(kick_off_wellbore, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("KickOffWellbore"), value=kick_off_wellbore))
+    if kick_off_wellbore and isinstance(kick_off_wellbore, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("KickOffWellbore"), values=kick_off_wellbore))
+    if kick_off_wellbore_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("KickOffWellbore"), value=kick_off_wellbore_prefix))
+    if operating_environment_id and isinstance(operating_environment_id, str):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("OperatingEnvironmentID"), value=operating_environment_id)
+        )
+    if operating_environment_id and isinstance(operating_environment_id, list):
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("OperatingEnvironmentID"), values=operating_environment_id)
+        )
+    if operating_environment_id_prefix:
+        filters.append(
+            dm.filters.Prefix(view_id.as_property_ref("OperatingEnvironmentID"), value=operating_environment_id_prefix)
+        )
+    if outcome_id and isinstance(outcome_id, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("OutcomeID"), value=outcome_id))
+    if outcome_id and isinstance(outcome_id, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("OutcomeID"), values=outcome_id))
+    if outcome_id_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("OutcomeID"), value=outcome_id_prefix))
+    if primary_product_type_id and isinstance(primary_product_type_id, str):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("PrimaryProductTypeID"), value=primary_product_type_id)
+        )
+    if primary_product_type_id and isinstance(primary_product_type_id, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("PrimaryProductTypeID"), values=primary_product_type_id))
+    if primary_product_type_id_prefix:
+        filters.append(
+            dm.filters.Prefix(view_id.as_property_ref("PrimaryProductTypeID"), value=primary_product_type_id_prefix)
+        )
+    if projected_bottom_hole_location and isinstance(projected_bottom_hole_location, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("ProjectedBottomHoleLocation"),
+                value={"space": "IntegrationTestsImmutable", "externalId": projected_bottom_hole_location},
+            )
+        )
+    if projected_bottom_hole_location and isinstance(projected_bottom_hole_location, tuple):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("ProjectedBottomHoleLocation"),
+                value={"space": projected_bottom_hole_location[0], "externalId": projected_bottom_hole_location[1]},
+            )
+        )
+    if (
+        projected_bottom_hole_location
+        and isinstance(projected_bottom_hole_location, list)
+        and isinstance(projected_bottom_hole_location[0], str)
+    ):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("ProjectedBottomHoleLocation"),
+                values=[
+                    {"space": "IntegrationTestsImmutable", "externalId": item}
+                    for item in projected_bottom_hole_location
+                ],
+            )
+        )
+    if (
+        projected_bottom_hole_location
+        and isinstance(projected_bottom_hole_location, list)
+        and isinstance(projected_bottom_hole_location[0], tuple)
+    ):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("ProjectedBottomHoleLocation"),
+                values=[{"space": item[0], "externalId": item[1]} for item in projected_bottom_hole_location],
+            )
+        )
+    if resource_curation_status and isinstance(resource_curation_status, str):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("ResourceCurationStatus"), value=resource_curation_status)
+        )
+    if resource_curation_status and isinstance(resource_curation_status, list):
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("ResourceCurationStatus"), values=resource_curation_status)
+        )
+    if resource_curation_status_prefix:
+        filters.append(
+            dm.filters.Prefix(view_id.as_property_ref("ResourceCurationStatus"), value=resource_curation_status_prefix)
+        )
+    if resource_home_region_id and isinstance(resource_home_region_id, str):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("ResourceHomeRegionID"), value=resource_home_region_id)
+        )
+    if resource_home_region_id and isinstance(resource_home_region_id, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("ResourceHomeRegionID"), values=resource_home_region_id))
+    if resource_home_region_id_prefix:
+        filters.append(
+            dm.filters.Prefix(view_id.as_property_ref("ResourceHomeRegionID"), value=resource_home_region_id_prefix)
+        )
+    if resource_lifecycle_status and isinstance(resource_lifecycle_status, str):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("ResourceLifecycleStatus"), value=resource_lifecycle_status)
+        )
+    if resource_lifecycle_status and isinstance(resource_lifecycle_status, list):
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("ResourceLifecycleStatus"), values=resource_lifecycle_status)
+        )
+    if resource_lifecycle_status_prefix:
+        filters.append(
+            dm.filters.Prefix(
+                view_id.as_property_ref("ResourceLifecycleStatus"), value=resource_lifecycle_status_prefix
+            )
+        )
+    if resource_security_classification and isinstance(resource_security_classification, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("ResourceSecurityClassification"), value=resource_security_classification
+            )
+        )
+    if resource_security_classification and isinstance(resource_security_classification, list):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("ResourceSecurityClassification"), values=resource_security_classification
+            )
+        )
+    if resource_security_classification_prefix:
+        filters.append(
+            dm.filters.Prefix(
+                view_id.as_property_ref("ResourceSecurityClassification"), value=resource_security_classification_prefix
+            )
+        )
+    if role_id and isinstance(role_id, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("RoleID"), value=role_id))
+    if role_id and isinstance(role_id, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("RoleID"), values=role_id))
+    if role_id_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("RoleID"), value=role_id_prefix))
+    if secondary_product_type_id and isinstance(secondary_product_type_id, str):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("SecondaryProductTypeID"), value=secondary_product_type_id)
+        )
+    if secondary_product_type_id and isinstance(secondary_product_type_id, list):
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("SecondaryProductTypeID"), values=secondary_product_type_id)
+        )
+    if secondary_product_type_id_prefix:
+        filters.append(
+            dm.filters.Prefix(view_id.as_property_ref("SecondaryProductTypeID"), value=secondary_product_type_id_prefix)
+        )
+    if min_sequence_number or max_sequence_number:
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("SequenceNumber"), gte=min_sequence_number, lte=max_sequence_number
+            )
+        )
+    if show_product_type_id and isinstance(show_product_type_id, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("ShowProductTypeID"), value=show_product_type_id))
+    if show_product_type_id and isinstance(show_product_type_id, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("ShowProductTypeID"), values=show_product_type_id))
+    if show_product_type_id_prefix:
+        filters.append(
+            dm.filters.Prefix(view_id.as_property_ref("ShowProductTypeID"), value=show_product_type_id_prefix)
+        )
+    if source and isinstance(source, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("Source"), value=source))
+    if source and isinstance(source, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("Source"), values=source))
+    if source_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("Source"), value=source_prefix))
+    if spatial_location and isinstance(spatial_location, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("SpatialLocation"),
+                value={"space": "IntegrationTestsImmutable", "externalId": spatial_location},
+            )
+        )
+    if spatial_location and isinstance(spatial_location, tuple):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("SpatialLocation"),
+                value={"space": spatial_location[0], "externalId": spatial_location[1]},
+            )
+        )
+    if spatial_location and isinstance(spatial_location, list) and isinstance(spatial_location[0], str):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("SpatialLocation"),
+                values=[{"space": "IntegrationTestsImmutable", "externalId": item} for item in spatial_location],
+            )
+        )
+    if spatial_location and isinstance(spatial_location, list) and isinstance(spatial_location[0], tuple):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("SpatialLocation"),
+                values=[{"space": item[0], "externalId": item[1]} for item in spatial_location],
+            )
+        )
+    if status_summary_id and isinstance(status_summary_id, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("StatusSummaryID"), value=status_summary_id))
+    if status_summary_id and isinstance(status_summary_id, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("StatusSummaryID"), values=status_summary_id))
+    if status_summary_id_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("StatusSummaryID"), value=status_summary_id_prefix))
+    if target_formation and isinstance(target_formation, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("TargetFormation"), value=target_formation))
+    if target_formation and isinstance(target_formation, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("TargetFormation"), values=target_formation))
+    if target_formation_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("TargetFormation"), value=target_formation_prefix))
+    if technical_assurance_type_id and isinstance(technical_assurance_type_id, str):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("TechnicalAssuranceTypeID"), value=technical_assurance_type_id)
+        )
+    if technical_assurance_type_id and isinstance(technical_assurance_type_id, list):
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("TechnicalAssuranceTypeID"), values=technical_assurance_type_id)
+        )
+    if technical_assurance_type_id_prefix:
+        filters.append(
+            dm.filters.Prefix(
+                view_id.as_property_ref("TechnicalAssuranceTypeID"), value=technical_assurance_type_id_prefix
+            )
+        )
+    if tertiary_product_type_id and isinstance(tertiary_product_type_id, str):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("TertiaryProductTypeID"), value=tertiary_product_type_id)
+        )
+    if tertiary_product_type_id and isinstance(tertiary_product_type_id, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("TertiaryProductTypeID"), values=tertiary_product_type_id))
+    if tertiary_product_type_id_prefix:
+        filters.append(
+            dm.filters.Prefix(view_id.as_property_ref("TertiaryProductTypeID"), value=tertiary_product_type_id_prefix)
+        )
+    if trajectory_type_id and isinstance(trajectory_type_id, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("TrajectoryTypeID"), value=trajectory_type_id))
+    if trajectory_type_id and isinstance(trajectory_type_id, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("TrajectoryTypeID"), values=trajectory_type_id))
+    if trajectory_type_id_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("TrajectoryTypeID"), value=trajectory_type_id_prefix))
+    if version_creation_reason and isinstance(version_creation_reason, str):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("VersionCreationReason"), value=version_creation_reason)
+        )
+    if version_creation_reason and isinstance(version_creation_reason, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("VersionCreationReason"), values=version_creation_reason))
+    if version_creation_reason_prefix:
+        filters.append(
+            dm.filters.Prefix(view_id.as_property_ref("VersionCreationReason"), value=version_creation_reason_prefix)
+        )
+    if was_business_interest_financial_non_operated and isinstance(was_business_interest_financial_non_operated, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("WasBusinessInterestFinancialNonOperated"),
+                value=was_business_interest_financial_non_operated,
+            )
+        )
+    if was_business_interest_financial_operated and isinstance(was_business_interest_financial_operated, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("WasBusinessInterestFinancialOperated"),
+                value=was_business_interest_financial_operated,
+            )
+        )
+    if was_business_interest_obligatory and isinstance(was_business_interest_obligatory, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("WasBusinessInterestObligatory"), value=was_business_interest_obligatory
+            )
+        )
+    if was_business_interest_technical and isinstance(was_business_interest_technical, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("WasBusinessInterestTechnical"), value=was_business_interest_technical
+            )
+        )
+    if well_id and isinstance(well_id, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("WellID"), value=well_id))
+    if well_id and isinstance(well_id, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("WellID"), values=well_id))
+    if well_id_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("WellID"), value=well_id_prefix))
+    if wellbore_reason_id and isinstance(wellbore_reason_id, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("WellboreReasonID"), value=wellbore_reason_id))
+    if wellbore_reason_id and isinstance(wellbore_reason_id, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("WellboreReasonID"), values=wellbore_reason_id))
+    if wellbore_reason_id_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("WellboreReasonID"), value=wellbore_reason_id_prefix))
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

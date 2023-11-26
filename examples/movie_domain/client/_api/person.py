@@ -455,7 +455,6 @@ class PersonAPI(NodeAPI[Person, PersonApply, PersonList]):
         return self._list(
             limit=limit,
             filter=filter_,
-            space=space,
             retrieve_edges=retrieve_edges,
             edge_api_name_pairs=[
                 (self.roles_edge, "roles"),

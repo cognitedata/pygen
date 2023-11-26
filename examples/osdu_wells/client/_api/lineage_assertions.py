@@ -1,25 +1,30 @@
 from __future__ import annotations
 
-from typing import Sequence, overload
+from collections.abc import Sequence
+from typing import overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from osdu_wells.client.data_classes import (
+    DomainModelApply,
+    ResourcesApplyResult,
     LineageAssertions,
     LineageAssertionsApply,
-    LineageAssertionsList,
-    LineageAssertionsApplyList,
     LineageAssertionsFields,
+    LineageAssertionsList,
     LineageAssertionsTextFields,
-    DomainModelApply,
 )
-from osdu_wells.client.data_classes._lineage_assertions import _LINEAGEASSERTIONS_PROPERTIES_BY_FIELD
+from osdu_wells.client.data_classes._lineage_assertions import (
+    _LINEAGEASSERTIONS_PROPERTIES_BY_FIELD,
+    _create_lineage_assertion_filter,
+)
+from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from .lineage_assertions_query import LineageAssertionsQueryAPI
 
 
-class LineageAssertionsAPI(TypeAPI[LineageAssertions, LineageAssertionsApply, LineageAssertionsList]):
+class LineageAssertionsAPI(NodeAPI[LineageAssertions, LineageAssertionsApply, LineageAssertionsList]):
     def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
         view_id = view_by_write_class[LineageAssertionsApply]
         super().__init__(
@@ -28,13 +33,69 @@ class LineageAssertionsAPI(TypeAPI[LineageAssertions, LineageAssertionsApply, Li
             class_type=LineageAssertions,
             class_apply_type=LineageAssertionsApply,
             class_list=LineageAssertionsList,
+            view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self._view_by_write_class = view_by_write_class
+
+    def __call__(
+        self,
+        id_: str | list[str] | None = None,
+        id_prefix: str | None = None,
+        lineage_relationship_type: str | list[str] | None = None,
+        lineage_relationship_type_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> LineageAssertionsQueryAPI[LineageAssertionsList]:
+        """Query starting at lineage assertions.
+
+        Args:
+            id_: The id to filter on.
+            id_prefix: The prefix of the id to filter on.
+            lineage_relationship_type: The lineage relationship type to filter on.
+            lineage_relationship_type_prefix: The prefix of the lineage relationship type to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of lineage assertions to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            A query API for lineage assertions.
+
+        """
+        filter_ = _create_lineage_assertion_filter(
+            self._view_id,
+            id_,
+            id_prefix,
+            lineage_relationship_type,
+            lineage_relationship_type_prefix,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        builder = QueryBuilder(
+            LineageAssertionsList,
+            [
+                QueryStep(
+                    name="lineage_assertion",
+                    expression=dm.query.NodeResultSetExpression(
+                        from_=None,
+                        filter=filter_,
+                    ),
+                    select=dm.query.Select(
+                        [dm.query.SourceSelector(self._view_id, list(_LINEAGEASSERTIONS_PROPERTIES_BY_FIELD.values()))]
+                    ),
+                    result_cls=LineageAssertions,
+                    max_retrieve_limit=limit,
+                )
+            ],
+        )
+        return LineageAssertionsQueryAPI(self._client, builder, self._view_by_write_class)
 
     def apply(
         self, lineage_assertion: LineageAssertionsApply | Sequence[LineageAssertionsApply], replace: bool = False
-    ) -> dm.InstancesApplyResult:
+    ) -> ResourcesApplyResult:
         """Add or update (upsert) lineage assertions.
 
         Args:
@@ -42,7 +103,7 @@ class LineageAssertionsAPI(TypeAPI[LineageAssertions, LineageAssertionsApply, Li
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes, edges, and time series.
 
         Examples:
 
@@ -55,20 +116,10 @@ class LineageAssertionsAPI(TypeAPI[LineageAssertions, LineageAssertionsApply, Li
                 >>> result = client.lineage_assertions.apply(lineage_assertion)
 
         """
-        if isinstance(lineage_assertion, LineageAssertionsApply):
-            instances = lineage_assertion.to_instances_apply(self._view_by_write_class)
-        else:
-            instances = LineageAssertionsApplyList(lineage_assertion).to_instances_apply(self._view_by_write_class)
-        return self._client.data_modeling.instances.apply(
-            nodes=instances.nodes,
-            edges=instances.edges,
-            auto_create_start_nodes=True,
-            auto_create_end_nodes=True,
-            replace=replace,
-        )
+        return self._apply(lineage_assertion, replace)
 
     def delete(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> dm.InstancesDeleteResult:
         """Delete one or more lineage assertion.
 
@@ -87,23 +138,18 @@ class LineageAssertionsAPI(TypeAPI[LineageAssertions, LineageAssertionsApply, Li
                 >>> client = OSDUClient()
                 >>> client.lineage_assertions.delete("my_lineage_assertion")
         """
-        if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
-        else:
-            return self._client.data_modeling.instances.delete(
-                nodes=[(space, id) for id in external_id],
-            )
+        return self._delete(external_id, space)
 
     @overload
     def retrieve(self, external_id: str) -> LineageAssertions:
         ...
 
     @overload
-    def retrieve(self, external_id: Sequence[str]) -> LineageAssertionsList:
+    def retrieve(self, external_id: SequenceNotStr[str]) -> LineageAssertionsList:
         ...
 
     def retrieve(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> LineageAssertions | LineageAssertionsList:
         """Retrieve one or more lineage assertions by id(s).
 
@@ -123,10 +169,7 @@ class LineageAssertionsAPI(TypeAPI[LineageAssertions, LineageAssertionsApply, Li
                 >>> lineage_assertion = client.lineage_assertions.retrieve("my_lineage_assertion")
 
         """
-        if isinstance(external_id, str):
-            return self._retrieve((space, external_id))
-        else:
-            return self._retrieve([(space, ext_id) for ext_id in external_id])
+        return self._retrieve(external_id, space)
 
     def search(
         self,
@@ -167,7 +210,7 @@ class LineageAssertionsAPI(TypeAPI[LineageAssertions, LineageAssertionsApply, Li
                 >>> lineage_assertions = client.lineage_assertions.search('my_lineage_assertion')
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_lineage_assertion_filter(
             self._view_id,
             id_,
             id_prefix,
@@ -272,7 +315,7 @@ class LineageAssertionsAPI(TypeAPI[LineageAssertions, LineageAssertionsApply, Li
 
         """
 
-        filter_ = _create_filter(
+        filter_ = _create_lineage_assertion_filter(
             self._view_id,
             id_,
             id_prefix,
@@ -329,7 +372,7 @@ class LineageAssertionsAPI(TypeAPI[LineageAssertions, LineageAssertionsApply, Li
             Bucketed histogram results.
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_lineage_assertion_filter(
             self._view_id,
             id_,
             id_prefix,
@@ -385,7 +428,7 @@ class LineageAssertionsAPI(TypeAPI[LineageAssertions, LineageAssertionsApply, Li
                 >>> lineage_assertions = client.lineage_assertions.list(limit=5)
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_lineage_assertion_filter(
             self._view_id,
             id_,
             id_prefix,
@@ -395,47 +438,4 @@ class LineageAssertionsAPI(TypeAPI[LineageAssertions, LineageAssertionsApply, Li
             space,
             filter,
         )
-
         return self._list(limit=limit, filter=filter_)
-
-
-def _create_filter(
-    view_id: dm.ViewId,
-    id_: str | list[str] | None = None,
-    id_prefix: str | None = None,
-    lineage_relationship_type: str | list[str] | None = None,
-    lineage_relationship_type_prefix: str | None = None,
-    external_id_prefix: str | None = None,
-    space: str | list[str] | None = None,
-    filter: dm.Filter | None = None,
-) -> dm.Filter | None:
-    filters = []
-    if id_ and isinstance(id_, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("ID"), value=id_))
-    if id_ and isinstance(id_, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("ID"), values=id_))
-    if id_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("ID"), value=id_prefix))
-    if lineage_relationship_type and isinstance(lineage_relationship_type, str):
-        filters.append(
-            dm.filters.Equals(view_id.as_property_ref("LineageRelationshipType"), value=lineage_relationship_type)
-        )
-    if lineage_relationship_type and isinstance(lineage_relationship_type, list):
-        filters.append(
-            dm.filters.In(view_id.as_property_ref("LineageRelationshipType"), values=lineage_relationship_type)
-        )
-    if lineage_relationship_type_prefix:
-        filters.append(
-            dm.filters.Prefix(
-                view_id.as_property_ref("LineageRelationshipType"), value=lineage_relationship_type_prefix
-            )
-        )
-    if external_id_prefix:
-        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
-        filters.append(dm.filters.Equals(["node", "space"], value=space))
-    if space and isinstance(space, list):
-        filters.append(dm.filters.In(["node", "space"], values=space))
-    if filter:
-        filters.append(filter)
-    return dm.filters.And(*filters) if filters else None

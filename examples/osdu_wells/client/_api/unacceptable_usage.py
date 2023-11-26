@@ -1,25 +1,30 @@
 from __future__ import annotations
 
-from typing import Sequence, overload
+from collections.abc import Sequence
+from typing import overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from osdu_wells.client.data_classes import (
+    DomainModelApply,
+    ResourcesApplyResult,
     UnacceptableUsage,
     UnacceptableUsageApply,
-    UnacceptableUsageList,
-    UnacceptableUsageApplyList,
     UnacceptableUsageFields,
+    UnacceptableUsageList,
     UnacceptableUsageTextFields,
-    DomainModelApply,
 )
-from osdu_wells.client.data_classes._unacceptable_usage import _UNACCEPTABLEUSAGE_PROPERTIES_BY_FIELD
+from osdu_wells.client.data_classes._unacceptable_usage import (
+    _UNACCEPTABLEUSAGE_PROPERTIES_BY_FIELD,
+    _create_unacceptable_usage_filter,
+)
+from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from .unacceptable_usage_query import UnacceptableUsageQueryAPI
 
 
-class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, UnacceptableUsageList]):
+class UnacceptableUsageAPI(NodeAPI[UnacceptableUsage, UnacceptableUsageApply, UnacceptableUsageList]):
     def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
         view_id = view_by_write_class[UnacceptableUsageApply]
         super().__init__(
@@ -28,13 +33,87 @@ class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
             class_type=UnacceptableUsage,
             class_apply_type=UnacceptableUsageApply,
             class_list=UnacceptableUsageList,
+            view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self._view_by_write_class = view_by_write_class
+
+    def __call__(
+        self,
+        data_quality_id: str | list[str] | None = None,
+        data_quality_id_prefix: str | None = None,
+        data_quality_rule_set_id: str | list[str] | None = None,
+        data_quality_rule_set_id_prefix: str | None = None,
+        value_chain_status_type_id: str | list[str] | None = None,
+        value_chain_status_type_id_prefix: str | None = None,
+        workflow_persona_type_id: str | list[str] | None = None,
+        workflow_persona_type_id_prefix: str | None = None,
+        workflow_usage_type_id: str | list[str] | None = None,
+        workflow_usage_type_id_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> UnacceptableUsageQueryAPI[UnacceptableUsageList]:
+        """Query starting at unacceptable usages.
+
+        Args:
+            data_quality_id: The data quality id to filter on.
+            data_quality_id_prefix: The prefix of the data quality id to filter on.
+            data_quality_rule_set_id: The data quality rule set id to filter on.
+            data_quality_rule_set_id_prefix: The prefix of the data quality rule set id to filter on.
+            value_chain_status_type_id: The value chain status type id to filter on.
+            value_chain_status_type_id_prefix: The prefix of the value chain status type id to filter on.
+            workflow_persona_type_id: The workflow persona type id to filter on.
+            workflow_persona_type_id_prefix: The prefix of the workflow persona type id to filter on.
+            workflow_usage_type_id: The workflow usage type id to filter on.
+            workflow_usage_type_id_prefix: The prefix of the workflow usage type id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of unacceptable usages to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            A query API for unacceptable usages.
+
+        """
+        filter_ = _create_unacceptable_usage_filter(
+            self._view_id,
+            data_quality_id,
+            data_quality_id_prefix,
+            data_quality_rule_set_id,
+            data_quality_rule_set_id_prefix,
+            value_chain_status_type_id,
+            value_chain_status_type_id_prefix,
+            workflow_persona_type_id,
+            workflow_persona_type_id_prefix,
+            workflow_usage_type_id,
+            workflow_usage_type_id_prefix,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        builder = QueryBuilder(
+            UnacceptableUsageList,
+            [
+                QueryStep(
+                    name="unacceptable_usage",
+                    expression=dm.query.NodeResultSetExpression(
+                        from_=None,
+                        filter=filter_,
+                    ),
+                    select=dm.query.Select(
+                        [dm.query.SourceSelector(self._view_id, list(_UNACCEPTABLEUSAGE_PROPERTIES_BY_FIELD.values()))]
+                    ),
+                    result_cls=UnacceptableUsage,
+                    max_retrieve_limit=limit,
+                )
+            ],
+        )
+        return UnacceptableUsageQueryAPI(self._client, builder, self._view_by_write_class)
 
     def apply(
         self, unacceptable_usage: UnacceptableUsageApply | Sequence[UnacceptableUsageApply], replace: bool = False
-    ) -> dm.InstancesApplyResult:
+    ) -> ResourcesApplyResult:
         """Add or update (upsert) unacceptable usages.
 
         Args:
@@ -42,7 +121,7 @@ class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes, edges, and time series.
 
         Examples:
 
@@ -55,20 +134,10 @@ class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
                 >>> result = client.unacceptable_usage.apply(unacceptable_usage)
 
         """
-        if isinstance(unacceptable_usage, UnacceptableUsageApply):
-            instances = unacceptable_usage.to_instances_apply(self._view_by_write_class)
-        else:
-            instances = UnacceptableUsageApplyList(unacceptable_usage).to_instances_apply(self._view_by_write_class)
-        return self._client.data_modeling.instances.apply(
-            nodes=instances.nodes,
-            edges=instances.edges,
-            auto_create_start_nodes=True,
-            auto_create_end_nodes=True,
-            replace=replace,
-        )
+        return self._apply(unacceptable_usage, replace)
 
     def delete(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> dm.InstancesDeleteResult:
         """Delete one or more unacceptable usage.
 
@@ -87,23 +156,18 @@ class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
                 >>> client = OSDUClient()
                 >>> client.unacceptable_usage.delete("my_unacceptable_usage")
         """
-        if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
-        else:
-            return self._client.data_modeling.instances.delete(
-                nodes=[(space, id) for id in external_id],
-            )
+        return self._delete(external_id, space)
 
     @overload
     def retrieve(self, external_id: str) -> UnacceptableUsage:
         ...
 
     @overload
-    def retrieve(self, external_id: Sequence[str]) -> UnacceptableUsageList:
+    def retrieve(self, external_id: SequenceNotStr[str]) -> UnacceptableUsageList:
         ...
 
     def retrieve(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> UnacceptableUsage | UnacceptableUsageList:
         """Retrieve one or more unacceptable usages by id(s).
 
@@ -123,10 +187,7 @@ class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
                 >>> unacceptable_usage = client.unacceptable_usage.retrieve("my_unacceptable_usage")
 
         """
-        if isinstance(external_id, str):
-            return self._retrieve((space, external_id))
-        else:
-            return self._retrieve([(space, ext_id) for ext_id in external_id])
+        return self._retrieve(external_id, space)
 
     def search(
         self,
@@ -179,7 +240,7 @@ class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
                 >>> unacceptable_usages = client.unacceptable_usage.search('my_unacceptable_usage')
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_unacceptable_usage_filter(
             self._view_id,
             data_quality_id,
             data_quality_id_prefix,
@@ -314,7 +375,7 @@ class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
 
         """
 
-        filter_ = _create_filter(
+        filter_ = _create_unacceptable_usage_filter(
             self._view_id,
             data_quality_id,
             data_quality_id_prefix,
@@ -389,7 +450,7 @@ class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
             Bucketed histogram results.
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_unacceptable_usage_filter(
             self._view_id,
             data_quality_id,
             data_quality_id_prefix,
@@ -463,7 +524,7 @@ class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
                 >>> unacceptable_usages = client.unacceptable_usage.list(limit=5)
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_unacceptable_usage_filter(
             self._view_id,
             data_quality_id,
             data_quality_id_prefix,
@@ -479,81 +540,4 @@ class UnacceptableUsageAPI(TypeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
             space,
             filter,
         )
-
         return self._list(limit=limit, filter=filter_)
-
-
-def _create_filter(
-    view_id: dm.ViewId,
-    data_quality_id: str | list[str] | None = None,
-    data_quality_id_prefix: str | None = None,
-    data_quality_rule_set_id: str | list[str] | None = None,
-    data_quality_rule_set_id_prefix: str | None = None,
-    value_chain_status_type_id: str | list[str] | None = None,
-    value_chain_status_type_id_prefix: str | None = None,
-    workflow_persona_type_id: str | list[str] | None = None,
-    workflow_persona_type_id_prefix: str | None = None,
-    workflow_usage_type_id: str | list[str] | None = None,
-    workflow_usage_type_id_prefix: str | None = None,
-    external_id_prefix: str | None = None,
-    space: str | list[str] | None = None,
-    filter: dm.Filter | None = None,
-) -> dm.Filter | None:
-    filters = []
-    if data_quality_id and isinstance(data_quality_id, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("DataQualityID"), value=data_quality_id))
-    if data_quality_id and isinstance(data_quality_id, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("DataQualityID"), values=data_quality_id))
-    if data_quality_id_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("DataQualityID"), value=data_quality_id_prefix))
-    if data_quality_rule_set_id and isinstance(data_quality_rule_set_id, str):
-        filters.append(
-            dm.filters.Equals(view_id.as_property_ref("DataQualityRuleSetID"), value=data_quality_rule_set_id)
-        )
-    if data_quality_rule_set_id and isinstance(data_quality_rule_set_id, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("DataQualityRuleSetID"), values=data_quality_rule_set_id))
-    if data_quality_rule_set_id_prefix:
-        filters.append(
-            dm.filters.Prefix(view_id.as_property_ref("DataQualityRuleSetID"), value=data_quality_rule_set_id_prefix)
-        )
-    if value_chain_status_type_id and isinstance(value_chain_status_type_id, str):
-        filters.append(
-            dm.filters.Equals(view_id.as_property_ref("ValueChainStatusTypeID"), value=value_chain_status_type_id)
-        )
-    if value_chain_status_type_id and isinstance(value_chain_status_type_id, list):
-        filters.append(
-            dm.filters.In(view_id.as_property_ref("ValueChainStatusTypeID"), values=value_chain_status_type_id)
-        )
-    if value_chain_status_type_id_prefix:
-        filters.append(
-            dm.filters.Prefix(
-                view_id.as_property_ref("ValueChainStatusTypeID"), value=value_chain_status_type_id_prefix
-            )
-        )
-    if workflow_persona_type_id and isinstance(workflow_persona_type_id, str):
-        filters.append(
-            dm.filters.Equals(view_id.as_property_ref("WorkflowPersonaTypeID"), value=workflow_persona_type_id)
-        )
-    if workflow_persona_type_id and isinstance(workflow_persona_type_id, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("WorkflowPersonaTypeID"), values=workflow_persona_type_id))
-    if workflow_persona_type_id_prefix:
-        filters.append(
-            dm.filters.Prefix(view_id.as_property_ref("WorkflowPersonaTypeID"), value=workflow_persona_type_id_prefix)
-        )
-    if workflow_usage_type_id and isinstance(workflow_usage_type_id, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("WorkflowUsageTypeID"), value=workflow_usage_type_id))
-    if workflow_usage_type_id and isinstance(workflow_usage_type_id, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("WorkflowUsageTypeID"), values=workflow_usage_type_id))
-    if workflow_usage_type_id_prefix:
-        filters.append(
-            dm.filters.Prefix(view_id.as_property_ref("WorkflowUsageTypeID"), value=workflow_usage_type_id_prefix)
-        )
-    if external_id_prefix:
-        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
-        filters.append(dm.filters.Equals(["node", "space"], value=space))
-    if space and isinstance(space, list):
-        filters.append(dm.filters.In(["node", "space"], values=space))
-    if filter:
-        filters.append(filter)
-    return dm.filters.And(*filters) if filters else None

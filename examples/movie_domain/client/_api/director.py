@@ -366,7 +366,6 @@ class DirectorAPI(NodeAPI[Director, DirectorApply, DirectorList]):
         return self._list(
             limit=limit,
             filter=filter_,
-            space=space,
             retrieve_edges=retrieve_edges,
             edge_api_name_pairs=[
                 (self.movies_edge, "movies"),

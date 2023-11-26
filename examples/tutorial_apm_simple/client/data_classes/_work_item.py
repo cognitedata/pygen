@@ -1,15 +1,23 @@
 from __future__ import annotations
 
-from typing import Literal, TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
+from ._core import (
+    DomainModel,
+    DomainModelApply,
+    DomainModelApplyList,
+    DomainModelList,
+    DomainRelationApply,
+    ResourcesApply,
+)
 
 if TYPE_CHECKING:
-    from ._asset import AssetApply
-    from ._work_order import WorkOrderApply
+    from ._asset import Asset, AssetApply
+    from ._work_order import WorkOrder, WorkOrderApply
+
 
 __all__ = ["WorkItem", "WorkItemApply", "WorkItemList", "WorkItemApplyList", "WorkItemFields", "WorkItemTextFields"]
 
@@ -32,7 +40,7 @@ _WORKITEM_PROPERTIES_BY_FIELD = {
 
 
 class WorkItem(DomainModel):
-    """This represent a read version of work item.
+    """This represents the reading version of work item.
 
     It is used to when data is retrieved from CDF.
 
@@ -61,14 +69,14 @@ class WorkItem(DomainModel):
     is_completed: Optional[bool] = Field(None, alias="isCompleted")
     item_info: Optional[str] = Field(None, alias="itemInfo")
     item_name: Optional[str] = Field(None, alias="itemName")
-    linked_assets: Optional[list[str]] = Field(None, alias="linkedAssets")
+    linked_assets: Union[list[Asset], list[str], None] = Field(default=None, repr=False, alias="linkedAssets")
     method: Optional[str] = None
     title: Optional[str] = None
     to_be_done: Optional[bool] = Field(None, alias="toBeDone")
-    work_order: Optional[str] = Field(None, alias="workOrder")
+    work_order: Union[WorkOrder, str, None] = Field(None, repr=False, alias="workOrder")
 
     def as_apply(self) -> WorkItemApply:
-        """Convert this read version of work item to a write version."""
+        """Convert this read version of work item to the writing version."""
         return WorkItemApply(
             space=self.space,
             external_id=self.external_id,
@@ -77,16 +85,19 @@ class WorkItem(DomainModel):
             is_completed=self.is_completed,
             item_info=self.item_info,
             item_name=self.item_name,
-            linked_assets=self.linked_assets,
+            linked_assets=[
+                linked_asset.as_apply() if isinstance(linked_asset, DomainModel) else linked_asset
+                for linked_asset in self.linked_assets or []
+            ],
             method=self.method,
             title=self.title,
             to_be_done=self.to_be_done,
-            work_order=self.work_order,
+            work_order=self.work_order.as_apply() if isinstance(self.work_order, DomainModel) else self.work_order,
         )
 
 
 class WorkItemApply(DomainModelApply):
-    """This represent a write version of work item.
+    """This represents the writing version of work item.
 
     It is used to when data is sent to CDF.
 
@@ -103,7 +114,7 @@ class WorkItemApply(DomainModelApply):
         title: The title field.
         to_be_done: @name to be done
         work_order: The work order field.
-        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+        existing_version: Fail the ingestion request if the work item version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
@@ -122,11 +133,17 @@ class WorkItemApply(DomainModelApply):
     work_order: Union[WorkOrderApply, str, None] = Field(None, repr=False, alias="workOrder")
 
     def _to_instances_apply(
-        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
-    ) -> dm.InstancesApply:
-        if self.external_id in cache:
-            return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
-        write_view = view_by_write_class and view_by_write_class.get(type(self))
+        self,
+        cache: set[tuple[str, str]],
+        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+    ) -> ResourcesApply:
+        resources = ResourcesApply()
+        if self.as_tuple_id() in cache:
+            return resources
+
+        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
+            "tutorial_apm_simple", "WorkItem", "18ac48abbe96aa"
+        )
 
         properties = {}
         if self.criticality is not None:
@@ -150,70 +167,146 @@ class WorkItemApply(DomainModelApply):
                 "space": self.space if isinstance(self.work_order, str) else self.work_order.space,
                 "externalId": self.work_order if isinstance(self.work_order, str) else self.work_order.external_id,
             }
+
         if properties:
-            source = dm.NodeOrEdgeData(
-                source=write_view or dm.ViewId("tutorial_apm_simple", "WorkItem", "18ac48abbe96aa"),
-                properties=properties,
-            )
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=[source],
+                sources=[
+                    dm.NodeOrEdgeData(
+                        source=write_view,
+                        properties=properties,
+                    )
+                ],
             )
-            nodes = [this_node]
-        else:
-            nodes = []
+            resources.nodes.append(this_node)
+            cache.add(self.as_tuple_id())
 
-        edges = []
-        cache.add(self.external_id)
-
+        edge_type = dm.DirectRelationReference("tutorial_apm_simple", "WorkItem.linkedAssets")
         for linked_asset in self.linked_assets or []:
-            edge = self._create_linked_asset_edge(linked_asset)
-            if edge.external_id not in cache:
-                edges.append(edge)
-                cache.add(edge.external_id)
-
-            if isinstance(linked_asset, DomainModelApply):
-                instances = linked_asset._to_instances_apply(cache, view_by_write_class)
-                nodes.extend(instances.nodes)
-                edges.extend(instances.edges)
+            other_resources = DomainRelationApply._from_edge_to_resources(
+                cache, self, linked_asset, edge_type, view_by_write_class
+            )
+            resources.extend(other_resources)
 
         if isinstance(self.work_order, DomainModelApply):
-            instances = self.work_order._to_instances_apply(cache, view_by_write_class)
-            nodes.extend(instances.nodes)
-            edges.extend(instances.edges)
+            other_resources = self.work_order._to_instances_apply(cache, view_by_write_class)
+            resources.extend(other_resources)
 
-        return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
-
-    def _create_linked_asset_edge(self, linked_asset: Union[str, AssetApply]) -> dm.EdgeApply:
-        if isinstance(linked_asset, str):
-            end_space, end_node_ext_id = self.space, linked_asset
-        elif isinstance(linked_asset, DomainModelApply):
-            end_space, end_node_ext_id = linked_asset.space, linked_asset.external_id
-        else:
-            raise TypeError(f"Expected str or AssetApply, got {type(linked_asset)}")
-
-        return dm.EdgeApply(
-            space=self.space,
-            external_id=f"{self.external_id}:{end_node_ext_id}",
-            type=dm.DirectRelationReference("tutorial_apm_simple", "WorkItem.linkedAssets"),
-            start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
-        )
+        return resources
 
 
-class WorkItemList(TypeList[WorkItem]):
-    """List of work items in read version."""
+class WorkItemList(DomainModelList[WorkItem]):
+    """List of work items in the read version."""
 
-    _NODE = WorkItem
+    _INSTANCE = WorkItem
 
     def as_apply(self) -> WorkItemApplyList:
-        """Convert this read version of work item to a write version."""
+        """Convert these read versions of work item to the writing versions."""
         return WorkItemApplyList([node.as_apply() for node in self.data])
 
 
-class WorkItemApplyList(TypeApplyList[WorkItemApply]):
-    """List of work items in write version."""
+class WorkItemApplyList(DomainModelApplyList[WorkItemApply]):
+    """List of work items in the writing version."""
 
-    _NODE = WorkItemApply
+    _INSTANCE = WorkItemApply
+
+
+def _create_work_item_filter(
+    view_id: dm.ViewId,
+    criticality: str | list[str] | None = None,
+    criticality_prefix: str | None = None,
+    description: str | list[str] | None = None,
+    description_prefix: str | None = None,
+    is_completed: bool | None = None,
+    item_info: str | list[str] | None = None,
+    item_info_prefix: str | None = None,
+    item_name: str | list[str] | None = None,
+    item_name_prefix: str | None = None,
+    method: str | list[str] | None = None,
+    method_prefix: str | None = None,
+    title: str | list[str] | None = None,
+    title_prefix: str | None = None,
+    to_be_done: bool | None = None,
+    work_order: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+    external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if criticality and isinstance(criticality, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("criticality"), value=criticality))
+    if criticality and isinstance(criticality, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("criticality"), values=criticality))
+    if criticality_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("criticality"), value=criticality_prefix))
+    if description and isinstance(description, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("description"), value=description))
+    if description and isinstance(description, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("description"), values=description))
+    if description_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("description"), value=description_prefix))
+    if is_completed and isinstance(is_completed, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("isCompleted"), value=is_completed))
+    if item_info and isinstance(item_info, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("itemInfo"), value=item_info))
+    if item_info and isinstance(item_info, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("itemInfo"), values=item_info))
+    if item_info_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("itemInfo"), value=item_info_prefix))
+    if item_name and isinstance(item_name, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("itemName"), value=item_name))
+    if item_name and isinstance(item_name, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("itemName"), values=item_name))
+    if item_name_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("itemName"), value=item_name_prefix))
+    if method and isinstance(method, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("method"), value=method))
+    if method and isinstance(method, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("method"), values=method))
+    if method_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("method"), value=method_prefix))
+    if title and isinstance(title, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("title"), value=title))
+    if title and isinstance(title, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("title"), values=title))
+    if title_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("title"), value=title_prefix))
+    if to_be_done and isinstance(to_be_done, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("toBeDone"), value=to_be_done))
+    if work_order and isinstance(work_order, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("workOrder"), value={"space": "tutorial_apm_simple", "externalId": work_order}
+            )
+        )
+    if work_order and isinstance(work_order, tuple):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("workOrder"), value={"space": work_order[0], "externalId": work_order[1]}
+            )
+        )
+    if work_order and isinstance(work_order, list) and isinstance(work_order[0], str):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("workOrder"),
+                values=[{"space": "tutorial_apm_simple", "externalId": item} for item in work_order],
+            )
+        )
+    if work_order and isinstance(work_order, list) and isinstance(work_order[0], tuple):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("workOrder"),
+                values=[{"space": item[0], "externalId": item[1]} for item in work_order],
+            )
+        )
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

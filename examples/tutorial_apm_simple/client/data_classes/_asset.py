@@ -1,16 +1,24 @@
 from __future__ import annotations
 
 import datetime
-from typing import Literal, TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
+from ._core import (
+    DomainModel,
+    DomainModelApply,
+    DomainModelApplyList,
+    DomainModelList,
+    DomainRelationApply,
+    ResourcesApply,
+)
 
 if TYPE_CHECKING:
-    from ._asset import AssetApply
-    from ._cdf_3_d_model import CdfModelApply
+    from ._asset import Asset, AssetApply
+    from ._cdf_3_d_connection_properties import CdfConnectionProperties, CdfConnectionPropertiesApply
+
 
 __all__ = ["Asset", "AssetApply", "AssetList", "AssetApplyList", "AssetFields", "AssetTextFields"]
 
@@ -56,7 +64,7 @@ _ASSET_PROPERTIES_BY_FIELD = {
 
 
 class Asset(DomainModel):
-    """This represent a read version of asset.
+    """This represents the reading version of asset.
 
     It is used to when data is retrieved from CDF.
 
@@ -90,16 +98,16 @@ class Asset(DomainModel):
     space: str = "tutorial_apm_simple"
     area_id: Optional[int] = Field(None, alias="areaId")
     category_id: Optional[int] = Field(None, alias="categoryId")
-    children: Optional[list[str]] = None
+    children: Union[list[Asset], list[str], None] = Field(default=None, repr=False)
     created_date: Optional[datetime.datetime] = Field(None, alias="createdDate")
     description: Optional[str] = None
     documents: Optional[list[str]] = None
-    in_model_3_d: Optional[list[str]] = Field(None, alias="inModel3d")
+    in_model_3_d: Optional[list[CdfConnectionProperties]] = Field(default=None, repr=False, alias="inModel3d")
     is_active: Optional[bool] = Field(None, alias="isActive")
     is_critical_line: Optional[bool] = Field(None, alias="isCriticalLine")
     measurements: Optional[list[str]] = None
     metrics: Optional[list[str]] = None
-    parent: Optional[str] = None
+    parent: Union[Asset, str, None] = Field(None, repr=False)
     pressure: Optional[str] = None
     source_db: Optional[str] = Field(None, alias="sourceDb")
     specification: Optional[str] = None
@@ -108,22 +116,22 @@ class Asset(DomainModel):
     updated_date: Optional[datetime.datetime] = Field(None, alias="updatedDate")
 
     def as_apply(self) -> AssetApply:
-        """Convert this read version of asset to a write version."""
+        """Convert this read version of asset to the writing version."""
         return AssetApply(
             space=self.space,
             external_id=self.external_id,
             area_id=self.area_id,
             category_id=self.category_id,
-            children=self.children,
+            children=[child.as_apply() if isinstance(child, DomainModel) else child for child in self.children or []],
             created_date=self.created_date,
             description=self.description,
             documents=self.documents,
-            in_model_3_d=self.in_model_3_d,
+            in_model_3_d=[in_model_3_d.as_apply() for in_model_3_d in self.in_model_3_d or []],
             is_active=self.is_active,
             is_critical_line=self.is_critical_line,
             measurements=self.measurements,
             metrics=self.metrics,
-            parent=self.parent,
+            parent=self.parent.as_apply() if isinstance(self.parent, DomainModel) else self.parent,
             pressure=self.pressure,
             source_db=self.source_db,
             specification=self.specification,
@@ -134,7 +142,7 @@ class Asset(DomainModel):
 
 
 class AssetApply(DomainModelApply):
-    """This represent a write version of asset.
+    """This represents the writing version of asset.
 
     It is used to when data is sent to CDF.
 
@@ -159,7 +167,7 @@ class AssetApply(DomainModelApply):
         tag: The tag field.
         trajectory: The trajectory field.
         updated_date: @name updated date
-        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+        existing_version: Fail the ingestion request if the asset version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
@@ -172,7 +180,7 @@ class AssetApply(DomainModelApply):
     created_date: Optional[datetime.datetime] = Field(None, alias="createdDate")
     description: Optional[str] = None
     documents: Optional[list[str]] = None
-    in_model_3_d: Union[list[CdfModelApply], list[str], None] = Field(default=None, repr=False, alias="inModel3d")
+    in_model_3_d: Optional[list[CdfConnectionPropertiesApply]] = Field(default=None, repr=False, alias="inModel3d")
     is_active: Optional[bool] = Field(None, alias="isActive")
     is_critical_line: Optional[bool] = Field(None, alias="isCriticalLine")
     measurements: Optional[list[str]] = None
@@ -186,11 +194,19 @@ class AssetApply(DomainModelApply):
     updated_date: Optional[datetime.datetime] = Field(None, alias="updatedDate")
 
     def _to_instances_apply(
-        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
-    ) -> dm.InstancesApply:
-        if self.external_id in cache:
-            return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
-        write_view = view_by_write_class and view_by_write_class.get(type(self))
+        self,
+        cache: set[tuple[str, str]],
+        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+    ) -> ResourcesApply:
+        from ._cdf_3_d_connection_properties import CdfConnectionPropertiesApply
+
+        resources = ResourcesApply()
+        if self.as_tuple_id() in cache:
+            return resources
+
+        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
+            "tutorial_apm_simple", "Asset", "beb2bebdcbb4ad"
+        )
 
         properties = {}
         if self.area_id is not None:
@@ -198,7 +214,7 @@ class AssetApply(DomainModelApply):
         if self.category_id is not None:
             properties["categoryId"] = self.category_id
         if self.created_date is not None:
-            properties["createdDate"] = self.created_date.isoformat()
+            properties["createdDate"] = self.created_date.isoformat(timespec="milliseconds")
         if self.description is not None:
             properties["description"] = self.description
         if self.documents is not None:
@@ -227,98 +243,155 @@ class AssetApply(DomainModelApply):
         if self.trajectory is not None:
             properties["trajectory"] = self.trajectory
         if self.updated_date is not None:
-            properties["updatedDate"] = self.updated_date.isoformat()
+            properties["updatedDate"] = self.updated_date.isoformat(timespec="milliseconds")
+
         if properties:
-            source = dm.NodeOrEdgeData(
-                source=write_view or dm.ViewId("tutorial_apm_simple", "Asset", "beb2bebdcbb4ad"),
-                properties=properties,
-            )
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=[source],
+                sources=[
+                    dm.NodeOrEdgeData(
+                        source=write_view,
+                        properties=properties,
+                    )
+                ],
             )
-            nodes = [this_node]
-        else:
-            nodes = []
+            resources.nodes.append(this_node)
+            cache.add(self.as_tuple_id())
 
-        edges = []
-        cache.add(self.external_id)
-
+        edge_type = dm.DirectRelationReference("tutorial_apm_simple", "Asset.children")
         for child in self.children or []:
-            edge = self._create_child_edge(child)
-            if edge.external_id not in cache:
-                edges.append(edge)
-                cache.add(edge.external_id)
-
-            if isinstance(child, DomainModelApply):
-                instances = child._to_instances_apply(cache, view_by_write_class)
-                nodes.extend(instances.nodes)
-                edges.extend(instances.edges)
+            other_resources = DomainRelationApply._from_edge_to_resources(
+                cache, self, child, edge_type, view_by_write_class
+            )
+            resources.extend(other_resources)
 
         for in_model_3_d in self.in_model_3_d or []:
-            edge = self._create_in_model_3_d_edge(in_model_3_d)
-            if edge.external_id not in cache:
-                edges.append(edge)
-                cache.add(edge.external_id)
-
-            if isinstance(in_model_3_d, DomainModelApply):
-                instances = in_model_3_d._to_instances_apply(cache, view_by_write_class)
-                nodes.extend(instances.nodes)
-                edges.extend(instances.edges)
+            if isinstance(in_model_3_d, DomainRelationApply):
+                other_resources = in_model_3_d._to_instances_apply(cache, self, view_by_write_class)
+                resources.extend(other_resources)
 
         if isinstance(self.parent, DomainModelApply):
-            instances = self.parent._to_instances_apply(cache, view_by_write_class)
-            nodes.extend(instances.nodes)
-            edges.extend(instances.edges)
+            other_resources = self.parent._to_instances_apply(cache, view_by_write_class)
+            resources.extend(other_resources)
 
-        return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
-
-    def _create_child_edge(self, child: Union[str, AssetApply]) -> dm.EdgeApply:
-        if isinstance(child, str):
-            end_space, end_node_ext_id = self.space, child
-        elif isinstance(child, DomainModelApply):
-            end_space, end_node_ext_id = child.space, child.external_id
-        else:
-            raise TypeError(f"Expected str or AssetApply, got {type(child)}")
-
-        return dm.EdgeApply(
-            space=self.space,
-            external_id=f"{self.external_id}:{end_node_ext_id}",
-            type=dm.DirectRelationReference("tutorial_apm_simple", "Asset.children"),
-            start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
-        )
-
-    def _create_in_model_3_d_edge(self, in_model_3_d: Union[str, CdfModelApply]) -> dm.EdgeApply:
-        if isinstance(in_model_3_d, str):
-            end_space, end_node_ext_id = self.space, in_model_3_d
-        elif isinstance(in_model_3_d, DomainModelApply):
-            end_space, end_node_ext_id = in_model_3_d.space, in_model_3_d.external_id
-        else:
-            raise TypeError(f"Expected str or CdfModelApply, got {type(in_model_3_d)}")
-
-        return dm.EdgeApply(
-            space=self.space,
-            external_id=f"{self.external_id}:{end_node_ext_id}",
-            type=dm.DirectRelationReference("cdf_3d_schema", "cdf3dEntityConnection"),
-            start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
-        )
+        return resources
 
 
-class AssetList(TypeList[Asset]):
-    """List of assets in read version."""
+class AssetList(DomainModelList[Asset]):
+    """List of assets in the read version."""
 
-    _NODE = Asset
+    _INSTANCE = Asset
 
     def as_apply(self) -> AssetApplyList:
-        """Convert this read version of asset to a write version."""
+        """Convert these read versions of asset to the writing versions."""
         return AssetApplyList([node.as_apply() for node in self.data])
 
 
-class AssetApplyList(TypeApplyList[AssetApply]):
-    """List of assets in write version."""
+class AssetApplyList(DomainModelApplyList[AssetApply]):
+    """List of assets in the writing version."""
 
-    _NODE = AssetApply
+    _INSTANCE = AssetApply
+
+
+def _create_asset_filter(
+    view_id: dm.ViewId,
+    min_area_id: int | None = None,
+    max_area_id: int | None = None,
+    min_category_id: int | None = None,
+    max_category_id: int | None = None,
+    min_created_date: datetime.datetime | None = None,
+    max_created_date: datetime.datetime | None = None,
+    description: str | list[str] | None = None,
+    description_prefix: str | None = None,
+    is_active: bool | None = None,
+    is_critical_line: bool | None = None,
+    parent: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+    source_db: str | list[str] | None = None,
+    source_db_prefix: str | None = None,
+    tag: str | list[str] | None = None,
+    tag_prefix: str | None = None,
+    min_updated_date: datetime.datetime | None = None,
+    max_updated_date: datetime.datetime | None = None,
+    external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if min_area_id or max_area_id:
+        filters.append(dm.filters.Range(view_id.as_property_ref("areaId"), gte=min_area_id, lte=max_area_id))
+    if min_category_id or max_category_id:
+        filters.append(
+            dm.filters.Range(view_id.as_property_ref("categoryId"), gte=min_category_id, lte=max_category_id)
+        )
+    if min_created_date or max_created_date:
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("createdDate"),
+                gte=min_created_date.isoformat(timespec="milliseconds") if min_created_date else None,
+                lte=max_created_date.isoformat(timespec="milliseconds") if max_created_date else None,
+            )
+        )
+    if description and isinstance(description, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("description"), value=description))
+    if description and isinstance(description, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("description"), values=description))
+    if description_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("description"), value=description_prefix))
+    if is_active and isinstance(is_active, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("isActive"), value=is_active))
+    if is_critical_line and isinstance(is_critical_line, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("isCriticalLine"), value=is_critical_line))
+    if parent and isinstance(parent, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("parent"), value={"space": "tutorial_apm_simple", "externalId": parent}
+            )
+        )
+    if parent and isinstance(parent, tuple):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("parent"), value={"space": parent[0], "externalId": parent[1]})
+        )
+    if parent and isinstance(parent, list) and isinstance(parent[0], str):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("parent"),
+                values=[{"space": "tutorial_apm_simple", "externalId": item} for item in parent],
+            )
+        )
+    if parent and isinstance(parent, list) and isinstance(parent[0], tuple):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("parent"), values=[{"space": item[0], "externalId": item[1]} for item in parent]
+            )
+        )
+    if source_db and isinstance(source_db, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("sourceDb"), value=source_db))
+    if source_db and isinstance(source_db, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("sourceDb"), values=source_db))
+    if source_db_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("sourceDb"), value=source_db_prefix))
+    if tag and isinstance(tag, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("tag"), value=tag))
+    if tag and isinstance(tag, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("tag"), values=tag))
+    if tag_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("tag"), value=tag_prefix))
+    if min_updated_date or max_updated_date:
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("updatedDate"),
+                gte=min_updated_date.isoformat(timespec="milliseconds") if min_updated_date else None,
+                lte=max_updated_date.isoformat(timespec="milliseconds") if max_updated_date else None,
+            )
+        )
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

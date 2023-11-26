@@ -1,25 +1,30 @@
 from __future__ import annotations
 
-from typing import Sequence, overload
+from collections.abc import Sequence
+from typing import overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from osdu_wells.client.data_classes import (
+    DomainModelApply,
+    ResourcesApplyResult,
     Geometry,
     GeometryApply,
-    GeometryList,
-    GeometryApplyList,
     GeometryFields,
+    GeometryList,
     GeometryTextFields,
-    DomainModelApply,
 )
-from osdu_wells.client.data_classes._geometry import _GEOMETRY_PROPERTIES_BY_FIELD
+from osdu_wells.client.data_classes._geometry import (
+    _GEOMETRY_PROPERTIES_BY_FIELD,
+    _create_geometry_filter,
+)
+from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from .geometry_query import GeometryQueryAPI
 
 
-class GeometryAPI(TypeAPI[Geometry, GeometryApply, GeometryList]):
+class GeometryAPI(NodeAPI[Geometry, GeometryApply, GeometryList]):
     def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
         view_id = view_by_write_class[GeometryApply]
         super().__init__(
@@ -28,13 +33,61 @@ class GeometryAPI(TypeAPI[Geometry, GeometryApply, GeometryList]):
             class_type=Geometry,
             class_apply_type=GeometryApply,
             class_list=GeometryList,
+            view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self._view_by_write_class = view_by_write_class
 
-    def apply(
-        self, geometry: GeometryApply | Sequence[GeometryApply], replace: bool = False
-    ) -> dm.InstancesApplyResult:
+    def __call__(
+        self,
+        type_: str | list[str] | None = None,
+        type_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> GeometryQueryAPI[GeometryList]:
+        """Query starting at geometries.
+
+        Args:
+            type_: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of geometries to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            A query API for geometries.
+
+        """
+        filter_ = _create_geometry_filter(
+            self._view_id,
+            type_,
+            type_prefix,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        builder = QueryBuilder(
+            GeometryList,
+            [
+                QueryStep(
+                    name="geometry",
+                    expression=dm.query.NodeResultSetExpression(
+                        from_=None,
+                        filter=filter_,
+                    ),
+                    select=dm.query.Select(
+                        [dm.query.SourceSelector(self._view_id, list(_GEOMETRY_PROPERTIES_BY_FIELD.values()))]
+                    ),
+                    result_cls=Geometry,
+                    max_retrieve_limit=limit,
+                )
+            ],
+        )
+        return GeometryQueryAPI(self._client, builder, self._view_by_write_class)
+
+    def apply(self, geometry: GeometryApply | Sequence[GeometryApply], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) geometries.
 
         Args:
@@ -42,7 +95,7 @@ class GeometryAPI(TypeAPI[Geometry, GeometryApply, GeometryList]):
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes, edges, and time series.
 
         Examples:
 
@@ -55,20 +108,10 @@ class GeometryAPI(TypeAPI[Geometry, GeometryApply, GeometryList]):
                 >>> result = client.geometry.apply(geometry)
 
         """
-        if isinstance(geometry, GeometryApply):
-            instances = geometry.to_instances_apply(self._view_by_write_class)
-        else:
-            instances = GeometryApplyList(geometry).to_instances_apply(self._view_by_write_class)
-        return self._client.data_modeling.instances.apply(
-            nodes=instances.nodes,
-            edges=instances.edges,
-            auto_create_start_nodes=True,
-            auto_create_end_nodes=True,
-            replace=replace,
-        )
+        return self._apply(geometry, replace)
 
     def delete(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> dm.InstancesDeleteResult:
         """Delete one or more geometry.
 
@@ -87,23 +130,18 @@ class GeometryAPI(TypeAPI[Geometry, GeometryApply, GeometryList]):
                 >>> client = OSDUClient()
                 >>> client.geometry.delete("my_geometry")
         """
-        if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
-        else:
-            return self._client.data_modeling.instances.delete(
-                nodes=[(space, id) for id in external_id],
-            )
+        return self._delete(external_id, space)
 
     @overload
     def retrieve(self, external_id: str) -> Geometry:
         ...
 
     @overload
-    def retrieve(self, external_id: Sequence[str]) -> GeometryList:
+    def retrieve(self, external_id: SequenceNotStr[str]) -> GeometryList:
         ...
 
     def retrieve(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> Geometry | GeometryList:
         """Retrieve one or more geometries by id(s).
 
@@ -123,10 +161,7 @@ class GeometryAPI(TypeAPI[Geometry, GeometryApply, GeometryList]):
                 >>> geometry = client.geometry.retrieve("my_geometry")
 
         """
-        if isinstance(external_id, str):
-            return self._retrieve((space, external_id))
-        else:
-            return self._retrieve([(space, ext_id) for ext_id in external_id])
+        return self._retrieve(external_id, space)
 
     def search(
         self,
@@ -163,7 +198,7 @@ class GeometryAPI(TypeAPI[Geometry, GeometryApply, GeometryList]):
                 >>> geometries = client.geometry.search('my_geometry')
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_geometry_filter(
             self._view_id,
             type_,
             type_prefix,
@@ -258,7 +293,7 @@ class GeometryAPI(TypeAPI[Geometry, GeometryApply, GeometryList]):
 
         """
 
-        filter_ = _create_filter(
+        filter_ = _create_geometry_filter(
             self._view_id,
             type_,
             type_prefix,
@@ -309,7 +344,7 @@ class GeometryAPI(TypeAPI[Geometry, GeometryApply, GeometryList]):
             Bucketed histogram results.
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_geometry_filter(
             self._view_id,
             type_,
             type_prefix,
@@ -359,7 +394,7 @@ class GeometryAPI(TypeAPI[Geometry, GeometryApply, GeometryList]):
                 >>> geometries = client.geometry.list(limit=5)
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_geometry_filter(
             self._view_id,
             type_,
             type_prefix,
@@ -367,31 +402,4 @@ class GeometryAPI(TypeAPI[Geometry, GeometryApply, GeometryList]):
             space,
             filter,
         )
-
         return self._list(limit=limit, filter=filter_)
-
-
-def _create_filter(
-    view_id: dm.ViewId,
-    type_: str | list[str] | None = None,
-    type_prefix: str | None = None,
-    external_id_prefix: str | None = None,
-    space: str | list[str] | None = None,
-    filter: dm.Filter | None = None,
-) -> dm.Filter | None:
-    filters = []
-    if type_ and isinstance(type_, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("type"), value=type_))
-    if type_ and isinstance(type_, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("type"), values=type_))
-    if type_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("type"), value=type_prefix))
-    if external_id_prefix:
-        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
-        filters.append(dm.filters.Equals(["node", "space"], value=space))
-    if space and isinstance(space, list):
-        filters.append(dm.filters.In(["node", "space"], values=space))
-    if filter:
-        filters.append(filter)
-    return dm.filters.And(*filters) if filters else None

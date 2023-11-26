@@ -11,6 +11,9 @@ from markets.client.data_classes import (
     DateTransformation,
     DateTransformationApply,
 )
+from markets.client.data_classes._date_transformation_pair import (
+    _DATETRANSFORMATIONPAIR_PROPERTIES_BY_FIELD,
+)
 from markets.client.data_classes._date_transformation import (
     _DATETRANSFORMATION_PROPERTIES_BY_FIELD,
 )
@@ -158,7 +161,14 @@ class DateTransformationPairQueryAPI(QueryAPI[T_DomainModelList]):
                         filter=None,
                         from_=from_,
                     ),
-                    select=dm.query.Select(),
+                    select=dm.query.Select(
+                        [
+                            dm.query.SourceSelector(
+                                self._view_by_write_class[DateTransformationPairApply],
+                                list(_DATETRANSFORMATIONPAIR_PROPERTIES_BY_FIELD.values()),
+                            )
+                        ]
+                    ),
                     result_cls=DateTransformationPair,
                     max_retrieve_limit=-1,
                 ),

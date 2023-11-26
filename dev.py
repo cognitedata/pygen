@@ -34,8 +34,6 @@ def generate_sdks(
     for example_sdk in EXAMPLE_SDKS:
         if example_sdk.download_only:
             continue
-        if sdk and example_sdk.client_name != sdk:
-            continue
         typer.echo(f"Generating {example_sdk.client_name} SDK...")
         data_models = [DataModel.load(safe_load(dms_file.read_text())[0]) for dms_file in example_sdk.dms_files]
         if len(data_models) == 1:

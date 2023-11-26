@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from cognite.client import ClientConfig, CogniteClient
-from cognite.client import data_modeling as dm
+from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
 from cognite.client.credentials import OAuthClientCredentials
 
-from . import data_classes
 from ._api.equipment_module import EquipmentModuleAPI
+from ._api.start_end_time import StartEndTimeAPI
 from ._api.unit_procedure import UnitProcedureAPI
+from . import data_classes
 
 
 class EquipmentUnitClient:
@@ -16,9 +16,9 @@ class EquipmentUnitClient:
     EquipmentUnitClient
 
     Generated with:
-        pygen = 0.30.5
-        cognite-sdk = 6.39.3
-        pydantic = 2.4.2
+        pygen = 0.31.0
+        cognite-sdk = 7.0.3
+        pydantic = 2.5.1
 
     Data Model:
         space: IntegrationTestsImmutable
@@ -42,6 +42,7 @@ class EquipmentUnitClient:
         }
 
         self.equipment_module = EquipmentModuleAPI(client, view_by_write_class)
+        self.start_end_time = StartEndTimeAPI(client, view_by_write_class)
         self.unit_procedure = UnitProcedureAPI(client, view_by_write_class)
 
     @classmethod

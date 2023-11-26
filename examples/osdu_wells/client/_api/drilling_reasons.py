@@ -1,25 +1,30 @@
 from __future__ import annotations
 
-from typing import Sequence, overload
+from collections.abc import Sequence
+from typing import overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from osdu_wells.client.data_classes import (
+    DomainModelApply,
+    ResourcesApplyResult,
     DrillingReasons,
     DrillingReasonsApply,
-    DrillingReasonsList,
-    DrillingReasonsApplyList,
     DrillingReasonsFields,
+    DrillingReasonsList,
     DrillingReasonsTextFields,
-    DomainModelApply,
 )
-from osdu_wells.client.data_classes._drilling_reasons import _DRILLINGREASONS_PROPERTIES_BY_FIELD
+from osdu_wells.client.data_classes._drilling_reasons import (
+    _DRILLINGREASONS_PROPERTIES_BY_FIELD,
+    _create_drilling_reason_filter,
+)
+from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from .drilling_reasons_query import DrillingReasonsQueryAPI
 
 
-class DrillingReasonsAPI(TypeAPI[DrillingReasons, DrillingReasonsApply, DrillingReasonsList]):
+class DrillingReasonsAPI(NodeAPI[DrillingReasons, DrillingReasonsApply, DrillingReasonsList]):
     def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
         view_id = view_by_write_class[DrillingReasonsApply]
         super().__init__(
@@ -28,13 +33,81 @@ class DrillingReasonsAPI(TypeAPI[DrillingReasons, DrillingReasonsApply, Drilling
             class_type=DrillingReasons,
             class_apply_type=DrillingReasonsApply,
             class_list=DrillingReasonsList,
+            view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self._view_by_write_class = view_by_write_class
+
+    def __call__(
+        self,
+        effective_date_time: str | list[str] | None = None,
+        effective_date_time_prefix: str | None = None,
+        lahee_class_id: str | list[str] | None = None,
+        lahee_class_id_prefix: str | None = None,
+        remark: str | list[str] | None = None,
+        remark_prefix: str | None = None,
+        termination_date_time: str | list[str] | None = None,
+        termination_date_time_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> DrillingReasonsQueryAPI[DrillingReasonsList]:
+        """Query starting at drilling reasons.
+
+        Args:
+            effective_date_time: The effective date time to filter on.
+            effective_date_time_prefix: The prefix of the effective date time to filter on.
+            lahee_class_id: The lahee class id to filter on.
+            lahee_class_id_prefix: The prefix of the lahee class id to filter on.
+            remark: The remark to filter on.
+            remark_prefix: The prefix of the remark to filter on.
+            termination_date_time: The termination date time to filter on.
+            termination_date_time_prefix: The prefix of the termination date time to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of drilling reasons to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            A query API for drilling reasons.
+
+        """
+        filter_ = _create_drilling_reason_filter(
+            self._view_id,
+            effective_date_time,
+            effective_date_time_prefix,
+            lahee_class_id,
+            lahee_class_id_prefix,
+            remark,
+            remark_prefix,
+            termination_date_time,
+            termination_date_time_prefix,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        builder = QueryBuilder(
+            DrillingReasonsList,
+            [
+                QueryStep(
+                    name="drilling_reason",
+                    expression=dm.query.NodeResultSetExpression(
+                        from_=None,
+                        filter=filter_,
+                    ),
+                    select=dm.query.Select(
+                        [dm.query.SourceSelector(self._view_id, list(_DRILLINGREASONS_PROPERTIES_BY_FIELD.values()))]
+                    ),
+                    result_cls=DrillingReasons,
+                    max_retrieve_limit=limit,
+                )
+            ],
+        )
+        return DrillingReasonsQueryAPI(self._client, builder, self._view_by_write_class)
 
     def apply(
         self, drilling_reason: DrillingReasonsApply | Sequence[DrillingReasonsApply], replace: bool = False
-    ) -> dm.InstancesApplyResult:
+    ) -> ResourcesApplyResult:
         """Add or update (upsert) drilling reasons.
 
         Args:
@@ -42,7 +115,7 @@ class DrillingReasonsAPI(TypeAPI[DrillingReasons, DrillingReasonsApply, Drilling
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes, edges, and time series.
 
         Examples:
 
@@ -55,20 +128,10 @@ class DrillingReasonsAPI(TypeAPI[DrillingReasons, DrillingReasonsApply, Drilling
                 >>> result = client.drilling_reasons.apply(drilling_reason)
 
         """
-        if isinstance(drilling_reason, DrillingReasonsApply):
-            instances = drilling_reason.to_instances_apply(self._view_by_write_class)
-        else:
-            instances = DrillingReasonsApplyList(drilling_reason).to_instances_apply(self._view_by_write_class)
-        return self._client.data_modeling.instances.apply(
-            nodes=instances.nodes,
-            edges=instances.edges,
-            auto_create_start_nodes=True,
-            auto_create_end_nodes=True,
-            replace=replace,
-        )
+        return self._apply(drilling_reason, replace)
 
     def delete(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> dm.InstancesDeleteResult:
         """Delete one or more drilling reason.
 
@@ -87,23 +150,18 @@ class DrillingReasonsAPI(TypeAPI[DrillingReasons, DrillingReasonsApply, Drilling
                 >>> client = OSDUClient()
                 >>> client.drilling_reasons.delete("my_drilling_reason")
         """
-        if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
-        else:
-            return self._client.data_modeling.instances.delete(
-                nodes=[(space, id) for id in external_id],
-            )
+        return self._delete(external_id, space)
 
     @overload
     def retrieve(self, external_id: str) -> DrillingReasons:
         ...
 
     @overload
-    def retrieve(self, external_id: Sequence[str]) -> DrillingReasonsList:
+    def retrieve(self, external_id: SequenceNotStr[str]) -> DrillingReasonsList:
         ...
 
     def retrieve(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> DrillingReasons | DrillingReasonsList:
         """Retrieve one or more drilling reasons by id(s).
 
@@ -123,10 +181,7 @@ class DrillingReasonsAPI(TypeAPI[DrillingReasons, DrillingReasonsApply, Drilling
                 >>> drilling_reason = client.drilling_reasons.retrieve("my_drilling_reason")
 
         """
-        if isinstance(external_id, str):
-            return self._retrieve((space, external_id))
-        else:
-            return self._retrieve([(space, ext_id) for ext_id in external_id])
+        return self._retrieve(external_id, space)
 
     def search(
         self,
@@ -175,7 +230,7 @@ class DrillingReasonsAPI(TypeAPI[DrillingReasons, DrillingReasonsApply, Drilling
                 >>> drilling_reasons = client.drilling_reasons.search('my_drilling_reason')
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_drilling_reason_filter(
             self._view_id,
             effective_date_time,
             effective_date_time_prefix,
@@ -300,7 +355,7 @@ class DrillingReasonsAPI(TypeAPI[DrillingReasons, DrillingReasonsApply, Drilling
 
         """
 
-        filter_ = _create_filter(
+        filter_ = _create_drilling_reason_filter(
             self._view_id,
             effective_date_time,
             effective_date_time_prefix,
@@ -369,7 +424,7 @@ class DrillingReasonsAPI(TypeAPI[DrillingReasons, DrillingReasonsApply, Drilling
             Bucketed histogram results.
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_drilling_reason_filter(
             self._view_id,
             effective_date_time,
             effective_date_time_prefix,
@@ -437,7 +492,7 @@ class DrillingReasonsAPI(TypeAPI[DrillingReasons, DrillingReasonsApply, Drilling
                 >>> drilling_reasons = client.drilling_reasons.list(limit=5)
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_drilling_reason_filter(
             self._view_id,
             effective_date_time,
             effective_date_time_prefix,
@@ -451,59 +506,4 @@ class DrillingReasonsAPI(TypeAPI[DrillingReasons, DrillingReasonsApply, Drilling
             space,
             filter,
         )
-
         return self._list(limit=limit, filter=filter_)
-
-
-def _create_filter(
-    view_id: dm.ViewId,
-    effective_date_time: str | list[str] | None = None,
-    effective_date_time_prefix: str | None = None,
-    lahee_class_id: str | list[str] | None = None,
-    lahee_class_id_prefix: str | None = None,
-    remark: str | list[str] | None = None,
-    remark_prefix: str | None = None,
-    termination_date_time: str | list[str] | None = None,
-    termination_date_time_prefix: str | None = None,
-    external_id_prefix: str | None = None,
-    space: str | list[str] | None = None,
-    filter: dm.Filter | None = None,
-) -> dm.Filter | None:
-    filters = []
-    if effective_date_time and isinstance(effective_date_time, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("EffectiveDateTime"), value=effective_date_time))
-    if effective_date_time and isinstance(effective_date_time, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("EffectiveDateTime"), values=effective_date_time))
-    if effective_date_time_prefix:
-        filters.append(
-            dm.filters.Prefix(view_id.as_property_ref("EffectiveDateTime"), value=effective_date_time_prefix)
-        )
-    if lahee_class_id and isinstance(lahee_class_id, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("LaheeClassID"), value=lahee_class_id))
-    if lahee_class_id and isinstance(lahee_class_id, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("LaheeClassID"), values=lahee_class_id))
-    if lahee_class_id_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("LaheeClassID"), value=lahee_class_id_prefix))
-    if remark and isinstance(remark, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("Remark"), value=remark))
-    if remark and isinstance(remark, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("Remark"), values=remark))
-    if remark_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("Remark"), value=remark_prefix))
-    if termination_date_time and isinstance(termination_date_time, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("TerminationDateTime"), value=termination_date_time))
-    if termination_date_time and isinstance(termination_date_time, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("TerminationDateTime"), values=termination_date_time))
-    if termination_date_time_prefix:
-        filters.append(
-            dm.filters.Prefix(view_id.as_property_ref("TerminationDateTime"), value=termination_date_time_prefix)
-        )
-    if external_id_prefix:
-        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
-        filters.append(dm.filters.Equals(["node", "space"], value=space))
-    if space and isinstance(space, list):
-        filters.append(dm.filters.In(["node", "space"], values=space))
-    if filter:
-        filters.append(filter)
-    return dm.filters.And(*filters) if filters else None

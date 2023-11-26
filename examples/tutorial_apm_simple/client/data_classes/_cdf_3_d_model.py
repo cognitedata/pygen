@@ -1,14 +1,22 @@
 from __future__ import annotations
 
-from typing import Literal, TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
+from ._core import (
+    DomainModel,
+    DomainModelApply,
+    DomainModelApplyList,
+    DomainModelList,
+    DomainRelationApply,
+    ResourcesApply,
+)
 
 if TYPE_CHECKING:
-    from ._cdf_3_d_entity import CdfEntityApply
+    from ._cdf_3_d_connection_properties import CdfConnectionProperties, CdfConnectionPropertiesApply
+
 
 __all__ = ["CdfModel", "CdfModelApply", "CdfModelList", "CdfModelApplyList", "CdfModelFields", "CdfModelTextFields"]
 
@@ -22,7 +30,7 @@ _CDFMODEL_PROPERTIES_BY_FIELD = {
 
 
 class CdfModel(DomainModel):
-    """This represent a read version of cdf 3 d model.
+    """This represents the reading version of cdf 3 d model.
 
     It is used to when data is retrieved from CDF.
 
@@ -38,21 +46,21 @@ class CdfModel(DomainModel):
     """
 
     space: str = "cdf_3d_schema"
-    entities: Optional[list[str]] = None
+    entities: Optional[list[CdfConnectionProperties]] = Field(default=None, repr=False)
     name: Optional[str] = None
 
     def as_apply(self) -> CdfModelApply:
-        """Convert this read version of cdf 3 d model to a write version."""
+        """Convert this read version of cdf 3 d model to the writing version."""
         return CdfModelApply(
             space=self.space,
             external_id=self.external_id,
-            entities=self.entities,
+            entities=[entity.as_apply() for entity in self.entities or []],
             name=self.name,
         )
 
 
 class CdfModelApply(DomainModelApply):
-    """This represent a write version of cdf 3 d model.
+    """This represents the writing version of cdf 3 d model.
 
     It is used to when data is sent to CDF.
 
@@ -61,85 +69,95 @@ class CdfModelApply(DomainModelApply):
         external_id: The external id of the cdf 3 d model.
         entities: Collection of Cdf3dEntity that are part of this Cdf3dModel
         name: The name field.
-        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+        existing_version: Fail the ingestion request if the cdf 3 d model version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
     space: str = "cdf_3d_schema"
-    entities: Union[list[CdfEntityApply], list[str], None] = Field(default=None, repr=False)
+    entities: Optional[list[CdfConnectionPropertiesApply]] = Field(default=None, repr=False)
     name: str
 
     def _to_instances_apply(
-        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
-    ) -> dm.InstancesApply:
-        if self.external_id in cache:
-            return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
-        write_view = view_by_write_class and view_by_write_class.get(type(self))
+        self,
+        cache: set[tuple[str, str]],
+        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+    ) -> ResourcesApply:
+        from ._cdf_3_d_connection_properties import CdfConnectionPropertiesApply
+
+        resources = ResourcesApply()
+        if self.as_tuple_id() in cache:
+            return resources
+
+        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
+            "cdf_3d_schema", "Cdf3dModel", "1"
+        )
 
         properties = {}
         if self.name is not None:
             properties["name"] = self.name
+
         if properties:
-            source = dm.NodeOrEdgeData(
-                source=write_view or dm.ViewId("cdf_3d_schema", "Cdf3dModel", "1"),
-                properties=properties,
-            )
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=[source],
+                sources=[
+                    dm.NodeOrEdgeData(
+                        source=write_view,
+                        properties=properties,
+                    )
+                ],
             )
-            nodes = [this_node]
-        else:
-            nodes = []
-
-        edges = []
-        cache.add(self.external_id)
+            resources.nodes.append(this_node)
+            cache.add(self.as_tuple_id())
 
         for entity in self.entities or []:
-            edge = self._create_entity_edge(entity)
-            if edge.external_id not in cache:
-                edges.append(edge)
-                cache.add(edge.external_id)
+            if isinstance(entity, DomainRelationApply):
+                other_resources = entity._to_instances_apply(cache, self, view_by_write_class)
+                resources.extend(other_resources)
 
-            if isinstance(entity, DomainModelApply):
-                instances = entity._to_instances_apply(cache, view_by_write_class)
-                nodes.extend(instances.nodes)
-                edges.extend(instances.edges)
-
-        return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
-
-    def _create_entity_edge(self, entity: Union[str, CdfEntityApply]) -> dm.EdgeApply:
-        if isinstance(entity, str):
-            end_space, end_node_ext_id = self.space, entity
-        elif isinstance(entity, DomainModelApply):
-            end_space, end_node_ext_id = entity.space, entity.external_id
-        else:
-            raise TypeError(f"Expected str or CdfEntityApply, got {type(entity)}")
-
-        return dm.EdgeApply(
-            space=self.space,
-            external_id=f"{self.external_id}:{end_node_ext_id}",
-            type=dm.DirectRelationReference("cdf_3d_schema", "cdf3dEntityConnection"),
-            start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
-        )
+        return resources
 
 
-class CdfModelList(TypeList[CdfModel]):
-    """List of cdf 3 d models in read version."""
+class CdfModelList(DomainModelList[CdfModel]):
+    """List of cdf 3 d models in the read version."""
 
-    _NODE = CdfModel
+    _INSTANCE = CdfModel
 
     def as_apply(self) -> CdfModelApplyList:
-        """Convert this read version of cdf 3 d model to a write version."""
+        """Convert these read versions of cdf 3 d model to the writing versions."""
         return CdfModelApplyList([node.as_apply() for node in self.data])
 
 
-class CdfModelApplyList(TypeApplyList[CdfModelApply]):
-    """List of cdf 3 d models in write version."""
+class CdfModelApplyList(DomainModelApplyList[CdfModelApply]):
+    """List of cdf 3 d models in the writing version."""
 
-    _NODE = CdfModelApply
+    _INSTANCE = CdfModelApply
+
+
+def _create_cdf_3_d_model_filter(
+    view_id: dm.ViewId,
+    name: str | list[str] | None = None,
+    name_prefix: str | None = None,
+    external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if name and isinstance(name, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
+    if name and isinstance(name, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("name"), values=name))
+    if name_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

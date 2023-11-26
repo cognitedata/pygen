@@ -1,19 +1,27 @@
 from __future__ import annotations
 
-from typing import Literal, TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
+from ._core import (
+    DomainModel,
+    DomainModelApply,
+    DomainModelApplyList,
+    DomainModelList,
+    DomainRelationApply,
+    ResourcesApply,
+)
 
 if TYPE_CHECKING:
-    from ._acl import AclApply
-    from ._ancestry import AncestryApply
-    from ._legal import LegalApply
-    from ._meta import MetaApply
-    from ._tags import TagsApply
-    from ._wellbore_trajectory_data import WellboreTrajectoryDataApply
+    from ._acl import Acl, AclApply
+    from ._ancestry import Ancestry, AncestryApply
+    from ._legal import Legal, LegalApply
+    from ._meta import Meta, MetaApply
+    from ._tags import Tags, TagsApply
+    from ._wellbore_trajectory_data import WellboreTrajectoryData, WellboreTrajectoryDataApply
+
 
 __all__ = [
     "WellboreTrajectory",
@@ -42,7 +50,7 @@ _WELLBORETRAJECTORY_PROPERTIES_BY_FIELD = {
 
 
 class WellboreTrajectory(DomainModel):
-    """This represent a read version of wellbore trajectory.
+    """This represents the reading version of wellbore trajectory.
 
     It is used to when data is retrieved from CDF.
 
@@ -69,43 +77,43 @@ class WellboreTrajectory(DomainModel):
     """
 
     space: str = "IntegrationTestsImmutable"
-    acl: Optional[str] = None
-    ancestry: Optional[str] = None
+    acl: Union[Acl, str, None] = Field(None, repr=False)
+    ancestry: Union[Ancestry, str, None] = Field(None, repr=False)
     create_time: Optional[str] = Field(None, alias="createTime")
     create_user: Optional[str] = Field(None, alias="createUser")
-    data: Optional[str] = None
+    data: Union[WellboreTrajectoryData, str, None] = Field(None, repr=False)
     id_: Optional[str] = Field(None, alias="id")
     kind: Optional[str] = None
-    legal: Optional[str] = None
-    meta: Optional[list[str]] = None
+    legal: Union[Legal, str, None] = Field(None, repr=False)
+    meta: Union[list[Meta], list[str], None] = Field(default=None, repr=False)
     modify_time: Optional[str] = Field(None, alias="modifyTime")
     modify_user: Optional[str] = Field(None, alias="modifyUser")
-    tags: Optional[str] = None
+    tags: Union[Tags, str, None] = Field(None, repr=False)
     version_: Optional[int] = Field(None, alias="version")
 
     def as_apply(self) -> WellboreTrajectoryApply:
-        """Convert this read version of wellbore trajectory to a write version."""
+        """Convert this read version of wellbore trajectory to the writing version."""
         return WellboreTrajectoryApply(
             space=self.space,
             external_id=self.external_id,
-            acl=self.acl,
-            ancestry=self.ancestry,
+            acl=self.acl.as_apply() if isinstance(self.acl, DomainModel) else self.acl,
+            ancestry=self.ancestry.as_apply() if isinstance(self.ancestry, DomainModel) else self.ancestry,
             create_time=self.create_time,
             create_user=self.create_user,
-            data=self.data,
+            data=self.data.as_apply() if isinstance(self.data, DomainModel) else self.data,
             id_=self.id_,
             kind=self.kind,
-            legal=self.legal,
-            meta=self.meta,
+            legal=self.legal.as_apply() if isinstance(self.legal, DomainModel) else self.legal,
+            meta=[meta.as_apply() if isinstance(meta, DomainModel) else meta for meta in self.meta or []],
             modify_time=self.modify_time,
             modify_user=self.modify_user,
-            tags=self.tags,
+            tags=self.tags.as_apply() if isinstance(self.tags, DomainModel) else self.tags,
             version_=self.version_,
         )
 
 
 class WellboreTrajectoryApply(DomainModelApply):
-    """This represent a write version of wellbore trajectory.
+    """This represents the writing version of wellbore trajectory.
 
     It is used to when data is sent to CDF.
 
@@ -125,7 +133,7 @@ class WellboreTrajectoryApply(DomainModelApply):
         modify_user: The modify user field.
         tags: The tag field.
         version_: The version field.
-        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+        existing_version: Fail the ingestion request if the wellbore trajectory version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
@@ -147,11 +155,17 @@ class WellboreTrajectoryApply(DomainModelApply):
     version_: Optional[int] = Field(None, alias="version")
 
     def _to_instances_apply(
-        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
-    ) -> dm.InstancesApply:
-        if self.external_id in cache:
-            return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
-        write_view = view_by_write_class and view_by_write_class.get(type(self))
+        self,
+        cache: set[tuple[str, str]],
+        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+    ) -> ResourcesApply:
+        resources = ResourcesApply()
+        if self.as_tuple_id() in cache:
+            return resources
+
+        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
+            "IntegrationTestsImmutable", "WellboreTrajectory", "5c4afa33e6bd65"
+        )
 
         properties = {}
         if self.acl is not None:
@@ -193,90 +207,255 @@ class WellboreTrajectoryApply(DomainModelApply):
             }
         if self.version_ is not None:
             properties["version"] = self.version_
+
         if properties:
-            source = dm.NodeOrEdgeData(
-                source=write_view or dm.ViewId("IntegrationTestsImmutable", "WellboreTrajectory", "5c4afa33e6bd65"),
-                properties=properties,
-            )
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=[source],
+                sources=[
+                    dm.NodeOrEdgeData(
+                        source=write_view,
+                        properties=properties,
+                    )
+                ],
             )
-            nodes = [this_node]
-        else:
-            nodes = []
+            resources.nodes.append(this_node)
+            cache.add(self.as_tuple_id())
 
-        edges = []
-        cache.add(self.external_id)
-
+        edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreTrajectory.meta")
         for meta in self.meta or []:
-            edge = self._create_meta_edge(meta)
-            if edge.external_id not in cache:
-                edges.append(edge)
-                cache.add(edge.external_id)
-
-            if isinstance(meta, DomainModelApply):
-                instances = meta._to_instances_apply(cache, view_by_write_class)
-                nodes.extend(instances.nodes)
-                edges.extend(instances.edges)
+            other_resources = DomainRelationApply._from_edge_to_resources(
+                cache, self, meta, edge_type, view_by_write_class
+            )
+            resources.extend(other_resources)
 
         if isinstance(self.acl, DomainModelApply):
-            instances = self.acl._to_instances_apply(cache, view_by_write_class)
-            nodes.extend(instances.nodes)
-            edges.extend(instances.edges)
+            other_resources = self.acl._to_instances_apply(cache, view_by_write_class)
+            resources.extend(other_resources)
 
         if isinstance(self.ancestry, DomainModelApply):
-            instances = self.ancestry._to_instances_apply(cache, view_by_write_class)
-            nodes.extend(instances.nodes)
-            edges.extend(instances.edges)
+            other_resources = self.ancestry._to_instances_apply(cache, view_by_write_class)
+            resources.extend(other_resources)
 
         if isinstance(self.data, DomainModelApply):
-            instances = self.data._to_instances_apply(cache, view_by_write_class)
-            nodes.extend(instances.nodes)
-            edges.extend(instances.edges)
+            other_resources = self.data._to_instances_apply(cache, view_by_write_class)
+            resources.extend(other_resources)
 
         if isinstance(self.legal, DomainModelApply):
-            instances = self.legal._to_instances_apply(cache, view_by_write_class)
-            nodes.extend(instances.nodes)
-            edges.extend(instances.edges)
+            other_resources = self.legal._to_instances_apply(cache, view_by_write_class)
+            resources.extend(other_resources)
 
         if isinstance(self.tags, DomainModelApply):
-            instances = self.tags._to_instances_apply(cache, view_by_write_class)
-            nodes.extend(instances.nodes)
-            edges.extend(instances.edges)
+            other_resources = self.tags._to_instances_apply(cache, view_by_write_class)
+            resources.extend(other_resources)
 
-        return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
-
-    def _create_meta_edge(self, meta: Union[str, MetaApply]) -> dm.EdgeApply:
-        if isinstance(meta, str):
-            end_space, end_node_ext_id = self.space, meta
-        elif isinstance(meta, DomainModelApply):
-            end_space, end_node_ext_id = meta.space, meta.external_id
-        else:
-            raise TypeError(f"Expected str or MetaApply, got {type(meta)}")
-
-        return dm.EdgeApply(
-            space=self.space,
-            external_id=f"{self.external_id}:{end_node_ext_id}",
-            type=dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreTrajectory.meta"),
-            start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
-        )
+        return resources
 
 
-class WellboreTrajectoryList(TypeList[WellboreTrajectory]):
-    """List of wellbore trajectories in read version."""
+class WellboreTrajectoryList(DomainModelList[WellboreTrajectory]):
+    """List of wellbore trajectories in the read version."""
 
-    _NODE = WellboreTrajectory
+    _INSTANCE = WellboreTrajectory
 
     def as_apply(self) -> WellboreTrajectoryApplyList:
-        """Convert this read version of wellbore trajectory to a write version."""
+        """Convert these read versions of wellbore trajectory to the writing versions."""
         return WellboreTrajectoryApplyList([node.as_apply() for node in self.data])
 
 
-class WellboreTrajectoryApplyList(TypeApplyList[WellboreTrajectoryApply]):
-    """List of wellbore trajectories in write version."""
+class WellboreTrajectoryApplyList(DomainModelApplyList[WellboreTrajectoryApply]):
+    """List of wellbore trajectories in the writing version."""
 
-    _NODE = WellboreTrajectoryApply
+    _INSTANCE = WellboreTrajectoryApply
+
+
+def _create_wellbore_trajectory_filter(
+    view_id: dm.ViewId,
+    acl: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+    ancestry: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+    create_time: str | list[str] | None = None,
+    create_time_prefix: str | None = None,
+    create_user: str | list[str] | None = None,
+    create_user_prefix: str | None = None,
+    data: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+    id_: str | list[str] | None = None,
+    id_prefix: str | None = None,
+    kind: str | list[str] | None = None,
+    kind_prefix: str | None = None,
+    legal: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+    modify_time: str | list[str] | None = None,
+    modify_time_prefix: str | None = None,
+    modify_user: str | list[str] | None = None,
+    modify_user_prefix: str | None = None,
+    tags: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+    min_version_: int | None = None,
+    max_version_: int | None = None,
+    external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if acl and isinstance(acl, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("acl"), value={"space": "IntegrationTestsImmutable", "externalId": acl}
+            )
+        )
+    if acl and isinstance(acl, tuple):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("acl"), value={"space": acl[0], "externalId": acl[1]}))
+    if acl and isinstance(acl, list) and isinstance(acl[0], str):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("acl"),
+                values=[{"space": "IntegrationTestsImmutable", "externalId": item} for item in acl],
+            )
+        )
+    if acl and isinstance(acl, list) and isinstance(acl[0], tuple):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("acl"), values=[{"space": item[0], "externalId": item[1]} for item in acl]
+            )
+        )
+    if ancestry and isinstance(ancestry, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("ancestry"),
+                value={"space": "IntegrationTestsImmutable", "externalId": ancestry},
+            )
+        )
+    if ancestry and isinstance(ancestry, tuple):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("ancestry"), value={"space": ancestry[0], "externalId": ancestry[1]}
+            )
+        )
+    if ancestry and isinstance(ancestry, list) and isinstance(ancestry[0], str):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("ancestry"),
+                values=[{"space": "IntegrationTestsImmutable", "externalId": item} for item in ancestry],
+            )
+        )
+    if ancestry and isinstance(ancestry, list) and isinstance(ancestry[0], tuple):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("ancestry"),
+                values=[{"space": item[0], "externalId": item[1]} for item in ancestry],
+            )
+        )
+    if create_time and isinstance(create_time, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("createTime"), value=create_time))
+    if create_time and isinstance(create_time, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("createTime"), values=create_time))
+    if create_time_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("createTime"), value=create_time_prefix))
+    if create_user and isinstance(create_user, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("createUser"), value=create_user))
+    if create_user and isinstance(create_user, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("createUser"), values=create_user))
+    if create_user_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("createUser"), value=create_user_prefix))
+    if data and isinstance(data, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("data"), value={"space": "IntegrationTestsImmutable", "externalId": data}
+            )
+        )
+    if data and isinstance(data, tuple):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("data"), value={"space": data[0], "externalId": data[1]})
+        )
+    if data and isinstance(data, list) and isinstance(data[0], str):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("data"),
+                values=[{"space": "IntegrationTestsImmutable", "externalId": item} for item in data],
+            )
+        )
+    if data and isinstance(data, list) and isinstance(data[0], tuple):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("data"), values=[{"space": item[0], "externalId": item[1]} for item in data]
+            )
+        )
+    if id_ and isinstance(id_, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("id"), value=id_))
+    if id_ and isinstance(id_, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("id"), values=id_))
+    if id_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("id"), value=id_prefix))
+    if kind and isinstance(kind, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("kind"), value=kind))
+    if kind and isinstance(kind, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("kind"), values=kind))
+    if kind_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("kind"), value=kind_prefix))
+    if legal and isinstance(legal, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("legal"), value={"space": "IntegrationTestsImmutable", "externalId": legal}
+            )
+        )
+    if legal and isinstance(legal, tuple):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("legal"), value={"space": legal[0], "externalId": legal[1]})
+        )
+    if legal and isinstance(legal, list) and isinstance(legal[0], str):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("legal"),
+                values=[{"space": "IntegrationTestsImmutable", "externalId": item} for item in legal],
+            )
+        )
+    if legal and isinstance(legal, list) and isinstance(legal[0], tuple):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("legal"), values=[{"space": item[0], "externalId": item[1]} for item in legal]
+            )
+        )
+    if modify_time and isinstance(modify_time, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("modifyTime"), value=modify_time))
+    if modify_time and isinstance(modify_time, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("modifyTime"), values=modify_time))
+    if modify_time_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("modifyTime"), value=modify_time_prefix))
+    if modify_user and isinstance(modify_user, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("modifyUser"), value=modify_user))
+    if modify_user and isinstance(modify_user, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("modifyUser"), values=modify_user))
+    if modify_user_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("modifyUser"), value=modify_user_prefix))
+    if tags and isinstance(tags, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("tags"), value={"space": "IntegrationTestsImmutable", "externalId": tags}
+            )
+        )
+    if tags and isinstance(tags, tuple):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("tags"), value={"space": tags[0], "externalId": tags[1]})
+        )
+    if tags and isinstance(tags, list) and isinstance(tags[0], str):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("tags"),
+                values=[{"space": "IntegrationTestsImmutable", "externalId": item} for item in tags],
+            )
+        )
+    if tags and isinstance(tags, list) and isinstance(tags[0], tuple):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("tags"), values=[{"space": item[0], "externalId": item[1]} for item in tags]
+            )
+        )
+    if min_version_ or max_version_:
+        filters.append(dm.filters.Range(view_id.as_property_ref("version"), gte=min_version_, lte=max_version_))
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None
