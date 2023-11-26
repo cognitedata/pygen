@@ -20,8 +20,8 @@ class ActorMoviesAPI(EdgeAPI):
         """List movie edges of a actor.
 
         Args:
-            actor: ID of the source movies.
-            actor_space: Location of the movies.
+            actor: ID of the source actors.
+            actor_space: Location of the actors.
             movie: ID of the target movies.
             movie_space: Location of the movies.
             external_id_prefix: The prefix of the external ID to filter on.
@@ -41,7 +41,6 @@ class ActorMoviesAPI(EdgeAPI):
                 >>> actor = client.actor.movies_edge.list("my_actor", limit=5)
 
         """
-        f = dm.filters
         filter_ = _create_edge_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "Role.movies"),
             actor,

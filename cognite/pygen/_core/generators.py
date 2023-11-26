@@ -19,6 +19,7 @@ from .data_classes import (
     APIClass,
     DataClass,
     EdgeDataClass,
+    EdgeWithPropertyDataClass,
     MultiAPIClass,
     NodeDataClass,
     ViewSpaceExternalId,
@@ -179,7 +180,7 @@ class MultiAPIGenerator:
             api.view_identifier: api.data_class for api in self.sub_apis
         }
         for api, view in zip(self.sub_apis, views):
-            if isinstance(api.data_class, EdgeDataClass):
+            if isinstance(api.data_class, EdgeWithPropertyDataClass):
                 api.data_class.update_nodes(data_class_by_view_id, views, config.naming.field)
             api.data_class.update_fields(view.properties, data_class_by_view_id, config.naming.field, config.filtering)
 
@@ -285,7 +286,7 @@ class APIGenerator:
     def generate_data_class_file(self) -> str:
         if isinstance(self.data_class, NodeDataClass):
             type_data = self._env.get_template("data_class_node.py.jinja")
-        elif isinstance(self.data_class, EdgeDataClass):
+        elif isinstance(self.data_class, EdgeWithPropertyDataClass):
             type_data = self._env.get_template("data_class_edge.py.jinja")
         else:
             raise ValueError(f"Unknown data class {type(self.data_class)}")
@@ -332,14 +333,24 @@ class APIGenerator:
     def generate_edge_api_files(self, top_level_package: str, client_name: str) -> Iterator[tuple[str, str]]:
         edge_api = self._env.get_template("api_class_edge.py.jinja")
         for field in self.data_class.one_to_many_edges:
+            if isinstance(self.data_class, NodeDataClass):
+                edge_class = EdgeDataClass.from_field_data_classes(
+                    field,
+                    self.data_class,
+                    self._config,
+                )
+            elif isinstance(self.data_class, EdgeWithPropertyDataClass):
+                edge_class = self.data_class
+            else:
+                raise ValueError(f"Unknown data class {type(self.data_class)}")
             yield field.edge_api_file_name, (
                 edge_api.render(
                     top_level_package=top_level_package,
                     client_name=client_name,
                     field=field,
                     api_class=self.api_class,
-                    data_class=self.data_class,
-                    list_method=self.data_class.list_method,
+                    data_class=edge_class,
+                    list_method=edge_class.list_method,
                     instance_space=self.view_identifier.space,
                 )
                 + "\n"

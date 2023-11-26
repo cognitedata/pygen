@@ -443,7 +443,7 @@ class EdgeOneToMany(EdgeField):
 
     @property
     def is_property_edge(self) -> bool:
-        return isinstance(self.data_class, EdgeDataClass)
+        return isinstance(self.data_class, EdgeWithPropertyDataClass)
 
     def as_apply(self) -> str:
         if self.is_property_edge:
@@ -546,7 +546,7 @@ class DataClass:
         if used_for == "node":
             return NodeDataClass(**args)
         elif used_for == "edge":
-            return EdgeDataClass(**args)
+            return EdgeWithPropertyDataClass(**args)
         else:
             raise ValueError(f"Unsupported used_for={used_for}")
 
@@ -701,8 +701,8 @@ class DataClass:
         return sorted(unique.values(), key=lambda x: x.write_name)
 
     @property
-    def dependencies_edges(self) -> list[EdgeDataClass]:
-        return [data_class for data_class in self.dependencies if isinstance(data_class, EdgeDataClass)]
+    def dependencies_edges(self) -> list[EdgeWithPropertyDataClass]:
+        return [data_class for data_class in self.dependencies if isinstance(data_class, EdgeWithPropertyDataClass)]
 
     @property
     def has_single_timeseries_fields(self) -> bool:
@@ -759,6 +759,57 @@ class NodeDataClass(DataClass):
 
 @dataclass
 class EdgeDataClass(DataClass):
+    _start_class: NodeDataClass | None = None
+    _end_class: NodeDataClass | None = None
+    _edge_type: dm.DirectRelationReference | None = None
+
+    @property
+    def start_class(self) -> NodeDataClass:
+        if self._start_class is None:
+            raise ValueError("EdgeDataClass has not been initialized.")
+        return self._start_class
+
+    @property
+    def end_class(self) -> NodeDataClass:
+        if self._end_class is None:
+            raise ValueError("EdgeDataClass has not been initialized.")
+        return self._end_class
+
+    @property
+    def edge_type(self) -> dm.DirectRelationReference:
+        if self._edge_type is None:
+            raise ValueError("EdgeDataClass has not been initialized.")
+        return self._edge_type
+
+    @classmethod
+    def from_field_data_classes(cls, field: EdgeOneToMany, data_class: NodeDataClass, config: pygen_config.PygenConfig):
+        edge_fields: list[Field] = []  # Space and External ID are automatically added
+        list_method = ListMethod.from_fields(edge_fields, config.filtering, is_edge_class=True)
+        return cls(
+            field.data_class.view_name,
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            field.data_class.view_id,
+            field.data_class.view_version,
+            edge_fields,
+            list_method,
+            data_class,
+            cast(NodeDataClass, field.data_class),
+            field.prop.type,
+        )
+
+
+@dataclass
+class EdgeWithPropertyDataClass(DataClass):
     _start_class: NodeDataClass | None = None
     _end_class: NodeDataClass | None = None
     _edge_type: dm.DirectRelationReference | None = None
