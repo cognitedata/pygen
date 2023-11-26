@@ -428,7 +428,7 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
 
     def next_name(self, name: str) -> str:
         pattern = re.compile(r"_(\d+)$")
-        counter = Counter(pattern.sub("", step) for step in self)
+        counter = Counter(pattern.sub("", step.name) for step in self)
         if name in counter:
             return f"{name}_{counter[name]}"
         return name
@@ -456,6 +456,8 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
 
     def update(self, batch: dm.query.QueryResult):
         for expression in self:
+            if expression.name not in batch:
+                continue
             expression.last_batch_count = len(batch[expression.name])
             expression.total_retrieved += expression.last_batch_count
             expression.cursor = batch.cursors.get(expression.name)
@@ -478,9 +480,19 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
         relation_by_type_by_start_node: dict[
             tuple[str, str], dict[tuple[str, str], list[DomainRelation]]
         ] = defaultdict(lambda: defaultdict(list))
+        node_attribute_to_end_node: dict[str, str] = {}
 
         for step in self:
-            if issubclass(step.result_cls, DomainModel):
+            if isinstance(step.expression, dm.query.NodeResultSetExpression) and step.expression.from_:
+                node_attribute_to_end_node[step.expression.from_] = step.name
+
+            if step.result_cls is None:  # This is a data model edge.
+                for edge in step.results:
+                    edge = cast(dm.Edge, edge)
+                    edges_by_type_by_start_node[(step.expression.from_, step.name)][
+                        (edge.start_node.space, edge.start_node.external_id)
+                    ].append(edge)
+            elif issubclass(step.result_cls, DomainModel):
                 for node in step.results:
                     domain = step.result_cls.from_instance(node)
                     # Circular dependencies will overwrite here, so we always get the last one
@@ -491,12 +503,6 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
                     relation_by_type_by_start_node[(step.expression.from_, step.name)][
                         domain.start_node.as_tuple()
                     ].append(domain)
-            elif step.result_cls is None:  # This is a data model edge.
-                for edge in step.results:
-                    edge = cast(dm.Edge, edge)
-                    edges_by_type_by_start_node[(step.expression.from_, step.name)][
-                        (edge.space, edge.external_id)
-                    ].append(edge)
 
         for (node_name, node_attribute), relations_by_start_node in relation_by_type_by_start_node.items():
             for node in nodes_by_type[node_name].values():
@@ -509,8 +515,11 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
                     ):
                         setattr(relation, edge_name, node)
 
-        if edges_by_type_by_start_node:
-            raise NotImplementedError()
+        for (node_name, node_attribute), edges_by_start_node in edges_by_type_by_start_node.items():
+            for node in nodes_by_type[node_name].values():
+                edges = edges_by_start_node.get(node.as_tuple_id(), [])
+                nodes = nodes_by_type.get(node_attribute_to_end_node.get(node_attribute), {})
+                setattr(node, node_attribute, [node for edge in edges if (node := nodes.get(edge.end_node.as_tuple()))])
 
         return self._result_cls(nodes_by_type[self[0].name].values())
 
