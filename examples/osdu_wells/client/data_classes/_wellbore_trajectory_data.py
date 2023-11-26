@@ -685,7 +685,7 @@ class WellboreTrajectoryDataApply(DomainModelApply):
 
         edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreTrajectoryData.Artefacts")
         for artefact in self.artefacts or []:
-            other_resources = DomainRelationApply._from_edge_to_resources(
+            other_resources = DomainRelationApply.from_edge_to_resources(
                 cache, self, artefact, edge_type, view_by_write_class
             )
             resources.extend(other_resources)
@@ -694,28 +694,28 @@ class WellboreTrajectoryDataApply(DomainModelApply):
             "IntegrationTestsImmutable", "WellboreTrajectoryData.AvailableTrajectoryStationProperties"
         )
         for available_trajectory_station_property in self.available_trajectory_station_properties or []:
-            other_resources = DomainRelationApply._from_edge_to_resources(
+            other_resources = DomainRelationApply.from_edge_to_resources(
                 cache, self, available_trajectory_station_property, edge_type, view_by_write_class
             )
             resources.extend(other_resources)
 
         edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreTrajectoryData.GeoContexts")
         for geo_context in self.geo_contexts or []:
-            other_resources = DomainRelationApply._from_edge_to_resources(
+            other_resources = DomainRelationApply.from_edge_to_resources(
                 cache, self, geo_context, edge_type, view_by_write_class
             )
             resources.extend(other_resources)
 
         edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreTrajectoryData.LineageAssertions")
         for lineage_assertion in self.lineage_assertions or []:
-            other_resources = DomainRelationApply._from_edge_to_resources(
+            other_resources = DomainRelationApply.from_edge_to_resources(
                 cache, self, lineage_assertion, edge_type, view_by_write_class
             )
             resources.extend(other_resources)
 
         edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreTrajectoryData.NameAliases")
         for name_alias in self.name_aliases or []:
-            other_resources = DomainRelationApply._from_edge_to_resources(
+            other_resources = DomainRelationApply.from_edge_to_resources(
                 cache, self, name_alias, edge_type, view_by_write_class
             )
             resources.extend(other_resources)
@@ -724,7 +724,7 @@ class WellboreTrajectoryDataApply(DomainModelApply):
             "IntegrationTestsImmutable", "WellboreTrajectoryData.TechnicalAssurances"
         )
         for technical_assurance in self.technical_assurances or []:
-            other_resources = DomainRelationApply._from_edge_to_resources(
+            other_resources = DomainRelationApply.from_edge_to_resources(
                 cache, self, technical_assurance, edge_type, view_by_write_class
             )
             resources.extend(other_resources)

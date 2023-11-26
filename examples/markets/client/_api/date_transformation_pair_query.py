@@ -11,9 +11,6 @@ from markets.client.data_classes import (
     DateTransformation,
     DateTransformationApply,
 )
-from markets.client.data_classes._date_transformation_pair import (
-    _DATETRANSFORMATIONPAIR_PROPERTIES_BY_FIELD,
-)
 from markets.client.data_classes._date_transformation import (
     _DATETRANSFORMATION_PROPERTIES_BY_FIELD,
 )

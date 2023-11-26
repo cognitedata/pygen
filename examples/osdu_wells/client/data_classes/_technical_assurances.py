@@ -165,21 +165,21 @@ class TechnicalAssurancesApply(DomainModelApply):
 
         edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "TechnicalAssurances.AcceptableUsage")
         for acceptable_usage in self.acceptable_usage or []:
-            other_resources = DomainRelationApply._from_edge_to_resources(
+            other_resources = DomainRelationApply.from_edge_to_resources(
                 cache, self, acceptable_usage, edge_type, view_by_write_class
             )
             resources.extend(other_resources)
 
         edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "TechnicalAssurances.Reviewers")
         for reviewer in self.reviewers or []:
-            other_resources = DomainRelationApply._from_edge_to_resources(
+            other_resources = DomainRelationApply.from_edge_to_resources(
                 cache, self, reviewer, edge_type, view_by_write_class
             )
             resources.extend(other_resources)
 
         edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "TechnicalAssurances.UnacceptableUsage")
         for unacceptable_usage in self.unacceptable_usage or []:
-            other_resources = DomainRelationApply._from_edge_to_resources(
+            other_resources = DomainRelationApply.from_edge_to_resources(
                 cache, self, unacceptable_usage, edge_type, view_by_write_class
             )
             resources.extend(other_resources)

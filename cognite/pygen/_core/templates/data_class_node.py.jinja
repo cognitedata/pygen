@@ -117,7 +117,7 @@ class {{ data_class.write_name }}(DomainModelApply):
                 resources.extend(other_resources){% else %}
         edge_type = dm.DirectRelationReference("{{ field.prop.type.space }}", "{{ field.prop.type.external_id }}")
         for {{ field.variable }} in self.{{ field.name }} or []:
-            other_resources = DomainRelationApply._from_edge_to_resources(
+            other_resources = DomainRelationApply.from_edge_to_resources(
                 cache, self, {{field.variable}}, edge_type, view_by_write_class
             )
             resources.extend(other_resources){% endif %}

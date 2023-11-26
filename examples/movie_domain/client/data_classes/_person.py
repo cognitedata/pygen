@@ -121,7 +121,7 @@ class PersonApply(DomainModelApply):
 
         edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "Person.roles")
         for role in self.roles or []:
-            other_resources = DomainRelationApply._from_edge_to_resources(
+            other_resources = DomainRelationApply.from_edge_to_resources(
                 cache, self, role, edge_type, view_by_write_class
             )
             resources.extend(other_resources)

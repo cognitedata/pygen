@@ -216,7 +216,7 @@ class WellApply(DomainModelApply):
 
         edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "Well.meta")
         for meta in self.meta or []:
-            other_resources = DomainRelationApply._from_edge_to_resources(
+            other_resources = DomainRelationApply.from_edge_to_resources(
                 cache, self, meta, edge_type, view_by_write_class
             )
             resources.extend(other_resources)

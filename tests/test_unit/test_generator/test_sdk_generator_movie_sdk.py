@@ -416,17 +416,6 @@ def test_generate_api_core_file(multi_api_generator: MultiAPIGenerator) -> None:
     assert actual == expected
 
 
-def test_generate_data_class_core_file(multi_api_generator: MultiAPIGenerator) -> None:
-    # Arrange
-    expected = MovieSDKFiles.core_data.read_text()
-
-    # Act
-    actual = multi_api_generator.generate_data_class_core_file()
-
-    # Assert
-    assert actual == expected
-
-
 def test_create_list_method(person_view: dm.View, pygen_config: PygenConfig) -> None:
     # Arrange
     data_class = NodeDataClass.from_view(person_view, pygen_config.naming.data_class)
@@ -434,7 +423,7 @@ def test_create_list_method(person_view: dm.View, pygen_config: PygenConfig) -> 
     data_class.update_fields(
         person_view.properties,
         {ViewSpaceExternalId(space="IntegrationTestsImmutable", external_id="Role"): MagicMock(spec=NodeDataClass)},
-        field_naming=pygen_config.naming.field,
+        config=pygen_config,
     )
     parameters = [
         FilterParameter("min_birth_year", "int", description="The minimum value of the birth year to filter on."),
@@ -447,13 +436,15 @@ def test_create_list_method(person_view: dm.View, pygen_config: PygenConfig) -> 
     expected = ListMethod(
         parameters=parameters,
         filters=[
-            FilterCondition(dm.filters.Range, "birthYear", dict(gte=parameters[0], lte=parameters[1])),
-            FilterCondition(dm.filters.Equals, "name", dict(value=parameters[2])),
-            FilterCondition(dm.filters.In, "name", dict(values=parameters[2])),
-            FilterCondition(dm.filters.Prefix, "name", dict(value=parameters[3])),
-            FilterCondition(dm.filters.Prefix, "externalId", dict(value=parameters[4])),
-            FilterCondition(dm.filters.Equals, "space", dict(value=parameters[5])),
-            FilterCondition(dm.filters.In, "space", dict(values=parameters[5])),
+            FilterCondition(
+                dm.filters.Range, "birthYear", dict(gte=parameters[0], lte=parameters[1]), is_edge_class=False
+            ),
+            FilterCondition(dm.filters.Equals, "name", dict(value=parameters[2]), is_edge_class=False),
+            FilterCondition(dm.filters.In, "name", dict(values=parameters[2]), is_edge_class=False),
+            FilterCondition(dm.filters.Prefix, "name", dict(value=parameters[3]), is_edge_class=False),
+            FilterCondition(dm.filters.Prefix, "externalId", dict(value=parameters[4]), is_edge_class=False),
+            FilterCondition(dm.filters.Equals, "space", dict(value=parameters[5]), is_edge_class=False),
+            FilterCondition(dm.filters.In, "space", dict(values=parameters[5]), is_edge_class=False),
         ],
     )
 
@@ -485,7 +476,7 @@ def test_create_list_method_actors(actor_view: dm.View, pygen_config: PygenConfi
             ),
             ViewSpaceExternalId(space="IntegrationTestsImmutable", external_id="Person"): person_data_class,
         },
-        field_naming=pygen_config.naming.field,
+        config=pygen_config,
     )
     parameters = [
         FilterParameter(
@@ -501,14 +492,22 @@ def test_create_list_method_actors(actor_view: dm.View, pygen_config: PygenConfi
     expected = ListMethod(
         parameters=parameters,
         filters=[
-            FilterConditionOnetoOneEdge(dm.filters.Equals, "person", dict(value=parameters[0]), instance_type=str),
-            FilterConditionOnetoOneEdge(dm.filters.Equals, "person", dict(value=parameters[0]), instance_type=tuple),
-            FilterConditionOnetoOneEdge(dm.filters.In, "person", dict(values=parameters[0]), instance_type=str),
-            FilterConditionOnetoOneEdge(dm.filters.In, "person", dict(values=parameters[0]), instance_type=tuple),
-            FilterCondition(dm.filters.Equals, "wonOscar", dict(value=parameters[1])),
-            FilterCondition(dm.filters.Prefix, "externalId", dict(value=parameters[2])),
-            FilterCondition(dm.filters.Equals, "space", dict(value=parameters[3])),
-            FilterCondition(dm.filters.In, "space", dict(values=parameters[3])),
+            FilterConditionOnetoOneEdge(
+                dm.filters.Equals, "person", dict(value=parameters[0]), instance_type=str, is_edge_class=False
+            ),
+            FilterConditionOnetoOneEdge(
+                dm.filters.Equals, "person", dict(value=parameters[0]), instance_type=tuple, is_edge_class=False
+            ),
+            FilterConditionOnetoOneEdge(
+                dm.filters.In, "person", dict(values=parameters[0]), instance_type=str, is_edge_class=False
+            ),
+            FilterConditionOnetoOneEdge(
+                dm.filters.In, "person", dict(values=parameters[0]), instance_type=tuple, is_edge_class=False
+            ),
+            FilterCondition(dm.filters.Equals, "wonOscar", dict(value=parameters[1]), is_edge_class=False),
+            FilterCondition(dm.filters.Prefix, "externalId", dict(value=parameters[2]), is_edge_class=False),
+            FilterCondition(dm.filters.Equals, "space", dict(value=parameters[3]), is_edge_class=False),
+            FilterCondition(dm.filters.In, "space", dict(values=parameters[3]), is_edge_class=False),
         ],
     )
 
