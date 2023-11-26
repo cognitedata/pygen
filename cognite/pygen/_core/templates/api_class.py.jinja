@@ -20,8 +20,8 @@ from {{ top_level_package }}.data_classes import (
     {{ field.data_class.write_name }},
     {{ field.data_class.read_list_name }},{% endfor %}
 )
-from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import (
-    {{ data_class.properties_dict_name }},
+from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import ({% if not data_class.has_only_one_to_many_edges %}
+    {{ data_class.properties_dict_name }},{%  endif %}
     {{ data_class.filter_name }},
 )
 from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder{% for field in data_class.one_to_many_edges %}
