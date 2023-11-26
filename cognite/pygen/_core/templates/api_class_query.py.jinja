@@ -19,7 +19,7 @@ from {{ top_level_package }}.data_classes.{{ field.data_class.file_name }} impor
 ){% endfor %}{% if data_class.has_one_to_many_edges %}
 if TYPE_CHECKING:{% for field in data_class.one_to_many_edges %}{% if field.data_class.is_edge_class %}
     from .{{ field.data_class.end_class.query_file_name}} import {{ field.data_class.end_class.query_class_name}}{% else %}
-    from {{ field.data_class.query_file_name }} import {{ field.data_class.query_class_name }}{% endif %}{% endfor %}
+    from .{{ field.data_class.query_file_name }} import {{ field.data_class.query_class_name }}{% endif %}{% endfor %}
 {% endif %}
 
 
@@ -40,7 +40,7 @@ class {{ data_class.query_class_name }}(QueryAPI[T_DomainModelList]):{% for fiel
             {% if field.data_class.is_edge_class %}{{ field.data_class.end_class.query_class_name }}{% else %}{{ field.data_class.query_class_name }}{% endif %}: The query API for the {% if field.data_class.is_edge_class %}{{ field.data_class.end_class.doc_name }}{% else %}{{ field.data_class.doc_name }}{% endif %}.
         """{% if field.data_class.is_edge_class %}
         from .{{ field.data_class.end_class.query_file_name}} import {{ field.data_class.end_class.query_class_name}}{% else %}
-        from {{ field.data_class.query_file_name }} import {{ field.data_class.query_class_name }}{% endif %}
+        from .{{ field.data_class.query_file_name }} import {{ field.data_class.query_class_name }}{% endif %}
 {% if field.data_class.is_edge_class %}
         edge_view = self._view_by_write_class[{{ field.data_class.write_name }}]{% endif %}
         edge_filter = {% if field.is_property_edge %}{{ field.data_class.filter_name }}{% else %}_create_edge_filter{% endif %}(
