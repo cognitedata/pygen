@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import datetime
 from typing import TYPE_CHECKING
 from cognite.client import data_modeling as dm
 from ._core import QueryStep, QueryAPI, T_DomainModelList
@@ -31,7 +30,7 @@ class NominationQueryAPI(QueryAPI[T_DomainModelList]):
         if retrieve_nomination and not self._builder[-1].name.startswith("nomination"):
             self._builder.append(
                 QueryStep(
-                    name="nomination",
+                    name=self._builder.next_name("nomination"),
                     expression=dm.query.NodeResultSetExpression(
                         filter=None,
                         from_=from_,

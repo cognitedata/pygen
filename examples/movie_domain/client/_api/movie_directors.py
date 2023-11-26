@@ -1,34 +1,29 @@
 from __future__ import annotations
 
-import datetime
 
 from cognite.client import data_modeling as dm
 
-from ._core import DEFAULT_LIMIT_READ, EdgeAPI
+from ._core import DEFAULT_LIMIT_READ, EdgeAPI, _create_edge_filter
 
 
 class MovieDirectorsAPI(EdgeAPI):
     def list(
         self,
+        movie: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        movie_space: str = "IntegrationTestsImmutable",
         director: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
         director_space: str = "IntegrationTestsImmutable",
-        director: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        director_space: str = "IntegrationTestsImmutable",
-        person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        won_oscar: bool | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit=DEFAULT_LIMIT_READ,
-    ) -> DirectorList:
+    ) -> dm.EdgeList:
         """List director edges of a movie.
 
         Args:
-            director: ID of the source directors.
-            director_space: Location of the directors.
+            movie: ID of the source movies.
+            movie_space: Location of the movies.
             director: ID of the target directors.
             director_space: Location of the directors.
-            person: The person to filter on.
-            won_oscar: The won oscar to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of director edges to return. Defaults to 25. Set to -1, float("inf") or None
@@ -46,20 +41,13 @@ class MovieDirectorsAPI(EdgeAPI):
                 >>> movie = client.movie.directors_edge.list("my_movie", limit=5)
 
         """
-        f = dm.filters
-        filter_ = _create_start_end_time_filter(
-            self._view_id,
+        filter_ = _create_edge_filter(
+            dm.DirectRelationReference("IntegrationTestsImmutable", "Movie.directors"),
+            movie,
+            movie_space,
             director,
             director_space,
-            director,
-            director_space,
-            person,
-            won_oscar,
             external_id_prefix,
             space,
-            f.Equals(
-                ["edge", "type"],
-                {"space": "IntegrationTestsImmutable", "externalId": "Movie.directors"},
-            ),
         )
         return self._list(filter_=filter_, limit=limit)

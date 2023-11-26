@@ -38,8 +38,8 @@ class MovieAPI(NodeAPI[Movie, MovieApply, MovieList]):
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self.actors_edge = MovieActorsAPI(client, view_by_write_class, Actor, ActorApply, ActorList)
-        self.directors_edge = MovieDirectorsAPI(client, view_by_write_class, Director, DirectorApply, DirectorList)
+        self.actors_edge = MovieActorsAPI(client)
+        self.directors_edge = MovieDirectorsAPI(client)
 
     def __call__(
         self,

@@ -37,10 +37,8 @@ class RoleAPI(NodeAPI[Role, RoleApply, RoleList]):
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self.movies_edge = RoleMoviesAPI(client, view_by_write_class, Movie, MovieApply, MovieList)
-        self.nomination_edge = RoleNominationAPI(
-            client, view_by_write_class, Nomination, NominationApply, NominationList
-        )
+        self.movies_edge = RoleMoviesAPI(client)
+        self.nomination_edge = RoleNominationAPI(client)
 
     def __call__(
         self,
