@@ -14,7 +14,6 @@ from markets.client.data_classes import (
     DateTransformationPairList,
 )
 from markets.client.data_classes._date_transformation_pair import (
-    _DATETRANSFORMATIONPAIR_PROPERTIES_BY_FIELD,
     _create_date_transformation_pair_filter,
 )
 from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder

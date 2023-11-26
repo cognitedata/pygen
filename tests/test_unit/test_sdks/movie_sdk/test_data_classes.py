@@ -14,7 +14,7 @@ else:
     from movie_domain_pydantic_v1.client.data_classes._core import unpack_properties
 
 
-def test_person_from_node():
+def test_person_from_instance():
     # Arrange
     node = dm.Node.load(
         {
@@ -29,7 +29,7 @@ def test_person_from_node():
     )
 
     # Act
-    person = movie.Person.from_node(node)
+    person = movie.Person.from_instance(node)
 
     # Assert
     assert person.name == "Christoph Waltz"
@@ -48,7 +48,7 @@ def test_person_to_pandas():
             "properties": {"IntegrationTestsImmutable": {"Person/2": {"name": "Christoph Waltz", "birthYear": 1956}}},
         }
     )
-    person = movie.Person.from_node(node)
+    person = movie.Person.from_instance(node)
     persons = movie.PersonList([person])
 
     # Act

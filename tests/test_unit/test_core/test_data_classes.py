@@ -146,7 +146,7 @@ def test_load_field(
         property_.name,
         property_,
         data_class_by_id,
-        pygen_config.naming.field,
+        pygen_config,
         view_name="dummy",
         view_id=dm.ViewId("a", "b", "c"),
     )
@@ -321,9 +321,7 @@ def test_data_class_is_time(pygen_config: PygenConfig) -> None:
 
     # Act
     data_class = NodeDataClass.from_view(view, pygen_config.naming.data_class)
-    data_class.update_fields(
-        view.properties, defaultdict(lambda: MagicMock(spec=NodeDataClass)), pygen_config.naming.field
-    )
+    data_class.update_fields(view.properties, defaultdict(lambda: MagicMock(spec=NodeDataClass)), pygen_config)
 
     # Assert
     assert data_class.has_single_timeseries_fields is True
@@ -377,7 +375,7 @@ def test_field_from_property_expect_warning(name: str, expected_name, pygen_conf
 
     # Act
     with pytest.warns(ViewPropertyNameCollisionWarning):
-        actual = Field.from_property(name, prop, {}, pygen_config.naming.field, "dummy", dm.ViewId("a", "b", "c"))
+        actual = Field.from_property(name, prop, {}, pygen_config, "dummy", dm.ViewId("a", "b", "c"))
 
     # Assert
     assert actual.name == expected_name

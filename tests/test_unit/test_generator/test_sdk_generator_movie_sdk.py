@@ -264,7 +264,7 @@ def test_fields_from_property(
 ):
     # Act
     actual = Field.from_property(
-        prop_name, property_, data_class_by_view_id, pygen_config.naming.field, view_name, dm.ViewId("a", "b", "c")
+        prop_name, property_, data_class_by_view_id, pygen_config, view_name, dm.ViewId("a", "b", "c")
     )
 
     # Assert
