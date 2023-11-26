@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
-from pydantic import model_validator
+from pydantic import Field, model_validator
 
 from ._core import DomainModelApply, DomainRelation, DomainRelationApply, DomainRelationList, ResourcesApply
 from ._cdf_3_d_entity import CdfEntity, CdfEntityApply
