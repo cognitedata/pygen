@@ -78,6 +78,7 @@ def load_field_test_cases():
     mapped = dm.MappedProperty.load(raw_data)
     data_class = MagicMock(spec=NodeDataClass)
     data_class.write_name = "ModelTemplateApply"
+    data_class.read_name = "ModelTemplate"
 
     yield pytest.param(
         mapped,
@@ -90,7 +91,7 @@ def load_field_test_cases():
             doc_name="model template",
         ),
         {ViewSpaceExternalId("cogShop", "ModelTemplate"): data_class},
-        'Optional[str] = Field(None, alias="modelTemplate")',
+        'Union[ModelTemplate, str, None] = Field(None, repr=False, alias="modelTemplate")',
         'Union[ModelTemplateApply, str, None] = Field(None, repr=False, alias="modelTemplate")',
         id="EdgeField that require alias.",
     )

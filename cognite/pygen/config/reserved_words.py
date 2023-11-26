@@ -25,13 +25,15 @@ FIELD_NAMES = (
     | {f for f in dir(BaseModel)}
     | {
         # Pydantic from DomainModel and DomainModelApply
-        "id_tuple",
+        "as_id",
+        "as_tuple_id",
+        "as_direct_reference",
         "to_pandas",
         "_repr_html_",
         "external_id_factory",
         "to_instances_apply",
         "_to_instances_apply",
-        "from_node",
+        "from_instance",
         "config",
         "create_external_id_if_factory",
     }

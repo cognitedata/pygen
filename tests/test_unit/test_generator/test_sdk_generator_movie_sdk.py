@@ -93,7 +93,7 @@ def create_fields_test_cases():
     }
     prop = ViewProperty.load(prop)
     data_class = NodeDataClass(
-        read_name="Role,",
+        read_name="Role",
         write_name="RoleApply",
         read_list_name="RoleList",
         write_list_name="RoleListApply",
@@ -108,7 +108,7 @@ def create_fields_test_cases():
         query_class_name="RoleQueryAPI",
         query_file_name="role_query",
     )
-
+    config = PygenConfig()
     data_class_by_view_id = {ViewSpaceExternalId("IntegrationTestsImmutable", "Role"): data_class}
     yield pytest.param(
         "roles",
@@ -123,11 +123,12 @@ def create_fields_test_cases():
             data_class=data_class,
             variable="role",
             pydantic_field="Field",
-            edge_api_attribute="roles",
+            edge_api_attribute="roles_edge",
             edge_api_class="PersonRolesAPI",
             edge_api_file_name="person_roles",
+            _list_method=ListMethod.from_fields([], config.filtering, is_edge_class=True),
         ),
-        "Optional[list[str]] = None",
+        "Union[list[Role], list[str], None] = Field(default=None, repr=False)",
         "Union[list[RoleApply], list[str], None] = Field(default=None, repr=False)",
         id="List of edges",
     )
@@ -208,7 +209,7 @@ def create_fields_test_cases():
             data_class=data_class,
             pydantic_field="Field",
         ),
-        "Optional[str] = None",
+        "Union[Person, str, None] = Field(None, repr=False)",
         "Union[PersonApply, str, None] = Field(None, repr=False)",
         id="Edge to another view",
     )
