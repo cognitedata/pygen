@@ -828,15 +828,25 @@ class EdgeDataClass(DataClass):
         )
 
     def node_parameters(self, instance_space: str) -> Iterable[FilterParameter]:
-        for class_, location in [(self.start_class, "source"), (self.end_class, "target")]:
+        nodes = [
+            (self.start_class, "source", self.start_class.variable),
+            (self.end_class, "target", self.end_class.variable),
+        ]
+        if self.start_class.variable == self.end_class.variable:
+            nodes = [
+                (self.start_class, "source", f"from_{self.start_class.variable}"),
+                (self.end_class, "target", f"to_{self.end_class.variable}"),
+            ]
+
+        for class_, location, name in nodes:
             yield FilterParameter(
-                name=class_.variable,
+                name=name,
                 type_="str | list[str] | dm.NodeId | list[dm.NodeId]",
                 description=f"ID of the {location} { class_.doc_list_name}.",
                 default=None,
             )
             yield FilterParameter(
-                name=f"{class_.variable}_space",
+                name=f"{name}_space",
                 type_="str",
                 description=f"Location of the {class_.doc_list_name}.",
                 default=f'"{instance_space}"',
@@ -934,15 +944,25 @@ class EdgeWithPropertyDataClass(DataClass):
             return "import pydantic"
 
     def node_parameters(self, instance_space: str) -> Iterable[FilterParameter]:
-        for class_, location in [(self.start_class, "source"), (self.end_class, "target")]:
+        nodes = [
+            (self.start_class, "source", self.start_class.variable),
+            (self.end_class, "target", self.end_class.variable),
+        ]
+        if self.start_class.variable == self.end_class.variable:
+            nodes = [
+                (self.start_class, "source", f"from_{self.start_class.variable}"),
+                (self.end_class, "target", f"to_{self.end_class.variable}"),
+            ]
+
+        for class_, location, name in nodes:
             yield FilterParameter(
-                name=class_.variable,
+                name=name,
                 type_="str | list[str] | dm.NodeId | list[dm.NodeId]",
                 description=f"ID of the {location} { class_.doc_list_name}.",
                 default=None,
             )
             yield FilterParameter(
-                name=f"{class_.variable}_space",
+                name=f"{name}_space",
                 type_="str",
                 description=f"Location of the {class_.doc_list_name}.",
                 default=f'"{instance_space}"',
