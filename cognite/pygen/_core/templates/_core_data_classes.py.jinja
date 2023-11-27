@@ -27,7 +27,11 @@ from pydantic.functional_serializers import PlainSerializer
 
 TimeSeries = Annotated[
     CogniteTimeSeries,
-    PlainSerializer(lambda v: v.dump(camel_case=True) if isinstance(v, CogniteTimeSeries) else v, return_type=dict, when_used="unless-none"),
+    PlainSerializer(
+        lambda v: v.dump(camel_case=True) if isinstance(v, CogniteTimeSeries) else v,
+        return_type=dict,
+        when_used="unless-none",
+    ),
     BeforeValidator(lambda v: CogniteTimeSeries.load(v) if isinstance(v, dict) else v),
 ]{% endif %}
 

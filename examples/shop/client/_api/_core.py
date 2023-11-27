@@ -529,7 +529,6 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
             elif issubclass(step.result_cls, DomainModel):
                 for node in step.results:
                     domain = step.result_cls.from_instance(node)
-                    # Circular dependencies will be skipped here, so we always get the first one
                     if (id_ := domain.as_tuple_id()) not in nodes_by_type[name]:
                         nodes_by_type[name][id_] = domain
             elif issubclass(step.result_cls, DomainRelation):
@@ -554,7 +553,7 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
                 nodes = nodes_by_type.get(node_attribute_to_node_type.get(node_attribute), {})
                 setattr(node, node_attribute, [node for edge in edges if (node := nodes.get(edge.end_node.as_tuple()))])
 
-        return self._result_cls(nodes_by_type[None])
+        return self._result_cls(nodes_by_type[self[0].name].values())
 
 
 class QueryAPI(Generic[T_DomainModelList]):
