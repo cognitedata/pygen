@@ -21,7 +21,15 @@ from markets.client.data_classes._pygen_pool import (
     _PYGENPOOL_PROPERTIES_BY_FIELD,
     _create_pygen_pool_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
 from .pygen_pool_query import PygenPoolQueryAPI
 
 
@@ -49,7 +57,7 @@ class PygenPoolAPI(NodeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
         timezone_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> PygenPoolQueryAPI[PygenPoolList]:
         """Query starting at pygen pools.

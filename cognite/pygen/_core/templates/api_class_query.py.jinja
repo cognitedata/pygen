@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime{% endif %}
 from typing import TYPE_CHECKING
 from cognite.client import data_modeling as dm
-from ._core import QueryStep, QueryAPI, T_DomainModelList{% if not data_class.all_one_to_many_is_property_edges %}, _create_edge_filter{% endif %}
+from ._core import DEFAULT_QUERY_LIMIT, QueryStep, QueryAPI, T_DomainModelList{% if not data_class.all_one_to_many_is_property_edges %}, _create_edge_filter{% endif %}
 from {{ top_level_package }}.data_classes import (
     {{ data_class.read_name }},
     {{ data_class.write_name }},{% for field in data_class.one_to_many_edges %}
@@ -27,7 +27,7 @@ class {{ data_class.query_class_name }}(QueryAPI[T_DomainModelList]):{% for fiel
     def {{ field.name }}(
         self,{% for parm in field.list_method.parameters %}
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
-        limit: int | None = None,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
     ) -> {% if field.data_class.is_edge_class %}{{ field.data_class.end_class.query_class_name }}{% else %}{{ field.data_class.query_class_name }}{% endif %}[T_DomainModelList]:
         """Query along the {{ field.doc_name }} edges of the {{ data_class.doc_name}}.
 

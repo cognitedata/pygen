@@ -24,7 +24,15 @@ from tutorial_apm_simple.client.data_classes._cdf_3_d_model import (
     _CDFMODEL_PROPERTIES_BY_FIELD,
     _create_cdf_3_d_model_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
 from .cdf_3_d_model_entities import CdfModelEntitiesAPI
 from .cdf_3_d_model_query import CdfModelQueryAPI
 
@@ -56,7 +64,7 @@ class CdfModelAPI(NodeAPI[CdfModel, CdfModelApply, CdfModelList]):
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> CdfModelQueryAPI[CdfModelList]:
         """Query starting at cdf 3 d models.
@@ -180,8 +188,8 @@ class CdfModelAPI(NodeAPI[CdfModel, CdfModelApply, CdfModelList]):
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_pairs=[
-                (self.entities_edge, "entities"),
+            edge_api_name_type_triple=[
+                (self.entities_edge, "entities", dm.DirectRelationReference("cdf_3d_schema", "cdf3dEntityConnection")),
             ],
         )
 
@@ -431,7 +439,7 @@ class CdfModelAPI(NodeAPI[CdfModel, CdfModelApply, CdfModelList]):
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_pairs=[
-                (self.entities_edge, "entities"),
+            edge_api_name_type_triple=[
+                (self.entities_edge, "entities", dm.DirectRelationReference("cdf_3d_schema", "cdf3dEntityConnection")),
             ],
         )

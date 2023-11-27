@@ -21,7 +21,15 @@ from osdu_wells.client.data_classes._facility_events import (
     _FACILITYEVENTS_PROPERTIES_BY_FIELD,
     _create_facility_event_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
 from .facility_events_query import FacilityEventsQueryAPI
 
 
@@ -51,7 +59,7 @@ class FacilityEventsAPI(NodeAPI[FacilityEvents, FacilityEventsApply, FacilityEve
         termination_date_time_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> FacilityEventsQueryAPI[FacilityEventsList]:
         """Query starting at facility events.

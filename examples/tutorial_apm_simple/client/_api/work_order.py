@@ -22,7 +22,15 @@ from tutorial_apm_simple.client.data_classes._work_order import (
     _WORKORDER_PROPERTIES_BY_FIELD,
     _create_work_order_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
 from .work_order_linked_assets import WorkOrderLinkedAssetsAPI
 from .work_order_work_items import WorkOrderWorkItemsAPI
 from .work_order_query import WorkOrderQueryAPI
@@ -82,7 +90,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         work_package_number_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> WorkOrderQueryAPI[WorkOrderList]:
         """Query starting at work orders.
@@ -274,9 +282,17 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_pairs=[
-                (self.linked_assets_edge, "linked_assets"),
-                (self.work_items_edge, "work_items"),
+            edge_api_name_type_triple=[
+                (
+                    self.linked_assets_edge,
+                    "linked_assets",
+                    dm.DirectRelationReference("tutorial_apm_simple", "WorkOrder.linkedAssets"),
+                ),
+                (
+                    self.work_items_edge,
+                    "work_items",
+                    dm.DirectRelationReference("tutorial_apm_simple", "WorkOrder.workItems"),
+                ),
             ],
         )
 
@@ -974,8 +990,16 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_pairs=[
-                (self.linked_assets_edge, "linked_assets"),
-                (self.work_items_edge, "work_items"),
+            edge_api_name_type_triple=[
+                (
+                    self.linked_assets_edge,
+                    "linked_assets",
+                    dm.DirectRelationReference("tutorial_apm_simple", "WorkOrder.linkedAssets"),
+                ),
+                (
+                    self.work_items_edge,
+                    "work_items",
+                    dm.DirectRelationReference("tutorial_apm_simple", "WorkOrder.workItems"),
+                ),
             ],
         )

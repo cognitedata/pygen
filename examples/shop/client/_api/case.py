@@ -22,7 +22,15 @@ from shop.client.data_classes._case import (
     _CASE_PROPERTIES_BY_FIELD,
     _create_case_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
 from .case_query import CaseQueryAPI
 
 
@@ -57,7 +65,7 @@ class CaseAPI(NodeAPI[Case, CaseApply, CaseList]):
         max_start_time: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> CaseQueryAPI[CaseList]:
         """Query starting at cases.

@@ -21,7 +21,15 @@ from tutorial_apm_simple.client.data_classes._work_item import (
     _WORKITEM_PROPERTIES_BY_FIELD,
     _create_work_item_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
 from .work_item_linked_assets import WorkItemLinkedAssetsAPI
 from .work_item_query import WorkItemQueryAPI
 
@@ -60,7 +68,7 @@ class WorkItemAPI(NodeAPI[WorkItem, WorkItemApply, WorkItemList]):
         work_order: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> WorkItemQueryAPI[WorkItemList]:
         """Query starting at work items.
@@ -212,8 +220,12 @@ class WorkItemAPI(NodeAPI[WorkItem, WorkItemApply, WorkItemList]):
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_pairs=[
-                (self.linked_assets_edge, "linked_assets"),
+            edge_api_name_type_triple=[
+                (
+                    self.linked_assets_edge,
+                    "linked_assets",
+                    dm.DirectRelationReference("tutorial_apm_simple", "WorkItem.linkedAssets"),
+                ),
             ],
         )
 
@@ -645,7 +657,11 @@ class WorkItemAPI(NodeAPI[WorkItem, WorkItemApply, WorkItemList]):
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_pairs=[
-                (self.linked_assets_edge, "linked_assets"),
+            edge_api_name_type_triple=[
+                (
+                    self.linked_assets_edge,
+                    "linked_assets",
+                    dm.DirectRelationReference("tutorial_apm_simple", "WorkItem.linkedAssets"),
+                ),
             ],
         )

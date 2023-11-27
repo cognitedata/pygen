@@ -29,6 +29,7 @@ from equipment_unit.client.data_classes._core import (
 )
 
 DEFAULT_LIMIT_READ = 25
+DEFAULT_QUERY_LIMIT = 3
 INSTANCE_QUERY_LIMIT = 1_000
 IN_FILTER_LIMIT = 5_000
 
@@ -342,7 +343,7 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
                 {"space": edge_type.space, "externalId": edge_type.external_id},
             )
             if len(ids := nodes.as_node_ids()) > IN_FILTER_LIMIT:
-                edges = edge_api._list(limit=-1, filter=is_type)
+                edges = edge_api._list(limit=-1, filter_=is_type)
             else:
                 is_nodes = dm.filters.In(
                     ["edge", "startNode"],

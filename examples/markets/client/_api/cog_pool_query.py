@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 from cognite.client import data_modeling as dm
-from ._core import QueryStep, QueryAPI, T_DomainModelList
+from ._core import DEFAULT_QUERY_LIMIT, QueryStep, QueryAPI, T_DomainModelList
 from markets.client.data_classes import (
     CogPool,
     CogPoolApply,

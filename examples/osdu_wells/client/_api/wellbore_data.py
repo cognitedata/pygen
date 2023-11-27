@@ -21,7 +21,15 @@ from osdu_wells.client.data_classes._wellbore_data import (
     _WELLBOREDATA_PROPERTIES_BY_FIELD,
     _create_wellbore_datum_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
 from .wellbore_data_drilling_reasons import WellboreDataDrillingReasonsAPI
 from .wellbore_data_facility_events import WellboreDataFacilityEventsAPI
 from .wellbore_data_facility_operators import WellboreDataFacilityOperatorsAPI
@@ -144,7 +152,7 @@ class WellboreDataAPI(NodeAPI[WellboreData, WellboreDataApply, WellboreDataList]
         wellbore_reason_id_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> WellboreDataQueryAPI[WellboreDataList]:
         """Query starting at wellbore data.
@@ -426,18 +434,62 @@ class WellboreDataAPI(NodeAPI[WellboreData, WellboreDataApply, WellboreDataList]
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_pairs=[
-                (self.drilling_reasons_edge, "drilling_reasons"),
-                (self.facility_events_edge, "facility_events"),
-                (self.facility_operators_edge, "facility_operators"),
-                (self.facility_specifications_edge, "facility_specifications"),
-                (self.facility_states_edge, "facility_states"),
-                (self.geo_contexts_edge, "geo_contexts"),
-                (self.historical_interests_edge, "historical_interests"),
-                (self.name_aliases_edge, "name_aliases"),
-                (self.technical_assurances_edge, "technical_assurances"),
-                (self.vertical_measurements_edge, "vertical_measurements"),
-                (self.wellbore_costs_edge, "wellbore_costs"),
+            edge_api_name_type_triple=[
+                (
+                    self.drilling_reasons_edge,
+                    "drilling_reasons",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.DrillingReasons"),
+                ),
+                (
+                    self.facility_events_edge,
+                    "facility_events",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.FacilityEvents"),
+                ),
+                (
+                    self.facility_operators_edge,
+                    "facility_operators",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.FacilityOperators"),
+                ),
+                (
+                    self.facility_specifications_edge,
+                    "facility_specifications",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.FacilitySpecifications"),
+                ),
+                (
+                    self.facility_states_edge,
+                    "facility_states",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.FacilityStates"),
+                ),
+                (
+                    self.geo_contexts_edge,
+                    "geo_contexts",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.GeoContexts"),
+                ),
+                (
+                    self.historical_interests_edge,
+                    "historical_interests",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.HistoricalInterests"),
+                ),
+                (
+                    self.name_aliases_edge,
+                    "name_aliases",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.NameAliases"),
+                ),
+                (
+                    self.technical_assurances_edge,
+                    "technical_assurances",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.TechnicalAssurances"),
+                ),
+                (
+                    self.vertical_measurements_edge,
+                    "vertical_measurements",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.VerticalMeasurements"),
+                ),
+                (
+                    self.wellbore_costs_edge,
+                    "wellbore_costs",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.WellboreCosts"),
+                ),
             ],
         )
 
@@ -1765,17 +1817,61 @@ class WellboreDataAPI(NodeAPI[WellboreData, WellboreDataApply, WellboreDataList]
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_pairs=[
-                (self.drilling_reasons_edge, "drilling_reasons"),
-                (self.facility_events_edge, "facility_events"),
-                (self.facility_operators_edge, "facility_operators"),
-                (self.facility_specifications_edge, "facility_specifications"),
-                (self.facility_states_edge, "facility_states"),
-                (self.geo_contexts_edge, "geo_contexts"),
-                (self.historical_interests_edge, "historical_interests"),
-                (self.name_aliases_edge, "name_aliases"),
-                (self.technical_assurances_edge, "technical_assurances"),
-                (self.vertical_measurements_edge, "vertical_measurements"),
-                (self.wellbore_costs_edge, "wellbore_costs"),
+            edge_api_name_type_triple=[
+                (
+                    self.drilling_reasons_edge,
+                    "drilling_reasons",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.DrillingReasons"),
+                ),
+                (
+                    self.facility_events_edge,
+                    "facility_events",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.FacilityEvents"),
+                ),
+                (
+                    self.facility_operators_edge,
+                    "facility_operators",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.FacilityOperators"),
+                ),
+                (
+                    self.facility_specifications_edge,
+                    "facility_specifications",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.FacilitySpecifications"),
+                ),
+                (
+                    self.facility_states_edge,
+                    "facility_states",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.FacilityStates"),
+                ),
+                (
+                    self.geo_contexts_edge,
+                    "geo_contexts",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.GeoContexts"),
+                ),
+                (
+                    self.historical_interests_edge,
+                    "historical_interests",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.HistoricalInterests"),
+                ),
+                (
+                    self.name_aliases_edge,
+                    "name_aliases",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.NameAliases"),
+                ),
+                (
+                    self.technical_assurances_edge,
+                    "technical_assurances",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.TechnicalAssurances"),
+                ),
+                (
+                    self.vertical_measurements_edge,
+                    "vertical_measurements",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.VerticalMeasurements"),
+                ),
+                (
+                    self.wellbore_costs_edge,
+                    "wellbore_costs",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.WellboreCosts"),
+                ),
             ],
         )

@@ -21,7 +21,15 @@ from osdu_wells.client.data_classes._wellbore_costs import (
     _WELLBORECOSTS_PROPERTIES_BY_FIELD,
     _create_wellbore_cost_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
 from .wellbore_costs_query import WellboreCostsQueryAPI
 
 
@@ -47,7 +55,7 @@ class WellboreCostsAPI(NodeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsL
         max_cost: float | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> WellboreCostsQueryAPI[WellboreCostsList]:
         """Query starting at wellbore costs.

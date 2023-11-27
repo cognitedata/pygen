@@ -29,6 +29,7 @@ from tutorial_apm_simple.client.data_classes._core import (
 )
 
 DEFAULT_LIMIT_READ = 25
+DEFAULT_QUERY_LIMIT = 3
 INSTANCE_QUERY_LIMIT = 1_000
 IN_FILTER_LIMIT = 5_000
 
@@ -128,7 +129,7 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
         external_id: str,
         space: str,
         retrieve_edges: bool = False,
-        edge_api_name_pairs: list[tuple[EdgeAPI, str]] | None = None,
+        edge_api_name_type_triple: list[tuple[EdgeAPI, str, dm.DirectRelationReference]] | None = None,
     ) -> T_DomainModel:
         ...
 
@@ -138,7 +139,7 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
         external_id: SequenceNotStr[str],
         space: str,
         retrieve_edges: bool = False,
-        edge_api_name_pairs: list[tuple[EdgeAPI, str]] | None = None,
+        edge_api_name_type_triple: list[tuple[EdgeAPI, str, dm.DirectRelationReference]] | None = None,
     ) -> T_DomainModelList:
         ...
 
@@ -147,7 +148,7 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
         external_id: str | SequenceNotStr[str],
         space: str,
         retrieve_edges: bool = False,
-        edge_api_name_pairs: list[tuple[EdgeAPI, str]] = None,
+        edge_api_name_type_triple: list[tuple[EdgeAPI, str, dm.DirectRelationReference]] | None = None,
     ) -> T_DomainModel | T_DomainModelList:
         is_multiple = True
         if isinstance(external_id, str):
@@ -160,7 +161,7 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
         nodes = self._class_list([self._class_type.from_instance(node) for node in instances.nodes])
 
         if retrieve_edges:
-            self._retrieve_and_set_edge_types(nodes, edge_api_name_pairs)
+            self._retrieve_and_set_edge_types(nodes, edge_api_name_type_triple)
 
         if is_multiple:
             return nodes
@@ -321,28 +322,34 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
         limit: int,
         filter: dm.Filter,
         retrieve_edges: bool = False,
-        edge_api_name_pairs: list[tuple[EdgeAPI, str]] | None = None,
+        edge_api_name_type_triple: list[tuple[EdgeAPI, str, dm.DirectRelationReference]] | None = None,
     ) -> T_DomainModelList:
         nodes = self._client.data_modeling.instances.list("node", sources=self._sources, limit=limit, filter=filter)
         node_list = self._class_list([self._class_type.from_instance(node) for node in nodes])
         if retrieve_edges:
-            self._retrieve_and_set_edge_types(node_list, edge_api_name_pairs)
+            self._retrieve_and_set_edge_types(node_list, edge_api_name_type_triple)
 
         return node_list
 
     @classmethod
     def _retrieve_and_set_edge_types(
-        cls, nodes: T_DomainModelList, edge_api_name_pairs: list[tuple[EdgeAPI, str]] | None = None
+        cls,
+        nodes: T_DomainModelList,
+        edge_api_name_type_triple: list[tuple[EdgeAPI, str, dm.DirectRelationReference]] | None = None,
     ):
-        for edge_api, edge_name in edge_api_name_pairs or []:
+        for edge_api, edge_name, edge_type in edge_api_name_type_triple or []:
+            is_type = dm.filters.Equals(
+                ["edge", "type"],
+                {"space": edge_type.space, "externalId": edge_type.external_id},
+            )
             if len(ids := nodes.as_node_ids()) > IN_FILTER_LIMIT:
-                edges = edge_api._list(limit=-1)
+                edges = edge_api._list(limit=-1, filter_=is_type)
             else:
                 is_nodes = dm.filters.In(
                     ["edge", "startNode"],
                     values=[id_.dump(camel_case=True, include_instance_type=False) for id_ in ids],
                 )
-                edges = edge_api._list(limit=-1, filter_=is_nodes)
+                edges = edge_api._list(limit=-1, filter_=dm.filters.And(is_type, is_nodes))
             cls._set_edges(nodes, edges, edge_name)
 
     @staticmethod

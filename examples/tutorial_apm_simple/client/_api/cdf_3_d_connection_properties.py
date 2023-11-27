@@ -20,7 +20,15 @@ from tutorial_apm_simple.client.data_classes._cdf_3_d_connection_properties impo
     _CDFCONNECTIONPROPERTIES_PROPERTIES_BY_FIELD,
     _create_cdf_3_d_connection_property_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
 from .cdf_3_d_connection_properties_query import CdfConnectionPropertiesQueryAPI
 
 
@@ -48,7 +56,7 @@ class CdfConnectionPropertiesAPI(
         max_revision_node_id: int | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> CdfConnectionPropertiesQueryAPI[CdfConnectionPropertiesList]:
         """Query starting at cdf 3 d connection properties.

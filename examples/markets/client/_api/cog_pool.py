@@ -21,7 +21,15 @@ from markets.client.data_classes._cog_pool import (
     _COGPOOL_PROPERTIES_BY_FIELD,
     _create_cog_pool_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
 from .cog_pool_query import CogPoolQueryAPI
 
 
@@ -53,7 +61,7 @@ class CogPoolAPI(NodeAPI[CogPool, CogPoolApply, CogPoolList]):
         timezone_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> CogPoolQueryAPI[CogPoolList]:
         """Query starting at cog pools.

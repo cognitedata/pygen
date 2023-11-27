@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 from cognite.client import data_modeling as dm
-from ._core import QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
+from ._core import DEFAULT_QUERY_LIMIT, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
 from osdu_wells.client.data_classes import (
     WellData,
     WellDataApply,
@@ -73,7 +73,7 @@ class WellDataQueryAPI(QueryAPI[T_DomainModelList]):
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = None,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
     ) -> FacilityEventsQueryAPI[T_DomainModelList]:
         """Query along the facility event edges of the well datum.
 
@@ -129,7 +129,7 @@ class WellDataQueryAPI(QueryAPI[T_DomainModelList]):
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = None,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
     ) -> FacilityOperatorsQueryAPI[T_DomainModelList]:
         """Query along the facility operator edges of the well datum.
 
@@ -185,7 +185,7 @@ class WellDataQueryAPI(QueryAPI[T_DomainModelList]):
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = None,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
     ) -> FacilitySpecificationsQueryAPI[T_DomainModelList]:
         """Query along the facility specification edges of the well datum.
 
@@ -241,7 +241,7 @@ class WellDataQueryAPI(QueryAPI[T_DomainModelList]):
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = None,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
     ) -> FacilityStatesQueryAPI[T_DomainModelList]:
         """Query along the facility state edges of the well datum.
 
@@ -297,7 +297,7 @@ class WellDataQueryAPI(QueryAPI[T_DomainModelList]):
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = None,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
     ) -> GeoContextsQueryAPI[T_DomainModelList]:
         """Query along the geo context edges of the well datum.
 
@@ -353,7 +353,7 @@ class WellDataQueryAPI(QueryAPI[T_DomainModelList]):
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = None,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
     ) -> HistoricalInterestsQueryAPI[T_DomainModelList]:
         """Query along the historical interest edges of the well datum.
 
@@ -409,7 +409,7 @@ class WellDataQueryAPI(QueryAPI[T_DomainModelList]):
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = None,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
     ) -> NameAliasesQueryAPI[T_DomainModelList]:
         """Query along the name alias edges of the well datum.
 
@@ -465,7 +465,7 @@ class WellDataQueryAPI(QueryAPI[T_DomainModelList]):
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = None,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
     ) -> TechnicalAssurancesQueryAPI[T_DomainModelList]:
         """Query along the technical assurance edges of the well datum.
 
@@ -521,7 +521,7 @@ class WellDataQueryAPI(QueryAPI[T_DomainModelList]):
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = None,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
     ) -> VerticalMeasurementsQueryAPI[T_DomainModelList]:
         """Query along the vertical measurement edges of the well datum.
 

@@ -21,7 +21,15 @@ from markets.client.data_classes._date_transformation import (
     _DATETRANSFORMATION_PROPERTIES_BY_FIELD,
     _create_date_transformation_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
 from .date_transformation_query import DateTransformationQueryAPI
 
 
@@ -45,7 +53,7 @@ class DateTransformationAPI(NodeAPI[DateTransformation, DateTransformationApply,
         method_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> DateTransformationQueryAPI[DateTransformationList]:
         """Query starting at date transformations.

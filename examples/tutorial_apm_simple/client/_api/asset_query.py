@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 from cognite.client import data_modeling as dm
-from ._core import QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
+from ._core import DEFAULT_QUERY_LIMIT, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
 from tutorial_apm_simple.client.data_classes import (
     Asset,
     AssetApply,
@@ -32,7 +32,7 @@ class AssetQueryAPI(QueryAPI[T_DomainModelList]):
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = None,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
     ) -> AssetQueryAPI[T_DomainModelList]:
         """Query along the child edges of the asset.
 
@@ -92,7 +92,7 @@ class AssetQueryAPI(QueryAPI[T_DomainModelList]):
         max_revision_node_id: int | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = None,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
     ) -> CdfEntityQueryAPI[T_DomainModelList]:
         """Query along the in model 3 d edges of the asset.
 

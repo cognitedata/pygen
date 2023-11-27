@@ -21,7 +21,15 @@ from osdu_wells.client.data_classes._as_ingested_coordinates import (
     _ASINGESTEDCOORDINATES_PROPERTIES_BY_FIELD,
     _create_as_ingested_coordinate_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
 from .as_ingested_coordinates_features import AsIngestedCoordinatesFeaturesAPI
 from .as_ingested_coordinates_query import AsIngestedCoordinatesQueryAPI
 
@@ -59,7 +67,7 @@ class AsIngestedCoordinatesAPI(NodeAPI[AsIngestedCoordinates, AsIngestedCoordina
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> AsIngestedCoordinatesQueryAPI[AsIngestedCoordinatesList]:
         """Query starting at as ingested coordinates.
@@ -217,8 +225,12 @@ class AsIngestedCoordinatesAPI(NodeAPI[AsIngestedCoordinates, AsIngestedCoordina
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_pairs=[
-                (self.features_edge, "features"),
+            edge_api_name_type_triple=[
+                (
+                    self.features_edge,
+                    "features",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "AsIngestedCoordinates.features"),
+                ),
             ],
         )
 
@@ -638,7 +650,11 @@ class AsIngestedCoordinatesAPI(NodeAPI[AsIngestedCoordinates, AsIngestedCoordina
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_pairs=[
-                (self.features_edge, "features"),
+            edge_api_name_type_triple=[
+                (
+                    self.features_edge,
+                    "features",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "AsIngestedCoordinates.features"),
+                ),
             ],
         )

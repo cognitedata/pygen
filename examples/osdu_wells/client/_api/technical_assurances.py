@@ -21,7 +21,15 @@ from osdu_wells.client.data_classes._technical_assurances import (
     _TECHNICALASSURANCES_PROPERTIES_BY_FIELD,
     _create_technical_assurance_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
 from .technical_assurances_acceptable_usage import TechnicalAssurancesAcceptableUsageAPI
 from .technical_assurances_reviewers import TechnicalAssurancesReviewersAPI
 from .technical_assurances_unacceptable_usage import TechnicalAssurancesUnacceptableUsageAPI
@@ -55,7 +63,7 @@ class TechnicalAssurancesAPI(NodeAPI[TechnicalAssurances, TechnicalAssurancesApp
         technical_assurance_type_id_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> TechnicalAssurancesQueryAPI[TechnicalAssurancesList]:
         """Query starting at technical assurances.
@@ -195,10 +203,22 @@ class TechnicalAssurancesAPI(NodeAPI[TechnicalAssurances, TechnicalAssurancesApp
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_pairs=[
-                (self.acceptable_usage_edge, "acceptable_usage"),
-                (self.reviewers_edge, "reviewers"),
-                (self.unacceptable_usage_edge, "unacceptable_usage"),
+            edge_api_name_type_triple=[
+                (
+                    self.acceptable_usage_edge,
+                    "acceptable_usage",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "TechnicalAssurances.AcceptableUsage"),
+                ),
+                (
+                    self.reviewers_edge,
+                    "reviewers",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "TechnicalAssurances.Reviewers"),
+                ),
+                (
+                    self.unacceptable_usage_edge,
+                    "unacceptable_usage",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "TechnicalAssurances.UnacceptableUsage"),
+                ),
             ],
         )
 
@@ -504,9 +524,21 @@ class TechnicalAssurancesAPI(NodeAPI[TechnicalAssurances, TechnicalAssurancesApp
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_pairs=[
-                (self.acceptable_usage_edge, "acceptable_usage"),
-                (self.reviewers_edge, "reviewers"),
-                (self.unacceptable_usage_edge, "unacceptable_usage"),
+            edge_api_name_type_triple=[
+                (
+                    self.acceptable_usage_edge,
+                    "acceptable_usage",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "TechnicalAssurances.AcceptableUsage"),
+                ),
+                (
+                    self.reviewers_edge,
+                    "reviewers",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "TechnicalAssurances.Reviewers"),
+                ),
+                (
+                    self.unacceptable_usage_edge,
+                    "unacceptable_usage",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "TechnicalAssurances.UnacceptableUsage"),
+                ),
             ],
         )

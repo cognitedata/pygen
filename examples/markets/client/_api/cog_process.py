@@ -21,7 +21,15 @@ from markets.client.data_classes._cog_process import (
     _COGPROCESS_PROPERTIES_BY_FIELD,
     _create_cog_proces_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
 from .cog_process_query import CogProcessQueryAPI
 
 
@@ -48,7 +56,7 @@ class CogProcessAPI(NodeAPI[CogProcess, CogProcessApply, CogProcessList]):
         transformation: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> CogProcessQueryAPI[CogProcessList]:
         """Query starting at cog process.

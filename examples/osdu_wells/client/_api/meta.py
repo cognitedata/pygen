@@ -21,7 +21,15 @@ from osdu_wells.client.data_classes._meta import (
     _META_PROPERTIES_BY_FIELD,
     _create_meta_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
 from .meta_query import MetaQueryAPI
 
 
@@ -51,7 +59,7 @@ class MetaAPI(NodeAPI[Meta, MetaApply, MetaList]):
         unit_of_measure_id_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> MetaQueryAPI[MetaList]:
         """Query starting at metas.

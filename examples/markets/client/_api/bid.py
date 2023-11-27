@@ -22,7 +22,15 @@ from markets.client.data_classes._bid import (
     _BID_PROPERTIES_BY_FIELD,
     _create_bid_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
 from .bid_query import BidQueryAPI
 
 
@@ -49,7 +57,7 @@ class BidAPI(NodeAPI[Bid, BidApply, BidList]):
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> BidQueryAPI[BidList]:
         """Query starting at bids.

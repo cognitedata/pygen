@@ -21,7 +21,15 @@ from movie_domain.client.data_classes._movie import (
     _MOVIE_PROPERTIES_BY_FIELD,
     _create_movie_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
 from .movie_actors import MovieActorsAPI
 from .movie_directors import MovieDirectorsAPI
 from .movie_query import MovieQueryAPI
@@ -54,7 +62,7 @@ class MovieAPI(NodeAPI[Movie, MovieApply, MovieList]):
         title_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> MovieQueryAPI[MovieList]:
         """Query starting at movies.
@@ -190,9 +198,13 @@ class MovieAPI(NodeAPI[Movie, MovieApply, MovieList]):
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_pairs=[
-                (self.actors_edge, "actors"),
-                (self.directors_edge, "directors"),
+            edge_api_name_type_triple=[
+                (self.actors_edge, "actors", dm.DirectRelationReference("IntegrationTestsImmutable", "Movie.actors")),
+                (
+                    self.directors_edge,
+                    "directors",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "Movie.directors"),
+                ),
             ],
         )
 
@@ -512,8 +524,12 @@ class MovieAPI(NodeAPI[Movie, MovieApply, MovieList]):
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_pairs=[
-                (self.actors_edge, "actors"),
-                (self.directors_edge, "directors"),
+            edge_api_name_type_triple=[
+                (self.actors_edge, "actors", dm.DirectRelationReference("IntegrationTestsImmutable", "Movie.actors")),
+                (
+                    self.directors_edge,
+                    "directors",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "Movie.directors"),
+                ),
             ],
         )

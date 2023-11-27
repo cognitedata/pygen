@@ -21,7 +21,15 @@ from osdu_wells.client.data_classes._historical_interests import (
     _HISTORICALINTERESTS_PROPERTIES_BY_FIELD,
     _create_historical_interest_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
 from .historical_interests_query import HistoricalInterestsQueryAPI
 
 
@@ -49,7 +57,7 @@ class HistoricalInterestsAPI(NodeAPI[HistoricalInterests, HistoricalInterestsApp
         termination_date_time_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> HistoricalInterestsQueryAPI[HistoricalInterestsList]:
         """Query starting at historical interests.

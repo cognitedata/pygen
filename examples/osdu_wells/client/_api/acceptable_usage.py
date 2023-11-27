@@ -21,7 +21,15 @@ from osdu_wells.client.data_classes._acceptable_usage import (
     _ACCEPTABLEUSAGE_PROPERTIES_BY_FIELD,
     _create_acceptable_usage_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
 from .acceptable_usage_query import AcceptableUsageQueryAPI
 
 
@@ -53,7 +61,7 @@ class AcceptableUsageAPI(NodeAPI[AcceptableUsage, AcceptableUsageApply, Acceptab
         workflow_usage_type_id_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> AcceptableUsageQueryAPI[AcceptableUsageList]:
         """Query starting at acceptable usages.

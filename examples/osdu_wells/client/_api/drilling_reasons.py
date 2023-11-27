@@ -21,7 +21,15 @@ from osdu_wells.client.data_classes._drilling_reasons import (
     _DRILLINGREASONS_PROPERTIES_BY_FIELD,
     _create_drilling_reason_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
 from .drilling_reasons_query import DrillingReasonsQueryAPI
 
 
@@ -51,7 +59,7 @@ class DrillingReasonsAPI(NodeAPI[DrillingReasons, DrillingReasonsApply, Drilling
         termination_date_time_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> DrillingReasonsQueryAPI[DrillingReasonsList]:
         """Query starting at drilling reasons.

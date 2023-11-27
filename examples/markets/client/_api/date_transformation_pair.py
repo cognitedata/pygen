@@ -17,7 +17,15 @@ from markets.client.data_classes import (
 from markets.client.data_classes._date_transformation_pair import (
     _create_date_transformation_pair_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
 from .date_transformation_pair_end import DateTransformationPairEndAPI
 from .date_transformation_pair_start import DateTransformationPairStartAPI
 from .date_transformation_pair_query import DateTransformationPairQueryAPI
@@ -45,7 +53,7 @@ class DateTransformationPairAPI(
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> DateTransformationPairQueryAPI[DateTransformationPairList]:
         """Query starting at date transformation pairs.
@@ -173,9 +181,9 @@ class DateTransformationPairAPI(
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_pairs=[
-                (self.end_edge, "end"),
-                (self.start_edge, "start"),
+            edge_api_name_type_triple=[
+                (self.end_edge, "end", dm.DirectRelationReference("market", "DateTransformationPair.end")),
+                (self.start_edge, "start", dm.DirectRelationReference("market", "DateTransformationPair.start")),
             ],
         )
 
@@ -219,8 +227,8 @@ class DateTransformationPairAPI(
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_pairs=[
-                (self.end_edge, "end"),
-                (self.start_edge, "start"),
+            edge_api_name_type_triple=[
+                (self.end_edge, "end", dm.DirectRelationReference("market", "DateTransformationPair.end")),
+                (self.start_edge, "start", dm.DirectRelationReference("market", "DateTransformationPair.start")),
             ],
         )

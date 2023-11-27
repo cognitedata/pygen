@@ -20,7 +20,15 @@ from tutorial_apm_simple.client.data_classes import (
 from tutorial_apm_simple.client.data_classes._cdf_3_d_entity import (
     _create_cdf_3_d_entity_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
 from .cdf_3_d_entity_in_model_3_d import CdfEntityInModelAPI
 from .cdf_3_d_entity_query import CdfEntityQueryAPI
 
@@ -50,7 +58,7 @@ class CdfEntityAPI(NodeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> CdfEntityQueryAPI[CdfEntityList]:
         """Query starting at cdf 3 d entities.
@@ -172,8 +180,12 @@ class CdfEntityAPI(NodeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_pairs=[
-                (self.in_model_3_d_edge, "in_model_3_d"),
+            edge_api_name_type_triple=[
+                (
+                    self.in_model_3_d_edge,
+                    "in_model_3_d",
+                    dm.DirectRelationReference("cdf_3d_schema", "cdf3dEntityConnection"),
+                ),
             ],
         )
 
@@ -217,7 +229,11 @@ class CdfEntityAPI(NodeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_pairs=[
-                (self.in_model_3_d_edge, "in_model_3_d"),
+            edge_api_name_type_triple=[
+                (
+                    self.in_model_3_d_edge,
+                    "in_model_3_d",
+                    dm.DirectRelationReference("cdf_3d_schema", "cdf3dEntityConnection"),
+                ),
             ],
         )

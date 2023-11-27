@@ -22,7 +22,15 @@ from markets.client.data_classes._pygen_bid import (
     _PYGENBID_PROPERTIES_BY_FIELD,
     _create_pygen_bid_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
 from .pygen_bid_query import PygenBidQueryAPI
 
 
@@ -54,7 +62,7 @@ class PygenBidAPI(NodeAPI[PygenBid, PygenBidApply, PygenBidList]):
         max_price_premium: float | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> PygenBidQueryAPI[PygenBidList]:
         """Query starting at pygen bids.

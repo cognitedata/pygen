@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING
 from cognite.client import data_modeling as dm
-from ._core import QueryStep, QueryAPI, T_DomainModelList
+from ._core import DEFAULT_QUERY_LIMIT, QueryStep, QueryAPI, T_DomainModelList
 from equipment_unit.client.data_classes import (
     UnitProcedure,
     UnitProcedureApply,
@@ -31,7 +31,7 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
         max_start_time: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = None,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
     ) -> EquipmentModuleQueryAPI[T_DomainModelList]:
         """Query along the work unit edges of the unit procedure.
 

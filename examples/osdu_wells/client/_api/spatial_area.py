@@ -21,7 +21,15 @@ from osdu_wells.client.data_classes._spatial_area import (
     _SPATIALAREA_PROPERTIES_BY_FIELD,
     _create_spatial_area_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
 from .spatial_area_query import SpatialAreaQueryAPI
 
 
@@ -59,7 +67,7 @@ class SpatialAreaAPI(NodeAPI[SpatialArea, SpatialAreaApply, SpatialAreaList]):
         wgs_84_coordinates: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> SpatialAreaQueryAPI[SpatialAreaList]:
         """Query starting at spatial areas.

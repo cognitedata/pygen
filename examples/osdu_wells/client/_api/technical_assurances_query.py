@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 from cognite.client import data_modeling as dm
-from ._core import QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
+from ._core import DEFAULT_QUERY_LIMIT, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
 from osdu_wells.client.data_classes import (
     TechnicalAssurances,
     TechnicalAssurancesApply,
@@ -37,7 +37,7 @@ class TechnicalAssurancesQueryAPI(QueryAPI[T_DomainModelList]):
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = None,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
     ) -> AcceptableUsageQueryAPI[T_DomainModelList]:
         """Query along the acceptable usage edges of the technical assurance.
 
@@ -93,7 +93,7 @@ class TechnicalAssurancesQueryAPI(QueryAPI[T_DomainModelList]):
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = None,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
     ) -> ReviewersQueryAPI[T_DomainModelList]:
         """Query along the reviewer edges of the technical assurance.
 
@@ -149,7 +149,7 @@ class TechnicalAssurancesQueryAPI(QueryAPI[T_DomainModelList]):
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = None,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
     ) -> UnacceptableUsageQueryAPI[T_DomainModelList]:
         """Query along the unacceptable usage edges of the technical assurance.
 

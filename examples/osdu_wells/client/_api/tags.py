@@ -21,7 +21,15 @@ from osdu_wells.client.data_classes._tags import (
     _TAGS_PROPERTIES_BY_FIELD,
     _create_tag_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
 from .tags_query import TagsQueryAPI
 
 
@@ -45,7 +53,7 @@ class TagsAPI(NodeAPI[Tags, TagsApply, TagsList]):
         name_of_key_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> TagsQueryAPI[TagsList]:
         """Query starting at tags.

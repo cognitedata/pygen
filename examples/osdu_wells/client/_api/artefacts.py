@@ -21,7 +21,15 @@ from osdu_wells.client.data_classes._artefacts import (
     _ARTEFACTS_PROPERTIES_BY_FIELD,
     _create_artefact_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
 from .artefacts_query import ArtefactsQueryAPI
 
 
@@ -49,7 +57,7 @@ class ArtefactsAPI(NodeAPI[Artefacts, ArtefactsApply, ArtefactsList]):
         role_id_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> ArtefactsQueryAPI[ArtefactsList]:
         """Query starting at artefacts.

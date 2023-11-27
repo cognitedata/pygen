@@ -22,7 +22,15 @@ from markets.client.data_classes._cog_bid import (
     _COGBID_PROPERTIES_BY_FIELD,
     _create_cog_bid_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
 from .cog_bid_query import CogBidQueryAPI
 
 
@@ -55,7 +63,7 @@ class CogBidAPI(NodeAPI[CogBid, CogBidApply, CogBidList]):
         max_quantity: int | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> CogBidQueryAPI[CogBidList]:
         """Query starting at cog bids.

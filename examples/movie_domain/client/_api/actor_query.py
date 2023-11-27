@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 from cognite.client import data_modeling as dm
-from ._core import QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
+from ._core import DEFAULT_QUERY_LIMIT, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
 from movie_domain.client.data_classes import (
     Actor,
     ActorApply,
@@ -31,7 +31,7 @@ class ActorQueryAPI(QueryAPI[T_DomainModelList]):
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = None,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
     ) -> MovieQueryAPI[T_DomainModelList]:
         """Query along the movie edges of the actor.
 
@@ -87,7 +87,7 @@ class ActorQueryAPI(QueryAPI[T_DomainModelList]):
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int | None = None,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
     ) -> NominationQueryAPI[T_DomainModelList]:
         """Query along the nomination edges of the actor.
 

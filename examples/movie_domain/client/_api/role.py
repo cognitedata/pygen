@@ -20,7 +20,15 @@ from movie_domain.client.data_classes._role import (
     _ROLE_PROPERTIES_BY_FIELD,
     _create_role_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
 from .role_movies import RoleMoviesAPI
 from .role_nomination import RoleNominationAPI
 from .role_query import RoleQueryAPI
@@ -48,7 +56,7 @@ class RoleAPI(NodeAPI[Role, RoleApply, RoleList]):
         won_oscar: bool | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> RoleQueryAPI[RoleList]:
         """Query starting at roles.
@@ -174,9 +182,13 @@ class RoleAPI(NodeAPI[Role, RoleApply, RoleList]):
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_pairs=[
-                (self.movies_edge, "movies"),
-                (self.nomination_edge, "nomination"),
+            edge_api_name_type_triple=[
+                (self.movies_edge, "movies", dm.DirectRelationReference("IntegrationTestsImmutable", "Role.movies")),
+                (
+                    self.nomination_edge,
+                    "nomination",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "Role.nomination"),
+                ),
             ],
         )
 
@@ -369,8 +381,12 @@ class RoleAPI(NodeAPI[Role, RoleApply, RoleList]):
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_pairs=[
-                (self.movies_edge, "movies"),
-                (self.nomination_edge, "nomination"),
+            edge_api_name_type_triple=[
+                (self.movies_edge, "movies", dm.DirectRelationReference("IntegrationTestsImmutable", "Role.movies")),
+                (
+                    self.nomination_edge,
+                    "nomination",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "Role.nomination"),
+                ),
             ],
         )

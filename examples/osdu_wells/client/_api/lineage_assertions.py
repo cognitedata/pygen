@@ -21,7 +21,15 @@ from osdu_wells.client.data_classes._lineage_assertions import (
     _LINEAGEASSERTIONS_PROPERTIES_BY_FIELD,
     _create_lineage_assertion_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
 from .lineage_assertions_query import LineageAssertionsQueryAPI
 
 
@@ -47,7 +55,7 @@ class LineageAssertionsAPI(NodeAPI[LineageAssertions, LineageAssertionsApply, Li
         lineage_relationship_type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> LineageAssertionsQueryAPI[LineageAssertionsList]:
         """Query starting at lineage assertions.

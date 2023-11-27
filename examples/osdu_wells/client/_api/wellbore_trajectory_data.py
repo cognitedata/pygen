@@ -21,7 +21,15 @@ from osdu_wells.client.data_classes._wellbore_trajectory_data import (
     _WELLBORETRAJECTORYDATA_PROPERTIES_BY_FIELD,
     _create_wellbore_trajectory_datum_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
 from .wellbore_trajectory_data_artefacts import WellboreTrajectoryDataArtefactsAPI
 from .wellbore_trajectory_data_available_trajectory_station_properties import (
     WellboreTrajectoryDataAvailableTrajectoryStationPropertiesAPI,
@@ -141,7 +149,7 @@ class WellboreTrajectoryDataAPI(
         wellbore_id_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> WellboreTrajectoryDataQueryAPI[WellboreTrajectoryDataList]:
         """Query starting at wellbore trajectory data.
@@ -431,13 +439,41 @@ class WellboreTrajectoryDataAPI(
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_pairs=[
-                (self.artefacts_edge, "artefacts"),
-                (self.available_trajectory_station_properties_edge, "available_trajectory_station_properties"),
-                (self.geo_contexts_edge, "geo_contexts"),
-                (self.lineage_assertions_edge, "lineage_assertions"),
-                (self.name_aliases_edge, "name_aliases"),
-                (self.technical_assurances_edge, "technical_assurances"),
+            edge_api_name_type_triple=[
+                (
+                    self.artefacts_edge,
+                    "artefacts",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreTrajectoryData.Artefacts"),
+                ),
+                (
+                    self.available_trajectory_station_properties_edge,
+                    "available_trajectory_station_properties",
+                    dm.DirectRelationReference(
+                        "IntegrationTestsImmutable", "WellboreTrajectoryData.AvailableTrajectoryStationProperties"
+                    ),
+                ),
+                (
+                    self.geo_contexts_edge,
+                    "geo_contexts",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreTrajectoryData.GeoContexts"),
+                ),
+                (
+                    self.lineage_assertions_edge,
+                    "lineage_assertions",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreTrajectoryData.LineageAssertions"),
+                ),
+                (
+                    self.name_aliases_edge,
+                    "name_aliases",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreTrajectoryData.NameAliases"),
+                ),
+                (
+                    self.technical_assurances_edge,
+                    "technical_assurances",
+                    dm.DirectRelationReference(
+                        "IntegrationTestsImmutable", "WellboreTrajectoryData.TechnicalAssurances"
+                    ),
+                ),
             ],
         )
 
@@ -1781,12 +1817,40 @@ class WellboreTrajectoryDataAPI(
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_pairs=[
-                (self.artefacts_edge, "artefacts"),
-                (self.available_trajectory_station_properties_edge, "available_trajectory_station_properties"),
-                (self.geo_contexts_edge, "geo_contexts"),
-                (self.lineage_assertions_edge, "lineage_assertions"),
-                (self.name_aliases_edge, "name_aliases"),
-                (self.technical_assurances_edge, "technical_assurances"),
+            edge_api_name_type_triple=[
+                (
+                    self.artefacts_edge,
+                    "artefacts",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreTrajectoryData.Artefacts"),
+                ),
+                (
+                    self.available_trajectory_station_properties_edge,
+                    "available_trajectory_station_properties",
+                    dm.DirectRelationReference(
+                        "IntegrationTestsImmutable", "WellboreTrajectoryData.AvailableTrajectoryStationProperties"
+                    ),
+                ),
+                (
+                    self.geo_contexts_edge,
+                    "geo_contexts",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreTrajectoryData.GeoContexts"),
+                ),
+                (
+                    self.lineage_assertions_edge,
+                    "lineage_assertions",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreTrajectoryData.LineageAssertions"),
+                ),
+                (
+                    self.name_aliases_edge,
+                    "name_aliases",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreTrajectoryData.NameAliases"),
+                ),
+                (
+                    self.technical_assurances_edge,
+                    "technical_assurances",
+                    dm.DirectRelationReference(
+                        "IntegrationTestsImmutable", "WellboreTrajectoryData.TechnicalAssurances"
+                    ),
+                ),
             ],
         )

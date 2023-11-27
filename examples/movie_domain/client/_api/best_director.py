@@ -21,7 +21,15 @@ from movie_domain.client.data_classes._best_director import (
     _BESTDIRECTOR_PROPERTIES_BY_FIELD,
     _create_best_director_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
 from .best_director_query import BestDirectorQueryAPI
 
 
@@ -47,7 +55,7 @@ class BestDirectorAPI(NodeAPI[BestDirector, BestDirectorApply, BestDirectorList]
         max_year: int | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> BestDirectorQueryAPI[BestDirectorList]:
         """Query starting at best directors.

@@ -21,7 +21,15 @@ from equipment_unit.client.data_classes._start_end_time import (
     _STARTENDTIME_PROPERTIES_BY_FIELD,
     _create_start_end_time_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
 from .start_end_time_query import StartEndTimeQueryAPI
 
 
@@ -47,7 +55,7 @@ class StartEndTimeAPI(NodeAPI[StartEndTime, StartEndTimeApply, StartEndTimeList]
         max_start_time: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> StartEndTimeQueryAPI[StartEndTimeList]:
         """Query starting at start end times.

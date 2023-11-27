@@ -20,7 +20,15 @@ from movie_domain.client.data_classes._rating import (
     _RATING_PROPERTIES_BY_FIELD,
     _create_rating_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
 from .rating_score import RatingScoreAPI
 from .rating_votes import RatingVotesAPI
 from .rating_query import RatingQueryAPI
@@ -46,7 +54,7 @@ class RatingAPI(NodeAPI[Rating, RatingApply, RatingList]):
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> RatingQueryAPI[RatingList]:
         """Query starting at ratings.

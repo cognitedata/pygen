@@ -25,7 +25,15 @@ from tutorial_apm_simple.client.data_classes._asset import (
     _ASSET_PROPERTIES_BY_FIELD,
     _create_asset_filter,
 )
-from ._core import DEFAULT_LIMIT_READ, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
 from .asset_children import AssetChildrenAPI
 from .asset_in_model_3_d import AssetInModelAPI
 from .asset_pressure import AssetPressureAPI
@@ -76,7 +84,7 @@ class AssetAPI(NodeAPI[Asset, AssetApply, AssetList]):
         max_updated_date: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
+        limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
     ) -> AssetQueryAPI[AssetList]:
         """Query starting at assets.
@@ -230,9 +238,13 @@ class AssetAPI(NodeAPI[Asset, AssetApply, AssetList]):
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_pairs=[
-                (self.children_edge, "children"),
-                (self.in_model_3_d_edge, "in_model_3_d"),
+            edge_api_name_type_triple=[
+                (self.children_edge, "children", dm.DirectRelationReference("tutorial_apm_simple", "Asset.children")),
+                (
+                    self.in_model_3_d_edge,
+                    "in_model_3_d",
+                    dm.DirectRelationReference("cdf_3d_schema", "cdf3dEntityConnection"),
+                ),
             ],
         )
 
@@ -692,8 +704,12 @@ class AssetAPI(NodeAPI[Asset, AssetApply, AssetList]):
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_pairs=[
-                (self.children_edge, "children"),
-                (self.in_model_3_d_edge, "in_model_3_d"),
+            edge_api_name_type_triple=[
+                (self.children_edge, "children", dm.DirectRelationReference("tutorial_apm_simple", "Asset.children")),
+                (
+                    self.in_model_3_d_edge,
+                    "in_model_3_d",
+                    dm.DirectRelationReference("cdf_3d_schema", "cdf3dEntityConnection"),
+                ),
             ],
         )
