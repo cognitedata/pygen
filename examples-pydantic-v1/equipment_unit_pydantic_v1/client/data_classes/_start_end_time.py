@@ -4,7 +4,7 @@ import datetime
 from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
-from pydantic import Field, model_validator
+from pydantic import Field, root_validator
 
 from ._core import DomainModelApply, DomainRelation, DomainRelationApply, DomainRelationList, ResourcesApply
 from ._equipment_module import EquipmentModule, EquipmentModuleApply
@@ -44,7 +44,7 @@ class StartEndTime(DomainRelation):
     def unit_procedure(self) -> str:
         return self.start_node.external_id
 
-    @model_validator(mode="before")
+    @root_validator(pre=True)
     def set_equipment_module_if_missing(cls, data: Any):
         if isinstance(data, dict) and "equipment_module" not in data:
             data["equipment_module"] = data["end_node"]["external_id"]

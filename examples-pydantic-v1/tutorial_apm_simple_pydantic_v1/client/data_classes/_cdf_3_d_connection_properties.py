@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
-from pydantic import Field, model_validator
+from pydantic import Field, root_validator
 
 from ._core import DomainModelApply, DomainRelation, DomainRelationApply, DomainRelationList, ResourcesApply
 from ._cdf_3_d_entity import CdfEntity, CdfEntityApply
@@ -49,7 +49,7 @@ class CdfConnectionProperties(DomainRelation):
     def cdf_3_d_model(self) -> str:
         return self.start_node.external_id
 
-    @model_validator(mode="before")
+    @root_validator(pre=True)
     def set_cdf_3_d_entity_if_missing(cls, data: Any):
         if isinstance(data, dict) and "cdf_3_d_entity" not in data:
             data["cdf_3_d_entity"] = data["end_node"]["external_id"]

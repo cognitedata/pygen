@@ -5,7 +5,7 @@ import datetime{% endif %}
 
 from cognite.client import data_modeling as dm{% if data_class.has_single_timeseries_fields %}
 from cognite.client.data_classes import TimeSeries{% if is_pydantic_v2 %} as CogniteTimeSeries{% endif %}{% endif %}{% if data_class.use_pydantic_field %}
-{{ data_class.import_pydantic_field }}{% endif %}
+{{ data_class.import_pydantic_field(is_pydantic_v2) }}{% endif %}
 
 from ._core import (
     DomainModel,

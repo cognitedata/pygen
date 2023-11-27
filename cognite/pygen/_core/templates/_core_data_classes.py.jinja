@@ -53,10 +53,9 @@ class ResourcesApplyResult:
 
 # Arbitrary types are allowed to be able to use the TimeSeries class
 class Core(BaseModel{% if is_pydantic_v2 %}, arbitrary_types_allowed=True{% endif %}):{% if not is_pydantic_v2 %}
-
     class Config:
         arbitrary_types_allowed = True
-    {% endif %}
+{% endif %}
     def to_pandas(self, include_instance_properties: bool = False) -> pd.Series:
         exclude = None
         if not include_instance_properties:
