@@ -5,7 +5,15 @@ from typing import Literal, Optional
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
+from ._core import (
+    DomainModel,
+    DomainModelApply,
+    DomainModelApplyList,
+    DomainModelList,
+    DomainRelationApply,
+    ResourcesApply,
+)
+
 
 __all__ = ["CogPool", "CogPoolApply", "CogPoolList", "CogPoolApplyList", "CogPoolFields", "CogPoolTextFields"]
 
@@ -23,7 +31,7 @@ _COGPOOL_PROPERTIES_BY_FIELD = {
 
 
 class CogPool(DomainModel):
-    """This represent a read version of cog pool.
+    """This represents the reading version of cog pool.
 
     It is used to when data is retrieved from CDF.
 
@@ -49,7 +57,7 @@ class CogPool(DomainModel):
     timezone: Optional[str] = None
 
     def as_apply(self) -> CogPoolApply:
-        """Convert this read version of cog pool to a write version."""
+        """Convert this read version of cog pool to the writing version."""
         return CogPoolApply(
             space=self.space,
             external_id=self.external_id,
@@ -62,7 +70,7 @@ class CogPool(DomainModel):
 
 
 class CogPoolApply(DomainModelApply):
-    """This represent a write version of cog pool.
+    """This represents the writing version of cog pool.
 
     It is used to when data is sent to CDF.
 
@@ -74,7 +82,7 @@ class CogPoolApply(DomainModelApply):
         name: The name field.
         time_unit: The time unit field.
         timezone: The timezone field.
-        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+        existing_version: Fail the ingestion request if the cog pool version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
@@ -88,11 +96,17 @@ class CogPoolApply(DomainModelApply):
     timezone: Optional[str] = None
 
     def _to_instances_apply(
-        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
-    ) -> dm.InstancesApply:
-        if self.external_id in cache:
-            return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
-        write_view = view_by_write_class and view_by_write_class.get(type(self))
+        self,
+        cache: set[tuple[str, str]],
+        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+    ) -> ResourcesApply:
+        resources = ResourcesApply()
+        if self.as_tuple_id() in cache:
+            return resources
+
+        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
+            "market", "CogPool", "28af312f1d7093"
+        )
 
         properties = {}
         if self.max_price is not None:
@@ -105,38 +119,86 @@ class CogPoolApply(DomainModelApply):
             properties["timeUnit"] = self.time_unit
         if self.timezone is not None:
             properties["timezone"] = self.timezone
+
         if properties:
-            source = dm.NodeOrEdgeData(
-                source=write_view or dm.ViewId("market", "CogPool", "28af312f1d7093"),
-                properties=properties,
-            )
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=[source],
+                sources=[
+                    dm.NodeOrEdgeData(
+                        source=write_view,
+                        properties=properties,
+                    )
+                ],
             )
-            nodes = [this_node]
-        else:
-            nodes = []
+            resources.nodes.append(this_node)
+            cache.add(self.as_tuple_id())
 
-        edges = []
-        cache.add(self.external_id)
-
-        return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
+        return resources
 
 
-class CogPoolList(TypeList[CogPool]):
-    """List of cog pools in read version."""
+class CogPoolList(DomainModelList[CogPool]):
+    """List of cog pools in the read version."""
 
-    _NODE = CogPool
+    _INSTANCE = CogPool
 
     def as_apply(self) -> CogPoolApplyList:
-        """Convert this read version of cog pool to a write version."""
+        """Convert these read versions of cog pool to the writing versions."""
         return CogPoolApplyList([node.as_apply() for node in self.data])
 
 
-class CogPoolApplyList(TypeApplyList[CogPoolApply]):
-    """List of cog pools in write version."""
+class CogPoolApplyList(DomainModelApplyList[CogPoolApply]):
+    """List of cog pools in the writing version."""
 
-    _NODE = CogPoolApply
+    _INSTANCE = CogPoolApply
+
+
+def _create_cog_pool_filter(
+    view_id: dm.ViewId,
+    min_max_price: float | None = None,
+    max_max_price: float | None = None,
+    min_min_price: float | None = None,
+    max_min_price: float | None = None,
+    name: str | list[str] | None = None,
+    name_prefix: str | None = None,
+    time_unit: str | list[str] | None = None,
+    time_unit_prefix: str | None = None,
+    timezone: str | list[str] | None = None,
+    timezone_prefix: str | None = None,
+    external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if min_max_price or max_max_price:
+        filters.append(dm.filters.Range(view_id.as_property_ref("maxPrice"), gte=min_max_price, lte=max_max_price))
+    if min_min_price or max_min_price:
+        filters.append(dm.filters.Range(view_id.as_property_ref("minPrice"), gte=min_min_price, lte=max_min_price))
+    if name and isinstance(name, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
+    if name and isinstance(name, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("name"), values=name))
+    if name_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
+    if time_unit and isinstance(time_unit, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("timeUnit"), value=time_unit))
+    if time_unit and isinstance(time_unit, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("timeUnit"), values=time_unit))
+    if time_unit_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("timeUnit"), value=time_unit_prefix))
+    if timezone and isinstance(timezone, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("timezone"), value=timezone))
+    if timezone and isinstance(timezone, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("timezone"), values=timezone))
+    if timezone_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("timezone"), value=timezone_prefix))
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

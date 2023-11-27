@@ -1,25 +1,39 @@
 from __future__ import annotations
 
-from typing import Sequence, overload
+from collections.abc import Sequence
+from typing import overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from osdu_wells_pydantic_v1.client.data_classes import (
+    DomainModelApply,
+    ResourcesApplyResult,
     Ancestry,
     AncestryApply,
+    AncestryFields,
     AncestryList,
     AncestryApplyList,
-    AncestryFields,
     AncestryTextFields,
-    DomainModelApply,
 )
-from osdu_wells_pydantic_v1.client.data_classes._ancestry import _ANCESTRY_PROPERTIES_BY_FIELD
+from osdu_wells_pydantic_v1.client.data_classes._ancestry import (
+    _ANCESTRY_PROPERTIES_BY_FIELD,
+    _create_ancestry_filter,
+)
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
+from .ancestry_query import AncestryQueryAPI
 
 
-class AncestryAPI(TypeAPI[Ancestry, AncestryApply, AncestryList]):
+class AncestryAPI(NodeAPI[Ancestry, AncestryApply, AncestryList]):
     def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
         view_id = view_by_write_class[AncestryApply]
         super().__init__(
@@ -28,13 +42,56 @@ class AncestryAPI(TypeAPI[Ancestry, AncestryApply, AncestryList]):
             class_type=Ancestry,
             class_apply_type=AncestryApply,
             class_list=AncestryList,
+            class_apply_list=AncestryApplyList,
+            view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self._view_by_write_class = view_by_write_class
 
-    def apply(
-        self, ancestry: AncestryApply | Sequence[AncestryApply], replace: bool = False
-    ) -> dm.InstancesApplyResult:
+    def __call__(
+        self,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+        filter: dm.Filter | None = None,
+    ) -> AncestryQueryAPI[AncestryList]:
+        """Query starting at ancestries.
+
+        Args:
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of ancestries to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            A query API for ancestries.
+
+        """
+        filter_ = _create_ancestry_filter(
+            self._view_id,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        builder = QueryBuilder(
+            AncestryList,
+            [
+                QueryStep(
+                    name="ancestry",
+                    expression=dm.query.NodeResultSetExpression(
+                        from_=None,
+                        filter=filter_,
+                    ),
+                    select=dm.query.Select(
+                        [dm.query.SourceSelector(self._view_id, list(_ANCESTRY_PROPERTIES_BY_FIELD.values()))]
+                    ),
+                    result_cls=Ancestry,
+                    max_retrieve_limit=limit,
+                )
+            ],
+        )
+        return AncestryQueryAPI(self._client, builder, self._view_by_write_class)
+
+    def apply(self, ancestry: AncestryApply | Sequence[AncestryApply], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) ancestries.
 
         Args:
@@ -42,7 +99,7 @@ class AncestryAPI(TypeAPI[Ancestry, AncestryApply, AncestryList]):
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes, edges, and time series.
 
         Examples:
 
@@ -55,20 +112,10 @@ class AncestryAPI(TypeAPI[Ancestry, AncestryApply, AncestryList]):
                 >>> result = client.ancestry.apply(ancestry)
 
         """
-        if isinstance(ancestry, AncestryApply):
-            instances = ancestry.to_instances_apply(self._view_by_write_class)
-        else:
-            instances = AncestryApplyList(ancestry).to_instances_apply(self._view_by_write_class)
-        return self._client.data_modeling.instances.apply(
-            nodes=instances.nodes,
-            edges=instances.edges,
-            auto_create_start_nodes=True,
-            auto_create_end_nodes=True,
-            replace=replace,
-        )
+        return self._apply(ancestry, replace)
 
     def delete(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> dm.InstancesDeleteResult:
         """Delete one or more ancestry.
 
@@ -87,23 +134,18 @@ class AncestryAPI(TypeAPI[Ancestry, AncestryApply, AncestryList]):
                 >>> client = OSDUClient()
                 >>> client.ancestry.delete("my_ancestry")
         """
-        if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
-        else:
-            return self._client.data_modeling.instances.delete(
-                nodes=[(space, id) for id in external_id],
-            )
+        return self._delete(external_id, space)
 
     @overload
     def retrieve(self, external_id: str) -> Ancestry:
         ...
 
     @overload
-    def retrieve(self, external_id: Sequence[str]) -> AncestryList:
+    def retrieve(self, external_id: SequenceNotStr[str]) -> AncestryList:
         ...
 
     def retrieve(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> Ancestry | AncestryList:
         """Retrieve one or more ancestries by id(s).
 
@@ -123,10 +165,7 @@ class AncestryAPI(TypeAPI[Ancestry, AncestryApply, AncestryList]):
                 >>> ancestry = client.ancestry.retrieve("my_ancestry")
 
         """
-        if isinstance(external_id, str):
-            return self._retrieve((space, external_id))
-        else:
-            return self._retrieve([(space, ext_id) for ext_id in external_id])
+        return self._retrieve(external_id, space)
 
     def search(
         self,
@@ -159,7 +198,7 @@ class AncestryAPI(TypeAPI[Ancestry, AncestryApply, AncestryList]):
                 >>> ancestries = client.ancestry.search('my_ancestry')
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_ancestry_filter(
             self._view_id,
             external_id_prefix,
             space,
@@ -244,7 +283,7 @@ class AncestryAPI(TypeAPI[Ancestry, AncestryApply, AncestryList]):
 
         """
 
-        filter_ = _create_filter(
+        filter_ = _create_ancestry_filter(
             self._view_id,
             external_id_prefix,
             space,
@@ -289,7 +328,7 @@ class AncestryAPI(TypeAPI[Ancestry, AncestryApply, AncestryList]):
             Bucketed histogram results.
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_ancestry_filter(
             self._view_id,
             external_id_prefix,
             space,
@@ -333,29 +372,10 @@ class AncestryAPI(TypeAPI[Ancestry, AncestryApply, AncestryList]):
                 >>> ancestries = client.ancestry.list(limit=5)
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_ancestry_filter(
             self._view_id,
             external_id_prefix,
             space,
             filter,
         )
-
         return self._list(limit=limit, filter=filter_)
-
-
-def _create_filter(
-    view_id: dm.ViewId,
-    external_id_prefix: str | None = None,
-    space: str | list[str] | None = None,
-    filter: dm.Filter | None = None,
-) -> dm.Filter | None:
-    filters = []
-    if external_id_prefix:
-        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
-        filters.append(dm.filters.Equals(["node", "space"], value=space))
-    if space and isinstance(space, list):
-        filters.append(dm.filters.In(["node", "space"], values=space))
-    if filter:
-        filters.append(filter)
-    return dm.filters.And(*filters) if filters else None

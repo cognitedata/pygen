@@ -17,7 +17,16 @@ if IS_PYDANTIC_V2:
 
     from examples.equipment_unit.client import EquipmentUnitClient
 else:
-    raise NotImplementedError()
+    from equipment_unit_pydantic_v1.client import EquipmentUnitClient
+    from equipment_unit_pydantic_v1.client.data_classes import (
+        EquipmentModule,
+        EquipmentModuleApply,
+        StartEndTime,
+        StartEndTimeApply,
+        StartEndTimeList,
+        UnitProcedureApply,
+        UnitProcedureList,
+    )
 
 
 @pytest.fixture

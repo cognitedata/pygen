@@ -1,14 +1,22 @@
 from __future__ import annotations
 
-from typing import Literal, TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
+from ._core import (
+    DomainModel,
+    DomainModelApply,
+    DomainModelApplyList,
+    DomainModelList,
+    DomainRelationApply,
+    ResourcesApply,
+)
 
 if TYPE_CHECKING:
-    from ._features import FeaturesApply
+    from ._features import Features, FeaturesApply
+
 
 __all__ = [
     "AsIngestedCoordinates",
@@ -53,7 +61,7 @@ _ASINGESTEDCOORDINATES_PROPERTIES_BY_FIELD = {
 
 
 class AsIngestedCoordinates(DomainModel):
-    """This represent a read version of as ingested coordinate.
+    """This represents the reading version of as ingested coordinate.
 
     It is used to when data is retrieved from CDF.
 
@@ -80,14 +88,14 @@ class AsIngestedCoordinates(DomainModel):
     vertical_coordinate_reference_system_id: Optional[str] = Field(None, alias="VerticalCoordinateReferenceSystemID")
     vertical_unit_id: Optional[str] = Field(None, alias="VerticalUnitID")
     bbox: Optional[list[float]] = None
-    features: Optional[list[str]] = None
+    features: Union[list[Features], list[str], None] = Field(default=None, repr=False)
     persistable_reference_crs: Optional[str] = Field(None, alias="persistableReferenceCrs")
     persistable_reference_unit_z: Optional[str] = Field(None, alias="persistableReferenceUnitZ")
     persistable_reference_vertical_crs: Optional[str] = Field(None, alias="persistableReferenceVerticalCrs")
     type_: Optional[str] = Field(None, alias="type")
 
     def as_apply(self) -> AsIngestedCoordinatesApply:
-        """Convert this read version of as ingested coordinate to a write version."""
+        """Convert this read version of as ingested coordinate to the writing version."""
         return AsIngestedCoordinatesApply(
             space=self.space,
             external_id=self.external_id,
@@ -95,7 +103,9 @@ class AsIngestedCoordinates(DomainModel):
             vertical_coordinate_reference_system_id=self.vertical_coordinate_reference_system_id,
             vertical_unit_id=self.vertical_unit_id,
             bbox=self.bbox,
-            features=self.features,
+            features=[
+                feature.as_apply() if isinstance(feature, DomainModel) else feature for feature in self.features or []
+            ],
             persistable_reference_crs=self.persistable_reference_crs,
             persistable_reference_unit_z=self.persistable_reference_unit_z,
             persistable_reference_vertical_crs=self.persistable_reference_vertical_crs,
@@ -104,7 +114,7 @@ class AsIngestedCoordinates(DomainModel):
 
 
 class AsIngestedCoordinatesApply(DomainModelApply):
-    """This represent a write version of as ingested coordinate.
+    """This represents the writing version of as ingested coordinate.
 
     It is used to when data is sent to CDF.
 
@@ -120,7 +130,7 @@ class AsIngestedCoordinatesApply(DomainModelApply):
         persistable_reference_unit_z: The persistable reference unit z field.
         persistable_reference_vertical_crs: The persistable reference vertical cr field.
         type_: The type field.
-        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+        existing_version: Fail the ingestion request if the as ingested coordinate version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
@@ -138,11 +148,17 @@ class AsIngestedCoordinatesApply(DomainModelApply):
     type_: Optional[str] = Field(None, alias="type")
 
     def _to_instances_apply(
-        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
-    ) -> dm.InstancesApply:
-        if self.external_id in cache:
-            return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
-        write_view = view_by_write_class and view_by_write_class.get(type(self))
+        self,
+        cache: set[tuple[str, str]],
+        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+    ) -> ResourcesApply:
+        resources = ResourcesApply()
+        if self.as_tuple_id() in cache:
+            return resources
+
+        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
+            "IntegrationTestsImmutable", "AsIngestedCoordinates", "da1e4eb90494da"
+        )
 
         properties = {}
         if self.coordinate_reference_system_id is not None:
@@ -161,65 +177,171 @@ class AsIngestedCoordinatesApply(DomainModelApply):
             properties["persistableReferenceVerticalCrs"] = self.persistable_reference_vertical_crs
         if self.type_ is not None:
             properties["type"] = self.type_
+
         if properties:
-            source = dm.NodeOrEdgeData(
-                source=write_view or dm.ViewId("IntegrationTestsImmutable", "AsIngestedCoordinates", "da1e4eb90494da"),
-                properties=properties,
-            )
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=[source],
+                sources=[
+                    dm.NodeOrEdgeData(
+                        source=write_view,
+                        properties=properties,
+                    )
+                ],
             )
-            nodes = [this_node]
-        else:
-            nodes = []
+            resources.nodes.append(this_node)
+            cache.add(self.as_tuple_id())
 
-        edges = []
-        cache.add(self.external_id)
-
+        edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "AsIngestedCoordinates.features")
         for feature in self.features or []:
-            edge = self._create_feature_edge(feature)
-            if edge.external_id not in cache:
-                edges.append(edge)
-                cache.add(edge.external_id)
+            other_resources = DomainRelationApply.from_edge_to_resources(
+                cache, self, feature, edge_type, view_by_write_class
+            )
+            resources.extend(other_resources)
 
-            if isinstance(feature, DomainModelApply):
-                instances = feature._to_instances_apply(cache, view_by_write_class)
-                nodes.extend(instances.nodes)
-                edges.extend(instances.edges)
-
-        return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
-
-    def _create_feature_edge(self, feature: Union[str, FeaturesApply]) -> dm.EdgeApply:
-        if isinstance(feature, str):
-            end_space, end_node_ext_id = self.space, feature
-        elif isinstance(feature, DomainModelApply):
-            end_space, end_node_ext_id = feature.space, feature.external_id
-        else:
-            raise TypeError(f"Expected str or FeaturesApply, got {type(feature)}")
-
-        return dm.EdgeApply(
-            space=self.space,
-            external_id=f"{self.external_id}:{end_node_ext_id}",
-            type=dm.DirectRelationReference("IntegrationTestsImmutable", "AsIngestedCoordinates.features"),
-            start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
-        )
+        return resources
 
 
-class AsIngestedCoordinatesList(TypeList[AsIngestedCoordinates]):
-    """List of as ingested coordinates in read version."""
+class AsIngestedCoordinatesList(DomainModelList[AsIngestedCoordinates]):
+    """List of as ingested coordinates in the read version."""
 
-    _NODE = AsIngestedCoordinates
+    _INSTANCE = AsIngestedCoordinates
 
     def as_apply(self) -> AsIngestedCoordinatesApplyList:
-        """Convert this read version of as ingested coordinate to a write version."""
+        """Convert these read versions of as ingested coordinate to the writing versions."""
         return AsIngestedCoordinatesApplyList([node.as_apply() for node in self.data])
 
 
-class AsIngestedCoordinatesApplyList(TypeApplyList[AsIngestedCoordinatesApply]):
-    """List of as ingested coordinates in write version."""
+class AsIngestedCoordinatesApplyList(DomainModelApplyList[AsIngestedCoordinatesApply]):
+    """List of as ingested coordinates in the writing version."""
 
-    _NODE = AsIngestedCoordinatesApply
+    _INSTANCE = AsIngestedCoordinatesApply
+
+
+def _create_as_ingested_coordinate_filter(
+    view_id: dm.ViewId,
+    coordinate_reference_system_id: str | list[str] | None = None,
+    coordinate_reference_system_id_prefix: str | None = None,
+    vertical_coordinate_reference_system_id: str | list[str] | None = None,
+    vertical_coordinate_reference_system_id_prefix: str | None = None,
+    vertical_unit_id: str | list[str] | None = None,
+    vertical_unit_id_prefix: str | None = None,
+    persistable_reference_crs: str | list[str] | None = None,
+    persistable_reference_crs_prefix: str | None = None,
+    persistable_reference_unit_z: str | list[str] | None = None,
+    persistable_reference_unit_z_prefix: str | None = None,
+    persistable_reference_vertical_crs: str | list[str] | None = None,
+    persistable_reference_vertical_crs_prefix: str | None = None,
+    type_: str | list[str] | None = None,
+    type_prefix: str | None = None,
+    external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if coordinate_reference_system_id and isinstance(coordinate_reference_system_id, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("CoordinateReferenceSystemID"), value=coordinate_reference_system_id
+            )
+        )
+    if coordinate_reference_system_id and isinstance(coordinate_reference_system_id, list):
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("CoordinateReferenceSystemID"), values=coordinate_reference_system_id)
+        )
+    if coordinate_reference_system_id_prefix:
+        filters.append(
+            dm.filters.Prefix(
+                view_id.as_property_ref("CoordinateReferenceSystemID"), value=coordinate_reference_system_id_prefix
+            )
+        )
+    if vertical_coordinate_reference_system_id and isinstance(vertical_coordinate_reference_system_id, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("VerticalCoordinateReferenceSystemID"),
+                value=vertical_coordinate_reference_system_id,
+            )
+        )
+    if vertical_coordinate_reference_system_id and isinstance(vertical_coordinate_reference_system_id, list):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("VerticalCoordinateReferenceSystemID"),
+                values=vertical_coordinate_reference_system_id,
+            )
+        )
+    if vertical_coordinate_reference_system_id_prefix:
+        filters.append(
+            dm.filters.Prefix(
+                view_id.as_property_ref("VerticalCoordinateReferenceSystemID"),
+                value=vertical_coordinate_reference_system_id_prefix,
+            )
+        )
+    if vertical_unit_id and isinstance(vertical_unit_id, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("VerticalUnitID"), value=vertical_unit_id))
+    if vertical_unit_id and isinstance(vertical_unit_id, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("VerticalUnitID"), values=vertical_unit_id))
+    if vertical_unit_id_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("VerticalUnitID"), value=vertical_unit_id_prefix))
+    if persistable_reference_crs and isinstance(persistable_reference_crs, str):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("persistableReferenceCrs"), value=persistable_reference_crs)
+        )
+    if persistable_reference_crs and isinstance(persistable_reference_crs, list):
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("persistableReferenceCrs"), values=persistable_reference_crs)
+        )
+    if persistable_reference_crs_prefix:
+        filters.append(
+            dm.filters.Prefix(
+                view_id.as_property_ref("persistableReferenceCrs"), value=persistable_reference_crs_prefix
+            )
+        )
+    if persistable_reference_unit_z and isinstance(persistable_reference_unit_z, str):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("persistableReferenceUnitZ"), value=persistable_reference_unit_z)
+        )
+    if persistable_reference_unit_z and isinstance(persistable_reference_unit_z, list):
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("persistableReferenceUnitZ"), values=persistable_reference_unit_z)
+        )
+    if persistable_reference_unit_z_prefix:
+        filters.append(
+            dm.filters.Prefix(
+                view_id.as_property_ref("persistableReferenceUnitZ"), value=persistable_reference_unit_z_prefix
+            )
+        )
+    if persistable_reference_vertical_crs and isinstance(persistable_reference_vertical_crs, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("persistableReferenceVerticalCrs"), value=persistable_reference_vertical_crs
+            )
+        )
+    if persistable_reference_vertical_crs and isinstance(persistable_reference_vertical_crs, list):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("persistableReferenceVerticalCrs"), values=persistable_reference_vertical_crs
+            )
+        )
+    if persistable_reference_vertical_crs_prefix:
+        filters.append(
+            dm.filters.Prefix(
+                view_id.as_property_ref("persistableReferenceVerticalCrs"),
+                value=persistable_reference_vertical_crs_prefix,
+            )
+        )
+    if type_ and isinstance(type_, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("type"), value=type_))
+    if type_ and isinstance(type_, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("type"), values=type_))
+    if type_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("type"), value=type_prefix))
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

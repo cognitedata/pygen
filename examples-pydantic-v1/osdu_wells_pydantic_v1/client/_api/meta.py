@@ -1,25 +1,39 @@
 from __future__ import annotations
 
-from typing import Sequence, overload
+from collections.abc import Sequence
+from typing import overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from osdu_wells_pydantic_v1.client.data_classes import (
+    DomainModelApply,
+    ResourcesApplyResult,
     Meta,
     MetaApply,
+    MetaFields,
     MetaList,
     MetaApplyList,
-    MetaFields,
     MetaTextFields,
-    DomainModelApply,
 )
-from osdu_wells_pydantic_v1.client.data_classes._meta import _META_PROPERTIES_BY_FIELD
+from osdu_wells_pydantic_v1.client.data_classes._meta import (
+    _META_PROPERTIES_BY_FIELD,
+    _create_meta_filter,
+)
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
+from .meta_query import MetaQueryAPI
 
 
-class MetaAPI(TypeAPI[Meta, MetaApply, MetaList]):
+class MetaAPI(NodeAPI[Meta, MetaApply, MetaList]):
     def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
         view_id = view_by_write_class[MetaApply]
         super().__init__(
@@ -28,11 +42,80 @@ class MetaAPI(TypeAPI[Meta, MetaApply, MetaList]):
             class_type=Meta,
             class_apply_type=MetaApply,
             class_list=MetaList,
+            class_apply_list=MetaApplyList,
+            view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self._view_by_write_class = view_by_write_class
 
-    def apply(self, meta: MetaApply | Sequence[MetaApply], replace: bool = False) -> dm.InstancesApplyResult:
+    def __call__(
+        self,
+        kind: str | list[str] | None = None,
+        kind_prefix: str | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        persistable_reference: str | list[str] | None = None,
+        persistable_reference_prefix: str | None = None,
+        unit_of_measure_id: str | list[str] | None = None,
+        unit_of_measure_id_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+        filter: dm.Filter | None = None,
+    ) -> MetaQueryAPI[MetaList]:
+        """Query starting at metas.
+
+        Args:
+            kind: The kind to filter on.
+            kind_prefix: The prefix of the kind to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            persistable_reference: The persistable reference to filter on.
+            persistable_reference_prefix: The prefix of the persistable reference to filter on.
+            unit_of_measure_id: The unit of measure id to filter on.
+            unit_of_measure_id_prefix: The prefix of the unit of measure id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of metas to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            A query API for metas.
+
+        """
+        filter_ = _create_meta_filter(
+            self._view_id,
+            kind,
+            kind_prefix,
+            name,
+            name_prefix,
+            persistable_reference,
+            persistable_reference_prefix,
+            unit_of_measure_id,
+            unit_of_measure_id_prefix,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        builder = QueryBuilder(
+            MetaList,
+            [
+                QueryStep(
+                    name="meta",
+                    expression=dm.query.NodeResultSetExpression(
+                        from_=None,
+                        filter=filter_,
+                    ),
+                    select=dm.query.Select(
+                        [dm.query.SourceSelector(self._view_id, list(_META_PROPERTIES_BY_FIELD.values()))]
+                    ),
+                    result_cls=Meta,
+                    max_retrieve_limit=limit,
+                )
+            ],
+        )
+        return MetaQueryAPI(self._client, builder, self._view_by_write_class)
+
+    def apply(self, meta: MetaApply | Sequence[MetaApply], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) metas.
 
         Args:
@@ -40,7 +123,7 @@ class MetaAPI(TypeAPI[Meta, MetaApply, MetaList]):
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes, edges, and time series.
 
         Examples:
 
@@ -53,20 +136,10 @@ class MetaAPI(TypeAPI[Meta, MetaApply, MetaList]):
                 >>> result = client.meta.apply(meta)
 
         """
-        if isinstance(meta, MetaApply):
-            instances = meta.to_instances_apply(self._view_by_write_class)
-        else:
-            instances = MetaApplyList(meta).to_instances_apply(self._view_by_write_class)
-        return self._client.data_modeling.instances.apply(
-            nodes=instances.nodes,
-            edges=instances.edges,
-            auto_create_start_nodes=True,
-            auto_create_end_nodes=True,
-            replace=replace,
-        )
+        return self._apply(meta, replace)
 
     def delete(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> dm.InstancesDeleteResult:
         """Delete one or more meta.
 
@@ -85,22 +158,19 @@ class MetaAPI(TypeAPI[Meta, MetaApply, MetaList]):
                 >>> client = OSDUClient()
                 >>> client.meta.delete("my_meta")
         """
-        if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
-        else:
-            return self._client.data_modeling.instances.delete(
-                nodes=[(space, id) for id in external_id],
-            )
+        return self._delete(external_id, space)
 
     @overload
     def retrieve(self, external_id: str) -> Meta:
         ...
 
     @overload
-    def retrieve(self, external_id: Sequence[str]) -> MetaList:
+    def retrieve(self, external_id: SequenceNotStr[str]) -> MetaList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> Meta | MetaList:
+    def retrieve(
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+    ) -> Meta | MetaList:
         """Retrieve one or more metas by id(s).
 
         Args:
@@ -119,10 +189,7 @@ class MetaAPI(TypeAPI[Meta, MetaApply, MetaList]):
                 >>> meta = client.meta.retrieve("my_meta")
 
         """
-        if isinstance(external_id, str):
-            return self._retrieve((space, external_id))
-        else:
-            return self._retrieve([(space, ext_id) for ext_id in external_id])
+        return self._retrieve(external_id, space)
 
     def search(
         self,
@@ -171,7 +238,7 @@ class MetaAPI(TypeAPI[Meta, MetaApply, MetaList]):
                 >>> metas = client.meta.search('my_meta')
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_meta_filter(
             self._view_id,
             kind,
             kind_prefix,
@@ -296,7 +363,7 @@ class MetaAPI(TypeAPI[Meta, MetaApply, MetaList]):
 
         """
 
-        filter_ = _create_filter(
+        filter_ = _create_meta_filter(
             self._view_id,
             kind,
             kind_prefix,
@@ -365,7 +432,7 @@ class MetaAPI(TypeAPI[Meta, MetaApply, MetaList]):
             Bucketed histogram results.
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_meta_filter(
             self._view_id,
             kind,
             kind_prefix,
@@ -433,7 +500,7 @@ class MetaAPI(TypeAPI[Meta, MetaApply, MetaList]):
                 >>> metas = client.meta.list(limit=5)
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_meta_filter(
             self._view_id,
             kind,
             kind_prefix,
@@ -447,57 +514,4 @@ class MetaAPI(TypeAPI[Meta, MetaApply, MetaList]):
             space,
             filter,
         )
-
         return self._list(limit=limit, filter=filter_)
-
-
-def _create_filter(
-    view_id: dm.ViewId,
-    kind: str | list[str] | None = None,
-    kind_prefix: str | None = None,
-    name: str | list[str] | None = None,
-    name_prefix: str | None = None,
-    persistable_reference: str | list[str] | None = None,
-    persistable_reference_prefix: str | None = None,
-    unit_of_measure_id: str | list[str] | None = None,
-    unit_of_measure_id_prefix: str | None = None,
-    external_id_prefix: str | None = None,
-    space: str | list[str] | None = None,
-    filter: dm.Filter | None = None,
-) -> dm.Filter | None:
-    filters = []
-    if kind and isinstance(kind, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("kind"), value=kind))
-    if kind and isinstance(kind, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("kind"), values=kind))
-    if kind_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("kind"), value=kind_prefix))
-    if name and isinstance(name, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
-    if name and isinstance(name, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("name"), values=name))
-    if name_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
-    if persistable_reference and isinstance(persistable_reference, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("persistableReference"), value=persistable_reference))
-    if persistable_reference and isinstance(persistable_reference, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("persistableReference"), values=persistable_reference))
-    if persistable_reference_prefix:
-        filters.append(
-            dm.filters.Prefix(view_id.as_property_ref("persistableReference"), value=persistable_reference_prefix)
-        )
-    if unit_of_measure_id and isinstance(unit_of_measure_id, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("unitOfMeasureID"), value=unit_of_measure_id))
-    if unit_of_measure_id and isinstance(unit_of_measure_id, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("unitOfMeasureID"), values=unit_of_measure_id))
-    if unit_of_measure_id_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("unitOfMeasureID"), value=unit_of_measure_id_prefix))
-    if external_id_prefix:
-        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
-        filters.append(dm.filters.Equals(["node", "space"], value=space))
-    if space and isinstance(space, list):
-        filters.append(dm.filters.In(["node", "space"], values=space))
-    if filter:
-        filters.append(filter)
-    return dm.filters.And(*filters) if filters else None

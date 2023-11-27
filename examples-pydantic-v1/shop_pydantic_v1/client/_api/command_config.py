@@ -1,25 +1,39 @@
 from __future__ import annotations
 
-from typing import Sequence, overload
+from collections.abc import Sequence
+from typing import overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from shop_pydantic_v1.client.data_classes import (
+    DomainModelApply,
+    ResourcesApplyResult,
     CommandConfig,
     CommandConfigApply,
+    CommandConfigFields,
     CommandConfigList,
     CommandConfigApplyList,
-    CommandConfigFields,
     CommandConfigTextFields,
-    DomainModelApply,
 )
-from shop_pydantic_v1.client.data_classes._command_config import _COMMANDCONFIG_PROPERTIES_BY_FIELD
+from shop_pydantic_v1.client.data_classes._command_config import (
+    _COMMANDCONFIG_PROPERTIES_BY_FIELD,
+    _create_command_config_filter,
+)
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
+from .command_config_query import CommandConfigQueryAPI
 
 
-class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigList]):
+class CommandConfigAPI(NodeAPI[CommandConfig, CommandConfigApply, CommandConfigList]):
     def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
         view_id = view_by_write_class[CommandConfigApply]
         super().__init__(
@@ -28,13 +42,58 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
             class_type=CommandConfig,
             class_apply_type=CommandConfigApply,
             class_list=CommandConfigList,
+            class_apply_list=CommandConfigApplyList,
+            view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self._view_by_write_class = view_by_write_class
+
+    def __call__(
+        self,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+        filter: dm.Filter | None = None,
+    ) -> CommandConfigQueryAPI[CommandConfigList]:
+        """Query starting at command configs.
+
+        Args:
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of command configs to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            A query API for command configs.
+
+        """
+        filter_ = _create_command_config_filter(
+            self._view_id,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        builder = QueryBuilder(
+            CommandConfigList,
+            [
+                QueryStep(
+                    name="command_config",
+                    expression=dm.query.NodeResultSetExpression(
+                        from_=None,
+                        filter=filter_,
+                    ),
+                    select=dm.query.Select(
+                        [dm.query.SourceSelector(self._view_id, list(_COMMANDCONFIG_PROPERTIES_BY_FIELD.values()))]
+                    ),
+                    result_cls=CommandConfig,
+                    max_retrieve_limit=limit,
+                )
+            ],
+        )
+        return CommandConfigQueryAPI(self._client, builder, self._view_by_write_class)
 
     def apply(
         self, command_config: CommandConfigApply | Sequence[CommandConfigApply], replace: bool = False
-    ) -> dm.InstancesApplyResult:
+    ) -> ResourcesApplyResult:
         """Add or update (upsert) command configs.
 
         Args:
@@ -42,7 +101,7 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes, edges, and time series.
 
         Examples:
 
@@ -55,20 +114,10 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
                 >>> result = client.command_config.apply(command_config)
 
         """
-        if isinstance(command_config, CommandConfigApply):
-            instances = command_config.to_instances_apply(self._view_by_write_class)
-        else:
-            instances = CommandConfigApplyList(command_config).to_instances_apply(self._view_by_write_class)
-        return self._client.data_modeling.instances.apply(
-            nodes=instances.nodes,
-            edges=instances.edges,
-            auto_create_start_nodes=True,
-            auto_create_end_nodes=True,
-            replace=replace,
-        )
+        return self._apply(command_config, replace)
 
     def delete(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> dm.InstancesDeleteResult:
         """Delete one or more command config.
 
@@ -87,23 +136,18 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
                 >>> client = ShopClient()
                 >>> client.command_config.delete("my_command_config")
         """
-        if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
-        else:
-            return self._client.data_modeling.instances.delete(
-                nodes=[(space, id) for id in external_id],
-            )
+        return self._delete(external_id, space)
 
     @overload
     def retrieve(self, external_id: str) -> CommandConfig:
         ...
 
     @overload
-    def retrieve(self, external_id: Sequence[str]) -> CommandConfigList:
+    def retrieve(self, external_id: SequenceNotStr[str]) -> CommandConfigList:
         ...
 
     def retrieve(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> CommandConfig | CommandConfigList:
         """Retrieve one or more command configs by id(s).
 
@@ -123,10 +167,7 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
                 >>> command_config = client.command_config.retrieve("my_command_config")
 
         """
-        if isinstance(external_id, str):
-            return self._retrieve((space, external_id))
-        else:
-            return self._retrieve([(space, ext_id) for ext_id in external_id])
+        return self._retrieve(external_id, space)
 
     def search(
         self,
@@ -159,7 +200,7 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
                 >>> command_configs = client.command_config.search('my_command_config')
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_command_config_filter(
             self._view_id,
             external_id_prefix,
             space,
@@ -244,7 +285,7 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
 
         """
 
-        filter_ = _create_filter(
+        filter_ = _create_command_config_filter(
             self._view_id,
             external_id_prefix,
             space,
@@ -289,7 +330,7 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
             Bucketed histogram results.
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_command_config_filter(
             self._view_id,
             external_id_prefix,
             space,
@@ -333,29 +374,10 @@ class CommandConfigAPI(TypeAPI[CommandConfig, CommandConfigApply, CommandConfigL
                 >>> command_configs = client.command_config.list(limit=5)
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_command_config_filter(
             self._view_id,
             external_id_prefix,
             space,
             filter,
         )
-
         return self._list(limit=limit, filter=filter_)
-
-
-def _create_filter(
-    view_id: dm.ViewId,
-    external_id_prefix: str | None = None,
-    space: str | list[str] | None = None,
-    filter: dm.Filter | None = None,
-) -> dm.Filter | None:
-    filters = []
-    if external_id_prefix:
-        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
-        filters.append(dm.filters.Equals(["node", "space"], value=space))
-    if space and isinstance(space, list):
-        filters.append(dm.filters.In(["node", "space"], values=space))
-    if filter:
-        filters.append(filter)
-    return dm.filters.And(*filters) if filters else None

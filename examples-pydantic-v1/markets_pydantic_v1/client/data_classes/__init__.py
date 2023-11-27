@@ -1,4 +1,11 @@
-from ._core import DomainModel, DomainModelApply
+from ._core import (
+    DomainModel,
+    DomainModelApply,
+    DomainModelList,
+    DomainRelationApply,
+    ResourcesApply,
+    ResourcesApplyResult,
+)
 from ._bid import Bid, BidApply, BidApplyList, BidFields, BidList, BidTextFields
 from ._cog_bid import CogBid, CogBidApply, CogBidApplyList, CogBidFields, CogBidList, CogBidTextFields
 from ._cog_pool import CogPool, CogPoolApply, CogPoolApplyList, CogPoolFields, CogPoolList, CogPoolTextFields
@@ -52,25 +59,50 @@ from ._value_transformation import (
     ValueTransformationTextFields,
 )
 
+Bid.update_forward_refs(
+    MarketApply=MarketApply,
+)
 BidApply.update_forward_refs(
+    MarketApply=MarketApply,
+)
+CogBid.update_forward_refs(
     MarketApply=MarketApply,
 )
 CogBidApply.update_forward_refs(
     MarketApply=MarketApply,
+)
+CogProcess.update_forward_refs(
+    BidApply=BidApply,
+    DateTransformationPairApply=DateTransformationPairApply,
+    ValueTransformationApply=ValueTransformationApply,
 )
 CogProcessApply.update_forward_refs(
     BidApply=BidApply,
     DateTransformationPairApply=DateTransformationPairApply,
     ValueTransformationApply=ValueTransformationApply,
 )
+DateTransformationPair.update_forward_refs(
+    DateTransformationApply=DateTransformationApply,
+)
 DateTransformationPairApply.update_forward_refs(
     DateTransformationApply=DateTransformationApply,
+)
+Process.update_forward_refs(
+    BidApply=BidApply,
 )
 ProcessApply.update_forward_refs(
     BidApply=BidApply,
 )
+PygenBid.update_forward_refs(
+    MarketApply=MarketApply,
+)
 PygenBidApply.update_forward_refs(
     MarketApply=MarketApply,
+)
+PygenProcess.update_forward_refs(
+    BidApply=BidApply,
+    DateTransformationPairApply=DateTransformationPairApply,
+    ValueTransformationApply=ValueTransformationApply,
 )
 PygenProcessApply.update_forward_refs(
     BidApply=BidApply,
@@ -79,8 +111,12 @@ PygenProcessApply.update_forward_refs(
 )
 
 __all__ = [
+    "ResourcesApply",
     "DomainModel",
     "DomainModelApply",
+    "DomainModelList",
+    "DomainRelationApply",
+    "ResourcesApplyResult",
     "Bid",
     "BidApply",
     "BidList",

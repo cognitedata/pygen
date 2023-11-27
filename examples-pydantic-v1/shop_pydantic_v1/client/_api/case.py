@@ -1,26 +1,40 @@
 from __future__ import annotations
 
 import datetime
-from typing import Sequence, overload
+from collections.abc import Sequence
+from typing import overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from shop_pydantic_v1.client.data_classes import (
+    DomainModelApply,
+    ResourcesApplyResult,
     Case,
     CaseApply,
+    CaseFields,
     CaseList,
     CaseApplyList,
-    CaseFields,
     CaseTextFields,
-    DomainModelApply,
 )
-from shop_pydantic_v1.client.data_classes._case import _CASE_PROPERTIES_BY_FIELD
+from shop_pydantic_v1.client.data_classes._case import (
+    _CASE_PROPERTIES_BY_FIELD,
+    _create_case_filter,
+)
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
+from .case_query import CaseQueryAPI
 
 
-class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
+class CaseAPI(NodeAPI[Case, CaseApply, CaseList]):
     def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
         view_id = view_by_write_class[CaseApply]
         super().__init__(
@@ -29,11 +43,95 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
             class_type=Case,
             class_apply_type=CaseApply,
             class_list=CaseList,
+            class_apply_list=CaseApplyList,
+            view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self._view_by_write_class = view_by_write_class
 
-    def apply(self, case: CaseApply | Sequence[CaseApply], replace: bool = False) -> dm.InstancesApplyResult:
+    def __call__(
+        self,
+        arguments: str | list[str] | None = None,
+        arguments_prefix: str | None = None,
+        commands: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        min_end_time: datetime.datetime | None = None,
+        max_end_time: datetime.datetime | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        run_status: str | list[str] | None = None,
+        run_status_prefix: str | None = None,
+        scenario: str | list[str] | None = None,
+        scenario_prefix: str | None = None,
+        min_start_time: datetime.datetime | None = None,
+        max_start_time: datetime.datetime | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+        filter: dm.Filter | None = None,
+    ) -> CaseQueryAPI[CaseList]:
+        """Query starting at cases.
+
+        Args:
+            arguments: The argument to filter on.
+            arguments_prefix: The prefix of the argument to filter on.
+            commands: The command to filter on.
+            min_end_time: The minimum value of the end time to filter on.
+            max_end_time: The maximum value of the end time to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            run_status: The run status to filter on.
+            run_status_prefix: The prefix of the run status to filter on.
+            scenario: The scenario to filter on.
+            scenario_prefix: The prefix of the scenario to filter on.
+            min_start_time: The minimum value of the start time to filter on.
+            max_start_time: The maximum value of the start time to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of cases to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            A query API for cases.
+
+        """
+        filter_ = _create_case_filter(
+            self._view_id,
+            arguments,
+            arguments_prefix,
+            commands,
+            min_end_time,
+            max_end_time,
+            name,
+            name_prefix,
+            run_status,
+            run_status_prefix,
+            scenario,
+            scenario_prefix,
+            min_start_time,
+            max_start_time,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        builder = QueryBuilder(
+            CaseList,
+            [
+                QueryStep(
+                    name="case",
+                    expression=dm.query.NodeResultSetExpression(
+                        from_=None,
+                        filter=filter_,
+                    ),
+                    select=dm.query.Select(
+                        [dm.query.SourceSelector(self._view_id, list(_CASE_PROPERTIES_BY_FIELD.values()))]
+                    ),
+                    result_cls=Case,
+                    max_retrieve_limit=limit,
+                )
+            ],
+        )
+        return CaseQueryAPI(self._client, builder, self._view_by_write_class)
+
+    def apply(self, case: CaseApply | Sequence[CaseApply], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) cases.
 
         Args:
@@ -41,7 +139,7 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes, edges, and time series.
 
         Examples:
 
@@ -54,20 +152,10 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
                 >>> result = client.case.apply(case)
 
         """
-        if isinstance(case, CaseApply):
-            instances = case.to_instances_apply(self._view_by_write_class)
-        else:
-            instances = CaseApplyList(case).to_instances_apply(self._view_by_write_class)
-        return self._client.data_modeling.instances.apply(
-            nodes=instances.nodes,
-            edges=instances.edges,
-            auto_create_start_nodes=True,
-            auto_create_end_nodes=True,
-            replace=replace,
-        )
+        return self._apply(case, replace)
 
     def delete(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> dm.InstancesDeleteResult:
         """Delete one or more case.
 
@@ -86,22 +174,19 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
                 >>> client = ShopClient()
                 >>> client.case.delete("my_case")
         """
-        if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
-        else:
-            return self._client.data_modeling.instances.delete(
-                nodes=[(space, id) for id in external_id],
-            )
+        return self._delete(external_id, space)
 
     @overload
     def retrieve(self, external_id: str) -> Case:
         ...
 
     @overload
-    def retrieve(self, external_id: Sequence[str]) -> CaseList:
+    def retrieve(self, external_id: SequenceNotStr[str]) -> CaseList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> Case | CaseList:
+    def retrieve(
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+    ) -> Case | CaseList:
         """Retrieve one or more cases by id(s).
 
         Args:
@@ -120,10 +205,7 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
                 >>> case = client.case.retrieve("my_case")
 
         """
-        if isinstance(external_id, str):
-            return self._retrieve((space, external_id))
-        else:
-            return self._retrieve([(space, ext_id) for ext_id in external_id])
+        return self._retrieve(external_id, space)
 
     def search(
         self,
@@ -182,7 +264,7 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
                 >>> cases = client.case.search('my_case')
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_case_filter(
             self._view_id,
             arguments,
             arguments_prefix,
@@ -332,7 +414,7 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
 
         """
 
-        filter_ = _create_filter(
+        filter_ = _create_case_filter(
             self._view_id,
             arguments,
             arguments_prefix,
@@ -416,7 +498,7 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
             Bucketed histogram results.
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_case_filter(
             self._view_id,
             arguments,
             arguments_prefix,
@@ -499,7 +581,7 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
                 >>> cases = client.case.list(limit=5)
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_case_filter(
             self._view_id,
             arguments,
             arguments_prefix,
@@ -518,103 +600,4 @@ class CaseAPI(TypeAPI[Case, CaseApply, CaseList]):
             space,
             filter,
         )
-
         return self._list(limit=limit, filter=filter_)
-
-
-def _create_filter(
-    view_id: dm.ViewId,
-    arguments: str | list[str] | None = None,
-    arguments_prefix: str | None = None,
-    commands: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-    min_end_time: datetime.datetime | None = None,
-    max_end_time: datetime.datetime | None = None,
-    name: str | list[str] | None = None,
-    name_prefix: str | None = None,
-    run_status: str | list[str] | None = None,
-    run_status_prefix: str | None = None,
-    scenario: str | list[str] | None = None,
-    scenario_prefix: str | None = None,
-    min_start_time: datetime.datetime | None = None,
-    max_start_time: datetime.datetime | None = None,
-    external_id_prefix: str | None = None,
-    space: str | list[str] | None = None,
-    filter: dm.Filter | None = None,
-) -> dm.Filter | None:
-    filters = []
-    if arguments and isinstance(arguments, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("arguments"), value=arguments))
-    if arguments and isinstance(arguments, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("arguments"), values=arguments))
-    if arguments_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("arguments"), value=arguments_prefix))
-    if commands and isinstance(commands, str):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("commands"),
-                value={"space": "IntegrationTestsImmutable", "externalId": commands},
-            )
-        )
-    if commands and isinstance(commands, tuple):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("commands"), value={"space": commands[0], "externalId": commands[1]}
-            )
-        )
-    if commands and isinstance(commands, list) and isinstance(commands[0], str):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("commands"),
-                values=[{"space": "IntegrationTestsImmutable", "externalId": item} for item in commands],
-            )
-        )
-    if commands and isinstance(commands, list) and isinstance(commands[0], tuple):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("commands"),
-                values=[{"space": item[0], "externalId": item[1]} for item in commands],
-            )
-        )
-    if min_end_time or max_end_time:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("end_time"),
-                gte=min_end_time.isoformat(timespec="milliseconds") if min_end_time else None,
-                lte=max_end_time.isoformat(timespec="milliseconds") if max_end_time else None,
-            )
-        )
-    if name and isinstance(name, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
-    if name and isinstance(name, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("name"), values=name))
-    if name_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
-    if run_status and isinstance(run_status, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("runStatus"), value=run_status))
-    if run_status and isinstance(run_status, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("runStatus"), values=run_status))
-    if run_status_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("runStatus"), value=run_status_prefix))
-    if scenario and isinstance(scenario, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("scenario"), value=scenario))
-    if scenario and isinstance(scenario, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("scenario"), values=scenario))
-    if scenario_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("scenario"), value=scenario_prefix))
-    if min_start_time or max_start_time:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("start_time"),
-                gte=min_start_time.isoformat(timespec="milliseconds") if min_start_time else None,
-                lte=max_start_time.isoformat(timespec="milliseconds") if max_start_time else None,
-            )
-        )
-    if external_id_prefix:
-        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
-        filters.append(dm.filters.Equals(["node", "space"], value=space))
-    if space and isinstance(space, list):
-        filters.append(dm.filters.In(["node", "space"], values=space))
-    if filter:
-        filters.append(filter)
-    return dm.filters.And(*filters) if filters else None

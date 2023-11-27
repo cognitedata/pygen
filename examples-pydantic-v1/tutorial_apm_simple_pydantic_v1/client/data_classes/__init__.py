@@ -1,4 +1,11 @@
-from ._core import DomainModel, DomainModelApply
+from ._core import (
+    DomainModel,
+    DomainModelApply,
+    DomainModelList,
+    DomainRelationApply,
+    ResourcesApply,
+    ResourcesApplyResult,
+)
 from ._asset import Asset, AssetApply, AssetApplyList, AssetFields, AssetList, AssetTextFields
 from ._cdf_3_d_connection_properties import (
     CdfConnectionProperties,
@@ -19,19 +26,43 @@ from ._work_order import (
     WorkOrderTextFields,
 )
 
+Asset.update_forward_refs(
+    AssetApply=AssetApply,
+    CdfConnectionPropertiesApply=CdfConnectionPropertiesApply,
+)
 AssetApply.update_forward_refs(
     AssetApply=AssetApply,
-    CdfModelApply=CdfModelApply,
+    CdfConnectionPropertiesApply=CdfConnectionPropertiesApply,
+)
+CdfConnectionProperties.update_forward_refs(
+    CdfEntityApply=CdfEntityApply,
+)
+CdfConnectionPropertiesApply.update_forward_refs(
+    CdfEntityApply=CdfEntityApply,
+)
+CdfEntity.update_forward_refs(
+    CdfConnectionPropertiesApply=CdfConnectionPropertiesApply,
 )
 CdfEntityApply.update_forward_refs(
-    CdfModelApply=CdfModelApply,
+    CdfConnectionPropertiesApply=CdfConnectionPropertiesApply,
+)
+CdfModel.update_forward_refs(
+    CdfConnectionPropertiesApply=CdfConnectionPropertiesApply,
 )
 CdfModelApply.update_forward_refs(
-    CdfEntityApply=CdfEntityApply,
+    CdfConnectionPropertiesApply=CdfConnectionPropertiesApply,
+)
+WorkItem.update_forward_refs(
+    AssetApply=AssetApply,
+    WorkOrderApply=WorkOrderApply,
 )
 WorkItemApply.update_forward_refs(
     AssetApply=AssetApply,
     WorkOrderApply=WorkOrderApply,
+)
+WorkOrder.update_forward_refs(
+    AssetApply=AssetApply,
+    WorkItemApply=WorkItemApply,
 )
 WorkOrderApply.update_forward_refs(
     AssetApply=AssetApply,
@@ -39,8 +70,12 @@ WorkOrderApply.update_forward_refs(
 )
 
 __all__ = [
+    "ResourcesApply",
     "DomainModel",
     "DomainModelApply",
+    "DomainModelList",
+    "DomainRelationApply",
+    "ResourcesApplyResult",
     "Asset",
     "AssetApply",
     "AssetList",
