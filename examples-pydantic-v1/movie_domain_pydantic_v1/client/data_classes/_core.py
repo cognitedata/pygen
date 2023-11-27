@@ -51,8 +51,8 @@ class Core(BaseModel):
     def to_pandas(self, include_instance_properties: bool = False) -> pd.Series:
         exclude = None
         if not include_instance_properties:
-            exclude = set(type(self).__bases__[0].model_fields) - {"external_id"}
-        return pd.Series(self.model_dump(exclude=exclude))
+            exclude = set(type(self).__bases__[0].__fields__) - {"external_id"}
+        return pd.Series(self.dict(exclude=exclude))
 
     def _repr_html_(self) -> str:
         """Returns HTML representation of DomainModel."""
