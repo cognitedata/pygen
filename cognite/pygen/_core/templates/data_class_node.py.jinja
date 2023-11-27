@@ -3,7 +3,8 @@ from __future__ import annotations
 import datetime{% endif %}
 {% if data_class.has_edges %}from typing import TYPE_CHECKING, Literal, Optional, Union{% else %}from typing import Literal, Optional{% if data_class.has_single_timeseries_fields %}, Union{% endif %}{% endif %}{% if not data_class.use_optional_type %}  # noqa: F401{% endif %}
 
-from cognite.client import data_modeling as dm{% if data_class.use_pydantic_field %}
+from cognite.client import data_modeling as dm{% if data_class.has_single_timeseries_fields %}
+from cognite.client.data_classes import TimeSeries as CogniteTimeSeries{% endif %}{% if data_class.use_pydantic_field %}
 {{ data_class.import_pydantic_field }}{% endif %}
 
 from ._core import (
@@ -94,7 +95,7 @@ class {{ data_class.write_name }}(DomainModelApply):
             properties["{{ field.prop_name }}"] = {% if field.is_edge %}{
                 "space":  self.space if isinstance(self.{{ field.name }}, str) else self.{{ field.name }}.space,
                 "externalId": self.{{ field.name }} if isinstance(self.{{ field.name }}, str) else self.{{ field.name }}.external_id,
-            }{% else %}self.{{ field.name }}{% if field.is_time_field %}.isoformat({% if field.is_timestamp %}timespec="milliseconds"{% endif %}){% endif %}{% endif %}{% endfor %}
+            }{% elif field.is_time_series %}self.{{ field.name }} if isinstance(self.{{ field.name }}, str) else self.{{ field.name }}.external_id{% else %}self.{{ field.name }}{% if field.is_time_field %}.isoformat({% if field.is_timestamp %}timespec="milliseconds"{% endif %}){% endif %}{% endif %}{% endfor %}
 
         if properties:
             this_node = dm.NodeApply(
@@ -126,6 +127,9 @@ class {{ data_class.write_name }}(DomainModelApply):
         if isinstance(self.{{ field.name }}, DomainModelApply):
             other_resources = self.{{ field.name }}._to_instances_apply(cache, view_by_write_class)
             resources.extend(other_resources)
+{% endfor %}{% for field in data_class.single_timeseries_fields %}
+        if isinstance(self.{{ field.name }}, CogniteTimeSeries):
+            resources.time_series.append(self.{{ field.name }})
 {% endfor %}
         return resources
 

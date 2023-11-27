@@ -4,6 +4,7 @@ import datetime
 from typing import TYPE_CHECKING, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
+from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
 from pydantic import Field
 
 from ._core import (
@@ -232,7 +233,7 @@ class AssetApply(DomainModelApply):
                 "externalId": self.parent if isinstance(self.parent, str) else self.parent.external_id,
             }
         if self.pressure is not None:
-            properties["pressure"] = self.pressure
+            properties["pressure"] = self.pressure if isinstance(self.pressure, str) else self.pressure.external_id
         if self.source_db is not None:
             properties["sourceDb"] = self.source_db
         if self.specification is not None:
@@ -274,6 +275,9 @@ class AssetApply(DomainModelApply):
         if isinstance(self.parent, DomainModelApply):
             other_resources = self.parent._to_instances_apply(cache, view_by_write_class)
             resources.extend(other_resources)
+
+        if isinstance(self.pressure, CogniteTimeSeries):
+            resources.time_series.append(self.pressure)
 
         return resources
 

@@ -4,6 +4,7 @@ import datetime
 from typing import Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
+from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
 from pydantic import Field
 
 from ._core import (
@@ -149,7 +150,9 @@ class ScenarioInstanceApply(DomainModelApply):
         if self.price_area is not None:
             properties["priceArea"] = self.price_area
         if self.price_forecast is not None:
-            properties["priceForecast"] = self.price_forecast
+            properties["priceForecast"] = (
+                self.price_forecast if isinstance(self.price_forecast, str) else self.price_forecast.external_id
+            )
         if self.scenario is not None:
             properties["scenario"] = self.scenario
         if self.start is not None:
@@ -169,6 +172,9 @@ class ScenarioInstanceApply(DomainModelApply):
             )
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
+
+        if isinstance(self.price_forecast, CogniteTimeSeries):
+            resources.time_series.append(self.price_forecast)
 
         return resources
 

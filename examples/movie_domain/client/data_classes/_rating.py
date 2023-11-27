@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Literal, Optional, Union  # noqa: F401
 
 from cognite.client import data_modeling as dm
+from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
 
 from ._core import (
     DomainModel,
@@ -89,9 +90,9 @@ class RatingApply(DomainModelApply):
 
         properties = {}
         if self.score is not None:
-            properties["score"] = self.score
+            properties["score"] = self.score if isinstance(self.score, str) else self.score.external_id
         if self.votes is not None:
-            properties["votes"] = self.votes
+            properties["votes"] = self.votes if isinstance(self.votes, str) else self.votes.external_id
 
         if properties:
             this_node = dm.NodeApply(
@@ -107,6 +108,12 @@ class RatingApply(DomainModelApply):
             )
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
+
+        if isinstance(self.score, CogniteTimeSeries):
+            resources.time_series.append(self.score)
+
+        if isinstance(self.votes, CogniteTimeSeries):
+            resources.time_series.append(self.votes)
 
         return resources
 

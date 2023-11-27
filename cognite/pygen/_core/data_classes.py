@@ -216,6 +216,10 @@ class Field(ABC):
         raise NotImplementedError()
 
     @property
+    def is_time_series(self) -> bool:
+        return False
+
+    @property
     @abstractmethod
     def is_text_field(self) -> bool:
         raise NotImplementedError()
@@ -324,6 +328,10 @@ class CDFExternalField(PrimitiveFieldCore):
     edge_api_file_name: str
     edge_api_class: str
     edge_api_attribute: str
+
+    @property
+    def is_time_series(self) -> bool:
+        return isinstance(self.prop.type, dm.TimeSeriesReference)
 
     def as_read_type_hint(self) -> str:
         return self.as_write_type_hint()
