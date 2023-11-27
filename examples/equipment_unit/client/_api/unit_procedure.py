@@ -186,8 +186,12 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_pairs=[
-                (self.work_units_edge, "work_units"),
+            edge_api_name_type_triple=[
+                (
+                    self.work_units_edge,
+                    "work_units",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.equipment_module"),
+                ),
             ],
         )
 
@@ -465,7 +469,11 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_pairs=[
-                (self.work_units_edge, "work_units"),
+            edge_api_name_type_triple=[
+                (
+                    self.work_units_edge,
+                    "work_units",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.equipment_module"),
+                ),
             ],
         )
