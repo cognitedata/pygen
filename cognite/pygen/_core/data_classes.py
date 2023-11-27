@@ -827,6 +827,22 @@ class EdgeDataClass(DataClass):
             field.prop.type,
         )
 
+    def node_parameters(self, instance_space: str) -> Iterable[FilterParameter]:
+        for class_, location in [(self.start_class, "source"), (self.end_class, "target")]:
+            yield FilterParameter(
+                name=class_.variable,
+                type_="str | list[str] | dm.NodeId | list[dm.NodeId]",
+                description=f"ID of the {location} { class_.doc_list_name}.",
+                default=None,
+            )
+            yield FilterParameter(
+                name=f"{class_.variable}_space",
+                type_="str",
+                description=f"Location of the {class_.doc_list_name}.",
+                default=f'"{instance_space}"',
+                is_nullable=False,
+            )
+
 
 @dataclass
 class EdgeWithPropertyDataClass(DataClass):
@@ -917,6 +933,22 @@ class EdgeWithPropertyDataClass(DataClass):
         else:
             return "import pydantic"
 
+    def node_parameters(self, instance_space: str) -> Iterable[FilterParameter]:
+        for class_, location in [(self.start_class, "source"), (self.end_class, "target")]:
+            yield FilterParameter(
+                name=class_.variable,
+                type_="str | list[str] | dm.NodeId | list[dm.NodeId]",
+                description=f"ID of the {location} { class_.doc_list_name}.",
+                default=None,
+            )
+            yield FilterParameter(
+                name=f"{class_.variable}_space",
+                type_="str",
+                description=f"Location of the {class_.doc_list_name}.",
+                default=f'"{instance_space}"',
+                is_nullable=False,
+            )
+
 
 @dataclass(frozen=True)
 class APIClass:
@@ -986,8 +1018,9 @@ class FilterParameter:
     name: str
     type_: str
     description: str
-    default: None = None
+    default: str | None = None
     space: str | None = None
+    is_nullable: bool = True
 
     def __post_init__(self):
         if is_reserved_word(self.name, "parameter"):
@@ -995,7 +1028,10 @@ class FilterParameter:
 
     @property
     def annotation(self) -> str:
-        return f"{self.type_} | None"
+        if self.is_nullable:
+            return f"{self.type_} | None"
+        else:
+            return self.type_
 
     @property
     def is_time(self) -> bool:
