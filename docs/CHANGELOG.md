@@ -15,7 +15,7 @@ Changes are grouped as follows
 
 ## [0.31.0] - 18-11-23
 ### Added
-* Support for `query`, see documentation for more information.
+* Support for `query`, [see documentation for more information](https://cognite-pygen.readthedocs-hosted.com/en/latest/examples/movie_domain.html#querying).
 * Support for reading and writing edges with properties.
 * Support for writing TimeSeries when calling `.apply` on a generated SDK.
 ### Changed
