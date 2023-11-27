@@ -154,7 +154,7 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
             node_ids = [(space, ext_id) for ext_id in external_id]
 
         instances = self._client.data_modeling.instances.retrieve(nodes=node_ids, sources=self._sources)
-        nodes = self._class_list([self._class_type.from_node(node) for node in instances.nodes])
+        nodes = self._class_list([self._class_type.from_instance(node) for node in instances.nodes])
 
         if retrieve_edges:
             self._retrieve_and_set_edge_types(nodes, edge_api_name_pairs)
@@ -180,7 +180,7 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
             properties = [properties_by_field.get(prop, prop) for prop in properties]
 
         nodes = self._client.data_modeling.instances.search(view_id, query, "node", properties, filter_, limit)
-        return self._class_list([self._class_type.from_node(node) for node in nodes])
+        return self._class_list([self._class_type.from_instance(node) for node in nodes])
 
     @overload
     def _aggregate(
