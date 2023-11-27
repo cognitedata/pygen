@@ -209,6 +209,7 @@ class EquipmentSDKFiles:
     core_data = data_classes / "_core.py"
     start_end_time_data = data_classes / "_start_end_time.py"
     unit_procedure_data = data_classes / "_unit_procedure.py"
+    equipment_module_data = data_classes / "_equipment_module.py"
 
     api = client_dir / "_api"
     equipment_api = api / "equipment_module.py"

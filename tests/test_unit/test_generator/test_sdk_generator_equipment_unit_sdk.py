@@ -99,6 +99,20 @@ def test_generate_data_class_start_end_time(
     assert actual == expected
 
 
+def test_generate_data_class_equipment_module(
+    equipment_module_api_generator: APIGenerator, pygen_config: PygenConfig, code_formatter: CodeFormatter
+):
+    # Arrange
+    expected = EquipmentSDKFiles.equipment_module_data.read_text()
+
+    # Act
+    actual = equipment_module_api_generator.generate_data_class_file()
+    actual = code_formatter.format_code(actual)
+
+    # Assert
+    assert actual == expected
+
+
 def test_create_view_api_classes_equipment_module(
     equipment_module_api_generator: APIGenerator, code_formatter: CodeFormatter
 ):

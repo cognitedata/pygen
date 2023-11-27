@@ -13,6 +13,7 @@ from ._core import (
     DomainModelList,
     DomainRelationApply,
     ResourcesApply,
+    TimeSeries,
 )
 
 if TYPE_CHECKING:
@@ -23,9 +24,7 @@ if TYPE_CHECKING:
 __all__ = ["Asset", "AssetApply", "AssetList", "AssetApplyList", "AssetFields", "AssetTextFields"]
 
 
-AssetTextFields = Literal[
-    "description", "documents", "measurements", "metrics", "pressure", "source_db", "specification", "tag", "trajectory"
-]
+AssetTextFields = Literal["description", "documents", "measurements", "source_db", "specification", "tag", "trajectory"]
 AssetFields = Literal[
     "area_id",
     "category_id",
@@ -106,13 +105,13 @@ class Asset(DomainModel):
     is_active: Optional[bool] = Field(None, alias="isActive")
     is_critical_line: Optional[bool] = Field(None, alias="isCriticalLine")
     measurements: Optional[list[str]] = None
-    metrics: Optional[list[str]] = None
+    metrics: Optional[list[TimeSeries]] = None
     parent: Union[Asset, str, None] = Field(None, repr=False)
-    pressure: Optional[str] = None
+    pressure: Union[TimeSeries, str, None] = None
     source_db: Optional[str] = Field(None, alias="sourceDb")
-    specification: Optional[str] = None
+    specification: Union[str, None] = None
     tag: Optional[str] = None
-    trajectory: Optional[str] = None
+    trajectory: Union[str, None] = None
     updated_date: Optional[datetime.datetime] = Field(None, alias="updatedDate")
 
     def as_apply(self) -> AssetApply:
@@ -184,13 +183,13 @@ class AssetApply(DomainModelApply):
     is_active: Optional[bool] = Field(None, alias="isActive")
     is_critical_line: Optional[bool] = Field(None, alias="isCriticalLine")
     measurements: Optional[list[str]] = None
-    metrics: Optional[list[str]] = None
+    metrics: Optional[list[TimeSeries]] = None
     parent: Union[AssetApply, str, None] = Field(None, repr=False)
-    pressure: Optional[str] = None
+    pressure: Union[TimeSeries, str, None] = None
     source_db: Optional[str] = Field(None, alias="sourceDb")
-    specification: Optional[str] = None
+    specification: Union[str, None] = None
     tag: Optional[str] = None
-    trajectory: Optional[str] = None
+    trajectory: Union[str, None] = None
     updated_date: Optional[datetime.datetime] = Field(None, alias="updatedDate")
 
     def _to_instances_apply(

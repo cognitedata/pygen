@@ -1,7 +1,7 @@
 from __future__ import annotations
 {% if data_class.has_time_field %}
 import datetime{% endif %}
-{% if data_class.has_edges %}from typing import TYPE_CHECKING, Literal, Optional, Union{% else %}from typing import Literal, Optional{% endif %}{% if not data_class.use_optional_type %}  # noqa: F401{% endif %}
+{% if data_class.has_edges %}from typing import TYPE_CHECKING, Literal, Optional, Union{% else %}from typing import Literal, Optional{% if data_class.has_single_timeseries_fields %}, Union{% endif %}{% endif %}{% if not data_class.use_optional_type %}  # noqa: F401{% endif %}
 
 from cognite.client import data_modeling as dm{% if data_class.use_pydantic_field %}
 {{ data_class.import_pydantic_field }}{% endif %}
@@ -12,7 +12,8 @@ from ._core import (
     DomainModelApplyList,
     DomainModelList,
     DomainRelationApply,
-    ResourcesApply,
+    ResourcesApply,{% if data_class.has_single_timeseries_fields %}
+    TimeSeries,{% endif %}
 )
 {% if data_class.has_edges %}
 if TYPE_CHECKING:{% for dependency_class in data_class.dependencies %}

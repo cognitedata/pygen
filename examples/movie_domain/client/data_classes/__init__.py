@@ -42,7 +42,7 @@ from ._nomination import (
     NominationTextFields,
 )
 from ._person import Person, PersonApply, PersonApplyList, PersonFields, PersonList, PersonTextFields
-from ._rating import Rating, RatingApply, RatingApplyList, RatingFields, RatingList, RatingTextFields
+from ._rating import Rating, RatingApply, RatingApplyList, RatingFields, RatingList
 from ._role import Role, RoleApply, RoleApplyList, RoleFields, RoleList
 
 Actor.model_rebuild()
@@ -114,7 +114,6 @@ __all__ = [
     "RatingList",
     "RatingApplyList",
     "RatingFields",
-    "RatingTextFields",
     "Role",
     "RoleApply",
     "RoleList",

@@ -66,7 +66,7 @@ class Case(DomainModel):
 
     space: str = "IntegrationTestsImmutable"
     arguments: Optional[str] = None
-    bid: Optional[str] = None
+    bid: Union[str, None] = None
     bid_history: Optional[list[str]] = None
     commands: Union[CommandConfig, str, None] = Field(None, repr=False)
     cut_files: Optional[list[str]] = None
@@ -120,7 +120,7 @@ class CaseApply(DomainModelApply):
 
     space: str = "IntegrationTestsImmutable"
     arguments: Optional[str] = None
-    bid: Optional[str] = None
+    bid: Union[str, None] = None
     bid_history: Optional[list[str]] = None
     commands: Union[CommandConfigApply, str, None] = Field(None, repr=False)
     cut_files: Optional[list[str]] = None

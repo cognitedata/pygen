@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, Optional
+from typing import Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -12,6 +12,7 @@ from ._core import (
     DomainModelList,
     DomainRelationApply,
     ResourcesApply,
+    TimeSeries,
 )
 
 
@@ -25,7 +26,7 @@ __all__ = [
 ]
 
 
-EquipmentModuleTextFields = Literal["description", "name", "sensor_value", "type_"]
+EquipmentModuleTextFields = Literal["description", "name", "type_"]
 EquipmentModuleFields = Literal["description", "name", "sensor_value", "type_"]
 
 _EQUIPMENTMODULE_PROPERTIES_BY_FIELD = {
@@ -57,7 +58,7 @@ class EquipmentModule(DomainModel):
     space: str = "IntegrationTestsImmutable"
     description: Optional[str] = None
     name: Optional[str] = None
-    sensor_value: Optional[str] = None
+    sensor_value: Union[TimeSeries, str, None] = None
     type_: Optional[str] = Field(None, alias="type")
 
     def as_apply(self) -> EquipmentModuleApply:
@@ -93,7 +94,7 @@ class EquipmentModuleApply(DomainModelApply):
     space: str = "IntegrationTestsImmutable"
     description: Optional[str] = None
     name: Optional[str] = None
-    sensor_value: Optional[str] = None
+    sensor_value: Union[TimeSeries, str, None] = None
     type_: Optional[str] = Field(None, alias="type")
 
     def _to_instances_apply(

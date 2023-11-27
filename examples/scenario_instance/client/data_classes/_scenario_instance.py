@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import Literal, Optional
+from typing import Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -13,6 +13,7 @@ from ._core import (
     DomainModelList,
     DomainRelationApply,
     ResourcesApply,
+    TimeSeries,
 )
 
 
@@ -26,7 +27,7 @@ __all__ = [
 ]
 
 
-ScenarioInstanceTextFields = Literal["aggregation", "country", "market", "price_area", "price_forecast", "scenario"]
+ScenarioInstanceTextFields = Literal["aggregation", "country", "market", "price_area", "scenario"]
 ScenarioInstanceFields = Literal[
     "aggregation", "country", "instance", "market", "price_area", "price_forecast", "scenario", "start"
 ]
@@ -71,7 +72,7 @@ class ScenarioInstance(DomainModel):
     instance: Optional[datetime.datetime] = None
     market: Optional[str] = None
     price_area: Optional[str] = Field(None, alias="priceArea")
-    price_forecast: Optional[str] = Field(None, alias="priceForecast")
+    price_forecast: Union[TimeSeries, str, None] = Field(None, alias="priceForecast")
     scenario: Optional[str] = None
     start: Optional[datetime.datetime] = None
 
@@ -119,7 +120,7 @@ class ScenarioInstanceApply(DomainModelApply):
     instance: Optional[datetime.datetime] = None
     market: Optional[str] = None
     price_area: Optional[str] = Field(None, alias="priceArea")
-    price_forecast: Optional[str] = Field(None, alias="priceForecast")
+    price_forecast: Union[TimeSeries, str, None] = Field(None, alias="priceForecast")
     scenario: Optional[str] = None
     start: Optional[datetime.datetime] = None
 

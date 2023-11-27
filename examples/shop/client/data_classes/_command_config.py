@@ -51,7 +51,7 @@ class CommandConfig(DomainModel):
 
     space: str = "IntegrationTestsImmutable"
     configs: Optional[list[str]] = None
-    source: Optional[str] = None
+    source: Union[str, None] = None
 
     def as_apply(self) -> CommandConfigApply:
         """Convert this read version of command config to the writing version."""
@@ -81,7 +81,7 @@ class CommandConfigApply(DomainModelApply):
 
     space: str = "IntegrationTestsImmutable"
     configs: list[str]
-    source: Optional[str] = None
+    source: Union[str, None] = None
 
     def _to_instances_apply(
         self,

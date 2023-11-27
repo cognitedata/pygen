@@ -15,7 +15,6 @@ from movie_domain.client.data_classes import (
     RatingFields,
     RatingList,
     RatingApplyList,
-    RatingTextFields,
 )
 from movie_domain.client.data_classes._rating import (
     _RATING_PROPERTIES_BY_FIELD,
@@ -163,45 +162,6 @@ class RatingAPI(NodeAPI[Rating, RatingApply, RatingList]):
         """
         return self._retrieve(external_id, space)
 
-    def search(
-        self,
-        query: str,
-        properties: RatingTextFields | Sequence[RatingTextFields] | None = None,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit: int = DEFAULT_LIMIT_READ,
-        filter: dm.Filter | None = None,
-    ) -> RatingList:
-        """Search ratings
-
-        Args:
-            query: The search query,
-            properties: The property to search, if nothing is passed all text fields will be searched.
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            limit: Maximum number of ratings to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-
-        Returns:
-            Search results ratings matching the query.
-
-        Examples:
-
-           Search for 'my_rating' in all text properties:
-
-                >>> from movie_domain.client import MovieClient
-                >>> client = MovieClient()
-                >>> ratings = client.rating.search('my_rating')
-
-        """
-        filter_ = _create_rating_filter(
-            self._view_id,
-            external_id_prefix,
-            space,
-            filter,
-        )
-        return self._search(self._view_id, query, _RATING_PROPERTIES_BY_FIELD, properties, filter_, limit)
-
     @overload
     def aggregate(
         self,
@@ -211,8 +171,6 @@ class RatingAPI(NodeAPI[Rating, RatingApply, RatingList]):
         | Sequence[dm.aggregations.MetricAggregation],
         property: RatingFields | Sequence[RatingFields] | None = None,
         group_by: None = None,
-        query: str | None = None,
-        search_properties: RatingTextFields | Sequence[RatingTextFields] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -229,8 +187,6 @@ class RatingAPI(NodeAPI[Rating, RatingApply, RatingList]):
         | Sequence[dm.aggregations.MetricAggregation],
         property: RatingFields | Sequence[RatingFields] | None = None,
         group_by: RatingFields | Sequence[RatingFields] = None,
-        query: str | None = None,
-        search_properties: RatingTextFields | Sequence[RatingTextFields] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -246,8 +202,6 @@ class RatingAPI(NodeAPI[Rating, RatingApply, RatingList]):
         | Sequence[dm.aggregations.MetricAggregation],
         property: RatingFields | Sequence[RatingFields] | None = None,
         group_by: RatingFields | Sequence[RatingFields] | None = None,
-        query: str | None = None,
-        search_property: RatingTextFields | Sequence[RatingTextFields] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -259,8 +213,6 @@ class RatingAPI(NodeAPI[Rating, RatingApply, RatingList]):
             aggregate: The aggregation to perform.
             property: The property to perform aggregation on.
             group_by: The property to group by when doing the aggregation.
-            query: The query to search for in the text field.
-            search_property: The text field to search in.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of ratings to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -291,8 +243,8 @@ class RatingAPI(NodeAPI[Rating, RatingApply, RatingList]):
             _RATING_PROPERTIES_BY_FIELD,
             property,
             group_by,
-            query,
-            search_property,
+            None,
+            None,
             limit,
             filter_,
         )
@@ -301,8 +253,6 @@ class RatingAPI(NodeAPI[Rating, RatingApply, RatingList]):
         self,
         property: RatingFields,
         interval: float,
-        query: str | None = None,
-        search_property: RatingTextFields | Sequence[RatingTextFields] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -313,8 +263,6 @@ class RatingAPI(NodeAPI[Rating, RatingApply, RatingList]):
         Args:
             property: The property to use as the value in the histogram.
             interval: The interval to use for the histogram bins.
-            query: The query to search for in the text field.
-            search_property: The text field to search in.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of ratings to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -335,8 +283,8 @@ class RatingAPI(NodeAPI[Rating, RatingApply, RatingList]):
             property,
             interval,
             _RATING_PROPERTIES_BY_FIELD,
-            query,
-            search_property,
+            None,
+            None,
             limit,
             filter_,
         )

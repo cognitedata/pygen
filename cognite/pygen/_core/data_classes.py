@@ -326,18 +326,18 @@ class CDFExternalField(PrimitiveFieldCore):
     edge_api_attribute: str
 
     def as_read_type_hint(self) -> str:
-        if self.need_alias:
-            return f'Optional[{self.type_}] = {self.pydantic_field}(None, alias="{self.prop_name}")'
-        else:
-            return f"Optional[{self.type_}] = None"
+        return self.as_write_type_hint()
 
     def as_write_type_hint(self) -> str:
-        out_type = self.type_
+        type_ = self.type_
+        if type_ != "str":
+            type_ = f"{type_}, str"
+
         # CDF External Fields are always nullable
         if self.need_alias:
-            out_type = f'Optional[{out_type}] = {self.pydantic_field}(None, alias="{self.prop_name}")'
+            out_type = f'Union[{type_}, None] = {self.pydantic_field}(None, alias="{self.prop_name}")'
         else:
-            out_type = f"Optional[{out_type}] = None"
+            out_type = f"Union[{type_}, None] = None"
         return out_type
 
 
@@ -1338,6 +1338,8 @@ def _to_python_type(type_: dm.DirectRelationReference | dm.PropertyType) -> str:
         out_type = "datetime.datetime"
     elif isinstance(type_, dm.Json):
         out_type = "dict"
+    elif isinstance(type_, dm.TimeSeriesReference):
+        out_type = "TimeSeries"
     elif isinstance(type_, (dm.Text, dm.DirectRelation, dm.CDFExternalIdReference, dm.DirectRelationReference)):
         out_type = "str"
     else:

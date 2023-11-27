@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, Optional
+from typing import Literal, Optional, Union  # noqa: F401
 
 from cognite.client import data_modeling as dm
 
@@ -11,13 +11,11 @@ from ._core import (
     DomainModelList,
     DomainRelationApply,
     ResourcesApply,
+    TimeSeries,
 )
 
 
-__all__ = ["Rating", "RatingApply", "RatingList", "RatingApplyList", "RatingFields", "RatingTextFields"]
-
-
-RatingTextFields = Literal["score", "votes"]
+__all__ = ["Rating", "RatingApply", "RatingList", "RatingApplyList", "RatingFields"]
 RatingFields = Literal["score", "votes"]
 
 _RATING_PROPERTIES_BY_FIELD = {
@@ -43,8 +41,8 @@ class Rating(DomainModel):
     """
 
     space: str = "IntegrationTestsImmutable"
-    score: Optional[str] = None
-    votes: Optional[str] = None
+    score: Union[TimeSeries, str, None] = None
+    votes: Union[TimeSeries, str, None] = None
 
     def as_apply(self) -> RatingApply:
         """Convert this read version of rating to the writing version."""
@@ -73,8 +71,8 @@ class RatingApply(DomainModelApply):
     """
 
     space: str = "IntegrationTestsImmutable"
-    score: Optional[str] = None
-    votes: Optional[str] = None
+    score: Union[TimeSeries, str, None] = None
+    votes: Union[TimeSeries, str, None] = None
 
     def _to_instances_apply(
         self,
