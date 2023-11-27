@@ -17,8 +17,9 @@ from ._command_config import (
 )
 
 Case.update_forward_refs(
-    CommandConfigApply=CommandConfigApply,
+    CommandConfig=CommandConfig,
 )
+
 CaseApply.update_forward_refs(
     CommandConfigApply=CommandConfigApply,
 )

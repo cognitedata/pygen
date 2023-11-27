@@ -60,49 +60,50 @@ from ._value_transformation import (
 )
 
 Bid.update_forward_refs(
-    MarketApply=MarketApply,
-)
-BidApply.update_forward_refs(
-    MarketApply=MarketApply,
+    Market=Market,
 )
 CogBid.update_forward_refs(
+    Market=Market,
+)
+CogProcess.update_forward_refs(
+    Bid=Bid,
+    DateTransformationPair=DateTransformationPair,
+    ValueTransformation=ValueTransformation,
+)
+DateTransformationPair.update_forward_refs(
+    DateTransformation=DateTransformation,
+)
+Process.update_forward_refs(
+    Bid=Bid,
+)
+PygenBid.update_forward_refs(
+    Market=Market,
+)
+PygenProcess.update_forward_refs(
+    Bid=Bid,
+    DateTransformationPair=DateTransformationPair,
+    ValueTransformation=ValueTransformation,
+)
+
+BidApply.update_forward_refs(
     MarketApply=MarketApply,
 )
 CogBidApply.update_forward_refs(
     MarketApply=MarketApply,
-)
-CogProcess.update_forward_refs(
-    BidApply=BidApply,
-    DateTransformationPairApply=DateTransformationPairApply,
-    ValueTransformationApply=ValueTransformationApply,
 )
 CogProcessApply.update_forward_refs(
     BidApply=BidApply,
     DateTransformationPairApply=DateTransformationPairApply,
     ValueTransformationApply=ValueTransformationApply,
 )
-DateTransformationPair.update_forward_refs(
-    DateTransformationApply=DateTransformationApply,
-)
 DateTransformationPairApply.update_forward_refs(
     DateTransformationApply=DateTransformationApply,
-)
-Process.update_forward_refs(
-    BidApply=BidApply,
 )
 ProcessApply.update_forward_refs(
     BidApply=BidApply,
 )
-PygenBid.update_forward_refs(
-    MarketApply=MarketApply,
-)
 PygenBidApply.update_forward_refs(
     MarketApply=MarketApply,
-)
-PygenProcess.update_forward_refs(
-    BidApply=BidApply,
-    DateTransformationPairApply=DateTransformationPairApply,
-    ValueTransformationApply=ValueTransformationApply,
 )
 PygenProcessApply.update_forward_refs(
     BidApply=BidApply,

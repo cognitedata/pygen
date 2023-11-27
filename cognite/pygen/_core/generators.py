@@ -251,16 +251,23 @@ class MultiAPIGenerator:
             ),
             key=lambda d: d.read_name,
         )
-        dependencies_by_data_class_name: dict[str, list[DataClass]] = {}
+        dependencies_by_data_class_read_name: dict[str, list[DataClass]] = {}
+        dependencies_by_data_class_write_name: dict[str, list[DataClass]] = {}
         for data_class in data_classes_with_dependencies:
             dependencies = sorted(data_class.dependencies, key=lambda d: d.read_name)
-            dependencies_by_data_class_name[data_class.read_name] = dependencies
-            dependencies_by_data_class_name[data_class.write_name] = dependencies
+            dependencies_by_data_class_read_name[data_class.read_name] = dependencies
+            dependencies_by_data_class_write_name[data_class.write_name] = dependencies
 
         return (
             data_class_init.render(
                 classes=sorted((api.data_class for api in self.sub_apis), key=lambda d: d.read_name),
-                dependencies_by_data_class_name=dependencies_by_data_class_name,
+                # Pydantic v1 needs read and write name separated, while v2 does not.
+                dependencies_by_data_class_read_name=dependencies_by_data_class_read_name,
+                dependencies_by_data_class_write_name=dependencies_by_data_class_write_name,
+                # Pydantic v2 we just need a list of the names
+                dependencies_by_data_class_name=sorted(
+                    itertools.chain(dependencies_by_data_class_read_name, dependencies_by_data_class_write_name)
+                ),
                 top_level_package=self.top_level_package,
                 import_file={
                     "v2": "data_classes_init_import.py.jinja",

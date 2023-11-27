@@ -1,4 +1,8 @@
-{% for write_name, dependencies in dependencies_by_data_class_name.items() %}{{ write_name }}.update_forward_refs({% for dependency in dependencies %}
+{% for read_name, dependencies in dependencies_by_data_class_read_name.items() %}{{ read_name }}.update_forward_refs({% for dependency in dependencies %}
+    {{ dependency.read_name }}={{ dependency.read_name }},{%  endfor %}
+)
+{% endfor %}
+{% for write_name, dependencies in dependencies_by_data_class_write_name.items() %}{{ write_name }}.update_forward_refs({% for dependency in dependencies %}
     {{ dependency.write_name }}={{ dependency.write_name }},{%  endfor %}
 )
 {% endfor %}

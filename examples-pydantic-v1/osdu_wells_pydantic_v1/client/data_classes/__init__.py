@@ -242,26 +242,110 @@ from ._wgs_84_coordinates import (
 )
 
 AsIngestedCoordinates.update_forward_refs(
-    FeaturesApply=FeaturesApply,
-)
-AsIngestedCoordinatesApply.update_forward_refs(
-    FeaturesApply=FeaturesApply,
+    Features=Features,
 )
 Features.update_forward_refs(
-    GeometryApply=GeometryApply,
+    Geometry=Geometry,
+)
+GeographicBottomHoleLocation.update_forward_refs(
+    AsIngestedCoordinates=AsIngestedCoordinates,
+    WgsCoordinates=WgsCoordinates,
+)
+ProjectedBottomHoleLocation.update_forward_refs(
+    AsIngestedCoordinates=AsIngestedCoordinates,
+    WgsCoordinates=WgsCoordinates,
+)
+SpatialArea.update_forward_refs(
+    AsIngestedCoordinates=AsIngestedCoordinates,
+    WgsCoordinates=WgsCoordinates,
+)
+SpatialLocation.update_forward_refs(
+    AsIngestedCoordinates=AsIngestedCoordinates,
+    WgsCoordinates=WgsCoordinates,
+)
+SpatialPoint.update_forward_refs(
+    AsIngestedCoordinates=AsIngestedCoordinates,
+    WgsCoordinates=WgsCoordinates,
+)
+TechnicalAssurances.update_forward_refs(
+    AcceptableUsage=AcceptableUsage,
+    Reviewers=Reviewers,
+    UnacceptableUsage=UnacceptableUsage,
+)
+Well.update_forward_refs(
+    Acl=Acl,
+    Ancestry=Ancestry,
+    Legal=Legal,
+    Meta=Meta,
+    Tags=Tags,
+    WellData=WellData,
+)
+WellData.update_forward_refs(
+    FacilityEvents=FacilityEvents,
+    FacilityOperators=FacilityOperators,
+    FacilitySpecifications=FacilitySpecifications,
+    FacilityStates=FacilityStates,
+    GeoContexts=GeoContexts,
+    HistoricalInterests=HistoricalInterests,
+    NameAliases=NameAliases,
+    SpatialLocation=SpatialLocation,
+    TechnicalAssurances=TechnicalAssurances,
+    VerticalMeasurements=VerticalMeasurements,
+)
+Wellbore.update_forward_refs(
+    Acl=Acl,
+    Ancestry=Ancestry,
+    Legal=Legal,
+    Meta=Meta,
+    Tags=Tags,
+    WellboreData=WellboreData,
+)
+WellboreData.update_forward_refs(
+    DrillingReasons=DrillingReasons,
+    FacilityEvents=FacilityEvents,
+    FacilityOperators=FacilityOperators,
+    FacilitySpecifications=FacilitySpecifications,
+    FacilityStates=FacilityStates,
+    GeoContexts=GeoContexts,
+    GeographicBottomHoleLocation=GeographicBottomHoleLocation,
+    HistoricalInterests=HistoricalInterests,
+    NameAliases=NameAliases,
+    ProjectedBottomHoleLocation=ProjectedBottomHoleLocation,
+    SpatialLocation=SpatialLocation,
+    TechnicalAssurances=TechnicalAssurances,
+    VerticalMeasurements=VerticalMeasurements,
+    WellboreCosts=WellboreCosts,
+)
+WellboreTrajectory.update_forward_refs(
+    Acl=Acl,
+    Ancestry=Ancestry,
+    Legal=Legal,
+    Meta=Meta,
+    Tags=Tags,
+    WellboreTrajectoryData=WellboreTrajectoryData,
+)
+WellboreTrajectoryData.update_forward_refs(
+    Artefacts=Artefacts,
+    AvailableTrajectoryStationProperties=AvailableTrajectoryStationProperties,
+    GeoContexts=GeoContexts,
+    LineageAssertions=LineageAssertions,
+    NameAliases=NameAliases,
+    SpatialArea=SpatialArea,
+    SpatialPoint=SpatialPoint,
+    TechnicalAssurances=TechnicalAssurances,
+    VerticalMeasurement=VerticalMeasurement,
+)
+WgsCoordinates.update_forward_refs(
+    Features=Features,
+)
+
+AsIngestedCoordinatesApply.update_forward_refs(
+    FeaturesApply=FeaturesApply,
 )
 FeaturesApply.update_forward_refs(
     GeometryApply=GeometryApply,
 )
-GeographicBottomHoleLocation.update_forward_refs(
-    AsIngestedCoordinatesApply=AsIngestedCoordinatesApply,
-    WgsCoordinatesApply=WgsCoordinatesApply,
-)
 GeographicBottomHoleLocationApply.update_forward_refs(
-    AsIngestedCoordinatesApply=AsIngestedCoordinatesApply,
-    WgsCoordinatesApply=WgsCoordinatesApply,
-)
-ProjectedBottomHoleLocation.update_forward_refs(
     AsIngestedCoordinatesApply=AsIngestedCoordinatesApply,
     WgsCoordinatesApply=WgsCoordinatesApply,
 )
@@ -269,15 +353,7 @@ ProjectedBottomHoleLocationApply.update_forward_refs(
     AsIngestedCoordinatesApply=AsIngestedCoordinatesApply,
     WgsCoordinatesApply=WgsCoordinatesApply,
 )
-SpatialArea.update_forward_refs(
-    AsIngestedCoordinatesApply=AsIngestedCoordinatesApply,
-    WgsCoordinatesApply=WgsCoordinatesApply,
-)
 SpatialAreaApply.update_forward_refs(
-    AsIngestedCoordinatesApply=AsIngestedCoordinatesApply,
-    WgsCoordinatesApply=WgsCoordinatesApply,
-)
-SpatialLocation.update_forward_refs(
     AsIngestedCoordinatesApply=AsIngestedCoordinatesApply,
     WgsCoordinatesApply=WgsCoordinatesApply,
 )
@@ -285,31 +361,14 @@ SpatialLocationApply.update_forward_refs(
     AsIngestedCoordinatesApply=AsIngestedCoordinatesApply,
     WgsCoordinatesApply=WgsCoordinatesApply,
 )
-SpatialPoint.update_forward_refs(
-    AsIngestedCoordinatesApply=AsIngestedCoordinatesApply,
-    WgsCoordinatesApply=WgsCoordinatesApply,
-)
 SpatialPointApply.update_forward_refs(
     AsIngestedCoordinatesApply=AsIngestedCoordinatesApply,
     WgsCoordinatesApply=WgsCoordinatesApply,
-)
-TechnicalAssurances.update_forward_refs(
-    AcceptableUsageApply=AcceptableUsageApply,
-    ReviewersApply=ReviewersApply,
-    UnacceptableUsageApply=UnacceptableUsageApply,
 )
 TechnicalAssurancesApply.update_forward_refs(
     AcceptableUsageApply=AcceptableUsageApply,
     ReviewersApply=ReviewersApply,
     UnacceptableUsageApply=UnacceptableUsageApply,
-)
-Well.update_forward_refs(
-    AclApply=AclApply,
-    AncestryApply=AncestryApply,
-    LegalApply=LegalApply,
-    MetaApply=MetaApply,
-    TagsApply=TagsApply,
-    WellDataApply=WellDataApply,
 )
 WellApply.update_forward_refs(
     AclApply=AclApply,
@@ -318,18 +377,6 @@ WellApply.update_forward_refs(
     MetaApply=MetaApply,
     TagsApply=TagsApply,
     WellDataApply=WellDataApply,
-)
-WellData.update_forward_refs(
-    FacilityEventsApply=FacilityEventsApply,
-    FacilityOperatorsApply=FacilityOperatorsApply,
-    FacilitySpecificationsApply=FacilitySpecificationsApply,
-    FacilityStatesApply=FacilityStatesApply,
-    GeoContextsApply=GeoContextsApply,
-    HistoricalInterestsApply=HistoricalInterestsApply,
-    NameAliasesApply=NameAliasesApply,
-    SpatialLocationApply=SpatialLocationApply,
-    TechnicalAssurancesApply=TechnicalAssurancesApply,
-    VerticalMeasurementsApply=VerticalMeasurementsApply,
 )
 WellDataApply.update_forward_refs(
     FacilityEventsApply=FacilityEventsApply,
@@ -343,14 +390,6 @@ WellDataApply.update_forward_refs(
     TechnicalAssurancesApply=TechnicalAssurancesApply,
     VerticalMeasurementsApply=VerticalMeasurementsApply,
 )
-Wellbore.update_forward_refs(
-    AclApply=AclApply,
-    AncestryApply=AncestryApply,
-    LegalApply=LegalApply,
-    MetaApply=MetaApply,
-    TagsApply=TagsApply,
-    WellboreDataApply=WellboreDataApply,
-)
 WellboreApply.update_forward_refs(
     AclApply=AclApply,
     AncestryApply=AncestryApply,
@@ -358,22 +397,6 @@ WellboreApply.update_forward_refs(
     MetaApply=MetaApply,
     TagsApply=TagsApply,
     WellboreDataApply=WellboreDataApply,
-)
-WellboreData.update_forward_refs(
-    DrillingReasonsApply=DrillingReasonsApply,
-    FacilityEventsApply=FacilityEventsApply,
-    FacilityOperatorsApply=FacilityOperatorsApply,
-    FacilitySpecificationsApply=FacilitySpecificationsApply,
-    FacilityStatesApply=FacilityStatesApply,
-    GeoContextsApply=GeoContextsApply,
-    GeographicBottomHoleLocationApply=GeographicBottomHoleLocationApply,
-    HistoricalInterestsApply=HistoricalInterestsApply,
-    NameAliasesApply=NameAliasesApply,
-    ProjectedBottomHoleLocationApply=ProjectedBottomHoleLocationApply,
-    SpatialLocationApply=SpatialLocationApply,
-    TechnicalAssurancesApply=TechnicalAssurancesApply,
-    VerticalMeasurementsApply=VerticalMeasurementsApply,
-    WellboreCostsApply=WellboreCostsApply,
 )
 WellboreDataApply.update_forward_refs(
     DrillingReasonsApply=DrillingReasonsApply,
@@ -391,14 +414,6 @@ WellboreDataApply.update_forward_refs(
     VerticalMeasurementsApply=VerticalMeasurementsApply,
     WellboreCostsApply=WellboreCostsApply,
 )
-WellboreTrajectory.update_forward_refs(
-    AclApply=AclApply,
-    AncestryApply=AncestryApply,
-    LegalApply=LegalApply,
-    MetaApply=MetaApply,
-    TagsApply=TagsApply,
-    WellboreTrajectoryDataApply=WellboreTrajectoryDataApply,
-)
 WellboreTrajectoryApply.update_forward_refs(
     AclApply=AclApply,
     AncestryApply=AncestryApply,
@@ -406,17 +421,6 @@ WellboreTrajectoryApply.update_forward_refs(
     MetaApply=MetaApply,
     TagsApply=TagsApply,
     WellboreTrajectoryDataApply=WellboreTrajectoryDataApply,
-)
-WellboreTrajectoryData.update_forward_refs(
-    ArtefactsApply=ArtefactsApply,
-    AvailableTrajectoryStationPropertiesApply=AvailableTrajectoryStationPropertiesApply,
-    GeoContextsApply=GeoContextsApply,
-    LineageAssertionsApply=LineageAssertionsApply,
-    NameAliasesApply=NameAliasesApply,
-    SpatialAreaApply=SpatialAreaApply,
-    SpatialPointApply=SpatialPointApply,
-    TechnicalAssurancesApply=TechnicalAssurancesApply,
-    VerticalMeasurementApply=VerticalMeasurementApply,
 )
 WellboreTrajectoryDataApply.update_forward_refs(
     ArtefactsApply=ArtefactsApply,
@@ -428,9 +432,6 @@ WellboreTrajectoryDataApply.update_forward_refs(
     SpatialPointApply=SpatialPointApply,
     TechnicalAssurancesApply=TechnicalAssurancesApply,
     VerticalMeasurementApply=VerticalMeasurementApply,
-)
-WgsCoordinates.update_forward_refs(
-    FeaturesApply=FeaturesApply,
 )
 WgsCoordinatesApply.update_forward_refs(
     FeaturesApply=FeaturesApply,

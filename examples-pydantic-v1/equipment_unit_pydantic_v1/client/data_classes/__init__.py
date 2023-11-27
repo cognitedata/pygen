@@ -31,13 +31,14 @@ from ._unit_procedure import (
 )
 
 StartEndTime.update_forward_refs(
-    EquipmentModuleApply=EquipmentModuleApply,
-)
-StartEndTimeApply.update_forward_refs(
-    EquipmentModuleApply=EquipmentModuleApply,
+    EquipmentModule=EquipmentModule,
 )
 UnitProcedure.update_forward_refs(
-    StartEndTimeApply=StartEndTimeApply,
+    StartEndTime=StartEndTime,
+)
+
+StartEndTimeApply.update_forward_refs(
+    EquipmentModuleApply=EquipmentModuleApply,
 )
 UnitProcedureApply.update_forward_refs(
     StartEndTimeApply=StartEndTimeApply,
