@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Literal, Optional, Union  # noqa: F401
 
 from cognite.client import data_modeling as dm
-from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
+from cognite.client.data_classes import TimeSeries
 
 from ._core import (
     DomainModel,
@@ -12,7 +12,6 @@ from ._core import (
     DomainModelList,
     DomainRelationApply,
     ResourcesApply,
-    TimeSeries,
 )
 
 

@@ -209,7 +209,7 @@ class MultiAPIGenerator:
         sdk = {(api_dir / "__init__.py"): ""}
         for api in self.sub_apis:
             file_name = api.api_class.file_name
-            sdk[data_classes_dir / f"_{file_name}.py"] = api.generate_data_class_file()
+            sdk[data_classes_dir / f"_{file_name}.py"] = api.generate_data_class_file(self.pydantic_version == "v2")
             sdk[api_dir / f"{file_name}.py"] = api.generate_api_file(self.top_level_package, self.client_name)
             sdk[api_dir / f"{api.data_class.query_file_name}.py"] = api.generate_api_query_file(
                 self.top_level_package, self.client_name
@@ -283,7 +283,7 @@ class APIGenerator:
         # List method cannot be generated here, as we need all data class fields to bo updated first.
         self._config = config
 
-    def generate_data_class_file(self) -> str:
+    def generate_data_class_file(self, is_pydantic_v2: bool) -> str:
         if isinstance(self.data_class, NodeDataClass):
             type_data = self._env.get_template("data_class_node.py.jinja")
         elif isinstance(self.data_class, EdgeWithPropertyDataClass):
@@ -297,6 +297,7 @@ class APIGenerator:
                 space=self.view_identifier.space,
                 list_method=self.data_class.list_method,
                 instance_space=self.view_identifier.space,
+                is_pydantic_v2=is_pydantic_v2,
             )
             + "\n"
         )

@@ -19,17 +19,9 @@ from typing import (
 
 import pandas as pd
 from cognite.client import data_modeling as dm
-from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
 from cognite.client.data_classes import TimeSeriesList
 from cognite.client.data_classes.data_modeling.instances import Instance, Properties, PropertyValue
-from pydantic import BaseModel, BeforeValidator, Extra, Field, root_validator
-from pydantic.functional_serializers import PlainSerializer
-
-TimeSeries = Annotated[
-    CogniteTimeSeries,
-    PlainSerializer(lambda v: v.dump(camel_case=True), return_type=dict, when_used="unless-none"),
-    BeforeValidator(lambda v: CogniteTimeSeries.load(v) if isinstance(v, dict) else v),
-]
+from pydantic import BaseModel, Extra, Field, root_validator
 
 
 @dataclass

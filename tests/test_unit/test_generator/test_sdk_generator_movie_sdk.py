@@ -24,7 +24,7 @@ from cognite.pygen._core.data_classes import (
 from cognite.pygen._core.generators import APIGenerator, MultiAPIGenerator, SDKGenerator
 from cognite.pygen._generator import CodeFormatter
 from cognite.pygen.config import PygenConfig
-from tests.constants import IS_PYDANTIC_V1, MovieSDKFiles
+from tests.constants import IS_PYDANTIC_V1, IS_PYDANTIC_V2, MovieSDKFiles
 
 
 @pytest.fixture
@@ -301,7 +301,7 @@ def test_generate_data_class_file_persons(
     expected = MovieSDKFiles.persons_data.read_text()
 
     # Act
-    actual = person_api_generator.generate_data_class_file()
+    actual = person_api_generator.generate_data_class_file(IS_PYDANTIC_V2)
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -315,7 +315,7 @@ def test_create_view_data_class_actors(
     expected = MovieSDKFiles.actors_data.read_text()
 
     # Act
-    actual = actor_api_generator.generate_data_class_file()
+    actual = actor_api_generator.generate_data_class_file(IS_PYDANTIC_V2)
     actual = code_formatter.format_code(actual)
 
     # Assert

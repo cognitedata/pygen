@@ -7,7 +7,7 @@ from cognite.client import data_modeling as dm
 
 from cognite.pygen._core.generators import APIGenerator, MultiAPIGenerator, SDKGenerator
 from cognite.pygen._generator import CodeFormatter
-from tests.constants import IS_PYDANTIC_V1, MarketSDKFiles
+from tests.constants import IS_PYDANTIC_V1, IS_PYDANTIC_V2, MarketSDKFiles
 
 
 @pytest.fixture
@@ -67,7 +67,7 @@ def test_generate_date_transformation_pairs_data_class(
     expected = MarketSDKFiles.date_transformation_pair_data.read_text()
 
     # Act
-    actual = date_transformation_generator.generate_data_class_file()
+    actual = date_transformation_generator.generate_data_class_file(IS_PYDANTIC_V2)
 
     # Assert
     actual = code_formatter.format_code(actual)

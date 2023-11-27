@@ -9,7 +9,7 @@ from cognite.pygen._core.data_classes import (
 from cognite.pygen._core.generators import APIGenerator, MultiAPIGenerator, SDKGenerator
 from cognite.pygen._generator import CodeFormatter
 from cognite.pygen.config import PygenConfig
-from tests.constants import EQUIPMENT_UNIT_SDK, EquipmentSDKFiles
+from tests.constants import EQUIPMENT_UNIT_SDK, IS_PYDANTIC_V2, EquipmentSDKFiles
 
 
 @pytest.fixture
@@ -78,7 +78,7 @@ def test_generate_data_class_file_unit_procedure(
     expected = EquipmentSDKFiles.unit_procedure_data.read_text()
 
     # Act
-    actual = unit_procedure_api_generator.generate_data_class_file()
+    actual = unit_procedure_api_generator.generate_data_class_file(IS_PYDANTIC_V2)
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -92,7 +92,7 @@ def test_generate_data_class_start_end_time(
     expected = EquipmentSDKFiles.start_end_time_data.read_text()
 
     # Act
-    actual = start_end_time_api_generator.generate_data_class_file()
+    actual = start_end_time_api_generator.generate_data_class_file(IS_PYDANTIC_V2)
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -106,7 +106,7 @@ def test_generate_data_class_equipment_module(
     expected = EquipmentSDKFiles.equipment_module_data.read_text()
 
     # Act
-    actual = equipment_module_api_generator.generate_data_class_file()
+    actual = equipment_module_api_generator.generate_data_class_file(IS_PYDANTIC_V2)
     actual = code_formatter.format_code(actual)
 
     # Assert
