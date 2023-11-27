@@ -33,7 +33,7 @@ def test_from_node_with_json() -> None:
     )
 
     # Act
-    actual = ValueTransformation.from_node(node)
+    actual = ValueTransformation.from_instance(node)
 
     # Assert
     assert actual == expected

@@ -5,7 +5,15 @@ from typing import Literal, Optional
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
+from ._core import (
+    DomainModel,
+    DomainModelApply,
+    DomainModelApplyList,
+    DomainModelList,
+    DomainRelationApply,
+    ResourcesApply,
+)
+
 
 __all__ = ["Meta", "MetaApply", "MetaList", "MetaApplyList", "MetaFields", "MetaTextFields"]
 
@@ -23,7 +31,7 @@ _META_PROPERTIES_BY_FIELD = {
 
 
 class Meta(DomainModel):
-    """This represent a read version of meta.
+    """This represents the reading version of meta.
 
     It is used to when data is retrieved from CDF.
 
@@ -49,7 +57,7 @@ class Meta(DomainModel):
     unit_of_measure_id: Optional[str] = Field(None, alias="unitOfMeasureID")
 
     def as_apply(self) -> MetaApply:
-        """Convert this read version of meta to a write version."""
+        """Convert this read version of meta to the writing version."""
         return MetaApply(
             space=self.space,
             external_id=self.external_id,
@@ -62,7 +70,7 @@ class Meta(DomainModel):
 
 
 class MetaApply(DomainModelApply):
-    """This represent a write version of meta.
+    """This represents the writing version of meta.
 
     It is used to when data is sent to CDF.
 
@@ -74,7 +82,7 @@ class MetaApply(DomainModelApply):
         persistable_reference: The persistable reference field.
         property_names: The property name field.
         unit_of_measure_id: The unit of measure id field.
-        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+        existing_version: Fail the ingestion request if the meta version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
@@ -88,11 +96,17 @@ class MetaApply(DomainModelApply):
     unit_of_measure_id: Optional[str] = Field(None, alias="unitOfMeasureID")
 
     def _to_instances_apply(
-        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
-    ) -> dm.InstancesApply:
-        if self.external_id in cache:
-            return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
-        write_view = view_by_write_class and view_by_write_class.get(type(self))
+        self,
+        cache: set[tuple[str, str]],
+        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+    ) -> ResourcesApply:
+        resources = ResourcesApply()
+        if self.as_tuple_id() in cache:
+            return resources
+
+        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
+            "IntegrationTestsImmutable", "Meta", "bf181692a967b6"
+        )
 
         properties = {}
         if self.kind is not None:
@@ -105,38 +119,88 @@ class MetaApply(DomainModelApply):
             properties["propertyNames"] = self.property_names
         if self.unit_of_measure_id is not None:
             properties["unitOfMeasureID"] = self.unit_of_measure_id
+
         if properties:
-            source = dm.NodeOrEdgeData(
-                source=write_view or dm.ViewId("IntegrationTestsImmutable", "Meta", "bf181692a967b6"),
-                properties=properties,
-            )
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=[source],
+                sources=[
+                    dm.NodeOrEdgeData(
+                        source=write_view,
+                        properties=properties,
+                    )
+                ],
             )
-            nodes = [this_node]
-        else:
-            nodes = []
+            resources.nodes.append(this_node)
+            cache.add(self.as_tuple_id())
 
-        edges = []
-        cache.add(self.external_id)
-
-        return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
+        return resources
 
 
-class MetaList(TypeList[Meta]):
-    """List of metas in read version."""
+class MetaList(DomainModelList[Meta]):
+    """List of metas in the read version."""
 
-    _NODE = Meta
+    _INSTANCE = Meta
 
     def as_apply(self) -> MetaApplyList:
-        """Convert this read version of meta to a write version."""
+        """Convert these read versions of meta to the writing versions."""
         return MetaApplyList([node.as_apply() for node in self.data])
 
 
-class MetaApplyList(TypeApplyList[MetaApply]):
-    """List of metas in write version."""
+class MetaApplyList(DomainModelApplyList[MetaApply]):
+    """List of metas in the writing version."""
 
-    _NODE = MetaApply
+    _INSTANCE = MetaApply
+
+
+def _create_meta_filter(
+    view_id: dm.ViewId,
+    kind: str | list[str] | None = None,
+    kind_prefix: str | None = None,
+    name: str | list[str] | None = None,
+    name_prefix: str | None = None,
+    persistable_reference: str | list[str] | None = None,
+    persistable_reference_prefix: str | None = None,
+    unit_of_measure_id: str | list[str] | None = None,
+    unit_of_measure_id_prefix: str | None = None,
+    external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if kind and isinstance(kind, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("kind"), value=kind))
+    if kind and isinstance(kind, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("kind"), values=kind))
+    if kind_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("kind"), value=kind_prefix))
+    if name and isinstance(name, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
+    if name and isinstance(name, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("name"), values=name))
+    if name_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
+    if persistable_reference and isinstance(persistable_reference, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("persistableReference"), value=persistable_reference))
+    if persistable_reference and isinstance(persistable_reference, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("persistableReference"), values=persistable_reference))
+    if persistable_reference_prefix:
+        filters.append(
+            dm.filters.Prefix(view_id.as_property_ref("persistableReference"), value=persistable_reference_prefix)
+        )
+    if unit_of_measure_id and isinstance(unit_of_measure_id, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("unitOfMeasureID"), value=unit_of_measure_id))
+    if unit_of_measure_id and isinstance(unit_of_measure_id, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("unitOfMeasureID"), values=unit_of_measure_id))
+    if unit_of_measure_id_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("unitOfMeasureID"), value=unit_of_measure_id_prefix))
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

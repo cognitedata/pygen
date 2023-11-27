@@ -1,116 +1,37 @@
 from __future__ import annotations
-{% if data_class.has_time_field or data_class.has_single_timeseries_fields %}
-import datetime{% endif %}{% if data_class.has_single_timeseries_fields %}
-import warnings{% endif %}
-{% if data_class.has_one_to_many_edges %}from collections import defaultdict
-from typing import Dict, List, Sequence, Tuple, overload{% else %}from typing import Sequence, overload{% endif %}{% if data_class.has_single_timeseries_fields %}, Literal{% endif %}
-{% if data_class.has_single_timeseries_fields %}
-import pandas as pd{% endif %}
-from cognite.client import CogniteClient{% if data_class.has_single_timeseries_fields %}
-from cognite.client.data_classes import TimeSeriesList, DatapointsList, Datapoints, DatapointsArrayList
-from cognite.client.data_classes.datapoints import Aggregate{% endif %}
+{% if data_class.has_time_field %}
+import datetime{% endif %}
+from collections.abc import Sequence
+from typing import overload
+
+from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm{% if data_class.has_primitive_fields %}
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList{% endif %}
 
-from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT{% if data_class.has_single_timeseries_fields %}, INSTANCE_QUERY_LIMIT{% endif %}
-from {{ top_level_package }}.data_classes import {{ data_class.read_name }}, {{ data_class.write_name }}, {{ data_class.read_list_name }}, {{ data_class.write_list_name }}{% if data_class.has_primitive_fields %}, {{ data_class.field_names }}{% endif %}{% if data_class.has_text_field %}, {{ data_class.text_field_names }}{% endif %}{% if data_class.has_primitive_fields %}, DomainModelApply
-from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import {{ data_class.properties_dict_name }}{% endif %}
+from {{ top_level_package }}.data_classes import (
+    DomainModelApply,
+    ResourcesApplyResult,
+    {{ data_class.read_name }},
+    {{ data_class.write_name }},{% if data_class.has_primitive_fields %}
+    {{ data_class.field_names }},{% endif %}
+    {{ data_class.read_list_name }},
+    {{ data_class.write_list_name }},{% if data_class.has_text_field %}
+    {{ data_class.text_field_names }},{% endif %}{% for field in data_class.property_edges %}
+    {{ field.data_class.read_name }},
+    {{ field.data_class.write_name }},
+    {{ field.data_class.read_list_name }},{% endfor %}
+)
+from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import ({% if not data_class.has_only_one_to_many_edges %}
+    {{ data_class.properties_dict_name }},{%  endif %}
+    {{ data_class.filter_name }},
+)
+from ._core import DEFAULT_LIMIT_READ, DEFAULT_QUERY_LIMIT, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder{% for field in data_class.one_to_many_edges %}
+from .{{ field.edge_api_file_name }} import {{ field.edge_api_class }}{% endfor %}{% for field in data_class.single_timeseries_fields %}
+from .{{ field.edge_api_file_name }} import {{ field.edge_api_class }}API{% endfor %}
+from .{{ data_class.query_file_name }} import {{ data_class.query_class_name }}
 
 
-{% if data_class.has_single_timeseries_fields %}{% include "api_class_timeseries.py.jinja" %}{% endif %}
-{% for field in data_class.one_to_many_edges %}
-class {{ field.edge_api_class }}:
-    def __init__(self, client: CogniteClient):
-        self._client = client
-
-    def retrieve(self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str ="{{ field.prop.type.space }}") -> dm.EdgeList:
-        """Retrieve one or more {{field.edge_api_attribute}} edges by id(s) of a {{ data_class.doc_name }}.
-
-        Args:
-            external_id: External id or list of external ids source {{ data_class.doc_name }}.
-            space: The space where all the {{ field.doc_name }} edges are located.
-
-        Returns:
-            The requested {{ field.doc_name }} edges.
-
-        Examples:
-
-            Retrieve {{ field.name }} edge by id:
-
-                >>> from {{ top_level_package }} import {{ client_name }}
-                >>> client = {{ client_name }}()
-                >>> {{ data_class.variable }} = client.{{ api_class.client_attribute }}.{{ field.edge_api_attribute }}.retrieve("my_{{ field.name }}")
-
-        """
-        f = dm.filters
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": "{{ data_class.view_id.space }}", "externalId": "{{ field.prop.type.external_id }}"},
-        )
-        if isinstance(external_id, (str, dm.NodeId)):
-            is_{{ data_class.variable_list }} = f.Equals(
-                ["edge", "startNode"],
-                {"space": space, "externalId": external_id}
-                if isinstance(external_id, str)
-                else external_id.dump(camel_case=True, include_instance_type=False),
-            )
-        else:
-            is_{{ data_class.variable_list }} = f.In(
-                ["edge", "startNode"],
-                [
-                    {"space": space, "externalId": ext_id}
-                    if isinstance(ext_id, str)
-                    else ext_id.dump(camel_case=True, include_instance_type=False)
-                    for ext_id in external_id
-                ],
-            )
-        return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_{{ data_class.variable_list }}))
-
-    def list(self, {{ data_class.variable }}_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None, limit=DEFAULT_LIMIT_READ, space: str ="{{ field.prop.type.space }}") -> dm.EdgeList:
-        """List {{field.edge_api_attribute}} edges of a {{ data_class.doc_name }}.
-
-        Args:
-            {{ data_class.variable }}_id: ID of the source {{ data_class.doc_name }}.
-            limit: Maximum number of {{ field.doc_name }} edges to return. Defaults to 25. Set to -1, float("inf") or None
-                to return all items.
-            space: The space where all the {{ field.doc_name }} edges are located.
-
-        Returns:
-            The requested {{ field.doc_name }} edges.
-
-        Examples:
-
-            List 5 {{field.edge_api_attribute}} edges connected to "my_{{ data_class.variable }}":
-
-                >>> from {{ top_level_package }} import {{ client_name }}
-                >>> client = {{ client_name }}()
-                >>> {{ data_class.variable }} = client.{{ api_class.client_attribute }}.{{ field.edge_api_attribute }}.list("my_{{ data_class.variable }}", limit=5)
-
-        """
-        f = dm.filters
-        filters = [
-            f.Equals(
-                ["edge", "type"],
-                {"space": "{{ data_class.view_id.space }}", "externalId": "{{ field.prop.type.external_id }}"},
-            )
-        ]
-        if {{ data_class.variable }}_id:
-            {{ data_class.variable }}_ids = {{ data_class.variable }}_id if isinstance({{ data_class.variable }}_id, list) else [{{ data_class.variable }}_id]
-            is_{{ data_class.variable_list }} = f.In(
-                ["edge", "startNode"],
-                [
-                    {"space": space, "externalId": ext_id}
-                    if isinstance(ext_id, str)
-                    else ext_id.dump(camel_case=True, include_instance_type=False)
-                    for ext_id in {{ data_class.variable }}_ids
-                ]
-            )
-            filters.append(is_{{ data_class.variable_list }})
-
-        return self._client.data_modeling.instances.list("edge", limit=limit, filter=f.And(*filters))
-
-{% endfor %}
-class {{ api_class.name }}(TypeAPI[{{ data_class.read_name }}, {{ data_class.write_name }}, {{ data_class.read_list_name }}]):
+class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.write_name }}, {{ data_class.read_list_name }}]):
     def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
         view_id = view_by_write_class[{{ data_class.write_name }}]
         super().__init__(
@@ -119,44 +40,353 @@ class {{ api_class.name }}(TypeAPI[{{ data_class.read_name }}, {{ data_class.wri
             class_type={{ data_class.read_name }},
             class_apply_type={{ data_class.write_name }},
             class_list={{ data_class.read_list_name }},
+            class_apply_list={{ data_class.write_list_name }},
+            view_by_write_class=view_by_write_class,
         )
-        self._view_id = view_id
-        self._view_by_write_class = view_by_write_class{% for field in data_class.one_to_many_edges %}
-        self.{{ field.edge_api_attribute }} = {{ field.edge_api_class }}(client){% endfor %}{% for timeseries in data_class.single_timeseries_fields %}
+        self._view_id = view_id{% for field in data_class.one_to_many_edges %}
+        self.{{ field.edge_api_attribute }} = {{ field.edge_api_class }}(
+            client{% if field.is_property_edge %}, view_by_write_class, {{ field.data_class.read_name }}, {{ field.data_class.write_name }}, {{ field.data_class.read_list_name }}{% endif %}
+        ){% endfor %}{% for timeseries in data_class.single_timeseries_fields %}
         self.{{ timeseries.edge_api_attribute }} = {{ timeseries.edge_api_class }}API(client, view_id){% endfor %}
 
-{% include 'api_class_apply_method.py.jinja' %}
+    def __call__(
+            self,{% for parm in list_method.parameters %}
+            {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
+            limit: int = DEFAULT_QUERY_LIMIT,
+            filter: dm.Filter | None = None,
+    ) -> {{ data_class.query_class_name }}[{{ data_class.read_list_name }}]:
+        """Query starting at {{ data_class.doc_list_name }}.
 
-{% include 'api_class_delete_method.py.jinja' %}
+        Args:{% for parm in list_method.parameters %}
+            {{ parm.name }}: {{ parm.description }}{% endfor %}
+            limit: Maximum number of {{ data_class.doc_list_name }} to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
-{% include 'api_class_retrieve_method.py.jinja' %}
+        Returns:
+            A query API for {{ data_class.doc_list_name}}.
+
+        """
+        filter_ = {{ data_class.filter_name }}(
+            self._view_id,{% for parm in list_method.parameters %}
+            {{ parm.name }},{% endfor %}
+            filter,
+        )
+        builder = QueryBuilder(
+            {{ data_class.read_list_name }},
+            [
+                QueryStep(
+                    name="{{ data_class.variable }}",
+                    expression=dm.query.NodeResultSetExpression(
+                        from_=None,
+                        filter=filter_,
+                    ),
+                    select=dm.query.Select(
+                        [dm.query.SourceSelector(self._view_id, list({{ data_class.properties_dict_name }}.values()))]
+                    ),
+                    result_cls= {{ data_class.read_name}},
+                    max_retrieve_limit=limit,
+                )
+            ],
+        )
+        return {{ data_class.query_class_name }}(self._client, builder, self._view_by_write_class)
+
+
+    def apply(self, {{ data_class.variable }}: {{ data_class.write_name }} | Sequence[{{ data_class.write_name }}], replace: bool = False) -> ResourcesApplyResult:
+        """Add or update (upsert) {{data_class.doc_list_name}}.{% if data_class.has_one_to_many_edges %}
+
+        Note: This method iterates through all nodes and timeseries linked to {{ data_class.variable }} and creates them including the edges
+        between the nodes. For example, if any of {{ data_class.one_to_many_edges_docs }} are set, then these
+        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.{% endif %}
+
+        Args:
+            {{ data_class.variable }}: {{ data_class.doc_name.capitalize() }} or sequence of {{ data_class.doc_list_name }} to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            Created instance(s), i.e., nodes, edges, and time series.
+
+        Examples:
+
+            Create a new {{ data_class.variable }}:
+
+                >>> from {{ top_level_package }} import {{ client_name }}
+                >>> from {{ top_level_package }}.data_classes import {{ data_class.write_name }}
+                >>> client = {{ client_name }}()
+                >>> {{ data_class.variable }} = {{ data_class.write_name }}(external_id="my_{{ data_class.variable }}", ...)
+                >>> result = client.{{ api_class.client_attribute }}.apply({{ data_class.variable }})
+
+        """
+        return self._apply({{ data_class.variable }}, replace)
+
+    def delete(self, external_id: str | SequenceNotStr[str], space: str ="{{ data_class.view_id.space }}") -> dm.InstancesDeleteResult:
+        """Delete one or more {{ data_class.doc_name }}.
+
+        Args:
+            external_id: External id of the {{ data_class.doc_name }} to delete.
+            space: The space where all the {{ data_class.doc_name }} are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete {{ data_class.variable }} by id:
+
+                >>> from {{ top_level_package }} import {{ client_name }}
+                >>> client = {{ client_name }}()
+                >>> client.{{ api_class.client_attribute }}.delete("my_{{ data_class.variable }}")
+        """
+        return self._delete(external_id, space)
+
+    @overload
+    def retrieve(self, external_id: str) -> {{ data_class.read_name }}:
+        ...
+
+    @overload
+    def retrieve(self, external_id: SequenceNotStr[str]) -> {{ data_class.read_list_name }}:
+        ...
+
+    def retrieve(self, external_id: str | SequenceNotStr[str], space: str ="{{ data_class.view_id.space }}") -> {{ data_class.read_name }} | {{ data_class.read_list_name }}:
+        """Retrieve one or more {{data_class.doc_list_name}} by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the {{ data_class.doc_list_name }}.
+            space: The space where all the {{ data_class.doc_list_name }} are located.
+
+        Returns:
+            The requested {{ data_class.doc_list_name }}.
+
+        Examples:
+
+            Retrieve {{ data_class.variable }} by id:
+
+                >>> from {{ top_level_package }} import {{ client_name }}
+                >>> client = {{ client_name }}()
+                >>> {{ data_class.variable }} = client.{{ api_class.client_attribute }}.retrieve("my_{{ data_class.variable }}")
+
+        """{% if data_class.has_one_to_many_edges %}
+        return self._retrieve(
+            external_id,
+            space,
+            retrieve_edges=True,
+            edge_api_name_type_triple=[{% for field in data_class.one_to_many_edges %}
+                (self.{{ field.edge_api_attribute }}, "{{ field.name }}", dm.DirectRelationReference("{{ field.prop.type.space }}", "{{ field.prop.type.external_id }}")),{% endfor %}
+            ]
+        )
+        {% else %}
+        return self._retrieve(external_id, space){% endif %}
 {% if data_class.has_text_field %}
-{% include 'api_class_search_method.py.jinja' %}{% endif %}
+    def search(
+        self,
+        query: str,
+        properties: {{ data_class.text_field_names }} | Sequence[{{ data_class.text_field_names }}] | None = None,{% for parm in list_method.parameters %}
+        {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> {{ data_class.read_list_name }}:
+        """Search {{ data_class.doc_list_name }}
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.{% for parm in list_method.parameters %}
+            {{ parm.name }}: {{ parm.description }}{% endfor %}
+            limit: Maximum number of {{ data_class.doc_list_name }} to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results {{ data_class.doc_list_name}} matching the query.
+
+        Examples:
+
+           Search for 'my_{{ data_class.variable }}' in all text properties:
+
+                >>> from {{ top_level_package }} import {{ client_name }}
+                >>> client = {{ client_name }}()
+                >>> {{ data_class.variable_list }} = client.{{ api_class.client_attribute }}.search('my_{{ data_class.variable }}')
+
+        """
+        filter_ = {{ data_class.filter_name }}(
+            self._view_id,{% for parm in list_method.parameters %}
+            {{ parm.name }},{% endfor %}
+            filter,
+        )
+        return self._search(self._view_id, query, {{ data_class.properties_dict_name }}, properties, filter_, limit){% endif %}
 {% if data_class.has_primitive_fields %}
-{% include 'api_class_aggregate_methods.py.jinja' %}{% endif %}
+    @overload
+    def aggregate(
+        self,
+        aggregations: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,
+        group_by: None = None,{% if data_class.has_text_field %}
+        query: str | None = None,
+        search_properties: {{ data_class.text_field_names }} | Sequence[{{ data_class.text_field_names }}] | None = None,{% endif %}{% for parm in list_method.parameters %}
+        {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> list[dm.aggregations.AggregatedNumberedValue]:
+        ...
 
-{% include 'api_class_list_method.py.jinja' %}
-{% for field in data_class.one_to_many_edges %}
-    @staticmethod
-    def _set_{{ field.name }}({{ data_class.variable_list }}: Sequence[{{ data_class.read_name }}], {{ field.variable }}_edges: Sequence[dm.Edge]):
-        edges_by_start_node: Dict[Tuple, List] = defaultdict(list)
-        for edge in {{ field.variable }}_edges:
-            edges_by_start_node[edge.start_node.as_tuple()].append(edge)
+    @overload
+    def aggregate(
+        self,
+        aggregations: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,
+        group_by: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] = None,{% if data_class.has_text_field %}
+        query: str | None = None,
+        search_properties: {{ data_class.text_field_names }} | Sequence[{{ data_class.text_field_names }}] | None = None,{% endif %}{% for parm in list_method.parameters %}
+        {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> InstanceAggregationResultList:
+        ...
 
-        for {{ data_class.variable }} in {{ data_class.variable_list }}:
-            node_id = {{ data_class.variable }}.id_tuple()
-            if node_id in edges_by_start_node:
-                {{ data_class.variable }}.{{ field.name }} = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
-{% endfor %}
+    def aggregate(
+        self,
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,
+        group_by: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,{% if data_class.has_text_field %}
+        query: str | None = None,
+        search_property: {{ data_class.text_field_names }} | Sequence[{{ data_class.text_field_names }}] | None = None,{% endif %}{% for parm in list_method.parameters %}
+        {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across {{ data_class.doc_list_name }}
 
-def _create_filter(
-    view_id: dm.ViewId,{% for parm in list_method.parameters %}
-    {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
-    filter: dm.Filter | None = None,
-) -> dm.Filter | None:
-    filters = []{% for filter in list_method.filters %}
-    if {{ filter.condition }}:
-        filters.append({{ filter.filter_call }}({{ filter.arguments }})){% endfor %}
-    if filter:
-        filters.append(filter)
-    return dm.filters.And(*filters) if filters else None
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.{% if data_class.has_text_field %}
+            query: The query to search for in the text field.
+            search_property: The text field to search in.{% endif %}{% for parm in list_method.parameters %}
+            {{ parm.name }}: {{ parm.description }}{% endfor %}
+            limit: Maximum number of {{ data_class.doc_list_name }} to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count {{ data_class.doc_list_name }} in space `my_space`:
+
+                >>> from {{ top_level_package }} import {{ client_name }}
+                >>> client = {{ client_name }}()
+                >>> result = client.{{ api_class.client_attribute }}.aggregate("count", space="my_space")
+
+        """
+
+        filter_ = {{ data_class.filter_name }}(
+            self._view_id,{% for parm in list_method.parameters %}
+            {{ parm.name }},{% endfor %}
+            filter,
+        )
+        return self._aggregate(
+            self._view_id,
+            aggregate,
+            {{ data_class.properties_dict_name }},
+            property,
+            group_by,{% if data_class.has_text_field %}
+            query,
+            search_property,{% else %}
+            None,
+            None,{% endif %}
+            limit,
+            filter_,
+        )
+
+    def histogram(
+        self,
+        property: {{ data_class.field_names }},
+        interval: float,{% if data_class.has_text_field %}
+        query: str | None = None,
+        search_property: {{ data_class.text_field_names }} | Sequence[{{ data_class.text_field_names }}] | None = None,{% endif %}{% for parm in list_method.parameters %}
+        {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for {{ data_class.doc_list_name }}
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.{% if data_class.has_text_field %}
+            query: The query to search for in the text field.
+            search_property: The text field to search in.{% endif %}{% for parm in list_method.parameters %}
+            {{ parm.name }}: {{ parm.description }}{% endfor %}
+            limit: Maximum number of {{ data_class.doc_list_name }} to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
+        filter_ = {{ data_class.filter_name }}(
+            self._view_id,{% for parm in list_method.parameters %}
+            {{ parm.name }},{% endfor %}
+            filter,
+        )
+        return self._histogram(
+            self._view_id,
+            property,
+            interval,
+            {{ data_class.properties_dict_name }},{% if data_class.has_text_field %}
+            query,
+            search_property,{% else %}
+            None,
+            None,{% endif %}
+            limit,
+            filter_,
+        )
+{% endif %}
+
+    def list(
+        self,{% for parm in list_method.parameters %}
+        {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,{% if data_class.has_one_to_many_edges %}
+        retrieve_edges: bool = True,{% endif %}
+    ) -> {{ data_class.read_list_name }}:
+        """List/filter {{ data_class.doc_list_name }}
+
+        Args:{% for parm in list_method.parameters %}
+            {{ parm.name }}: {{ parm.description }}{% endfor %}
+            limit: Maximum number of {{ data_class.doc_list_name }} to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above. {% if data_class.has_one_to_many_edges %}
+            retrieve_edges: Whether to retrieve {{ data_class.one_to_many_edges_docs }} external ids for the {{ data_class.doc_list_name }}. Defaults to True.{% endif %}
+
+        Returns:
+            List of requested {{ data_class.doc_list_name}}
+
+        Examples:
+
+            List {{ data_class.doc_list_name }} and limit to 5:
+
+                >>> from {{ top_level_package }} import {{ client_name }}
+                >>> client = {{ client_name }}()
+                >>> {{ data_class.variable_list }} = client.{{ api_class.client_attribute }}.list(limit=5)
+
+        """
+        filter_ = {{ data_class.filter_name }}(
+            self._view_id,{% for parm in list_method.parameters %}
+            {{ parm.name }},{% endfor %}
+            filter,
+        )
+        {% if data_class.has_one_to_many_edges %}
+        return self._list(
+            limit=limit,
+            filter=filter_,
+            retrieve_edges=retrieve_edges,
+            edge_api_name_type_triple=[{% for field in data_class.one_to_many_edges %}
+                (self.{{ field.edge_api_attribute }}, "{{ field.name }}", dm.DirectRelationReference("{{ field.prop.type.space }}", "{{ field.prop.type.external_id }}")),{% endfor %}
+            ]
+        )
+        {% else %}return self._list(limit=limit, filter=filter_){% endif %}

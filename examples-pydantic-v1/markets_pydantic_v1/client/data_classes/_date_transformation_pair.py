@@ -1,14 +1,22 @@
 from __future__ import annotations
 
-from typing import Literal, TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Literal, Optional, Union  # noqa: F401
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
+from ._core import (
+    DomainModel,
+    DomainModelApply,
+    DomainModelApplyList,
+    DomainModelList,
+    DomainRelationApply,
+    ResourcesApply,
+)
 
 if TYPE_CHECKING:
-    from ._date_transformation import DateTransformationApply
+    from ._date_transformation import DateTransformation, DateTransformationApply
+
 
 __all__ = [
     "DateTransformationPair",
@@ -19,7 +27,7 @@ __all__ = [
 
 
 class DateTransformationPair(DomainModel):
-    """This represent a read version of date transformation pair.
+    """This represents the reading version of date transformation pair.
 
     It is used to when data is retrieved from CDF.
 
@@ -35,21 +43,21 @@ class DateTransformationPair(DomainModel):
     """
 
     space: str = "market"
-    end: Optional[list[str]] = None
-    start: Optional[list[str]] = None
+    end: Union[list[DateTransformation], list[str], None] = Field(default=None, repr=False)
+    start: Union[list[DateTransformation], list[str], None] = Field(default=None, repr=False)
 
     def as_apply(self) -> DateTransformationPairApply:
-        """Convert this read version of date transformation pair to a write version."""
+        """Convert this read version of date transformation pair to the writing version."""
         return DateTransformationPairApply(
             space=self.space,
             external_id=self.external_id,
-            end=self.end,
-            start=self.start,
+            end=[end.as_apply() if isinstance(end, DomainModel) else end for end in self.end or []],
+            start=[start.as_apply() if isinstance(start, DomainModel) else start for start in self.start or []],
         )
 
 
 class DateTransformationPairApply(DomainModelApply):
-    """This represent a write version of date transformation pair.
+    """This represents the writing version of date transformation pair.
 
     It is used to when data is sent to CDF.
 
@@ -58,7 +66,7 @@ class DateTransformationPairApply(DomainModelApply):
         external_id: The external id of the date transformation pair.
         end: The end field.
         start: The start field.
-        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+        existing_version: Fail the ingestion request if the date transformation pair version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
@@ -69,85 +77,64 @@ class DateTransformationPairApply(DomainModelApply):
     start: Union[list[DateTransformationApply], list[str], None] = Field(default=None, repr=False)
 
     def _to_instances_apply(
-        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
-    ) -> dm.InstancesApply:
-        if self.external_id in cache:
-            return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
-        write_view = view_by_write_class and view_by_write_class.get(type(self))
+        self,
+        cache: set[tuple[str, str]],
+        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+    ) -> ResourcesApply:
+        resources = ResourcesApply()
+        if self.as_tuple_id() in cache:
+            return resources
 
-        nodes = []
+        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
+            "market", "DateTransformationPair", "310f933a9aca9b"
+        )
 
-        edges = []
-        cache.add(self.external_id)
-
+        edge_type = dm.DirectRelationReference("market", "DateTransformationPair.end")
         for end in self.end or []:
-            edge = self._create_end_edge(end)
-            if edge.external_id not in cache:
-                edges.append(edge)
-                cache.add(edge.external_id)
+            other_resources = DomainRelationApply.from_edge_to_resources(
+                cache, self, end, edge_type, view_by_write_class
+            )
+            resources.extend(other_resources)
 
-            if isinstance(end, DomainModelApply):
-                instances = end._to_instances_apply(cache, view_by_write_class)
-                nodes.extend(instances.nodes)
-                edges.extend(instances.edges)
-
+        edge_type = dm.DirectRelationReference("market", "DateTransformationPair.start")
         for start in self.start or []:
-            edge = self._create_start_edge(start)
-            if edge.external_id not in cache:
-                edges.append(edge)
-                cache.add(edge.external_id)
+            other_resources = DomainRelationApply.from_edge_to_resources(
+                cache, self, start, edge_type, view_by_write_class
+            )
+            resources.extend(other_resources)
 
-            if isinstance(start, DomainModelApply):
-                instances = start._to_instances_apply(cache, view_by_write_class)
-                nodes.extend(instances.nodes)
-                edges.extend(instances.edges)
-
-        return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
-
-    def _create_end_edge(self, end: Union[str, DateTransformationApply]) -> dm.EdgeApply:
-        if isinstance(end, str):
-            end_space, end_node_ext_id = self.space, end
-        elif isinstance(end, DomainModelApply):
-            end_space, end_node_ext_id = end.space, end.external_id
-        else:
-            raise TypeError(f"Expected str or DateTransformationApply, got {type(end)}")
-
-        return dm.EdgeApply(
-            space=self.space,
-            external_id=f"{self.external_id}:{end_node_ext_id}",
-            type=dm.DirectRelationReference("market", "DateTransformationPair.end"),
-            start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
-        )
-
-    def _create_start_edge(self, start: Union[str, DateTransformationApply]) -> dm.EdgeApply:
-        if isinstance(start, str):
-            end_space, end_node_ext_id = self.space, start
-        elif isinstance(start, DomainModelApply):
-            end_space, end_node_ext_id = start.space, start.external_id
-        else:
-            raise TypeError(f"Expected str or DateTransformationApply, got {type(start)}")
-
-        return dm.EdgeApply(
-            space=self.space,
-            external_id=f"{self.external_id}:{end_node_ext_id}",
-            type=dm.DirectRelationReference("market", "DateTransformationPair.start"),
-            start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
-        )
+        return resources
 
 
-class DateTransformationPairList(TypeList[DateTransformationPair]):
-    """List of date transformation pairs in read version."""
+class DateTransformationPairList(DomainModelList[DateTransformationPair]):
+    """List of date transformation pairs in the read version."""
 
-    _NODE = DateTransformationPair
+    _INSTANCE = DateTransformationPair
 
     def as_apply(self) -> DateTransformationPairApplyList:
-        """Convert this read version of date transformation pair to a write version."""
+        """Convert these read versions of date transformation pair to the writing versions."""
         return DateTransformationPairApplyList([node.as_apply() for node in self.data])
 
 
-class DateTransformationPairApplyList(TypeApplyList[DateTransformationPairApply]):
-    """List of date transformation pairs in write version."""
+class DateTransformationPairApplyList(DomainModelApplyList[DateTransformationPairApply]):
+    """List of date transformation pairs in the writing version."""
 
-    _NODE = DateTransformationPairApply
+    _INSTANCE = DateTransformationPairApply
+
+
+def _create_date_transformation_pair_filter(
+    view_id: dm.ViewId,
+    external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

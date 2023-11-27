@@ -1,25 +1,39 @@
 from __future__ import annotations
 
-from typing import Sequence, overload
+from collections.abc import Sequence
+from typing import overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from osdu_wells.client.data_classes import (
+    DomainModelApply,
+    ResourcesApplyResult,
     Acl,
     AclApply,
+    AclFields,
     AclList,
     AclApplyList,
-    AclFields,
     AclTextFields,
-    DomainModelApply,
 )
-from osdu_wells.client.data_classes._acl import _ACL_PROPERTIES_BY_FIELD
+from osdu_wells.client.data_classes._acl import (
+    _ACL_PROPERTIES_BY_FIELD,
+    _create_acl_filter,
+)
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
+from .acl_query import AclQueryAPI
 
 
-class AclAPI(TypeAPI[Acl, AclApply, AclList]):
+class AclAPI(NodeAPI[Acl, AclApply, AclList]):
     def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
         view_id = view_by_write_class[AclApply]
         super().__init__(
@@ -28,11 +42,56 @@ class AclAPI(TypeAPI[Acl, AclApply, AclList]):
             class_type=Acl,
             class_apply_type=AclApply,
             class_list=AclList,
+            class_apply_list=AclApplyList,
+            view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self._view_by_write_class = view_by_write_class
 
-    def apply(self, acl: AclApply | Sequence[AclApply], replace: bool = False) -> dm.InstancesApplyResult:
+    def __call__(
+        self,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+        filter: dm.Filter | None = None,
+    ) -> AclQueryAPI[AclList]:
+        """Query starting at acls.
+
+        Args:
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of acls to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            A query API for acls.
+
+        """
+        filter_ = _create_acl_filter(
+            self._view_id,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        builder = QueryBuilder(
+            AclList,
+            [
+                QueryStep(
+                    name="acl",
+                    expression=dm.query.NodeResultSetExpression(
+                        from_=None,
+                        filter=filter_,
+                    ),
+                    select=dm.query.Select(
+                        [dm.query.SourceSelector(self._view_id, list(_ACL_PROPERTIES_BY_FIELD.values()))]
+                    ),
+                    result_cls=Acl,
+                    max_retrieve_limit=limit,
+                )
+            ],
+        )
+        return AclQueryAPI(self._client, builder, self._view_by_write_class)
+
+    def apply(self, acl: AclApply | Sequence[AclApply], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) acls.
 
         Args:
@@ -40,7 +99,7 @@ class AclAPI(TypeAPI[Acl, AclApply, AclList]):
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes, edges, and time series.
 
         Examples:
 
@@ -53,20 +112,10 @@ class AclAPI(TypeAPI[Acl, AclApply, AclList]):
                 >>> result = client.acl.apply(acl)
 
         """
-        if isinstance(acl, AclApply):
-            instances = acl.to_instances_apply(self._view_by_write_class)
-        else:
-            instances = AclApplyList(acl).to_instances_apply(self._view_by_write_class)
-        return self._client.data_modeling.instances.apply(
-            nodes=instances.nodes,
-            edges=instances.edges,
-            auto_create_start_nodes=True,
-            auto_create_end_nodes=True,
-            replace=replace,
-        )
+        return self._apply(acl, replace)
 
     def delete(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> dm.InstancesDeleteResult:
         """Delete one or more acl.
 
@@ -85,22 +134,19 @@ class AclAPI(TypeAPI[Acl, AclApply, AclList]):
                 >>> client = OSDUClient()
                 >>> client.acl.delete("my_acl")
         """
-        if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
-        else:
-            return self._client.data_modeling.instances.delete(
-                nodes=[(space, id) for id in external_id],
-            )
+        return self._delete(external_id, space)
 
     @overload
     def retrieve(self, external_id: str) -> Acl:
         ...
 
     @overload
-    def retrieve(self, external_id: Sequence[str]) -> AclList:
+    def retrieve(self, external_id: SequenceNotStr[str]) -> AclList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> Acl | AclList:
+    def retrieve(
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+    ) -> Acl | AclList:
         """Retrieve one or more acls by id(s).
 
         Args:
@@ -119,10 +165,7 @@ class AclAPI(TypeAPI[Acl, AclApply, AclList]):
                 >>> acl = client.acl.retrieve("my_acl")
 
         """
-        if isinstance(external_id, str):
-            return self._retrieve((space, external_id))
-        else:
-            return self._retrieve([(space, ext_id) for ext_id in external_id])
+        return self._retrieve(external_id, space)
 
     def search(
         self,
@@ -155,7 +198,7 @@ class AclAPI(TypeAPI[Acl, AclApply, AclList]):
                 >>> acls = client.acl.search('my_acl')
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_acl_filter(
             self._view_id,
             external_id_prefix,
             space,
@@ -240,7 +283,7 @@ class AclAPI(TypeAPI[Acl, AclApply, AclList]):
 
         """
 
-        filter_ = _create_filter(
+        filter_ = _create_acl_filter(
             self._view_id,
             external_id_prefix,
             space,
@@ -285,7 +328,7 @@ class AclAPI(TypeAPI[Acl, AclApply, AclList]):
             Bucketed histogram results.
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_acl_filter(
             self._view_id,
             external_id_prefix,
             space,
@@ -329,29 +372,10 @@ class AclAPI(TypeAPI[Acl, AclApply, AclList]):
                 >>> acls = client.acl.list(limit=5)
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_acl_filter(
             self._view_id,
             external_id_prefix,
             space,
             filter,
         )
-
         return self._list(limit=limit, filter=filter_)
-
-
-def _create_filter(
-    view_id: dm.ViewId,
-    external_id_prefix: str | None = None,
-    space: str | list[str] | None = None,
-    filter: dm.Filter | None = None,
-) -> dm.Filter | None:
-    filters = []
-    if external_id_prefix:
-        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
-        filters.append(dm.filters.Equals(["node", "space"], value=space))
-    if space and isinstance(space, list):
-        filters.append(dm.filters.In(["node", "space"], values=space))
-    if filter:
-        filters.append(filter)
-    return dm.filters.And(*filters) if filters else None

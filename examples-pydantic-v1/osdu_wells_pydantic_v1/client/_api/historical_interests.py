@@ -1,25 +1,39 @@
 from __future__ import annotations
 
-from typing import Sequence, overload
+from collections.abc import Sequence
+from typing import overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from osdu_wells_pydantic_v1.client.data_classes import (
+    DomainModelApply,
+    ResourcesApplyResult,
     HistoricalInterests,
     HistoricalInterestsApply,
+    HistoricalInterestsFields,
     HistoricalInterestsList,
     HistoricalInterestsApplyList,
-    HistoricalInterestsFields,
     HistoricalInterestsTextFields,
-    DomainModelApply,
 )
-from osdu_wells_pydantic_v1.client.data_classes._historical_interests import _HISTORICALINTERESTS_PROPERTIES_BY_FIELD
+from osdu_wells_pydantic_v1.client.data_classes._historical_interests import (
+    _HISTORICALINTERESTS_PROPERTIES_BY_FIELD,
+    _create_historical_interest_filter,
+)
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
+from .historical_interests_query import HistoricalInterestsQueryAPI
 
 
-class HistoricalInterestsAPI(TypeAPI[HistoricalInterests, HistoricalInterestsApply, HistoricalInterestsList]):
+class HistoricalInterestsAPI(NodeAPI[HistoricalInterests, HistoricalInterestsApply, HistoricalInterestsList]):
     def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
         view_id = view_by_write_class[HistoricalInterestsApply]
         super().__init__(
@@ -28,13 +42,80 @@ class HistoricalInterestsAPI(TypeAPI[HistoricalInterests, HistoricalInterestsApp
             class_type=HistoricalInterests,
             class_apply_type=HistoricalInterestsApply,
             class_list=HistoricalInterestsList,
+            class_apply_list=HistoricalInterestsApplyList,
+            view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self._view_by_write_class = view_by_write_class
+
+    def __call__(
+        self,
+        effective_date_time: str | list[str] | None = None,
+        effective_date_time_prefix: str | None = None,
+        interest_type_id: str | list[str] | None = None,
+        interest_type_id_prefix: str | None = None,
+        termination_date_time: str | list[str] | None = None,
+        termination_date_time_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+        filter: dm.Filter | None = None,
+    ) -> HistoricalInterestsQueryAPI[HistoricalInterestsList]:
+        """Query starting at historical interests.
+
+        Args:
+            effective_date_time: The effective date time to filter on.
+            effective_date_time_prefix: The prefix of the effective date time to filter on.
+            interest_type_id: The interest type id to filter on.
+            interest_type_id_prefix: The prefix of the interest type id to filter on.
+            termination_date_time: The termination date time to filter on.
+            termination_date_time_prefix: The prefix of the termination date time to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of historical interests to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            A query API for historical interests.
+
+        """
+        filter_ = _create_historical_interest_filter(
+            self._view_id,
+            effective_date_time,
+            effective_date_time_prefix,
+            interest_type_id,
+            interest_type_id_prefix,
+            termination_date_time,
+            termination_date_time_prefix,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        builder = QueryBuilder(
+            HistoricalInterestsList,
+            [
+                QueryStep(
+                    name="historical_interest",
+                    expression=dm.query.NodeResultSetExpression(
+                        from_=None,
+                        filter=filter_,
+                    ),
+                    select=dm.query.Select(
+                        [
+                            dm.query.SourceSelector(
+                                self._view_id, list(_HISTORICALINTERESTS_PROPERTIES_BY_FIELD.values())
+                            )
+                        ]
+                    ),
+                    result_cls=HistoricalInterests,
+                    max_retrieve_limit=limit,
+                )
+            ],
+        )
+        return HistoricalInterestsQueryAPI(self._client, builder, self._view_by_write_class)
 
     def apply(
         self, historical_interest: HistoricalInterestsApply | Sequence[HistoricalInterestsApply], replace: bool = False
-    ) -> dm.InstancesApplyResult:
+    ) -> ResourcesApplyResult:
         """Add or update (upsert) historical interests.
 
         Args:
@@ -42,7 +123,7 @@ class HistoricalInterestsAPI(TypeAPI[HistoricalInterests, HistoricalInterestsApp
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes, edges, and time series.
 
         Examples:
 
@@ -55,20 +136,10 @@ class HistoricalInterestsAPI(TypeAPI[HistoricalInterests, HistoricalInterestsApp
                 >>> result = client.historical_interests.apply(historical_interest)
 
         """
-        if isinstance(historical_interest, HistoricalInterestsApply):
-            instances = historical_interest.to_instances_apply(self._view_by_write_class)
-        else:
-            instances = HistoricalInterestsApplyList(historical_interest).to_instances_apply(self._view_by_write_class)
-        return self._client.data_modeling.instances.apply(
-            nodes=instances.nodes,
-            edges=instances.edges,
-            auto_create_start_nodes=True,
-            auto_create_end_nodes=True,
-            replace=replace,
-        )
+        return self._apply(historical_interest, replace)
 
     def delete(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> dm.InstancesDeleteResult:
         """Delete one or more historical interest.
 
@@ -87,23 +158,18 @@ class HistoricalInterestsAPI(TypeAPI[HistoricalInterests, HistoricalInterestsApp
                 >>> client = OSDUClient()
                 >>> client.historical_interests.delete("my_historical_interest")
         """
-        if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
-        else:
-            return self._client.data_modeling.instances.delete(
-                nodes=[(space, id) for id in external_id],
-            )
+        return self._delete(external_id, space)
 
     @overload
     def retrieve(self, external_id: str) -> HistoricalInterests:
         ...
 
     @overload
-    def retrieve(self, external_id: Sequence[str]) -> HistoricalInterestsList:
+    def retrieve(self, external_id: SequenceNotStr[str]) -> HistoricalInterestsList:
         ...
 
     def retrieve(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> HistoricalInterests | HistoricalInterestsList:
         """Retrieve one or more historical interests by id(s).
 
@@ -123,10 +189,7 @@ class HistoricalInterestsAPI(TypeAPI[HistoricalInterests, HistoricalInterestsApp
                 >>> historical_interest = client.historical_interests.retrieve("my_historical_interest")
 
         """
-        if isinstance(external_id, str):
-            return self._retrieve((space, external_id))
-        else:
-            return self._retrieve([(space, ext_id) for ext_id in external_id])
+        return self._retrieve(external_id, space)
 
     def search(
         self,
@@ -171,7 +234,7 @@ class HistoricalInterestsAPI(TypeAPI[HistoricalInterests, HistoricalInterestsApp
                 >>> historical_interests = client.historical_interests.search('my_historical_interest')
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_historical_interest_filter(
             self._view_id,
             effective_date_time,
             effective_date_time_prefix,
@@ -286,7 +349,7 @@ class HistoricalInterestsAPI(TypeAPI[HistoricalInterests, HistoricalInterestsApp
 
         """
 
-        filter_ = _create_filter(
+        filter_ = _create_historical_interest_filter(
             self._view_id,
             effective_date_time,
             effective_date_time_prefix,
@@ -349,7 +412,7 @@ class HistoricalInterestsAPI(TypeAPI[HistoricalInterests, HistoricalInterestsApp
             Bucketed histogram results.
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_historical_interest_filter(
             self._view_id,
             effective_date_time,
             effective_date_time_prefix,
@@ -411,7 +474,7 @@ class HistoricalInterestsAPI(TypeAPI[HistoricalInterests, HistoricalInterestsApp
                 >>> historical_interests = client.historical_interests.list(limit=5)
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_historical_interest_filter(
             self._view_id,
             effective_date_time,
             effective_date_time_prefix,
@@ -423,51 +486,4 @@ class HistoricalInterestsAPI(TypeAPI[HistoricalInterests, HistoricalInterestsApp
             space,
             filter,
         )
-
         return self._list(limit=limit, filter=filter_)
-
-
-def _create_filter(
-    view_id: dm.ViewId,
-    effective_date_time: str | list[str] | None = None,
-    effective_date_time_prefix: str | None = None,
-    interest_type_id: str | list[str] | None = None,
-    interest_type_id_prefix: str | None = None,
-    termination_date_time: str | list[str] | None = None,
-    termination_date_time_prefix: str | None = None,
-    external_id_prefix: str | None = None,
-    space: str | list[str] | None = None,
-    filter: dm.Filter | None = None,
-) -> dm.Filter | None:
-    filters = []
-    if effective_date_time and isinstance(effective_date_time, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("EffectiveDateTime"), value=effective_date_time))
-    if effective_date_time and isinstance(effective_date_time, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("EffectiveDateTime"), values=effective_date_time))
-    if effective_date_time_prefix:
-        filters.append(
-            dm.filters.Prefix(view_id.as_property_ref("EffectiveDateTime"), value=effective_date_time_prefix)
-        )
-    if interest_type_id and isinstance(interest_type_id, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("InterestTypeID"), value=interest_type_id))
-    if interest_type_id and isinstance(interest_type_id, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("InterestTypeID"), values=interest_type_id))
-    if interest_type_id_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("InterestTypeID"), value=interest_type_id_prefix))
-    if termination_date_time and isinstance(termination_date_time, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("TerminationDateTime"), value=termination_date_time))
-    if termination_date_time and isinstance(termination_date_time, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("TerminationDateTime"), values=termination_date_time))
-    if termination_date_time_prefix:
-        filters.append(
-            dm.filters.Prefix(view_id.as_property_ref("TerminationDateTime"), value=termination_date_time_prefix)
-        )
-    if external_id_prefix:
-        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
-        filters.append(dm.filters.Equals(["node", "space"], value=space))
-    if space and isinstance(space, list):
-        filters.append(dm.filters.In(["node", "space"], values=space))
-    if filter:
-        filters.append(filter)
-    return dm.filters.And(*filters) if filters else None

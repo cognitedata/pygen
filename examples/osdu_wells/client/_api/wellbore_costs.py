@@ -1,25 +1,39 @@
 from __future__ import annotations
 
-from typing import Sequence, overload
+from collections.abc import Sequence
+from typing import overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from osdu_wells.client.data_classes import (
+    DomainModelApply,
+    ResourcesApplyResult,
     WellboreCosts,
     WellboreCostsApply,
+    WellboreCostsFields,
     WellboreCostsList,
     WellboreCostsApplyList,
-    WellboreCostsFields,
     WellboreCostsTextFields,
-    DomainModelApply,
 )
-from osdu_wells.client.data_classes._wellbore_costs import _WELLBORECOSTS_PROPERTIES_BY_FIELD
+from osdu_wells.client.data_classes._wellbore_costs import (
+    _WELLBORECOSTS_PROPERTIES_BY_FIELD,
+    _create_wellbore_cost_filter,
+)
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
+from .wellbore_costs_query import WellboreCostsQueryAPI
 
 
-class WellboreCostsAPI(TypeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsList]):
+class WellboreCostsAPI(NodeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsList]):
     def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
         view_id = view_by_write_class[WellboreCostsApply]
         super().__init__(
@@ -28,13 +42,70 @@ class WellboreCostsAPI(TypeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsL
             class_type=WellboreCosts,
             class_apply_type=WellboreCostsApply,
             class_list=WellboreCostsList,
+            class_apply_list=WellboreCostsApplyList,
+            view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self._view_by_write_class = view_by_write_class
+
+    def __call__(
+        self,
+        activity_type_id: str | list[str] | None = None,
+        activity_type_id_prefix: str | None = None,
+        min_cost: float | None = None,
+        max_cost: float | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+        filter: dm.Filter | None = None,
+    ) -> WellboreCostsQueryAPI[WellboreCostsList]:
+        """Query starting at wellbore costs.
+
+        Args:
+            activity_type_id: The activity type id to filter on.
+            activity_type_id_prefix: The prefix of the activity type id to filter on.
+            min_cost: The minimum value of the cost to filter on.
+            max_cost: The maximum value of the cost to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of wellbore costs to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            A query API for wellbore costs.
+
+        """
+        filter_ = _create_wellbore_cost_filter(
+            self._view_id,
+            activity_type_id,
+            activity_type_id_prefix,
+            min_cost,
+            max_cost,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        builder = QueryBuilder(
+            WellboreCostsList,
+            [
+                QueryStep(
+                    name="wellbore_cost",
+                    expression=dm.query.NodeResultSetExpression(
+                        from_=None,
+                        filter=filter_,
+                    ),
+                    select=dm.query.Select(
+                        [dm.query.SourceSelector(self._view_id, list(_WELLBORECOSTS_PROPERTIES_BY_FIELD.values()))]
+                    ),
+                    result_cls=WellboreCosts,
+                    max_retrieve_limit=limit,
+                )
+            ],
+        )
+        return WellboreCostsQueryAPI(self._client, builder, self._view_by_write_class)
 
     def apply(
         self, wellbore_cost: WellboreCostsApply | Sequence[WellboreCostsApply], replace: bool = False
-    ) -> dm.InstancesApplyResult:
+    ) -> ResourcesApplyResult:
         """Add or update (upsert) wellbore costs.
 
         Args:
@@ -42,7 +113,7 @@ class WellboreCostsAPI(TypeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsL
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes, edges, and time series.
 
         Examples:
 
@@ -55,20 +126,10 @@ class WellboreCostsAPI(TypeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsL
                 >>> result = client.wellbore_costs.apply(wellbore_cost)
 
         """
-        if isinstance(wellbore_cost, WellboreCostsApply):
-            instances = wellbore_cost.to_instances_apply(self._view_by_write_class)
-        else:
-            instances = WellboreCostsApplyList(wellbore_cost).to_instances_apply(self._view_by_write_class)
-        return self._client.data_modeling.instances.apply(
-            nodes=instances.nodes,
-            edges=instances.edges,
-            auto_create_start_nodes=True,
-            auto_create_end_nodes=True,
-            replace=replace,
-        )
+        return self._apply(wellbore_cost, replace)
 
     def delete(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> dm.InstancesDeleteResult:
         """Delete one or more wellbore cost.
 
@@ -87,23 +148,18 @@ class WellboreCostsAPI(TypeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsL
                 >>> client = OSDUClient()
                 >>> client.wellbore_costs.delete("my_wellbore_cost")
         """
-        if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
-        else:
-            return self._client.data_modeling.instances.delete(
-                nodes=[(space, id) for id in external_id],
-            )
+        return self._delete(external_id, space)
 
     @overload
     def retrieve(self, external_id: str) -> WellboreCosts:
         ...
 
     @overload
-    def retrieve(self, external_id: Sequence[str]) -> WellboreCostsList:
+    def retrieve(self, external_id: SequenceNotStr[str]) -> WellboreCostsList:
         ...
 
     def retrieve(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> WellboreCosts | WellboreCostsList:
         """Retrieve one or more wellbore costs by id(s).
 
@@ -123,10 +179,7 @@ class WellboreCostsAPI(TypeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsL
                 >>> wellbore_cost = client.wellbore_costs.retrieve("my_wellbore_cost")
 
         """
-        if isinstance(external_id, str):
-            return self._retrieve((space, external_id))
-        else:
-            return self._retrieve([(space, ext_id) for ext_id in external_id])
+        return self._retrieve(external_id, space)
 
     def search(
         self,
@@ -167,7 +220,7 @@ class WellboreCostsAPI(TypeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsL
                 >>> wellbore_costs = client.wellbore_costs.search('my_wellbore_cost')
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_wellbore_cost_filter(
             self._view_id,
             activity_type_id,
             activity_type_id_prefix,
@@ -272,7 +325,7 @@ class WellboreCostsAPI(TypeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsL
 
         """
 
-        filter_ = _create_filter(
+        filter_ = _create_wellbore_cost_filter(
             self._view_id,
             activity_type_id,
             activity_type_id_prefix,
@@ -329,7 +382,7 @@ class WellboreCostsAPI(TypeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsL
             Bucketed histogram results.
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_wellbore_cost_filter(
             self._view_id,
             activity_type_id,
             activity_type_id_prefix,
@@ -385,7 +438,7 @@ class WellboreCostsAPI(TypeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsL
                 >>> wellbore_costs = client.wellbore_costs.list(limit=5)
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_wellbore_cost_filter(
             self._view_id,
             activity_type_id,
             activity_type_id_prefix,
@@ -395,35 +448,4 @@ class WellboreCostsAPI(TypeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsL
             space,
             filter,
         )
-
         return self._list(limit=limit, filter=filter_)
-
-
-def _create_filter(
-    view_id: dm.ViewId,
-    activity_type_id: str | list[str] | None = None,
-    activity_type_id_prefix: str | None = None,
-    min_cost: float | None = None,
-    max_cost: float | None = None,
-    external_id_prefix: str | None = None,
-    space: str | list[str] | None = None,
-    filter: dm.Filter | None = None,
-) -> dm.Filter | None:
-    filters = []
-    if activity_type_id and isinstance(activity_type_id, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("ActivityTypeID"), value=activity_type_id))
-    if activity_type_id and isinstance(activity_type_id, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("ActivityTypeID"), values=activity_type_id))
-    if activity_type_id_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("ActivityTypeID"), value=activity_type_id_prefix))
-    if min_cost or max_cost:
-        filters.append(dm.filters.Range(view_id.as_property_ref("Cost"), gte=min_cost, lte=max_cost))
-    if external_id_prefix:
-        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
-        filters.append(dm.filters.Equals(["node", "space"], value=space))
-    if space and isinstance(space, list):
-        filters.append(dm.filters.In(["node", "space"], values=space))
-    if filter:
-        filters.append(filter)
-    return dm.filters.And(*filters) if filters else None

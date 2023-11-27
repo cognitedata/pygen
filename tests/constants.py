@@ -146,6 +146,12 @@ APM_APP_DATA_SINK = ExampleSDK(
     has_container_file=True,
 )
 
+EQUIPMENT_UNIT_SDK = ExampleSDK(
+    data_models=[DataModelId("IntegrationTestsImmutable", "EquipmentUnit", "1")],
+    _top_level_package="equipment_unit.client",
+    client_name="EquipmentUnitClient",
+)
+
 
 # The following files are manually controlled and should not be overwritten by the generator by default.
 
@@ -155,6 +161,7 @@ class MarketSDKFiles:
     client = client_dir / "_api_client.py"
     date_transformation_pair_data = client_dir / "data_classes" / "_date_transformation_pair.py"
     date_transformation_pair_api = client_dir / "_api" / "date_transformation_pair.py"
+    date_transformation_pair_query_api = client_dir / "_api" / "date_transformation_pair_query.py"
 
 
 MARKET_SDK.append_manual_files(MarketSDKFiles)
@@ -179,12 +186,13 @@ class MovieSDKFiles:
     data_classes = client_dir / "data_classes"
     persons_data = data_classes / "_person.py"
     actors_data = data_classes / "_actor.py"
-    core_data = data_classes / "_core.py"
 
     api = client_dir / "_api"
+    core_api = api / "_core.py"
     persons_api = api / "person.py"
     actors_api = api / "actor.py"
-    core_api = api / "_core.py"
+    actor_query_api = api / "actor_query.py"
+    actor_movies_api = api / "actor_movies.py"
 
     client = client_dir / "_api_client.py"
     client_init = client_dir / "__init__.py"
@@ -193,6 +201,29 @@ class MovieSDKFiles:
 
 
 MOVIE_SDK.append_manual_files(MovieSDKFiles)
+
+
+class EquipmentSDKFiles:
+    client_dir = EQUIPMENT_UNIT_SDK.client_dir
+    data_classes = client_dir / "data_classes"
+    core_data = data_classes / "_core.py"
+    start_end_time_data = data_classes / "_start_end_time.py"
+    unit_procedure_data = data_classes / "_unit_procedure.py"
+    equipment_module_data = data_classes / "_equipment_module.py"
+
+    api = client_dir / "_api"
+    equipment_api = api / "equipment_module.py"
+    equipment_module_sensor_value_api = api / "equipment_module_sensor_value.py"
+
+    unit_procedure_api = api / "unit_procedure.py"
+    unit_procedure_query = api / "unit_procedure_query.py"
+    unit_procedure_work_units = api / "unit_procedure_work_units.py"
+    core_api = api / "_core.py"
+
+    data_init = data_classes / "__init__.py"
+
+
+EQUIPMENT_UNIT_SDK.append_manual_files(EquipmentSDKFiles)
 
 
 class ScenarioInstanceFiles:

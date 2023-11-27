@@ -1,16 +1,19 @@
 from __future__ import annotations
 
 from cognite.client import CogniteClient
-from cognite.client import data_modeling as dm
 
-from tests.constants import IS_PYDANTIC_V1
+from tests.constants import IS_PYDANTIC_V2
 
-if IS_PYDANTIC_V1:
-    from markets_pydantic_v1.client import MarketClient
-    from markets_pydantic_v1.client.data_classes import DateTransformationApply, DateTransformationPairApply
-else:
+if IS_PYDANTIC_V2:
     from markets.client import MarketClient
-    from markets.client.data_classes import DateTransformationApply, DateTransformationPairApply
+    from markets.client.data_classes import DateTransformationApply, DateTransformationPairApply, ResourcesApplyResult
+else:
+    from markets_pydantic_v1.client import MarketClient
+    from markets_pydantic_v1.client.data_classes import (
+        DateTransformationApply,
+        DateTransformationPairApply,
+        ResourcesApplyResult,
+    )
 
 
 def test_apply(market_client: MarketClient, cognite_client: CogniteClient) -> None:
@@ -32,7 +35,7 @@ def test_apply(market_client: MarketClient, cognite_client: CogniteClient) -> No
             ),
         ],
     )
-    created: dm.InstancesApplyResult | None = None
+    created: ResourcesApplyResult | None = None
     try:
         # Act
         created = market_client.pygen_pool.date_transformation_pair.apply(new_date_transformation_pair)

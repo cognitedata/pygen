@@ -1,4 +1,11 @@
-from ._core import DomainModel, DomainModelApply
+from ._core import (
+    DomainModel,
+    DomainModelApply,
+    DomainModelList,
+    DomainRelationApply,
+    ResourcesApply,
+    ResourcesApplyResult,
+)
 from ._actor import Actor, ActorApply, ActorApplyList, ActorFields, ActorList
 from ._best_director import (
     BestDirector,
@@ -35,8 +42,32 @@ from ._nomination import (
     NominationTextFields,
 )
 from ._person import Person, PersonApply, PersonApplyList, PersonFields, PersonList, PersonTextFields
-from ._rating import Rating, RatingApply, RatingApplyList, RatingFields, RatingList, RatingTextFields
+from ._rating import Rating, RatingApply, RatingApplyList, RatingFields, RatingList
 from ._role import Role, RoleApply, RoleApplyList, RoleFields, RoleList
+
+Actor.update_forward_refs(
+    Movie=Movie,
+    Nomination=Nomination,
+    Person=Person,
+)
+Director.update_forward_refs(
+    Movie=Movie,
+    Nomination=Nomination,
+    Person=Person,
+)
+Movie.update_forward_refs(
+    Actor=Actor,
+    Director=Director,
+    Rating=Rating,
+)
+Person.update_forward_refs(
+    Role=Role,
+)
+Role.update_forward_refs(
+    Movie=Movie,
+    Nomination=Nomination,
+    Person=Person,
+)
 
 ActorApply.update_forward_refs(
     MovieApply=MovieApply,
@@ -63,8 +94,12 @@ RoleApply.update_forward_refs(
 )
 
 __all__ = [
+    "ResourcesApply",
     "DomainModel",
     "DomainModelApply",
+    "DomainModelList",
+    "DomainRelationApply",
+    "ResourcesApplyResult",
     "Actor",
     "ActorApply",
     "ActorList",
@@ -116,7 +151,6 @@ __all__ = [
     "RatingList",
     "RatingApplyList",
     "RatingFields",
-    "RatingTextFields",
     "Role",
     "RoleApply",
     "RoleList",

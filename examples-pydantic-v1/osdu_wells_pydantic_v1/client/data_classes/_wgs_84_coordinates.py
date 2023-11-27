@@ -1,14 +1,22 @@
 from __future__ import annotations
 
-from typing import Literal, TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
+from ._core import (
+    DomainModel,
+    DomainModelApply,
+    DomainModelApplyList,
+    DomainModelList,
+    DomainRelationApply,
+    ResourcesApply,
+)
 
 if TYPE_CHECKING:
-    from ._features import FeaturesApply
+    from ._features import Features, FeaturesApply
+
 
 __all__ = [
     "WgsCoordinates",
@@ -30,7 +38,7 @@ _WGSCOORDINATES_PROPERTIES_BY_FIELD = {
 
 
 class WgsCoordinates(DomainModel):
-    """This represent a read version of wgs 84 coordinate.
+    """This represents the reading version of wgs 84 coordinate.
 
     It is used to when data is retrieved from CDF.
 
@@ -48,22 +56,24 @@ class WgsCoordinates(DomainModel):
 
     space: str = "IntegrationTestsImmutable"
     bbox: Optional[list[float]] = None
-    features: Optional[list[str]] = None
+    features: Union[list[Features], list[str], None] = Field(default=None, repr=False)
     type_: Optional[str] = Field(None, alias="type")
 
     def as_apply(self) -> WgsCoordinatesApply:
-        """Convert this read version of wgs 84 coordinate to a write version."""
+        """Convert this read version of wgs 84 coordinate to the writing version."""
         return WgsCoordinatesApply(
             space=self.space,
             external_id=self.external_id,
             bbox=self.bbox,
-            features=self.features,
+            features=[
+                feature.as_apply() if isinstance(feature, DomainModel) else feature for feature in self.features or []
+            ],
             type_=self.type_,
         )
 
 
 class WgsCoordinatesApply(DomainModelApply):
-    """This represent a write version of wgs 84 coordinate.
+    """This represents the writing version of wgs 84 coordinate.
 
     It is used to when data is sent to CDF.
 
@@ -73,7 +83,7 @@ class WgsCoordinatesApply(DomainModelApply):
         bbox: The bbox field.
         features: The feature field.
         type_: The type field.
-        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+        existing_version: Fail the ingestion request if the wgs 84 coordinate version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
@@ -85,76 +95,86 @@ class WgsCoordinatesApply(DomainModelApply):
     type_: Optional[str] = Field(None, alias="type")
 
     def _to_instances_apply(
-        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
-    ) -> dm.InstancesApply:
-        if self.external_id in cache:
-            return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
-        write_view = view_by_write_class and view_by_write_class.get(type(self))
+        self,
+        cache: set[tuple[str, str]],
+        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+    ) -> ResourcesApply:
+        resources = ResourcesApply()
+        if self.as_tuple_id() in cache:
+            return resources
+
+        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
+            "IntegrationTestsImmutable", "Wgs84Coordinates", "d6030081373896"
+        )
 
         properties = {}
         if self.bbox is not None:
             properties["bbox"] = self.bbox
         if self.type_ is not None:
             properties["type"] = self.type_
+
         if properties:
-            source = dm.NodeOrEdgeData(
-                source=write_view or dm.ViewId("IntegrationTestsImmutable", "Wgs84Coordinates", "d6030081373896"),
-                properties=properties,
-            )
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=[source],
+                sources=[
+                    dm.NodeOrEdgeData(
+                        source=write_view,
+                        properties=properties,
+                    )
+                ],
             )
-            nodes = [this_node]
-        else:
-            nodes = []
+            resources.nodes.append(this_node)
+            cache.add(self.as_tuple_id())
 
-        edges = []
-        cache.add(self.external_id)
-
+        edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "Wgs84Coordinates.features")
         for feature in self.features or []:
-            edge = self._create_feature_edge(feature)
-            if edge.external_id not in cache:
-                edges.append(edge)
-                cache.add(edge.external_id)
+            other_resources = DomainRelationApply.from_edge_to_resources(
+                cache, self, feature, edge_type, view_by_write_class
+            )
+            resources.extend(other_resources)
 
-            if isinstance(feature, DomainModelApply):
-                instances = feature._to_instances_apply(cache, view_by_write_class)
-                nodes.extend(instances.nodes)
-                edges.extend(instances.edges)
-
-        return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
-
-    def _create_feature_edge(self, feature: Union[str, FeaturesApply]) -> dm.EdgeApply:
-        if isinstance(feature, str):
-            end_space, end_node_ext_id = self.space, feature
-        elif isinstance(feature, DomainModelApply):
-            end_space, end_node_ext_id = feature.space, feature.external_id
-        else:
-            raise TypeError(f"Expected str or FeaturesApply, got {type(feature)}")
-
-        return dm.EdgeApply(
-            space=self.space,
-            external_id=f"{self.external_id}:{end_node_ext_id}",
-            type=dm.DirectRelationReference("IntegrationTestsImmutable", "Wgs84Coordinates.features"),
-            start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
-        )
+        return resources
 
 
-class WgsCoordinatesList(TypeList[WgsCoordinates]):
-    """List of wgs 84 coordinates in read version."""
+class WgsCoordinatesList(DomainModelList[WgsCoordinates]):
+    """List of wgs 84 coordinates in the read version."""
 
-    _NODE = WgsCoordinates
+    _INSTANCE = WgsCoordinates
 
     def as_apply(self) -> WgsCoordinatesApplyList:
-        """Convert this read version of wgs 84 coordinate to a write version."""
+        """Convert these read versions of wgs 84 coordinate to the writing versions."""
         return WgsCoordinatesApplyList([node.as_apply() for node in self.data])
 
 
-class WgsCoordinatesApplyList(TypeApplyList[WgsCoordinatesApply]):
-    """List of wgs 84 coordinates in write version."""
+class WgsCoordinatesApplyList(DomainModelApplyList[WgsCoordinatesApply]):
+    """List of wgs 84 coordinates in the writing version."""
 
-    _NODE = WgsCoordinatesApply
+    _INSTANCE = WgsCoordinatesApply
+
+
+def _create_wgs_84_coordinate_filter(
+    view_id: dm.ViewId,
+    type_: str | list[str] | None = None,
+    type_prefix: str | None = None,
+    external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if type_ and isinstance(type_, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("type"), value=type_))
+    if type_ and isinstance(type_, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("type"), values=type_))
+    if type_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("type"), value=type_prefix))
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

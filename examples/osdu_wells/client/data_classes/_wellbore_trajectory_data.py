@@ -1,22 +1,33 @@
 from __future__ import annotations
 
-from typing import Literal, TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
+from ._core import (
+    DomainModel,
+    DomainModelApply,
+    DomainModelApplyList,
+    DomainModelList,
+    DomainRelationApply,
+    ResourcesApply,
+)
 
 if TYPE_CHECKING:
-    from ._artefacts import ArtefactsApply
-    from ._available_trajectory_station_properties import AvailableTrajectoryStationPropertiesApply
-    from ._geo_contexts import GeoContextsApply
-    from ._lineage_assertions import LineageAssertionsApply
-    from ._name_aliases import NameAliasesApply
-    from ._spatial_area import SpatialAreaApply
-    from ._spatial_point import SpatialPointApply
-    from ._technical_assurances import TechnicalAssurancesApply
-    from ._vertical_measurement import VerticalMeasurementApply
+    from ._artefacts import Artefacts, ArtefactsApply
+    from ._available_trajectory_station_properties import (
+        AvailableTrajectoryStationProperties,
+        AvailableTrajectoryStationPropertiesApply,
+    )
+    from ._geo_contexts import GeoContexts, GeoContextsApply
+    from ._lineage_assertions import LineageAssertions, LineageAssertionsApply
+    from ._name_aliases import NameAliases, NameAliasesApply
+    from ._spatial_area import SpatialArea, SpatialAreaApply
+    from ._spatial_point import SpatialPoint, SpatialPointApply
+    from ._technical_assurances import TechnicalAssurances, TechnicalAssurancesApply
+    from ._vertical_measurement import VerticalMeasurement, VerticalMeasurementApply
+
 
 __all__ = [
     "WellboreTrajectoryData",
@@ -168,7 +179,7 @@ _WELLBORETRAJECTORYDATA_PROPERTIES_BY_FIELD = {
 
 
 class WellboreTrajectoryData(DomainModel):
-    """This represent a read version of wellbore trajectory datum.
+    """This represents the reading version of wellbore trajectory datum.
 
     It is used to when data is retrieved from CDF.
 
@@ -245,10 +256,10 @@ class WellboreTrajectoryData(DomainModel):
     applied_operations_date_time: Optional[str] = Field(None, alias="AppliedOperationsDateTime")
     applied_operations_remarks: Optional[str] = Field(None, alias="AppliedOperationsRemarks")
     applied_operations_user: Optional[str] = Field(None, alias="AppliedOperationsUser")
-    artefacts: Optional[list[str]] = Field(None, alias="Artefacts")
+    artefacts: Union[list[Artefacts], list[str], None] = Field(default=None, repr=False, alias="Artefacts")
     author_i_ds: Optional[list[str]] = Field(None, alias="AuthorIDs")
-    available_trajectory_station_properties: Optional[list[str]] = Field(
-        None, alias="AvailableTrajectoryStationProperties"
+    available_trajectory_station_properties: Union[list[AvailableTrajectoryStationProperties], list[str], None] = Field(
+        default=None, repr=False, alias="AvailableTrajectoryStationProperties"
     )
     azimuth_reference_type: Optional[str] = Field(None, alias="AzimuthReferenceType")
     base_depth_measured_depth: Optional[int] = Field(None, alias="BaseDepthMeasuredDepth")
@@ -263,13 +274,15 @@ class WellboreTrajectoryData(DomainModel):
     existence_kind: Optional[str] = Field(None, alias="ExistenceKind")
     extrapolated_measured_depth: Optional[int] = Field(None, alias="ExtrapolatedMeasuredDepth")
     extrapolated_measured_depth_remark: Optional[str] = Field(None, alias="ExtrapolatedMeasuredDepthRemark")
-    geo_contexts: Optional[list[str]] = Field(None, alias="GeoContexts")
+    geo_contexts: Union[list[GeoContexts], list[str], None] = Field(default=None, repr=False, alias="GeoContexts")
     geographic_crsid: Optional[str] = Field(None, alias="GeographicCRSID")
     is_discoverable: Optional[bool] = Field(None, alias="IsDiscoverable")
     is_extended_load: Optional[bool] = Field(None, alias="IsExtendedLoad")
-    lineage_assertions: Optional[list[str]] = Field(None, alias="LineageAssertions")
+    lineage_assertions: Union[list[LineageAssertions], list[str], None] = Field(
+        default=None, repr=False, alias="LineageAssertions"
+    )
     name: Optional[str] = Field(None, alias="Name")
-    name_aliases: Optional[list[str]] = Field(None, alias="NameAliases")
+    name_aliases: Union[list[NameAliases], list[str], None] = Field(default=None, repr=False, alias="NameAliases")
     projected_crsid: Optional[str] = Field(None, alias="ProjectedCRSID")
     resource_curation_status: Optional[str] = Field(None, alias="ResourceCurationStatus")
     resource_home_region_id: Optional[str] = Field(None, alias="ResourceHomeRegionID")
@@ -278,8 +291,8 @@ class WellboreTrajectoryData(DomainModel):
     resource_security_classification: Optional[str] = Field(None, alias="ResourceSecurityClassification")
     service_company_id: Optional[str] = Field(None, alias="ServiceCompanyID")
     source: Optional[str] = Field(None, alias="Source")
-    spatial_area: Optional[str] = Field(None, alias="SpatialArea")
-    spatial_point: Optional[str] = Field(None, alias="SpatialPoint")
+    spatial_area: Union[SpatialArea, str, None] = Field(None, repr=False, alias="SpatialArea")
+    spatial_point: Union[SpatialPoint, str, None] = Field(None, repr=False, alias="SpatialPoint")
     start_date_time: Optional[str] = Field(None, alias="StartDateTime")
     submitter_name: Optional[str] = Field(None, alias="SubmitterName")
     surface_grid_convergence: Optional[float] = Field(None, alias="SurfaceGridConvergence")
@@ -289,16 +302,18 @@ class WellboreTrajectoryData(DomainModel):
     survey_type: Optional[str] = Field(None, alias="SurveyType")
     survey_version: Optional[str] = Field(None, alias="SurveyVersion")
     tags: Optional[list[str]] = Field(None, alias="Tags")
-    technical_assurances: Optional[list[str]] = Field(None, alias="TechnicalAssurances")
+    technical_assurances: Union[list[TechnicalAssurances], list[str], None] = Field(
+        default=None, repr=False, alias="TechnicalAssurances"
+    )
     tie_measured_depth: Optional[int] = Field(None, alias="TieMeasuredDepth")
     tie_true_vertical_depth: Optional[int] = Field(None, alias="TieTrueVerticalDepth")
     top_depth_measured_depth: Optional[int] = Field(None, alias="TopDepthMeasuredDepth")
     tortuosity: Optional[float] = Field(None, alias="Tortuosity")
-    vertical_measurement: Optional[str] = Field(None, alias="VerticalMeasurement")
+    vertical_measurement: Union[VerticalMeasurement, str, None] = Field(None, repr=False, alias="VerticalMeasurement")
     wellbore_id: Optional[str] = Field(None, alias="WellboreID")
 
     def as_apply(self) -> WellboreTrajectoryDataApply:
-        """Convert this read version of wellbore trajectory datum to a write version."""
+        """Convert this read version of wellbore trajectory datum to the writing version."""
         return WellboreTrajectoryDataApply(
             space=self.space,
             external_id=self.external_id,
@@ -309,9 +324,17 @@ class WellboreTrajectoryData(DomainModel):
             applied_operations_date_time=self.applied_operations_date_time,
             applied_operations_remarks=self.applied_operations_remarks,
             applied_operations_user=self.applied_operations_user,
-            artefacts=self.artefacts,
+            artefacts=[
+                artefact.as_apply() if isinstance(artefact, DomainModel) else artefact
+                for artefact in self.artefacts or []
+            ],
             author_i_ds=self.author_i_ds,
-            available_trajectory_station_properties=self.available_trajectory_station_properties,
+            available_trajectory_station_properties=[
+                available_trajectory_station_property.as_apply()
+                if isinstance(available_trajectory_station_property, DomainModel)
+                else available_trajectory_station_property
+                for available_trajectory_station_property in self.available_trajectory_station_properties or []
+            ],
             azimuth_reference_type=self.azimuth_reference_type,
             base_depth_measured_depth=self.base_depth_measured_depth,
             business_activities=self.business_activities,
@@ -325,13 +348,22 @@ class WellboreTrajectoryData(DomainModel):
             existence_kind=self.existence_kind,
             extrapolated_measured_depth=self.extrapolated_measured_depth,
             extrapolated_measured_depth_remark=self.extrapolated_measured_depth_remark,
-            geo_contexts=self.geo_contexts,
+            geo_contexts=[
+                geo_context.as_apply() if isinstance(geo_context, DomainModel) else geo_context
+                for geo_context in self.geo_contexts or []
+            ],
             geographic_crsid=self.geographic_crsid,
             is_discoverable=self.is_discoverable,
             is_extended_load=self.is_extended_load,
-            lineage_assertions=self.lineage_assertions,
+            lineage_assertions=[
+                lineage_assertion.as_apply() if isinstance(lineage_assertion, DomainModel) else lineage_assertion
+                for lineage_assertion in self.lineage_assertions or []
+            ],
             name=self.name,
-            name_aliases=self.name_aliases,
+            name_aliases=[
+                name_alias.as_apply() if isinstance(name_alias, DomainModel) else name_alias
+                for name_alias in self.name_aliases or []
+            ],
             projected_crsid=self.projected_crsid,
             resource_curation_status=self.resource_curation_status,
             resource_home_region_id=self.resource_home_region_id,
@@ -340,8 +372,12 @@ class WellboreTrajectoryData(DomainModel):
             resource_security_classification=self.resource_security_classification,
             service_company_id=self.service_company_id,
             source=self.source,
-            spatial_area=self.spatial_area,
-            spatial_point=self.spatial_point,
+            spatial_area=self.spatial_area.as_apply()
+            if isinstance(self.spatial_area, DomainModel)
+            else self.spatial_area,
+            spatial_point=self.spatial_point.as_apply()
+            if isinstance(self.spatial_point, DomainModel)
+            else self.spatial_point,
             start_date_time=self.start_date_time,
             submitter_name=self.submitter_name,
             surface_grid_convergence=self.surface_grid_convergence,
@@ -351,18 +387,23 @@ class WellboreTrajectoryData(DomainModel):
             survey_type=self.survey_type,
             survey_version=self.survey_version,
             tags=self.tags,
-            technical_assurances=self.technical_assurances,
+            technical_assurances=[
+                technical_assurance.as_apply() if isinstance(technical_assurance, DomainModel) else technical_assurance
+                for technical_assurance in self.technical_assurances or []
+            ],
             tie_measured_depth=self.tie_measured_depth,
             tie_true_vertical_depth=self.tie_true_vertical_depth,
             top_depth_measured_depth=self.top_depth_measured_depth,
             tortuosity=self.tortuosity,
-            vertical_measurement=self.vertical_measurement,
+            vertical_measurement=self.vertical_measurement.as_apply()
+            if isinstance(self.vertical_measurement, DomainModel)
+            else self.vertical_measurement,
             wellbore_id=self.wellbore_id,
         )
 
 
 class WellboreTrajectoryDataApply(DomainModelApply):
-    """This represent a write version of wellbore trajectory datum.
+    """This represents the writing version of wellbore trajectory datum.
 
     It is used to when data is sent to CDF.
 
@@ -425,7 +466,7 @@ class WellboreTrajectoryDataApply(DomainModelApply):
         tortuosity: The tortuosity field.
         vertical_measurement: The vertical measurement field.
         wellbore_id: The wellbore id field.
-        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+        existing_version: Fail the ingestion request if the wellbore trajectory datum version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
@@ -498,11 +539,17 @@ class WellboreTrajectoryDataApply(DomainModelApply):
     wellbore_id: Optional[str] = Field(None, alias="WellboreID")
 
     def _to_instances_apply(
-        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
-    ) -> dm.InstancesApply:
-        if self.external_id in cache:
-            return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
-        write_view = view_by_write_class and view_by_write_class.get(type(self))
+        self,
+        cache: set[tuple[str, str]],
+        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+    ) -> ResourcesApply:
+        resources = ResourcesApply()
+        if self.as_tuple_id() in cache:
+            return resources
+
+        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
+            "IntegrationTestsImmutable", "WellboreTrajectoryData", "d35eace9691587"
+        )
 
         properties = {}
         if self.acquisition_date is not None:
@@ -620,226 +667,588 @@ class WellboreTrajectoryDataApply(DomainModelApply):
             }
         if self.wellbore_id is not None:
             properties["WellboreID"] = self.wellbore_id
+
         if properties:
-            source = dm.NodeOrEdgeData(
-                source=write_view or dm.ViewId("IntegrationTestsImmutable", "WellboreTrajectoryData", "d35eace9691587"),
-                properties=properties,
-            )
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=[source],
+                sources=[
+                    dm.NodeOrEdgeData(
+                        source=write_view,
+                        properties=properties,
+                    )
+                ],
             )
-            nodes = [this_node]
-        else:
-            nodes = []
+            resources.nodes.append(this_node)
+            cache.add(self.as_tuple_id())
 
-        edges = []
-        cache.add(self.external_id)
-
+        edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreTrajectoryData.Artefacts")
         for artefact in self.artefacts or []:
-            edge = self._create_artefact_edge(artefact)
-            if edge.external_id not in cache:
-                edges.append(edge)
-                cache.add(edge.external_id)
+            other_resources = DomainRelationApply.from_edge_to_resources(
+                cache, self, artefact, edge_type, view_by_write_class
+            )
+            resources.extend(other_resources)
 
-            if isinstance(artefact, DomainModelApply):
-                instances = artefact._to_instances_apply(cache, view_by_write_class)
-                nodes.extend(instances.nodes)
-                edges.extend(instances.edges)
-
+        edge_type = dm.DirectRelationReference(
+            "IntegrationTestsImmutable", "WellboreTrajectoryData.AvailableTrajectoryStationProperties"
+        )
         for available_trajectory_station_property in self.available_trajectory_station_properties or []:
-            edge = self._create_available_trajectory_station_property_edge(available_trajectory_station_property)
-            if edge.external_id not in cache:
-                edges.append(edge)
-                cache.add(edge.external_id)
+            other_resources = DomainRelationApply.from_edge_to_resources(
+                cache, self, available_trajectory_station_property, edge_type, view_by_write_class
+            )
+            resources.extend(other_resources)
 
-            if isinstance(available_trajectory_station_property, DomainModelApply):
-                instances = available_trajectory_station_property._to_instances_apply(cache, view_by_write_class)
-                nodes.extend(instances.nodes)
-                edges.extend(instances.edges)
-
+        edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreTrajectoryData.GeoContexts")
         for geo_context in self.geo_contexts or []:
-            edge = self._create_geo_context_edge(geo_context)
-            if edge.external_id not in cache:
-                edges.append(edge)
-                cache.add(edge.external_id)
+            other_resources = DomainRelationApply.from_edge_to_resources(
+                cache, self, geo_context, edge_type, view_by_write_class
+            )
+            resources.extend(other_resources)
 
-            if isinstance(geo_context, DomainModelApply):
-                instances = geo_context._to_instances_apply(cache, view_by_write_class)
-                nodes.extend(instances.nodes)
-                edges.extend(instances.edges)
-
+        edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreTrajectoryData.LineageAssertions")
         for lineage_assertion in self.lineage_assertions or []:
-            edge = self._create_lineage_assertion_edge(lineage_assertion)
-            if edge.external_id not in cache:
-                edges.append(edge)
-                cache.add(edge.external_id)
+            other_resources = DomainRelationApply.from_edge_to_resources(
+                cache, self, lineage_assertion, edge_type, view_by_write_class
+            )
+            resources.extend(other_resources)
 
-            if isinstance(lineage_assertion, DomainModelApply):
-                instances = lineage_assertion._to_instances_apply(cache, view_by_write_class)
-                nodes.extend(instances.nodes)
-                edges.extend(instances.edges)
-
+        edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreTrajectoryData.NameAliases")
         for name_alias in self.name_aliases or []:
-            edge = self._create_name_alias_edge(name_alias)
-            if edge.external_id not in cache:
-                edges.append(edge)
-                cache.add(edge.external_id)
+            other_resources = DomainRelationApply.from_edge_to_resources(
+                cache, self, name_alias, edge_type, view_by_write_class
+            )
+            resources.extend(other_resources)
 
-            if isinstance(name_alias, DomainModelApply):
-                instances = name_alias._to_instances_apply(cache, view_by_write_class)
-                nodes.extend(instances.nodes)
-                edges.extend(instances.edges)
-
+        edge_type = dm.DirectRelationReference(
+            "IntegrationTestsImmutable", "WellboreTrajectoryData.TechnicalAssurances"
+        )
         for technical_assurance in self.technical_assurances or []:
-            edge = self._create_technical_assurance_edge(technical_assurance)
-            if edge.external_id not in cache:
-                edges.append(edge)
-                cache.add(edge.external_id)
-
-            if isinstance(technical_assurance, DomainModelApply):
-                instances = technical_assurance._to_instances_apply(cache, view_by_write_class)
-                nodes.extend(instances.nodes)
-                edges.extend(instances.edges)
+            other_resources = DomainRelationApply.from_edge_to_resources(
+                cache, self, technical_assurance, edge_type, view_by_write_class
+            )
+            resources.extend(other_resources)
 
         if isinstance(self.spatial_area, DomainModelApply):
-            instances = self.spatial_area._to_instances_apply(cache, view_by_write_class)
-            nodes.extend(instances.nodes)
-            edges.extend(instances.edges)
+            other_resources = self.spatial_area._to_instances_apply(cache, view_by_write_class)
+            resources.extend(other_resources)
 
         if isinstance(self.spatial_point, DomainModelApply):
-            instances = self.spatial_point._to_instances_apply(cache, view_by_write_class)
-            nodes.extend(instances.nodes)
-            edges.extend(instances.edges)
+            other_resources = self.spatial_point._to_instances_apply(cache, view_by_write_class)
+            resources.extend(other_resources)
 
         if isinstance(self.vertical_measurement, DomainModelApply):
-            instances = self.vertical_measurement._to_instances_apply(cache, view_by_write_class)
-            nodes.extend(instances.nodes)
-            edges.extend(instances.edges)
+            other_resources = self.vertical_measurement._to_instances_apply(cache, view_by_write_class)
+            resources.extend(other_resources)
 
-        return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
-
-    def _create_artefact_edge(self, artefact: Union[str, ArtefactsApply]) -> dm.EdgeApply:
-        if isinstance(artefact, str):
-            end_space, end_node_ext_id = self.space, artefact
-        elif isinstance(artefact, DomainModelApply):
-            end_space, end_node_ext_id = artefact.space, artefact.external_id
-        else:
-            raise TypeError(f"Expected str or ArtefactsApply, got {type(artefact)}")
-
-        return dm.EdgeApply(
-            space=self.space,
-            external_id=f"{self.external_id}:{end_node_ext_id}",
-            type=dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreTrajectoryData.Artefacts"),
-            start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
-        )
-
-    def _create_available_trajectory_station_property_edge(
-        self, available_trajectory_station_property: Union[str, AvailableTrajectoryStationPropertiesApply]
-    ) -> dm.EdgeApply:
-        if isinstance(available_trajectory_station_property, str):
-            end_space, end_node_ext_id = self.space, available_trajectory_station_property
-        elif isinstance(available_trajectory_station_property, DomainModelApply):
-            end_space, end_node_ext_id = (
-                available_trajectory_station_property.space,
-                available_trajectory_station_property.external_id,
-            )
-        else:
-            raise TypeError(
-                f"Expected str or AvailableTrajectoryStationPropertiesApply, got {type(available_trajectory_station_property)}"
-            )
-
-        return dm.EdgeApply(
-            space=self.space,
-            external_id=f"{self.external_id}:{end_node_ext_id}",
-            type=dm.DirectRelationReference(
-                "IntegrationTestsImmutable", "WellboreTrajectoryData.AvailableTrajectoryStationProperties"
-            ),
-            start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
-        )
-
-    def _create_geo_context_edge(self, geo_context: Union[str, GeoContextsApply]) -> dm.EdgeApply:
-        if isinstance(geo_context, str):
-            end_space, end_node_ext_id = self.space, geo_context
-        elif isinstance(geo_context, DomainModelApply):
-            end_space, end_node_ext_id = geo_context.space, geo_context.external_id
-        else:
-            raise TypeError(f"Expected str or GeoContextsApply, got {type(geo_context)}")
-
-        return dm.EdgeApply(
-            space=self.space,
-            external_id=f"{self.external_id}:{end_node_ext_id}",
-            type=dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreTrajectoryData.GeoContexts"),
-            start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
-        )
-
-    def _create_lineage_assertion_edge(self, lineage_assertion: Union[str, LineageAssertionsApply]) -> dm.EdgeApply:
-        if isinstance(lineage_assertion, str):
-            end_space, end_node_ext_id = self.space, lineage_assertion
-        elif isinstance(lineage_assertion, DomainModelApply):
-            end_space, end_node_ext_id = lineage_assertion.space, lineage_assertion.external_id
-        else:
-            raise TypeError(f"Expected str or LineageAssertionsApply, got {type(lineage_assertion)}")
-
-        return dm.EdgeApply(
-            space=self.space,
-            external_id=f"{self.external_id}:{end_node_ext_id}",
-            type=dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreTrajectoryData.LineageAssertions"),
-            start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
-        )
-
-    def _create_name_alias_edge(self, name_alias: Union[str, NameAliasesApply]) -> dm.EdgeApply:
-        if isinstance(name_alias, str):
-            end_space, end_node_ext_id = self.space, name_alias
-        elif isinstance(name_alias, DomainModelApply):
-            end_space, end_node_ext_id = name_alias.space, name_alias.external_id
-        else:
-            raise TypeError(f"Expected str or NameAliasesApply, got {type(name_alias)}")
-
-        return dm.EdgeApply(
-            space=self.space,
-            external_id=f"{self.external_id}:{end_node_ext_id}",
-            type=dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreTrajectoryData.NameAliases"),
-            start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
-        )
-
-    def _create_technical_assurance_edge(
-        self, technical_assurance: Union[str, TechnicalAssurancesApply]
-    ) -> dm.EdgeApply:
-        if isinstance(technical_assurance, str):
-            end_space, end_node_ext_id = self.space, technical_assurance
-        elif isinstance(technical_assurance, DomainModelApply):
-            end_space, end_node_ext_id = technical_assurance.space, technical_assurance.external_id
-        else:
-            raise TypeError(f"Expected str or TechnicalAssurancesApply, got {type(technical_assurance)}")
-
-        return dm.EdgeApply(
-            space=self.space,
-            external_id=f"{self.external_id}:{end_node_ext_id}",
-            type=dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreTrajectoryData.TechnicalAssurances"),
-            start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
-        )
+        return resources
 
 
-class WellboreTrajectoryDataList(TypeList[WellboreTrajectoryData]):
-    """List of wellbore trajectory data in read version."""
+class WellboreTrajectoryDataList(DomainModelList[WellboreTrajectoryData]):
+    """List of wellbore trajectory data in the read version."""
 
-    _NODE = WellboreTrajectoryData
+    _INSTANCE = WellboreTrajectoryData
 
     def as_apply(self) -> WellboreTrajectoryDataApplyList:
-        """Convert this read version of wellbore trajectory datum to a write version."""
+        """Convert these read versions of wellbore trajectory datum to the writing versions."""
         return WellboreTrajectoryDataApplyList([node.as_apply() for node in self.data])
 
 
-class WellboreTrajectoryDataApplyList(TypeApplyList[WellboreTrajectoryDataApply]):
-    """List of wellbore trajectory data in write version."""
+class WellboreTrajectoryDataApplyList(DomainModelApplyList[WellboreTrajectoryDataApply]):
+    """List of wellbore trajectory data in the writing version."""
 
-    _NODE = WellboreTrajectoryDataApply
+    _INSTANCE = WellboreTrajectoryDataApply
+
+
+def _create_wellbore_trajectory_datum_filter(
+    view_id: dm.ViewId,
+    acquisition_date: str | list[str] | None = None,
+    acquisition_date_prefix: str | None = None,
+    acquisition_remark: str | list[str] | None = None,
+    acquisition_remark_prefix: str | None = None,
+    active_indicator: bool | None = None,
+    applied_operations_date_time: str | list[str] | None = None,
+    applied_operations_date_time_prefix: str | None = None,
+    applied_operations_remarks: str | list[str] | None = None,
+    applied_operations_remarks_prefix: str | None = None,
+    applied_operations_user: str | list[str] | None = None,
+    applied_operations_user_prefix: str | None = None,
+    azimuth_reference_type: str | list[str] | None = None,
+    azimuth_reference_type_prefix: str | None = None,
+    min_base_depth_measured_depth: int | None = None,
+    max_base_depth_measured_depth: int | None = None,
+    calculation_method_type: str | list[str] | None = None,
+    calculation_method_type_prefix: str | None = None,
+    company_id: str | list[str] | None = None,
+    company_id_prefix: str | None = None,
+    creation_date_time: str | list[str] | None = None,
+    creation_date_time_prefix: str | None = None,
+    description: str | list[str] | None = None,
+    description_prefix: str | None = None,
+    end_date_time: str | list[str] | None = None,
+    end_date_time_prefix: str | None = None,
+    existence_kind: str | list[str] | None = None,
+    existence_kind_prefix: str | None = None,
+    min_extrapolated_measured_depth: int | None = None,
+    max_extrapolated_measured_depth: int | None = None,
+    extrapolated_measured_depth_remark: str | list[str] | None = None,
+    extrapolated_measured_depth_remark_prefix: str | None = None,
+    geographic_crsid: str | list[str] | None = None,
+    geographic_crsid_prefix: str | None = None,
+    is_discoverable: bool | None = None,
+    is_extended_load: bool | None = None,
+    name: str | list[str] | None = None,
+    name_prefix: str | None = None,
+    projected_crsid: str | list[str] | None = None,
+    projected_crsid_prefix: str | None = None,
+    resource_curation_status: str | list[str] | None = None,
+    resource_curation_status_prefix: str | None = None,
+    resource_home_region_id: str | list[str] | None = None,
+    resource_home_region_id_prefix: str | None = None,
+    resource_lifecycle_status: str | list[str] | None = None,
+    resource_lifecycle_status_prefix: str | None = None,
+    resource_security_classification: str | list[str] | None = None,
+    resource_security_classification_prefix: str | None = None,
+    service_company_id: str | list[str] | None = None,
+    service_company_id_prefix: str | None = None,
+    source: str | list[str] | None = None,
+    source_prefix: str | None = None,
+    spatial_area: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+    spatial_point: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+    start_date_time: str | list[str] | None = None,
+    start_date_time_prefix: str | None = None,
+    submitter_name: str | list[str] | None = None,
+    submitter_name_prefix: str | None = None,
+    min_surface_grid_convergence: float | None = None,
+    max_surface_grid_convergence: float | None = None,
+    min_surface_scale_factor: float | None = None,
+    max_surface_scale_factor: float | None = None,
+    survey_reference_identifier: str | list[str] | None = None,
+    survey_reference_identifier_prefix: str | None = None,
+    survey_tool_type_id: str | list[str] | None = None,
+    survey_tool_type_id_prefix: str | None = None,
+    survey_type: str | list[str] | None = None,
+    survey_type_prefix: str | None = None,
+    survey_version: str | list[str] | None = None,
+    survey_version_prefix: str | None = None,
+    min_tie_measured_depth: int | None = None,
+    max_tie_measured_depth: int | None = None,
+    min_tie_true_vertical_depth: int | None = None,
+    max_tie_true_vertical_depth: int | None = None,
+    min_top_depth_measured_depth: int | None = None,
+    max_top_depth_measured_depth: int | None = None,
+    min_tortuosity: float | None = None,
+    max_tortuosity: float | None = None,
+    vertical_measurement: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+    wellbore_id: str | list[str] | None = None,
+    wellbore_id_prefix: str | None = None,
+    external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if acquisition_date and isinstance(acquisition_date, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("AcquisitionDate"), value=acquisition_date))
+    if acquisition_date and isinstance(acquisition_date, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("AcquisitionDate"), values=acquisition_date))
+    if acquisition_date_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("AcquisitionDate"), value=acquisition_date_prefix))
+    if acquisition_remark and isinstance(acquisition_remark, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("AcquisitionRemark"), value=acquisition_remark))
+    if acquisition_remark and isinstance(acquisition_remark, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("AcquisitionRemark"), values=acquisition_remark))
+    if acquisition_remark_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("AcquisitionRemark"), value=acquisition_remark_prefix))
+    if active_indicator and isinstance(active_indicator, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("ActiveIndicator"), value=active_indicator))
+    if applied_operations_date_time and isinstance(applied_operations_date_time, str):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("AppliedOperationsDateTime"), value=applied_operations_date_time)
+        )
+    if applied_operations_date_time and isinstance(applied_operations_date_time, list):
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("AppliedOperationsDateTime"), values=applied_operations_date_time)
+        )
+    if applied_operations_date_time_prefix:
+        filters.append(
+            dm.filters.Prefix(
+                view_id.as_property_ref("AppliedOperationsDateTime"), value=applied_operations_date_time_prefix
+            )
+        )
+    if applied_operations_remarks and isinstance(applied_operations_remarks, str):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("AppliedOperationsRemarks"), value=applied_operations_remarks)
+        )
+    if applied_operations_remarks and isinstance(applied_operations_remarks, list):
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("AppliedOperationsRemarks"), values=applied_operations_remarks)
+        )
+    if applied_operations_remarks_prefix:
+        filters.append(
+            dm.filters.Prefix(
+                view_id.as_property_ref("AppliedOperationsRemarks"), value=applied_operations_remarks_prefix
+            )
+        )
+    if applied_operations_user and isinstance(applied_operations_user, str):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("AppliedOperationsUser"), value=applied_operations_user)
+        )
+    if applied_operations_user and isinstance(applied_operations_user, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("AppliedOperationsUser"), values=applied_operations_user))
+    if applied_operations_user_prefix:
+        filters.append(
+            dm.filters.Prefix(view_id.as_property_ref("AppliedOperationsUser"), value=applied_operations_user_prefix)
+        )
+    if azimuth_reference_type and isinstance(azimuth_reference_type, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("AzimuthReferenceType"), value=azimuth_reference_type))
+    if azimuth_reference_type and isinstance(azimuth_reference_type, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("AzimuthReferenceType"), values=azimuth_reference_type))
+    if azimuth_reference_type_prefix:
+        filters.append(
+            dm.filters.Prefix(view_id.as_property_ref("AzimuthReferenceType"), value=azimuth_reference_type_prefix)
+        )
+    if min_base_depth_measured_depth or max_base_depth_measured_depth:
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("BaseDepthMeasuredDepth"),
+                gte=min_base_depth_measured_depth,
+                lte=max_base_depth_measured_depth,
+            )
+        )
+    if calculation_method_type and isinstance(calculation_method_type, str):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("CalculationMethodType"), value=calculation_method_type)
+        )
+    if calculation_method_type and isinstance(calculation_method_type, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("CalculationMethodType"), values=calculation_method_type))
+    if calculation_method_type_prefix:
+        filters.append(
+            dm.filters.Prefix(view_id.as_property_ref("CalculationMethodType"), value=calculation_method_type_prefix)
+        )
+    if company_id and isinstance(company_id, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("CompanyID"), value=company_id))
+    if company_id and isinstance(company_id, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("CompanyID"), values=company_id))
+    if company_id_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("CompanyID"), value=company_id_prefix))
+    if creation_date_time and isinstance(creation_date_time, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("CreationDateTime"), value=creation_date_time))
+    if creation_date_time and isinstance(creation_date_time, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("CreationDateTime"), values=creation_date_time))
+    if creation_date_time_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("CreationDateTime"), value=creation_date_time_prefix))
+    if description and isinstance(description, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("Description"), value=description))
+    if description and isinstance(description, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("Description"), values=description))
+    if description_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("Description"), value=description_prefix))
+    if end_date_time and isinstance(end_date_time, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("EndDateTime"), value=end_date_time))
+    if end_date_time and isinstance(end_date_time, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("EndDateTime"), values=end_date_time))
+    if end_date_time_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("EndDateTime"), value=end_date_time_prefix))
+    if existence_kind and isinstance(existence_kind, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("ExistenceKind"), value=existence_kind))
+    if existence_kind and isinstance(existence_kind, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("ExistenceKind"), values=existence_kind))
+    if existence_kind_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("ExistenceKind"), value=existence_kind_prefix))
+    if min_extrapolated_measured_depth or max_extrapolated_measured_depth:
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("ExtrapolatedMeasuredDepth"),
+                gte=min_extrapolated_measured_depth,
+                lte=max_extrapolated_measured_depth,
+            )
+        )
+    if extrapolated_measured_depth_remark and isinstance(extrapolated_measured_depth_remark, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("ExtrapolatedMeasuredDepthRemark"), value=extrapolated_measured_depth_remark
+            )
+        )
+    if extrapolated_measured_depth_remark and isinstance(extrapolated_measured_depth_remark, list):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("ExtrapolatedMeasuredDepthRemark"), values=extrapolated_measured_depth_remark
+            )
+        )
+    if extrapolated_measured_depth_remark_prefix:
+        filters.append(
+            dm.filters.Prefix(
+                view_id.as_property_ref("ExtrapolatedMeasuredDepthRemark"),
+                value=extrapolated_measured_depth_remark_prefix,
+            )
+        )
+    if geographic_crsid and isinstance(geographic_crsid, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("GeographicCRSID"), value=geographic_crsid))
+    if geographic_crsid and isinstance(geographic_crsid, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("GeographicCRSID"), values=geographic_crsid))
+    if geographic_crsid_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("GeographicCRSID"), value=geographic_crsid_prefix))
+    if is_discoverable and isinstance(is_discoverable, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("IsDiscoverable"), value=is_discoverable))
+    if is_extended_load and isinstance(is_extended_load, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("IsExtendedLoad"), value=is_extended_load))
+    if name and isinstance(name, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("Name"), value=name))
+    if name and isinstance(name, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("Name"), values=name))
+    if name_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("Name"), value=name_prefix))
+    if projected_crsid and isinstance(projected_crsid, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("ProjectedCRSID"), value=projected_crsid))
+    if projected_crsid and isinstance(projected_crsid, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("ProjectedCRSID"), values=projected_crsid))
+    if projected_crsid_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("ProjectedCRSID"), value=projected_crsid_prefix))
+    if resource_curation_status and isinstance(resource_curation_status, str):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("ResourceCurationStatus"), value=resource_curation_status)
+        )
+    if resource_curation_status and isinstance(resource_curation_status, list):
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("ResourceCurationStatus"), values=resource_curation_status)
+        )
+    if resource_curation_status_prefix:
+        filters.append(
+            dm.filters.Prefix(view_id.as_property_ref("ResourceCurationStatus"), value=resource_curation_status_prefix)
+        )
+    if resource_home_region_id and isinstance(resource_home_region_id, str):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("ResourceHomeRegionID"), value=resource_home_region_id)
+        )
+    if resource_home_region_id and isinstance(resource_home_region_id, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("ResourceHomeRegionID"), values=resource_home_region_id))
+    if resource_home_region_id_prefix:
+        filters.append(
+            dm.filters.Prefix(view_id.as_property_ref("ResourceHomeRegionID"), value=resource_home_region_id_prefix)
+        )
+    if resource_lifecycle_status and isinstance(resource_lifecycle_status, str):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("ResourceLifecycleStatus"), value=resource_lifecycle_status)
+        )
+    if resource_lifecycle_status and isinstance(resource_lifecycle_status, list):
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("ResourceLifecycleStatus"), values=resource_lifecycle_status)
+        )
+    if resource_lifecycle_status_prefix:
+        filters.append(
+            dm.filters.Prefix(
+                view_id.as_property_ref("ResourceLifecycleStatus"), value=resource_lifecycle_status_prefix
+            )
+        )
+    if resource_security_classification and isinstance(resource_security_classification, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("ResourceSecurityClassification"), value=resource_security_classification
+            )
+        )
+    if resource_security_classification and isinstance(resource_security_classification, list):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("ResourceSecurityClassification"), values=resource_security_classification
+            )
+        )
+    if resource_security_classification_prefix:
+        filters.append(
+            dm.filters.Prefix(
+                view_id.as_property_ref("ResourceSecurityClassification"), value=resource_security_classification_prefix
+            )
+        )
+    if service_company_id and isinstance(service_company_id, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("ServiceCompanyID"), value=service_company_id))
+    if service_company_id and isinstance(service_company_id, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("ServiceCompanyID"), values=service_company_id))
+    if service_company_id_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("ServiceCompanyID"), value=service_company_id_prefix))
+    if source and isinstance(source, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("Source"), value=source))
+    if source and isinstance(source, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("Source"), values=source))
+    if source_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("Source"), value=source_prefix))
+    if spatial_area and isinstance(spatial_area, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("SpatialArea"),
+                value={"space": "IntegrationTestsImmutable", "externalId": spatial_area},
+            )
+        )
+    if spatial_area and isinstance(spatial_area, tuple):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("SpatialArea"), value={"space": spatial_area[0], "externalId": spatial_area[1]}
+            )
+        )
+    if spatial_area and isinstance(spatial_area, list) and isinstance(spatial_area[0], str):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("SpatialArea"),
+                values=[{"space": "IntegrationTestsImmutable", "externalId": item} for item in spatial_area],
+            )
+        )
+    if spatial_area and isinstance(spatial_area, list) and isinstance(spatial_area[0], tuple):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("SpatialArea"),
+                values=[{"space": item[0], "externalId": item[1]} for item in spatial_area],
+            )
+        )
+    if spatial_point and isinstance(spatial_point, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("SpatialPoint"),
+                value={"space": "IntegrationTestsImmutable", "externalId": spatial_point},
+            )
+        )
+    if spatial_point and isinstance(spatial_point, tuple):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("SpatialPoint"),
+                value={"space": spatial_point[0], "externalId": spatial_point[1]},
+            )
+        )
+    if spatial_point and isinstance(spatial_point, list) and isinstance(spatial_point[0], str):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("SpatialPoint"),
+                values=[{"space": "IntegrationTestsImmutable", "externalId": item} for item in spatial_point],
+            )
+        )
+    if spatial_point and isinstance(spatial_point, list) and isinstance(spatial_point[0], tuple):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("SpatialPoint"),
+                values=[{"space": item[0], "externalId": item[1]} for item in spatial_point],
+            )
+        )
+    if start_date_time and isinstance(start_date_time, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("StartDateTime"), value=start_date_time))
+    if start_date_time and isinstance(start_date_time, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("StartDateTime"), values=start_date_time))
+    if start_date_time_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("StartDateTime"), value=start_date_time_prefix))
+    if submitter_name and isinstance(submitter_name, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("SubmitterName"), value=submitter_name))
+    if submitter_name and isinstance(submitter_name, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("SubmitterName"), values=submitter_name))
+    if submitter_name_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("SubmitterName"), value=submitter_name_prefix))
+    if min_surface_grid_convergence or max_surface_grid_convergence:
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("SurfaceGridConvergence"),
+                gte=min_surface_grid_convergence,
+                lte=max_surface_grid_convergence,
+            )
+        )
+    if min_surface_scale_factor or max_surface_scale_factor:
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("SurfaceScaleFactor"),
+                gte=min_surface_scale_factor,
+                lte=max_surface_scale_factor,
+            )
+        )
+    if survey_reference_identifier and isinstance(survey_reference_identifier, str):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("SurveyReferenceIdentifier"), value=survey_reference_identifier)
+        )
+    if survey_reference_identifier and isinstance(survey_reference_identifier, list):
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("SurveyReferenceIdentifier"), values=survey_reference_identifier)
+        )
+    if survey_reference_identifier_prefix:
+        filters.append(
+            dm.filters.Prefix(
+                view_id.as_property_ref("SurveyReferenceIdentifier"), value=survey_reference_identifier_prefix
+            )
+        )
+    if survey_tool_type_id and isinstance(survey_tool_type_id, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("SurveyToolTypeID"), value=survey_tool_type_id))
+    if survey_tool_type_id and isinstance(survey_tool_type_id, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("SurveyToolTypeID"), values=survey_tool_type_id))
+    if survey_tool_type_id_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("SurveyToolTypeID"), value=survey_tool_type_id_prefix))
+    if survey_type and isinstance(survey_type, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("SurveyType"), value=survey_type))
+    if survey_type and isinstance(survey_type, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("SurveyType"), values=survey_type))
+    if survey_type_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("SurveyType"), value=survey_type_prefix))
+    if survey_version and isinstance(survey_version, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("SurveyVersion"), value=survey_version))
+    if survey_version and isinstance(survey_version, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("SurveyVersion"), values=survey_version))
+    if survey_version_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("SurveyVersion"), value=survey_version_prefix))
+    if min_tie_measured_depth or max_tie_measured_depth:
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("TieMeasuredDepth"), gte=min_tie_measured_depth, lte=max_tie_measured_depth
+            )
+        )
+    if min_tie_true_vertical_depth or max_tie_true_vertical_depth:
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("TieTrueVerticalDepth"),
+                gte=min_tie_true_vertical_depth,
+                lte=max_tie_true_vertical_depth,
+            )
+        )
+    if min_top_depth_measured_depth or max_top_depth_measured_depth:
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("TopDepthMeasuredDepth"),
+                gte=min_top_depth_measured_depth,
+                lte=max_top_depth_measured_depth,
+            )
+        )
+    if min_tortuosity or max_tortuosity:
+        filters.append(dm.filters.Range(view_id.as_property_ref("Tortuosity"), gte=min_tortuosity, lte=max_tortuosity))
+    if vertical_measurement and isinstance(vertical_measurement, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("VerticalMeasurement"),
+                value={"space": "IntegrationTestsImmutable", "externalId": vertical_measurement},
+            )
+        )
+    if vertical_measurement and isinstance(vertical_measurement, tuple):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("VerticalMeasurement"),
+                value={"space": vertical_measurement[0], "externalId": vertical_measurement[1]},
+            )
+        )
+    if vertical_measurement and isinstance(vertical_measurement, list) and isinstance(vertical_measurement[0], str):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("VerticalMeasurement"),
+                values=[{"space": "IntegrationTestsImmutable", "externalId": item} for item in vertical_measurement],
+            )
+        )
+    if vertical_measurement and isinstance(vertical_measurement, list) and isinstance(vertical_measurement[0], tuple):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("VerticalMeasurement"),
+                values=[{"space": item[0], "externalId": item[1]} for item in vertical_measurement],
+            )
+        )
+    if wellbore_id and isinstance(wellbore_id, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("WellboreID"), value=wellbore_id))
+    if wellbore_id and isinstance(wellbore_id, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("WellboreID"), values=wellbore_id))
+    if wellbore_id_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("WellboreID"), value=wellbore_id_prefix))
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

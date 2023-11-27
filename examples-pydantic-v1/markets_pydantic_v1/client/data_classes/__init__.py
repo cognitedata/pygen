@@ -1,4 +1,11 @@
-from ._core import DomainModel, DomainModelApply
+from ._core import (
+    DomainModel,
+    DomainModelApply,
+    DomainModelList,
+    DomainRelationApply,
+    ResourcesApply,
+    ResourcesApplyResult,
+)
 from ._bid import Bid, BidApply, BidApplyList, BidFields, BidList, BidTextFields
 from ._cog_bid import CogBid, CogBidApply, CogBidApplyList, CogBidFields, CogBidList, CogBidTextFields
 from ._cog_pool import CogPool, CogPoolApply, CogPoolApplyList, CogPoolFields, CogPoolList, CogPoolTextFields
@@ -52,6 +59,32 @@ from ._value_transformation import (
     ValueTransformationTextFields,
 )
 
+Bid.update_forward_refs(
+    Market=Market,
+)
+CogBid.update_forward_refs(
+    Market=Market,
+)
+CogProcess.update_forward_refs(
+    Bid=Bid,
+    DateTransformationPair=DateTransformationPair,
+    ValueTransformation=ValueTransformation,
+)
+DateTransformationPair.update_forward_refs(
+    DateTransformation=DateTransformation,
+)
+Process.update_forward_refs(
+    Bid=Bid,
+)
+PygenBid.update_forward_refs(
+    Market=Market,
+)
+PygenProcess.update_forward_refs(
+    Bid=Bid,
+    DateTransformationPair=DateTransformationPair,
+    ValueTransformation=ValueTransformation,
+)
+
 BidApply.update_forward_refs(
     MarketApply=MarketApply,
 )
@@ -79,8 +112,12 @@ PygenProcessApply.update_forward_refs(
 )
 
 __all__ = [
+    "ResourcesApply",
     "DomainModel",
     "DomainModelApply",
+    "DomainModelList",
+    "DomainRelationApply",
+    "ResourcesApplyResult",
     "Bid",
     "BidApply",
     "BidList",

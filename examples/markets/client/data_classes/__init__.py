@@ -1,4 +1,11 @@
-from ._core import DomainModel, DomainModelApply
+from ._core import (
+    DomainModel,
+    DomainModelApply,
+    DomainModelList,
+    DomainRelationApply,
+    ResourcesApply,
+    ResourcesApplyResult,
+)
 from ._bid import Bid, BidApply, BidApplyList, BidFields, BidList, BidTextFields
 from ._cog_bid import CogBid, CogBidApply, CogBidApplyList, CogBidFields, CogBidList, CogBidTextFields
 from ._cog_pool import CogPool, CogPoolApply, CogPoolApplyList, CogPoolFields, CogPoolList, CogPoolTextFields
@@ -52,17 +59,28 @@ from ._value_transformation import (
     ValueTransformationTextFields,
 )
 
+Bid.model_rebuild()
 BidApply.model_rebuild()
+CogBid.model_rebuild()
 CogBidApply.model_rebuild()
+CogProcess.model_rebuild()
 CogProcessApply.model_rebuild()
+DateTransformationPair.model_rebuild()
 DateTransformationPairApply.model_rebuild()
+Process.model_rebuild()
 ProcessApply.model_rebuild()
+PygenBid.model_rebuild()
 PygenBidApply.model_rebuild()
+PygenProcess.model_rebuild()
 PygenProcessApply.model_rebuild()
 
 __all__ = [
+    "ResourcesApply",
     "DomainModel",
     "DomainModelApply",
+    "DomainModelList",
+    "DomainRelationApply",
+    "ResourcesApplyResult",
     "Bid",
     "BidApply",
     "BidList",

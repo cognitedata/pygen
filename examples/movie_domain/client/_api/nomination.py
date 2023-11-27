@@ -1,25 +1,39 @@
 from __future__ import annotations
 
-from typing import Sequence, overload
+from collections.abc import Sequence
+from typing import overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from movie_domain.client.data_classes import (
+    DomainModelApply,
+    ResourcesApplyResult,
     Nomination,
     NominationApply,
+    NominationFields,
     NominationList,
     NominationApplyList,
-    NominationFields,
     NominationTextFields,
-    DomainModelApply,
 )
-from movie_domain.client.data_classes._nomination import _NOMINATION_PROPERTIES_BY_FIELD
+from movie_domain.client.data_classes._nomination import (
+    _NOMINATION_PROPERTIES_BY_FIELD,
+    _create_nomination_filter,
+)
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
+from .nomination_query import NominationQueryAPI
 
 
-class NominationAPI(TypeAPI[Nomination, NominationApply, NominationList]):
+class NominationAPI(NodeAPI[Nomination, NominationApply, NominationList]):
     def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
         view_id = view_by_write_class[NominationApply]
         super().__init__(
@@ -28,13 +42,70 @@ class NominationAPI(TypeAPI[Nomination, NominationApply, NominationList]):
             class_type=Nomination,
             class_apply_type=NominationApply,
             class_list=NominationList,
+            class_apply_list=NominationApplyList,
+            view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self._view_by_write_class = view_by_write_class
+
+    def __call__(
+        self,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        min_year: int | None = None,
+        max_year: int | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+        filter: dm.Filter | None = None,
+    ) -> NominationQueryAPI[NominationList]:
+        """Query starting at nominations.
+
+        Args:
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            min_year: The minimum value of the year to filter on.
+            max_year: The maximum value of the year to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of nominations to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            A query API for nominations.
+
+        """
+        filter_ = _create_nomination_filter(
+            self._view_id,
+            name,
+            name_prefix,
+            min_year,
+            max_year,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        builder = QueryBuilder(
+            NominationList,
+            [
+                QueryStep(
+                    name="nomination",
+                    expression=dm.query.NodeResultSetExpression(
+                        from_=None,
+                        filter=filter_,
+                    ),
+                    select=dm.query.Select(
+                        [dm.query.SourceSelector(self._view_id, list(_NOMINATION_PROPERTIES_BY_FIELD.values()))]
+                    ),
+                    result_cls=Nomination,
+                    max_retrieve_limit=limit,
+                )
+            ],
+        )
+        return NominationQueryAPI(self._client, builder, self._view_by_write_class)
 
     def apply(
         self, nomination: NominationApply | Sequence[NominationApply], replace: bool = False
-    ) -> dm.InstancesApplyResult:
+    ) -> ResourcesApplyResult:
         """Add or update (upsert) nominations.
 
         Args:
@@ -42,7 +113,7 @@ class NominationAPI(TypeAPI[Nomination, NominationApply, NominationList]):
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes, edges, and time series.
 
         Examples:
 
@@ -55,20 +126,10 @@ class NominationAPI(TypeAPI[Nomination, NominationApply, NominationList]):
                 >>> result = client.nomination.apply(nomination)
 
         """
-        if isinstance(nomination, NominationApply):
-            instances = nomination.to_instances_apply(self._view_by_write_class)
-        else:
-            instances = NominationApplyList(nomination).to_instances_apply(self._view_by_write_class)
-        return self._client.data_modeling.instances.apply(
-            nodes=instances.nodes,
-            edges=instances.edges,
-            auto_create_start_nodes=True,
-            auto_create_end_nodes=True,
-            replace=replace,
-        )
+        return self._apply(nomination, replace)
 
     def delete(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> dm.InstancesDeleteResult:
         """Delete one or more nomination.
 
@@ -87,23 +148,18 @@ class NominationAPI(TypeAPI[Nomination, NominationApply, NominationList]):
                 >>> client = MovieClient()
                 >>> client.nomination.delete("my_nomination")
         """
-        if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
-        else:
-            return self._client.data_modeling.instances.delete(
-                nodes=[(space, id) for id in external_id],
-            )
+        return self._delete(external_id, space)
 
     @overload
     def retrieve(self, external_id: str) -> Nomination:
         ...
 
     @overload
-    def retrieve(self, external_id: Sequence[str]) -> NominationList:
+    def retrieve(self, external_id: SequenceNotStr[str]) -> NominationList:
         ...
 
     def retrieve(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> Nomination | NominationList:
         """Retrieve one or more nominations by id(s).
 
@@ -123,10 +179,7 @@ class NominationAPI(TypeAPI[Nomination, NominationApply, NominationList]):
                 >>> nomination = client.nomination.retrieve("my_nomination")
 
         """
-        if isinstance(external_id, str):
-            return self._retrieve((space, external_id))
-        else:
-            return self._retrieve([(space, ext_id) for ext_id in external_id])
+        return self._retrieve(external_id, space)
 
     def search(
         self,
@@ -167,7 +220,7 @@ class NominationAPI(TypeAPI[Nomination, NominationApply, NominationList]):
                 >>> nominations = client.nomination.search('my_nomination')
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_nomination_filter(
             self._view_id,
             name,
             name_prefix,
@@ -272,7 +325,7 @@ class NominationAPI(TypeAPI[Nomination, NominationApply, NominationList]):
 
         """
 
-        filter_ = _create_filter(
+        filter_ = _create_nomination_filter(
             self._view_id,
             name,
             name_prefix,
@@ -329,7 +382,7 @@ class NominationAPI(TypeAPI[Nomination, NominationApply, NominationList]):
             Bucketed histogram results.
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_nomination_filter(
             self._view_id,
             name,
             name_prefix,
@@ -385,7 +438,7 @@ class NominationAPI(TypeAPI[Nomination, NominationApply, NominationList]):
                 >>> nominations = client.nomination.list(limit=5)
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_nomination_filter(
             self._view_id,
             name,
             name_prefix,
@@ -395,35 +448,4 @@ class NominationAPI(TypeAPI[Nomination, NominationApply, NominationList]):
             space,
             filter,
         )
-
         return self._list(limit=limit, filter=filter_)
-
-
-def _create_filter(
-    view_id: dm.ViewId,
-    name: str | list[str] | None = None,
-    name_prefix: str | None = None,
-    min_year: int | None = None,
-    max_year: int | None = None,
-    external_id_prefix: str | None = None,
-    space: str | list[str] | None = None,
-    filter: dm.Filter | None = None,
-) -> dm.Filter | None:
-    filters = []
-    if name and isinstance(name, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
-    if name and isinstance(name, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("name"), values=name))
-    if name_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
-    if min_year or max_year:
-        filters.append(dm.filters.Range(view_id.as_property_ref("year"), gte=min_year, lte=max_year))
-    if external_id_prefix:
-        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
-        filters.append(dm.filters.Equals(["node", "space"], value=space))
-    if space and isinstance(space, list):
-        filters.append(dm.filters.In(["node", "space"], values=space))
-    if filter:
-        filters.append(filter)
-    return dm.filters.And(*filters) if filters else None

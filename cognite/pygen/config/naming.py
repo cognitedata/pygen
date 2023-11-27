@@ -80,6 +80,7 @@ class FieldNaming:
 
     name: Naming = Naming(Case.snake, Number.unchanged)
     variable: Naming = Naming(Case.snake, Number.singular)
+    edge_api_file: Naming = Naming(Case.snake, Number.unchanged)
     edge_api_class: Naming = Naming(Case.pascal, Number.unchanged)
     api_class_attribute: Naming = Naming(Case.snake, Number.unchanged)
 

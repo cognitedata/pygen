@@ -28,7 +28,8 @@ app = typer.Typer(
 def generate_sdks(
     overwrite: bool = typer.Option(
         False, help="Whether to overwrite the files expected to be manually maintained in the examples"
-    )
+    ),
+    sdk: str = typer.Option(None, help="Generate only the specified SDK"),
 ):
     for example_sdk in EXAMPLE_SDKS:
         if example_sdk.download_only:

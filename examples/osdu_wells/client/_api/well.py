@@ -1,124 +1,40 @@
 from __future__ import annotations
 
-from collections import defaultdict
-from typing import Dict, List, Sequence, Tuple, overload
+from collections.abc import Sequence
+from typing import overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from osdu_wells.client.data_classes import (
+    DomainModelApply,
+    ResourcesApplyResult,
     Well,
     WellApply,
+    WellFields,
     WellList,
     WellApplyList,
-    WellFields,
     WellTextFields,
-    DomainModelApply,
 )
-from osdu_wells.client.data_classes._well import _WELL_PROPERTIES_BY_FIELD
+from osdu_wells.client.data_classes._well import (
+    _WELL_PROPERTIES_BY_FIELD,
+    _create_well_filter,
+)
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
+from .well_meta import WellMetaAPI
+from .well_query import WellQueryAPI
 
 
-class WellMetaAPI:
-    def __init__(self, client: CogniteClient):
-        self._client = client
-
-    def retrieve(
-        self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str = "IntegrationTestsImmutable"
-    ) -> dm.EdgeList:
-        """Retrieve one or more meta edges by id(s) of a well.
-
-        Args:
-            external_id: External id or list of external ids source well.
-            space: The space where all the meta edges are located.
-
-        Returns:
-            The requested meta edges.
-
-        Examples:
-
-            Retrieve meta edge by id:
-
-                >>> from osdu_wells.client import OSDUClient
-                >>> client = OSDUClient()
-                >>> well = client.well.meta.retrieve("my_meta")
-
-        """
-        f = dm.filters
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": "IntegrationTestsImmutable", "externalId": "Well.meta"},
-        )
-        if isinstance(external_id, (str, dm.NodeId)):
-            is_wells = f.Equals(
-                ["edge", "startNode"],
-                {"space": space, "externalId": external_id}
-                if isinstance(external_id, str)
-                else external_id.dump(camel_case=True, include_instance_type=False),
-            )
-        else:
-            is_wells = f.In(
-                ["edge", "startNode"],
-                [
-                    {"space": space, "externalId": ext_id}
-                    if isinstance(ext_id, str)
-                    else ext_id.dump(camel_case=True, include_instance_type=False)
-                    for ext_id in external_id
-                ],
-            )
-        return self._client.data_modeling.instances.list("edge", limit=-1, filter=f.And(is_edge_type, is_wells))
-
-    def list(
-        self,
-        well_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        limit=DEFAULT_LIMIT_READ,
-        space: str = "IntegrationTestsImmutable",
-    ) -> dm.EdgeList:
-        """List meta edges of a well.
-
-        Args:
-            well_id: ID of the source well.
-            limit: Maximum number of meta edges to return. Defaults to 25. Set to -1, float("inf") or None
-                to return all items.
-            space: The space where all the meta edges are located.
-
-        Returns:
-            The requested meta edges.
-
-        Examples:
-
-            List 5 meta edges connected to "my_well":
-
-                >>> from osdu_wells.client import OSDUClient
-                >>> client = OSDUClient()
-                >>> well = client.well.meta.list("my_well", limit=5)
-
-        """
-        f = dm.filters
-        filters = [
-            f.Equals(
-                ["edge", "type"],
-                {"space": "IntegrationTestsImmutable", "externalId": "Well.meta"},
-            )
-        ]
-        if well_id:
-            well_ids = well_id if isinstance(well_id, list) else [well_id]
-            is_wells = f.In(
-                ["edge", "startNode"],
-                [
-                    {"space": space, "externalId": ext_id}
-                    if isinstance(ext_id, str)
-                    else ext_id.dump(camel_case=True, include_instance_type=False)
-                    for ext_id in well_ids
-                ],
-            )
-            filters.append(is_wells)
-
-        return self._client.data_modeling.instances.list("edge", limit=limit, filter=f.And(*filters))
-
-
-class WellAPI(TypeAPI[Well, WellApply, WellList]):
+class WellAPI(NodeAPI[Well, WellApply, WellList]):
     def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
         view_id = view_by_write_class[WellApply]
         super().__init__(
@@ -127,15 +43,117 @@ class WellAPI(TypeAPI[Well, WellApply, WellList]):
             class_type=Well,
             class_apply_type=WellApply,
             class_list=WellList,
+            class_apply_list=WellApplyList,
+            view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self._view_by_write_class = view_by_write_class
-        self.meta = WellMetaAPI(client)
+        self.meta_edge = WellMetaAPI(client)
 
-    def apply(self, well: WellApply | Sequence[WellApply], replace: bool = False) -> dm.InstancesApplyResult:
+    def __call__(
+        self,
+        acl: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        ancestry: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        create_time: str | list[str] | None = None,
+        create_time_prefix: str | None = None,
+        create_user: str | list[str] | None = None,
+        create_user_prefix: str | None = None,
+        data: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        id_: str | list[str] | None = None,
+        id_prefix: str | None = None,
+        kind: str | list[str] | None = None,
+        kind_prefix: str | None = None,
+        legal: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        modify_time: str | list[str] | None = None,
+        modify_time_prefix: str | None = None,
+        modify_user: str | list[str] | None = None,
+        modify_user_prefix: str | None = None,
+        tags: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        min_version_: int | None = None,
+        max_version_: int | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+        filter: dm.Filter | None = None,
+    ) -> WellQueryAPI[WellList]:
+        """Query starting at wells.
+
+        Args:
+            acl: The acl to filter on.
+            ancestry: The ancestry to filter on.
+            create_time: The create time to filter on.
+            create_time_prefix: The prefix of the create time to filter on.
+            create_user: The create user to filter on.
+            create_user_prefix: The prefix of the create user to filter on.
+            data: The datum to filter on.
+            id_: The id to filter on.
+            id_prefix: The prefix of the id to filter on.
+            kind: The kind to filter on.
+            kind_prefix: The prefix of the kind to filter on.
+            legal: The legal to filter on.
+            modify_time: The modify time to filter on.
+            modify_time_prefix: The prefix of the modify time to filter on.
+            modify_user: The modify user to filter on.
+            modify_user_prefix: The prefix of the modify user to filter on.
+            tags: The tag to filter on.
+            min_version_: The minimum value of the version to filter on.
+            max_version_: The maximum value of the version to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of wells to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            A query API for wells.
+
+        """
+        filter_ = _create_well_filter(
+            self._view_id,
+            acl,
+            ancestry,
+            create_time,
+            create_time_prefix,
+            create_user,
+            create_user_prefix,
+            data,
+            id_,
+            id_prefix,
+            kind,
+            kind_prefix,
+            legal,
+            modify_time,
+            modify_time_prefix,
+            modify_user,
+            modify_user_prefix,
+            tags,
+            min_version_,
+            max_version_,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        builder = QueryBuilder(
+            WellList,
+            [
+                QueryStep(
+                    name="well",
+                    expression=dm.query.NodeResultSetExpression(
+                        from_=None,
+                        filter=filter_,
+                    ),
+                    select=dm.query.Select(
+                        [dm.query.SourceSelector(self._view_id, list(_WELL_PROPERTIES_BY_FIELD.values()))]
+                    ),
+                    result_cls=Well,
+                    max_retrieve_limit=limit,
+                )
+            ],
+        )
+        return WellQueryAPI(self._client, builder, self._view_by_write_class)
+
+    def apply(self, well: WellApply | Sequence[WellApply], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) wells.
 
-        Note: This method iterates through all nodes linked to well and create them including the edges
+        Note: This method iterates through all nodes and timeseries linked to well and creates them including the edges
         between the nodes. For example, if any of `meta` are set, then these
         nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
 
@@ -144,7 +162,7 @@ class WellAPI(TypeAPI[Well, WellApply, WellList]):
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes, edges, and time series.
 
         Examples:
 
@@ -157,20 +175,10 @@ class WellAPI(TypeAPI[Well, WellApply, WellList]):
                 >>> result = client.well.apply(well)
 
         """
-        if isinstance(well, WellApply):
-            instances = well.to_instances_apply(self._view_by_write_class)
-        else:
-            instances = WellApplyList(well).to_instances_apply(self._view_by_write_class)
-        return self._client.data_modeling.instances.apply(
-            nodes=instances.nodes,
-            edges=instances.edges,
-            auto_create_start_nodes=True,
-            auto_create_end_nodes=True,
-            replace=replace,
-        )
+        return self._apply(well, replace)
 
     def delete(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> dm.InstancesDeleteResult:
         """Delete one or more well.
 
@@ -189,22 +197,19 @@ class WellAPI(TypeAPI[Well, WellApply, WellList]):
                 >>> client = OSDUClient()
                 >>> client.well.delete("my_well")
         """
-        if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
-        else:
-            return self._client.data_modeling.instances.delete(
-                nodes=[(space, id) for id in external_id],
-            )
+        return self._delete(external_id, space)
 
     @overload
     def retrieve(self, external_id: str) -> Well:
         ...
 
     @overload
-    def retrieve(self, external_id: Sequence[str]) -> WellList:
+    def retrieve(self, external_id: SequenceNotStr[str]) -> WellList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable") -> Well | WellList:
+    def retrieve(
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+    ) -> Well | WellList:
         """Retrieve one or more wells by id(s).
 
         Args:
@@ -223,20 +228,14 @@ class WellAPI(TypeAPI[Well, WellApply, WellList]):
                 >>> well = client.well.retrieve("my_well")
 
         """
-        if isinstance(external_id, str):
-            well = self._retrieve((space, external_id))
-
-            meta_edges = self.meta.retrieve(external_id, space=space)
-            well.meta = [edge.end_node.external_id for edge in meta_edges]
-
-            return well
-        else:
-            wells = self._retrieve([(space, ext_id) for ext_id in external_id])
-
-            meta_edges = self.meta.retrieve(wells.as_node_ids())
-            self._set_meta(wells, meta_edges)
-
-            return wells
+        return self._retrieve(
+            external_id,
+            space,
+            retrieve_edges=True,
+            edge_api_name_type_triple=[
+                (self.meta_edge, "meta", dm.DirectRelationReference("IntegrationTestsImmutable", "Well.meta")),
+            ],
+        )
 
     def search(
         self,
@@ -307,7 +306,7 @@ class WellAPI(TypeAPI[Well, WellApply, WellList]):
                 >>> wells = client.well.search('my_well')
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_well_filter(
             self._view_id,
             acl,
             ancestry,
@@ -487,7 +486,7 @@ class WellAPI(TypeAPI[Well, WellApply, WellList]):
 
         """
 
-        filter_ = _create_filter(
+        filter_ = _create_well_filter(
             self._view_id,
             acl,
             ancestry,
@@ -584,13 +583,12 @@ class WellAPI(TypeAPI[Well, WellApply, WellList]):
             space: The space to filter on.
             limit: Maximum number of wells to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            retrieve_edges: Whether to retrieve `meta` external ids for the wells. Defaults to True.
 
         Returns:
             Bucketed histogram results.
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_well_filter(
             self._view_id,
             acl,
             ancestry,
@@ -693,7 +691,7 @@ class WellAPI(TypeAPI[Well, WellApply, WellList]):
                 >>> wells = client.well.list(limit=5)
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_well_filter(
             self._view_id,
             acl,
             ancestry,
@@ -719,217 +717,11 @@ class WellAPI(TypeAPI[Well, WellApply, WellList]):
             filter,
         )
 
-        wells = self._list(limit=limit, filter=filter_)
-
-        if retrieve_edges:
-            space_arg = {"space": space} if space else {}
-            if len(ids := wells.as_node_ids()) > IN_FILTER_LIMIT:
-                meta_edges = self.meta.list(limit=-1, **space_arg)
-            else:
-                meta_edges = self.meta.list(ids, limit=-1)
-            self._set_meta(wells, meta_edges)
-
-        return wells
-
-    @staticmethod
-    def _set_meta(wells: Sequence[Well], meta_edges: Sequence[dm.Edge]):
-        edges_by_start_node: Dict[Tuple, List] = defaultdict(list)
-        for edge in meta_edges:
-            edges_by_start_node[edge.start_node.as_tuple()].append(edge)
-
-        for well in wells:
-            node_id = well.id_tuple()
-            if node_id in edges_by_start_node:
-                well.meta = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
-
-
-def _create_filter(
-    view_id: dm.ViewId,
-    acl: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-    ancestry: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-    create_time: str | list[str] | None = None,
-    create_time_prefix: str | None = None,
-    create_user: str | list[str] | None = None,
-    create_user_prefix: str | None = None,
-    data: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-    id_: str | list[str] | None = None,
-    id_prefix: str | None = None,
-    kind: str | list[str] | None = None,
-    kind_prefix: str | None = None,
-    legal: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-    modify_time: str | list[str] | None = None,
-    modify_time_prefix: str | None = None,
-    modify_user: str | list[str] | None = None,
-    modify_user_prefix: str | None = None,
-    tags: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-    min_version_: int | None = None,
-    max_version_: int | None = None,
-    external_id_prefix: str | None = None,
-    space: str | list[str] | None = None,
-    filter: dm.Filter | None = None,
-) -> dm.Filter | None:
-    filters = []
-    if acl and isinstance(acl, str):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("acl"), value={"space": "IntegrationTestsImmutable", "externalId": acl}
-            )
+        return self._list(
+            limit=limit,
+            filter=filter_,
+            retrieve_edges=retrieve_edges,
+            edge_api_name_type_triple=[
+                (self.meta_edge, "meta", dm.DirectRelationReference("IntegrationTestsImmutable", "Well.meta")),
+            ],
         )
-    if acl and isinstance(acl, tuple):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("acl"), value={"space": acl[0], "externalId": acl[1]}))
-    if acl and isinstance(acl, list) and isinstance(acl[0], str):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("acl"),
-                values=[{"space": "IntegrationTestsImmutable", "externalId": item} for item in acl],
-            )
-        )
-    if acl and isinstance(acl, list) and isinstance(acl[0], tuple):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("acl"), values=[{"space": item[0], "externalId": item[1]} for item in acl]
-            )
-        )
-    if ancestry and isinstance(ancestry, str):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("ancestry"),
-                value={"space": "IntegrationTestsImmutable", "externalId": ancestry},
-            )
-        )
-    if ancestry and isinstance(ancestry, tuple):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("ancestry"), value={"space": ancestry[0], "externalId": ancestry[1]}
-            )
-        )
-    if ancestry and isinstance(ancestry, list) and isinstance(ancestry[0], str):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("ancestry"),
-                values=[{"space": "IntegrationTestsImmutable", "externalId": item} for item in ancestry],
-            )
-        )
-    if ancestry and isinstance(ancestry, list) and isinstance(ancestry[0], tuple):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("ancestry"),
-                values=[{"space": item[0], "externalId": item[1]} for item in ancestry],
-            )
-        )
-    if create_time and isinstance(create_time, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("createTime"), value=create_time))
-    if create_time and isinstance(create_time, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("createTime"), values=create_time))
-    if create_time_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("createTime"), value=create_time_prefix))
-    if create_user and isinstance(create_user, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("createUser"), value=create_user))
-    if create_user and isinstance(create_user, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("createUser"), values=create_user))
-    if create_user_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("createUser"), value=create_user_prefix))
-    if data and isinstance(data, str):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("data"), value={"space": "IntegrationTestsImmutable", "externalId": data}
-            )
-        )
-    if data and isinstance(data, tuple):
-        filters.append(
-            dm.filters.Equals(view_id.as_property_ref("data"), value={"space": data[0], "externalId": data[1]})
-        )
-    if data and isinstance(data, list) and isinstance(data[0], str):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("data"),
-                values=[{"space": "IntegrationTestsImmutable", "externalId": item} for item in data],
-            )
-        )
-    if data and isinstance(data, list) and isinstance(data[0], tuple):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("data"), values=[{"space": item[0], "externalId": item[1]} for item in data]
-            )
-        )
-    if id_ and isinstance(id_, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("id"), value=id_))
-    if id_ and isinstance(id_, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("id"), values=id_))
-    if id_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("id"), value=id_prefix))
-    if kind and isinstance(kind, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("kind"), value=kind))
-    if kind and isinstance(kind, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("kind"), values=kind))
-    if kind_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("kind"), value=kind_prefix))
-    if legal and isinstance(legal, str):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("legal"), value={"space": "IntegrationTestsImmutable", "externalId": legal}
-            )
-        )
-    if legal and isinstance(legal, tuple):
-        filters.append(
-            dm.filters.Equals(view_id.as_property_ref("legal"), value={"space": legal[0], "externalId": legal[1]})
-        )
-    if legal and isinstance(legal, list) and isinstance(legal[0], str):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("legal"),
-                values=[{"space": "IntegrationTestsImmutable", "externalId": item} for item in legal],
-            )
-        )
-    if legal and isinstance(legal, list) and isinstance(legal[0], tuple):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("legal"), values=[{"space": item[0], "externalId": item[1]} for item in legal]
-            )
-        )
-    if modify_time and isinstance(modify_time, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("modifyTime"), value=modify_time))
-    if modify_time and isinstance(modify_time, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("modifyTime"), values=modify_time))
-    if modify_time_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("modifyTime"), value=modify_time_prefix))
-    if modify_user and isinstance(modify_user, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("modifyUser"), value=modify_user))
-    if modify_user and isinstance(modify_user, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("modifyUser"), values=modify_user))
-    if modify_user_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("modifyUser"), value=modify_user_prefix))
-    if tags and isinstance(tags, str):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("tags"), value={"space": "IntegrationTestsImmutable", "externalId": tags}
-            )
-        )
-    if tags and isinstance(tags, tuple):
-        filters.append(
-            dm.filters.Equals(view_id.as_property_ref("tags"), value={"space": tags[0], "externalId": tags[1]})
-        )
-    if tags and isinstance(tags, list) and isinstance(tags[0], str):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("tags"),
-                values=[{"space": "IntegrationTestsImmutable", "externalId": item} for item in tags],
-            )
-        )
-    if tags and isinstance(tags, list) and isinstance(tags[0], tuple):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("tags"), values=[{"space": item[0], "externalId": item[1]} for item in tags]
-            )
-        )
-    if min_version_ or max_version_:
-        filters.append(dm.filters.Range(view_id.as_property_ref("version"), gte=min_version_, lte=max_version_))
-    if external_id_prefix:
-        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
-        filters.append(dm.filters.Equals(["node", "space"], value=space))
-    if space and isinstance(space, list):
-        filters.append(dm.filters.In(["node", "space"], values=space))
-    if filter:
-        filters.append(filter)
-    return dm.filters.And(*filters) if filters else None

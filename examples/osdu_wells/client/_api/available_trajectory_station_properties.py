@@ -1,28 +1,40 @@
 from __future__ import annotations
 
-from typing import Sequence, overload
+from collections.abc import Sequence
+from typing import overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from osdu_wells.client.data_classes import (
+    DomainModelApply,
+    ResourcesApplyResult,
     AvailableTrajectoryStationProperties,
     AvailableTrajectoryStationPropertiesApply,
+    AvailableTrajectoryStationPropertiesFields,
     AvailableTrajectoryStationPropertiesList,
     AvailableTrajectoryStationPropertiesApplyList,
-    AvailableTrajectoryStationPropertiesFields,
     AvailableTrajectoryStationPropertiesTextFields,
-    DomainModelApply,
 )
 from osdu_wells.client.data_classes._available_trajectory_station_properties import (
     _AVAILABLETRAJECTORYSTATIONPROPERTIES_PROPERTIES_BY_FIELD,
+    _create_available_trajectory_station_property_filter,
 )
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
+from .available_trajectory_station_properties_query import AvailableTrajectoryStationPropertiesQueryAPI
 
 
 class AvailableTrajectoryStationPropertiesAPI(
-    TypeAPI[
+    NodeAPI[
         AvailableTrajectoryStationProperties,
         AvailableTrajectoryStationPropertiesApply,
         AvailableTrajectoryStationPropertiesList,
@@ -36,16 +48,83 @@ class AvailableTrajectoryStationPropertiesAPI(
             class_type=AvailableTrajectoryStationProperties,
             class_apply_type=AvailableTrajectoryStationPropertiesApply,
             class_list=AvailableTrajectoryStationPropertiesList,
+            class_apply_list=AvailableTrajectoryStationPropertiesApplyList,
+            view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self._view_by_write_class = view_by_write_class
+
+    def __call__(
+        self,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        station_property_unit_id: str | list[str] | None = None,
+        station_property_unit_id_prefix: str | None = None,
+        trajectory_station_property_type_id: str | list[str] | None = None,
+        trajectory_station_property_type_id_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+        filter: dm.Filter | None = None,
+    ) -> AvailableTrajectoryStationPropertiesQueryAPI[AvailableTrajectoryStationPropertiesList]:
+        """Query starting at available trajectory station properties.
+
+        Args:
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            station_property_unit_id: The station property unit id to filter on.
+            station_property_unit_id_prefix: The prefix of the station property unit id to filter on.
+            trajectory_station_property_type_id: The trajectory station property type id to filter on.
+            trajectory_station_property_type_id_prefix: The prefix of the trajectory station property type id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of available trajectory station properties to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            A query API for available trajectory station properties.
+
+        """
+        filter_ = _create_available_trajectory_station_property_filter(
+            self._view_id,
+            name,
+            name_prefix,
+            station_property_unit_id,
+            station_property_unit_id_prefix,
+            trajectory_station_property_type_id,
+            trajectory_station_property_type_id_prefix,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        builder = QueryBuilder(
+            AvailableTrajectoryStationPropertiesList,
+            [
+                QueryStep(
+                    name="available_trajectory_station_property",
+                    expression=dm.query.NodeResultSetExpression(
+                        from_=None,
+                        filter=filter_,
+                    ),
+                    select=dm.query.Select(
+                        [
+                            dm.query.SourceSelector(
+                                self._view_id, list(_AVAILABLETRAJECTORYSTATIONPROPERTIES_PROPERTIES_BY_FIELD.values())
+                            )
+                        ]
+                    ),
+                    result_cls=AvailableTrajectoryStationProperties,
+                    max_retrieve_limit=limit,
+                )
+            ],
+        )
+        return AvailableTrajectoryStationPropertiesQueryAPI(self._client, builder, self._view_by_write_class)
 
     def apply(
         self,
         available_trajectory_station_property: AvailableTrajectoryStationPropertiesApply
         | Sequence[AvailableTrajectoryStationPropertiesApply],
         replace: bool = False,
-    ) -> dm.InstancesApplyResult:
+    ) -> ResourcesApplyResult:
         """Add or update (upsert) available trajectory station properties.
 
         Args:
@@ -53,7 +132,7 @@ class AvailableTrajectoryStationPropertiesAPI(
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes, edges, and time series.
 
         Examples:
 
@@ -66,22 +145,10 @@ class AvailableTrajectoryStationPropertiesAPI(
                 >>> result = client.available_trajectory_station_properties.apply(available_trajectory_station_property)
 
         """
-        if isinstance(available_trajectory_station_property, AvailableTrajectoryStationPropertiesApply):
-            instances = available_trajectory_station_property.to_instances_apply(self._view_by_write_class)
-        else:
-            instances = AvailableTrajectoryStationPropertiesApplyList(
-                available_trajectory_station_property
-            ).to_instances_apply(self._view_by_write_class)
-        return self._client.data_modeling.instances.apply(
-            nodes=instances.nodes,
-            edges=instances.edges,
-            auto_create_start_nodes=True,
-            auto_create_end_nodes=True,
-            replace=replace,
-        )
+        return self._apply(available_trajectory_station_property, replace)
 
     def delete(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> dm.InstancesDeleteResult:
         """Delete one or more available trajectory station property.
 
@@ -100,23 +167,18 @@ class AvailableTrajectoryStationPropertiesAPI(
                 >>> client = OSDUClient()
                 >>> client.available_trajectory_station_properties.delete("my_available_trajectory_station_property")
         """
-        if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
-        else:
-            return self._client.data_modeling.instances.delete(
-                nodes=[(space, id) for id in external_id],
-            )
+        return self._delete(external_id, space)
 
     @overload
     def retrieve(self, external_id: str) -> AvailableTrajectoryStationProperties:
         ...
 
     @overload
-    def retrieve(self, external_id: Sequence[str]) -> AvailableTrajectoryStationPropertiesList:
+    def retrieve(self, external_id: SequenceNotStr[str]) -> AvailableTrajectoryStationPropertiesList:
         ...
 
     def retrieve(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> AvailableTrajectoryStationProperties | AvailableTrajectoryStationPropertiesList:
         """Retrieve one or more available trajectory station properties by id(s).
 
@@ -136,10 +198,7 @@ class AvailableTrajectoryStationPropertiesAPI(
                 >>> available_trajectory_station_property = client.available_trajectory_station_properties.retrieve("my_available_trajectory_station_property")
 
         """
-        if isinstance(external_id, str):
-            return self._retrieve((space, external_id))
-        else:
-            return self._retrieve([(space, ext_id) for ext_id in external_id])
+        return self._retrieve(external_id, space)
 
     def search(
         self,
@@ -186,7 +245,7 @@ class AvailableTrajectoryStationPropertiesAPI(
                 >>> available_trajectory_station_properties = client.available_trajectory_station_properties.search('my_available_trajectory_station_property')
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_available_trajectory_station_property_filter(
             self._view_id,
             name,
             name_prefix,
@@ -318,7 +377,7 @@ class AvailableTrajectoryStationPropertiesAPI(
 
         """
 
-        filter_ = _create_filter(
+        filter_ = _create_available_trajectory_station_property_filter(
             self._view_id,
             name,
             name_prefix,
@@ -383,7 +442,7 @@ class AvailableTrajectoryStationPropertiesAPI(
             Bucketed histogram results.
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_available_trajectory_station_property_filter(
             self._view_id,
             name,
             name_prefix,
@@ -445,7 +504,7 @@ class AvailableTrajectoryStationPropertiesAPI(
                 >>> available_trajectory_station_properties = client.available_trajectory_station_properties.list(limit=5)
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_available_trajectory_station_property_filter(
             self._view_id,
             name,
             name_prefix,
@@ -457,64 +516,4 @@ class AvailableTrajectoryStationPropertiesAPI(
             space,
             filter,
         )
-
         return self._list(limit=limit, filter=filter_)
-
-
-def _create_filter(
-    view_id: dm.ViewId,
-    name: str | list[str] | None = None,
-    name_prefix: str | None = None,
-    station_property_unit_id: str | list[str] | None = None,
-    station_property_unit_id_prefix: str | None = None,
-    trajectory_station_property_type_id: str | list[str] | None = None,
-    trajectory_station_property_type_id_prefix: str | None = None,
-    external_id_prefix: str | None = None,
-    space: str | list[str] | None = None,
-    filter: dm.Filter | None = None,
-) -> dm.Filter | None:
-    filters = []
-    if name and isinstance(name, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("Name"), value=name))
-    if name and isinstance(name, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("Name"), values=name))
-    if name_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("Name"), value=name_prefix))
-    if station_property_unit_id and isinstance(station_property_unit_id, str):
-        filters.append(
-            dm.filters.Equals(view_id.as_property_ref("StationPropertyUnitID"), value=station_property_unit_id)
-        )
-    if station_property_unit_id and isinstance(station_property_unit_id, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("StationPropertyUnitID"), values=station_property_unit_id))
-    if station_property_unit_id_prefix:
-        filters.append(
-            dm.filters.Prefix(view_id.as_property_ref("StationPropertyUnitID"), value=station_property_unit_id_prefix)
-        )
-    if trajectory_station_property_type_id and isinstance(trajectory_station_property_type_id, str):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("TrajectoryStationPropertyTypeID"), value=trajectory_station_property_type_id
-            )
-        )
-    if trajectory_station_property_type_id and isinstance(trajectory_station_property_type_id, list):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("TrajectoryStationPropertyTypeID"), values=trajectory_station_property_type_id
-            )
-        )
-    if trajectory_station_property_type_id_prefix:
-        filters.append(
-            dm.filters.Prefix(
-                view_id.as_property_ref("TrajectoryStationPropertyTypeID"),
-                value=trajectory_station_property_type_id_prefix,
-            )
-        )
-    if external_id_prefix:
-        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
-        filters.append(dm.filters.Equals(["node", "space"], value=space))
-    if space and isinstance(space, list):
-        filters.append(dm.filters.In(["node", "space"], values=space))
-    if filter:
-        filters.append(filter)
-    return dm.filters.And(*filters) if filters else None

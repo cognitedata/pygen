@@ -1,25 +1,39 @@
 from __future__ import annotations
 
-from typing import Sequence, overload
+from collections.abc import Sequence
+from typing import overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from markets.client.data_classes import (
+    DomainModelApply,
+    ResourcesApplyResult,
     Process,
     ProcessApply,
+    ProcessFields,
     ProcessList,
     ProcessApplyList,
-    ProcessFields,
     ProcessTextFields,
-    DomainModelApply,
 )
-from markets.client.data_classes._process import _PROCESS_PROPERTIES_BY_FIELD
+from markets.client.data_classes._process import (
+    _PROCESS_PROPERTIES_BY_FIELD,
+    _create_proces_filter,
+)
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
+from .process_query import ProcessQueryAPI
 
 
-class ProcessAPI(TypeAPI[Process, ProcessApply, ProcessList]):
+class ProcessAPI(NodeAPI[Process, ProcessApply, ProcessList]):
     def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
         view_id = view_by_write_class[ProcessApply]
         super().__init__(
@@ -28,11 +42,65 @@ class ProcessAPI(TypeAPI[Process, ProcessApply, ProcessList]):
             class_type=Process,
             class_apply_type=ProcessApply,
             class_list=ProcessList,
+            class_apply_list=ProcessApplyList,
+            view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self._view_by_write_class = view_by_write_class
 
-    def apply(self, proces: ProcessApply | Sequence[ProcessApply], replace: bool = False) -> dm.InstancesApplyResult:
+    def __call__(
+        self,
+        bid: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+        filter: dm.Filter | None = None,
+    ) -> ProcessQueryAPI[ProcessList]:
+        """Query starting at process.
+
+        Args:
+            bid: The bid to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of process to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            A query API for process.
+
+        """
+        filter_ = _create_proces_filter(
+            self._view_id,
+            bid,
+            name,
+            name_prefix,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        builder = QueryBuilder(
+            ProcessList,
+            [
+                QueryStep(
+                    name="proces",
+                    expression=dm.query.NodeResultSetExpression(
+                        from_=None,
+                        filter=filter_,
+                    ),
+                    select=dm.query.Select(
+                        [dm.query.SourceSelector(self._view_id, list(_PROCESS_PROPERTIES_BY_FIELD.values()))]
+                    ),
+                    result_cls=Process,
+                    max_retrieve_limit=limit,
+                )
+            ],
+        )
+        return ProcessQueryAPI(self._client, builder, self._view_by_write_class)
+
+    def apply(self, proces: ProcessApply | Sequence[ProcessApply], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) process.
 
         Args:
@@ -40,7 +108,7 @@ class ProcessAPI(TypeAPI[Process, ProcessApply, ProcessList]):
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes, edges, and time series.
 
         Examples:
 
@@ -53,19 +121,9 @@ class ProcessAPI(TypeAPI[Process, ProcessApply, ProcessList]):
                 >>> result = client.process.apply(proces)
 
         """
-        if isinstance(proces, ProcessApply):
-            instances = proces.to_instances_apply(self._view_by_write_class)
-        else:
-            instances = ProcessApplyList(proces).to_instances_apply(self._view_by_write_class)
-        return self._client.data_modeling.instances.apply(
-            nodes=instances.nodes,
-            edges=instances.edges,
-            auto_create_start_nodes=True,
-            auto_create_end_nodes=True,
-            replace=replace,
-        )
+        return self._apply(proces, replace)
 
-    def delete(self, external_id: str | Sequence[str], space: str = "market") -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | SequenceNotStr[str], space: str = "market") -> dm.InstancesDeleteResult:
         """Delete one or more proces.
 
         Args:
@@ -83,22 +141,17 @@ class ProcessAPI(TypeAPI[Process, ProcessApply, ProcessList]):
                 >>> client = MarketClient()
                 >>> client.process.delete("my_proces")
         """
-        if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
-        else:
-            return self._client.data_modeling.instances.delete(
-                nodes=[(space, id) for id in external_id],
-            )
+        return self._delete(external_id, space)
 
     @overload
     def retrieve(self, external_id: str) -> Process:
         ...
 
     @overload
-    def retrieve(self, external_id: Sequence[str]) -> ProcessList:
+    def retrieve(self, external_id: SequenceNotStr[str]) -> ProcessList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str], space: str = "market") -> Process | ProcessList:
+    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = "market") -> Process | ProcessList:
         """Retrieve one or more process by id(s).
 
         Args:
@@ -117,10 +170,7 @@ class ProcessAPI(TypeAPI[Process, ProcessApply, ProcessList]):
                 >>> proces = client.process.retrieve("my_proces")
 
         """
-        if isinstance(external_id, str):
-            return self._retrieve((space, external_id))
-        else:
-            return self._retrieve([(space, ext_id) for ext_id in external_id])
+        return self._retrieve(external_id, space)
 
     def search(
         self,
@@ -159,7 +209,7 @@ class ProcessAPI(TypeAPI[Process, ProcessApply, ProcessList]):
                 >>> process = client.process.search('my_proces')
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_proces_filter(
             self._view_id,
             bid,
             name,
@@ -259,7 +309,7 @@ class ProcessAPI(TypeAPI[Process, ProcessApply, ProcessList]):
 
         """
 
-        filter_ = _create_filter(
+        filter_ = _create_proces_filter(
             self._view_id,
             bid,
             name,
@@ -313,7 +363,7 @@ class ProcessAPI(TypeAPI[Process, ProcessApply, ProcessList]):
             Bucketed histogram results.
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_proces_filter(
             self._view_id,
             bid,
             name,
@@ -366,7 +416,7 @@ class ProcessAPI(TypeAPI[Process, ProcessApply, ProcessList]):
                 >>> process = client.process.list(limit=5)
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_proces_filter(
             self._view_id,
             bid,
             name,
@@ -375,48 +425,4 @@ class ProcessAPI(TypeAPI[Process, ProcessApply, ProcessList]):
             space,
             filter,
         )
-
         return self._list(limit=limit, filter=filter_)
-
-
-def _create_filter(
-    view_id: dm.ViewId,
-    bid: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-    name: str | list[str] | None = None,
-    name_prefix: str | None = None,
-    external_id_prefix: str | None = None,
-    space: str | list[str] | None = None,
-    filter: dm.Filter | None = None,
-) -> dm.Filter | None:
-    filters = []
-    if bid and isinstance(bid, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("bid"), value={"space": "market", "externalId": bid}))
-    if bid and isinstance(bid, tuple):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("bid"), value={"space": bid[0], "externalId": bid[1]}))
-    if bid and isinstance(bid, list) and isinstance(bid[0], str):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("bid"), values=[{"space": "market", "externalId": item} for item in bid]
-            )
-        )
-    if bid and isinstance(bid, list) and isinstance(bid[0], tuple):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("bid"), values=[{"space": item[0], "externalId": item[1]} for item in bid]
-            )
-        )
-    if name and isinstance(name, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
-    if name and isinstance(name, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("name"), values=name))
-    if name_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
-    if external_id_prefix:
-        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
-        filters.append(dm.filters.Equals(["node", "space"], value=space))
-    if space and isinstance(space, list):
-        filters.append(dm.filters.In(["node", "space"], values=space))
-    if filter:
-        filters.append(filter)
-    return dm.filters.And(*filters) if filters else None

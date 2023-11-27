@@ -9,7 +9,6 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.views import ViewProperty
 
 from cognite.pygen._core.data_classes import (
-    DataClass,
     EdgeOneToMany,
     EdgeOneToOne,
     Field,
@@ -17,6 +16,7 @@ from cognite.pygen._core.data_classes import (
     FilterConditionOnetoOneEdge,
     FilterParameter,
     ListMethod,
+    NodeDataClass,
     PrimitiveField,
     PrimitiveListField,
     ViewSpaceExternalId,
@@ -24,7 +24,7 @@ from cognite.pygen._core.data_classes import (
 from cognite.pygen._core.generators import APIGenerator, MultiAPIGenerator, SDKGenerator
 from cognite.pygen._generator import CodeFormatter
 from cognite.pygen.config import PygenConfig
-from tests.constants import IS_PYDANTIC_V1, MovieSDKFiles
+from tests.constants import IS_PYDANTIC_V1, IS_PYDANTIC_V2, MovieSDKFiles
 
 
 @pytest.fixture
@@ -92,7 +92,7 @@ def create_fields_test_cases():
         "direction": "outwards",
     }
     prop = ViewProperty.load(prop)
-    data_class = DataClass(
+    data_class = NodeDataClass(
         read_name="Role",
         write_name="RoleApply",
         read_list_name="RoleList",
@@ -105,8 +105,10 @@ def create_fields_test_cases():
         view_id=ViewSpaceExternalId("IntegrationTestsImmutable", "Role"),
         view_version="2",
         view_name="Role",
+        query_class_name="RoleQueryAPI",
+        query_file_name="role_query",
     )
-
+    config = PygenConfig()
     data_class_by_view_id = {ViewSpaceExternalId("IntegrationTestsImmutable", "Role"): data_class}
     yield pytest.param(
         "roles",
@@ -121,10 +123,12 @@ def create_fields_test_cases():
             data_class=data_class,
             variable="role",
             pydantic_field="Field",
-            edge_api_attribute="roles",
+            edge_api_attribute="roles_edge",
             edge_api_class="PersonRolesAPI",
+            edge_api_file_name="person_roles",
+            _list_method=ListMethod.from_fields([], config.filtering, is_edge_class=True),
         ),
-        "Optional[list[str]] = None",
+        "Union[list[Role], list[str], None] = Field(default=None, repr=False)",
         "Union[list[RoleApply], list[str], None] = Field(default=None, repr=False)",
         id="List of edges",
     )
@@ -173,7 +177,7 @@ def create_fields_test_cases():
         "name": "person",
         "description": None,
     }
-    data_class = DataClass(
+    data_class = NodeDataClass(
         read_name="Person",
         write_name="PersonApply",
         read_list_name="PersonList",
@@ -186,6 +190,8 @@ def create_fields_test_cases():
         view_version="2",
         variable_list="persons",
         view_name="Person",
+        query_class_name="PersonQueryAPI",
+        query_file_name="person_query",
     )
     data_class_by_view_id = {ViewSpaceExternalId("IntegrationTestsImmutable", "Person"): data_class}
 
@@ -203,7 +209,7 @@ def create_fields_test_cases():
             data_class=data_class,
             pydantic_field="Field",
         ),
-        "Optional[str] = None",
+        "Union[Person, str, None] = Field(None, repr=False)",
         "Union[PersonApply, str, None] = Field(None, repr=False)",
         id="Edge to another view",
     )
@@ -250,7 +256,7 @@ def create_fields_test_cases():
 def test_fields_from_property(
     prop_name: str,
     property_: dm.MappedProperty | dm.ConnectionDefinition,
-    data_class_by_view_id: dict[ViewSpaceExternalId, DataClass],
+    data_class_by_view_id: dict[ViewSpaceExternalId, NodeDataClass],
     view_name: str,
     expected: Field,
     expected_read_type_hint: str,
@@ -259,7 +265,7 @@ def test_fields_from_property(
 ):
     # Act
     actual = Field.from_property(
-        prop_name, property_, data_class_by_view_id, pygen_config.naming.field, view_name, dm.ViewId("a", "b", "c")
+        prop_name, property_, data_class_by_view_id, pygen_config, view_name, dm.ViewId("a", "b", "c")
     )
 
     # Assert
@@ -295,7 +301,7 @@ def test_generate_data_class_file_persons(
     expected = MovieSDKFiles.persons_data.read_text()
 
     # Act
-    actual = person_api_generator.generate_data_class_file()
+    actual = person_api_generator.generate_data_class_file(IS_PYDANTIC_V2)
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -309,7 +315,7 @@ def test_create_view_data_class_actors(
     expected = MovieSDKFiles.actors_data.read_text()
 
     # Act
-    actual = actor_api_generator.generate_data_class_file()
+    actual = actor_api_generator.generate_data_class_file(IS_PYDANTIC_V2)
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -324,6 +330,34 @@ def test_create_view_api_classes_actors(
 
     # Act
     actual = actor_api_generator.generate_api_file(top_level_package, client_name)
+    actual = code_formatter.format_code(actual)
+
+    # Assert
+    assert actual == expected
+
+
+def test_create_query_api_actors(
+    actor_api_generator: APIGenerator, top_level_package: str, client_name: str, code_formatter: CodeFormatter
+):
+    # Arrange
+    expected = MovieSDKFiles.actor_query_api.read_text()
+
+    # Act
+    actual = actor_api_generator.generate_api_query_file(top_level_package, client_name)
+    actual = code_formatter.format_code(actual)
+
+    # Assert
+    assert actual == expected
+
+
+def test_generate_actor_movie_edge_api(
+    actor_api_generator: APIGenerator, top_level_package: str, client_name: str, code_formatter: CodeFormatter
+):
+    # Arrange
+    expected = MovieSDKFiles.actor_movies_api.read_text()
+
+    # Act
+    _, actual = next(actor_api_generator.generate_edge_api_files(top_level_package, client_name))
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -383,25 +417,14 @@ def test_generate_api_core_file(multi_api_generator: MultiAPIGenerator) -> None:
     assert actual == expected
 
 
-def test_generate_data_class_core_file(multi_api_generator: MultiAPIGenerator) -> None:
-    # Arrange
-    expected = MovieSDKFiles.core_data.read_text()
-
-    # Act
-    actual = multi_api_generator.generate_data_class_core_file()
-
-    # Assert
-    assert actual == expected
-
-
 def test_create_list_method(person_view: dm.View, pygen_config: PygenConfig) -> None:
     # Arrange
-    data_class = DataClass.from_view(person_view, pygen_config.naming.data_class)
+    data_class = NodeDataClass.from_view(person_view, pygen_config.naming.data_class)
 
     data_class.update_fields(
         person_view.properties,
-        {ViewSpaceExternalId(space="IntegrationTestsImmutable", external_id="Role"): MagicMock(spec=DataClass)},
-        field_naming=pygen_config.naming.field,
+        {ViewSpaceExternalId(space="IntegrationTestsImmutable", external_id="Role"): MagicMock(spec=NodeDataClass)},
+        config=pygen_config,
     )
     parameters = [
         FilterParameter("min_birth_year", "int", description="The minimum value of the birth year to filter on."),
@@ -414,13 +437,15 @@ def test_create_list_method(person_view: dm.View, pygen_config: PygenConfig) -> 
     expected = ListMethod(
         parameters=parameters,
         filters=[
-            FilterCondition(dm.filters.Range, "birthYear", dict(gte=parameters[0], lte=parameters[1])),
-            FilterCondition(dm.filters.Equals, "name", dict(value=parameters[2])),
-            FilterCondition(dm.filters.In, "name", dict(values=parameters[2])),
-            FilterCondition(dm.filters.Prefix, "name", dict(value=parameters[3])),
-            FilterCondition(dm.filters.Prefix, "externalId", dict(value=parameters[4])),
-            FilterCondition(dm.filters.Equals, "space", dict(value=parameters[5])),
-            FilterCondition(dm.filters.In, "space", dict(values=parameters[5])),
+            FilterCondition(
+                dm.filters.Range, "birthYear", dict(gte=parameters[0], lte=parameters[1]), is_edge_class=False
+            ),
+            FilterCondition(dm.filters.Equals, "name", dict(value=parameters[2]), is_edge_class=False),
+            FilterCondition(dm.filters.In, "name", dict(values=parameters[2]), is_edge_class=False),
+            FilterCondition(dm.filters.Prefix, "name", dict(value=parameters[3]), is_edge_class=False),
+            FilterCondition(dm.filters.Prefix, "externalId", dict(value=parameters[4]), is_edge_class=False),
+            FilterCondition(dm.filters.Equals, "space", dict(value=parameters[5]), is_edge_class=False),
+            FilterCondition(dm.filters.In, "space", dict(values=parameters[5]), is_edge_class=False),
         ],
     )
 
@@ -439,18 +464,20 @@ def test_create_list_method(person_view: dm.View, pygen_config: PygenConfig) -> 
 
 def test_create_list_method_actors(actor_view: dm.View, pygen_config: PygenConfig) -> None:
     # Arrange
-    data_class = DataClass.from_view(actor_view, pygen_config.naming.data_class)
+    data_class = NodeDataClass.from_view(actor_view, pygen_config.naming.data_class)
 
-    person_data_class = MagicMock(spec=DataClass)
+    person_data_class = MagicMock(spec=NodeDataClass)
     person_data_class.view_id = ViewSpaceExternalId(space="IntegrationTestsImmutable", external_id="Person")
     data_class.update_fields(
         actor_view.properties,
         {
-            ViewSpaceExternalId(space="IntegrationTestsImmutable", external_id="Movie"): MagicMock(spec=DataClass),
-            ViewSpaceExternalId(space="IntegrationTestsImmutable", external_id="Nomination"): MagicMock(spec=DataClass),
+            ViewSpaceExternalId(space="IntegrationTestsImmutable", external_id="Movie"): MagicMock(spec=NodeDataClass),
+            ViewSpaceExternalId(space="IntegrationTestsImmutable", external_id="Nomination"): MagicMock(
+                spec=NodeDataClass
+            ),
             ViewSpaceExternalId(space="IntegrationTestsImmutable", external_id="Person"): person_data_class,
         },
-        field_naming=pygen_config.naming.field,
+        config=pygen_config,
     )
     parameters = [
         FilterParameter(
@@ -466,14 +493,22 @@ def test_create_list_method_actors(actor_view: dm.View, pygen_config: PygenConfi
     expected = ListMethod(
         parameters=parameters,
         filters=[
-            FilterConditionOnetoOneEdge(dm.filters.Equals, "person", dict(value=parameters[0]), instance_type=str),
-            FilterConditionOnetoOneEdge(dm.filters.Equals, "person", dict(value=parameters[0]), instance_type=tuple),
-            FilterConditionOnetoOneEdge(dm.filters.In, "person", dict(values=parameters[0]), instance_type=str),
-            FilterConditionOnetoOneEdge(dm.filters.In, "person", dict(values=parameters[0]), instance_type=tuple),
-            FilterCondition(dm.filters.Equals, "wonOscar", dict(value=parameters[1])),
-            FilterCondition(dm.filters.Prefix, "externalId", dict(value=parameters[2])),
-            FilterCondition(dm.filters.Equals, "space", dict(value=parameters[3])),
-            FilterCondition(dm.filters.In, "space", dict(values=parameters[3])),
+            FilterConditionOnetoOneEdge(
+                dm.filters.Equals, "person", dict(value=parameters[0]), instance_type=str, is_edge_class=False
+            ),
+            FilterConditionOnetoOneEdge(
+                dm.filters.Equals, "person", dict(value=parameters[0]), instance_type=tuple, is_edge_class=False
+            ),
+            FilterConditionOnetoOneEdge(
+                dm.filters.In, "person", dict(values=parameters[0]), instance_type=str, is_edge_class=False
+            ),
+            FilterConditionOnetoOneEdge(
+                dm.filters.In, "person", dict(values=parameters[0]), instance_type=tuple, is_edge_class=False
+            ),
+            FilterCondition(dm.filters.Equals, "wonOscar", dict(value=parameters[1]), is_edge_class=False),
+            FilterCondition(dm.filters.Prefix, "externalId", dict(value=parameters[2]), is_edge_class=False),
+            FilterCondition(dm.filters.Equals, "space", dict(value=parameters[3]), is_edge_class=False),
+            FilterCondition(dm.filters.In, "space", dict(values=parameters[3]), is_edge_class=False),
         ],
     )
 

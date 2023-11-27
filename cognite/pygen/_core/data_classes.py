@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import itertools
+import warnings
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass, field
+from typing import Any, cast
 
 from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.data_modeling.data_types import ListablePropertyType
@@ -68,11 +70,12 @@ class Field(ABC):
         prop_name: str,
         prop: dm.MappedProperty | dm.ConnectionDefinition,
         data_class_by_view_id: dict[ViewSpaceExternalId, DataClass],
-        field_naming: pygen_config.FieldNaming,
+        config: pygen_config.PygenConfig,
         view_name: str,
         view_id: dm.ViewId,
         pydantic_field: str = "Field",
     ) -> Field:
+        field_naming = config.naming.field
         name = create_name(prop_name, field_naming.name)
         if is_reserved_word(name, "field", view_id, prop_name):
             name = f"{name}_"
@@ -82,18 +85,30 @@ class Field(ABC):
             variable = create_name(prop_name, field_naming.variable)
 
             edge_api_class_input = f"{view_name}_{prop_name}"
+            edge_api_file_name = f"{create_name(edge_api_class_input, field_naming.edge_api_file)}"
             edge_api_class = f"{create_name(edge_api_class_input, field_naming.edge_api_class)}API"
-            edge_api_attribute = create_name(prop_name, field_naming.api_class_attribute)
+            edge_api_attribute = f"{create_name(prop_name, field_naming.api_class_attribute)}_edge"
+            args: dict[str, Any] = {"_list_method": None}
+            if prop.edge_source:
+                # The edge has properties, i.e., it has its own view
+                edge_id = prop.edge_source.space, prop.edge_source.external_id
+            else:
+                edge_id = prop.source.space, prop.source.external_id
+                args["_list_method"] = ListMethod.from_fields([], config.filtering, is_edge_class=True)
+            data_class = data_class_by_view_id[ViewSpaceExternalId(*edge_id)]
+
             return EdgeOneToMany(
                 name=name,
                 doc_name=doc_name,
                 prop_name=prop_name,
                 prop=prop,
-                data_class=data_class_by_view_id[ViewSpaceExternalId(prop.source.space, prop.source.external_id)],
+                data_class=data_class,
                 variable=variable,
                 pydantic_field=pydantic_field,
+                edge_api_file_name=edge_api_file_name,
                 edge_api_class=edge_api_class,
                 edge_api_attribute=edge_api_attribute,
+                **args,
             )
         elif isinstance(prop, dm.MappedProperty) and (
             isinstance(prop.type, _PRIMITIVE_TYPES) or isinstance(prop.type, _EXTERNAL_TYPES)
@@ -114,7 +129,8 @@ class Field(ABC):
                 # are handled above.
                 edge_api_class_input = f"{view_name}_{prop_name}"
                 edge_api_class = f"{create_name(edge_api_class_input, field_naming.edge_api_class)}"
-                edge_api_attribute = create_name(prop_name, field_naming.api_class_attribute)
+                edge_api_attribute = f"{create_name(prop_name, field_naming.api_class_attribute)}"
+                edge_api_file_name = f"{create_name(edge_api_class_input, field_naming.edge_api_file)}"
                 return CDFExternalField(
                     name=name,
                     prop_name=prop_name,
@@ -123,6 +139,7 @@ class Field(ABC):
                     is_nullable=prop.nullable,
                     prop=prop,
                     pydantic_field=pydantic_field,
+                    edge_api_file_name=edge_api_file_name,
                     edge_api_class=edge_api_class,
                     edge_api_attribute=edge_api_attribute,
                 )
@@ -195,12 +212,26 @@ class Field(ABC):
 
     @property
     @abstractmethod
+    def is_timestamp(self) -> bool:
+        raise NotImplementedError()
+
+    @property
+    def is_time_series(self) -> bool:
+        return False
+
+    @property
+    @abstractmethod
     def is_text_field(self) -> bool:
         raise NotImplementedError()
 
     @property
     @abstractmethod
     def description(self) -> str | None:
+        raise NotImplementedError
+
+    @abstractmethod
+    def as_apply(self) -> str:
+        """Used in the .as_apply() method for the read version of the data class."""
         raise NotImplementedError
 
     @property
@@ -226,12 +257,19 @@ class PrimitiveFieldCore(Field, ABC):
         return self.type_ in ("datetime.datetime", "datetime.date")
 
     @property
+    def is_timestamp(self) -> bool:
+        return self.type_ in ("datetime.datetime",)
+
+    @property
     def is_text_field(self) -> bool:
         return self.type_ == "str"
 
     @property
     def description(self) -> str | None:
         return self.prop.description
+
+    def as_apply(self) -> str:
+        return f"self.{self.name}"
 
 
 @dataclass(frozen=True)
@@ -287,22 +325,27 @@ class PrimitiveListField(PrimitiveFieldCore):
 
 @dataclass(frozen=True)
 class CDFExternalField(PrimitiveFieldCore):
+    edge_api_file_name: str
     edge_api_class: str
     edge_api_attribute: str
 
+    @property
+    def is_time_series(self) -> bool:
+        return isinstance(self.prop.type, dm.TimeSeriesReference)
+
     def as_read_type_hint(self) -> str:
-        if self.need_alias:
-            return f'Optional[{self.type_}] = {self.pydantic_field}(None, alias="{self.prop_name}")'
-        else:
-            return f"Optional[{self.type_}] = None"
+        return self.as_write_type_hint()
 
     def as_write_type_hint(self) -> str:
-        out_type = self.type_
+        type_ = self.type_
+        if type_ != "str":
+            type_ = f"{type_}, str"
+
         # CDF External Fields are always nullable
         if self.need_alias:
-            out_type = f'Optional[{out_type}] = {self.pydantic_field}(None, alias="{self.prop_name}")'
+            out_type = f'Union[{type_}, None] = {self.pydantic_field}(None, alias="{self.prop_name}")'
         else:
-            out_type = f"Optional[{out_type}] = None"
+            out_type = f"Union[{type_}, None] = None"
         return out_type
 
 
@@ -323,6 +366,10 @@ class EdgeField(Field, ABC):
         return False
 
     @property
+    def is_timestamp(self) -> bool:
+        return False
+
+    @property
     def is_text_field(self) -> bool:
         return False
 
@@ -336,13 +383,13 @@ class EdgeOneToOne(EdgeField):
     prop: dm.MappedProperty
 
     def as_read_type_hint(self) -> str:
-        if self.need_alias:
-            return f'Optional[str] = {self.pydantic_field}(None, alias="{self.prop_name}")'
-        else:
-            return "Optional[str] = None"
+        return self._type_hint(self.data_class.read_name)
 
     def as_write_type_hint(self) -> str:
-        left_side = f"Union[{self.data_class.write_name}, str, None] ="
+        return self._type_hint(self.data_class.write_name)
+
+    def _type_hint(self, data_class_name: str) -> str:
+        left_side = f"Union[{data_class_name}, str, None] ="
         # Edge fields are always nullable
         if self.need_alias:
             return f'{left_side} {self.pydantic_field}(None, repr=False, alias="{self.prop_name}")'
@@ -353,6 +400,42 @@ class EdgeOneToOne(EdgeField):
     def description(self) -> str | None:
         return self.prop.description
 
+    def as_apply(self) -> str:
+        return f"self.{self.name}.as_apply() if isinstance(self.{self.name}, DomainModel) else self.{self.name}"
+
+
+@dataclass(frozen=True)
+class RequiredEdgeOneToOne(EdgeField):
+    variable: str
+    edge_api_class: str
+    edge_api_attribute: str
+    prop: dm.SingleHopConnectionDefinition
+
+    def as_read_type_hint(self) -> str:
+        return self._type_hint(self.data_class.read_name)
+
+    def as_write_type_hint(self) -> str:
+        return self._type_hint(self.data_class.write_name)
+
+    def _type_hint(self, data_class_name: str) -> str:
+        left_side = f"Union[{data_class_name}, str]"
+        # Required Edge fields cannot be nulled
+        if self.need_alias:
+            return f'{left_side} = {self.pydantic_field}(alias="{self.prop_name}")'
+        else:
+            return left_side
+
+    @property
+    def description(self) -> str | None:
+        return self.prop.description
+
+    def as_apply(self) -> str:
+        return (
+            f"self.{self.variable}.as_apply() "
+            f"if isinstance(self.{self.variable}, {self.data_class.read_name}) "
+            f"else self.{self.variable}"
+        )
+
 
 @dataclass(frozen=True)
 class EdgeOneToMany(EdgeField):
@@ -361,22 +444,48 @@ class EdgeOneToMany(EdgeField):
     """
 
     variable: str
+    edge_api_file_name: str
     edge_api_class: str
     edge_api_attribute: str
     prop: dm.SingleHopConnectionDefinition
+    _list_method: ListMethod | None = None
 
     @property
     def description(self) -> str | None:
         return self.prop.description
 
-    def as_read_type_hint(self) -> str:
-        if self.need_alias:
-            return f"Optional[list[str]] = {self.pydantic_field}(None, alias='{self.prop_name}')"
+    @property
+    def is_property_edge(self) -> bool:
+        return isinstance(self.data_class, EdgeWithPropertyDataClass)
+
+    @property
+    def list_method(self) -> ListMethod:
+        if self.is_property_edge:
+            return self.data_class.list_method
+        if self._list_method is None:
+            raise ValueError("EdgeOneToMany has not been initialized.")
+        return self._list_method
+
+    def as_apply(self) -> str:
+        if self.is_property_edge:
+            return f"[{self.variable}.as_apply() for {self.variable} in self.{self.name} or []]"
         else:
-            return "Optional[list[str]] = None"
+            return (
+                f"[{self.variable}.as_apply() if isinstance({self.variable}, DomainModel) else {self.variable} "
+                f"for {self.variable} in self.{self.name} or []]"
+            )
+
+    def as_read_type_hint(self) -> str:
+        return self._type_hint(self.data_class.read_name)
 
     def as_write_type_hint(self) -> str:
-        left_side = f"Union[list[{self.data_class.write_name}], list[str], None]"
+        return self._type_hint(self.data_class.write_name)
+
+    def _type_hint(self, data_class_name: str) -> str:
+        if self.is_property_edge:
+            left_side = f"Optional[list[{data_class_name}]]"
+        else:
+            left_side = f"Union[list[{data_class_name}], list[str], None]"
         # Edge fields are always nullable
         if self.need_alias:
             return f'{left_side} = {self.pydantic_field}(default=None, repr=False, alias="{self.prop_name}")'
@@ -384,7 +493,7 @@ class EdgeOneToMany(EdgeField):
             return f"{left_side} = {self.pydantic_field}(default=None, repr=False)"
 
 
-@dataclass(frozen=True)
+@dataclass
 class DataClass:
     """
     This represents a data class. It is created from a view.
@@ -400,12 +509,21 @@ class DataClass:
     variable: str
     variable_list: str
     file_name: str
+    query_file_name: str
+    query_class_name: str
     view_id: ViewSpaceExternalId
     view_version: str
     fields: list[Field] = field(default_factory=list)
+    _list_method: ListMethod | None = None
+
+    @property
+    def list_method(self) -> ListMethod:
+        if self._list_method is None:
+            raise ValueError("DataClass has not been initialized.")
+        return self._list_method
 
     @classmethod
-    def from_view(cls, view: dm.View, data_class: pygen_config.DataClassNaming) -> Self:
+    def from_view(cls, view: dm.View, data_class: pygen_config.DataClassNaming) -> DataClass:
         view_name = (view.name or view.external_id).replace(" ", "_")
         class_name = create_name(view_name, data_class.name)
         if is_reserved_word(class_name, "data class", view.as_id()):
@@ -417,11 +535,19 @@ class DataClass:
         doc_list_name = to_words(view_name, pluralize=True)
         if variable_name == variable_list:
             variable_list = f"{variable_list}_list"
-        file_name = f"_{create_name(view_name, data_class.file)}"
+        raw_file_name = create_name(view_name, data_class.file)
+        file_name = f"_{raw_file_name}"
         if is_reserved_word(file_name, "filename", view.as_id()):
             file_name = f"{file_name}_"
+        query_file_name = f"{raw_file_name}_query"
+        query_class_name = f"{class_name.replace('_', '')}QueryAPI"
 
-        return cls(
+        used_for = view.used_for
+        if used_for == "all":
+            used_for = "node"
+            warnings.warn("View used_for is set to 'all'. This is not supported. Using 'node' instead.", stacklevel=2)
+
+        args = dict(
             view_name=view_name,
             read_name=class_name,
             write_name=f"{class_name}Apply",
@@ -432,15 +558,24 @@ class DataClass:
             variable=variable_name,
             variable_list=variable_list,
             file_name=file_name,
+            query_file_name=query_file_name,
+            query_class_name=query_class_name,
             view_id=ViewSpaceExternalId.from_(view),
             view_version=view.version,
         )
+
+        if used_for == "node":
+            return NodeDataClass(**args)
+        elif used_for == "edge":
+            return EdgeWithPropertyDataClass(**args)
+        else:
+            raise ValueError(f"Unsupported used_for={used_for}")
 
     def update_fields(
         self,
         properties: dict[str, dm.MappedProperty | dm.ConnectionDefinition],
         data_class_by_view_id: dict[ViewSpaceExternalId, DataClass],
-        field_naming: pygen_config.FieldNaming,
+        config: pygen_config.PygenConfig,
     ) -> None:
         pydantic_field = self.pydantic_field
         for prop_name, prop in properties.items():
@@ -448,12 +583,13 @@ class DataClass:
                 prop_name,
                 prop,
                 data_class_by_view_id,
-                field_naming,
+                config,
                 self.view_name,
                 dm.ViewId(self.view_id.space, self.view_id.external_id, self.view_version),
                 pydantic_field=pydantic_field,
             )
             self.fields.append(field_)
+        self._list_method = ListMethod.from_fields(self.fields, config.filtering, self.is_edge_class)
 
     @property
     def text_field_names(self) -> str:
@@ -521,12 +657,28 @@ class DataClass:
         return (field_ for field_ in self.cdf_external_fields if isinstance(field_.prop.type, dm.TimeSeriesReference))
 
     @property
+    def property_edges(self) -> Iterable[EdgeOneToMany]:
+        return (field_ for field_ in self.fields if isinstance(field_, EdgeOneToMany) and field_.is_property_edge)
+
+    @property
     def has_one_to_many_edges(self) -> bool:
         return any(isinstance(field_, EdgeOneToMany) for field_ in self.fields)
 
     @property
     def has_edges(self) -> bool:
         return any(isinstance(field_, EdgeField) for field_ in self.fields)
+
+    @property
+    def has_edge_with_property(self) -> bool:
+        return any(isinstance(field_, EdgeOneToMany) and field_.is_property_edge for field_ in self.fields)
+
+    @property
+    def all_one_to_many_is_property_edges(self) -> bool:
+        return all(field_.is_property_edge for field_ in self.one_to_many_edges)
+
+    @property
+    def has_time_field_on_property_edge(self) -> bool:
+        return any(field_.is_time_field for edge in self.property_edges for field_ in edge.data_class.fields)
 
     @property
     def has_primitive_fields(self) -> bool:
@@ -567,13 +719,6 @@ class DataClass:
         return any(pydantic_field in hint for hint in self._field_type_hints)
 
     @property
-    def import_pydantic_field(self) -> str:
-        if self.pydantic_field == "Field":
-            return "from pydantic import Field"
-        else:
-            return "import pydantic"
-
-    @property
     def dependencies(self) -> list[DataClass]:
         unique: dict[ViewSpaceExternalId, DataClass] = {}
         for field_ in self.fields:
@@ -582,6 +727,10 @@ class DataClass:
                 # however, this is not a problem as all data classes are uniquely identified by their view id
                 unique[field_.data_class.view_id] = field_.data_class
         return sorted(unique.values(), key=lambda x: x.write_name)
+
+    @property
+    def dependencies_edges(self) -> list[EdgeWithPropertyDataClass]:
+        return [data_class for data_class in self.dependencies if isinstance(data_class, EdgeWithPropertyDataClass)]
 
     @property
     def has_single_timeseries_fields(self) -> bool:
@@ -612,6 +761,220 @@ class DataClass:
     def fields_literals(self) -> str:
         return ", ".join(f'"{field_.name}"' for field_ in self if isinstance(field_, PrimitiveFieldCore))
 
+    @property
+    def filter_name(self) -> str:
+        return f"_create_{self.variable}_filter"
+
+    @property
+    @abstractmethod
+    def is_edge_class(self) -> bool:
+        raise NotImplementedError()
+
+
+@dataclass
+class NodeDataClass(DataClass):
+    def import_pydantic_field(self, is_pydantic_v2: bool) -> str:
+        if self.pydantic_field == "Field":
+            return "from pydantic import Field"
+        else:
+            return "import pydantic"
+
+    @property
+    def is_edge_class(self) -> bool:
+        return False
+
+
+@dataclass
+class EdgeDataClass(DataClass):
+    _start_class: NodeDataClass | None = None
+    _end_class: NodeDataClass | None = None
+    _edge_type: dm.DirectRelationReference | None = None
+
+    @property
+    def start_class(self) -> NodeDataClass:
+        if self._start_class is None:
+            raise ValueError("EdgeDataClass has not been initialized.")
+        return self._start_class
+
+    @property
+    def end_class(self) -> NodeDataClass:
+        if self._end_class is None:
+            raise ValueError("EdgeDataClass has not been initialized.")
+        return self._end_class
+
+    @property
+    def edge_type(self) -> dm.DirectRelationReference:
+        if self._edge_type is None:
+            raise ValueError("EdgeDataClass has not been initialized.")
+        return self._edge_type
+
+    @classmethod
+    def from_field_data_classes(cls, field: EdgeOneToMany, data_class: NodeDataClass, config: pygen_config.PygenConfig):
+        edge_fields: list[Field] = []  # Space and External ID are automatically added
+        list_method = ListMethod.from_fields(edge_fields, config.filtering, is_edge_class=True)
+        return cls(
+            field.data_class.view_name,
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            field.data_class.view_id,
+            field.data_class.view_version,
+            edge_fields,
+            list_method,
+            data_class,
+            cast(NodeDataClass, field.data_class),
+            field.prop.type,
+        )
+
+    def node_parameters(self, instance_space: str) -> Iterable[FilterParameter]:
+        nodes = [
+            (self.start_class, "source", self.start_class.variable),
+            (self.end_class, "target", self.end_class.variable),
+        ]
+        if self.start_class.variable == self.end_class.variable:
+            nodes = [
+                (self.start_class, "source", f"from_{self.start_class.variable}"),
+                (self.end_class, "target", f"to_{self.end_class.variable}"),
+            ]
+
+        for class_, location, name in nodes:
+            yield FilterParameter(
+                name=name,
+                type_="str | list[str] | dm.NodeId | list[dm.NodeId]",
+                description=f"ID of the {location} { class_.doc_list_name}.",
+                default=None,
+            )
+            yield FilterParameter(
+                name=f"{name}_space",
+                type_="str",
+                description=f"Location of the {class_.doc_list_name}.",
+                default=f'"{instance_space}"',
+                is_nullable=False,
+            )
+
+
+@dataclass
+class EdgeWithPropertyDataClass(DataClass):
+    _start_class: NodeDataClass | None = None
+    _end_class: NodeDataClass | None = None
+    _edge_type: dm.DirectRelationReference | None = None
+
+    @property
+    def is_edge_class(self) -> bool:
+        return True
+
+    @property
+    def start_class(self) -> NodeDataClass:
+        if self._start_class is None:
+            raise ValueError("EdgeDataClass has not been initialized.")
+        return self._start_class
+
+    @property
+    def end_class(self) -> NodeDataClass:
+        if self._end_class is None:
+            raise ValueError("EdgeDataClass has not been initialized.")
+        return self._end_class
+
+    @property
+    def edge_type(self) -> dm.DirectRelationReference:
+        if self._edge_type is None:
+            raise ValueError("EdgeDataClass has not been initialized.")
+        return self._edge_type
+
+    def update_nodes(
+        self,
+        data_class_by_view_id: dict[ViewSpaceExternalId, DataClass],
+        views: Iterable[dm.View],
+        field_naming: pygen_config.FieldNaming,
+    ):
+        source_view, source_property, prop_name = self._find_source_view_and_property(views)
+        self._start_class = cast(NodeDataClass, data_class_by_view_id[ViewSpaceExternalId.from_(source_view.as_id())])
+        self._end_class = cast(NodeDataClass, data_class_by_view_id[ViewSpaceExternalId.from_(source_property.source)])
+        self._edge_type = source_property.type
+
+        end_class = self._end_class
+        # Todo avoid repeating the code below here and the load method
+        name = create_name(end_class.view_name, field_naming.name)
+        view_id = dm.ViewId(end_class.view_id.space, end_class.view_id.external_id, end_class.view_version)
+        if is_reserved_word(name, "field", view_id, end_class.view_name):
+            name = f"{name}_"
+
+        doc_name = to_words(name, singularize=True)
+
+        variable = create_name(end_class.view_name, field_naming.variable)
+
+        edge_api_class_input = f"{self.view_name}_{end_class.view_name}"
+        edge_api_class = f"{create_name(edge_api_class_input, field_naming.edge_api_class)}API"
+        edge_api_attribute = f"{create_name(end_class.view_name, field_naming.api_class_attribute)}_edge"
+
+        self.fields.append(
+            RequiredEdgeOneToOne(
+                name=name,
+                doc_name=doc_name,
+                prop_name=name,
+                pydantic_field=self.pydantic_field,
+                data_class=self.end_class,
+                prop=source_property,
+                variable=variable,
+                edge_api_class=edge_api_class,
+                edge_api_attribute=edge_api_attribute,
+            )
+        )
+
+    def _find_source_view_and_property(
+        self, views: Iterable[dm.View]
+    ) -> tuple[dm.View, dm.SingleHopConnectionDefinition, str]:
+        for view in views:
+            for prop_name, prop in view.properties.items():
+                if (
+                    isinstance(prop, dm.SingleHopConnectionDefinition)
+                    and prop.edge_source
+                    and prop.edge_source.space == self.view_id.space
+                    and prop.edge_source.external_id == self.view_id.external_id
+                ):
+                    return view, prop, prop_name
+        raise ValueError("Could not find source view and property")
+
+    def import_pydantic_field(self, is_pydantic_v2: bool) -> str:
+        if self.pydantic_field == "Field":
+            return "from pydantic import Field" + (", model_validator" if is_pydantic_v2 else ", root_validator")
+        else:
+            return "import pydantic"
+
+    def node_parameters(self, instance_space: str) -> Iterable[FilterParameter]:
+        nodes = [
+            (self.start_class, "source", self.start_class.variable),
+            (self.end_class, "target", self.end_class.variable),
+        ]
+        if self.start_class.variable == self.end_class.variable:
+            nodes = [
+                (self.start_class, "source", f"from_{self.start_class.variable}"),
+                (self.end_class, "target", f"to_{self.end_class.variable}"),
+            ]
+
+        for class_, location, name in nodes:
+            yield FilterParameter(
+                name=name,
+                type_="str | list[str] | dm.NodeId | list[dm.NodeId]",
+                description=f"ID of the {location} { class_.doc_list_name}.",
+                default=None,
+            )
+            yield FilterParameter(
+                name=f"{name}_space",
+                type_="str",
+                description=f"Location of the {class_.doc_list_name}.",
+                default=f'"{instance_space}"',
+                is_nullable=False,
+            )
+
 
 @dataclass(frozen=True)
 class APIClass:
@@ -626,11 +989,12 @@ class APIClass:
         raw_name = view.name or view.external_id
 
         raw_name = raw_name.replace(" ", "_")
-
+        file_name = create_name(raw_name, api_class.file_name)
+        class_name = create_name(raw_name, api_class.name)
         return cls(
             client_attribute=create_name(raw_name, api_class.client_attribute),
-            name=f"{create_name(raw_name, api_class.name)}API",
-            file_name=create_name(raw_name, api_class.file_name),
+            name=f"{class_name}API",
+            file_name=file_name,
             view_id=ViewSpaceExternalId.from_(view),
             data_class=data_class,
         )
@@ -680,8 +1044,9 @@ class FilterParameter:
     name: str
     type_: str
     description: str
-    default: None = None
+    default: str | None = None
     space: str | None = None
+    is_nullable: bool = True
 
     def __post_init__(self):
         if is_reserved_word(self.name, "parameter"):
@@ -689,7 +1054,10 @@ class FilterParameter:
 
     @property
     def annotation(self) -> str:
-        return f"{self.type_} | None"
+        if self.is_nullable:
+            return f"{self.type_} | None"
+        else:
+            return self.type_
 
     @property
     def is_time(self) -> bool:
@@ -705,6 +1073,7 @@ class FilterCondition:
     filter: type[dm.Filter]
     prop_name: str
     keyword_arguments: dict[str, FilterParameter]
+    is_edge_class: bool
 
     @property
     def condition(self) -> str:
@@ -720,7 +1089,8 @@ class FilterCondition:
     @property
     def arguments(self) -> str:
         if self.prop_name in {"externalId", "space"}:
-            property_ref = f'["node", "{self.prop_name}"], '
+            instance_type = "edge" if self.is_edge_class else "node"
+            property_ref = f'["{instance_type}", "{self.prop_name}"], '
         else:
             property_ref = f'view_id.as_property_ref("{self.prop_name}"), '
 
@@ -817,7 +1187,7 @@ class ListMethod:
     filters: list[FilterCondition]
 
     @classmethod
-    def from_fields(cls, fields: Iterable[Field], config: pygen_config.Filtering) -> Self:
+    def from_fields(cls, fields: Iterable[Field], config: pygen_config.Filtering, is_edge_class: bool = False) -> Self:
         parameters_by_name: dict[str, FilterParameter] = {}
         list_filters: list[FilterCondition] = []
 
@@ -840,6 +1210,7 @@ class ListMethod:
                                 filter=selected_filter,
                                 prop_name=field_.prop_name,
                                 keyword_arguments=dict(value=parameter),
+                                is_edge_class=is_edge_class,
                             )
                         )
                     elif selected_filter is dm.filters.In:
@@ -859,6 +1230,7 @@ class ListMethod:
                                 filter=selected_filter,
                                 prop_name=field_.prop_name,
                                 keyword_arguments=dict(values=parameter),
+                                is_edge_class=is_edge_class,
                             )
                         )
                     elif selected_filter is dm.filters.Prefix:
@@ -873,6 +1245,7 @@ class ListMethod:
                                 filter=selected_filter,
                                 prop_name=field_.prop_name,
                                 keyword_arguments=dict(value=parameter),
+                                is_edge_class=is_edge_class,
                             )
                         )
                     elif selected_filter is dm.filters.Range:
@@ -893,6 +1266,7 @@ class ListMethod:
                                 filter=selected_filter,
                                 prop_name=field_.prop_name,
                                 keyword_arguments=dict(gte=min_parameter, lte=max_parameter),
+                                is_edge_class=is_edge_class,
                             )
                         )
                     else:
@@ -920,6 +1294,7 @@ class ListMethod:
                                     prop_name=field_.prop_name,
                                     keyword_arguments=dict(value=parameter),
                                     instance_type=condition_type,
+                                    is_edge_class=is_edge_class,
                                 )
                                 for condition_type in (str, tuple)
                             ]
@@ -944,6 +1319,7 @@ class ListMethod:
                                     prop_name=field_.prop_name,
                                     keyword_arguments=dict(values=parameter),
                                     instance_type=condition_type,
+                                    is_edge_class=is_edge_class,
                                 )
                                 for condition_type in (str, tuple)
                             ]
@@ -968,6 +1344,8 @@ def _to_python_type(type_: dm.DirectRelationReference | dm.PropertyType) -> str:
         out_type = "datetime.datetime"
     elif isinstance(type_, dm.Json):
         out_type = "dict"
+    elif isinstance(type_, dm.TimeSeriesReference):
+        out_type = "TimeSeries"
     elif isinstance(type_, (dm.Text, dm.DirectRelation, dm.CDFExternalIdReference, dm.DirectRelationReference)):
         out_type = "str"
     else:
