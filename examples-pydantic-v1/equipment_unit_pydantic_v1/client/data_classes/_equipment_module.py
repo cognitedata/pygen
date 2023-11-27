@@ -137,7 +137,7 @@ class EquipmentModuleApply(DomainModelApply):
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
 
-        if isinstance(self.sensor_value, CogniteTimeSeries):
+        if isinstance(self.sensor_value, TimeSeries):
             resources.time_series.append(self.sensor_value)
 
         return resources

@@ -108,10 +108,10 @@ class RatingApply(DomainModelApply):
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
 
-        if isinstance(self.score, CogniteTimeSeries):
+        if isinstance(self.score, TimeSeries):
             resources.time_series.append(self.score)
 
-        if isinstance(self.votes, CogniteTimeSeries):
+        if isinstance(self.votes, TimeSeries):
             resources.time_series.append(self.votes)
 
         return resources

@@ -275,7 +275,7 @@ class AssetApply(DomainModelApply):
             other_resources = self.parent._to_instances_apply(cache, view_by_write_class)
             resources.extend(other_resources)
 
-        if isinstance(self.pressure, CogniteTimeSeries):
+        if isinstance(self.pressure, TimeSeries):
             resources.time_series.append(self.pressure)
 
         return resources

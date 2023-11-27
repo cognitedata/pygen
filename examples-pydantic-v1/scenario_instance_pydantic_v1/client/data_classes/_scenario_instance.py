@@ -172,7 +172,7 @@ class ScenarioInstanceApply(DomainModelApply):
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
 
-        if isinstance(self.price_forecast, CogniteTimeSeries):
+        if isinstance(self.price_forecast, TimeSeries):
             resources.time_series.append(self.price_forecast)
 
         return resources
