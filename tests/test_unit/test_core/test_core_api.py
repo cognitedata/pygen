@@ -11,7 +11,12 @@ if IS_PYDANTIC_V2:
     )
 
 else:
-    raise NotImplementedError()
+    from equipment_unit_pydantic_v1.client._api._core import QueryBuilder, QueryStep
+    from equipment_unit_pydantic_v1.client.data_classes import (
+        StartEndTime,
+        UnitProcedure,
+        UnitProcedureList,
+    )
 
 
 class TestQueryBuilderT:

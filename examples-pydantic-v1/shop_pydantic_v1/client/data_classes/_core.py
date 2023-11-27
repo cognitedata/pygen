@@ -44,7 +44,10 @@ class ResourcesApplyResult:
 
 
 # Arbitrary types are allowed to be able to use the TimeSeries class
-class Core(BaseModel, arbitrary_types_allowed=True):
+class Core(BaseModel):
+    class Config:
+        arbitrary_types_allowed = True
+
     def to_pandas(self, include_instance_properties: bool = False) -> pd.Series:
         exclude = None
         if not include_instance_properties:
@@ -109,7 +112,7 @@ class DomainModelApply(DomainModelCore):
     ) -> ResourcesApply:
         raise NotImplementedError()
 
-    @root_validator(pre=True)
+    @root_validator(pre=True, allow_reuse=True)
     def create_external_id_if_factory(cls, data: Any) -> Any:
         if isinstance(data, dict) and cls.external_id_factory is not None:
             data["external_id"] = cls.external_id_factory(cls, data)
@@ -226,12 +229,16 @@ def default_edge_external_id_factory(
     return f"{start_node.external_id}:{end_node.external_id}"
 
 
-class DomainRelationApply(BaseModel, extra=Extra.forbid, populate_by_name=True):
+class DomainRelationApply(BaseModel):
     external_id_factory: ClassVar[
         Callable[[DomainModelApply, dm.DirectRelationReference, dm.DirectRelationReference], str]
     ] = default_edge_external_id_factory
     existing_version: Optional[int] = None
     external_id: Optional[str] = Field(None, min_length=1, max_length=255)
+
+    class Config:
+        extra = Extra.forbid
+        allow_population_by_field_name = True
 
     @abstractmethod
     def _to_instances_apply(
