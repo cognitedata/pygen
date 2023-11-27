@@ -9,10 +9,10 @@ from ._core import DEFAULT_LIMIT_READ, EdgeAPI, _create_edge_filter
 class AssetChildrenAPI(EdgeAPI):
     def list(
         self,
-        asset: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        asset_space: str = "tutorial_apm_simple",
-        asset: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        asset_space: str = "tutorial_apm_simple",
+        from_asset: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        from_asset_space: str = "tutorial_apm_simple",
+        to_asset: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        to_asset_space: str = "tutorial_apm_simple",
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit=DEFAULT_LIMIT_READ,
@@ -20,10 +20,10 @@ class AssetChildrenAPI(EdgeAPI):
         """List child edges of a asset.
 
         Args:
-            asset: ID of the source assets.
-            asset_space: Location of the assets.
-            asset: ID of the target assets.
-            asset_space: Location of the assets.
+            from_asset: ID of the source assets.
+            from_asset_space: Location of the assets.
+            to_asset: ID of the target assets.
+            to_asset_space: Location of the assets.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of child edges to return. Defaults to 25. Set to -1, float("inf") or None
