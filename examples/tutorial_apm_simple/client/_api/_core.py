@@ -277,12 +277,16 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
             else:
                 raise TypeError(f"Expected str or MetricAggregation, got {type(agg)}")
 
-        result = self._client.data_modeling.instances.aggregate(
-            view_id, aggregates, "node", group_by, query, search_properties, filter, limit
+        return self._client.data_modeling.instances.aggregate(
+            view=view_id,
+            aggregates=aggregates,
+            group_by=group_by,
+            instance_type="node",
+            query=query,
+            properties=search_properties,
+            filter=filter,
+            limit=limit,
         )
-        if group_by is None:
-            return result[0].aggregates
-        return result
 
     def _histogram(
         self,
@@ -303,7 +307,13 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
             search_properties = [properties_by_field.get(prop, prop) for prop in search_properties]
 
         return self._client.data_modeling.instances.histogram(
-            view_id, dm.aggregations.Histogram(property, interval), "node", query, search_properties, filter, limit
+            view=view_id,
+            histograms=dm.aggregations.Histogram(property, interval),
+            instance_type="node",
+            query=query,
+            properties=search_properties,
+            filter=filter,
+            limit=limit,
         )
 
     def _list(

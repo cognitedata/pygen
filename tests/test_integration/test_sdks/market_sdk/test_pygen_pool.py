@@ -19,6 +19,10 @@ def test_list_empty_to_pandas(market_client: MarketClient, cognite_client: Cogni
     # Assert
     assert market_df.empty
     if IS_PYDANTIC_V1:
-        assert sorted(market_df.columns) == sorted(set(PygenPool.__fields__) - set(DomainModel.__fields__))
+        assert sorted(market_df.columns) == sorted(
+            set(PygenPool.__fields__) - (set(DomainModel.__fields__) - {"external_id"})
+        )
     else:
-        assert sorted(market_df.columns) == sorted(set(PygenPool.model_fields) - set(DomainModel.model_fields))
+        assert sorted(market_df.columns) == sorted(
+            set(PygenPool.model_fields) - (set(DomainModel.model_fields) - {"external_id"})
+        )
