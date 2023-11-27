@@ -14,6 +14,7 @@ from osdu_wells.client.data_classes import (
     NameAliasesApply,
     NameAliasesFields,
     NameAliasesList,
+    NameAliasesApplyList,
     NameAliasesTextFields,
 )
 from osdu_wells.client.data_classes._name_aliases import (

@@ -14,6 +14,7 @@ from movie_domain.client.data_classes import (
     BestDirectorApply,
     BestDirectorFields,
     BestDirectorList,
+    BestDirectorApplyList,
     BestDirectorTextFields,
 )
 from movie_domain.client.data_classes._best_director import (

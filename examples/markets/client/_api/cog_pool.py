@@ -14,6 +14,7 @@ from markets.client.data_classes import (
     CogPoolApply,
     CogPoolFields,
     CogPoolList,
+    CogPoolApplyList,
     CogPoolTextFields,
 )
 from markets.client.data_classes._cog_pool import (

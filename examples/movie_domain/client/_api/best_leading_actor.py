@@ -14,6 +14,7 @@ from movie_domain.client.data_classes import (
     BestLeadingActorApply,
     BestLeadingActorFields,
     BestLeadingActorList,
+    BestLeadingActorApplyList,
     BestLeadingActorTextFields,
 )
 from movie_domain.client.data_classes._best_leading_actor import (

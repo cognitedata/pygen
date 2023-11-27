@@ -14,6 +14,7 @@ from osdu_wells.client.data_classes import (
     ReviewersApply,
     ReviewersFields,
     ReviewersList,
+    ReviewersApplyList,
     ReviewersTextFields,
 )
 from osdu_wells.client.data_classes._reviewers import (

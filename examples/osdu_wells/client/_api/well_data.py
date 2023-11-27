@@ -14,6 +14,7 @@ from osdu_wells.client.data_classes import (
     WellDataApply,
     WellDataFields,
     WellDataList,
+    WellDataApplyList,
     WellDataTextFields,
 )
 from osdu_wells.client.data_classes._well_data import (

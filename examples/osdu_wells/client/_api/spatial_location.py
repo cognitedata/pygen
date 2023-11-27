@@ -14,6 +14,7 @@ from osdu_wells.client.data_classes import (
     SpatialLocationApply,
     SpatialLocationFields,
     SpatialLocationList,
+    SpatialLocationApplyList,
     SpatialLocationTextFields,
 )
 from osdu_wells.client.data_classes._spatial_location import (

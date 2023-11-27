@@ -14,6 +14,7 @@ from markets.client.data_classes import (
     MarketApply,
     MarketFields,
     MarketList,
+    MarketApplyList,
     MarketTextFields,
 )
 from markets.client.data_classes._market import (

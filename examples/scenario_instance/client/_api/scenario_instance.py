@@ -15,6 +15,7 @@ from scenario_instance.client.data_classes import (
     ScenarioInstanceApply,
     ScenarioInstanceFields,
     ScenarioInstanceList,
+    ScenarioInstanceApplyList,
     ScenarioInstanceTextFields,
 )
 from scenario_instance.client.data_classes._scenario_instance import (

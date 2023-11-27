@@ -14,6 +14,7 @@ from markets.client.data_classes import (
     CogProcessApply,
     CogProcessFields,
     CogProcessList,
+    CogProcessApplyList,
     CogProcessTextFields,
 )
 from markets.client.data_classes._cog_process import (

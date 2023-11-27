@@ -14,6 +14,7 @@ from osdu_wells.client.data_classes import (
     DrillingReasonsApply,
     DrillingReasonsFields,
     DrillingReasonsList,
+    DrillingReasonsApplyList,
     DrillingReasonsTextFields,
 )
 from osdu_wells.client.data_classes._drilling_reasons import (

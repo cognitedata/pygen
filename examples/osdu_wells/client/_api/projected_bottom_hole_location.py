@@ -14,6 +14,7 @@ from osdu_wells.client.data_classes import (
     ProjectedBottomHoleLocationApply,
     ProjectedBottomHoleLocationFields,
     ProjectedBottomHoleLocationList,
+    ProjectedBottomHoleLocationApplyList,
     ProjectedBottomHoleLocationTextFields,
 )
 from osdu_wells.client.data_classes._projected_bottom_hole_location import (

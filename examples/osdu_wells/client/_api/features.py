@@ -14,6 +14,7 @@ from osdu_wells.client.data_classes import (
     FeaturesApply,
     FeaturesFields,
     FeaturesList,
+    FeaturesApplyList,
     FeaturesTextFields,
 )
 from osdu_wells.client.data_classes._features import (

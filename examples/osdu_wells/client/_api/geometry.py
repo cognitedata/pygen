@@ -14,6 +14,7 @@ from osdu_wells.client.data_classes import (
     GeometryApply,
     GeometryFields,
     GeometryList,
+    GeometryApplyList,
     GeometryTextFields,
 )
 from osdu_wells.client.data_classes._geometry import (

@@ -14,6 +14,7 @@ from osdu_wells.client.data_classes import (
     ArtefactsApply,
     ArtefactsFields,
     ArtefactsList,
+    ArtefactsApplyList,
     ArtefactsTextFields,
 )
 from osdu_wells.client.data_classes._artefacts import (

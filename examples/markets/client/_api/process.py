@@ -14,6 +14,7 @@ from markets.client.data_classes import (
     ProcessApply,
     ProcessFields,
     ProcessList,
+    ProcessApplyList,
     ProcessTextFields,
 )
 from markets.client.data_classes._process import (

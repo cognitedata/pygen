@@ -14,6 +14,7 @@ from osdu_wells.client.data_classes import (
     AvailableTrajectoryStationPropertiesApply,
     AvailableTrajectoryStationPropertiesFields,
     AvailableTrajectoryStationPropertiesList,
+    AvailableTrajectoryStationPropertiesApplyList,
     AvailableTrajectoryStationPropertiesTextFields,
 )
 from osdu_wells.client.data_classes._available_trajectory_station_properties import (

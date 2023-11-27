@@ -14,6 +14,7 @@ from movie_domain.client.data_classes import (
     PersonApply,
     PersonFields,
     PersonList,
+    PersonApplyList,
     PersonTextFields,
 )
 from movie_domain.client.data_classes._person import (

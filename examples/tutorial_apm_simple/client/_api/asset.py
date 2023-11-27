@@ -15,6 +15,7 @@ from tutorial_apm_simple.client.data_classes import (
     AssetApply,
     AssetFields,
     AssetList,
+    AssetApplyList,
     AssetTextFields,
     CdfConnectionProperties,
     CdfConnectionPropertiesApply,

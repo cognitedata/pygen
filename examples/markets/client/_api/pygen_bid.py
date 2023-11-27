@@ -15,6 +15,7 @@ from markets.client.data_classes import (
     PygenBidApply,
     PygenBidFields,
     PygenBidList,
+    PygenBidApplyList,
     PygenBidTextFields,
 )
 from markets.client.data_classes._pygen_bid import (

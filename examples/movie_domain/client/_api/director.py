@@ -14,6 +14,7 @@ from movie_domain.client.data_classes import (
     DirectorApply,
     DirectorFields,
     DirectorList,
+    DirectorApplyList,
 )
 from movie_domain.client.data_classes._director import (
     _DIRECTOR_PROPERTIES_BY_FIELD,

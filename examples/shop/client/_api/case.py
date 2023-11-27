@@ -15,6 +15,7 @@ from shop.client.data_classes import (
     CaseApply,
     CaseFields,
     CaseList,
+    CaseApplyList,
     CaseTextFields,
 )
 from shop.client.data_classes._case import (

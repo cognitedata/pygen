@@ -14,6 +14,7 @@ from osdu_wells.client.data_classes import (
     AsIngestedCoordinatesApply,
     AsIngestedCoordinatesFields,
     AsIngestedCoordinatesList,
+    AsIngestedCoordinatesApplyList,
     AsIngestedCoordinatesTextFields,
 )
 from osdu_wells.client.data_classes._as_ingested_coordinates import (

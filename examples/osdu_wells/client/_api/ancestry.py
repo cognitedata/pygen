@@ -14,6 +14,7 @@ from osdu_wells.client.data_classes import (
     AncestryApply,
     AncestryFields,
     AncestryList,
+    AncestryApplyList,
     AncestryTextFields,
 )
 from osdu_wells.client.data_classes._ancestry import (

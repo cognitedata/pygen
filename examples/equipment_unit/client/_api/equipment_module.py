@@ -14,6 +14,7 @@ from equipment_unit.client.data_classes import (
     EquipmentModuleApply,
     EquipmentModuleFields,
     EquipmentModuleList,
+    EquipmentModuleApplyList,
     EquipmentModuleTextFields,
 )
 from equipment_unit.client.data_classes._equipment_module import (

@@ -14,6 +14,7 @@ from markets.client.data_classes import (
     DateTransformationApply,
     DateTransformationFields,
     DateTransformationList,
+    DateTransformationApplyList,
     DateTransformationTextFields,
 )
 from markets.client.data_classes._date_transformation import (

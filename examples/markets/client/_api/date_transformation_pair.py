@@ -12,6 +12,7 @@ from markets.client.data_classes import (
     DateTransformationPair,
     DateTransformationPairApply,
     DateTransformationPairList,
+    DateTransformationPairApplyList,
 )
 from markets.client.data_classes._date_transformation_pair import (
     _create_date_transformation_pair_filter,

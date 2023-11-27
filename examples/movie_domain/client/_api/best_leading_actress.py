@@ -14,6 +14,7 @@ from movie_domain.client.data_classes import (
     BestLeadingActressApply,
     BestLeadingActressFields,
     BestLeadingActressList,
+    BestLeadingActressApplyList,
     BestLeadingActressTextFields,
 )
 from movie_domain.client.data_classes._best_leading_actress import (

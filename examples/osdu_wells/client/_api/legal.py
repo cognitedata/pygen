@@ -14,6 +14,7 @@ from osdu_wells.client.data_classes import (
     LegalApply,
     LegalFields,
     LegalList,
+    LegalApplyList,
     LegalTextFields,
 )
 from osdu_wells.client.data_classes._legal import (

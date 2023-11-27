@@ -14,6 +14,7 @@ from osdu_wells.client.data_classes import (
     WgsCoordinatesApply,
     WgsCoordinatesFields,
     WgsCoordinatesList,
+    WgsCoordinatesApplyList,
     WgsCoordinatesTextFields,
 )
 from osdu_wells.client.data_classes._wgs_84_coordinates import (

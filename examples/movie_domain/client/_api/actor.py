@@ -14,6 +14,7 @@ from movie_domain.client.data_classes import (
     ActorApply,
     ActorFields,
     ActorList,
+    ActorApplyList,
 )
 from movie_domain.client.data_classes._actor import (
     _ACTOR_PROPERTIES_BY_FIELD,

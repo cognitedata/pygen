@@ -14,6 +14,7 @@ from markets.client.data_classes import (
     PygenPoolApply,
     PygenPoolFields,
     PygenPoolList,
+    PygenPoolApplyList,
     PygenPoolTextFields,
 )
 from markets.client.data_classes._pygen_pool import (

@@ -14,6 +14,7 @@ from osdu_wells.client.data_classes import (
     LineageAssertionsApply,
     LineageAssertionsFields,
     LineageAssertionsList,
+    LineageAssertionsApplyList,
     LineageAssertionsTextFields,
 )
 from osdu_wells.client.data_classes._lineage_assertions import (

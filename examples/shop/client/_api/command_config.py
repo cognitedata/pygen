@@ -14,6 +14,7 @@ from shop.client.data_classes import (
     CommandConfigApply,
     CommandConfigFields,
     CommandConfigList,
+    CommandConfigApplyList,
     CommandConfigTextFields,
 )
 from shop.client.data_classes._command_config import (

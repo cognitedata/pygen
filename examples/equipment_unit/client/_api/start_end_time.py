@@ -15,6 +15,7 @@ from equipment_unit.client.data_classes import (
     StartEndTimeApply,
     StartEndTimeFields,
     StartEndTimeList,
+    StartEndTimeApplyList,
 )
 from equipment_unit.client.data_classes._start_end_time import (
     _STARTENDTIME_PROPERTIES_BY_FIELD,

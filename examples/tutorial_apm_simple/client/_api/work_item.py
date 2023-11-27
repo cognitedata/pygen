@@ -14,6 +14,7 @@ from tutorial_apm_simple.client.data_classes import (
     WorkItemApply,
     WorkItemFields,
     WorkItemList,
+    WorkItemApplyList,
     WorkItemTextFields,
 )
 from tutorial_apm_simple.client.data_classes._work_item import (

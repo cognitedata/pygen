@@ -15,6 +15,7 @@ from markets.client.data_classes import (
     BidApply,
     BidFields,
     BidList,
+    BidApplyList,
     BidTextFields,
 )
 from markets.client.data_classes._bid import (

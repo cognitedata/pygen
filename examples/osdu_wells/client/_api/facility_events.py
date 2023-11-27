@@ -14,6 +14,7 @@ from osdu_wells.client.data_classes import (
     FacilityEventsApply,
     FacilityEventsFields,
     FacilityEventsList,
+    FacilityEventsApplyList,
     FacilityEventsTextFields,
 )
 from osdu_wells.client.data_classes._facility_events import (

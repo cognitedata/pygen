@@ -14,6 +14,7 @@ from osdu_wells.client.data_classes import (
     AcceptableUsageApply,
     AcceptableUsageFields,
     AcceptableUsageList,
+    AcceptableUsageApplyList,
     AcceptableUsageTextFields,
 )
 from osdu_wells.client.data_classes._acceptable_usage import (

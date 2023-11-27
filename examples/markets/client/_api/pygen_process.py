@@ -14,6 +14,7 @@ from markets.client.data_classes import (
     PygenProcessApply,
     PygenProcessFields,
     PygenProcessList,
+    PygenProcessApplyList,
     PygenProcessTextFields,
 )
 from markets.client.data_classes._pygen_process import (

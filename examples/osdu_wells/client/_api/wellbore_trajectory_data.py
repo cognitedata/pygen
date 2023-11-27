@@ -14,6 +14,7 @@ from osdu_wells.client.data_classes import (
     WellboreTrajectoryDataApply,
     WellboreTrajectoryDataFields,
     WellboreTrajectoryDataList,
+    WellboreTrajectoryDataApplyList,
     WellboreTrajectoryDataTextFields,
 )
 from osdu_wells.client.data_classes._wellbore_trajectory_data import (

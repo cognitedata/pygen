@@ -14,6 +14,7 @@ from osdu_wells.client.data_classes import (
     AclApply,
     AclFields,
     AclList,
+    AclApplyList,
     AclTextFields,
 )
 from osdu_wells.client.data_classes._acl import (

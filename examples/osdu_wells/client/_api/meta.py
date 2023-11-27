@@ -14,6 +14,7 @@ from osdu_wells.client.data_classes import (
     MetaApply,
     MetaFields,
     MetaList,
+    MetaApplyList,
     MetaTextFields,
 )
 from osdu_wells.client.data_classes._meta import (

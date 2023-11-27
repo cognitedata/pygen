@@ -14,6 +14,7 @@ from osdu_wells.client.data_classes import (
     UnacceptableUsageApply,
     UnacceptableUsageFields,
     UnacceptableUsageList,
+    UnacceptableUsageApplyList,
     UnacceptableUsageTextFields,
 )
 from osdu_wells.client.data_classes._unacceptable_usage import (

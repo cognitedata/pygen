@@ -14,6 +14,7 @@ from movie_domain.client.data_classes import (
     MovieApply,
     MovieFields,
     MovieList,
+    MovieApplyList,
     MovieTextFields,
 )
 from movie_domain.client.data_classes._movie import (

@@ -14,6 +14,7 @@ from osdu_wells.client.data_classes import (
     TechnicalAssurancesApply,
     TechnicalAssurancesFields,
     TechnicalAssurancesList,
+    TechnicalAssurancesApplyList,
     TechnicalAssurancesTextFields,
 )
 from osdu_wells.client.data_classes._technical_assurances import (

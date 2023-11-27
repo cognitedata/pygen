@@ -14,6 +14,7 @@ from osdu_wells.client.data_classes import (
     GeographicBottomHoleLocationApply,
     GeographicBottomHoleLocationFields,
     GeographicBottomHoleLocationList,
+    GeographicBottomHoleLocationApplyList,
     GeographicBottomHoleLocationTextFields,
 )
 from osdu_wells.client.data_classes._geographic_bottom_hole_location import (

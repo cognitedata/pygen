@@ -14,6 +14,7 @@ from osdu_wells.client.data_classes import (
     HistoricalInterestsApply,
     HistoricalInterestsFields,
     HistoricalInterestsList,
+    HistoricalInterestsApplyList,
     HistoricalInterestsTextFields,
 )
 from osdu_wells.client.data_classes._historical_interests import (

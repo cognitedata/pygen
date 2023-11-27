@@ -14,6 +14,7 @@ from movie_domain.client.data_classes import (
     RoleApply,
     RoleFields,
     RoleList,
+    RoleApplyList,
 )
 from movie_domain.client.data_classes._role import (
     _ROLE_PROPERTIES_BY_FIELD,

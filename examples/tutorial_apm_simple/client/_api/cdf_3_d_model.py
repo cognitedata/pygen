@@ -14,6 +14,7 @@ from tutorial_apm_simple.client.data_classes import (
     CdfModelApply,
     CdfModelFields,
     CdfModelList,
+    CdfModelApplyList,
     CdfModelTextFields,
     CdfConnectionProperties,
     CdfConnectionPropertiesApply,

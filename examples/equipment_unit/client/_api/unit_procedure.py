@@ -14,6 +14,7 @@ from equipment_unit.client.data_classes import (
     UnitProcedureApply,
     UnitProcedureFields,
     UnitProcedureList,
+    UnitProcedureApplyList,
     UnitProcedureTextFields,
     StartEndTime,
     StartEndTimeApply,

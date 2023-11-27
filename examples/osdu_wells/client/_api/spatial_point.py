@@ -14,6 +14,7 @@ from osdu_wells.client.data_classes import (
     SpatialPointApply,
     SpatialPointFields,
     SpatialPointList,
+    SpatialPointApplyList,
     SpatialPointTextFields,
 )
 from osdu_wells.client.data_classes._spatial_point import (

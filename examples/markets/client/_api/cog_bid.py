@@ -15,6 +15,7 @@ from markets.client.data_classes import (
     CogBidApply,
     CogBidFields,
     CogBidList,
+    CogBidApplyList,
     CogBidTextFields,
 )
 from markets.client.data_classes._cog_bid import (

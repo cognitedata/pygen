@@ -14,6 +14,7 @@ from osdu_wells.client.data_classes import (
     SpatialAreaApply,
     SpatialAreaFields,
     SpatialAreaList,
+    SpatialAreaApplyList,
     SpatialAreaTextFields,
 )
 from osdu_wells.client.data_classes._spatial_area import (

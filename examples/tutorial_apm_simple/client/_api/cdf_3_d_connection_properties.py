@@ -14,6 +14,7 @@ from tutorial_apm_simple.client.data_classes import (
     CdfConnectionPropertiesApply,
     CdfConnectionPropertiesFields,
     CdfConnectionPropertiesList,
+    CdfConnectionPropertiesApplyList,
 )
 from tutorial_apm_simple.client.data_classes._cdf_3_d_connection_properties import (
     _CDFCONNECTIONPROPERTIES_PROPERTIES_BY_FIELD,

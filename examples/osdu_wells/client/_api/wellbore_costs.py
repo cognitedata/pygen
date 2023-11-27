@@ -14,6 +14,7 @@ from osdu_wells.client.data_classes import (
     WellboreCostsApply,
     WellboreCostsFields,
     WellboreCostsList,
+    WellboreCostsApplyList,
     WellboreCostsTextFields,
 )
 from osdu_wells.client.data_classes._wellbore_costs import (

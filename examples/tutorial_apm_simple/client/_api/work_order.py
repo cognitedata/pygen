@@ -15,6 +15,7 @@ from tutorial_apm_simple.client.data_classes import (
     WorkOrderApply,
     WorkOrderFields,
     WorkOrderList,
+    WorkOrderApplyList,
     WorkOrderTextFields,
 )
 from tutorial_apm_simple.client.data_classes._work_order import (

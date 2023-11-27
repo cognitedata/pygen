@@ -14,6 +14,7 @@ from osdu_wells.client.data_classes import (
     TagsApply,
     TagsFields,
     TagsList,
+    TagsApplyList,
     TagsTextFields,
 )
 from osdu_wells.client.data_classes._tags import (

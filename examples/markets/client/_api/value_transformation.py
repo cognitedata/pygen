@@ -14,6 +14,7 @@ from markets.client.data_classes import (
     ValueTransformationApply,
     ValueTransformationFields,
     ValueTransformationList,
+    ValueTransformationApplyList,
     ValueTransformationTextFields,
 )
 from markets.client.data_classes._value_transformation import (

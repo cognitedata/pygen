@@ -12,6 +12,7 @@ from tutorial_apm_simple.client.data_classes import (
     CdfEntity,
     CdfEntityApply,
     CdfEntityList,
+    CdfEntityApplyList,
     CdfConnectionProperties,
     CdfConnectionPropertiesApply,
     CdfConnectionPropertiesList,

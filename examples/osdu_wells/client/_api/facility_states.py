@@ -14,6 +14,7 @@ from osdu_wells.client.data_classes import (
     FacilityStatesApply,
     FacilityStatesFields,
     FacilityStatesList,
+    FacilityStatesApplyList,
     FacilityStatesTextFields,
 )
 from osdu_wells.client.data_classes._facility_states import (

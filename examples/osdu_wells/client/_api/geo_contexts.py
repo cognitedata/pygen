@@ -14,6 +14,7 @@ from osdu_wells.client.data_classes import (
     GeoContextsApply,
     GeoContextsFields,
     GeoContextsList,
+    GeoContextsApplyList,
     GeoContextsTextFields,
 )
 from osdu_wells.client.data_classes._geo_contexts import (

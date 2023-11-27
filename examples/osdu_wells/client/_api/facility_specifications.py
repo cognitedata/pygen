@@ -14,6 +14,7 @@ from osdu_wells.client.data_classes import (
     FacilitySpecificationsApply,
     FacilitySpecificationsFields,
     FacilitySpecificationsList,
+    FacilitySpecificationsApplyList,
     FacilitySpecificationsTextFields,
 )
 from osdu_wells.client.data_classes._facility_specifications import (

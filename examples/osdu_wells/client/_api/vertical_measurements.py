@@ -14,6 +14,7 @@ from osdu_wells.client.data_classes import (
     VerticalMeasurementsApply,
     VerticalMeasurementsFields,
     VerticalMeasurementsList,
+    VerticalMeasurementsApplyList,
     VerticalMeasurementsTextFields,
 )
 from osdu_wells.client.data_classes._vertical_measurements import (

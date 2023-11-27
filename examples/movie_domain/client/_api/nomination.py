@@ -14,6 +14,7 @@ from movie_domain.client.data_classes import (
     NominationApply,
     NominationFields,
     NominationList,
+    NominationApplyList,
     NominationTextFields,
 )
 from movie_domain.client.data_classes._nomination import (

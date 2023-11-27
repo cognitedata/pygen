@@ -14,6 +14,7 @@ from movie_domain.client.data_classes import (
     RatingApply,
     RatingFields,
     RatingList,
+    RatingApplyList,
     RatingTextFields,
 )
 from movie_domain.client.data_classes._rating import (
