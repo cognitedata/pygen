@@ -39,6 +39,7 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
             class_type={{ data_class.read_name }},
             class_apply_type={{ data_class.write_name }},
             class_list={{ data_class.read_list_name }},
+            class_apply_list={{ data_class.write_list_name }},
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id{% for field in data_class.one_to_many_edges %}
