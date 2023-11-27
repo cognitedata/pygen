@@ -169,14 +169,14 @@ class CogBidAPI(NodeAPI[CogBid, CogBidApply, CogBidList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> CogBid:
+    def retrieve(self, external_id: str) -> CogBid | None:
         ...
 
     @overload
     def retrieve(self, external_id: SequenceNotStr[str]) -> CogBidList:
         ...
 
-    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = "market") -> CogBid | CogBidList:
+    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = "market") -> CogBid | CogBidList | None:
         """Retrieve one or more cog bids by id(s).
 
         Args:

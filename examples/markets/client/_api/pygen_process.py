@@ -152,7 +152,7 @@ class PygenProcessAPI(NodeAPI[PygenProcess, PygenProcessApply, PygenProcessList]
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> PygenProcess:
+    def retrieve(self, external_id: str) -> PygenProcess | None:
         ...
 
     @overload
@@ -161,7 +161,7 @@ class PygenProcessAPI(NodeAPI[PygenProcess, PygenProcessApply, PygenProcessList]
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "market"
-    ) -> PygenProcess | PygenProcessList:
+    ) -> PygenProcess | PygenProcessList | None:
         """Retrieve one or more pygen process by id(s).
 
         Args:

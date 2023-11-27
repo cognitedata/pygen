@@ -151,7 +151,7 @@ class BestDirectorAPI(NodeAPI[BestDirector, BestDirectorApply, BestDirectorList]
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> BestDirector:
+    def retrieve(self, external_id: str) -> BestDirector | None:
         ...
 
     @overload
@@ -160,7 +160,7 @@ class BestDirectorAPI(NodeAPI[BestDirector, BestDirectorApply, BestDirectorList]
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> BestDirector | BestDirectorList:
+    ) -> BestDirector | BestDirectorList | None:
         """Retrieve one or more best directors by id(s).
 
         Args:

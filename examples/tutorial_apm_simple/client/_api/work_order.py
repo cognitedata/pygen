@@ -250,7 +250,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> WorkOrder:
+    def retrieve(self, external_id: str) -> WorkOrder | None:
         ...
 
     @overload
@@ -259,7 +259,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "tutorial_apm_simple"
-    ) -> WorkOrder | WorkOrderList:
+    ) -> WorkOrder | WorkOrderList | None:
         """Retrieve one or more work orders by id(s).
 
         Args:

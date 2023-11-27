@@ -151,7 +151,7 @@ class WellboreCostsAPI(NodeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsL
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> WellboreCosts:
+    def retrieve(self, external_id: str) -> WellboreCosts | None:
         ...
 
     @overload
@@ -160,7 +160,7 @@ class WellboreCostsAPI(NodeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsL
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> WellboreCosts | WellboreCostsList:
+    ) -> WellboreCosts | WellboreCostsList | None:
         """Retrieve one or more wellbore costs by id(s).
 
         Args:

@@ -151,14 +151,14 @@ class BidAPI(NodeAPI[Bid, BidApply, BidList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> Bid:
+    def retrieve(self, external_id: str) -> Bid | None:
         ...
 
     @overload
     def retrieve(self, external_id: SequenceNotStr[str]) -> BidList:
         ...
 
-    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = "market") -> Bid | BidList:
+    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = "market") -> Bid | BidList | None:
         """Retrieve one or more bids by id(s).
 
         Args:

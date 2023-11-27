@@ -143,7 +143,7 @@ class GeometryAPI(NodeAPI[Geometry, GeometryApply, GeometryList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> Geometry:
+    def retrieve(self, external_id: str) -> Geometry | None:
         ...
 
     @overload
@@ -152,7 +152,7 @@ class GeometryAPI(NodeAPI[Geometry, GeometryApply, GeometryList]):
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> Geometry | GeometryList:
+    ) -> Geometry | GeometryList | None:
         """Retrieve one or more geometries by id(s).
 
         Args:

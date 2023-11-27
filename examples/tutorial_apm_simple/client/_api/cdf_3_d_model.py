@@ -158,14 +158,16 @@ class CdfModelAPI(NodeAPI[CdfModel, CdfModelApply, CdfModelList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> CdfModel:
+    def retrieve(self, external_id: str) -> CdfModel | None:
         ...
 
     @overload
     def retrieve(self, external_id: SequenceNotStr[str]) -> CdfModelList:
         ...
 
-    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = "cdf_3d_schema") -> CdfModel | CdfModelList:
+    def retrieve(
+        self, external_id: str | SequenceNotStr[str], space: str = "cdf_3d_schema"
+    ) -> CdfModel | CdfModelList | None:
         """Retrieve one or more cdf 3 d models by id(s).
 
         Args:

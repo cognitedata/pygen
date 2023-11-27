@@ -165,14 +165,14 @@ class CogPoolAPI(NodeAPI[CogPool, CogPoolApply, CogPoolList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> CogPool:
+    def retrieve(self, external_id: str) -> CogPool | None:
         ...
 
     @overload
     def retrieve(self, external_id: SequenceNotStr[str]) -> CogPoolList:
         ...
 
-    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = "market") -> CogPool | CogPoolList:
+    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = "market") -> CogPool | CogPoolList | None:
         """Retrieve one or more cog pools by id(s).
 
         Args:

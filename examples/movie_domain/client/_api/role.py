@@ -150,7 +150,7 @@ class RoleAPI(NodeAPI[Role, RoleApply, RoleList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> Role:
+    def retrieve(self, external_id: str) -> Role | None:
         ...
 
     @overload
@@ -159,7 +159,7 @@ class RoleAPI(NodeAPI[Role, RoleApply, RoleList]):
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> Role | RoleList:
+    ) -> Role | RoleList | None:
         """Retrieve one or more roles by id(s).
 
         Args:

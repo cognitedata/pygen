@@ -152,14 +152,16 @@ class CogProcessAPI(NodeAPI[CogProcess, CogProcessApply, CogProcessList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> CogProcess:
+    def retrieve(self, external_id: str) -> CogProcess | None:
         ...
 
     @overload
     def retrieve(self, external_id: SequenceNotStr[str]) -> CogProcessList:
         ...
 
-    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = "market") -> CogProcess | CogProcessList:
+    def retrieve(
+        self, external_id: str | SequenceNotStr[str], space: str = "market"
+    ) -> CogProcess | CogProcessList | None:
         """Retrieve one or more cog process by id(s).
 
         Args:

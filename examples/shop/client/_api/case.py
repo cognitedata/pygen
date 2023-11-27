@@ -177,7 +177,7 @@ class CaseAPI(NodeAPI[Case, CaseApply, CaseList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> Case:
+    def retrieve(self, external_id: str) -> Case | None:
         ...
 
     @overload
@@ -186,7 +186,7 @@ class CaseAPI(NodeAPI[Case, CaseApply, CaseList]):
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> Case | CaseList:
+    ) -> Case | CaseList | None:
         """Retrieve one or more cases by id(s).
 
         Args:

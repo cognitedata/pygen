@@ -407,7 +407,7 @@ class WellboreTrajectoryDataAPI(
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> WellboreTrajectoryData:
+    def retrieve(self, external_id: str) -> WellboreTrajectoryData | None:
         ...
 
     @overload
@@ -416,7 +416,7 @@ class WellboreTrajectoryDataAPI(
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> WellboreTrajectoryData | WellboreTrajectoryDataList:
+    ) -> WellboreTrajectoryData | WellboreTrajectoryDataList | None:
         """Retrieve one or more wellbore trajectory data by id(s).
 
         Args:

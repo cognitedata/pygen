@@ -78,3 +78,11 @@ def test_circular_query_from_actor(movie_client: MovieClient):
             assert isinstance(movie, m.Movie)
             for movie_actor in movie.actors:
                 assert isinstance(movie_actor, m.Actor)
+
+
+def test_actor_retrieve_missing(movie_client: MovieClient) -> None:
+    # Act
+    actor = movie_client.actor.retrieve("actor:missing")
+
+    # Assert
+    assert actor is None

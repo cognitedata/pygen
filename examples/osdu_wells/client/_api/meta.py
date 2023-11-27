@@ -161,7 +161,7 @@ class MetaAPI(NodeAPI[Meta, MetaApply, MetaList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> Meta:
+    def retrieve(self, external_id: str) -> Meta | None:
         ...
 
     @overload
@@ -170,7 +170,7 @@ class MetaAPI(NodeAPI[Meta, MetaApply, MetaList]):
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> Meta | MetaList:
+    ) -> Meta | MetaList | None:
         """Retrieve one or more metas by id(s).
 
         Args:

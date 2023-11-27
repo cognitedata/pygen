@@ -208,14 +208,16 @@ class AssetAPI(NodeAPI[Asset, AssetApply, AssetList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> Asset:
+    def retrieve(self, external_id: str) -> Asset | None:
         ...
 
     @overload
     def retrieve(self, external_id: SequenceNotStr[str]) -> AssetList:
         ...
 
-    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = "tutorial_apm_simple") -> Asset | AssetList:
+    def retrieve(
+        self, external_id: str | SequenceNotStr[str], space: str = "tutorial_apm_simple"
+    ) -> Asset | AssetList | None:
         """Retrieve one or more assets by id(s).
 
         Args:

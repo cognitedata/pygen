@@ -195,7 +195,7 @@ class ProjectedBottomHoleLocationAPI(
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> ProjectedBottomHoleLocation:
+    def retrieve(self, external_id: str) -> ProjectedBottomHoleLocation | None:
         ...
 
     @overload
@@ -204,7 +204,7 @@ class ProjectedBottomHoleLocationAPI(
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> ProjectedBottomHoleLocation | ProjectedBottomHoleLocationList:
+    ) -> ProjectedBottomHoleLocation | ProjectedBottomHoleLocationList | None:
         """Retrieve one or more projected bottom hole locations by id(s).
 
         Args:

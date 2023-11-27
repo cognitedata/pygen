@@ -150,7 +150,7 @@ class ActorAPI(NodeAPI[Actor, ActorApply, ActorList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> Actor:
+    def retrieve(self, external_id: str) -> Actor | None:
         ...
 
     @overload
@@ -159,7 +159,7 @@ class ActorAPI(NodeAPI[Actor, ActorApply, ActorList]):
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> Actor | ActorList:
+    ) -> Actor | ActorList | None:
         """Retrieve one or more actors by id(s).
 
         Args:

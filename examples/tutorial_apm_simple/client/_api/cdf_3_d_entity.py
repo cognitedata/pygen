@@ -148,7 +148,7 @@ class CdfEntityAPI(NodeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> CdfEntity:
+    def retrieve(self, external_id: str) -> CdfEntity | None:
         ...
 
     @overload
@@ -157,7 +157,7 @@ class CdfEntityAPI(NodeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "cdf_3d_schema"
-    ) -> CdfEntity | CdfEntityList:
+    ) -> CdfEntity | CdfEntityList | None:
         """Retrieve one or more cdf 3 d entities by id(s).
 
         Args:

@@ -175,7 +175,7 @@ class GeoContextsAPI(NodeAPI[GeoContexts, GeoContextsApply, GeoContextsList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> GeoContexts:
+    def retrieve(self, external_id: str) -> GeoContexts | None:
         ...
 
     @overload
@@ -184,7 +184,7 @@ class GeoContextsAPI(NodeAPI[GeoContexts, GeoContextsApply, GeoContextsList]):
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> GeoContexts | GeoContextsList:
+    ) -> GeoContexts | GeoContextsList | None:
         """Retrieve one or more geo contexts by id(s).
 
         Args:

@@ -146,7 +146,7 @@ class FeaturesAPI(NodeAPI[Features, FeaturesApply, FeaturesList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> Features:
+    def retrieve(self, external_id: str) -> Features | None:
         ...
 
     @overload
@@ -155,7 +155,7 @@ class FeaturesAPI(NodeAPI[Features, FeaturesApply, FeaturesList]):
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> Features | FeaturesList:
+    ) -> Features | FeaturesList | None:
         """Retrieve one or more features by id(s).
 
         Args:

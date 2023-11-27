@@ -167,7 +167,7 @@ class ReviewersAPI(NodeAPI[Reviewers, ReviewersApply, ReviewersList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> Reviewers:
+    def retrieve(self, external_id: str) -> Reviewers | None:
         ...
 
     @overload
@@ -176,7 +176,7 @@ class ReviewersAPI(NodeAPI[Reviewers, ReviewersApply, ReviewersList]):
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> Reviewers | ReviewersList:
+    ) -> Reviewers | ReviewersList | None:
         """Retrieve one or more reviewers by id(s).
 
         Args:

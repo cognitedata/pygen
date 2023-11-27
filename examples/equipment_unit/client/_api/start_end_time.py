@@ -151,7 +151,7 @@ class StartEndTimeAPI(NodeAPI[StartEndTime, StartEndTimeApply, StartEndTimeList]
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> StartEndTime:
+    def retrieve(self, external_id: str) -> StartEndTime | None:
         ...
 
     @overload
@@ -160,7 +160,7 @@ class StartEndTimeAPI(NodeAPI[StartEndTime, StartEndTimeApply, StartEndTimeList]
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> StartEndTime | StartEndTimeList:
+    ) -> StartEndTime | StartEndTimeList | None:
         """Retrieve one or more start end times by id(s).
 
         Args:

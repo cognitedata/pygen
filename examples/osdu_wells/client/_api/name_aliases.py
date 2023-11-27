@@ -169,7 +169,7 @@ class NameAliasesAPI(NodeAPI[NameAliases, NameAliasesApply, NameAliasesList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> NameAliases:
+    def retrieve(self, external_id: str) -> NameAliases | None:
         ...
 
     @overload
@@ -178,7 +178,7 @@ class NameAliasesAPI(NodeAPI[NameAliases, NameAliasesApply, NameAliasesList]):
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> NameAliases | NameAliasesList:
+    ) -> NameAliases | NameAliasesList | None:
         """Retrieve one or more name aliases by id(s).
 
         Args:

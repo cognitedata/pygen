@@ -156,7 +156,7 @@ class CdfConnectionPropertiesAPI(
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> CdfConnectionProperties:
+    def retrieve(self, external_id: str) -> CdfConnectionProperties | None:
         ...
 
     @overload
@@ -165,7 +165,7 @@ class CdfConnectionPropertiesAPI(
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "cdf_3d_schema"
-    ) -> CdfConnectionProperties | CdfConnectionPropertiesList:
+    ) -> CdfConnectionProperties | CdfConnectionPropertiesList | None:
         """Retrieve one or more cdf 3 d connection properties by id(s).
 
         Args:

@@ -130,7 +130,7 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
         space: str,
         retrieve_edges: bool = False,
         edge_api_name_type_triple: list[tuple[EdgeAPI, str, dm.DirectRelationReference]] | None = None,
-    ) -> T_DomainModel:
+    ) -> T_DomainModel | None:
         ...
 
     @overload
@@ -149,7 +149,7 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
         space: str,
         retrieve_edges: bool = False,
         edge_api_name_type_triple: list[tuple[EdgeAPI, str, dm.DirectRelationReference]] | None = None,
-    ) -> T_DomainModel | T_DomainModelList:
+    ) -> T_DomainModel | T_DomainModelList | None:
         is_multiple = True
         if isinstance(external_id, str):
             node_ids = (space, external_id)
@@ -160,10 +160,12 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
         instances = self._client.data_modeling.instances.retrieve(nodes=node_ids, sources=self._sources)
         nodes = self._class_list([self._class_type.from_instance(node) for node in instances.nodes])
 
-        if retrieve_edges:
+        if retrieve_edges and nodes:
             self._retrieve_and_set_edge_types(nodes, edge_api_name_type_triple)
 
-        if is_multiple:
+        if not nodes:
+            return None
+        elif is_multiple:
             return nodes
         else:
             return nodes[0]

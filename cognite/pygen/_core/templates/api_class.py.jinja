@@ -139,14 +139,14 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> {{ data_class.read_name }}:
+    def retrieve(self, external_id: str) -> {{ data_class.read_name }} | None:
         ...
 
     @overload
     def retrieve(self, external_id: SequenceNotStr[str]) -> {{ data_class.read_list_name }}:
         ...
 
-    def retrieve(self, external_id: str | SequenceNotStr[str], space: str ="{{ data_class.view_id.space }}") -> {{ data_class.read_name }} | {{ data_class.read_list_name }}:
+    def retrieve(self, external_id: str | SequenceNotStr[str], space: str ="{{ data_class.view_id.space }}") -> {{ data_class.read_name }} | {{ data_class.read_list_name }} | None:
         """Retrieve one or more {{data_class.doc_list_name}} by id(s).
 
         Args:

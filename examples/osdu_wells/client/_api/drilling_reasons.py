@@ -163,7 +163,7 @@ class DrillingReasonsAPI(NodeAPI[DrillingReasons, DrillingReasonsApply, Drilling
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> DrillingReasons:
+    def retrieve(self, external_id: str) -> DrillingReasons | None:
         ...
 
     @overload
@@ -172,7 +172,7 @@ class DrillingReasonsAPI(NodeAPI[DrillingReasons, DrillingReasonsApply, Drilling
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> DrillingReasons | DrillingReasonsList:
+    ) -> DrillingReasons | DrillingReasonsList | None:
         """Retrieve one or more drilling reasons by id(s).
 
         Args:

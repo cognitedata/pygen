@@ -161,7 +161,7 @@ class HistoricalInterestsAPI(NodeAPI[HistoricalInterests, HistoricalInterestsApp
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> HistoricalInterests:
+    def retrieve(self, external_id: str) -> HistoricalInterests | None:
         ...
 
     @overload
@@ -170,7 +170,7 @@ class HistoricalInterestsAPI(NodeAPI[HistoricalInterests, HistoricalInterestsApp
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> HistoricalInterests | HistoricalInterestsList:
+    ) -> HistoricalInterests | HistoricalInterestsList | None:
         """Retrieve one or more historical interests by id(s).
 
         Args:

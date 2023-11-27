@@ -155,7 +155,7 @@ class ArtefactsAPI(NodeAPI[Artefacts, ArtefactsApply, ArtefactsList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> Artefacts:
+    def retrieve(self, external_id: str) -> Artefacts | None:
         ...
 
     @overload
@@ -164,7 +164,7 @@ class ArtefactsAPI(NodeAPI[Artefacts, ArtefactsApply, ArtefactsList]):
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> Artefacts | ArtefactsList:
+    ) -> Artefacts | ArtefactsList | None:
         """Retrieve one or more artefacts by id(s).
 
         Args:

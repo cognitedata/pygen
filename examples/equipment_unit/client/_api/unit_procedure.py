@@ -162,7 +162,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> UnitProcedure:
+    def retrieve(self, external_id: str) -> UnitProcedure | None:
         ...
 
     @overload
@@ -171,7 +171,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> UnitProcedure | UnitProcedureList:
+    ) -> UnitProcedure | UnitProcedureList | None:
         """Retrieve one or more unit procedures by id(s).
 
         Args:

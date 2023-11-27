@@ -169,7 +169,7 @@ class UnacceptableUsageAPI(NodeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> UnacceptableUsage:
+    def retrieve(self, external_id: str) -> UnacceptableUsage | None:
         ...
 
     @overload
@@ -178,7 +178,7 @@ class UnacceptableUsageAPI(NodeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> UnacceptableUsage | UnacceptableUsageList:
+    ) -> UnacceptableUsage | UnacceptableUsageList | None:
         """Retrieve one or more unacceptable usages by id(s).
 
         Args:

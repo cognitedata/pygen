@@ -170,7 +170,7 @@ class AvailableTrajectoryStationPropertiesAPI(
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> AvailableTrajectoryStationProperties:
+    def retrieve(self, external_id: str) -> AvailableTrajectoryStationProperties | None:
         ...
 
     @overload
@@ -179,7 +179,7 @@ class AvailableTrajectoryStationPropertiesAPI(
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> AvailableTrajectoryStationProperties | AvailableTrajectoryStationPropertiesList:
+    ) -> AvailableTrajectoryStationProperties | AvailableTrajectoryStationPropertiesList | None:
         """Retrieve one or more available trajectory station properties by id(s).
 
         Args:
