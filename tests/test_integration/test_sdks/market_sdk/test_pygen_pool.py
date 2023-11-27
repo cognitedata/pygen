@@ -6,10 +6,10 @@ from tests.constants import IS_PYDANTIC_V1
 
 if IS_PYDANTIC_V1:
     from markets_pydantic_v1.client import MarketClient
-    from markets_pydantic_v1.client.data_classes import PygenPool
+    from markets_pydantic_v1.client.data_classes import DomainModel, PygenPool
 else:
     from markets.client import MarketClient
-    from markets.client.data_classes import PygenPool
+    from markets.client.data_classes import DomainModel, PygenPool
 
 
 def test_list_empty_to_pandas(market_client: MarketClient, cognite_client: CogniteClient) -> None:
@@ -19,6 +19,6 @@ def test_list_empty_to_pandas(market_client: MarketClient, cognite_client: Cogni
     # Assert
     assert market_df.empty
     if IS_PYDANTIC_V1:
-        assert sorted(market_df.columns) == sorted(PygenPool.__fields__)
+        assert sorted(market_df.columns) == sorted(set(PygenPool.__fields__) - set(DomainModel.__fields__))
     else:
-        assert sorted(market_df.columns) == sorted(PygenPool.model_fields)
+        assert sorted(market_df.columns) == sorted(set(PygenPool.model_fields) - set(DomainModel.model_fields))
