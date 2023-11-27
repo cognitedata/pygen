@@ -34,6 +34,7 @@ class ActorAPI(NodeAPI[Actor, ActorApply, ActorList]):
             class_type=Actor,
             class_apply_type=ActorApply,
             class_list=ActorList,
+            class_apply_list=ActorApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

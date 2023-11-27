@@ -33,6 +33,7 @@ class FacilityEventsAPI(NodeAPI[FacilityEvents, FacilityEventsApply, FacilityEve
             class_type=FacilityEvents,
             class_apply_type=FacilityEventsApply,
             class_list=FacilityEventsList,
+            class_apply_list=FacilityEventsApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

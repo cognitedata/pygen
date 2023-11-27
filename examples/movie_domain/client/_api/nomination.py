@@ -33,6 +33,7 @@ class NominationAPI(NodeAPI[Nomination, NominationApply, NominationList]):
             class_type=Nomination,
             class_apply_type=NominationApply,
             class_list=NominationList,
+            class_apply_list=NominationApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

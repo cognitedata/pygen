@@ -33,6 +33,7 @@ class CogPoolAPI(NodeAPI[CogPool, CogPoolApply, CogPoolList]):
             class_type=CogPool,
             class_apply_type=CogPoolApply,
             class_list=CogPoolList,
+            class_apply_list=CogPoolApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

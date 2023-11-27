@@ -33,6 +33,7 @@ class SpatialPointAPI(NodeAPI[SpatialPoint, SpatialPointApply, SpatialPointList]
             class_type=SpatialPoint,
             class_apply_type=SpatialPointApply,
             class_list=SpatialPointList,
+            class_apply_list=SpatialPointApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

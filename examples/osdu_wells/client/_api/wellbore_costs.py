@@ -33,6 +33,7 @@ class WellboreCostsAPI(NodeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsL
             class_type=WellboreCosts,
             class_apply_type=WellboreCostsApply,
             class_list=WellboreCostsList,
+            class_apply_list=WellboreCostsApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

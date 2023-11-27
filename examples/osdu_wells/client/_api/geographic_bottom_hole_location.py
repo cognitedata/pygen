@@ -35,6 +35,7 @@ class GeographicBottomHoleLocationAPI(
             class_type=GeographicBottomHoleLocation,
             class_apply_type=GeographicBottomHoleLocationApply,
             class_list=GeographicBottomHoleLocationList,
+            class_apply_list=GeographicBottomHoleLocationApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

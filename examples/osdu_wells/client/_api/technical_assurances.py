@@ -36,6 +36,7 @@ class TechnicalAssurancesAPI(NodeAPI[TechnicalAssurances, TechnicalAssurancesApp
             class_type=TechnicalAssurances,
             class_apply_type=TechnicalAssurancesApply,
             class_list=TechnicalAssurancesList,
+            class_apply_list=TechnicalAssurancesApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

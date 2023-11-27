@@ -34,6 +34,7 @@ class AsIngestedCoordinatesAPI(NodeAPI[AsIngestedCoordinates, AsIngestedCoordina
             class_type=AsIngestedCoordinates,
             class_apply_type=AsIngestedCoordinatesApply,
             class_list=AsIngestedCoordinatesList,
+            class_apply_list=AsIngestedCoordinatesApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

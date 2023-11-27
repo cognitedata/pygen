@@ -40,6 +40,7 @@ class AssetAPI(NodeAPI[Asset, AssetApply, AssetList]):
             class_type=Asset,
             class_apply_type=AssetApply,
             class_list=AssetList,
+            class_apply_list=AssetApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

@@ -33,6 +33,7 @@ class AclAPI(NodeAPI[Acl, AclApply, AclList]):
             class_type=Acl,
             class_apply_type=AclApply,
             class_list=AclList,
+            class_apply_list=AclApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

@@ -33,6 +33,7 @@ class UnacceptableUsageAPI(NodeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
             class_type=UnacceptableUsage,
             class_apply_type=UnacceptableUsageApply,
             class_list=UnacceptableUsageList,
+            class_apply_list=UnacceptableUsageApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

@@ -34,6 +34,7 @@ class CogBidAPI(NodeAPI[CogBid, CogBidApply, CogBidList]):
             class_type=CogBid,
             class_apply_type=CogBidApply,
             class_list=CogBidList,
+            class_apply_list=CogBidApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

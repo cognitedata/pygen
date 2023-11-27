@@ -34,6 +34,7 @@ class RoleAPI(NodeAPI[Role, RoleApply, RoleList]):
             class_type=Role,
             class_apply_type=RoleApply,
             class_list=RoleList,
+            class_apply_list=RoleApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

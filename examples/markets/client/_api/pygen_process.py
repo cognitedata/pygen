@@ -33,6 +33,7 @@ class PygenProcessAPI(NodeAPI[PygenProcess, PygenProcessApply, PygenProcessList]
             class_type=PygenProcess,
             class_apply_type=PygenProcessApply,
             class_list=PygenProcessList,
+            class_apply_list=PygenProcessApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

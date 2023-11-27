@@ -35,6 +35,7 @@ class MovieAPI(NodeAPI[Movie, MovieApply, MovieList]):
             class_type=Movie,
             class_apply_type=MovieApply,
             class_list=MovieList,
+            class_apply_list=MovieApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

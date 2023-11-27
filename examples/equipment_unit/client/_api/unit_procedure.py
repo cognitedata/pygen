@@ -37,6 +37,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
             class_type=UnitProcedure,
             class_apply_type=UnitProcedureApply,
             class_list=UnitProcedureList,
+            class_apply_list=UnitProcedureApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

@@ -33,6 +33,7 @@ class BestDirectorAPI(NodeAPI[BestDirector, BestDirectorApply, BestDirectorList]
             class_type=BestDirector,
             class_apply_type=BestDirectorApply,
             class_list=BestDirectorList,
+            class_apply_list=BestDirectorApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

@@ -33,6 +33,7 @@ class SpatialLocationAPI(NodeAPI[SpatialLocation, SpatialLocationApply, SpatialL
             class_type=SpatialLocation,
             class_apply_type=SpatialLocationApply,
             class_list=SpatialLocationList,
+            class_apply_list=SpatialLocationApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

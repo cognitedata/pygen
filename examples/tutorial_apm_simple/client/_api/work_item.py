@@ -34,6 +34,7 @@ class WorkItemAPI(NodeAPI[WorkItem, WorkItemApply, WorkItemList]):
             class_type=WorkItem,
             class_apply_type=WorkItemApply,
             class_list=WorkItemList,
+            class_apply_list=WorkItemApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

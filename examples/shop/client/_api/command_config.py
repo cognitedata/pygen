@@ -33,6 +33,7 @@ class CommandConfigAPI(NodeAPI[CommandConfig, CommandConfigApply, CommandConfigL
             class_type=CommandConfig,
             class_apply_type=CommandConfigApply,
             class_list=CommandConfigList,
+            class_apply_list=CommandConfigApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

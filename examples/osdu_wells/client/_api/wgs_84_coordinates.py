@@ -34,6 +34,7 @@ class WgsCoordinatesAPI(NodeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
             class_type=WgsCoordinates,
             class_apply_type=WgsCoordinatesApply,
             class_list=WgsCoordinatesList,
+            class_apply_list=WgsCoordinatesApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

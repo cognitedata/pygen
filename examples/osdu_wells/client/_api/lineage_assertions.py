@@ -33,6 +33,7 @@ class LineageAssertionsAPI(NodeAPI[LineageAssertions, LineageAssertionsApply, Li
             class_type=LineageAssertions,
             class_apply_type=LineageAssertionsApply,
             class_list=LineageAssertionsList,
+            class_apply_list=LineageAssertionsApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

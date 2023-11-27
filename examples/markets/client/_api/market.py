@@ -33,6 +33,7 @@ class MarketAPI(NodeAPI[Market, MarketApply, MarketList]):
             class_type=Market,
             class_apply_type=MarketApply,
             class_list=MarketList,
+            class_apply_list=MarketApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

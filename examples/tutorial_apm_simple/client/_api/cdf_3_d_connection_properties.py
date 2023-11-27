@@ -34,6 +34,7 @@ class CdfConnectionPropertiesAPI(
             class_type=CdfConnectionProperties,
             class_apply_type=CdfConnectionPropertiesApply,
             class_list=CdfConnectionPropertiesList,
+            class_apply_list=CdfConnectionPropertiesApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

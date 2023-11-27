@@ -33,6 +33,7 @@ class FacilityOperatorsAPI(NodeAPI[FacilityOperators, FacilityOperatorsApply, Fa
             class_type=FacilityOperators,
             class_apply_type=FacilityOperatorsApply,
             class_list=FacilityOperatorsList,
+            class_apply_list=FacilityOperatorsApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

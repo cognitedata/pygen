@@ -34,6 +34,7 @@ class DirectorAPI(NodeAPI[Director, DirectorApply, DirectorList]):
             class_type=Director,
             class_apply_type=DirectorApply,
             class_list=DirectorList,
+            class_apply_list=DirectorApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

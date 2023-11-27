@@ -33,6 +33,7 @@ class AcceptableUsageAPI(NodeAPI[AcceptableUsage, AcceptableUsageApply, Acceptab
             class_type=AcceptableUsage,
             class_apply_type=AcceptableUsageApply,
             class_list=AcceptableUsageList,
+            class_apply_list=AcceptableUsageApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

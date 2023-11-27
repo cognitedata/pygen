@@ -36,6 +36,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
             class_type=WorkOrder,
             class_apply_type=WorkOrderApply,
             class_list=WorkOrderList,
+            class_apply_list=WorkOrderApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

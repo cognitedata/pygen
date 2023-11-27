@@ -33,6 +33,7 @@ class GeometryAPI(NodeAPI[Geometry, GeometryApply, GeometryList]):
             class_type=Geometry,
             class_apply_type=GeometryApply,
             class_list=GeometryList,
+            class_apply_list=GeometryApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

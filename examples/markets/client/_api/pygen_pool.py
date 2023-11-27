@@ -33,6 +33,7 @@ class PygenPoolAPI(NodeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
             class_type=PygenPool,
             class_apply_type=PygenPoolApply,
             class_list=PygenPoolList,
+            class_apply_list=PygenPoolApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

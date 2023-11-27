@@ -34,6 +34,7 @@ class BidAPI(NodeAPI[Bid, BidApply, BidList]):
             class_type=Bid,
             class_apply_type=BidApply,
             class_list=BidList,
+            class_apply_list=BidApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

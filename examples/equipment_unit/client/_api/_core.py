@@ -19,6 +19,7 @@ from equipment_unit.client.data_classes._core import (
     ResourcesApplyResult,
     T_DomainModel,
     T_DomainModelApply,
+    T_DomainModelApplyList,
     T_DomainModelList,
     T_DomainRelation,
     T_DomainRelationApply,
@@ -82,6 +83,7 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
         class_type: type[T_DomainModel],
         class_apply_type: type[T_DomainModelApply],
         class_list: type[T_DomainModelList],
+        class_apply_list: type[T_DomainModelApplyList],
         view_by_write_class: dict[type[DomainModelApply], dm.ViewId],
     ):
         self._client = client
@@ -89,6 +91,7 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
         self._class_type = class_type
         self._class_apply_type = class_apply_type
         self._class_list = class_list
+        self._class_apply_list = class_apply_list
         self._view_by_write_class = view_by_write_class
 
     def _apply(
@@ -97,7 +100,7 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
         if isinstance(item, DomainModelApply):
             instances = item.to_instances_apply(self._view_by_write_class)
         else:
-            instances = self._class_list(item).to_instances_apply(self._view_by_write_class)
+            instances = self._class_apply_list(item).to_instances_apply(self._view_by_write_class)
         result = self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,

@@ -33,6 +33,7 @@ class LegalAPI(NodeAPI[Legal, LegalApply, LegalList]):
             class_type=Legal,
             class_apply_type=LegalApply,
             class_list=LegalList,
+            class_apply_list=LegalApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

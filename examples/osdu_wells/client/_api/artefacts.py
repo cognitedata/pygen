@@ -33,6 +33,7 @@ class ArtefactsAPI(NodeAPI[Artefacts, ArtefactsApply, ArtefactsList]):
             class_type=Artefacts,
             class_apply_type=ArtefactsApply,
             class_list=ArtefactsList,
+            class_apply_list=ArtefactsApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

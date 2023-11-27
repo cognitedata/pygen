@@ -33,6 +33,7 @@ class SpatialAreaAPI(NodeAPI[SpatialArea, SpatialAreaApply, SpatialAreaList]):
             class_type=SpatialArea,
             class_apply_type=SpatialAreaApply,
             class_list=SpatialAreaList,
+            class_apply_list=SpatialAreaApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

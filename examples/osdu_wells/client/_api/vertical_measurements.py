@@ -33,6 +33,7 @@ class VerticalMeasurementsAPI(NodeAPI[VerticalMeasurements, VerticalMeasurements
             class_type=VerticalMeasurements,
             class_apply_type=VerticalMeasurementsApply,
             class_list=VerticalMeasurementsList,
+            class_apply_list=VerticalMeasurementsApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

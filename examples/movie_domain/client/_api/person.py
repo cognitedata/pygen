@@ -34,6 +34,7 @@ class PersonAPI(NodeAPI[Person, PersonApply, PersonList]):
             class_type=Person,
             class_apply_type=PersonApply,
             class_list=PersonList,
+            class_apply_list=PersonApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

@@ -33,6 +33,7 @@ class ProcessAPI(NodeAPI[Process, ProcessApply, ProcessList]):
             class_type=Process,
             class_apply_type=ProcessApply,
             class_list=ProcessList,
+            class_apply_list=ProcessApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

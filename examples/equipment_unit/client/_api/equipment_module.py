@@ -34,6 +34,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleApply, Equipmen
             class_type=EquipmentModule,
             class_apply_type=EquipmentModuleApply,
             class_list=EquipmentModuleList,
+            class_apply_list=EquipmentModuleApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

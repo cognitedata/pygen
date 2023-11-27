@@ -34,6 +34,7 @@ class PygenBidAPI(NodeAPI[PygenBid, PygenBidApply, PygenBidList]):
             class_type=PygenBid,
             class_apply_type=PygenBidApply,
             class_list=PygenBidList,
+            class_apply_list=PygenBidApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

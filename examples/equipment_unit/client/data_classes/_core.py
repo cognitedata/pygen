@@ -208,6 +208,9 @@ class DomainModelApplyList(DomainModelList[T_DomainModelApply]):
         return domains
 
 
+T_DomainModelApplyList = TypeVar("T_DomainModelApplyList", bound=DomainModelApplyList, covariant=True)
+
+
 class DomainRelation(DomainModelCore):
     type: dm.DirectRelationReference
     start_node: dm.DirectRelationReference

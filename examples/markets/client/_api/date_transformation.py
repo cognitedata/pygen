@@ -33,6 +33,7 @@ class DateTransformationAPI(NodeAPI[DateTransformation, DateTransformationApply,
             class_type=DateTransformation,
             class_apply_type=DateTransformationApply,
             class_list=DateTransformationList,
+            class_apply_list=DateTransformationApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

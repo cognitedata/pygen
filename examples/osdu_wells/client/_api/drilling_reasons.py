@@ -33,6 +33,7 @@ class DrillingReasonsAPI(NodeAPI[DrillingReasons, DrillingReasonsApply, Drilling
             class_type=DrillingReasons,
             class_apply_type=DrillingReasonsApply,
             class_list=DrillingReasonsList,
+            class_apply_list=DrillingReasonsApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

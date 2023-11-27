@@ -39,6 +39,7 @@ class AvailableTrajectoryStationPropertiesAPI(
             class_type=AvailableTrajectoryStationProperties,
             class_apply_type=AvailableTrajectoryStationPropertiesApply,
             class_list=AvailableTrajectoryStationPropertiesList,
+            class_apply_list=AvailableTrajectoryStationPropertiesApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

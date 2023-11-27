@@ -33,6 +33,7 @@ class ReviewersAPI(NodeAPI[Reviewers, ReviewersApply, ReviewersList]):
             class_type=Reviewers,
             class_apply_type=ReviewersApply,
             class_list=ReviewersList,
+            class_apply_list=ReviewersApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

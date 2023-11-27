@@ -35,6 +35,7 @@ class ProjectedBottomHoleLocationAPI(
             class_type=ProjectedBottomHoleLocation,
             class_apply_type=ProjectedBottomHoleLocationApply,
             class_list=ProjectedBottomHoleLocationList,
+            class_apply_list=ProjectedBottomHoleLocationApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

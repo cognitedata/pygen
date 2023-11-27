@@ -33,6 +33,7 @@ class NameAliasesAPI(NodeAPI[NameAliases, NameAliasesApply, NameAliasesList]):
             class_type=NameAliases,
             class_apply_type=NameAliasesApply,
             class_list=NameAliasesList,
+            class_apply_list=NameAliasesApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

@@ -34,6 +34,7 @@ class WellAPI(NodeAPI[Well, WellApply, WellList]):
             class_type=Well,
             class_apply_type=WellApply,
             class_list=WellList,
+            class_apply_list=WellApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

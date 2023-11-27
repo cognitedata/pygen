@@ -33,6 +33,7 @@ class FacilityStatesAPI(NodeAPI[FacilityStates, FacilityStatesApply, FacilitySta
             class_type=FacilityStates,
             class_apply_type=FacilityStatesApply,
             class_list=FacilityStatesList,
+            class_apply_list=FacilityStatesApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

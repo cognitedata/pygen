@@ -37,6 +37,7 @@ class CdfModelAPI(NodeAPI[CdfModel, CdfModelApply, CdfModelList]):
             class_type=CdfModel,
             class_apply_type=CdfModelApply,
             class_list=CdfModelList,
+            class_apply_list=CdfModelApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

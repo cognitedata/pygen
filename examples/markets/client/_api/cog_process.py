@@ -33,6 +33,7 @@ class CogProcessAPI(NodeAPI[CogProcess, CogProcessApply, CogProcessList]):
             class_type=CogProcess,
             class_apply_type=CogProcessApply,
             class_list=CogProcessList,
+            class_apply_list=CogProcessApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

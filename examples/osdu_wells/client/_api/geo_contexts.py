@@ -33,6 +33,7 @@ class GeoContextsAPI(NodeAPI[GeoContexts, GeoContextsApply, GeoContextsList]):
             class_type=GeoContexts,
             class_apply_type=GeoContextsApply,
             class_list=GeoContextsList,
+            class_apply_list=GeoContextsApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

@@ -33,6 +33,7 @@ class StartEndTimeAPI(NodeAPI[StartEndTime, StartEndTimeApply, StartEndTimeList]
             class_type=StartEndTime,
             class_apply_type=StartEndTimeApply,
             class_list=StartEndTimeList,
+            class_apply_list=StartEndTimeApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

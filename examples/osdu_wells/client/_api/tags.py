@@ -33,6 +33,7 @@ class TagsAPI(NodeAPI[Tags, TagsApply, TagsList]):
             class_type=Tags,
             class_apply_type=TagsApply,
             class_list=TagsList,
+            class_apply_list=TagsApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

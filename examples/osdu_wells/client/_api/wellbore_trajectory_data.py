@@ -43,6 +43,7 @@ class WellboreTrajectoryDataAPI(
             class_type=WellboreTrajectoryData,
             class_apply_type=WellboreTrajectoryDataApply,
             class_list=WellboreTrajectoryDataList,
+            class_apply_list=WellboreTrajectoryDataApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

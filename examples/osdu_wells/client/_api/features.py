@@ -33,6 +33,7 @@ class FeaturesAPI(NodeAPI[Features, FeaturesApply, FeaturesList]):
             class_type=Features,
             class_apply_type=FeaturesApply,
             class_list=FeaturesList,
+            class_apply_list=FeaturesApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

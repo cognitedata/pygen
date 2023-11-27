@@ -34,6 +34,7 @@ class WellboreTrajectoryAPI(NodeAPI[WellboreTrajectory, WellboreTrajectoryApply,
             class_type=WellboreTrajectory,
             class_apply_type=WellboreTrajectoryApply,
             class_list=WellboreTrajectoryList,
+            class_apply_list=WellboreTrajectoryApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

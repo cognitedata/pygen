@@ -33,6 +33,7 @@ class BestLeadingActressAPI(NodeAPI[BestLeadingActress, BestLeadingActressApply,
             class_type=BestLeadingActress,
             class_apply_type=BestLeadingActressApply,
             class_list=BestLeadingActressList,
+            class_apply_list=BestLeadingActressApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

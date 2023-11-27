@@ -34,6 +34,7 @@ class CaseAPI(NodeAPI[Case, CaseApply, CaseList]):
             class_type=Case,
             class_apply_type=CaseApply,
             class_list=CaseList,
+            class_apply_list=CaseApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

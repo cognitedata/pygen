@@ -33,6 +33,7 @@ class DateTransformationPairAPI(
             class_type=DateTransformationPair,
             class_apply_type=DateTransformationPairApply,
             class_list=DateTransformationPairList,
+            class_apply_list=DateTransformationPairApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

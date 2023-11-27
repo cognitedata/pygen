@@ -33,6 +33,7 @@ class ValueTransformationAPI(NodeAPI[ValueTransformation, ValueTransformationApp
             class_type=ValueTransformation,
             class_apply_type=ValueTransformationApply,
             class_list=ValueTransformationList,
+            class_apply_list=ValueTransformationApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

@@ -35,6 +35,7 @@ class RatingAPI(NodeAPI[Rating, RatingApply, RatingList]):
             class_type=Rating,
             class_apply_type=RatingApply,
             class_list=RatingList,
+            class_apply_list=RatingApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

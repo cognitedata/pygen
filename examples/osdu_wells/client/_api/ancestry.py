@@ -33,6 +33,7 @@ class AncestryAPI(NodeAPI[Ancestry, AncestryApply, AncestryList]):
             class_type=Ancestry,
             class_apply_type=AncestryApply,
             class_list=AncestryList,
+            class_apply_list=AncestryApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

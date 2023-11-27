@@ -34,6 +34,7 @@ class WellboreAPI(NodeAPI[Wellbore, WellboreApply, WellboreList]):
             class_type=Wellbore,
             class_apply_type=WellboreApply,
             class_list=WellboreList,
+            class_apply_list=WellboreApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

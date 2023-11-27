@@ -35,6 +35,7 @@ class FacilitySpecificationsAPI(
             class_type=FacilitySpecifications,
             class_apply_type=FacilitySpecificationsApply,
             class_list=FacilitySpecificationsList,
+            class_apply_list=FacilitySpecificationsApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id

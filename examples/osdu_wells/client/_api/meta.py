@@ -33,6 +33,7 @@ class MetaAPI(NodeAPI[Meta, MetaApply, MetaList]):
             class_type=Meta,
             class_apply_type=MetaApply,
             class_list=MetaList,
+            class_apply_list=MetaApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
