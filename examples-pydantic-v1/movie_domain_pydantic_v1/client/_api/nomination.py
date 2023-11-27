@@ -151,7 +151,7 @@ class NominationAPI(NodeAPI[Nomination, NominationApply, NominationList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> Nomination:
+    def retrieve(self, external_id: str) -> Nomination | None:
         ...
 
     @overload
@@ -160,7 +160,7 @@ class NominationAPI(NodeAPI[Nomination, NominationApply, NominationList]):
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> Nomination | NominationList:
+    ) -> Nomination | NominationList | None:
         """Retrieve one or more nominations by id(s).
 
         Args:

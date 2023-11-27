@@ -318,7 +318,7 @@ class WellDataAPI(NodeAPI[WellData, WellDataApply, WellDataList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> WellData:
+    def retrieve(self, external_id: str) -> WellData | None:
         ...
 
     @overload
@@ -327,7 +327,7 @@ class WellDataAPI(NodeAPI[WellData, WellDataApply, WellDataList]):
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> WellData | WellDataList:
+    ) -> WellData | WellDataList | None:
         """Retrieve one or more well data by id(s).
 
         Args:

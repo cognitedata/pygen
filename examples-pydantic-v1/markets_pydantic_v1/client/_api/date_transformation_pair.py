@@ -149,7 +149,7 @@ class DateTransformationPairAPI(
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> DateTransformationPair:
+    def retrieve(self, external_id: str) -> DateTransformationPair | None:
         ...
 
     @overload
@@ -158,7 +158,7 @@ class DateTransformationPairAPI(
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "market"
-    ) -> DateTransformationPair | DateTransformationPairList:
+    ) -> DateTransformationPair | DateTransformationPairList | None:
         """Retrieve one or more date transformation pairs by id(s).
 
         Args:

@@ -139,7 +139,7 @@ class CommandConfigAPI(NodeAPI[CommandConfig, CommandConfigApply, CommandConfigL
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> CommandConfig:
+    def retrieve(self, external_id: str) -> CommandConfig | None:
         ...
 
     @overload
@@ -148,7 +148,7 @@ class CommandConfigAPI(NodeAPI[CommandConfig, CommandConfigApply, CommandConfigL
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> CommandConfig | CommandConfigList:
+    ) -> CommandConfig | CommandConfigList | None:
         """Retrieve one or more command configs by id(s).
 
         Args:

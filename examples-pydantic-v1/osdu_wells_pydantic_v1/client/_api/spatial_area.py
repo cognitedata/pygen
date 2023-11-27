@@ -187,7 +187,7 @@ class SpatialAreaAPI(NodeAPI[SpatialArea, SpatialAreaApply, SpatialAreaList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> SpatialArea:
+    def retrieve(self, external_id: str) -> SpatialArea | None:
         ...
 
     @overload
@@ -196,7 +196,7 @@ class SpatialAreaAPI(NodeAPI[SpatialArea, SpatialAreaApply, SpatialAreaList]):
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> SpatialArea | SpatialAreaList:
+    ) -> SpatialArea | SpatialAreaList | None:
         """Retrieve one or more spatial areas by id(s).
 
         Args:

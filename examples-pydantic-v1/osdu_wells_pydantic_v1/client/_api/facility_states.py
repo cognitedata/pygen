@@ -163,7 +163,7 @@ class FacilityStatesAPI(NodeAPI[FacilityStates, FacilityStatesApply, FacilitySta
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> FacilityStates:
+    def retrieve(self, external_id: str) -> FacilityStates | None:
         ...
 
     @overload
@@ -172,7 +172,7 @@ class FacilityStatesAPI(NodeAPI[FacilityStates, FacilityStatesApply, FacilitySta
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> FacilityStates | FacilityStatesList:
+    ) -> FacilityStates | FacilityStatesList | None:
         """Retrieve one or more facility states by id(s).
 
         Args:

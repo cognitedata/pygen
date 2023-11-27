@@ -187,7 +187,7 @@ class SpatialLocationAPI(NodeAPI[SpatialLocation, SpatialLocationApply, SpatialL
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> SpatialLocation:
+    def retrieve(self, external_id: str) -> SpatialLocation | None:
         ...
 
     @overload
@@ -196,7 +196,7 @@ class SpatialLocationAPI(NodeAPI[SpatialLocation, SpatialLocationApply, SpatialL
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> SpatialLocation | SpatialLocationList:
+    ) -> SpatialLocation | SpatialLocationList | None:
         """Retrieve one or more spatial locations by id(s).
 
         Args:

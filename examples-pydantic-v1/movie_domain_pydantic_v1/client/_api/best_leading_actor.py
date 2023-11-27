@@ -151,7 +151,7 @@ class BestLeadingActorAPI(NodeAPI[BestLeadingActor, BestLeadingActorApply, BestL
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> BestLeadingActor:
+    def retrieve(self, external_id: str) -> BestLeadingActor | None:
         ...
 
     @overload
@@ -160,7 +160,7 @@ class BestLeadingActorAPI(NodeAPI[BestLeadingActor, BestLeadingActorApply, BestL
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> BestLeadingActor | BestLeadingActorList:
+    ) -> BestLeadingActor | BestLeadingActorList | None:
         """Retrieve one or more best leading actors by id(s).
 
         Args:

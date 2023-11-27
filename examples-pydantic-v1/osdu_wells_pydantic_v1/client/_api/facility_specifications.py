@@ -192,7 +192,7 @@ class FacilitySpecificationsAPI(
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> FacilitySpecifications:
+    def retrieve(self, external_id: str) -> FacilitySpecifications | None:
         ...
 
     @overload
@@ -201,7 +201,7 @@ class FacilitySpecificationsAPI(
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> FacilitySpecifications | FacilitySpecificationsList:
+    ) -> FacilitySpecifications | FacilitySpecificationsList | None:
         """Retrieve one or more facility specifications by id(s).
 
         Args:

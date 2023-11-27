@@ -196,7 +196,7 @@ class GeographicBottomHoleLocationAPI(
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> GeographicBottomHoleLocation:
+    def retrieve(self, external_id: str) -> GeographicBottomHoleLocation | None:
         ...
 
     @overload
@@ -205,7 +205,7 @@ class GeographicBottomHoleLocationAPI(
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> GeographicBottomHoleLocation | GeographicBottomHoleLocationList:
+    ) -> GeographicBottomHoleLocation | GeographicBottomHoleLocationList | None:
         """Retrieve one or more geographic bottom hole locations by id(s).
 
         Args:

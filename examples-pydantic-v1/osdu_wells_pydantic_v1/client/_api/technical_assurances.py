@@ -171,7 +171,7 @@ class TechnicalAssurancesAPI(NodeAPI[TechnicalAssurances, TechnicalAssurancesApp
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> TechnicalAssurances:
+    def retrieve(self, external_id: str) -> TechnicalAssurances | None:
         ...
 
     @overload
@@ -180,7 +180,7 @@ class TechnicalAssurancesAPI(NodeAPI[TechnicalAssurances, TechnicalAssurancesApp
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> TechnicalAssurances | TechnicalAssurancesList:
+    ) -> TechnicalAssurances | TechnicalAssurancesList | None:
         """Retrieve one or more technical assurances by id(s).
 
         Args:

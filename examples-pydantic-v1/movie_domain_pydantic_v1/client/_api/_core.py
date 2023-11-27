@@ -130,7 +130,7 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
         space: str,
         retrieve_edges: bool = False,
         edge_api_name_type_triple: list[tuple[EdgeAPI, str, dm.DirectRelationReference]] | None = None,
-    ) -> T_DomainModel:
+    ) -> T_DomainModel | None:
         ...
 
     @overload
@@ -149,7 +149,7 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
         space: str,
         retrieve_edges: bool = False,
         edge_api_name_type_triple: list[tuple[EdgeAPI, str, dm.DirectRelationReference]] | None = None,
-    ) -> T_DomainModel | T_DomainModelList:
+    ) -> T_DomainModel | T_DomainModelList | None:
         is_multiple = True
         if isinstance(external_id, str):
             node_ids = (space, external_id)
@@ -160,10 +160,12 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
         instances = self._client.data_modeling.instances.retrieve(nodes=node_ids, sources=self._sources)
         nodes = self._class_list([self._class_type.from_instance(node) for node in instances.nodes])
 
-        if retrieve_edges:
+        if retrieve_edges and nodes:
             self._retrieve_and_set_edge_types(nodes, edge_api_name_type_triple)
 
-        if is_multiple:
+        if not nodes:
+            return None
+        elif is_multiple:
             return nodes
         else:
             return nodes[0]
@@ -326,7 +328,7 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
     ) -> T_DomainModelList:
         nodes = self._client.data_modeling.instances.list("node", sources=self._sources, limit=limit, filter=filter)
         node_list = self._class_list([self._class_type.from_instance(node) for node in nodes])
-        if retrieve_edges:
+        if retrieve_edges and node_list:
             self._retrieve_and_set_edge_types(node_list, edge_api_name_type_triple)
 
         return node_list
@@ -511,37 +513,29 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
         ] = defaultdict(lambda: defaultdict(list))
         node_attribute_to_node_type: dict[str, str] = {}
 
-        return_nodes: list[DomainModel] = []
-        is_first = True
-
         for step in self:
-            name_clean = self._clean_name(step.name)
-            from_clean = step.expression.from_ and self._clean_name(step.expression.from_)
+            name = step.name
+            from_ = step.expression.from_
 
             if isinstance(step.expression, dm.query.NodeResultSetExpression) and step.expression.from_:
-                node_attribute_to_node_type[from_clean] = name_clean
+                node_attribute_to_node_type[from_] = name
 
             if step.result_cls is None:  # This is a data model edge.
                 for edge in step.results:
                     edge = cast(dm.Edge, edge)
-                    edges_by_type_by_start_node[(from_clean, name_clean)][
+                    edges_by_type_by_start_node[(from_, name)][
                         (edge.start_node.space, edge.start_node.external_id)
                     ].append(edge)
             elif issubclass(step.result_cls, DomainModel):
                 for node in step.results:
                     domain = step.result_cls.from_instance(node)
                     # Circular dependencies will be skipped here, so we always get the first one
-                    if (id_ := domain.as_tuple_id()) not in nodes_by_type[name_clean]:
-                        nodes_by_type[name_clean][id_] = domain
-                if is_first:
-                    return_nodes = list(nodes_by_type[name_clean].values())
-                    is_first = False
+                    if (id_ := domain.as_tuple_id()) not in nodes_by_type[name]:
+                        nodes_by_type[name][id_] = domain
             elif issubclass(step.result_cls, DomainRelation):
                 for edge in step.results:
                     domain = step.result_cls.from_instance(edge)
-                    relation_by_type_by_start_node[(from_clean, name_clean)][domain.start_node.as_tuple()].append(
-                        domain
-                    )
+                    relation_by_type_by_start_node[(from_, name)][domain.start_node.as_tuple()].append(domain)
 
         for (node_name, node_attribute), relations_by_start_node in relation_by_type_by_start_node.items():
             for node in nodes_by_type[node_name].values():
@@ -560,7 +554,7 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
                 nodes = nodes_by_type.get(node_attribute_to_node_type.get(node_attribute), {})
                 setattr(node, node_attribute, [node for edge in edges if (node := nodes.get(edge.end_node.as_tuple()))])
 
-        return self._result_cls(return_nodes)
+        return self._result_cls(nodes_by_type[None])
 
 
 class QueryAPI(Generic[T_DomainModelList]):

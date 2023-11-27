@@ -151,7 +151,7 @@ class WgsCoordinatesAPI(NodeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> WgsCoordinates:
+    def retrieve(self, external_id: str) -> WgsCoordinates | None:
         ...
 
     @overload
@@ -160,7 +160,7 @@ class WgsCoordinatesAPI(NodeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> WgsCoordinates | WgsCoordinatesList:
+    ) -> WgsCoordinates | WgsCoordinatesList | None:
         """Retrieve one or more wgs 84 coordinates by id(s).
 
         Args:

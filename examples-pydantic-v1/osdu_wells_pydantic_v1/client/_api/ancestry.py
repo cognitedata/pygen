@@ -137,7 +137,7 @@ class AncestryAPI(NodeAPI[Ancestry, AncestryApply, AncestryList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> Ancestry:
+    def retrieve(self, external_id: str) -> Ancestry | None:
         ...
 
     @overload
@@ -146,7 +146,7 @@ class AncestryAPI(NodeAPI[Ancestry, AncestryApply, AncestryList]):
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> Ancestry | AncestryList:
+    ) -> Ancestry | AncestryList | None:
         """Retrieve one or more ancestries by id(s).
 
         Args:

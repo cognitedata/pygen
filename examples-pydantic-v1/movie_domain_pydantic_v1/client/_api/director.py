@@ -150,7 +150,7 @@ class DirectorAPI(NodeAPI[Director, DirectorApply, DirectorList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> Director:
+    def retrieve(self, external_id: str) -> Director | None:
         ...
 
     @overload
@@ -159,7 +159,7 @@ class DirectorAPI(NodeAPI[Director, DirectorApply, DirectorList]):
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> Director | DirectorList:
+    ) -> Director | DirectorList | None:
         """Retrieve one or more directors by id(s).
 
         Args:

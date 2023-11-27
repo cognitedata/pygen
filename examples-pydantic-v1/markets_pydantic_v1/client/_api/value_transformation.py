@@ -147,7 +147,7 @@ class ValueTransformationAPI(NodeAPI[ValueTransformation, ValueTransformationApp
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> ValueTransformation:
+    def retrieve(self, external_id: str) -> ValueTransformation | None:
         ...
 
     @overload
@@ -156,7 +156,7 @@ class ValueTransformationAPI(NodeAPI[ValueTransformation, ValueTransformationApp
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "market"
-    ) -> ValueTransformation | ValueTransformationList:
+    ) -> ValueTransformation | ValueTransformationList | None:
         """Retrieve one or more value transformations by id(s).
 
         Args:

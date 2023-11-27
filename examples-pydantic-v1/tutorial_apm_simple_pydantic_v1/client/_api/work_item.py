@@ -188,7 +188,7 @@ class WorkItemAPI(NodeAPI[WorkItem, WorkItemApply, WorkItemList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> WorkItem:
+    def retrieve(self, external_id: str) -> WorkItem | None:
         ...
 
     @overload
@@ -197,7 +197,7 @@ class WorkItemAPI(NodeAPI[WorkItem, WorkItemApply, WorkItemList]):
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "tutorial_apm_simple"
-    ) -> WorkItem | WorkItemList:
+    ) -> WorkItem | WorkItemList | None:
         """Retrieve one or more work items by id(s).
 
         Args:

@@ -202,7 +202,7 @@ class WellboreTrajectoryAPI(NodeAPI[WellboreTrajectory, WellboreTrajectoryApply,
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> WellboreTrajectory:
+    def retrieve(self, external_id: str) -> WellboreTrajectory | None:
         ...
 
     @overload
@@ -211,7 +211,7 @@ class WellboreTrajectoryAPI(NodeAPI[WellboreTrajectory, WellboreTrajectoryApply,
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> WellboreTrajectory | WellboreTrajectoryList:
+    ) -> WellboreTrajectory | WellboreTrajectoryList | None:
         """Retrieve one or more wellbore trajectories by id(s).
 
         Args:

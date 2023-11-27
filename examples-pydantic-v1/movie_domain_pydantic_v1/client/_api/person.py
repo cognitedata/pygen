@@ -155,7 +155,7 @@ class PersonAPI(NodeAPI[Person, PersonApply, PersonList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> Person:
+    def retrieve(self, external_id: str) -> Person | None:
         ...
 
     @overload
@@ -164,7 +164,7 @@ class PersonAPI(NodeAPI[Person, PersonApply, PersonList]):
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> Person | PersonList:
+    ) -> Person | PersonList | None:
         """Retrieve one or more persons by id(s).
 
         Args:

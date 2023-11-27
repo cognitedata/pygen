@@ -151,7 +151,7 @@ class BestLeadingActressAPI(NodeAPI[BestLeadingActress, BestLeadingActressApply,
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> BestLeadingActress:
+    def retrieve(self, external_id: str) -> BestLeadingActress | None:
         ...
 
     @overload
@@ -160,7 +160,7 @@ class BestLeadingActressAPI(NodeAPI[BestLeadingActress, BestLeadingActressApply,
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> BestLeadingActress | BestLeadingActressList:
+    ) -> BestLeadingActress | BestLeadingActressList | None:
         """Retrieve one or more best leading actresses by id(s).
 
         Args:

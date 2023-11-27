@@ -166,14 +166,14 @@ class PygenBidAPI(NodeAPI[PygenBid, PygenBidApply, PygenBidList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> PygenBid:
+    def retrieve(self, external_id: str) -> PygenBid | None:
         ...
 
     @overload
     def retrieve(self, external_id: SequenceNotStr[str]) -> PygenBidList:
         ...
 
-    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = "market") -> PygenBid | PygenBidList:
+    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = "market") -> PygenBid | PygenBidList | None:
         """Retrieve one or more pygen bids by id(s).
 
         Args:

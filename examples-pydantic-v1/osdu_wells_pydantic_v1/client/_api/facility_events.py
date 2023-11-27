@@ -163,7 +163,7 @@ class FacilityEventsAPI(NodeAPI[FacilityEvents, FacilityEventsApply, FacilityEve
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> FacilityEvents:
+    def retrieve(self, external_id: str) -> FacilityEvents | None:
         ...
 
     @overload
@@ -172,7 +172,7 @@ class FacilityEventsAPI(NodeAPI[FacilityEvents, FacilityEventsApply, FacilityEve
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> FacilityEvents | FacilityEventsList:
+    ) -> FacilityEvents | FacilityEventsList | None:
         """Retrieve one or more facility events by id(s).
 
         Args:

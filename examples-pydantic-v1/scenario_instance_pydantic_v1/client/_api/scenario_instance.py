@@ -184,7 +184,7 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> ScenarioInstance:
+    def retrieve(self, external_id: str) -> ScenarioInstance | None:
         ...
 
     @overload
@@ -193,7 +193,7 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> ScenarioInstance | ScenarioInstanceList:
+    ) -> ScenarioInstance | ScenarioInstanceList | None:
         """Retrieve one or more scenario instances by id(s).
 
         Args:

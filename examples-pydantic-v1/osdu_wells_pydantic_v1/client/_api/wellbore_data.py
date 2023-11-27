@@ -402,7 +402,7 @@ class WellboreDataAPI(NodeAPI[WellboreData, WellboreDataApply, WellboreDataList]
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> WellboreData:
+    def retrieve(self, external_id: str) -> WellboreData | None:
         ...
 
     @overload
@@ -411,7 +411,7 @@ class WellboreDataAPI(NodeAPI[WellboreData, WellboreDataApply, WellboreDataList]
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> WellboreData | WellboreDataList:
+    ) -> WellboreData | WellboreDataList | None:
         """Retrieve one or more wellbore data by id(s).
 
         Args:

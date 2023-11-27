@@ -144,14 +144,14 @@ class ProcessAPI(NodeAPI[Process, ProcessApply, ProcessList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> Process:
+    def retrieve(self, external_id: str) -> Process | None:
         ...
 
     @overload
     def retrieve(self, external_id: SequenceNotStr[str]) -> ProcessList:
         ...
 
-    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = "market") -> Process | ProcessList:
+    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = "market") -> Process | ProcessList | None:
         """Retrieve one or more process by id(s).
 
         Args:

@@ -151,7 +151,7 @@ class LineageAssertionsAPI(NodeAPI[LineageAssertions, LineageAssertionsApply, Li
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> LineageAssertions:
+    def retrieve(self, external_id: str) -> LineageAssertions | None:
         ...
 
     @overload
@@ -160,7 +160,7 @@ class LineageAssertionsAPI(NodeAPI[LineageAssertions, LineageAssertionsApply, Li
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> LineageAssertions | LineageAssertionsList:
+    ) -> LineageAssertions | LineageAssertionsList | None:
         """Retrieve one or more lineage assertions by id(s).
 
         Args:

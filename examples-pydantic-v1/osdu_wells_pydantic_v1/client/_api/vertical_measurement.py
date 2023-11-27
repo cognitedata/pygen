@@ -215,7 +215,7 @@ class VerticalMeasurementAPI(NodeAPI[VerticalMeasurement, VerticalMeasurementApp
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> VerticalMeasurement:
+    def retrieve(self, external_id: str) -> VerticalMeasurement | None:
         ...
 
     @overload
@@ -224,7 +224,7 @@ class VerticalMeasurementAPI(NodeAPI[VerticalMeasurement, VerticalMeasurementApp
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> VerticalMeasurement | VerticalMeasurementList:
+    ) -> VerticalMeasurement | VerticalMeasurementList | None:
         """Retrieve one or more vertical measurements by id(s).
 
         Args:

@@ -140,7 +140,7 @@ class RatingAPI(NodeAPI[Rating, RatingApply, RatingList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> Rating:
+    def retrieve(self, external_id: str) -> Rating | None:
         ...
 
     @overload
@@ -149,7 +149,7 @@ class RatingAPI(NodeAPI[Rating, RatingApply, RatingList]):
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> Rating | RatingList:
+    ) -> Rating | RatingList | None:
         """Retrieve one or more ratings by id(s).
 
         Args:

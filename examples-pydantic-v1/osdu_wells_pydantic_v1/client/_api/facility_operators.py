@@ -169,7 +169,7 @@ class FacilityOperatorsAPI(NodeAPI[FacilityOperators, FacilityOperatorsApply, Fa
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> FacilityOperators:
+    def retrieve(self, external_id: str) -> FacilityOperators | None:
         ...
 
     @overload
@@ -178,7 +178,7 @@ class FacilityOperatorsAPI(NodeAPI[FacilityOperators, FacilityOperatorsApply, Fa
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> FacilityOperators | FacilityOperatorsList:
+    ) -> FacilityOperators | FacilityOperatorsList | None:
         """Retrieve one or more facility operators by id(s).
 
         Args:

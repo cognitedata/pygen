@@ -147,14 +147,14 @@ class MarketAPI(NodeAPI[Market, MarketApply, MarketList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> Market:
+    def retrieve(self, external_id: str) -> Market | None:
         ...
 
     @overload
     def retrieve(self, external_id: SequenceNotStr[str]) -> MarketList:
         ...
 
-    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = "market") -> Market | MarketList:
+    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = "market") -> Market | MarketList | None:
         """Retrieve one or more markets by id(s).
 
         Args:

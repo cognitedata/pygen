@@ -159,7 +159,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleApply, Equipmen
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> EquipmentModule:
+    def retrieve(self, external_id: str) -> EquipmentModule | None:
         ...
 
     @overload
@@ -168,7 +168,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleApply, Equipmen
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> EquipmentModule | EquipmentModuleList:
+    ) -> EquipmentModule | EquipmentModuleList | None:
         """Retrieve one or more equipment modules by id(s).
 
         Args:

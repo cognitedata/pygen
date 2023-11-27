@@ -143,7 +143,7 @@ class DateTransformationAPI(NodeAPI[DateTransformation, DateTransformationApply,
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> DateTransformation:
+    def retrieve(self, external_id: str) -> DateTransformation | None:
         ...
 
     @overload
@@ -152,7 +152,7 @@ class DateTransformationAPI(NodeAPI[DateTransformation, DateTransformationApply,
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "market"
-    ) -> DateTransformation | DateTransformationList:
+    ) -> DateTransformation | DateTransformationList | None:
         """Retrieve one or more date transformations by id(s).
 
         Args:

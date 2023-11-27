@@ -166,7 +166,7 @@ class MovieAPI(NodeAPI[Movie, MovieApply, MovieList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> Movie:
+    def retrieve(self, external_id: str) -> Movie | None:
         ...
 
     @overload
@@ -175,7 +175,7 @@ class MovieAPI(NodeAPI[Movie, MovieApply, MovieList]):
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> Movie | MovieList:
+    ) -> Movie | MovieList | None:
         """Retrieve one or more movies by id(s).
 
         Args:

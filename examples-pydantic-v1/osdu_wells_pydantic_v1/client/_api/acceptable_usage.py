@@ -169,7 +169,7 @@ class AcceptableUsageAPI(NodeAPI[AcceptableUsage, AcceptableUsageApply, Acceptab
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> AcceptableUsage:
+    def retrieve(self, external_id: str) -> AcceptableUsage | None:
         ...
 
     @overload
@@ -178,7 +178,7 @@ class AcceptableUsageAPI(NodeAPI[AcceptableUsage, AcceptableUsageApply, Acceptab
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> AcceptableUsage | AcceptableUsageList:
+    ) -> AcceptableUsage | AcceptableUsageList | None:
         """Retrieve one or more acceptable usages by id(s).
 
         Args:

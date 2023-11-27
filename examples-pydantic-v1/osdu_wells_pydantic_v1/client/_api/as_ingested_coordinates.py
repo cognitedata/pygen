@@ -193,7 +193,7 @@ class AsIngestedCoordinatesAPI(NodeAPI[AsIngestedCoordinates, AsIngestedCoordina
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> AsIngestedCoordinates:
+    def retrieve(self, external_id: str) -> AsIngestedCoordinates | None:
         ...
 
     @overload
@@ -202,7 +202,7 @@ class AsIngestedCoordinatesAPI(NodeAPI[AsIngestedCoordinates, AsIngestedCoordina
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> AsIngestedCoordinates | AsIngestedCoordinatesList:
+    ) -> AsIngestedCoordinates | AsIngestedCoordinatesList | None:
         """Retrieve one or more as ingested coordinates by id(s).
 
         Args:

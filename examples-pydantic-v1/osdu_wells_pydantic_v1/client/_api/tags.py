@@ -143,7 +143,7 @@ class TagsAPI(NodeAPI[Tags, TagsApply, TagsList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> Tags:
+    def retrieve(self, external_id: str) -> Tags | None:
         ...
 
     @overload
@@ -152,7 +152,7 @@ class TagsAPI(NodeAPI[Tags, TagsApply, TagsList]):
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> Tags | TagsList:
+    ) -> Tags | TagsList | None:
         """Retrieve one or more tags by id(s).
 
         Args:

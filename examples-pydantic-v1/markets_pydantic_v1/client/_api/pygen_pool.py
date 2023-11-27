@@ -155,14 +155,16 @@ class PygenPoolAPI(NodeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> PygenPool:
+    def retrieve(self, external_id: str) -> PygenPool | None:
         ...
 
     @overload
     def retrieve(self, external_id: SequenceNotStr[str]) -> PygenPoolList:
         ...
 
-    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = "market") -> PygenPool | PygenPoolList:
+    def retrieve(
+        self, external_id: str | SequenceNotStr[str], space: str = "market"
+    ) -> PygenPool | PygenPoolList | None:
         """Retrieve one or more pygen pools by id(s).
 
         Args:

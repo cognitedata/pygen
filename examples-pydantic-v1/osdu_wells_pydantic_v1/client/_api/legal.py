@@ -143,7 +143,7 @@ class LegalAPI(NodeAPI[Legal, LegalApply, LegalList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> Legal:
+    def retrieve(self, external_id: str) -> Legal | None:
         ...
 
     @overload
@@ -152,7 +152,7 @@ class LegalAPI(NodeAPI[Legal, LegalApply, LegalList]):
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> Legal | LegalList:
+    ) -> Legal | LegalList | None:
         """Retrieve one or more legals by id(s).
 
         Args:

@@ -137,7 +137,7 @@ class AclAPI(NodeAPI[Acl, AclApply, AclList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> Acl:
+    def retrieve(self, external_id: str) -> Acl | None:
         ...
 
     @overload
@@ -146,7 +146,7 @@ class AclAPI(NodeAPI[Acl, AclApply, AclList]):
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> Acl | AclList:
+    ) -> Acl | AclList | None:
         """Retrieve one or more acls by id(s).
 
         Args:
