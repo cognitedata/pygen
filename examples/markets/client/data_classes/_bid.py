@@ -96,7 +96,7 @@ class BidApply(DomainModelApply):
             return resources
 
         write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
-            "market", "Bid", "1add47c48cf88b"
+            "market", "Bid", "1ad3f030a8399f"
         )
 
         properties = {}

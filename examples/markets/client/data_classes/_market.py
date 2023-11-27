@@ -86,7 +86,7 @@ class MarketApply(DomainModelApply):
             return resources
 
         write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
-            "market", "Market", "a5067899750188"
+            "market", "Market", "5b43e98565d4d5"
         )
 
         properties = {}

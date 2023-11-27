@@ -89,7 +89,7 @@ class ProcessApply(DomainModelApply):
             return resources
 
         write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
-            "market", "Process", "98a2becd0f63ee"
+            "market", "Process", "b3e0207c0bb510"
         )
 
         properties = {}

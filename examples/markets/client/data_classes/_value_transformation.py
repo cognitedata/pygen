@@ -93,7 +93,7 @@ class ValueTransformationApply(DomainModelApply):
             return resources
 
         write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
-            "market", "ValueTransformation", "147ebcf1583165"
+            "market", "ValueTransformation", "946587c592b44c"
         )
 
         properties = {}
