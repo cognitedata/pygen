@@ -10,6 +10,8 @@ from movie_domain.client.data_classes import (
     MovieApply,
     Nomination,
     NominationApply,
+    Person,
+    PersonApply,
 )
 from movie_domain.client.data_classes._actor import (
     _ACTOR_PROPERTIES_BY_FIELD,
@@ -19,6 +21,9 @@ from movie_domain.client.data_classes._movie import (
 )
 from movie_domain.client.data_classes._nomination import (
     _NOMINATION_PROPERTIES_BY_FIELD,
+)
+from movie_domain.client.data_classes._person import (
+    _PERSON_PROPERTIES_BY_FIELD,
 )
 
 if TYPE_CHECKING:
@@ -142,6 +147,7 @@ class ActorQueryAPI(QueryAPI[T_DomainModelList]):
     def query(
         self,
         retrieve_actor: bool = True,
+        include_person: bool = False,
     ) -> T_DomainModelList:
         """Execute query and return the result.
 
@@ -165,12 +171,31 @@ class ActorQueryAPI(QueryAPI[T_DomainModelList]):
                         [
                             dm.query.SourceSelector(
                                 self._view_by_write_class[ActorApply],
-                                list(_ACTOR_PROPERTIES_BY_FIELD.values()),
+                                ["*"],
                             )
                         ]
                     ),
                     result_cls=Actor,
                     max_retrieve_limit=-1,
+                ),
+            )
+        if include_person:
+            self._builder.append(
+                QueryStep(
+                    name=self._builder.next_name("person"),
+                    expression=dm.query.NodeResultSetExpression(
+                        filter=None,
+                        from_=from_,
+                    ),
+                    select=dm.query.Select(
+                        [
+                            dm.query.SourceSelector(
+                                self._view_by_write_class[PersonApply], list(_PERSON_PROPERTIES_BY_FIELD.values())
+                            )
+                        ]
+                    ),
+                    max_retrieve_limit=-1,
+                    result_cls=Person,
                 ),
             )
 
