@@ -147,7 +147,7 @@ class ActorQueryAPI(QueryAPI[T_DomainModelList]):
     def query(
         self,
         retrieve_actor: bool = True,
-        include_person: bool = False,
+        retrieve_person: bool = False,
     ) -> T_DomainModelList:
         """Execute query and return the result.
 
@@ -179,21 +179,17 @@ class ActorQueryAPI(QueryAPI[T_DomainModelList]):
                     max_retrieve_limit=-1,
                 ),
             )
-        if include_person:
+        if retrieve_person:
             self._builder.append(
                 QueryStep(
                     name=self._builder.next_name("person"),
                     expression=dm.query.NodeResultSetExpression(
                         filter=None,
                         from_=from_,
+                        through=["IntegrationTestsImmutable", "Actor/2", "person"],
+                        direction="outwards",
                     ),
-                    select=dm.query.Select(
-                        [
-                            dm.query.SourceSelector(
-                                self._view_by_write_class[PersonApply], list(_PERSON_PROPERTIES_BY_FIELD.values())
-                            )
-                        ]
-                    ),
+                    select=dm.query.Select([dm.query.SourceSelector(self._view_by_write_class[PersonApply], ["*"])]),
                     max_retrieve_limit=-1,
                     result_cls=Person,
                 ),
