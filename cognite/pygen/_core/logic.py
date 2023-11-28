@@ -59,4 +59,15 @@ def get_unique_views(*views: dm.View) -> list[dm.View]:
         if view_hash not in view_hashes:
             unique_views.append(view)
             view_hashes.add(view_hash)
+        else:
+            existing_view = next(
+                (v for v in unique_views if (v.space, v.external_id) == (view.space, view.external_id)), None
+            )
+            if existing_view is None:
+                # Bug in the code, should not happen, but we do not want to crash
+                continue
+            if existing_view.created_time < view.created_time:
+                # Replace existing view with newer version
+                unique_views.remove(existing_view)
+                unique_views.append(view)
     return unique_views

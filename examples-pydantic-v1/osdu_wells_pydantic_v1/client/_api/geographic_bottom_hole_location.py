@@ -1,28 +1,40 @@
 from __future__ import annotations
 
-from typing import Sequence, overload
+from collections.abc import Sequence
+from typing import overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from osdu_wells_pydantic_v1.client.data_classes import (
+    DomainModelApply,
+    ResourcesApplyResult,
     GeographicBottomHoleLocation,
     GeographicBottomHoleLocationApply,
+    GeographicBottomHoleLocationFields,
     GeographicBottomHoleLocationList,
     GeographicBottomHoleLocationApplyList,
-    GeographicBottomHoleLocationFields,
     GeographicBottomHoleLocationTextFields,
-    DomainModelApply,
 )
 from osdu_wells_pydantic_v1.client.data_classes._geographic_bottom_hole_location import (
     _GEOGRAPHICBOTTOMHOLELOCATION_PROPERTIES_BY_FIELD,
+    _create_geographic_bottom_hole_location_filter,
 )
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
+from .geographic_bottom_hole_location_query import GeographicBottomHoleLocationQueryAPI
 
 
 class GeographicBottomHoleLocationAPI(
-    TypeAPI[GeographicBottomHoleLocation, GeographicBottomHoleLocationApply, GeographicBottomHoleLocationList]
+    NodeAPI[GeographicBottomHoleLocation, GeographicBottomHoleLocationApply, GeographicBottomHoleLocationList]
 ):
     def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
         view_id = view_by_write_class[GeographicBottomHoleLocationApply]
@@ -32,16 +44,113 @@ class GeographicBottomHoleLocationAPI(
             class_type=GeographicBottomHoleLocation,
             class_apply_type=GeographicBottomHoleLocationApply,
             class_list=GeographicBottomHoleLocationList,
+            class_apply_list=GeographicBottomHoleLocationApplyList,
+            view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self._view_by_write_class = view_by_write_class
+
+    def __call__(
+        self,
+        as_ingested_coordinates: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        coordinate_quality_check_date_time: str | list[str] | None = None,
+        coordinate_quality_check_date_time_prefix: str | None = None,
+        coordinate_quality_check_performed_by: str | list[str] | None = None,
+        coordinate_quality_check_performed_by_prefix: str | None = None,
+        qualitative_spatial_accuracy_type_id: str | list[str] | None = None,
+        qualitative_spatial_accuracy_type_id_prefix: str | None = None,
+        quantitative_accuracy_band_id: str | list[str] | None = None,
+        quantitative_accuracy_band_id_prefix: str | None = None,
+        spatial_geometry_type_id: str | list[str] | None = None,
+        spatial_geometry_type_id_prefix: str | None = None,
+        spatial_location_coordinates_date: str | list[str] | None = None,
+        spatial_location_coordinates_date_prefix: str | None = None,
+        spatial_parameter_type_id: str | list[str] | None = None,
+        spatial_parameter_type_id_prefix: str | None = None,
+        wgs_84_coordinates: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+        filter: dm.Filter | None = None,
+    ) -> GeographicBottomHoleLocationQueryAPI[GeographicBottomHoleLocationList]:
+        """Query starting at geographic bottom hole locations.
+
+        Args:
+            as_ingested_coordinates: The as ingested coordinate to filter on.
+            coordinate_quality_check_date_time: The coordinate quality check date time to filter on.
+            coordinate_quality_check_date_time_prefix: The prefix of the coordinate quality check date time to filter on.
+            coordinate_quality_check_performed_by: The coordinate quality check performed by to filter on.
+            coordinate_quality_check_performed_by_prefix: The prefix of the coordinate quality check performed by to filter on.
+            qualitative_spatial_accuracy_type_id: The qualitative spatial accuracy type id to filter on.
+            qualitative_spatial_accuracy_type_id_prefix: The prefix of the qualitative spatial accuracy type id to filter on.
+            quantitative_accuracy_band_id: The quantitative accuracy band id to filter on.
+            quantitative_accuracy_band_id_prefix: The prefix of the quantitative accuracy band id to filter on.
+            spatial_geometry_type_id: The spatial geometry type id to filter on.
+            spatial_geometry_type_id_prefix: The prefix of the spatial geometry type id to filter on.
+            spatial_location_coordinates_date: The spatial location coordinates date to filter on.
+            spatial_location_coordinates_date_prefix: The prefix of the spatial location coordinates date to filter on.
+            spatial_parameter_type_id: The spatial parameter type id to filter on.
+            spatial_parameter_type_id_prefix: The prefix of the spatial parameter type id to filter on.
+            wgs_84_coordinates: The wgs 84 coordinate to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of geographic bottom hole locations to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            A query API for geographic bottom hole locations.
+
+        """
+        filter_ = _create_geographic_bottom_hole_location_filter(
+            self._view_id,
+            as_ingested_coordinates,
+            coordinate_quality_check_date_time,
+            coordinate_quality_check_date_time_prefix,
+            coordinate_quality_check_performed_by,
+            coordinate_quality_check_performed_by_prefix,
+            qualitative_spatial_accuracy_type_id,
+            qualitative_spatial_accuracy_type_id_prefix,
+            quantitative_accuracy_band_id,
+            quantitative_accuracy_band_id_prefix,
+            spatial_geometry_type_id,
+            spatial_geometry_type_id_prefix,
+            spatial_location_coordinates_date,
+            spatial_location_coordinates_date_prefix,
+            spatial_parameter_type_id,
+            spatial_parameter_type_id_prefix,
+            wgs_84_coordinates,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        builder = QueryBuilder(
+            GeographicBottomHoleLocationList,
+            [
+                QueryStep(
+                    name="geographic_bottom_hole_location",
+                    expression=dm.query.NodeResultSetExpression(
+                        from_=None,
+                        filter=filter_,
+                    ),
+                    select=dm.query.Select(
+                        [
+                            dm.query.SourceSelector(
+                                self._view_id, list(_GEOGRAPHICBOTTOMHOLELOCATION_PROPERTIES_BY_FIELD.values())
+                            )
+                        ]
+                    ),
+                    result_cls=GeographicBottomHoleLocation,
+                    max_retrieve_limit=limit,
+                )
+            ],
+        )
+        return GeographicBottomHoleLocationQueryAPI(self._client, builder, self._view_by_write_class)
 
     def apply(
         self,
         geographic_bottom_hole_location: GeographicBottomHoleLocationApply
         | Sequence[GeographicBottomHoleLocationApply],
         replace: bool = False,
-    ) -> dm.InstancesApplyResult:
+    ) -> ResourcesApplyResult:
         """Add or update (upsert) geographic bottom hole locations.
 
         Args:
@@ -49,7 +158,7 @@ class GeographicBottomHoleLocationAPI(
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes, edges, and time series.
 
         Examples:
 
@@ -62,22 +171,10 @@ class GeographicBottomHoleLocationAPI(
                 >>> result = client.geographic_bottom_hole_location.apply(geographic_bottom_hole_location)
 
         """
-        if isinstance(geographic_bottom_hole_location, GeographicBottomHoleLocationApply):
-            instances = geographic_bottom_hole_location.to_instances_apply(self._view_by_write_class)
-        else:
-            instances = GeographicBottomHoleLocationApplyList(geographic_bottom_hole_location).to_instances_apply(
-                self._view_by_write_class
-            )
-        return self._client.data_modeling.instances.apply(
-            nodes=instances.nodes,
-            edges=instances.edges,
-            auto_create_start_nodes=True,
-            auto_create_end_nodes=True,
-            replace=replace,
-        )
+        return self._apply(geographic_bottom_hole_location, replace)
 
     def delete(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> dm.InstancesDeleteResult:
         """Delete one or more geographic bottom hole location.
 
@@ -96,24 +193,19 @@ class GeographicBottomHoleLocationAPI(
                 >>> client = OSDUClient()
                 >>> client.geographic_bottom_hole_location.delete("my_geographic_bottom_hole_location")
         """
-        if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
-        else:
-            return self._client.data_modeling.instances.delete(
-                nodes=[(space, id) for id in external_id],
-            )
+        return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> GeographicBottomHoleLocation:
+    def retrieve(self, external_id: str) -> GeographicBottomHoleLocation | None:
         ...
 
     @overload
-    def retrieve(self, external_id: Sequence[str]) -> GeographicBottomHoleLocationList:
+    def retrieve(self, external_id: SequenceNotStr[str]) -> GeographicBottomHoleLocationList:
         ...
 
     def retrieve(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
-    ) -> GeographicBottomHoleLocation | GeographicBottomHoleLocationList:
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+    ) -> GeographicBottomHoleLocation | GeographicBottomHoleLocationList | None:
         """Retrieve one or more geographic bottom hole locations by id(s).
 
         Args:
@@ -132,10 +224,7 @@ class GeographicBottomHoleLocationAPI(
                 >>> geographic_bottom_hole_location = client.geographic_bottom_hole_location.retrieve("my_geographic_bottom_hole_location")
 
         """
-        if isinstance(external_id, str):
-            return self._retrieve((space, external_id))
-        else:
-            return self._retrieve([(space, ext_id) for ext_id in external_id])
+        return self._retrieve(external_id, space)
 
     def search(
         self,
@@ -202,7 +291,7 @@ class GeographicBottomHoleLocationAPI(
                 >>> geographic_bottom_hole_locations = client.geographic_bottom_hole_location.search('my_geographic_bottom_hole_location')
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_geographic_bottom_hole_location_filter(
             self._view_id,
             as_ingested_coordinates,
             coordinate_quality_check_date_time,
@@ -375,7 +464,7 @@ class GeographicBottomHoleLocationAPI(
 
         """
 
-        filter_ = _create_filter(
+        filter_ = _create_geographic_bottom_hole_location_filter(
             self._view_id,
             as_ingested_coordinates,
             coordinate_quality_check_date_time,
@@ -470,7 +559,7 @@ class GeographicBottomHoleLocationAPI(
             Bucketed histogram results.
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_geographic_bottom_hole_location_filter(
             self._view_id,
             as_ingested_coordinates,
             coordinate_quality_check_date_time,
@@ -562,7 +651,7 @@ class GeographicBottomHoleLocationAPI(
                 >>> geographic_bottom_hole_locations = client.geographic_bottom_hole_location.list(limit=5)
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_geographic_bottom_hole_location_filter(
             self._view_id,
             as_ingested_coordinates,
             coordinate_quality_check_date_time,
@@ -584,219 +673,4 @@ class GeographicBottomHoleLocationAPI(
             space,
             filter,
         )
-
         return self._list(limit=limit, filter=filter_)
-
-
-def _create_filter(
-    view_id: dm.ViewId,
-    as_ingested_coordinates: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-    coordinate_quality_check_date_time: str | list[str] | None = None,
-    coordinate_quality_check_date_time_prefix: str | None = None,
-    coordinate_quality_check_performed_by: str | list[str] | None = None,
-    coordinate_quality_check_performed_by_prefix: str | None = None,
-    qualitative_spatial_accuracy_type_id: str | list[str] | None = None,
-    qualitative_spatial_accuracy_type_id_prefix: str | None = None,
-    quantitative_accuracy_band_id: str | list[str] | None = None,
-    quantitative_accuracy_band_id_prefix: str | None = None,
-    spatial_geometry_type_id: str | list[str] | None = None,
-    spatial_geometry_type_id_prefix: str | None = None,
-    spatial_location_coordinates_date: str | list[str] | None = None,
-    spatial_location_coordinates_date_prefix: str | None = None,
-    spatial_parameter_type_id: str | list[str] | None = None,
-    spatial_parameter_type_id_prefix: str | None = None,
-    wgs_84_coordinates: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-    external_id_prefix: str | None = None,
-    space: str | list[str] | None = None,
-    filter: dm.Filter | None = None,
-) -> dm.Filter | None:
-    filters = []
-    if as_ingested_coordinates and isinstance(as_ingested_coordinates, str):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("AsIngestedCoordinates"),
-                value={"space": "IntegrationTestsImmutable", "externalId": as_ingested_coordinates},
-            )
-        )
-    if as_ingested_coordinates and isinstance(as_ingested_coordinates, tuple):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("AsIngestedCoordinates"),
-                value={"space": as_ingested_coordinates[0], "externalId": as_ingested_coordinates[1]},
-            )
-        )
-    if (
-        as_ingested_coordinates
-        and isinstance(as_ingested_coordinates, list)
-        and isinstance(as_ingested_coordinates[0], str)
-    ):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("AsIngestedCoordinates"),
-                values=[{"space": "IntegrationTestsImmutable", "externalId": item} for item in as_ingested_coordinates],
-            )
-        )
-    if (
-        as_ingested_coordinates
-        and isinstance(as_ingested_coordinates, list)
-        and isinstance(as_ingested_coordinates[0], tuple)
-    ):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("AsIngestedCoordinates"),
-                values=[{"space": item[0], "externalId": item[1]} for item in as_ingested_coordinates],
-            )
-        )
-    if coordinate_quality_check_date_time and isinstance(coordinate_quality_check_date_time, str):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("CoordinateQualityCheckDateTime"), value=coordinate_quality_check_date_time
-            )
-        )
-    if coordinate_quality_check_date_time and isinstance(coordinate_quality_check_date_time, list):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("CoordinateQualityCheckDateTime"), values=coordinate_quality_check_date_time
-            )
-        )
-    if coordinate_quality_check_date_time_prefix:
-        filters.append(
-            dm.filters.Prefix(
-                view_id.as_property_ref("CoordinateQualityCheckDateTime"),
-                value=coordinate_quality_check_date_time_prefix,
-            )
-        )
-    if coordinate_quality_check_performed_by and isinstance(coordinate_quality_check_performed_by, str):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("CoordinateQualityCheckPerformedBy"),
-                value=coordinate_quality_check_performed_by,
-            )
-        )
-    if coordinate_quality_check_performed_by and isinstance(coordinate_quality_check_performed_by, list):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("CoordinateQualityCheckPerformedBy"),
-                values=coordinate_quality_check_performed_by,
-            )
-        )
-    if coordinate_quality_check_performed_by_prefix:
-        filters.append(
-            dm.filters.Prefix(
-                view_id.as_property_ref("CoordinateQualityCheckPerformedBy"),
-                value=coordinate_quality_check_performed_by_prefix,
-            )
-        )
-    if qualitative_spatial_accuracy_type_id and isinstance(qualitative_spatial_accuracy_type_id, str):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("QualitativeSpatialAccuracyTypeID"), value=qualitative_spatial_accuracy_type_id
-            )
-        )
-    if qualitative_spatial_accuracy_type_id and isinstance(qualitative_spatial_accuracy_type_id, list):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("QualitativeSpatialAccuracyTypeID"), values=qualitative_spatial_accuracy_type_id
-            )
-        )
-    if qualitative_spatial_accuracy_type_id_prefix:
-        filters.append(
-            dm.filters.Prefix(
-                view_id.as_property_ref("QualitativeSpatialAccuracyTypeID"),
-                value=qualitative_spatial_accuracy_type_id_prefix,
-            )
-        )
-    if quantitative_accuracy_band_id and isinstance(quantitative_accuracy_band_id, str):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("QuantitativeAccuracyBandID"), value=quantitative_accuracy_band_id
-            )
-        )
-    if quantitative_accuracy_band_id and isinstance(quantitative_accuracy_band_id, list):
-        filters.append(
-            dm.filters.In(view_id.as_property_ref("QuantitativeAccuracyBandID"), values=quantitative_accuracy_band_id)
-        )
-    if quantitative_accuracy_band_id_prefix:
-        filters.append(
-            dm.filters.Prefix(
-                view_id.as_property_ref("QuantitativeAccuracyBandID"), value=quantitative_accuracy_band_id_prefix
-            )
-        )
-    if spatial_geometry_type_id and isinstance(spatial_geometry_type_id, str):
-        filters.append(
-            dm.filters.Equals(view_id.as_property_ref("SpatialGeometryTypeID"), value=spatial_geometry_type_id)
-        )
-    if spatial_geometry_type_id and isinstance(spatial_geometry_type_id, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("SpatialGeometryTypeID"), values=spatial_geometry_type_id))
-    if spatial_geometry_type_id_prefix:
-        filters.append(
-            dm.filters.Prefix(view_id.as_property_ref("SpatialGeometryTypeID"), value=spatial_geometry_type_id_prefix)
-        )
-    if spatial_location_coordinates_date and isinstance(spatial_location_coordinates_date, str):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("SpatialLocationCoordinatesDate"), value=spatial_location_coordinates_date
-            )
-        )
-    if spatial_location_coordinates_date and isinstance(spatial_location_coordinates_date, list):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("SpatialLocationCoordinatesDate"), values=spatial_location_coordinates_date
-            )
-        )
-    if spatial_location_coordinates_date_prefix:
-        filters.append(
-            dm.filters.Prefix(
-                view_id.as_property_ref("SpatialLocationCoordinatesDate"),
-                value=spatial_location_coordinates_date_prefix,
-            )
-        )
-    if spatial_parameter_type_id and isinstance(spatial_parameter_type_id, str):
-        filters.append(
-            dm.filters.Equals(view_id.as_property_ref("SpatialParameterTypeID"), value=spatial_parameter_type_id)
-        )
-    if spatial_parameter_type_id and isinstance(spatial_parameter_type_id, list):
-        filters.append(
-            dm.filters.In(view_id.as_property_ref("SpatialParameterTypeID"), values=spatial_parameter_type_id)
-        )
-    if spatial_parameter_type_id_prefix:
-        filters.append(
-            dm.filters.Prefix(view_id.as_property_ref("SpatialParameterTypeID"), value=spatial_parameter_type_id_prefix)
-        )
-    if wgs_84_coordinates and isinstance(wgs_84_coordinates, str):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("Wgs84Coordinates"),
-                value={"space": "IntegrationTestsImmutable", "externalId": wgs_84_coordinates},
-            )
-        )
-    if wgs_84_coordinates and isinstance(wgs_84_coordinates, tuple):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("Wgs84Coordinates"),
-                value={"space": wgs_84_coordinates[0], "externalId": wgs_84_coordinates[1]},
-            )
-        )
-    if wgs_84_coordinates and isinstance(wgs_84_coordinates, list) and isinstance(wgs_84_coordinates[0], str):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("Wgs84Coordinates"),
-                values=[{"space": "IntegrationTestsImmutable", "externalId": item} for item in wgs_84_coordinates],
-            )
-        )
-    if wgs_84_coordinates and isinstance(wgs_84_coordinates, list) and isinstance(wgs_84_coordinates[0], tuple):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("Wgs84Coordinates"),
-                values=[{"space": item[0], "externalId": item[1]} for item in wgs_84_coordinates],
-            )
-        )
-    if external_id_prefix:
-        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
-        filters.append(dm.filters.Equals(["node", "space"], value=space))
-    if space and isinstance(space, list):
-        filters.append(dm.filters.In(["node", "space"], values=space))
-    if filter:
-        filters.append(filter)
-    return dm.filters.And(*filters) if filters else None

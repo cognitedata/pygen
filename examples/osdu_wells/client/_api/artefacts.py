@@ -1,25 +1,39 @@
 from __future__ import annotations
 
-from typing import Sequence, overload
+from collections.abc import Sequence
+from typing import overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from osdu_wells.client.data_classes import (
+    DomainModelApply,
+    ResourcesApplyResult,
     Artefacts,
     ArtefactsApply,
+    ArtefactsFields,
     ArtefactsList,
     ArtefactsApplyList,
-    ArtefactsFields,
     ArtefactsTextFields,
-    DomainModelApply,
 )
-from osdu_wells.client.data_classes._artefacts import _ARTEFACTS_PROPERTIES_BY_FIELD
+from osdu_wells.client.data_classes._artefacts import (
+    _ARTEFACTS_PROPERTIES_BY_FIELD,
+    _create_artefact_filter,
+)
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
+from .artefacts_query import ArtefactsQueryAPI
 
 
-class ArtefactsAPI(TypeAPI[Artefacts, ArtefactsApply, ArtefactsList]):
+class ArtefactsAPI(NodeAPI[Artefacts, ArtefactsApply, ArtefactsList]):
     def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
         view_id = view_by_write_class[ArtefactsApply]
         super().__init__(
@@ -28,13 +42,74 @@ class ArtefactsAPI(TypeAPI[Artefacts, ArtefactsApply, ArtefactsList]):
             class_type=Artefacts,
             class_apply_type=ArtefactsApply,
             class_list=ArtefactsList,
+            class_apply_list=ArtefactsApplyList,
+            view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self._view_by_write_class = view_by_write_class
 
-    def apply(
-        self, artefact: ArtefactsApply | Sequence[ArtefactsApply], replace: bool = False
-    ) -> dm.InstancesApplyResult:
+    def __call__(
+        self,
+        resource_id: str | list[str] | None = None,
+        resource_id_prefix: str | None = None,
+        resource_kind: str | list[str] | None = None,
+        resource_kind_prefix: str | None = None,
+        role_id: str | list[str] | None = None,
+        role_id_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+        filter: dm.Filter | None = None,
+    ) -> ArtefactsQueryAPI[ArtefactsList]:
+        """Query starting at artefacts.
+
+        Args:
+            resource_id: The resource id to filter on.
+            resource_id_prefix: The prefix of the resource id to filter on.
+            resource_kind: The resource kind to filter on.
+            resource_kind_prefix: The prefix of the resource kind to filter on.
+            role_id: The role id to filter on.
+            role_id_prefix: The prefix of the role id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of artefacts to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            A query API for artefacts.
+
+        """
+        filter_ = _create_artefact_filter(
+            self._view_id,
+            resource_id,
+            resource_id_prefix,
+            resource_kind,
+            resource_kind_prefix,
+            role_id,
+            role_id_prefix,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        builder = QueryBuilder(
+            ArtefactsList,
+            [
+                QueryStep(
+                    name="artefact",
+                    expression=dm.query.NodeResultSetExpression(
+                        from_=None,
+                        filter=filter_,
+                    ),
+                    select=dm.query.Select(
+                        [dm.query.SourceSelector(self._view_id, list(_ARTEFACTS_PROPERTIES_BY_FIELD.values()))]
+                    ),
+                    result_cls=Artefacts,
+                    max_retrieve_limit=limit,
+                )
+            ],
+        )
+        return ArtefactsQueryAPI(self._client, builder, self._view_by_write_class)
+
+    def apply(self, artefact: ArtefactsApply | Sequence[ArtefactsApply], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) artefacts.
 
         Args:
@@ -42,7 +117,7 @@ class ArtefactsAPI(TypeAPI[Artefacts, ArtefactsApply, ArtefactsList]):
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes, edges, and time series.
 
         Examples:
 
@@ -55,20 +130,10 @@ class ArtefactsAPI(TypeAPI[Artefacts, ArtefactsApply, ArtefactsList]):
                 >>> result = client.artefacts.apply(artefact)
 
         """
-        if isinstance(artefact, ArtefactsApply):
-            instances = artefact.to_instances_apply(self._view_by_write_class)
-        else:
-            instances = ArtefactsApplyList(artefact).to_instances_apply(self._view_by_write_class)
-        return self._client.data_modeling.instances.apply(
-            nodes=instances.nodes,
-            edges=instances.edges,
-            auto_create_start_nodes=True,
-            auto_create_end_nodes=True,
-            replace=replace,
-        )
+        return self._apply(artefact, replace)
 
     def delete(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> dm.InstancesDeleteResult:
         """Delete one or more artefact.
 
@@ -87,24 +152,19 @@ class ArtefactsAPI(TypeAPI[Artefacts, ArtefactsApply, ArtefactsList]):
                 >>> client = OSDUClient()
                 >>> client.artefacts.delete("my_artefact")
         """
-        if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
-        else:
-            return self._client.data_modeling.instances.delete(
-                nodes=[(space, id) for id in external_id],
-            )
+        return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> Artefacts:
+    def retrieve(self, external_id: str) -> Artefacts | None:
         ...
 
     @overload
-    def retrieve(self, external_id: Sequence[str]) -> ArtefactsList:
+    def retrieve(self, external_id: SequenceNotStr[str]) -> ArtefactsList:
         ...
 
     def retrieve(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
-    ) -> Artefacts | ArtefactsList:
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+    ) -> Artefacts | ArtefactsList | None:
         """Retrieve one or more artefacts by id(s).
 
         Args:
@@ -123,10 +183,7 @@ class ArtefactsAPI(TypeAPI[Artefacts, ArtefactsApply, ArtefactsList]):
                 >>> artefact = client.artefacts.retrieve("my_artefact")
 
         """
-        if isinstance(external_id, str):
-            return self._retrieve((space, external_id))
-        else:
-            return self._retrieve([(space, ext_id) for ext_id in external_id])
+        return self._retrieve(external_id, space)
 
     def search(
         self,
@@ -171,7 +228,7 @@ class ArtefactsAPI(TypeAPI[Artefacts, ArtefactsApply, ArtefactsList]):
                 >>> artefacts = client.artefacts.search('my_artefact')
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_artefact_filter(
             self._view_id,
             resource_id,
             resource_id_prefix,
@@ -286,7 +343,7 @@ class ArtefactsAPI(TypeAPI[Artefacts, ArtefactsApply, ArtefactsList]):
 
         """
 
-        filter_ = _create_filter(
+        filter_ = _create_artefact_filter(
             self._view_id,
             resource_id,
             resource_id_prefix,
@@ -349,7 +406,7 @@ class ArtefactsAPI(TypeAPI[Artefacts, ArtefactsApply, ArtefactsList]):
             Bucketed histogram results.
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_artefact_filter(
             self._view_id,
             resource_id,
             resource_id_prefix,
@@ -411,7 +468,7 @@ class ArtefactsAPI(TypeAPI[Artefacts, ArtefactsApply, ArtefactsList]):
                 >>> artefacts = client.artefacts.list(limit=5)
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_artefact_filter(
             self._view_id,
             resource_id,
             resource_id_prefix,
@@ -423,47 +480,4 @@ class ArtefactsAPI(TypeAPI[Artefacts, ArtefactsApply, ArtefactsList]):
             space,
             filter,
         )
-
         return self._list(limit=limit, filter=filter_)
-
-
-def _create_filter(
-    view_id: dm.ViewId,
-    resource_id: str | list[str] | None = None,
-    resource_id_prefix: str | None = None,
-    resource_kind: str | list[str] | None = None,
-    resource_kind_prefix: str | None = None,
-    role_id: str | list[str] | None = None,
-    role_id_prefix: str | None = None,
-    external_id_prefix: str | None = None,
-    space: str | list[str] | None = None,
-    filter: dm.Filter | None = None,
-) -> dm.Filter | None:
-    filters = []
-    if resource_id and isinstance(resource_id, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("ResourceID"), value=resource_id))
-    if resource_id and isinstance(resource_id, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("ResourceID"), values=resource_id))
-    if resource_id_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("ResourceID"), value=resource_id_prefix))
-    if resource_kind and isinstance(resource_kind, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("ResourceKind"), value=resource_kind))
-    if resource_kind and isinstance(resource_kind, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("ResourceKind"), values=resource_kind))
-    if resource_kind_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("ResourceKind"), value=resource_kind_prefix))
-    if role_id and isinstance(role_id, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("RoleID"), value=role_id))
-    if role_id and isinstance(role_id, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("RoleID"), values=role_id))
-    if role_id_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("RoleID"), value=role_id_prefix))
-    if external_id_prefix:
-        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
-        filters.append(dm.filters.Equals(["node", "space"], value=space))
-    if space and isinstance(space, list):
-        filters.append(dm.filters.In(["node", "space"], values=space))
-    if filter:
-        filters.append(filter)
-    return dm.filters.And(*filters) if filters else None

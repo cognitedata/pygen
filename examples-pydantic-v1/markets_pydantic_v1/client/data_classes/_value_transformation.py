@@ -4,7 +4,15 @@ from typing import Literal, Optional
 
 from cognite.client import data_modeling as dm
 
-from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
+from ._core import (
+    DomainModel,
+    DomainModelApply,
+    DomainModelApplyList,
+    DomainModelList,
+    DomainRelationApply,
+    ResourcesApply,
+)
+
 
 __all__ = [
     "ValueTransformation",
@@ -26,7 +34,7 @@ _VALUETRANSFORMATION_PROPERTIES_BY_FIELD = {
 
 
 class ValueTransformation(DomainModel):
-    """This represent a read version of value transformation.
+    """This represents the reading version of value transformation.
 
     It is used to when data is retrieved from CDF.
 
@@ -46,7 +54,7 @@ class ValueTransformation(DomainModel):
     method: Optional[str] = None
 
     def as_apply(self) -> ValueTransformationApply:
-        """Convert this read version of value transformation to a write version."""
+        """Convert this read version of value transformation to the writing version."""
         return ValueTransformationApply(
             space=self.space,
             external_id=self.external_id,
@@ -56,7 +64,7 @@ class ValueTransformation(DomainModel):
 
 
 class ValueTransformationApply(DomainModelApply):
-    """This represent a write version of value transformation.
+    """This represents the writing version of value transformation.
 
     It is used to when data is sent to CDF.
 
@@ -65,7 +73,7 @@ class ValueTransformationApply(DomainModelApply):
         external_id: The external id of the value transformation.
         arguments: The argument field.
         method: The method field.
-        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+        existing_version: Fail the ingestion request if the value transformation version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
@@ -76,49 +84,79 @@ class ValueTransformationApply(DomainModelApply):
     method: Optional[str] = None
 
     def _to_instances_apply(
-        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
-    ) -> dm.InstancesApply:
-        if self.external_id in cache:
-            return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
-        write_view = view_by_write_class and view_by_write_class.get(type(self))
+        self,
+        cache: set[tuple[str, str]],
+        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+    ) -> ResourcesApply:
+        resources = ResourcesApply()
+        if self.as_tuple_id() in cache:
+            return resources
+
+        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
+            "market", "ValueTransformation", "946587c592b44c"
+        )
 
         properties = {}
         if self.arguments is not None:
             properties["arguments"] = self.arguments
         if self.method is not None:
             properties["method"] = self.method
+
         if properties:
-            source = dm.NodeOrEdgeData(
-                source=write_view or dm.ViewId("market", "ValueTransformation", "147ebcf1583165"),
-                properties=properties,
-            )
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=[source],
+                sources=[
+                    dm.NodeOrEdgeData(
+                        source=write_view,
+                        properties=properties,
+                    )
+                ],
             )
-            nodes = [this_node]
-        else:
-            nodes = []
+            resources.nodes.append(this_node)
+            cache.add(self.as_tuple_id())
 
-        edges = []
-        cache.add(self.external_id)
-
-        return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
+        return resources
 
 
-class ValueTransformationList(TypeList[ValueTransformation]):
-    """List of value transformations in read version."""
+class ValueTransformationList(DomainModelList[ValueTransformation]):
+    """List of value transformations in the read version."""
 
-    _NODE = ValueTransformation
+    _INSTANCE = ValueTransformation
 
     def as_apply(self) -> ValueTransformationApplyList:
-        """Convert this read version of value transformation to a write version."""
+        """Convert these read versions of value transformation to the writing versions."""
         return ValueTransformationApplyList([node.as_apply() for node in self.data])
 
 
-class ValueTransformationApplyList(TypeApplyList[ValueTransformationApply]):
-    """List of value transformations in write version."""
+class ValueTransformationApplyList(DomainModelApplyList[ValueTransformationApply]):
+    """List of value transformations in the writing version."""
 
-    _NODE = ValueTransformationApply
+    _INSTANCE = ValueTransformationApply
+
+
+def _create_value_transformation_filter(
+    view_id: dm.ViewId,
+    method: str | list[str] | None = None,
+    method_prefix: str | None = None,
+    external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if method and isinstance(method, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("method"), value=method))
+    if method and isinstance(method, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("method"), values=method))
+    if method_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("method"), value=method_prefix))
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

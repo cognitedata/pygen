@@ -1,25 +1,39 @@
 from __future__ import annotations
 
-from typing import Sequence, overload
+from collections.abc import Sequence
+from typing import overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from osdu_wells_pydantic_v1.client.data_classes import (
+    DomainModelApply,
+    ResourcesApplyResult,
     GeoContexts,
     GeoContextsApply,
+    GeoContextsFields,
     GeoContextsList,
     GeoContextsApplyList,
-    GeoContextsFields,
     GeoContextsTextFields,
-    DomainModelApply,
 )
-from osdu_wells_pydantic_v1.client.data_classes._geo_contexts import _GEOCONTEXTS_PROPERTIES_BY_FIELD
+from osdu_wells_pydantic_v1.client.data_classes._geo_contexts import (
+    _GEOCONTEXTS_PROPERTIES_BY_FIELD,
+    _create_geo_context_filter,
+)
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
+from .geo_contexts_query import GeoContextsQueryAPI
 
 
-class GeoContextsAPI(TypeAPI[GeoContexts, GeoContextsApply, GeoContextsList]):
+class GeoContextsAPI(NodeAPI[GeoContexts, GeoContextsApply, GeoContextsList]):
     def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
         view_id = view_by_write_class[GeoContextsApply]
         super().__init__(
@@ -28,13 +42,94 @@ class GeoContextsAPI(TypeAPI[GeoContexts, GeoContextsApply, GeoContextsList]):
             class_type=GeoContexts,
             class_apply_type=GeoContextsApply,
             class_list=GeoContextsList,
+            class_apply_list=GeoContextsApplyList,
+            view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self._view_by_write_class = view_by_write_class
+
+    def __call__(
+        self,
+        basin_id: str | list[str] | None = None,
+        basin_id_prefix: str | None = None,
+        field_id: str | list[str] | None = None,
+        field_id_prefix: str | None = None,
+        geo_political_entity_id: str | list[str] | None = None,
+        geo_political_entity_id_prefix: str | None = None,
+        geo_type_id: str | list[str] | None = None,
+        geo_type_id_prefix: str | None = None,
+        play_id: str | list[str] | None = None,
+        play_id_prefix: str | None = None,
+        prospect_id: str | list[str] | None = None,
+        prospect_id_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+        filter: dm.Filter | None = None,
+    ) -> GeoContextsQueryAPI[GeoContextsList]:
+        """Query starting at geo contexts.
+
+        Args:
+            basin_id: The basin id to filter on.
+            basin_id_prefix: The prefix of the basin id to filter on.
+            field_id: The field id to filter on.
+            field_id_prefix: The prefix of the field id to filter on.
+            geo_political_entity_id: The geo political entity id to filter on.
+            geo_political_entity_id_prefix: The prefix of the geo political entity id to filter on.
+            geo_type_id: The geo type id to filter on.
+            geo_type_id_prefix: The prefix of the geo type id to filter on.
+            play_id: The play id to filter on.
+            play_id_prefix: The prefix of the play id to filter on.
+            prospect_id: The prospect id to filter on.
+            prospect_id_prefix: The prefix of the prospect id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of geo contexts to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            A query API for geo contexts.
+
+        """
+        filter_ = _create_geo_context_filter(
+            self._view_id,
+            basin_id,
+            basin_id_prefix,
+            field_id,
+            field_id_prefix,
+            geo_political_entity_id,
+            geo_political_entity_id_prefix,
+            geo_type_id,
+            geo_type_id_prefix,
+            play_id,
+            play_id_prefix,
+            prospect_id,
+            prospect_id_prefix,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        builder = QueryBuilder(
+            GeoContextsList,
+            [
+                QueryStep(
+                    name="geo_context",
+                    expression=dm.query.NodeResultSetExpression(
+                        from_=None,
+                        filter=filter_,
+                    ),
+                    select=dm.query.Select(
+                        [dm.query.SourceSelector(self._view_id, list(_GEOCONTEXTS_PROPERTIES_BY_FIELD.values()))]
+                    ),
+                    result_cls=GeoContexts,
+                    max_retrieve_limit=limit,
+                )
+            ],
+        )
+        return GeoContextsQueryAPI(self._client, builder, self._view_by_write_class)
 
     def apply(
         self, geo_context: GeoContextsApply | Sequence[GeoContextsApply], replace: bool = False
-    ) -> dm.InstancesApplyResult:
+    ) -> ResourcesApplyResult:
         """Add or update (upsert) geo contexts.
 
         Args:
@@ -42,7 +137,7 @@ class GeoContextsAPI(TypeAPI[GeoContexts, GeoContextsApply, GeoContextsList]):
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes, edges, and time series.
 
         Examples:
 
@@ -55,20 +150,10 @@ class GeoContextsAPI(TypeAPI[GeoContexts, GeoContextsApply, GeoContextsList]):
                 >>> result = client.geo_contexts.apply(geo_context)
 
         """
-        if isinstance(geo_context, GeoContextsApply):
-            instances = geo_context.to_instances_apply(self._view_by_write_class)
-        else:
-            instances = GeoContextsApplyList(geo_context).to_instances_apply(self._view_by_write_class)
-        return self._client.data_modeling.instances.apply(
-            nodes=instances.nodes,
-            edges=instances.edges,
-            auto_create_start_nodes=True,
-            auto_create_end_nodes=True,
-            replace=replace,
-        )
+        return self._apply(geo_context, replace)
 
     def delete(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> dm.InstancesDeleteResult:
         """Delete one or more geo context.
 
@@ -87,24 +172,19 @@ class GeoContextsAPI(TypeAPI[GeoContexts, GeoContextsApply, GeoContextsList]):
                 >>> client = OSDUClient()
                 >>> client.geo_contexts.delete("my_geo_context")
         """
-        if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
-        else:
-            return self._client.data_modeling.instances.delete(
-                nodes=[(space, id) for id in external_id],
-            )
+        return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> GeoContexts:
+    def retrieve(self, external_id: str) -> GeoContexts | None:
         ...
 
     @overload
-    def retrieve(self, external_id: Sequence[str]) -> GeoContextsList:
+    def retrieve(self, external_id: SequenceNotStr[str]) -> GeoContextsList:
         ...
 
     def retrieve(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
-    ) -> GeoContexts | GeoContextsList:
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+    ) -> GeoContexts | GeoContextsList | None:
         """Retrieve one or more geo contexts by id(s).
 
         Args:
@@ -123,10 +203,7 @@ class GeoContextsAPI(TypeAPI[GeoContexts, GeoContextsApply, GeoContextsList]):
                 >>> geo_context = client.geo_contexts.retrieve("my_geo_context")
 
         """
-        if isinstance(external_id, str):
-            return self._retrieve((space, external_id))
-        else:
-            return self._retrieve([(space, ext_id) for ext_id in external_id])
+        return self._retrieve(external_id, space)
 
     def search(
         self,
@@ -183,7 +260,7 @@ class GeoContextsAPI(TypeAPI[GeoContexts, GeoContextsApply, GeoContextsList]):
                 >>> geo_contexts = client.geo_contexts.search('my_geo_context')
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_geo_context_filter(
             self._view_id,
             basin_id,
             basin_id_prefix,
@@ -328,7 +405,7 @@ class GeoContextsAPI(TypeAPI[GeoContexts, GeoContextsApply, GeoContextsList]):
 
         """
 
-        filter_ = _create_filter(
+        filter_ = _create_geo_context_filter(
             self._view_id,
             basin_id,
             basin_id_prefix,
@@ -409,7 +486,7 @@ class GeoContextsAPI(TypeAPI[GeoContexts, GeoContextsApply, GeoContextsList]):
             Bucketed histogram results.
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_geo_context_filter(
             self._view_id,
             basin_id,
             basin_id_prefix,
@@ -489,7 +566,7 @@ class GeoContextsAPI(TypeAPI[GeoContexts, GeoContextsApply, GeoContextsList]):
                 >>> geo_contexts = client.geo_contexts.list(limit=5)
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_geo_context_filter(
             self._view_id,
             basin_id,
             basin_id_prefix,
@@ -507,75 +584,4 @@ class GeoContextsAPI(TypeAPI[GeoContexts, GeoContextsApply, GeoContextsList]):
             space,
             filter,
         )
-
         return self._list(limit=limit, filter=filter_)
-
-
-def _create_filter(
-    view_id: dm.ViewId,
-    basin_id: str | list[str] | None = None,
-    basin_id_prefix: str | None = None,
-    field_id: str | list[str] | None = None,
-    field_id_prefix: str | None = None,
-    geo_political_entity_id: str | list[str] | None = None,
-    geo_political_entity_id_prefix: str | None = None,
-    geo_type_id: str | list[str] | None = None,
-    geo_type_id_prefix: str | None = None,
-    play_id: str | list[str] | None = None,
-    play_id_prefix: str | None = None,
-    prospect_id: str | list[str] | None = None,
-    prospect_id_prefix: str | None = None,
-    external_id_prefix: str | None = None,
-    space: str | list[str] | None = None,
-    filter: dm.Filter | None = None,
-) -> dm.Filter | None:
-    filters = []
-    if basin_id and isinstance(basin_id, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("BasinID"), value=basin_id))
-    if basin_id and isinstance(basin_id, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("BasinID"), values=basin_id))
-    if basin_id_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("BasinID"), value=basin_id_prefix))
-    if field_id and isinstance(field_id, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("FieldID"), value=field_id))
-    if field_id and isinstance(field_id, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("FieldID"), values=field_id))
-    if field_id_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("FieldID"), value=field_id_prefix))
-    if geo_political_entity_id and isinstance(geo_political_entity_id, str):
-        filters.append(
-            dm.filters.Equals(view_id.as_property_ref("GeoPoliticalEntityID"), value=geo_political_entity_id)
-        )
-    if geo_political_entity_id and isinstance(geo_political_entity_id, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("GeoPoliticalEntityID"), values=geo_political_entity_id))
-    if geo_political_entity_id_prefix:
-        filters.append(
-            dm.filters.Prefix(view_id.as_property_ref("GeoPoliticalEntityID"), value=geo_political_entity_id_prefix)
-        )
-    if geo_type_id and isinstance(geo_type_id, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("GeoTypeID"), value=geo_type_id))
-    if geo_type_id and isinstance(geo_type_id, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("GeoTypeID"), values=geo_type_id))
-    if geo_type_id_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("GeoTypeID"), value=geo_type_id_prefix))
-    if play_id and isinstance(play_id, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("PlayID"), value=play_id))
-    if play_id and isinstance(play_id, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("PlayID"), values=play_id))
-    if play_id_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("PlayID"), value=play_id_prefix))
-    if prospect_id and isinstance(prospect_id, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("ProspectID"), value=prospect_id))
-    if prospect_id and isinstance(prospect_id, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("ProspectID"), values=prospect_id))
-    if prospect_id_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("ProspectID"), value=prospect_id_prefix))
-    if external_id_prefix:
-        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
-        filters.append(dm.filters.Equals(["node", "space"], value=space))
-    if space and isinstance(space, list):
-        filters.append(dm.filters.In(["node", "space"], values=space))
-    if filter:
-        filters.append(filter)
-    return dm.filters.And(*filters) if filters else None

@@ -1,4 +1,11 @@
-from ._core import DomainModel, DomainModelApply
+from ._core import (
+    DomainModel,
+    DomainModelApply,
+    DomainModelList,
+    DomainRelationApply,
+    ResourcesApply,
+    ResourcesApplyResult,
+)
 from ._acceptable_usage import (
     AcceptableUsage,
     AcceptableUsageApply,
@@ -234,6 +241,104 @@ from ._wgs_84_coordinates import (
     WgsCoordinatesTextFields,
 )
 
+AsIngestedCoordinates.update_forward_refs(
+    Features=Features,
+)
+Features.update_forward_refs(
+    Geometry=Geometry,
+)
+GeographicBottomHoleLocation.update_forward_refs(
+    AsIngestedCoordinates=AsIngestedCoordinates,
+    WgsCoordinates=WgsCoordinates,
+)
+ProjectedBottomHoleLocation.update_forward_refs(
+    AsIngestedCoordinates=AsIngestedCoordinates,
+    WgsCoordinates=WgsCoordinates,
+)
+SpatialArea.update_forward_refs(
+    AsIngestedCoordinates=AsIngestedCoordinates,
+    WgsCoordinates=WgsCoordinates,
+)
+SpatialLocation.update_forward_refs(
+    AsIngestedCoordinates=AsIngestedCoordinates,
+    WgsCoordinates=WgsCoordinates,
+)
+SpatialPoint.update_forward_refs(
+    AsIngestedCoordinates=AsIngestedCoordinates,
+    WgsCoordinates=WgsCoordinates,
+)
+TechnicalAssurances.update_forward_refs(
+    AcceptableUsage=AcceptableUsage,
+    Reviewers=Reviewers,
+    UnacceptableUsage=UnacceptableUsage,
+)
+Well.update_forward_refs(
+    Acl=Acl,
+    Ancestry=Ancestry,
+    Legal=Legal,
+    Meta=Meta,
+    Tags=Tags,
+    WellData=WellData,
+)
+WellData.update_forward_refs(
+    FacilityEvents=FacilityEvents,
+    FacilityOperators=FacilityOperators,
+    FacilitySpecifications=FacilitySpecifications,
+    FacilityStates=FacilityStates,
+    GeoContexts=GeoContexts,
+    HistoricalInterests=HistoricalInterests,
+    NameAliases=NameAliases,
+    SpatialLocation=SpatialLocation,
+    TechnicalAssurances=TechnicalAssurances,
+    VerticalMeasurements=VerticalMeasurements,
+)
+Wellbore.update_forward_refs(
+    Acl=Acl,
+    Ancestry=Ancestry,
+    Legal=Legal,
+    Meta=Meta,
+    Tags=Tags,
+    WellboreData=WellboreData,
+)
+WellboreData.update_forward_refs(
+    DrillingReasons=DrillingReasons,
+    FacilityEvents=FacilityEvents,
+    FacilityOperators=FacilityOperators,
+    FacilitySpecifications=FacilitySpecifications,
+    FacilityStates=FacilityStates,
+    GeoContexts=GeoContexts,
+    GeographicBottomHoleLocation=GeographicBottomHoleLocation,
+    HistoricalInterests=HistoricalInterests,
+    NameAliases=NameAliases,
+    ProjectedBottomHoleLocation=ProjectedBottomHoleLocation,
+    SpatialLocation=SpatialLocation,
+    TechnicalAssurances=TechnicalAssurances,
+    VerticalMeasurements=VerticalMeasurements,
+    WellboreCosts=WellboreCosts,
+)
+WellboreTrajectory.update_forward_refs(
+    Acl=Acl,
+    Ancestry=Ancestry,
+    Legal=Legal,
+    Meta=Meta,
+    Tags=Tags,
+    WellboreTrajectoryData=WellboreTrajectoryData,
+)
+WellboreTrajectoryData.update_forward_refs(
+    Artefacts=Artefacts,
+    AvailableTrajectoryStationProperties=AvailableTrajectoryStationProperties,
+    GeoContexts=GeoContexts,
+    LineageAssertions=LineageAssertions,
+    NameAliases=NameAliases,
+    SpatialArea=SpatialArea,
+    SpatialPoint=SpatialPoint,
+    TechnicalAssurances=TechnicalAssurances,
+    VerticalMeasurement=VerticalMeasurement,
+)
+WgsCoordinates.update_forward_refs(
+    Features=Features,
+)
+
 AsIngestedCoordinatesApply.update_forward_refs(
     FeaturesApply=FeaturesApply,
 )
@@ -333,8 +438,12 @@ WgsCoordinatesApply.update_forward_refs(
 )
 
 __all__ = [
+    "ResourcesApply",
     "DomainModel",
     "DomainModelApply",
+    "DomainModelList",
+    "DomainRelationApply",
+    "ResourcesApplyResult",
     "AcceptableUsage",
     "AcceptableUsageApply",
     "AcceptableUsageList",

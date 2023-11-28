@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
+import itertools
+from collections.abc import Iterator, Sequence
 from pathlib import Path
-from typing import Callable, Literal
+from typing import Callable, Literal, cast
 
 from cognite.client import data_modeling as dm
 from cognite.client._version import __version__ as cognite_sdk_version
@@ -14,7 +15,15 @@ from cognite.pygen.config import PygenConfig
 from cognite.pygen.utils.helper import get_pydantic_version
 
 from . import validation
-from .data_classes import APIClass, DataClass, ListMethod, MultiAPIClass, ViewSpaceExternalId
+from .data_classes import (
+    APIClass,
+    DataClass,
+    EdgeDataClass,
+    EdgeWithPropertyDataClass,
+    MultiAPIClass,
+    NodeDataClass,
+    ViewSpaceExternalId,
+)
 from .logic import get_unique_views
 
 
@@ -171,7 +180,9 @@ class MultiAPIGenerator:
             api.view_identifier: api.data_class for api in self.sub_apis
         }
         for api, view in zip(self.sub_apis, views):
-            api.data_class.update_fields(view.properties, data_class_by_view_id, config.naming.field)
+            if isinstance(api.data_class, EdgeWithPropertyDataClass):
+                api.data_class.update_nodes(data_class_by_view_id, views, config.naming.field)
+            api.data_class.update_fields(view.properties, data_class_by_view_id, config)
 
         validation.validate_data_classes_unique_name([api.data_class for api in self.sub_apis])
         validation.validate_api_classes_unique_names([api.api_class for api in self.sub_apis])
@@ -198,8 +209,16 @@ class MultiAPIGenerator:
         sdk = {(api_dir / "__init__.py"): ""}
         for api in self.sub_apis:
             file_name = api.api_class.file_name
-            sdk[data_classes_dir / f"_{file_name}.py"] = api.generate_data_class_file()
+            sdk[data_classes_dir / f"_{file_name}.py"] = api.generate_data_class_file(self.pydantic_version == "v2")
             sdk[api_dir / f"{file_name}.py"] = api.generate_api_file(self.top_level_package, self.client_name)
+            sdk[api_dir / f"{api.data_class.query_file_name}.py"] = api.generate_api_query_file(
+                self.top_level_package, self.client_name
+            )
+            for file_name, file_content in itertools.chain(
+                api.generate_edge_api_files(self.top_level_package, self.client_name),
+                api.generate_timeseries_api_files(self.top_level_package, self.client_name),
+            ):
+                sdk[api_dir / f"{file_name}.py"] = file_content
 
         sdk[client_dir / "__init__.py"] = self.generate_client_init_file()
         sdk[data_classes_dir / "__init__.py"] = self.generate_data_classes_init_file()
@@ -225,17 +244,30 @@ class MultiAPIGenerator:
         data_class_init = self.env.get_template("data_classes_init.py.jinja")
 
         data_classes_with_dependencies = sorted(
-            (api.data_class for api in self.sub_apis if api.data_class.has_edges), key=lambda d: d.read_name
+            (
+                api.data_class
+                for api in self.sub_apis
+                if api.data_class.has_edges or api.data_class.has_edge_with_property
+            ),
+            key=lambda d: d.read_name,
         )
-        dependencies_by_data_class_write_name = {
-            data_class.write_name: sorted(data_class.dependencies, key=lambda d: d.read_name)
-            for data_class in data_classes_with_dependencies
-        }
+        dependencies_by_data_class_read_name: dict[str, list[DataClass]] = {}
+        dependencies_by_data_class_write_name: dict[str, list[DataClass]] = {}
+        for data_class in data_classes_with_dependencies:
+            dependencies = sorted(data_class.dependencies, key=lambda d: d.read_name)
+            dependencies_by_data_class_read_name[data_class.read_name] = dependencies
+            dependencies_by_data_class_write_name[data_class.write_name] = dependencies
 
         return (
             data_class_init.render(
                 classes=sorted((api.data_class for api in self.sub_apis), key=lambda d: d.read_name),
+                # Pydantic v1 needs read and write name separated, while v2 does not.
+                dependencies_by_data_class_read_name=dependencies_by_data_class_read_name,
                 dependencies_by_data_class_write_name=dependencies_by_data_class_write_name,
+                # Pydantic v2 we just need a list of the names
+                dependencies_by_data_class_name=sorted(
+                    itertools.chain(dependencies_by_data_class_read_name, dependencies_by_data_class_write_name)
+                ),
                 top_level_package=self.top_level_package,
                 import_file={
                     "v2": "data_classes_init_import.py.jinja",
@@ -258,10 +290,24 @@ class APIGenerator:
         # List method cannot be generated here, as we need all data class fields to bo updated first.
         self._config = config
 
-    def generate_data_class_file(self) -> str:
-        type_data = self._env.get_template("data_class.py.jinja")
+    def generate_data_class_file(self, is_pydantic_v2: bool) -> str:
+        if isinstance(self.data_class, NodeDataClass):
+            type_data = self._env.get_template("data_class_node.py.jinja")
+        elif isinstance(self.data_class, EdgeWithPropertyDataClass):
+            type_data = self._env.get_template("data_class_edge.py.jinja")
+        else:
+            raise ValueError(f"Unknown data class {type(self.data_class)}")
 
-        return type_data.render(data_class=self.data_class, space=self.view_identifier.space) + "\n"
+        return (
+            type_data.render(
+                data_class=self.data_class,
+                space=self.view_identifier.space,
+                list_method=self.data_class.list_method,
+                instance_space=self.view_identifier.space,
+                is_pydantic_v2=is_pydantic_v2,
+            )
+            + "\n"
+        )
 
     def generate_api_file(self, top_level_package: str, client_name: str) -> str:
         type_api = self._env.get_template("api_class.py.jinja")
@@ -272,7 +318,65 @@ class APIGenerator:
                 client_name=client_name,
                 api_class=self.api_class,
                 data_class=self.data_class,
-                list_method=ListMethod.from_fields(self.data_class.fields, self._config.filtering),
+                list_method=self.data_class.list_method,
             )
             + "\n"
         )
+
+    def generate_api_query_file(self, top_level_package: str, client_name: str) -> str:
+        query_api = self._env.get_template("api_class_query.py.jinja")
+
+        return (
+            query_api.render(
+                top_level_package=top_level_package,
+                client_name=client_name,
+                api_class=self.api_class,
+                data_class=self.data_class,
+                list_method=self.data_class.list_method,
+                sorted=sorted,
+            )
+            + "\n"
+        )
+
+    def generate_edge_api_files(self, top_level_package: str, client_name: str) -> Iterator[tuple[str, str]]:
+        edge_api = self._env.get_template("api_class_edge.py.jinja")
+        for field in self.data_class.one_to_many_edges:
+            if isinstance(field.data_class, NodeDataClass):
+                edge_class = EdgeDataClass.from_field_data_classes(
+                    field,
+                    cast(NodeDataClass, self.data_class),
+                    self._config,
+                )
+                list_method = edge_class.list_method
+            elif isinstance(field.data_class, EdgeWithPropertyDataClass):
+                edge_class = field.data_class
+                list_method = field.data_class.list_method
+            else:
+                raise ValueError(f"Unknown data class {type(self.data_class)}")
+            yield field.edge_api_file_name, (
+                edge_api.render(
+                    top_level_package=top_level_package,
+                    client_name=client_name,
+                    field=field,
+                    api_class=self.api_class,
+                    data_class=edge_class,
+                    list_method=list_method,
+                    instance_space=self.view_identifier.space,
+                )
+                + "\n"
+            )
+
+    def generate_timeseries_api_files(self, top_level_package: str, client_name: str) -> Iterator[tuple[str, str]]:
+        timeseries_api = self._env.get_template("api_class_timeseries.py.jinja")
+        for timeseries in self.data_class.single_timeseries_fields:
+            yield timeseries.edge_api_file_name, (
+                timeseries_api.render(
+                    top_level_package=top_level_package,
+                    client_name=client_name,
+                    timeseries=timeseries,
+                    api_class=self.api_class,
+                    data_class=self.data_class,
+                    list_method=self.data_class.list_method,
+                )
+                + "\n"
+            )

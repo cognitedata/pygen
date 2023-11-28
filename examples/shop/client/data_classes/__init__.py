@@ -1,4 +1,11 @@
-from ._core import DomainModel, DomainModelApply
+from ._core import (
+    DomainModel,
+    DomainModelApply,
+    DomainModelList,
+    DomainRelationApply,
+    ResourcesApply,
+    ResourcesApplyResult,
+)
 from ._case import Case, CaseApply, CaseApplyList, CaseFields, CaseList, CaseTextFields
 from ._command_config import (
     CommandConfig,
@@ -9,11 +16,16 @@ from ._command_config import (
     CommandConfigTextFields,
 )
 
+Case.model_rebuild()
 CaseApply.model_rebuild()
 
 __all__ = [
+    "ResourcesApply",
     "DomainModel",
     "DomainModelApply",
+    "DomainModelList",
+    "DomainRelationApply",
+    "ResourcesApplyResult",
     "Case",
     "CaseApply",
     "CaseList",

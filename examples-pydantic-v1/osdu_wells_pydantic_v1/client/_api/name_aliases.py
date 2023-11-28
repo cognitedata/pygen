@@ -1,25 +1,39 @@
 from __future__ import annotations
 
-from typing import Sequence, overload
+from collections.abc import Sequence
+from typing import overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from osdu_wells_pydantic_v1.client.data_classes import (
+    DomainModelApply,
+    ResourcesApplyResult,
     NameAliases,
     NameAliasesApply,
+    NameAliasesFields,
     NameAliasesList,
     NameAliasesApplyList,
-    NameAliasesFields,
     NameAliasesTextFields,
-    DomainModelApply,
 )
-from osdu_wells_pydantic_v1.client.data_classes._name_aliases import _NAMEALIASES_PROPERTIES_BY_FIELD
+from osdu_wells_pydantic_v1.client.data_classes._name_aliases import (
+    _NAMEALIASES_PROPERTIES_BY_FIELD,
+    _create_name_alias_filter,
+)
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
+from .name_aliases_query import NameAliasesQueryAPI
 
 
-class NameAliasesAPI(TypeAPI[NameAliases, NameAliasesApply, NameAliasesList]):
+class NameAliasesAPI(NodeAPI[NameAliases, NameAliasesApply, NameAliasesList]):
     def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
         view_id = view_by_write_class[NameAliasesApply]
         super().__init__(
@@ -28,13 +42,88 @@ class NameAliasesAPI(TypeAPI[NameAliases, NameAliasesApply, NameAliasesList]):
             class_type=NameAliases,
             class_apply_type=NameAliasesApply,
             class_list=NameAliasesList,
+            class_apply_list=NameAliasesApplyList,
+            view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self._view_by_write_class = view_by_write_class
+
+    def __call__(
+        self,
+        alias_name: str | list[str] | None = None,
+        alias_name_prefix: str | None = None,
+        alias_name_type_id: str | list[str] | None = None,
+        alias_name_type_id_prefix: str | None = None,
+        definition_organisation_id: str | list[str] | None = None,
+        definition_organisation_id_prefix: str | None = None,
+        effective_date_time: str | list[str] | None = None,
+        effective_date_time_prefix: str | None = None,
+        termination_date_time: str | list[str] | None = None,
+        termination_date_time_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+        filter: dm.Filter | None = None,
+    ) -> NameAliasesQueryAPI[NameAliasesList]:
+        """Query starting at name aliases.
+
+        Args:
+            alias_name: The alias name to filter on.
+            alias_name_prefix: The prefix of the alias name to filter on.
+            alias_name_type_id: The alias name type id to filter on.
+            alias_name_type_id_prefix: The prefix of the alias name type id to filter on.
+            definition_organisation_id: The definition organisation id to filter on.
+            definition_organisation_id_prefix: The prefix of the definition organisation id to filter on.
+            effective_date_time: The effective date time to filter on.
+            effective_date_time_prefix: The prefix of the effective date time to filter on.
+            termination_date_time: The termination date time to filter on.
+            termination_date_time_prefix: The prefix of the termination date time to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of name aliases to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            A query API for name aliases.
+
+        """
+        filter_ = _create_name_alias_filter(
+            self._view_id,
+            alias_name,
+            alias_name_prefix,
+            alias_name_type_id,
+            alias_name_type_id_prefix,
+            definition_organisation_id,
+            definition_organisation_id_prefix,
+            effective_date_time,
+            effective_date_time_prefix,
+            termination_date_time,
+            termination_date_time_prefix,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        builder = QueryBuilder(
+            NameAliasesList,
+            [
+                QueryStep(
+                    name="name_alias",
+                    expression=dm.query.NodeResultSetExpression(
+                        from_=None,
+                        filter=filter_,
+                    ),
+                    select=dm.query.Select(
+                        [dm.query.SourceSelector(self._view_id, list(_NAMEALIASES_PROPERTIES_BY_FIELD.values()))]
+                    ),
+                    result_cls=NameAliases,
+                    max_retrieve_limit=limit,
+                )
+            ],
+        )
+        return NameAliasesQueryAPI(self._client, builder, self._view_by_write_class)
 
     def apply(
         self, name_alias: NameAliasesApply | Sequence[NameAliasesApply], replace: bool = False
-    ) -> dm.InstancesApplyResult:
+    ) -> ResourcesApplyResult:
         """Add or update (upsert) name aliases.
 
         Args:
@@ -42,7 +131,7 @@ class NameAliasesAPI(TypeAPI[NameAliases, NameAliasesApply, NameAliasesList]):
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes, edges, and time series.
 
         Examples:
 
@@ -55,20 +144,10 @@ class NameAliasesAPI(TypeAPI[NameAliases, NameAliasesApply, NameAliasesList]):
                 >>> result = client.name_aliases.apply(name_alias)
 
         """
-        if isinstance(name_alias, NameAliasesApply):
-            instances = name_alias.to_instances_apply(self._view_by_write_class)
-        else:
-            instances = NameAliasesApplyList(name_alias).to_instances_apply(self._view_by_write_class)
-        return self._client.data_modeling.instances.apply(
-            nodes=instances.nodes,
-            edges=instances.edges,
-            auto_create_start_nodes=True,
-            auto_create_end_nodes=True,
-            replace=replace,
-        )
+        return self._apply(name_alias, replace)
 
     def delete(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> dm.InstancesDeleteResult:
         """Delete one or more name alias.
 
@@ -87,24 +166,19 @@ class NameAliasesAPI(TypeAPI[NameAliases, NameAliasesApply, NameAliasesList]):
                 >>> client = OSDUClient()
                 >>> client.name_aliases.delete("my_name_alias")
         """
-        if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
-        else:
-            return self._client.data_modeling.instances.delete(
-                nodes=[(space, id) for id in external_id],
-            )
+        return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> NameAliases:
+    def retrieve(self, external_id: str) -> NameAliases | None:
         ...
 
     @overload
-    def retrieve(self, external_id: Sequence[str]) -> NameAliasesList:
+    def retrieve(self, external_id: SequenceNotStr[str]) -> NameAliasesList:
         ...
 
     def retrieve(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
-    ) -> NameAliases | NameAliasesList:
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+    ) -> NameAliases | NameAliasesList | None:
         """Retrieve one or more name aliases by id(s).
 
         Args:
@@ -123,10 +197,7 @@ class NameAliasesAPI(TypeAPI[NameAliases, NameAliasesApply, NameAliasesList]):
                 >>> name_alias = client.name_aliases.retrieve("my_name_alias")
 
         """
-        if isinstance(external_id, str):
-            return self._retrieve((space, external_id))
-        else:
-            return self._retrieve([(space, ext_id) for ext_id in external_id])
+        return self._retrieve(external_id, space)
 
     def search(
         self,
@@ -179,7 +250,7 @@ class NameAliasesAPI(TypeAPI[NameAliases, NameAliasesApply, NameAliasesList]):
                 >>> name_aliases = client.name_aliases.search('my_name_alias')
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_name_alias_filter(
             self._view_id,
             alias_name,
             alias_name_prefix,
@@ -314,7 +385,7 @@ class NameAliasesAPI(TypeAPI[NameAliases, NameAliasesApply, NameAliasesList]):
 
         """
 
-        filter_ = _create_filter(
+        filter_ = _create_name_alias_filter(
             self._view_id,
             alias_name,
             alias_name_prefix,
@@ -389,7 +460,7 @@ class NameAliasesAPI(TypeAPI[NameAliases, NameAliasesApply, NameAliasesList]):
             Bucketed histogram results.
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_name_alias_filter(
             self._view_id,
             alias_name,
             alias_name_prefix,
@@ -463,7 +534,7 @@ class NameAliasesAPI(TypeAPI[NameAliases, NameAliasesApply, NameAliasesList]):
                 >>> name_aliases = client.name_aliases.list(limit=5)
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_name_alias_filter(
             self._view_id,
             alias_name,
             alias_name_prefix,
@@ -479,75 +550,4 @@ class NameAliasesAPI(TypeAPI[NameAliases, NameAliasesApply, NameAliasesList]):
             space,
             filter,
         )
-
         return self._list(limit=limit, filter=filter_)
-
-
-def _create_filter(
-    view_id: dm.ViewId,
-    alias_name: str | list[str] | None = None,
-    alias_name_prefix: str | None = None,
-    alias_name_type_id: str | list[str] | None = None,
-    alias_name_type_id_prefix: str | None = None,
-    definition_organisation_id: str | list[str] | None = None,
-    definition_organisation_id_prefix: str | None = None,
-    effective_date_time: str | list[str] | None = None,
-    effective_date_time_prefix: str | None = None,
-    termination_date_time: str | list[str] | None = None,
-    termination_date_time_prefix: str | None = None,
-    external_id_prefix: str | None = None,
-    space: str | list[str] | None = None,
-    filter: dm.Filter | None = None,
-) -> dm.Filter | None:
-    filters = []
-    if alias_name and isinstance(alias_name, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("AliasName"), value=alias_name))
-    if alias_name and isinstance(alias_name, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("AliasName"), values=alias_name))
-    if alias_name_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("AliasName"), value=alias_name_prefix))
-    if alias_name_type_id and isinstance(alias_name_type_id, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("AliasNameTypeID"), value=alias_name_type_id))
-    if alias_name_type_id and isinstance(alias_name_type_id, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("AliasNameTypeID"), values=alias_name_type_id))
-    if alias_name_type_id_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("AliasNameTypeID"), value=alias_name_type_id_prefix))
-    if definition_organisation_id and isinstance(definition_organisation_id, str):
-        filters.append(
-            dm.filters.Equals(view_id.as_property_ref("DefinitionOrganisationID"), value=definition_organisation_id)
-        )
-    if definition_organisation_id and isinstance(definition_organisation_id, list):
-        filters.append(
-            dm.filters.In(view_id.as_property_ref("DefinitionOrganisationID"), values=definition_organisation_id)
-        )
-    if definition_organisation_id_prefix:
-        filters.append(
-            dm.filters.Prefix(
-                view_id.as_property_ref("DefinitionOrganisationID"), value=definition_organisation_id_prefix
-            )
-        )
-    if effective_date_time and isinstance(effective_date_time, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("EffectiveDateTime"), value=effective_date_time))
-    if effective_date_time and isinstance(effective_date_time, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("EffectiveDateTime"), values=effective_date_time))
-    if effective_date_time_prefix:
-        filters.append(
-            dm.filters.Prefix(view_id.as_property_ref("EffectiveDateTime"), value=effective_date_time_prefix)
-        )
-    if termination_date_time and isinstance(termination_date_time, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("TerminationDateTime"), value=termination_date_time))
-    if termination_date_time and isinstance(termination_date_time, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("TerminationDateTime"), values=termination_date_time))
-    if termination_date_time_prefix:
-        filters.append(
-            dm.filters.Prefix(view_id.as_property_ref("TerminationDateTime"), value=termination_date_time_prefix)
-        )
-    if external_id_prefix:
-        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
-        filters.append(dm.filters.Equals(["node", "space"], value=space))
-    if space and isinstance(space, list):
-        filters.append(dm.filters.In(["node", "space"], values=space))
-    if filter:
-        filters.append(filter)
-    return dm.filters.And(*filters) if filters else None

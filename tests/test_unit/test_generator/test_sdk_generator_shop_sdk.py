@@ -6,7 +6,7 @@ from cognite.client import data_modeling as dm
 
 from cognite.pygen._core.generators import APIGenerator, MultiAPIGenerator, SDKGenerator
 from cognite.pygen._generator import CodeFormatter, write_sdk_to_disk
-from tests.constants import EXAMPLES_DIR, IS_PYDANTIC_V1, ShopSDKFiles
+from tests.constants import EXAMPLES_DIR, IS_PYDANTIC_V1, IS_PYDANTIC_V2, ShopSDKFiles
 
 
 @pytest.fixture
@@ -48,7 +48,7 @@ def test_create_view_data_classes_case(
     assert api_generator is not None, "Could not find API generator for case view"
 
     # Act
-    actual = api_generator.generate_data_class_file()
+    actual = api_generator.generate_data_class_file(IS_PYDANTIC_V2)
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -62,7 +62,7 @@ def test_generate_data_class_file_command_configs(
     expected = ShopSDKFiles.command_configs_data.read_text()
 
     # Act
-    actual = command_api_generator.generate_data_class_file()
+    actual = command_api_generator.generate_data_class_file(IS_PYDANTIC_V2)
     actual = code_formatter.format_code(actual)
 
     # Assert

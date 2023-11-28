@@ -1,16 +1,24 @@
 from __future__ import annotations
 
-from typing import Literal, TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
+from ._core import (
+    DomainModel,
+    DomainModelApply,
+    DomainModelApplyList,
+    DomainModelList,
+    DomainRelationApply,
+    ResourcesApply,
+)
 
 if TYPE_CHECKING:
-    from ._bid import BidApply
-    from ._date_transformation_pair import DateTransformationPairApply
-    from ._value_transformation import ValueTransformationApply
+    from ._bid import Bid, BidApply
+    from ._date_transformation_pair import DateTransformationPair, DateTransformationPairApply
+    from ._value_transformation import ValueTransformation, ValueTransformationApply
+
 
 __all__ = [
     "PygenProcess",
@@ -31,7 +39,7 @@ _PYGENPROCESS_PROPERTIES_BY_FIELD = {
 
 
 class PygenProcess(DomainModel):
-    """This represent a read version of pygen proces.
+    """This represents the reading version of pygen proces.
 
     It is used to when data is retrieved from CDF.
 
@@ -49,25 +57,31 @@ class PygenProcess(DomainModel):
     """
 
     space: str = "market"
-    bid: Optional[str] = None
-    date_transformations: Optional[str] = Field(None, alias="dateTransformations")
+    bid: Union[Bid, str, None] = Field(None, repr=False)
+    date_transformations: Union[DateTransformationPair, str, None] = Field(
+        None, repr=False, alias="dateTransformations"
+    )
     name: Optional[str] = None
-    transformation: Optional[str] = None
+    transformation: Union[ValueTransformation, str, None] = Field(None, repr=False)
 
     def as_apply(self) -> PygenProcessApply:
-        """Convert this read version of pygen proces to a write version."""
+        """Convert this read version of pygen proces to the writing version."""
         return PygenProcessApply(
             space=self.space,
             external_id=self.external_id,
-            bid=self.bid,
-            date_transformations=self.date_transformations,
+            bid=self.bid.as_apply() if isinstance(self.bid, DomainModel) else self.bid,
+            date_transformations=self.date_transformations.as_apply()
+            if isinstance(self.date_transformations, DomainModel)
+            else self.date_transformations,
             name=self.name,
-            transformation=self.transformation,
+            transformation=self.transformation.as_apply()
+            if isinstance(self.transformation, DomainModel)
+            else self.transformation,
         )
 
 
 class PygenProcessApply(DomainModelApply):
-    """This represent a write version of pygen proces.
+    """This represents the writing version of pygen proces.
 
     It is used to when data is sent to CDF.
 
@@ -78,7 +92,7 @@ class PygenProcessApply(DomainModelApply):
         date_transformations: The date transformation field.
         name: The name field.
         transformation: The transformation field.
-        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+        existing_version: Fail the ingestion request if the pygen proces version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
@@ -93,11 +107,17 @@ class PygenProcessApply(DomainModelApply):
     transformation: Union[ValueTransformationApply, str, None] = Field(None, repr=False)
 
     def _to_instances_apply(
-        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
-    ) -> dm.InstancesApply:
-        if self.external_id in cache:
-            return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
-        write_view = view_by_write_class and view_by_write_class.get(type(self))
+        self,
+        cache: set[tuple[str, str]],
+        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+    ) -> ResourcesApply:
+        resources = ResourcesApply()
+        if self.as_tuple_id() in cache:
+            return resources
+
+        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
+            "market", "PygenProcess", "477b68a858c7a8"
+        )
 
         properties = {}
         if self.bid is not None:
@@ -121,53 +141,148 @@ class PygenProcessApply(DomainModelApply):
                 if isinstance(self.transformation, str)
                 else self.transformation.external_id,
             }
+
         if properties:
-            source = dm.NodeOrEdgeData(
-                source=write_view or dm.ViewId("market", "PygenProcess", "477b68a858c7a8"),
-                properties=properties,
-            )
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=[source],
+                sources=[
+                    dm.NodeOrEdgeData(
+                        source=write_view,
+                        properties=properties,
+                    )
+                ],
             )
-            nodes = [this_node]
-        else:
-            nodes = []
-
-        edges = []
-        cache.add(self.external_id)
+            resources.nodes.append(this_node)
+            cache.add(self.as_tuple_id())
 
         if isinstance(self.bid, DomainModelApply):
-            instances = self.bid._to_instances_apply(cache, view_by_write_class)
-            nodes.extend(instances.nodes)
-            edges.extend(instances.edges)
+            other_resources = self.bid._to_instances_apply(cache, view_by_write_class)
+            resources.extend(other_resources)
 
         if isinstance(self.date_transformations, DomainModelApply):
-            instances = self.date_transformations._to_instances_apply(cache, view_by_write_class)
-            nodes.extend(instances.nodes)
-            edges.extend(instances.edges)
+            other_resources = self.date_transformations._to_instances_apply(cache, view_by_write_class)
+            resources.extend(other_resources)
 
         if isinstance(self.transformation, DomainModelApply):
-            instances = self.transformation._to_instances_apply(cache, view_by_write_class)
-            nodes.extend(instances.nodes)
-            edges.extend(instances.edges)
+            other_resources = self.transformation._to_instances_apply(cache, view_by_write_class)
+            resources.extend(other_resources)
 
-        return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
+        return resources
 
 
-class PygenProcessList(TypeList[PygenProcess]):
-    """List of pygen process in read version."""
+class PygenProcessList(DomainModelList[PygenProcess]):
+    """List of pygen process in the read version."""
 
-    _NODE = PygenProcess
+    _INSTANCE = PygenProcess
 
     def as_apply(self) -> PygenProcessApplyList:
-        """Convert this read version of pygen proces to a write version."""
+        """Convert these read versions of pygen proces to the writing versions."""
         return PygenProcessApplyList([node.as_apply() for node in self.data])
 
 
-class PygenProcessApplyList(TypeApplyList[PygenProcessApply]):
-    """List of pygen process in write version."""
+class PygenProcessApplyList(DomainModelApplyList[PygenProcessApply]):
+    """List of pygen process in the writing version."""
 
-    _NODE = PygenProcessApply
+    _INSTANCE = PygenProcessApply
+
+
+def _create_pygen_proces_filter(
+    view_id: dm.ViewId,
+    bid: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+    date_transformations: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+    name: str | list[str] | None = None,
+    name_prefix: str | None = None,
+    transformation: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+    external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if bid and isinstance(bid, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("bid"), value={"space": "market", "externalId": bid}))
+    if bid and isinstance(bid, tuple):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("bid"), value={"space": bid[0], "externalId": bid[1]}))
+    if bid and isinstance(bid, list) and isinstance(bid[0], str):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("bid"), values=[{"space": "market", "externalId": item} for item in bid]
+            )
+        )
+    if bid and isinstance(bid, list) and isinstance(bid[0], tuple):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("bid"), values=[{"space": item[0], "externalId": item[1]} for item in bid]
+            )
+        )
+    if date_transformations and isinstance(date_transformations, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("dateTransformations"),
+                value={"space": "market", "externalId": date_transformations},
+            )
+        )
+    if date_transformations and isinstance(date_transformations, tuple):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("dateTransformations"),
+                value={"space": date_transformations[0], "externalId": date_transformations[1]},
+            )
+        )
+    if date_transformations and isinstance(date_transformations, list) and isinstance(date_transformations[0], str):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("dateTransformations"),
+                values=[{"space": "market", "externalId": item} for item in date_transformations],
+            )
+        )
+    if date_transformations and isinstance(date_transformations, list) and isinstance(date_transformations[0], tuple):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("dateTransformations"),
+                values=[{"space": item[0], "externalId": item[1]} for item in date_transformations],
+            )
+        )
+    if name and isinstance(name, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
+    if name and isinstance(name, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("name"), values=name))
+    if name_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
+    if transformation and isinstance(transformation, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("transformation"), value={"space": "market", "externalId": transformation}
+            )
+        )
+    if transformation and isinstance(transformation, tuple):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("transformation"),
+                value={"space": transformation[0], "externalId": transformation[1]},
+            )
+        )
+    if transformation and isinstance(transformation, list) and isinstance(transformation[0], str):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("transformation"),
+                values=[{"space": "market", "externalId": item} for item in transformation],
+            )
+        )
+    if transformation and isinstance(transformation, list) and isinstance(transformation[0], tuple):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("transformation"),
+                values=[{"space": item[0], "externalId": item[1]} for item in transformation],
+            )
+        )
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

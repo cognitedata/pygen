@@ -1,16 +1,24 @@
 from __future__ import annotations
 
-from typing import Literal, TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
+from ._core import (
+    DomainModel,
+    DomainModelApply,
+    DomainModelApplyList,
+    DomainModelList,
+    DomainRelationApply,
+    ResourcesApply,
+)
 
 if TYPE_CHECKING:
-    from ._movie import MovieApply
-    from ._nomination import NominationApply
-    from ._person import PersonApply
+    from ._movie import Movie, MovieApply
+    from ._nomination import Nomination, NominationApply
+    from ._person import Person, PersonApply
+
 
 __all__ = ["Role", "RoleApply", "RoleList", "RoleApplyList", "RoleFields"]
 RoleFields = Literal["won_oscar"]
@@ -21,7 +29,7 @@ _ROLE_PROPERTIES_BY_FIELD = {
 
 
 class Role(DomainModel):
-    """This represent a read version of role.
+    """This represents the reading version of role.
 
     It is used to when data is retrieved from CDF.
 
@@ -39,25 +47,28 @@ class Role(DomainModel):
     """
 
     space: str = "IntegrationTestsImmutable"
-    movies: Optional[list[str]] = None
-    nomination: Optional[list[str]] = None
-    person: Optional[str] = None
+    movies: Union[list[Movie], list[str], None] = Field(default=None, repr=False)
+    nomination: Union[list[Nomination], list[str], None] = Field(default=None, repr=False)
+    person: Union[Person, str, None] = Field(None, repr=False)
     won_oscar: Optional[bool] = Field(None, alias="wonOscar")
 
     def as_apply(self) -> RoleApply:
-        """Convert this read version of role to a write version."""
+        """Convert this read version of role to the writing version."""
         return RoleApply(
             space=self.space,
             external_id=self.external_id,
-            movies=self.movies,
-            nomination=self.nomination,
-            person=self.person,
+            movies=[movie.as_apply() if isinstance(movie, DomainModel) else movie for movie in self.movies or []],
+            nomination=[
+                nomination.as_apply() if isinstance(nomination, DomainModel) else nomination
+                for nomination in self.nomination or []
+            ],
+            person=self.person.as_apply() if isinstance(self.person, DomainModel) else self.person,
             won_oscar=self.won_oscar,
         )
 
 
 class RoleApply(DomainModelApply):
-    """This represent a write version of role.
+    """This represents the writing version of role.
 
     It is used to when data is sent to CDF.
 
@@ -68,7 +79,7 @@ class RoleApply(DomainModelApply):
         nomination: The nomination field.
         person: The person field.
         won_oscar: The won oscar field.
-        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+        existing_version: Fail the ingestion request if the role version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
@@ -81,11 +92,17 @@ class RoleApply(DomainModelApply):
     won_oscar: Optional[bool] = Field(None, alias="wonOscar")
 
     def _to_instances_apply(
-        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
-    ) -> dm.InstancesApply:
-        if self.external_id in cache:
-            return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
-        write_view = view_by_write_class and view_by_write_class.get(type(self))
+        self,
+        cache: set[tuple[str, str]],
+        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+    ) -> ResourcesApply:
+        resources = ResourcesApply()
+        if self.as_tuple_id() in cache:
+            return resources
+
+        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
+            "IntegrationTestsImmutable", "Role", "2"
+        )
 
         properties = {}
         if self.person is not None:
@@ -95,97 +112,99 @@ class RoleApply(DomainModelApply):
             }
         if self.won_oscar is not None:
             properties["wonOscar"] = self.won_oscar
+
         if properties:
-            source = dm.NodeOrEdgeData(
-                source=write_view or dm.ViewId("IntegrationTestsImmutable", "Role", "2"),
-                properties=properties,
-            )
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=[source],
+                sources=[
+                    dm.NodeOrEdgeData(
+                        source=write_view,
+                        properties=properties,
+                    )
+                ],
             )
-            nodes = [this_node]
-        else:
-            nodes = []
+            resources.nodes.append(this_node)
+            cache.add(self.as_tuple_id())
 
-        edges = []
-        cache.add(self.external_id)
-
+        edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "Role.movies")
         for movie in self.movies or []:
-            edge = self._create_movie_edge(movie)
-            if edge.external_id not in cache:
-                edges.append(edge)
-                cache.add(edge.external_id)
+            other_resources = DomainRelationApply.from_edge_to_resources(
+                cache, self, movie, edge_type, view_by_write_class
+            )
+            resources.extend(other_resources)
 
-            if isinstance(movie, DomainModelApply):
-                instances = movie._to_instances_apply(cache, view_by_write_class)
-                nodes.extend(instances.nodes)
-                edges.extend(instances.edges)
-
+        edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "Role.nomination")
         for nomination in self.nomination or []:
-            edge = self._create_nomination_edge(nomination)
-            if edge.external_id not in cache:
-                edges.append(edge)
-                cache.add(edge.external_id)
-
-            if isinstance(nomination, DomainModelApply):
-                instances = nomination._to_instances_apply(cache, view_by_write_class)
-                nodes.extend(instances.nodes)
-                edges.extend(instances.edges)
+            other_resources = DomainRelationApply.from_edge_to_resources(
+                cache, self, nomination, edge_type, view_by_write_class
+            )
+            resources.extend(other_resources)
 
         if isinstance(self.person, DomainModelApply):
-            instances = self.person._to_instances_apply(cache, view_by_write_class)
-            nodes.extend(instances.nodes)
-            edges.extend(instances.edges)
+            other_resources = self.person._to_instances_apply(cache, view_by_write_class)
+            resources.extend(other_resources)
 
-        return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
-
-    def _create_movie_edge(self, movie: Union[str, MovieApply]) -> dm.EdgeApply:
-        if isinstance(movie, str):
-            end_space, end_node_ext_id = self.space, movie
-        elif isinstance(movie, DomainModelApply):
-            end_space, end_node_ext_id = movie.space, movie.external_id
-        else:
-            raise TypeError(f"Expected str or MovieApply, got {type(movie)}")
-
-        return dm.EdgeApply(
-            space=self.space,
-            external_id=f"{self.external_id}:{end_node_ext_id}",
-            type=dm.DirectRelationReference("IntegrationTestsImmutable", "Role.movies"),
-            start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
-        )
-
-    def _create_nomination_edge(self, nomination: Union[str, NominationApply]) -> dm.EdgeApply:
-        if isinstance(nomination, str):
-            end_space, end_node_ext_id = self.space, nomination
-        elif isinstance(nomination, DomainModelApply):
-            end_space, end_node_ext_id = nomination.space, nomination.external_id
-        else:
-            raise TypeError(f"Expected str or NominationApply, got {type(nomination)}")
-
-        return dm.EdgeApply(
-            space=self.space,
-            external_id=f"{self.external_id}:{end_node_ext_id}",
-            type=dm.DirectRelationReference("IntegrationTestsImmutable", "Role.nomination"),
-            start_node=dm.DirectRelationReference(self.space, self.external_id),
-            end_node=dm.DirectRelationReference(end_space, end_node_ext_id),
-        )
+        return resources
 
 
-class RoleList(TypeList[Role]):
-    """List of roles in read version."""
+class RoleList(DomainModelList[Role]):
+    """List of roles in the read version."""
 
-    _NODE = Role
+    _INSTANCE = Role
 
     def as_apply(self) -> RoleApplyList:
-        """Convert this read version of role to a write version."""
+        """Convert these read versions of role to the writing versions."""
         return RoleApplyList([node.as_apply() for node in self.data])
 
 
-class RoleApplyList(TypeApplyList[RoleApply]):
-    """List of roles in write version."""
+class RoleApplyList(DomainModelApplyList[RoleApply]):
+    """List of roles in the writing version."""
 
-    _NODE = RoleApply
+    _INSTANCE = RoleApply
+
+
+def _create_role_filter(
+    view_id: dm.ViewId,
+    person: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+    won_oscar: bool | None = None,
+    external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if person and isinstance(person, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("person"), value={"space": "IntegrationTestsImmutable", "externalId": person}
+            )
+        )
+    if person and isinstance(person, tuple):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("person"), value={"space": person[0], "externalId": person[1]})
+        )
+    if person and isinstance(person, list) and isinstance(person[0], str):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("person"),
+                values=[{"space": "IntegrationTestsImmutable", "externalId": item} for item in person],
+            )
+        )
+    if person and isinstance(person, list) and isinstance(person[0], tuple):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("person"), values=[{"space": item[0], "externalId": item[1]} for item in person]
+            )
+        )
+    if won_oscar and isinstance(won_oscar, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("wonOscar"), value=won_oscar))
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

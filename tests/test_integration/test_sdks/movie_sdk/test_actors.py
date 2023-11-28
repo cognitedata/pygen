@@ -2,14 +2,14 @@ from __future__ import annotations
 
 import pytest
 
-from tests.constants import IS_PYDANTIC_V1
+from tests.constants import IS_PYDANTIC_V2
 
-if IS_PYDANTIC_V1:
-    from movie_domain_pydantic_v1.client import MovieClient
-    from movie_domain_pydantic_v1.client import data_classes as m
-else:
+if IS_PYDANTIC_V2:
     from movie_domain.client import MovieClient
     from movie_domain.client import data_classes as m
+else:
+    from movie_domain_pydantic_v1.client import MovieClient
+    from movie_domain_pydantic_v1.client import data_classes as m
 
 
 def test_actor_list(movie_client: MovieClient):
@@ -66,3 +66,23 @@ def test_actor_list_filter_on_direct_edge(
     # Assert
     assert len(actors) == expected_count
     assert sorted([actor.person for actor in actors]) == sorted(expected_person)
+
+
+def test_circular_query_from_actor(movie_client: MovieClient):
+    actors = movie_client.actor(person="person:quentin_tarantino", limit=-1).movies(limit=-1).actors(limit=-1).query()
+
+    assert len(actors) > 0
+    for actor in actors:
+        assert isinstance(actor, m.Actor)
+        for movie in actor.movies:
+            assert isinstance(movie, m.Movie)
+            for movie_actor in movie.actors:
+                assert isinstance(movie_actor, m.Actor)
+
+
+def test_actor_retrieve_missing(movie_client: MovieClient) -> None:
+    # Act
+    actor = movie_client.actor.retrieve("actor:missing")
+
+    # Assert
+    assert actor is None

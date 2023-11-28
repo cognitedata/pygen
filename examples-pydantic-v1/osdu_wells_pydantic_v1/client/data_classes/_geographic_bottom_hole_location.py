@@ -1,15 +1,23 @@
 from __future__ import annotations
 
-from typing import Literal, TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
+from ._core import (
+    DomainModel,
+    DomainModelApply,
+    DomainModelApplyList,
+    DomainModelList,
+    DomainRelationApply,
+    ResourcesApply,
+)
 
 if TYPE_CHECKING:
-    from ._as_ingested_coordinates import AsIngestedCoordinatesApply
-    from ._wgs_84_coordinates import WgsCoordinatesApply
+    from ._as_ingested_coordinates import AsIngestedCoordinates, AsIngestedCoordinatesApply
+    from ._wgs_84_coordinates import WgsCoordinates, WgsCoordinatesApply
+
 
 __all__ = [
     "GeographicBottomHoleLocation",
@@ -58,7 +66,7 @@ _GEOGRAPHICBOTTOMHOLELOCATION_PROPERTIES_BY_FIELD = {
 
 
 class GeographicBottomHoleLocation(DomainModel):
-    """This represent a read version of geographic bottom hole location.
+    """This represents the reading version of geographic bottom hole location.
 
     It is used to when data is retrieved from CDF.
 
@@ -84,7 +92,9 @@ class GeographicBottomHoleLocation(DomainModel):
 
     space: str = "IntegrationTestsImmutable"
     applied_operations: Optional[list[str]] = Field(None, alias="AppliedOperations")
-    as_ingested_coordinates: Optional[str] = Field(None, alias="AsIngestedCoordinates")
+    as_ingested_coordinates: Union[AsIngestedCoordinates, str, None] = Field(
+        None, repr=False, alias="AsIngestedCoordinates"
+    )
     coordinate_quality_check_date_time: Optional[str] = Field(None, alias="CoordinateQualityCheckDateTime")
     coordinate_quality_check_performed_by: Optional[str] = Field(None, alias="CoordinateQualityCheckPerformedBy")
     coordinate_quality_check_remarks: Optional[list[str]] = Field(None, alias="CoordinateQualityCheckRemarks")
@@ -93,15 +103,17 @@ class GeographicBottomHoleLocation(DomainModel):
     spatial_geometry_type_id: Optional[str] = Field(None, alias="SpatialGeometryTypeID")
     spatial_location_coordinates_date: Optional[str] = Field(None, alias="SpatialLocationCoordinatesDate")
     spatial_parameter_type_id: Optional[str] = Field(None, alias="SpatialParameterTypeID")
-    wgs_84_coordinates: Optional[str] = Field(None, alias="Wgs84Coordinates")
+    wgs_84_coordinates: Union[WgsCoordinates, str, None] = Field(None, repr=False, alias="Wgs84Coordinates")
 
     def as_apply(self) -> GeographicBottomHoleLocationApply:
-        """Convert this read version of geographic bottom hole location to a write version."""
+        """Convert this read version of geographic bottom hole location to the writing version."""
         return GeographicBottomHoleLocationApply(
             space=self.space,
             external_id=self.external_id,
             applied_operations=self.applied_operations,
-            as_ingested_coordinates=self.as_ingested_coordinates,
+            as_ingested_coordinates=self.as_ingested_coordinates.as_apply()
+            if isinstance(self.as_ingested_coordinates, DomainModel)
+            else self.as_ingested_coordinates,
             coordinate_quality_check_date_time=self.coordinate_quality_check_date_time,
             coordinate_quality_check_performed_by=self.coordinate_quality_check_performed_by,
             coordinate_quality_check_remarks=self.coordinate_quality_check_remarks,
@@ -110,12 +122,14 @@ class GeographicBottomHoleLocation(DomainModel):
             spatial_geometry_type_id=self.spatial_geometry_type_id,
             spatial_location_coordinates_date=self.spatial_location_coordinates_date,
             spatial_parameter_type_id=self.spatial_parameter_type_id,
-            wgs_84_coordinates=self.wgs_84_coordinates,
+            wgs_84_coordinates=self.wgs_84_coordinates.as_apply()
+            if isinstance(self.wgs_84_coordinates, DomainModel)
+            else self.wgs_84_coordinates,
         )
 
 
 class GeographicBottomHoleLocationApply(DomainModelApply):
-    """This represent a write version of geographic bottom hole location.
+    """This represents the writing version of geographic bottom hole location.
 
     It is used to when data is sent to CDF.
 
@@ -133,7 +147,7 @@ class GeographicBottomHoleLocationApply(DomainModelApply):
         spatial_location_coordinates_date: The spatial location coordinates date field.
         spatial_parameter_type_id: The spatial parameter type id field.
         wgs_84_coordinates: The wgs 84 coordinate field.
-        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+        existing_version: Fail the ingestion request if the geographic bottom hole location version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
@@ -155,11 +169,17 @@ class GeographicBottomHoleLocationApply(DomainModelApply):
     wgs_84_coordinates: Union[WgsCoordinatesApply, str, None] = Field(None, repr=False, alias="Wgs84Coordinates")
 
     def _to_instances_apply(
-        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
-    ) -> dm.InstancesApply:
-        if self.external_id in cache:
-            return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
-        write_view = view_by_write_class and view_by_write_class.get(type(self))
+        self,
+        cache: set[tuple[str, str]],
+        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+    ) -> ResourcesApply:
+        resources = ResourcesApply()
+        if self.as_tuple_id() in cache:
+            return resources
+
+        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
+            "IntegrationTestsImmutable", "GeographicBottomHoleLocation", "a82995ae29bc5c"
+        )
 
         properties = {}
         if self.applied_operations is not None:
@@ -196,49 +216,258 @@ class GeographicBottomHoleLocationApply(DomainModelApply):
                 if isinstance(self.wgs_84_coordinates, str)
                 else self.wgs_84_coordinates.external_id,
             }
+
         if properties:
-            source = dm.NodeOrEdgeData(
-                source=write_view
-                or dm.ViewId("IntegrationTestsImmutable", "GeographicBottomHoleLocation", "a82995ae29bc5c"),
-                properties=properties,
-            )
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=[source],
+                sources=[
+                    dm.NodeOrEdgeData(
+                        source=write_view,
+                        properties=properties,
+                    )
+                ],
             )
-            nodes = [this_node]
-        else:
-            nodes = []
-
-        edges = []
-        cache.add(self.external_id)
+            resources.nodes.append(this_node)
+            cache.add(self.as_tuple_id())
 
         if isinstance(self.as_ingested_coordinates, DomainModelApply):
-            instances = self.as_ingested_coordinates._to_instances_apply(cache, view_by_write_class)
-            nodes.extend(instances.nodes)
-            edges.extend(instances.edges)
+            other_resources = self.as_ingested_coordinates._to_instances_apply(cache, view_by_write_class)
+            resources.extend(other_resources)
 
         if isinstance(self.wgs_84_coordinates, DomainModelApply):
-            instances = self.wgs_84_coordinates._to_instances_apply(cache, view_by_write_class)
-            nodes.extend(instances.nodes)
-            edges.extend(instances.edges)
+            other_resources = self.wgs_84_coordinates._to_instances_apply(cache, view_by_write_class)
+            resources.extend(other_resources)
 
-        return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
+        return resources
 
 
-class GeographicBottomHoleLocationList(TypeList[GeographicBottomHoleLocation]):
-    """List of geographic bottom hole locations in read version."""
+class GeographicBottomHoleLocationList(DomainModelList[GeographicBottomHoleLocation]):
+    """List of geographic bottom hole locations in the read version."""
 
-    _NODE = GeographicBottomHoleLocation
+    _INSTANCE = GeographicBottomHoleLocation
 
     def as_apply(self) -> GeographicBottomHoleLocationApplyList:
-        """Convert this read version of geographic bottom hole location to a write version."""
+        """Convert these read versions of geographic bottom hole location to the writing versions."""
         return GeographicBottomHoleLocationApplyList([node.as_apply() for node in self.data])
 
 
-class GeographicBottomHoleLocationApplyList(TypeApplyList[GeographicBottomHoleLocationApply]):
-    """List of geographic bottom hole locations in write version."""
+class GeographicBottomHoleLocationApplyList(DomainModelApplyList[GeographicBottomHoleLocationApply]):
+    """List of geographic bottom hole locations in the writing version."""
 
-    _NODE = GeographicBottomHoleLocationApply
+    _INSTANCE = GeographicBottomHoleLocationApply
+
+
+def _create_geographic_bottom_hole_location_filter(
+    view_id: dm.ViewId,
+    as_ingested_coordinates: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+    coordinate_quality_check_date_time: str | list[str] | None = None,
+    coordinate_quality_check_date_time_prefix: str | None = None,
+    coordinate_quality_check_performed_by: str | list[str] | None = None,
+    coordinate_quality_check_performed_by_prefix: str | None = None,
+    qualitative_spatial_accuracy_type_id: str | list[str] | None = None,
+    qualitative_spatial_accuracy_type_id_prefix: str | None = None,
+    quantitative_accuracy_band_id: str | list[str] | None = None,
+    quantitative_accuracy_band_id_prefix: str | None = None,
+    spatial_geometry_type_id: str | list[str] | None = None,
+    spatial_geometry_type_id_prefix: str | None = None,
+    spatial_location_coordinates_date: str | list[str] | None = None,
+    spatial_location_coordinates_date_prefix: str | None = None,
+    spatial_parameter_type_id: str | list[str] | None = None,
+    spatial_parameter_type_id_prefix: str | None = None,
+    wgs_84_coordinates: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+    external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if as_ingested_coordinates and isinstance(as_ingested_coordinates, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("AsIngestedCoordinates"),
+                value={"space": "IntegrationTestsImmutable", "externalId": as_ingested_coordinates},
+            )
+        )
+    if as_ingested_coordinates and isinstance(as_ingested_coordinates, tuple):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("AsIngestedCoordinates"),
+                value={"space": as_ingested_coordinates[0], "externalId": as_ingested_coordinates[1]},
+            )
+        )
+    if (
+        as_ingested_coordinates
+        and isinstance(as_ingested_coordinates, list)
+        and isinstance(as_ingested_coordinates[0], str)
+    ):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("AsIngestedCoordinates"),
+                values=[{"space": "IntegrationTestsImmutable", "externalId": item} for item in as_ingested_coordinates],
+            )
+        )
+    if (
+        as_ingested_coordinates
+        and isinstance(as_ingested_coordinates, list)
+        and isinstance(as_ingested_coordinates[0], tuple)
+    ):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("AsIngestedCoordinates"),
+                values=[{"space": item[0], "externalId": item[1]} for item in as_ingested_coordinates],
+            )
+        )
+    if coordinate_quality_check_date_time and isinstance(coordinate_quality_check_date_time, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("CoordinateQualityCheckDateTime"), value=coordinate_quality_check_date_time
+            )
+        )
+    if coordinate_quality_check_date_time and isinstance(coordinate_quality_check_date_time, list):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("CoordinateQualityCheckDateTime"), values=coordinate_quality_check_date_time
+            )
+        )
+    if coordinate_quality_check_date_time_prefix:
+        filters.append(
+            dm.filters.Prefix(
+                view_id.as_property_ref("CoordinateQualityCheckDateTime"),
+                value=coordinate_quality_check_date_time_prefix,
+            )
+        )
+    if coordinate_quality_check_performed_by and isinstance(coordinate_quality_check_performed_by, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("CoordinateQualityCheckPerformedBy"),
+                value=coordinate_quality_check_performed_by,
+            )
+        )
+    if coordinate_quality_check_performed_by and isinstance(coordinate_quality_check_performed_by, list):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("CoordinateQualityCheckPerformedBy"),
+                values=coordinate_quality_check_performed_by,
+            )
+        )
+    if coordinate_quality_check_performed_by_prefix:
+        filters.append(
+            dm.filters.Prefix(
+                view_id.as_property_ref("CoordinateQualityCheckPerformedBy"),
+                value=coordinate_quality_check_performed_by_prefix,
+            )
+        )
+    if qualitative_spatial_accuracy_type_id and isinstance(qualitative_spatial_accuracy_type_id, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("QualitativeSpatialAccuracyTypeID"), value=qualitative_spatial_accuracy_type_id
+            )
+        )
+    if qualitative_spatial_accuracy_type_id and isinstance(qualitative_spatial_accuracy_type_id, list):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("QualitativeSpatialAccuracyTypeID"), values=qualitative_spatial_accuracy_type_id
+            )
+        )
+    if qualitative_spatial_accuracy_type_id_prefix:
+        filters.append(
+            dm.filters.Prefix(
+                view_id.as_property_ref("QualitativeSpatialAccuracyTypeID"),
+                value=qualitative_spatial_accuracy_type_id_prefix,
+            )
+        )
+    if quantitative_accuracy_band_id and isinstance(quantitative_accuracy_band_id, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("QuantitativeAccuracyBandID"), value=quantitative_accuracy_band_id
+            )
+        )
+    if quantitative_accuracy_band_id and isinstance(quantitative_accuracy_band_id, list):
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("QuantitativeAccuracyBandID"), values=quantitative_accuracy_band_id)
+        )
+    if quantitative_accuracy_band_id_prefix:
+        filters.append(
+            dm.filters.Prefix(
+                view_id.as_property_ref("QuantitativeAccuracyBandID"), value=quantitative_accuracy_band_id_prefix
+            )
+        )
+    if spatial_geometry_type_id and isinstance(spatial_geometry_type_id, str):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("SpatialGeometryTypeID"), value=spatial_geometry_type_id)
+        )
+    if spatial_geometry_type_id and isinstance(spatial_geometry_type_id, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("SpatialGeometryTypeID"), values=spatial_geometry_type_id))
+    if spatial_geometry_type_id_prefix:
+        filters.append(
+            dm.filters.Prefix(view_id.as_property_ref("SpatialGeometryTypeID"), value=spatial_geometry_type_id_prefix)
+        )
+    if spatial_location_coordinates_date and isinstance(spatial_location_coordinates_date, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("SpatialLocationCoordinatesDate"), value=spatial_location_coordinates_date
+            )
+        )
+    if spatial_location_coordinates_date and isinstance(spatial_location_coordinates_date, list):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("SpatialLocationCoordinatesDate"), values=spatial_location_coordinates_date
+            )
+        )
+    if spatial_location_coordinates_date_prefix:
+        filters.append(
+            dm.filters.Prefix(
+                view_id.as_property_ref("SpatialLocationCoordinatesDate"),
+                value=spatial_location_coordinates_date_prefix,
+            )
+        )
+    if spatial_parameter_type_id and isinstance(spatial_parameter_type_id, str):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("SpatialParameterTypeID"), value=spatial_parameter_type_id)
+        )
+    if spatial_parameter_type_id and isinstance(spatial_parameter_type_id, list):
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("SpatialParameterTypeID"), values=spatial_parameter_type_id)
+        )
+    if spatial_parameter_type_id_prefix:
+        filters.append(
+            dm.filters.Prefix(view_id.as_property_ref("SpatialParameterTypeID"), value=spatial_parameter_type_id_prefix)
+        )
+    if wgs_84_coordinates and isinstance(wgs_84_coordinates, str):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("Wgs84Coordinates"),
+                value={"space": "IntegrationTestsImmutable", "externalId": wgs_84_coordinates},
+            )
+        )
+    if wgs_84_coordinates and isinstance(wgs_84_coordinates, tuple):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("Wgs84Coordinates"),
+                value={"space": wgs_84_coordinates[0], "externalId": wgs_84_coordinates[1]},
+            )
+        )
+    if wgs_84_coordinates and isinstance(wgs_84_coordinates, list) and isinstance(wgs_84_coordinates[0], str):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("Wgs84Coordinates"),
+                values=[{"space": "IntegrationTestsImmutable", "externalId": item} for item in wgs_84_coordinates],
+            )
+        )
+    if wgs_84_coordinates and isinstance(wgs_84_coordinates, list) and isinstance(wgs_84_coordinates[0], tuple):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("Wgs84Coordinates"),
+                values=[{"space": item[0], "externalId": item[1]} for item in wgs_84_coordinates],
+            )
+        )
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

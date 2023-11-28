@@ -1,7 +1,19 @@
+from __future__ import annotations
+
+import datetime
+from collections.abc import Sequence
+from typing import Literal
+
+import pandas as pd
+from cognite.client import CogniteClient
+from cognite.client import data_modeling as dm
+from cognite.client.data_classes import Datapoints, DatapointsArrayList, DatapointsList, TimeSeriesList
+from cognite.client.data_classes.datapoints import Aggregate
+from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import {{ data_class.filter_name }}
+from ._core import DEFAULT_LIMIT_READ, INSTANCE_QUERY_LIMIT
 
 ColumnNames = Literal[{{ data_class.primitive_fields_literal }}]
 
-{% for timeseries in data_class.single_timeseries_fields %}
 class {{ timeseries.edge_api_class}}Query:
     def __init__(
         self,
@@ -32,16 +44,16 @@ class {{ timeseries.edge_api_class}}Query:
         **Performance guide**:
             In order to retrieve millions of datapoints as efficiently as possible, here are a few guidelines:
 
-            1. For best speed, and significantly lower memory usage, consider using ``retrieve_arrays(...)`` which uses ``numpy.ndarrays`` for data storage.
-            2. Only unlimited queries with (``limit=None``) are fetched in parallel so specifying a large finite ``limit`` like 1 million, comes with severe performance penalty as data is fetched serially.
-            3. Try to avoid specifying `start` and `end` to be very far from the actual data: If you have data from 2000 to 2015, don't set start=0 (1970).
+            1. For the best speed, and significantly lower memory usage, consider using ``retrieve_arrays(...)`` which uses ``numpy.ndarrays`` for data storage.
+            2. Only unlimited queries with (``limit=None``) are fetched in parallel, so specifying a large finite ``limit`` like 1 million, comes with severe performance penalty as data is fetched serially.
+            3. Try to avoid specifying `start` and `end` to be very far from the actual data: If you had data from 2000 to 2015, don't set start=0 (1970).
 
         Args:
             start: Inclusive start. Default: 1970-01-01 UTC.
             end: Exclusive end. Default: "now"
             aggregates: Single aggregate or list of aggregates to retrieve. Default: None (raw datapoints returned)
             granularity The granularity to fetch aggregates at. e.g. '15s', '2h', '10d'. Default: None.
-            target_unit: The unit_external_id of the data points returned. If the time series does not have a unit_external_id that can be converted to the target_unit, an error will be returned. Cannot be used with target_unit_system.
+            target_unit: The unit_external_id of the data points returned. If the time series does not have an unit_external_id that can be converted to the target_unit, an error will be returned. Cannot be used with target_unit_system.
             target_unit_system: The unit system of the data points returned. Cannot be used with target_unit.
             limit (int | None): Maximum number of datapoints to return for each time series. Default: None (no limit)
             include_outside_points (bool): Whether to include outside points. Not allowed when fetching aggregates. Default: False
@@ -56,7 +68,7 @@ class {{ timeseries.edge_api_class}}Query:
 
                 >>> from {{ top_level_package }} import {{ client_name }}
                 >>> client = {{ client_name }}()
-                >>> {{ data_class.variable }}_datapoints = client.{{ api_class.client_attribute }}.{{ timeseries.edge_api_attribute }}(external_id="my_{{ timeseries.edge_api_attribute }}").retrieve(start="2w-ago)
+                >>> {{ data_class.variable }}_datapoints = client.{{ api_class.client_attribute }}.{{ timeseries.edge_api_attribute }}(external_id="my_{{ timeseries.edge_api_attribute }}").retrieve(start="2w-ago")
         """
         external_ids = self._retrieve_timeseries_external_ids_with_extra()
         if external_ids:
@@ -91,16 +103,16 @@ class {{ timeseries.edge_api_class}}Query:
         **Performance guide**:
             In order to retrieve millions of datapoints as efficiently as possible, here are a few guidelines:
 
-            1. For best speed, and significantly lower memory usage, consider using ``retrieve_arrays(...)`` which uses ``numpy.ndarrays`` for data storage.
-            2. Only unlimited queries with (``limit=None``) are fetched in parallel so specifying a large finite ``limit`` like 1 million, comes with severe performance penalty as data is fetched serially.
-            3. Try to avoid specifying `start` and `end` to be very far from the actual data: If you have data from 2000 to 2015, don't set start=0 (1970).
+            1. For the best speed, and significantly lower memory usage, consider using ``retrieve_arrays(...)`` which uses ``numpy.ndarrays`` for data storage.
+            2. Only unlimited queries with (``limit=None``) are fetched in parallel, so specifying a large finite ``limit`` like 1 million, comes with severe performance penalty as data is fetched serially.
+            3. Try to avoid specifying `start` and `end` to be very far from the actual data: If you had data from 2000 to 2015, don't set start=0 (1970).
 
         Args:
             start: Inclusive start. Default: 1970-01-01 UTC.
             end: Exclusive end. Default: "now"
             aggregates: Single aggregate or list of aggregates to retrieve. Default: None (raw datapoints returned)
             granularity The granularity to fetch aggregates at. e.g. '15s', '2h', '10d'. Default: None.
-            target_unit: The unit_external_id of the data points returned. If the time series does not have a unit_external_id that can be converted to the target_unit, an error will be returned. Cannot be used with target_unit_system.
+            target_unit: The unit_external_id of the data points returned. If the time series does not have an unit_external_id that can be converted to the target_unit, an error will be returned. Cannot be used with target_unit_system.
             target_unit_system: The unit system of the data points returned. Cannot be used with target_unit.
             limit (int | None): Maximum number of datapoints to return for each time series. Default: None (no limit)
             include_outside_points (bool): Whether to include outside points. Not allowed when fetching aggregates. Default: False
@@ -115,7 +127,7 @@ class {{ timeseries.edge_api_class}}Query:
 
                 >>> from {{ top_level_package }} import {{ client_name }}
                 >>> client = {{ client_name }}()
-                >>> {{ data_class.variable }}_datapoints = client.{{ api_class.client_attribute }}.{{ timeseries.edge_api_attribute }}(external_id="my_{{ timeseries.edge_api_attribute }}").retrieve_array(start="2w-ago)
+                >>> {{ data_class.variable }}_datapoints = client.{{ api_class.client_attribute }}.{{ timeseries.edge_api_attribute }}(external_id="my_{{ timeseries.edge_api_attribute }}").retrieve_array(start="2w-ago")
         """
         external_ids = self._retrieve_timeseries_external_ids_with_extra()
         if external_ids:
@@ -154,20 +166,20 @@ class {{ timeseries.edge_api_class}}Query:
         **Performance guide**:
             In order to retrieve millions of datapoints as efficiently as possible, here are a few guidelines:
 
-            1. For best speed, and significantly lower memory usage, consider using ``retrieve_arrays(...)`` which uses ``numpy.ndarrays`` for data storage.
-            2. Only unlimited queries with (``limit=None``) are fetched in parallel so specifying a large finite ``limit`` like 1 million, comes with severe performance penalty as data is fetched serially.
-            3. Try to avoid specifying `start` and `end` to be very far from the actual data: If you have data from 2000 to 2015, don't set start=0 (1970).
+            1. For the best speed, and significantly lower memory usage, consider using ``retrieve_arrays(...)`` which uses ``numpy.ndarrays`` for data storage.
+            2. Only unlimited queries with (``limit=None``) are fetched in parallel, so specifying a large finite ``limit`` like 1 million, comes with severe performance penalty as data is fetched serially.
+            3. Try to avoid specifying `start` and `end` to be very far from the actual data: If you had data from 2000 to 2015, don't set start=0 (1970).
 
         Args:
             start: Inclusive start. Default: 1970-01-01 UTC.
             end: Exclusive end. Default: "now"
             aggregates: Single aggregate or list of aggregates to retrieve. Default: None (raw datapoints returned)
             granularity The granularity to fetch aggregates at. e.g. '15s', '2h', '10d'. Default: None.
-            target_unit: The unit_external_id of the data points returned. If the time series does not have a unit_external_id that can be converted to the target_unit, an error will be returned. Cannot be used with target_unit_system.
+            target_unit: The unit_external_id of the data points returned. If the time series does not have an unit_external_id that can be converted to the target_unit, an error will be returned. Cannot be used with target_unit_system.
             target_unit_system: The unit system of the data points returned. Cannot be used with target_unit.
             limit: Maximum number of datapoints to return for each time series. Default: None (no limit)
             include_outside_points: Whether to include outside points. Not allowed when fetching aggregates. Default: False
-            uniform_index: If only querying aggregates AND a single granularity is used AND no limit is used, specifying `uniform_index=True` will return a dataframe with an equidistant datetime index from the earliest `start` to the latest `end` (missing values will be NaNs). If these requirements are not met, a ValueError is raised. Default: False
+            uniform_index: If only querying aggregates AND a single granularity is used, AND no limit is used, specifying `uniform_index=True` will return a dataframe with an equidistant datetime index from the earliest `start` to the latest `end` (missing values will be NaNs). If these requirements are not met, a ValueError is raised. Default: False
             include_aggregate_name: Include 'aggregate' in the column name, e.g. `my-ts|average`. Ignored for raw time series. Default: True
             include_granularity_name: Include 'granularity' in the column name, e.g. `my-ts|12h`. Added after 'aggregate' when present. Ignored for raw time series. Default: False
             column_names: Which property to use for column names. Defauts to {{ timeseries.prop_name }}
@@ -183,7 +195,7 @@ class {{ timeseries.edge_api_class}}Query:
 
                 >>> from {{ top_level_package }} import {{ client_name }}
                 >>> client = {{ client_name }}()
-                >>> {{ data_class.variable }}_datapoints = client.{{ api_class.client_attribute }}.{{ timeseries.edge_api_attribute }}(external_id="my_{{ timeseries.edge_api_attribute }}").retrieve_dataframe(start="2w-ago)
+                >>> {{ data_class.variable }}_datapoints = client.{{ api_class.client_attribute }}.{{ timeseries.edge_api_attribute }}(external_id="my_{{ timeseries.edge_api_attribute }}").retrieve_dataframe(start="2w-ago")
         """
         external_ids = self._retrieve_timeseries_external_ids_with_extra(column_names)
         if external_ids:
@@ -231,20 +243,20 @@ class {{ timeseries.edge_api_class}}Query:
         **Performance guide**:
             In order to retrieve millions of datapoints as efficiently as possible, here are a few guidelines:
 
-            1. For best speed, and significantly lower memory usage, consider using ``retrieve_arrays(...)`` which uses ``numpy.ndarrays`` for data storage.
-            2. Only unlimited queries with (``limit=None``) are fetched in parallel so specifying a large finite ``limit`` like 1 million, comes with severe performance penalty as data is fetched serially.
-            3. Try to avoid specifying `start` and `end` to be very far from the actual data: If you have data from 2000 to 2015, don't set start=0 (1970).
+            1. For the best speed, and significantly lower memory usage, consider using ``retrieve_arrays(...)`` which uses ``numpy.ndarrays`` for data storage.
+            2. Only unlimited queries with (``limit=None``) are fetched in parallel, so specifying a large finite ``limit`` like 1 million, comes with severe performance penalty as data is fetched serially.
+            3. Try to avoid specifying `start` and `end` to be very far from the actual data: If you had data from 2000 to 2015, don't set start=0 (1970).
 
         Args:
             start: Inclusive start.
             end: Exclusive end
             aggregates: Single aggregate or list of aggregates to retrieve. Default: None (raw datapoints returned)
             granularity The granularity to fetch aggregates at. e.g. '15s', '2h', '10d'. Default: None.
-            target_unit: The unit_external_id of the data points returned. If the time series does not have a unit_external_id that can be converted to the target_unit, an error will be returned. Cannot be used with target_unit_system.
+            target_unit: The unit_external_id of the data points returned. If the time series does not have an unit_external_id that can be converted to the target_unit, an error will be returned. Cannot be used with target_unit_system.
             target_unit_system: The unit system of the data points returned. Cannot be used with target_unit.
             limit: Maximum number of datapoints to return for each time series. Default: None (no limit)
             include_outside_points: Whether to include outside points. Not allowed when fetching aggregates. Default: False
-            uniform_index: If only querying aggregates AND a single granularity is used AND no limit is used, specifying `uniform_index=True` will return a dataframe with an equidistant datetime index from the earliest `start` to the latest `end` (missing values will be NaNs). If these requirements are not met, a ValueError is raised. Default: False
+            uniform_index: If only querying aggregates AND a single granularity is used, AND no limit is used, specifying `uniform_index=True` will return a dataframe with an equidistant datetime index from the earliest `start` to the latest `end` (missing values will be NaNs). If these requirements are not met, a ValueError is raised. Default: False
             include_aggregate_name: Include 'aggregate' in the column name, e.g. `my-ts|average`. Ignored for raw time series. Default: True
             include_granularity_name: Include 'granularity' in the column name, e.g. `my-ts|12h`. Added after 'aggregate' when present. Ignored for raw time series. Default: False
             column_names: Which property to use for column names. Defauts to {{ timeseries.prop_name }}
@@ -359,7 +371,7 @@ class {{ timeseries.edge_api_class}}API:
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
-            A query object that can be used to retrieve datapoins for the  {{ data_class.variable }}.{{ timeseries.edge_api_attribute }} timeseries
+            A query object that can be used to retrieve datapoins for the {{ data_class.variable }}.{{ timeseries.edge_api_attribute }} timeseries
             selected in this method.
 
         Examples:
@@ -371,7 +383,7 @@ class {{ timeseries.edge_api_class}}API:
                 >>> {{ data_class.variable_list }} = client.{{ api_class.client_attribute }}.{{ timeseries.edge_api_attribute }}(limit=5).retrieve()
 
         """
-        filter_ = _create_filter(
+        filter_ = {{ data_class.filter_name }}(
             self._view_id,{% for parm in list_method.parameters %}
             {{ parm.name }},{% endfor %}
             filter,
@@ -409,7 +421,7 @@ class {{ timeseries.edge_api_class}}API:
                 >>> {{ data_class.variable_list }} = client.{{ api_class.client_attribute }}.{{ timeseries.edge_api_attribute }}.list(limit=5)
 
         """
-        filter_ = _create_filter(
+        filter_ = {{ data_class.filter_name }}(
             self._view_id,{% for parm in list_method.parameters %}
             {{ parm.name }},{% endfor %}
             filter,
@@ -428,6 +440,7 @@ def _retrieve_timeseries_external_ids_with_extra_{{ timeseries.name }}(
     limit: int,
     extra_properties: ColumnNames | list[ColumnNames] = "{{ timeseries.prop_name }}",
 ) -> dict[str, list[str]]:
+    limit = float("inf") if limit is None or limit == -1 else limit
     properties = ["{{ timeseries.prop_name }}"]
     if extra_properties == "{{ timeseries.prop_name }}":
         ...
@@ -473,4 +486,3 @@ def _retrieve_timeseries_external_ids_with_extra_{{ timeseries.name }}(
         if total_retrieved >= limit or cursor is None:
             break
     return external_ids
-{% endfor %}

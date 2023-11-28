@@ -5,7 +5,15 @@ from typing import Literal, Optional
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
-from ._core import DomainModel, DomainModelApply, TypeList, TypeApplyList
+from ._core import (
+    DomainModel,
+    DomainModelApply,
+    DomainModelApplyList,
+    DomainModelList,
+    DomainRelationApply,
+    ResourcesApply,
+)
+
 
 __all__ = [
     "DrillingReasons",
@@ -29,7 +37,7 @@ _DRILLINGREASONS_PROPERTIES_BY_FIELD = {
 
 
 class DrillingReasons(DomainModel):
-    """This represent a read version of drilling reason.
+    """This represents the reading version of drilling reason.
 
     It is used to when data is retrieved from CDF.
 
@@ -53,7 +61,7 @@ class DrillingReasons(DomainModel):
     termination_date_time: Optional[str] = Field(None, alias="TerminationDateTime")
 
     def as_apply(self) -> DrillingReasonsApply:
-        """Convert this read version of drilling reason to a write version."""
+        """Convert this read version of drilling reason to the writing version."""
         return DrillingReasonsApply(
             space=self.space,
             external_id=self.external_id,
@@ -65,7 +73,7 @@ class DrillingReasons(DomainModel):
 
 
 class DrillingReasonsApply(DomainModelApply):
-    """This represent a write version of drilling reason.
+    """This represents the writing version of drilling reason.
 
     It is used to when data is sent to CDF.
 
@@ -76,7 +84,7 @@ class DrillingReasonsApply(DomainModelApply):
         lahee_class_id: The lahee class id field.
         remark: The remark field.
         termination_date_time: The termination date time field.
-        existing_version: Fail the ingestion request if the  version is greater than or equal to this value.
+        existing_version: Fail the ingestion request if the drilling reason version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
@@ -89,11 +97,17 @@ class DrillingReasonsApply(DomainModelApply):
     termination_date_time: Optional[str] = Field(None, alias="TerminationDateTime")
 
     def _to_instances_apply(
-        self, cache: set[str], view_by_write_class: dict[type[DomainModelApply], dm.ViewId] | None
-    ) -> dm.InstancesApply:
-        if self.external_id in cache:
-            return dm.InstancesApply(dm.NodeApplyList([]), dm.EdgeApplyList([]))
-        write_view = view_by_write_class and view_by_write_class.get(type(self))
+        self,
+        cache: set[tuple[str, str]],
+        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+    ) -> ResourcesApply:
+        resources = ResourcesApply()
+        if self.as_tuple_id() in cache:
+            return resources
+
+        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
+            "IntegrationTestsImmutable", "DrillingReasons", "220055a8165644"
+        )
 
         properties = {}
         if self.effective_date_time is not None:
@@ -104,38 +118,90 @@ class DrillingReasonsApply(DomainModelApply):
             properties["Remark"] = self.remark
         if self.termination_date_time is not None:
             properties["TerminationDateTime"] = self.termination_date_time
+
         if properties:
-            source = dm.NodeOrEdgeData(
-                source=write_view or dm.ViewId("IntegrationTestsImmutable", "DrillingReasons", "220055a8165644"),
-                properties=properties,
-            )
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                sources=[source],
+                sources=[
+                    dm.NodeOrEdgeData(
+                        source=write_view,
+                        properties=properties,
+                    )
+                ],
             )
-            nodes = [this_node]
-        else:
-            nodes = []
+            resources.nodes.append(this_node)
+            cache.add(self.as_tuple_id())
 
-        edges = []
-        cache.add(self.external_id)
-
-        return dm.InstancesApply(dm.NodeApplyList(nodes), dm.EdgeApplyList(edges))
+        return resources
 
 
-class DrillingReasonsList(TypeList[DrillingReasons]):
-    """List of drilling reasons in read version."""
+class DrillingReasonsList(DomainModelList[DrillingReasons]):
+    """List of drilling reasons in the read version."""
 
-    _NODE = DrillingReasons
+    _INSTANCE = DrillingReasons
 
     def as_apply(self) -> DrillingReasonsApplyList:
-        """Convert this read version of drilling reason to a write version."""
+        """Convert these read versions of drilling reason to the writing versions."""
         return DrillingReasonsApplyList([node.as_apply() for node in self.data])
 
 
-class DrillingReasonsApplyList(TypeApplyList[DrillingReasonsApply]):
-    """List of drilling reasons in write version."""
+class DrillingReasonsApplyList(DomainModelApplyList[DrillingReasonsApply]):
+    """List of drilling reasons in the writing version."""
 
-    _NODE = DrillingReasonsApply
+    _INSTANCE = DrillingReasonsApply
+
+
+def _create_drilling_reason_filter(
+    view_id: dm.ViewId,
+    effective_date_time: str | list[str] | None = None,
+    effective_date_time_prefix: str | None = None,
+    lahee_class_id: str | list[str] | None = None,
+    lahee_class_id_prefix: str | None = None,
+    remark: str | list[str] | None = None,
+    remark_prefix: str | None = None,
+    termination_date_time: str | list[str] | None = None,
+    termination_date_time_prefix: str | None = None,
+    external_id_prefix: str | None = None,
+    space: str | list[str] | None = None,
+    filter: dm.Filter | None = None,
+) -> dm.Filter | None:
+    filters = []
+    if effective_date_time and isinstance(effective_date_time, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("EffectiveDateTime"), value=effective_date_time))
+    if effective_date_time and isinstance(effective_date_time, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("EffectiveDateTime"), values=effective_date_time))
+    if effective_date_time_prefix:
+        filters.append(
+            dm.filters.Prefix(view_id.as_property_ref("EffectiveDateTime"), value=effective_date_time_prefix)
+        )
+    if lahee_class_id and isinstance(lahee_class_id, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("LaheeClassID"), value=lahee_class_id))
+    if lahee_class_id and isinstance(lahee_class_id, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("LaheeClassID"), values=lahee_class_id))
+    if lahee_class_id_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("LaheeClassID"), value=lahee_class_id_prefix))
+    if remark and isinstance(remark, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("Remark"), value=remark))
+    if remark and isinstance(remark, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("Remark"), values=remark))
+    if remark_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("Remark"), value=remark_prefix))
+    if termination_date_time and isinstance(termination_date_time, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("TerminationDateTime"), value=termination_date_time))
+    if termination_date_time and isinstance(termination_date_time, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("TerminationDateTime"), values=termination_date_time))
+    if termination_date_time_prefix:
+        filters.append(
+            dm.filters.Prefix(view_id.as_property_ref("TerminationDateTime"), value=termination_date_time_prefix)
+        )
+    if external_id_prefix:
+        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
+    if space and isinstance(space, str):
+        filters.append(dm.filters.Equals(["node", "space"], value=space))
+    if space and isinstance(space, list):
+        filters.append(dm.filters.In(["node", "space"], values=space))
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters) if filters else None

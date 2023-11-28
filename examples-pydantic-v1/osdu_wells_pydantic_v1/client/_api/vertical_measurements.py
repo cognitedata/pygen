@@ -1,25 +1,39 @@
 from __future__ import annotations
 
-from typing import Sequence, overload
+from collections.abc import Sequence
+from typing import overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from osdu_wells_pydantic_v1.client.data_classes import (
+    DomainModelApply,
+    ResourcesApplyResult,
     VerticalMeasurements,
     VerticalMeasurementsApply,
+    VerticalMeasurementsFields,
     VerticalMeasurementsList,
     VerticalMeasurementsApplyList,
-    VerticalMeasurementsFields,
     VerticalMeasurementsTextFields,
-    DomainModelApply,
 )
-from osdu_wells_pydantic_v1.client.data_classes._vertical_measurements import _VERTICALMEASUREMENTS_PROPERTIES_BY_FIELD
+from osdu_wells_pydantic_v1.client.data_classes._vertical_measurements import (
+    _VERTICALMEASUREMENTS_PROPERTIES_BY_FIELD,
+    _create_vertical_measurement_filter,
+)
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
+from .vertical_measurements_query import VerticalMeasurementsQueryAPI
 
 
-class VerticalMeasurementsAPI(TypeAPI[VerticalMeasurements, VerticalMeasurementsApply, VerticalMeasurementsList]):
+class VerticalMeasurementsAPI(NodeAPI[VerticalMeasurements, VerticalMeasurementsApply, VerticalMeasurementsList]):
     def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
         view_id = view_by_write_class[VerticalMeasurementsApply]
         super().__init__(
@@ -28,15 +42,148 @@ class VerticalMeasurementsAPI(TypeAPI[VerticalMeasurements, VerticalMeasurements
             class_type=VerticalMeasurements,
             class_apply_type=VerticalMeasurementsApply,
             class_list=VerticalMeasurementsList,
+            class_apply_list=VerticalMeasurementsApplyList,
+            view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self._view_by_write_class = view_by_write_class
+
+    def __call__(
+        self,
+        effective_date_time: str | list[str] | None = None,
+        effective_date_time_prefix: str | None = None,
+        rig_id: str | list[str] | None = None,
+        rig_id_prefix: str | None = None,
+        termination_date_time: str | list[str] | None = None,
+        termination_date_time_prefix: str | None = None,
+        vertical_crsid: str | list[str] | None = None,
+        vertical_crsid_prefix: str | None = None,
+        min_vertical_measurement: float | None = None,
+        max_vertical_measurement: float | None = None,
+        vertical_measurement_description: str | list[str] | None = None,
+        vertical_measurement_description_prefix: str | None = None,
+        vertical_measurement_id: str | list[str] | None = None,
+        vertical_measurement_id_prefix: str | None = None,
+        vertical_measurement_path_id: str | list[str] | None = None,
+        vertical_measurement_path_id_prefix: str | None = None,
+        vertical_measurement_source_id: str | list[str] | None = None,
+        vertical_measurement_source_id_prefix: str | None = None,
+        vertical_measurement_type_id: str | list[str] | None = None,
+        vertical_measurement_type_id_prefix: str | None = None,
+        vertical_measurement_unit_of_measure_id: str | list[str] | None = None,
+        vertical_measurement_unit_of_measure_id_prefix: str | None = None,
+        vertical_reference_entity_id: str | list[str] | None = None,
+        vertical_reference_entity_id_prefix: str | None = None,
+        vertical_reference_id: str | list[str] | None = None,
+        vertical_reference_id_prefix: str | None = None,
+        wellbore_tvd_trajectory_id: str | list[str] | None = None,
+        wellbore_tvd_trajectory_id_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+        filter: dm.Filter | None = None,
+    ) -> VerticalMeasurementsQueryAPI[VerticalMeasurementsList]:
+        """Query starting at vertical measurements.
+
+        Args:
+            effective_date_time: The effective date time to filter on.
+            effective_date_time_prefix: The prefix of the effective date time to filter on.
+            rig_id: The rig id to filter on.
+            rig_id_prefix: The prefix of the rig id to filter on.
+            termination_date_time: The termination date time to filter on.
+            termination_date_time_prefix: The prefix of the termination date time to filter on.
+            vertical_crsid: The vertical crsid to filter on.
+            vertical_crsid_prefix: The prefix of the vertical crsid to filter on.
+            min_vertical_measurement: The minimum value of the vertical measurement to filter on.
+            max_vertical_measurement: The maximum value of the vertical measurement to filter on.
+            vertical_measurement_description: The vertical measurement description to filter on.
+            vertical_measurement_description_prefix: The prefix of the vertical measurement description to filter on.
+            vertical_measurement_id: The vertical measurement id to filter on.
+            vertical_measurement_id_prefix: The prefix of the vertical measurement id to filter on.
+            vertical_measurement_path_id: The vertical measurement path id to filter on.
+            vertical_measurement_path_id_prefix: The prefix of the vertical measurement path id to filter on.
+            vertical_measurement_source_id: The vertical measurement source id to filter on.
+            vertical_measurement_source_id_prefix: The prefix of the vertical measurement source id to filter on.
+            vertical_measurement_type_id: The vertical measurement type id to filter on.
+            vertical_measurement_type_id_prefix: The prefix of the vertical measurement type id to filter on.
+            vertical_measurement_unit_of_measure_id: The vertical measurement unit of measure id to filter on.
+            vertical_measurement_unit_of_measure_id_prefix: The prefix of the vertical measurement unit of measure id to filter on.
+            vertical_reference_entity_id: The vertical reference entity id to filter on.
+            vertical_reference_entity_id_prefix: The prefix of the vertical reference entity id to filter on.
+            vertical_reference_id: The vertical reference id to filter on.
+            vertical_reference_id_prefix: The prefix of the vertical reference id to filter on.
+            wellbore_tvd_trajectory_id: The wellbore tvd trajectory id to filter on.
+            wellbore_tvd_trajectory_id_prefix: The prefix of the wellbore tvd trajectory id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of vertical measurements to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            A query API for vertical measurements.
+
+        """
+        filter_ = _create_vertical_measurement_filter(
+            self._view_id,
+            effective_date_time,
+            effective_date_time_prefix,
+            rig_id,
+            rig_id_prefix,
+            termination_date_time,
+            termination_date_time_prefix,
+            vertical_crsid,
+            vertical_crsid_prefix,
+            min_vertical_measurement,
+            max_vertical_measurement,
+            vertical_measurement_description,
+            vertical_measurement_description_prefix,
+            vertical_measurement_id,
+            vertical_measurement_id_prefix,
+            vertical_measurement_path_id,
+            vertical_measurement_path_id_prefix,
+            vertical_measurement_source_id,
+            vertical_measurement_source_id_prefix,
+            vertical_measurement_type_id,
+            vertical_measurement_type_id_prefix,
+            vertical_measurement_unit_of_measure_id,
+            vertical_measurement_unit_of_measure_id_prefix,
+            vertical_reference_entity_id,
+            vertical_reference_entity_id_prefix,
+            vertical_reference_id,
+            vertical_reference_id_prefix,
+            wellbore_tvd_trajectory_id,
+            wellbore_tvd_trajectory_id_prefix,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        builder = QueryBuilder(
+            VerticalMeasurementsList,
+            [
+                QueryStep(
+                    name="vertical_measurement",
+                    expression=dm.query.NodeResultSetExpression(
+                        from_=None,
+                        filter=filter_,
+                    ),
+                    select=dm.query.Select(
+                        [
+                            dm.query.SourceSelector(
+                                self._view_id, list(_VERTICALMEASUREMENTS_PROPERTIES_BY_FIELD.values())
+                            )
+                        ]
+                    ),
+                    result_cls=VerticalMeasurements,
+                    max_retrieve_limit=limit,
+                )
+            ],
+        )
+        return VerticalMeasurementsQueryAPI(self._client, builder, self._view_by_write_class)
 
     def apply(
         self,
         vertical_measurement: VerticalMeasurementsApply | Sequence[VerticalMeasurementsApply],
         replace: bool = False,
-    ) -> dm.InstancesApplyResult:
+    ) -> ResourcesApplyResult:
         """Add or update (upsert) vertical measurements.
 
         Args:
@@ -44,7 +191,7 @@ class VerticalMeasurementsAPI(TypeAPI[VerticalMeasurements, VerticalMeasurements
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes, edges, and time series.
 
         Examples:
 
@@ -57,22 +204,10 @@ class VerticalMeasurementsAPI(TypeAPI[VerticalMeasurements, VerticalMeasurements
                 >>> result = client.vertical_measurements.apply(vertical_measurement)
 
         """
-        if isinstance(vertical_measurement, VerticalMeasurementsApply):
-            instances = vertical_measurement.to_instances_apply(self._view_by_write_class)
-        else:
-            instances = VerticalMeasurementsApplyList(vertical_measurement).to_instances_apply(
-                self._view_by_write_class
-            )
-        return self._client.data_modeling.instances.apply(
-            nodes=instances.nodes,
-            edges=instances.edges,
-            auto_create_start_nodes=True,
-            auto_create_end_nodes=True,
-            replace=replace,
-        )
+        return self._apply(vertical_measurement, replace)
 
     def delete(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> dm.InstancesDeleteResult:
         """Delete one or more vertical measurement.
 
@@ -91,24 +226,19 @@ class VerticalMeasurementsAPI(TypeAPI[VerticalMeasurements, VerticalMeasurements
                 >>> client = OSDUClient()
                 >>> client.vertical_measurements.delete("my_vertical_measurement")
         """
-        if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
-        else:
-            return self._client.data_modeling.instances.delete(
-                nodes=[(space, id) for id in external_id],
-            )
+        return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> VerticalMeasurements:
+    def retrieve(self, external_id: str) -> VerticalMeasurements | None:
         ...
 
     @overload
-    def retrieve(self, external_id: Sequence[str]) -> VerticalMeasurementsList:
+    def retrieve(self, external_id: SequenceNotStr[str]) -> VerticalMeasurementsList:
         ...
 
     def retrieve(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
-    ) -> VerticalMeasurements | VerticalMeasurementsList:
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+    ) -> VerticalMeasurements | VerticalMeasurementsList | None:
         """Retrieve one or more vertical measurements by id(s).
 
         Args:
@@ -127,10 +257,7 @@ class VerticalMeasurementsAPI(TypeAPI[VerticalMeasurements, VerticalMeasurements
                 >>> vertical_measurement = client.vertical_measurements.retrieve("my_vertical_measurement")
 
         """
-        if isinstance(external_id, str):
-            return self._retrieve((space, external_id))
-        else:
-            return self._retrieve([(space, ext_id) for ext_id in external_id])
+        return self._retrieve(external_id, space)
 
     def search(
         self,
@@ -219,7 +346,7 @@ class VerticalMeasurementsAPI(TypeAPI[VerticalMeasurements, VerticalMeasurements
                 >>> vertical_measurements = client.vertical_measurements.search('my_vertical_measurement')
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_vertical_measurement_filter(
             self._view_id,
             effective_date_time,
             effective_date_time_prefix,
@@ -444,7 +571,7 @@ class VerticalMeasurementsAPI(TypeAPI[VerticalMeasurements, VerticalMeasurements
 
         """
 
-        filter_ = _create_filter(
+        filter_ = _create_vertical_measurement_filter(
             self._view_id,
             effective_date_time,
             effective_date_time_prefix,
@@ -573,7 +700,7 @@ class VerticalMeasurementsAPI(TypeAPI[VerticalMeasurements, VerticalMeasurements
             Bucketed histogram results.
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_vertical_measurement_filter(
             self._view_id,
             effective_date_time,
             effective_date_time_prefix,
@@ -701,7 +828,7 @@ class VerticalMeasurementsAPI(TypeAPI[VerticalMeasurements, VerticalMeasurements
                 >>> vertical_measurements = client.vertical_measurements.list(limit=5)
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_vertical_measurement_filter(
             self._view_id,
             effective_date_time,
             effective_date_time_prefix,
@@ -735,216 +862,4 @@ class VerticalMeasurementsAPI(TypeAPI[VerticalMeasurements, VerticalMeasurements
             space,
             filter,
         )
-
         return self._list(limit=limit, filter=filter_)
-
-
-def _create_filter(
-    view_id: dm.ViewId,
-    effective_date_time: str | list[str] | None = None,
-    effective_date_time_prefix: str | None = None,
-    rig_id: str | list[str] | None = None,
-    rig_id_prefix: str | None = None,
-    termination_date_time: str | list[str] | None = None,
-    termination_date_time_prefix: str | None = None,
-    vertical_crsid: str | list[str] | None = None,
-    vertical_crsid_prefix: str | None = None,
-    min_vertical_measurement: float | None = None,
-    max_vertical_measurement: float | None = None,
-    vertical_measurement_description: str | list[str] | None = None,
-    vertical_measurement_description_prefix: str | None = None,
-    vertical_measurement_id: str | list[str] | None = None,
-    vertical_measurement_id_prefix: str | None = None,
-    vertical_measurement_path_id: str | list[str] | None = None,
-    vertical_measurement_path_id_prefix: str | None = None,
-    vertical_measurement_source_id: str | list[str] | None = None,
-    vertical_measurement_source_id_prefix: str | None = None,
-    vertical_measurement_type_id: str | list[str] | None = None,
-    vertical_measurement_type_id_prefix: str | None = None,
-    vertical_measurement_unit_of_measure_id: str | list[str] | None = None,
-    vertical_measurement_unit_of_measure_id_prefix: str | None = None,
-    vertical_reference_entity_id: str | list[str] | None = None,
-    vertical_reference_entity_id_prefix: str | None = None,
-    vertical_reference_id: str | list[str] | None = None,
-    vertical_reference_id_prefix: str | None = None,
-    wellbore_tvd_trajectory_id: str | list[str] | None = None,
-    wellbore_tvd_trajectory_id_prefix: str | None = None,
-    external_id_prefix: str | None = None,
-    space: str | list[str] | None = None,
-    filter: dm.Filter | None = None,
-) -> dm.Filter | None:
-    filters = []
-    if effective_date_time and isinstance(effective_date_time, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("EffectiveDateTime"), value=effective_date_time))
-    if effective_date_time and isinstance(effective_date_time, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("EffectiveDateTime"), values=effective_date_time))
-    if effective_date_time_prefix:
-        filters.append(
-            dm.filters.Prefix(view_id.as_property_ref("EffectiveDateTime"), value=effective_date_time_prefix)
-        )
-    if rig_id and isinstance(rig_id, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("RigID"), value=rig_id))
-    if rig_id and isinstance(rig_id, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("RigID"), values=rig_id))
-    if rig_id_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("RigID"), value=rig_id_prefix))
-    if termination_date_time and isinstance(termination_date_time, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("TerminationDateTime"), value=termination_date_time))
-    if termination_date_time and isinstance(termination_date_time, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("TerminationDateTime"), values=termination_date_time))
-    if termination_date_time_prefix:
-        filters.append(
-            dm.filters.Prefix(view_id.as_property_ref("TerminationDateTime"), value=termination_date_time_prefix)
-        )
-    if vertical_crsid and isinstance(vertical_crsid, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("VerticalCRSID"), value=vertical_crsid))
-    if vertical_crsid and isinstance(vertical_crsid, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("VerticalCRSID"), values=vertical_crsid))
-    if vertical_crsid_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("VerticalCRSID"), value=vertical_crsid_prefix))
-    if min_vertical_measurement or max_vertical_measurement:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("VerticalMeasurement"),
-                gte=min_vertical_measurement,
-                lte=max_vertical_measurement,
-            )
-        )
-    if vertical_measurement_description and isinstance(vertical_measurement_description, str):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("VerticalMeasurementDescription"), value=vertical_measurement_description
-            )
-        )
-    if vertical_measurement_description and isinstance(vertical_measurement_description, list):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("VerticalMeasurementDescription"), values=vertical_measurement_description
-            )
-        )
-    if vertical_measurement_description_prefix:
-        filters.append(
-            dm.filters.Prefix(
-                view_id.as_property_ref("VerticalMeasurementDescription"), value=vertical_measurement_description_prefix
-            )
-        )
-    if vertical_measurement_id and isinstance(vertical_measurement_id, str):
-        filters.append(
-            dm.filters.Equals(view_id.as_property_ref("VerticalMeasurementID"), value=vertical_measurement_id)
-        )
-    if vertical_measurement_id and isinstance(vertical_measurement_id, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("VerticalMeasurementID"), values=vertical_measurement_id))
-    if vertical_measurement_id_prefix:
-        filters.append(
-            dm.filters.Prefix(view_id.as_property_ref("VerticalMeasurementID"), value=vertical_measurement_id_prefix)
-        )
-    if vertical_measurement_path_id and isinstance(vertical_measurement_path_id, str):
-        filters.append(
-            dm.filters.Equals(view_id.as_property_ref("VerticalMeasurementPathID"), value=vertical_measurement_path_id)
-        )
-    if vertical_measurement_path_id and isinstance(vertical_measurement_path_id, list):
-        filters.append(
-            dm.filters.In(view_id.as_property_ref("VerticalMeasurementPathID"), values=vertical_measurement_path_id)
-        )
-    if vertical_measurement_path_id_prefix:
-        filters.append(
-            dm.filters.Prefix(
-                view_id.as_property_ref("VerticalMeasurementPathID"), value=vertical_measurement_path_id_prefix
-            )
-        )
-    if vertical_measurement_source_id and isinstance(vertical_measurement_source_id, str):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("VerticalMeasurementSourceID"), value=vertical_measurement_source_id
-            )
-        )
-    if vertical_measurement_source_id and isinstance(vertical_measurement_source_id, list):
-        filters.append(
-            dm.filters.In(view_id.as_property_ref("VerticalMeasurementSourceID"), values=vertical_measurement_source_id)
-        )
-    if vertical_measurement_source_id_prefix:
-        filters.append(
-            dm.filters.Prefix(
-                view_id.as_property_ref("VerticalMeasurementSourceID"), value=vertical_measurement_source_id_prefix
-            )
-        )
-    if vertical_measurement_type_id and isinstance(vertical_measurement_type_id, str):
-        filters.append(
-            dm.filters.Equals(view_id.as_property_ref("VerticalMeasurementTypeID"), value=vertical_measurement_type_id)
-        )
-    if vertical_measurement_type_id and isinstance(vertical_measurement_type_id, list):
-        filters.append(
-            dm.filters.In(view_id.as_property_ref("VerticalMeasurementTypeID"), values=vertical_measurement_type_id)
-        )
-    if vertical_measurement_type_id_prefix:
-        filters.append(
-            dm.filters.Prefix(
-                view_id.as_property_ref("VerticalMeasurementTypeID"), value=vertical_measurement_type_id_prefix
-            )
-        )
-    if vertical_measurement_unit_of_measure_id and isinstance(vertical_measurement_unit_of_measure_id, str):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("VerticalMeasurementUnitOfMeasureID"),
-                value=vertical_measurement_unit_of_measure_id,
-            )
-        )
-    if vertical_measurement_unit_of_measure_id and isinstance(vertical_measurement_unit_of_measure_id, list):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("VerticalMeasurementUnitOfMeasureID"),
-                values=vertical_measurement_unit_of_measure_id,
-            )
-        )
-    if vertical_measurement_unit_of_measure_id_prefix:
-        filters.append(
-            dm.filters.Prefix(
-                view_id.as_property_ref("VerticalMeasurementUnitOfMeasureID"),
-                value=vertical_measurement_unit_of_measure_id_prefix,
-            )
-        )
-    if vertical_reference_entity_id and isinstance(vertical_reference_entity_id, str):
-        filters.append(
-            dm.filters.Equals(view_id.as_property_ref("VerticalReferenceEntityID"), value=vertical_reference_entity_id)
-        )
-    if vertical_reference_entity_id and isinstance(vertical_reference_entity_id, list):
-        filters.append(
-            dm.filters.In(view_id.as_property_ref("VerticalReferenceEntityID"), values=vertical_reference_entity_id)
-        )
-    if vertical_reference_entity_id_prefix:
-        filters.append(
-            dm.filters.Prefix(
-                view_id.as_property_ref("VerticalReferenceEntityID"), value=vertical_reference_entity_id_prefix
-            )
-        )
-    if vertical_reference_id and isinstance(vertical_reference_id, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("VerticalReferenceID"), value=vertical_reference_id))
-    if vertical_reference_id and isinstance(vertical_reference_id, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("VerticalReferenceID"), values=vertical_reference_id))
-    if vertical_reference_id_prefix:
-        filters.append(
-            dm.filters.Prefix(view_id.as_property_ref("VerticalReferenceID"), value=vertical_reference_id_prefix)
-        )
-    if wellbore_tvd_trajectory_id and isinstance(wellbore_tvd_trajectory_id, str):
-        filters.append(
-            dm.filters.Equals(view_id.as_property_ref("WellboreTVDTrajectoryID"), value=wellbore_tvd_trajectory_id)
-        )
-    if wellbore_tvd_trajectory_id and isinstance(wellbore_tvd_trajectory_id, list):
-        filters.append(
-            dm.filters.In(view_id.as_property_ref("WellboreTVDTrajectoryID"), values=wellbore_tvd_trajectory_id)
-        )
-    if wellbore_tvd_trajectory_id_prefix:
-        filters.append(
-            dm.filters.Prefix(
-                view_id.as_property_ref("WellboreTVDTrajectoryID"), value=wellbore_tvd_trajectory_id_prefix
-            )
-        )
-    if external_id_prefix:
-        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
-        filters.append(dm.filters.Equals(["node", "space"], value=space))
-    if space and isinstance(space, list):
-        filters.append(dm.filters.In(["node", "space"], values=space))
-    if filter:
-        filters.append(filter)
-    return dm.filters.And(*filters) if filters else None

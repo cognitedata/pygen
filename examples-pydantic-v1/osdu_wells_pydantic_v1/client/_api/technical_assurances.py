@@ -1,332 +1,42 @@
 from __future__ import annotations
 
-from collections import defaultdict
-from typing import Dict, List, Sequence, Tuple, overload
+from collections.abc import Sequence
+from typing import overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from osdu_wells_pydantic_v1.client.data_classes import (
+    DomainModelApply,
+    ResourcesApplyResult,
     TechnicalAssurances,
     TechnicalAssurancesApply,
+    TechnicalAssurancesFields,
     TechnicalAssurancesList,
     TechnicalAssurancesApplyList,
-    TechnicalAssurancesFields,
     TechnicalAssurancesTextFields,
-    DomainModelApply,
 )
-from osdu_wells_pydantic_v1.client.data_classes._technical_assurances import _TECHNICALASSURANCES_PROPERTIES_BY_FIELD
+from osdu_wells_pydantic_v1.client.data_classes._technical_assurances import (
+    _TECHNICALASSURANCES_PROPERTIES_BY_FIELD,
+    _create_technical_assurance_filter,
+)
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
+from .technical_assurances_acceptable_usage import TechnicalAssurancesAcceptableUsageAPI
+from .technical_assurances_reviewers import TechnicalAssurancesReviewersAPI
+from .technical_assurances_unacceptable_usage import TechnicalAssurancesUnacceptableUsageAPI
+from .technical_assurances_query import TechnicalAssurancesQueryAPI
 
 
-class TechnicalAssurancesAcceptableUsageAPI:
-    def __init__(self, client: CogniteClient):
-        self._client = client
-
-    def retrieve(
-        self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str = "IntegrationTestsImmutable"
-    ) -> dm.EdgeList:
-        """Retrieve one or more acceptable_usage edges by id(s) of a technical assurance.
-
-        Args:
-            external_id: External id or list of external ids source technical assurance.
-            space: The space where all the acceptable usage edges are located.
-
-        Returns:
-            The requested acceptable usage edges.
-
-        Examples:
-
-            Retrieve acceptable_usage edge by id:
-
-                >>> from osdu_wells_pydantic_v1.client import OSDUClient
-                >>> client = OSDUClient()
-                >>> technical_assurance = client.technical_assurances.acceptable_usage.retrieve("my_acceptable_usage")
-
-        """
-        f = dm.filters
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": "IntegrationTestsImmutable", "externalId": "TechnicalAssurances.AcceptableUsage"},
-        )
-        if isinstance(external_id, (str, dm.NodeId)):
-            is_technical_assurances = f.Equals(
-                ["edge", "startNode"],
-                {"space": space, "externalId": external_id}
-                if isinstance(external_id, str)
-                else external_id.dump(camel_case=True, include_instance_type=False),
-            )
-        else:
-            is_technical_assurances = f.In(
-                ["edge", "startNode"],
-                [
-                    {"space": space, "externalId": ext_id}
-                    if isinstance(ext_id, str)
-                    else ext_id.dump(camel_case=True, include_instance_type=False)
-                    for ext_id in external_id
-                ],
-            )
-        return self._client.data_modeling.instances.list(
-            "edge", limit=-1, filter=f.And(is_edge_type, is_technical_assurances)
-        )
-
-    def list(
-        self,
-        technical_assurance_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        limit=DEFAULT_LIMIT_READ,
-        space: str = "IntegrationTestsImmutable",
-    ) -> dm.EdgeList:
-        """List acceptable_usage edges of a technical assurance.
-
-        Args:
-            technical_assurance_id: ID of the source technical assurance.
-            limit: Maximum number of acceptable usage edges to return. Defaults to 25. Set to -1, float("inf") or None
-                to return all items.
-            space: The space where all the acceptable usage edges are located.
-
-        Returns:
-            The requested acceptable usage edges.
-
-        Examples:
-
-            List 5 acceptable_usage edges connected to "my_technical_assurance":
-
-                >>> from osdu_wells_pydantic_v1.client import OSDUClient
-                >>> client = OSDUClient()
-                >>> technical_assurance = client.technical_assurances.acceptable_usage.list("my_technical_assurance", limit=5)
-
-        """
-        f = dm.filters
-        filters = [
-            f.Equals(
-                ["edge", "type"],
-                {"space": "IntegrationTestsImmutable", "externalId": "TechnicalAssurances.AcceptableUsage"},
-            )
-        ]
-        if technical_assurance_id:
-            technical_assurance_ids = (
-                technical_assurance_id if isinstance(technical_assurance_id, list) else [technical_assurance_id]
-            )
-            is_technical_assurances = f.In(
-                ["edge", "startNode"],
-                [
-                    {"space": space, "externalId": ext_id}
-                    if isinstance(ext_id, str)
-                    else ext_id.dump(camel_case=True, include_instance_type=False)
-                    for ext_id in technical_assurance_ids
-                ],
-            )
-            filters.append(is_technical_assurances)
-
-        return self._client.data_modeling.instances.list("edge", limit=limit, filter=f.And(*filters))
-
-
-class TechnicalAssurancesReviewersAPI:
-    def __init__(self, client: CogniteClient):
-        self._client = client
-
-    def retrieve(
-        self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str = "IntegrationTestsImmutable"
-    ) -> dm.EdgeList:
-        """Retrieve one or more reviewers edges by id(s) of a technical assurance.
-
-        Args:
-            external_id: External id or list of external ids source technical assurance.
-            space: The space where all the reviewer edges are located.
-
-        Returns:
-            The requested reviewer edges.
-
-        Examples:
-
-            Retrieve reviewers edge by id:
-
-                >>> from osdu_wells_pydantic_v1.client import OSDUClient
-                >>> client = OSDUClient()
-                >>> technical_assurance = client.technical_assurances.reviewers.retrieve("my_reviewers")
-
-        """
-        f = dm.filters
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": "IntegrationTestsImmutable", "externalId": "TechnicalAssurances.Reviewers"},
-        )
-        if isinstance(external_id, (str, dm.NodeId)):
-            is_technical_assurances = f.Equals(
-                ["edge", "startNode"],
-                {"space": space, "externalId": external_id}
-                if isinstance(external_id, str)
-                else external_id.dump(camel_case=True, include_instance_type=False),
-            )
-        else:
-            is_technical_assurances = f.In(
-                ["edge", "startNode"],
-                [
-                    {"space": space, "externalId": ext_id}
-                    if isinstance(ext_id, str)
-                    else ext_id.dump(camel_case=True, include_instance_type=False)
-                    for ext_id in external_id
-                ],
-            )
-        return self._client.data_modeling.instances.list(
-            "edge", limit=-1, filter=f.And(is_edge_type, is_technical_assurances)
-        )
-
-    def list(
-        self,
-        technical_assurance_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        limit=DEFAULT_LIMIT_READ,
-        space: str = "IntegrationTestsImmutable",
-    ) -> dm.EdgeList:
-        """List reviewers edges of a technical assurance.
-
-        Args:
-            technical_assurance_id: ID of the source technical assurance.
-            limit: Maximum number of reviewer edges to return. Defaults to 25. Set to -1, float("inf") or None
-                to return all items.
-            space: The space where all the reviewer edges are located.
-
-        Returns:
-            The requested reviewer edges.
-
-        Examples:
-
-            List 5 reviewers edges connected to "my_technical_assurance":
-
-                >>> from osdu_wells_pydantic_v1.client import OSDUClient
-                >>> client = OSDUClient()
-                >>> technical_assurance = client.technical_assurances.reviewers.list("my_technical_assurance", limit=5)
-
-        """
-        f = dm.filters
-        filters = [
-            f.Equals(
-                ["edge", "type"],
-                {"space": "IntegrationTestsImmutable", "externalId": "TechnicalAssurances.Reviewers"},
-            )
-        ]
-        if technical_assurance_id:
-            technical_assurance_ids = (
-                technical_assurance_id if isinstance(technical_assurance_id, list) else [technical_assurance_id]
-            )
-            is_technical_assurances = f.In(
-                ["edge", "startNode"],
-                [
-                    {"space": space, "externalId": ext_id}
-                    if isinstance(ext_id, str)
-                    else ext_id.dump(camel_case=True, include_instance_type=False)
-                    for ext_id in technical_assurance_ids
-                ],
-            )
-            filters.append(is_technical_assurances)
-
-        return self._client.data_modeling.instances.list("edge", limit=limit, filter=f.And(*filters))
-
-
-class TechnicalAssurancesUnacceptableUsageAPI:
-    def __init__(self, client: CogniteClient):
-        self._client = client
-
-    def retrieve(
-        self, external_id: str | Sequence[str] | dm.NodeId | list[dm.NodeId], space: str = "IntegrationTestsImmutable"
-    ) -> dm.EdgeList:
-        """Retrieve one or more unacceptable_usage edges by id(s) of a technical assurance.
-
-        Args:
-            external_id: External id or list of external ids source technical assurance.
-            space: The space where all the unacceptable usage edges are located.
-
-        Returns:
-            The requested unacceptable usage edges.
-
-        Examples:
-
-            Retrieve unacceptable_usage edge by id:
-
-                >>> from osdu_wells_pydantic_v1.client import OSDUClient
-                >>> client = OSDUClient()
-                >>> technical_assurance = client.technical_assurances.unacceptable_usage.retrieve("my_unacceptable_usage")
-
-        """
-        f = dm.filters
-        is_edge_type = f.Equals(
-            ["edge", "type"],
-            {"space": "IntegrationTestsImmutable", "externalId": "TechnicalAssurances.UnacceptableUsage"},
-        )
-        if isinstance(external_id, (str, dm.NodeId)):
-            is_technical_assurances = f.Equals(
-                ["edge", "startNode"],
-                {"space": space, "externalId": external_id}
-                if isinstance(external_id, str)
-                else external_id.dump(camel_case=True, include_instance_type=False),
-            )
-        else:
-            is_technical_assurances = f.In(
-                ["edge", "startNode"],
-                [
-                    {"space": space, "externalId": ext_id}
-                    if isinstance(ext_id, str)
-                    else ext_id.dump(camel_case=True, include_instance_type=False)
-                    for ext_id in external_id
-                ],
-            )
-        return self._client.data_modeling.instances.list(
-            "edge", limit=-1, filter=f.And(is_edge_type, is_technical_assurances)
-        )
-
-    def list(
-        self,
-        technical_assurance_id: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        limit=DEFAULT_LIMIT_READ,
-        space: str = "IntegrationTestsImmutable",
-    ) -> dm.EdgeList:
-        """List unacceptable_usage edges of a technical assurance.
-
-        Args:
-            technical_assurance_id: ID of the source technical assurance.
-            limit: Maximum number of unacceptable usage edges to return. Defaults to 25. Set to -1, float("inf") or None
-                to return all items.
-            space: The space where all the unacceptable usage edges are located.
-
-        Returns:
-            The requested unacceptable usage edges.
-
-        Examples:
-
-            List 5 unacceptable_usage edges connected to "my_technical_assurance":
-
-                >>> from osdu_wells_pydantic_v1.client import OSDUClient
-                >>> client = OSDUClient()
-                >>> technical_assurance = client.technical_assurances.unacceptable_usage.list("my_technical_assurance", limit=5)
-
-        """
-        f = dm.filters
-        filters = [
-            f.Equals(
-                ["edge", "type"],
-                {"space": "IntegrationTestsImmutable", "externalId": "TechnicalAssurances.UnacceptableUsage"},
-            )
-        ]
-        if technical_assurance_id:
-            technical_assurance_ids = (
-                technical_assurance_id if isinstance(technical_assurance_id, list) else [technical_assurance_id]
-            )
-            is_technical_assurances = f.In(
-                ["edge", "startNode"],
-                [
-                    {"space": space, "externalId": ext_id}
-                    if isinstance(ext_id, str)
-                    else ext_id.dump(camel_case=True, include_instance_type=False)
-                    for ext_id in technical_assurance_ids
-                ],
-            )
-            filters.append(is_technical_assurances)
-
-        return self._client.data_modeling.instances.list("edge", limit=limit, filter=f.And(*filters))
-
-
-class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApply, TechnicalAssurancesList]):
+class TechnicalAssurancesAPI(NodeAPI[TechnicalAssurances, TechnicalAssurancesApply, TechnicalAssurancesList]):
     def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
         view_id = view_by_write_class[TechnicalAssurancesApply]
         super().__init__(
@@ -335,19 +45,86 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
             class_type=TechnicalAssurances,
             class_apply_type=TechnicalAssurancesApply,
             class_list=TechnicalAssurancesList,
+            class_apply_list=TechnicalAssurancesApplyList,
+            view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self._view_by_write_class = view_by_write_class
-        self.acceptable_usage = TechnicalAssurancesAcceptableUsageAPI(client)
-        self.reviewers = TechnicalAssurancesReviewersAPI(client)
-        self.unacceptable_usage = TechnicalAssurancesUnacceptableUsageAPI(client)
+        self.acceptable_usage_edge = TechnicalAssurancesAcceptableUsageAPI(client)
+        self.reviewers_edge = TechnicalAssurancesReviewersAPI(client)
+        self.unacceptable_usage_edge = TechnicalAssurancesUnacceptableUsageAPI(client)
+
+    def __call__(
+        self,
+        comment: str | list[str] | None = None,
+        comment_prefix: str | None = None,
+        effective_date: str | list[str] | None = None,
+        effective_date_prefix: str | None = None,
+        technical_assurance_type_id: str | list[str] | None = None,
+        technical_assurance_type_id_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+        filter: dm.Filter | None = None,
+    ) -> TechnicalAssurancesQueryAPI[TechnicalAssurancesList]:
+        """Query starting at technical assurances.
+
+        Args:
+            comment: The comment to filter on.
+            comment_prefix: The prefix of the comment to filter on.
+            effective_date: The effective date to filter on.
+            effective_date_prefix: The prefix of the effective date to filter on.
+            technical_assurance_type_id: The technical assurance type id to filter on.
+            technical_assurance_type_id_prefix: The prefix of the technical assurance type id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of technical assurances to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            A query API for technical assurances.
+
+        """
+        filter_ = _create_technical_assurance_filter(
+            self._view_id,
+            comment,
+            comment_prefix,
+            effective_date,
+            effective_date_prefix,
+            technical_assurance_type_id,
+            technical_assurance_type_id_prefix,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        builder = QueryBuilder(
+            TechnicalAssurancesList,
+            [
+                QueryStep(
+                    name="technical_assurance",
+                    expression=dm.query.NodeResultSetExpression(
+                        from_=None,
+                        filter=filter_,
+                    ),
+                    select=dm.query.Select(
+                        [
+                            dm.query.SourceSelector(
+                                self._view_id, list(_TECHNICALASSURANCES_PROPERTIES_BY_FIELD.values())
+                            )
+                        ]
+                    ),
+                    result_cls=TechnicalAssurances,
+                    max_retrieve_limit=limit,
+                )
+            ],
+        )
+        return TechnicalAssurancesQueryAPI(self._client, builder, self._view_by_write_class)
 
     def apply(
         self, technical_assurance: TechnicalAssurancesApply | Sequence[TechnicalAssurancesApply], replace: bool = False
-    ) -> dm.InstancesApplyResult:
+    ) -> ResourcesApplyResult:
         """Add or update (upsert) technical assurances.
 
-        Note: This method iterates through all nodes linked to technical_assurance and create them including the edges
+        Note: This method iterates through all nodes and timeseries linked to technical_assurance and creates them including the edges
         between the nodes. For example, if any of `acceptable_usage`, `reviewers` or `unacceptable_usage` are set, then these
         nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
 
@@ -356,7 +133,7 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes, edges, and time series.
 
         Examples:
 
@@ -369,20 +146,10 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
                 >>> result = client.technical_assurances.apply(technical_assurance)
 
         """
-        if isinstance(technical_assurance, TechnicalAssurancesApply):
-            instances = technical_assurance.to_instances_apply(self._view_by_write_class)
-        else:
-            instances = TechnicalAssurancesApplyList(technical_assurance).to_instances_apply(self._view_by_write_class)
-        return self._client.data_modeling.instances.apply(
-            nodes=instances.nodes,
-            edges=instances.edges,
-            auto_create_start_nodes=True,
-            auto_create_end_nodes=True,
-            replace=replace,
-        )
+        return self._apply(technical_assurance, replace)
 
     def delete(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> dm.InstancesDeleteResult:
         """Delete one or more technical assurance.
 
@@ -401,24 +168,19 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
                 >>> client = OSDUClient()
                 >>> client.technical_assurances.delete("my_technical_assurance")
         """
-        if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
-        else:
-            return self._client.data_modeling.instances.delete(
-                nodes=[(space, id) for id in external_id],
-            )
+        return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> TechnicalAssurances:
+    def retrieve(self, external_id: str) -> TechnicalAssurances | None:
         ...
 
     @overload
-    def retrieve(self, external_id: Sequence[str]) -> TechnicalAssurancesList:
+    def retrieve(self, external_id: SequenceNotStr[str]) -> TechnicalAssurancesList:
         ...
 
     def retrieve(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
-    ) -> TechnicalAssurances | TechnicalAssurancesList:
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+    ) -> TechnicalAssurances | TechnicalAssurancesList | None:
         """Retrieve one or more technical assurances by id(s).
 
         Args:
@@ -437,28 +199,28 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
                 >>> technical_assurance = client.technical_assurances.retrieve("my_technical_assurance")
 
         """
-        if isinstance(external_id, str):
-            technical_assurance = self._retrieve((space, external_id))
-
-            acceptable_usage_edges = self.acceptable_usage.retrieve(external_id, space=space)
-            technical_assurance.acceptable_usage = [edge.end_node.external_id for edge in acceptable_usage_edges]
-            reviewer_edges = self.reviewers.retrieve(external_id, space=space)
-            technical_assurance.reviewers = [edge.end_node.external_id for edge in reviewer_edges]
-            unacceptable_usage_edges = self.unacceptable_usage.retrieve(external_id, space=space)
-            technical_assurance.unacceptable_usage = [edge.end_node.external_id for edge in unacceptable_usage_edges]
-
-            return technical_assurance
-        else:
-            technical_assurances = self._retrieve([(space, ext_id) for ext_id in external_id])
-
-            acceptable_usage_edges = self.acceptable_usage.retrieve(technical_assurances.as_node_ids())
-            self._set_acceptable_usage(technical_assurances, acceptable_usage_edges)
-            reviewer_edges = self.reviewers.retrieve(technical_assurances.as_node_ids())
-            self._set_reviewers(technical_assurances, reviewer_edges)
-            unacceptable_usage_edges = self.unacceptable_usage.retrieve(technical_assurances.as_node_ids())
-            self._set_unacceptable_usage(technical_assurances, unacceptable_usage_edges)
-
-            return technical_assurances
+        return self._retrieve(
+            external_id,
+            space,
+            retrieve_edges=True,
+            edge_api_name_type_triple=[
+                (
+                    self.acceptable_usage_edge,
+                    "acceptable_usage",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "TechnicalAssurances.AcceptableUsage"),
+                ),
+                (
+                    self.reviewers_edge,
+                    "reviewers",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "TechnicalAssurances.Reviewers"),
+                ),
+                (
+                    self.unacceptable_usage_edge,
+                    "unacceptable_usage",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "TechnicalAssurances.UnacceptableUsage"),
+                ),
+            ],
+        )
 
     def search(
         self,
@@ -490,7 +252,6 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
             space: The space to filter on.
             limit: Maximum number of technical assurances to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            retrieve_edges: Whether to retrieve `acceptable_usage`, `reviewers` or `unacceptable_usage` external ids for the technical assurances. Defaults to True.
 
         Returns:
             Search results technical assurances matching the query.
@@ -504,7 +265,7 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
                 >>> technical_assurances = client.technical_assurances.search('my_technical_assurance')
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_technical_assurance_filter(
             self._view_id,
             comment,
             comment_prefix,
@@ -605,7 +366,6 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
             space: The space to filter on.
             limit: Maximum number of technical assurances to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            retrieve_edges: Whether to retrieve `acceptable_usage`, `reviewers` or `unacceptable_usage` external ids for the technical assurances. Defaults to True.
 
         Returns:
             Aggregation results.
@@ -620,7 +380,7 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
 
         """
 
-        filter_ = _create_filter(
+        filter_ = _create_technical_assurance_filter(
             self._view_id,
             comment,
             comment_prefix,
@@ -678,13 +438,12 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
             space: The space to filter on.
             limit: Maximum number of technical assurances to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            retrieve_edges: Whether to retrieve `acceptable_usage`, `reviewers` or `unacceptable_usage` external ids for the technical assurances. Defaults to True.
 
         Returns:
             Bucketed histogram results.
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_technical_assurance_filter(
             self._view_id,
             comment,
             comment_prefix,
@@ -748,7 +507,7 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
                 >>> technical_assurances = client.technical_assurances.list(limit=5)
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_technical_assurance_filter(
             self._view_id,
             comment,
             comment_prefix,
@@ -761,115 +520,25 @@ class TechnicalAssurancesAPI(TypeAPI[TechnicalAssurances, TechnicalAssurancesApp
             filter,
         )
 
-        technical_assurances = self._list(limit=limit, filter=filter_)
-
-        if retrieve_edges:
-            space_arg = {"space": space} if space else {}
-            if len(ids := technical_assurances.as_node_ids()) > IN_FILTER_LIMIT:
-                acceptable_usage_edges = self.acceptable_usage.list(limit=-1, **space_arg)
-            else:
-                acceptable_usage_edges = self.acceptable_usage.list(ids, limit=-1)
-            self._set_acceptable_usage(technical_assurances, acceptable_usage_edges)
-            if len(ids := technical_assurances.as_node_ids()) > IN_FILTER_LIMIT:
-                reviewer_edges = self.reviewers.list(limit=-1, **space_arg)
-            else:
-                reviewer_edges = self.reviewers.list(ids, limit=-1)
-            self._set_reviewers(technical_assurances, reviewer_edges)
-            if len(ids := technical_assurances.as_node_ids()) > IN_FILTER_LIMIT:
-                unacceptable_usage_edges = self.unacceptable_usage.list(limit=-1, **space_arg)
-            else:
-                unacceptable_usage_edges = self.unacceptable_usage.list(ids, limit=-1)
-            self._set_unacceptable_usage(technical_assurances, unacceptable_usage_edges)
-
-        return technical_assurances
-
-    @staticmethod
-    def _set_acceptable_usage(
-        technical_assurances: Sequence[TechnicalAssurances], acceptable_usage_edges: Sequence[dm.Edge]
-    ):
-        edges_by_start_node: Dict[Tuple, List] = defaultdict(list)
-        for edge in acceptable_usage_edges:
-            edges_by_start_node[edge.start_node.as_tuple()].append(edge)
-
-        for technical_assurance in technical_assurances:
-            node_id = technical_assurance.id_tuple()
-            if node_id in edges_by_start_node:
-                technical_assurance.acceptable_usage = [
-                    edge.end_node.external_id for edge in edges_by_start_node[node_id]
-                ]
-
-    @staticmethod
-    def _set_reviewers(technical_assurances: Sequence[TechnicalAssurances], reviewer_edges: Sequence[dm.Edge]):
-        edges_by_start_node: Dict[Tuple, List] = defaultdict(list)
-        for edge in reviewer_edges:
-            edges_by_start_node[edge.start_node.as_tuple()].append(edge)
-
-        for technical_assurance in technical_assurances:
-            node_id = technical_assurance.id_tuple()
-            if node_id in edges_by_start_node:
-                technical_assurance.reviewers = [edge.end_node.external_id for edge in edges_by_start_node[node_id]]
-
-    @staticmethod
-    def _set_unacceptable_usage(
-        technical_assurances: Sequence[TechnicalAssurances], unacceptable_usage_edges: Sequence[dm.Edge]
-    ):
-        edges_by_start_node: Dict[Tuple, List] = defaultdict(list)
-        for edge in unacceptable_usage_edges:
-            edges_by_start_node[edge.start_node.as_tuple()].append(edge)
-
-        for technical_assurance in technical_assurances:
-            node_id = technical_assurance.id_tuple()
-            if node_id in edges_by_start_node:
-                technical_assurance.unacceptable_usage = [
-                    edge.end_node.external_id for edge in edges_by_start_node[node_id]
-                ]
-
-
-def _create_filter(
-    view_id: dm.ViewId,
-    comment: str | list[str] | None = None,
-    comment_prefix: str | None = None,
-    effective_date: str | list[str] | None = None,
-    effective_date_prefix: str | None = None,
-    technical_assurance_type_id: str | list[str] | None = None,
-    technical_assurance_type_id_prefix: str | None = None,
-    external_id_prefix: str | None = None,
-    space: str | list[str] | None = None,
-    filter: dm.Filter | None = None,
-) -> dm.Filter | None:
-    filters = []
-    if comment and isinstance(comment, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("Comment"), value=comment))
-    if comment and isinstance(comment, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("Comment"), values=comment))
-    if comment_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("Comment"), value=comment_prefix))
-    if effective_date and isinstance(effective_date, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("EffectiveDate"), value=effective_date))
-    if effective_date and isinstance(effective_date, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("EffectiveDate"), values=effective_date))
-    if effective_date_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("EffectiveDate"), value=effective_date_prefix))
-    if technical_assurance_type_id and isinstance(technical_assurance_type_id, str):
-        filters.append(
-            dm.filters.Equals(view_id.as_property_ref("TechnicalAssuranceTypeID"), value=technical_assurance_type_id)
+        return self._list(
+            limit=limit,
+            filter=filter_,
+            retrieve_edges=retrieve_edges,
+            edge_api_name_type_triple=[
+                (
+                    self.acceptable_usage_edge,
+                    "acceptable_usage",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "TechnicalAssurances.AcceptableUsage"),
+                ),
+                (
+                    self.reviewers_edge,
+                    "reviewers",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "TechnicalAssurances.Reviewers"),
+                ),
+                (
+                    self.unacceptable_usage_edge,
+                    "unacceptable_usage",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "TechnicalAssurances.UnacceptableUsage"),
+                ),
+            ],
         )
-    if technical_assurance_type_id and isinstance(technical_assurance_type_id, list):
-        filters.append(
-            dm.filters.In(view_id.as_property_ref("TechnicalAssuranceTypeID"), values=technical_assurance_type_id)
-        )
-    if technical_assurance_type_id_prefix:
-        filters.append(
-            dm.filters.Prefix(
-                view_id.as_property_ref("TechnicalAssuranceTypeID"), value=technical_assurance_type_id_prefix
-            )
-        )
-    if external_id_prefix:
-        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
-        filters.append(dm.filters.Equals(["node", "space"], value=space))
-    if space and isinstance(space, list):
-        filters.append(dm.filters.In(["node", "space"], values=space))
-    if filter:
-        filters.append(filter)
-    return dm.filters.And(*filters) if filters else None

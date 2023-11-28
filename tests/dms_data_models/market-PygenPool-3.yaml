@@ -1,25 +1,25 @@
-- created_time: 1689487620604
+- createdTime: 1689487620604
   description: ''
-  external_id: PygenPool
-  is_global: false
-  last_updated_time: 1689487620604
+  externalId: PygenPool
+  isGlobal: false
+  lastUpdatedTime: 1689487620604
   name: PygenPool
   space: market
   version: '3'
   views:
-  - created_time: 1689328127900
-    external_id: ValueTransformation
-    is_global: false
-    last_updated_time: 1689328127900
+  - createdTime: 1689328127900
+    externalId: ValueTransformation
+    isGlobal: false
+    lastUpdatedTime: 1689328127900
     name: ValueTransformation
     properties:
       arguments:
-        auto_increment: false
+        autoIncrement: false
         container:
-          external_id: ValueTransformation
+          externalId: ValueTransformation
           space: market
-        container_property_identifier: arguments
-        default_value: null
+        containerPropertyIdentifier: arguments
+        defaultValue: null
         description: null
         name: arguments
         nullable: true
@@ -28,12 +28,12 @@
           list: false
           type: json
       method:
-        auto_increment: false
+        autoIncrement: false
         container:
-          external_id: ValueTransformation
+          externalId: ValueTransformation
           space: market
-        container_property_identifier: method
-        default_value: null
+        containerPropertyIdentifier: method
+        defaultValue: null
         description: null
         name: method
         nullable: true
@@ -43,22 +43,22 @@
           list: false
           type: text
     space: market
-    used_for: node
+    usedFor: node
     version: 946587c592b44c
     writable: true
-  - created_time: 1689487094937
-    external_id: DateTransformation
-    is_global: false
-    last_updated_time: 1689487094937
+  - createdTime: 1689487094937
+    externalId: DateTransformation
+    isGlobal: false
+    lastUpdatedTime: 1689487094937
     name: DateTransformation
     properties:
       arguments:
-        auto_increment: false
+        autoIncrement: false
         container:
-          external_id: DateTransformation
+          externalId: DateTransformation
           space: market
-        container_property_identifier: arguments
-        default_value: null
+        containerPropertyIdentifier: arguments
+        defaultValue: null
         description: null
         name: arguments
         nullable: true
@@ -67,12 +67,12 @@
           list: false
           type: json
       method:
-        auto_increment: false
+        autoIncrement: false
         container:
-          external_id: DateTransformation
+          externalId: DateTransformation
           space: market
-        container_property_identifier: method
-        default_value: null
+        containerPropertyIdentifier: method
+        defaultValue: null
         description: null
         name: method
         nullable: true
@@ -82,58 +82,60 @@
           list: false
           type: text
     space: market
-    used_for: node
+    usedFor: node
     version: 5248f7e87c4c96
     writable: true
-  - created_time: 1689487619605
-    external_id: DateTransformationPair
-    is_global: false
-    last_updated_time: 1689487619605
+  - createdTime: 1689487619605
+    externalId: DateTransformationPair
+    isGlobal: false
+    lastUpdatedTime: 1689487619605
     name: DateTransformationPair
     properties:
       end:
+        connectionType: multi_edge_connection
         description: null
         direction: outwards
-        edge_source: null
+        edgeSource: null
         name: end
         source:
-          external_id: DateTransformation
+          externalId: DateTransformation
           space: market
           type: view
           version: 5248f7e87c4c96
         type:
-          external_id: DateTransformationPair.end
+          externalId: DateTransformationPair.end
           space: market
       start:
+        connectionType: multi_edge_connection
         description: null
         direction: outwards
-        edge_source: null
+        edgeSource: null
         name: start
         source:
-          external_id: DateTransformation
+          externalId: DateTransformation
           space: market
           type: view
           version: 5248f7e87c4c96
         type:
-          external_id: DateTransformationPair.start
+          externalId: DateTransformationPair.start
           space: market
     space: market
-    used_for: all
+    usedFor: all
     version: 310f933a9aca9b
     writable: false
-  - created_time: 1689328127900
-    external_id: Market
-    is_global: false
-    last_updated_time: 1689328127900
+  - createdTime: 1689328127900
+    externalId: Market
+    isGlobal: false
+    lastUpdatedTime: 1689328127900
     name: Market
     properties:
       name:
-        auto_increment: false
+        autoIncrement: false
         container:
-          external_id: Market
+          externalId: Market
           space: market
-        container_property_identifier: name
-        default_value: null
+        containerPropertyIdentifier: name
+        defaultValue: null
         description: null
         name: name
         nullable: true
@@ -143,12 +145,12 @@
           list: false
           type: text
       timezone:
-        auto_increment: false
+        autoIncrement: false
         container:
-          external_id: Market
+          externalId: Market
           space: market
-        container_property_identifier: timezone
-        default_value: null
+        containerPropertyIdentifier: timezone
+        defaultValue: null
         description: null
         name: timezone
         nullable: true
@@ -158,39 +160,38 @@
           list: false
           type: text
     space: market
-    used_for: node
+    usedFor: node
     version: 5b43e98565d4d5
     writable: true
-  - created_time: 1689487619605
-    external_id: Process
-    is_global: false
-    last_updated_time: 1689487619605
+  - createdTime: 1689487619605
+    externalId: Process
+    isGlobal: false
+    lastUpdatedTime: 1689487619605
     name: Process
     properties:
       bid:
-        auto_increment: false
+        autoIncrement: false
         container:
-          external_id: Process
+          externalId: Process
           space: market
-        container_property_identifier: bid
-        default_value: null
+        containerPropertyIdentifier: bid
+        defaultValue: null
         description: null
         name: bid
         nullable: true
         type:
-          container: null
           source:
-            external_id: Bid
+            externalId: Bid
             space: market
             version: 1ad3f030a8399f
           type: direct
       name:
-        auto_increment: false
+        autoIncrement: false
         container:
-          external_id: Process
+          externalId: Process
           space: market
-        container_property_identifier: name
-        default_value: null
+        containerPropertyIdentifier: name
+        defaultValue: null
         description: null
         name: name
         nullable: true
@@ -200,22 +201,22 @@
           list: false
           type: text
     space: market
-    used_for: node
+    usedFor: node
     version: b3e0207c0bb510
     writable: true
-  - created_time: 1689487619605
-    external_id: Bid
-    is_global: false
-    last_updated_time: 1689487619605
+  - createdTime: 1689487619605
+    externalId: Bid
+    isGlobal: false
+    lastUpdatedTime: 1689487619605
     name: Bid
     properties:
       date:
-        auto_increment: false
+        autoIncrement: false
         container:
-          external_id: Bid
+          externalId: Bid
           space: market
-        container_property_identifier: date
-        default_value: null
+        containerPropertyIdentifier: date
+        defaultValue: null
         description: null
         name: date
         nullable: true
@@ -224,29 +225,28 @@
           list: false
           type: date
       market:
-        auto_increment: false
+        autoIncrement: false
         container:
-          external_id: Bid
+          externalId: Bid
           space: market
-        container_property_identifier: market
-        default_value: null
+        containerPropertyIdentifier: market
+        defaultValue: null
         description: null
         name: market
         nullable: true
         type:
-          container: null
           source:
-            external_id: Market
+            externalId: Market
             space: market
             version: 5b43e98565d4d5
           type: direct
       name:
-        auto_increment: false
+        autoIncrement: false
         container:
-          external_id: Bid
+          externalId: Bid
           space: market
-        container_property_identifier: name
-        default_value: null
+        containerPropertyIdentifier: name
+        defaultValue: null
         description: null
         name: name
         nullable: true
@@ -256,27 +256,27 @@
           list: false
           type: text
     space: market
-    used_for: node
+    usedFor: node
     version: 1ad3f030a8399f
     writable: true
-  - created_time: 1689487619605
-    external_id: PygenPool
+  - createdTime: 1689487619605
+    externalId: PygenPool
     implements:
-    - external_id: Market
+    - externalId: Market
       space: market
       type: view
       version: 5b43e98565d4d5
-    is_global: false
-    last_updated_time: 1689487619605
+    isGlobal: false
+    lastUpdatedTime: 1689487619605
     name: PygenPool
     properties:
       dayOfWeek:
-        auto_increment: false
+        autoIncrement: false
         container:
-          external_id: PygenPool
+          externalId: PygenPool
           space: market
-        container_property_identifier: dayOfWeek
-        default_value: null
+        containerPropertyIdentifier: dayOfWeek
+        defaultValue: null
         description: null
         name: dayOfWeek
         nullable: true
@@ -285,12 +285,12 @@
           list: false
           type: int32
       name:
-        auto_increment: false
+        autoIncrement: false
         container:
-          external_id: Market
+          externalId: Market
           space: market
-        container_property_identifier: name
-        default_value: null
+        containerPropertyIdentifier: name
+        defaultValue: null
         description: null
         name: name
         nullable: true
@@ -300,12 +300,12 @@
           list: false
           type: text
       timezone:
-        auto_increment: false
+        autoIncrement: false
         container:
-          external_id: Market
+          externalId: Market
           space: market
-        container_property_identifier: timezone
-        default_value: null
+        containerPropertyIdentifier: timezone
+        defaultValue: null
         description: null
         name: timezone
         nullable: true
@@ -315,27 +315,27 @@
           list: false
           type: text
     space: market
-    used_for: node
+    usedFor: node
     version: 23c71ba66bad9d
     writable: true
-  - created_time: 1689487619605
-    external_id: PygenBid
+  - createdTime: 1689487619605
+    externalId: PygenBid
     implements:
-    - external_id: Bid
+    - externalId: Bid
       space: market
       type: view
       version: 1ad3f030a8399f
-    is_global: false
-    last_updated_time: 1689487619605
+    isGlobal: false
+    lastUpdatedTime: 1689487619605
     name: PygenBid
     properties:
       date:
-        auto_increment: false
+        autoIncrement: false
         container:
-          external_id: Bid
+          externalId: Bid
           space: market
-        container_property_identifier: date
-        default_value: null
+        containerPropertyIdentifier: date
+        defaultValue: null
         description: null
         name: date
         nullable: true
@@ -344,12 +344,12 @@
           list: false
           type: date
       isBlock:
-        auto_increment: false
+        autoIncrement: false
         container:
-          external_id: PygenBid
+          externalId: PygenBid
           space: market
-        container_property_identifier: isBlock
-        default_value: null
+        containerPropertyIdentifier: isBlock
+        defaultValue: null
         description: null
         name: isBlock
         nullable: true
@@ -358,29 +358,28 @@
           list: false
           type: boolean
       market:
-        auto_increment: false
+        autoIncrement: false
         container:
-          external_id: Bid
+          externalId: Bid
           space: market
-        container_property_identifier: market
-        default_value: null
+        containerPropertyIdentifier: market
+        defaultValue: null
         description: null
         name: market
         nullable: true
         type:
-          container: null
           source:
-            external_id: Market
+            externalId: Market
             space: market
             version: 5b43e98565d4d5
           type: direct
       minimumPrice:
-        auto_increment: false
+        autoIncrement: false
         container:
-          external_id: PygenBid
+          externalId: PygenBid
           space: market
-        container_property_identifier: minimumPrice
-        default_value: null
+        containerPropertyIdentifier: minimumPrice
+        defaultValue: null
         description: null
         name: minimumPrice
         nullable: true
@@ -389,12 +388,12 @@
           list: false
           type: float64
       name:
-        auto_increment: false
+        autoIncrement: false
         container:
-          external_id: Bid
+          externalId: Bid
           space: market
-        container_property_identifier: name
-        default_value: null
+        containerPropertyIdentifier: name
+        defaultValue: null
         description: null
         name: name
         nullable: true
@@ -404,12 +403,12 @@
           list: false
           type: text
       pricePremium:
-        auto_increment: false
+        autoIncrement: false
         container:
-          external_id: PygenBid
+          externalId: PygenBid
           space: market
-        container_property_identifier: pricePremium
-        default_value: null
+        containerPropertyIdentifier: pricePremium
+        defaultValue: null
         description: null
         name: pricePremium
         nullable: true
@@ -418,61 +417,59 @@
           list: false
           type: float64
     space: market
-    used_for: node
+    usedFor: node
     version: 57f9da2a1acf7e
     writable: true
-  - created_time: 1689487619605
-    external_id: PygenProcess
+  - createdTime: 1689487619605
+    externalId: PygenProcess
     implements:
-    - external_id: Process
+    - externalId: Process
       space: market
       type: view
       version: b3e0207c0bb510
-    is_global: false
-    last_updated_time: 1689487619605
+    isGlobal: false
+    lastUpdatedTime: 1689487619605
     name: PygenProcess
     properties:
       bid:
-        auto_increment: false
+        autoIncrement: false
         container:
-          external_id: Process
+          externalId: Process
           space: market
-        container_property_identifier: bid
-        default_value: null
+        containerPropertyIdentifier: bid
+        defaultValue: null
         description: null
         name: bid
         nullable: true
         type:
-          container: null
           source:
-            external_id: Bid
+            externalId: Bid
             space: market
             version: 1ad3f030a8399f
           type: direct
       dateTransformations:
-        auto_increment: false
+        autoIncrement: false
         container:
-          external_id: PygenProcess
+          externalId: PygenProcess
           space: market
-        container_property_identifier: dateTransformations
-        default_value: null
+        containerPropertyIdentifier: dateTransformations
+        defaultValue: null
         description: null
         name: dateTransformations
         nullable: true
         type:
-          container: null
           source:
-            external_id: DateTransformationPair
+            externalId: DateTransformationPair
             space: market
             version: 310f933a9aca9b
           type: direct
       name:
-        auto_increment: false
+        autoIncrement: false
         container:
-          external_id: Process
+          externalId: Process
           space: market
-        container_property_identifier: name
-        default_value: null
+        containerPropertyIdentifier: name
+        defaultValue: null
         description: null
         name: name
         nullable: true
@@ -482,23 +479,22 @@
           list: false
           type: text
       transformation:
-        auto_increment: false
+        autoIncrement: false
         container:
-          external_id: PygenProcess
+          externalId: PygenProcess
           space: market
-        container_property_identifier: transformation
-        default_value: null
+        containerPropertyIdentifier: transformation
+        defaultValue: null
         description: null
         name: transformation
         nullable: true
         type:
-          container: null
           source:
-            external_id: ValueTransformation
+            externalId: ValueTransformation
             space: market
             version: 946587c592b44c
           type: direct
     space: market
-    used_for: node
+    usedFor: node
     version: 477b68a858c7a8
     writable: true

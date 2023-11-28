@@ -1,0 +1,207 @@
+from __future__ import annotations
+{% if data_class.has_time_field %}
+import datetime{% endif %}
+from typing import Any, Literal, Optional, Union
+
+from cognite.client import data_modeling as dm
+{{ data_class.import_pydantic_field(is_pydantic_v2) }}
+
+from ._core import DomainModelApply, DomainRelation, DomainRelationApply, DomainRelationList, ResourcesApply
+from .{{data_class.end_class.file_name }} import {{ data_class.end_class.read_name }}, {{ data_class.end_class.write_name }}
+
+__all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data_class.read_list_name }}", "{{ data_class.write_list_name }}"{% if data_class.has_primitive_fields %}, "{{ data_class.field_names }}"{% endif %}{% if data_class.has_text_field %}, "{{ data_class.text_field_names }}"{% endif %}]
+{% if data_class.has_text_field %}
+
+{{ data_class.text_field_names }} = Literal[{{ data_class.text_fields_literals }}]
+{% endif %}{% if data_class.has_primitive_fields %}{{ data_class.field_names }} = Literal[{{ data_class.fields_literals }}]
+
+{{ data_class.properties_dict_name }} = {% raw %}{{% endraw %}{% for field in data_class.primitive_core_fields %}
+    "{{ field.name }}": "{{ field.prop_name }}",{% endfor %}
+{% raw %}}{% endraw %}{% endif %}
+
+
+class {{ data_class.read_name }}(DomainRelation):
+    """This represents the reading version of {{ data_class.doc_name }}.
+
+    It is used to when data is retrieved from CDF.
+
+    Args:
+        space: The space where the node is located.
+        external_id: The external id of the {{ data_class.doc_name }}.{% for field in data_class %}
+        {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
+        created_time: The created time of the {{ data_class.doc_name }} node.
+        last_updated_time: The last updated time of the {{ data_class.doc_name }} node.
+        deleted_time: If present, the deleted time of the {{ data_class.doc_name }} node.
+        version: The version of the {{ data_class.doc_name }} node.
+    """
+    space: str = "{{ space }}"{% for field in data_class %}
+    {{ field.name }}: {{ field.as_read_type_hint() }}{% endfor %}
+
+    @property
+    def {{ data_class.start_class.variable }}(self) -> str:
+        return self.start_node.external_id
+
+    {% if is_pydantic_v2 %}@model_validator(mode="before"){% else %}@root_validator(pre=True){% endif %}
+    def set_{{ data_class.end_class.variable }}_if_missing(cls, data: Any):
+        if isinstance(data, dict) and "{{ data_class.end_class.variable }}" not in data:
+            data["{{ data_class.end_class.variable }}"] = data["end_node"]["external_id"]
+        return data
+
+    def as_apply(self) -> {{ data_class.write_name }}:
+        """Convert this read version of {{ data_class.doc_name }} to the writing version."""
+        return {{ data_class.write_name }}(
+            space=self.space,
+            external_id=self.external_id,{% for field in data_class %}
+            {{ field.name }}={{ field.as_apply() }},{% endfor %}
+        )
+
+
+class {{ data_class.write_name }}(DomainRelationApply):
+    """This represents the writing version of {{ data_class.doc_name }}.
+
+    It is used to when data is sent to CDF.
+
+    Args:
+        edge_type: The edge type of the {{ data_class.doc_name }}.
+        space: The space where the node is located.
+        external_id: The external id of the {{ data_class.doc_name }}.{% for field in data_class %}
+        {{ field.name }}: {{ field.argument_documentation }}{% endfor %}
+        existing_version: Fail the ingestion request if the {{ data_class.doc_name }} version is greater than or equal to this value.
+            If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
+            If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
+            If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
+    """
+    edge_type: dm.DirectRelationReference = dm.DirectRelationReference(
+        "{{ data_class.edge_type.space }}", "{{ data_class.edge_type.external_id }}"
+    )
+    space: str = "{{ space }}"{% for field in data_class %}
+    {{ field.name }}: {{ field.as_write_type_hint() }}{% endfor %}
+
+    def _to_instances_apply(
+        self,
+        cache: set[tuple[str, str]],
+        start_node: DomainModelApply,
+        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+    ) -> ResourcesApply:
+        resources = ResourcesApply()
+        if self.external_id and (self.space, self.external_id) in cache:
+            return resources
+
+        if isinstance(self.{{ data_class.end_class.variable }}, DomainModelApply):
+            end_node = self.{{ data_class.end_class.variable }}.as_direct_reference()
+        elif isinstance(self.{{ data_class.end_class.variable }}, str):
+            end_node = dm.DirectRelationReference(self.space, self.{{ data_class.end_class.variable }})
+        else:
+            raise ValueError(f"Invalid type for equipment_module: {type(self.{{ data_class.end_class.variable }})}")
+
+        self.external_id = external_id = DomainRelationApply.external_id_factory(start_node, end_node, self.edge_type)
+
+        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
+            "{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_version }}"
+        )
+
+        properties = {}{% for field in data_class.property_fields %}
+        if self.{{ field.name }} is not None:
+            properties["{{ field.prop_name }}"] = {% if field.is_edge %}{
+                "space":  self.space if isinstance(self.{{ field.name }}, str) else self.{{ field.name }}.space,
+                "externalId": self.{{ field.name }} if isinstance(self.{{ field.name }}, str) else self.{{ field.name }}.external_id,
+            }{% else %}self.{{ field.name }}{% if field.is_time_field %}.isoformat({% if field.is_timestamp %}timespec="milliseconds"{% endif %}){% endif %}{% endif %}{% endfor %}
+
+        if properties:
+            this_edge = dm.EdgeApply(
+                space=self.space,
+                external_id=external_id,
+                type=self.edge_type,
+                start_node=start_node.as_direct_reference(),
+                end_node=end_node,
+                existing_version=self.existing_version,
+                sources=[
+                    dm.NodeOrEdgeData(
+                        source=write_view,
+                        properties=properties,
+                    )
+                ],
+            )
+            resources.edges.append(this_edge)
+            cache.add((self.space, external_id))
+
+        if isinstance(self.{{ data_class.end_class.variable }}, DomainModelApply):
+            other_resources = self.{{ data_class.end_class.variable }}._to_instances_apply(cache, view_by_write_class)
+            resources.extend(other_resources)
+
+        return resources
+
+
+class {{ data_class.read_list_name }}(DomainRelationList[{{ data_class.read_name }}]):
+    """List of {{ data_class.doc_list_name }} in the reading version."""
+
+    _INSTANCE = {{ data_class.read_name }}
+
+
+class {{ data_class.write_list_name }}(DomainRelationList[{{ data_class.write_name }}]):
+    """List of {{ data_class.doc_list_name }} in the writing version."""
+
+    _INSTANCE = {{ data_class.write_name }}
+
+
+def {{ data_class.filter_name }}(
+    edge_type: dm.DirectRelationReference,
+    view_id: dm.ViewId,
+    start_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+    start_node_space: str = "{{ instance_space }}",
+    end_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+    space_end_node: str = "{{ instance_space }}",{% for parm in list_method.parameters %}
+    {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
+    filter: dm.Filter | None = None,
+) -> dm.Filter:
+    filters: list[dm.Filter] = [
+        dm.filters.Equals(
+            ["edge", "type"],
+            {"space": edge_type.space, "externalId": edge_type.external_id},
+        )
+    ]
+    if start_node and isinstance(start_node, str):
+        filters.append(
+            dm.filters.Equals(["edge", "startNode"], value={"space": start_node_space, "externalId": start_node})
+        )
+    elif start_node and isinstance(start_node, dm.NodeId):
+        filters.append(
+            dm.filters.Equals(
+                ["edge", "startNode"], value=start_node.dump(camel_case=True, include_instance_type=False)
+            )
+        )
+    if start_node and isinstance(start_node, list):
+        filters.append(
+            dm.filters.In(
+                ["edge", "startNode"],
+                values=[
+                    {"space": start_node_space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in start_node
+                ],
+            )
+        )
+    if end_node and isinstance(end_node, str):
+        filters.append(dm.filters.Equals(["edge", "endNode"], value={"space": space_end_node, "externalId": end_node}))
+    elif end_node and isinstance(end_node, dm.NodeId):
+        filters.append(
+            dm.filters.Equals(["edge", "endNode"], value=end_node.dump(camel_case=True, include_instance_type=False))
+        )
+    if end_node and isinstance(end_node, list):
+        filters.append(
+            dm.filters.In(
+                ["edge", "endNode"],
+                values=[
+                    {"space": space_end_node, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                    for ext_id in end_node
+                ],
+            )
+        ){% for filter in list_method.filters %}
+    if {{ filter.condition }}:
+        filters.append({{ filter.filter_call }}({{ filter.arguments }})){% endfor %}
+    if filter:
+        filters.append(filter)
+    return dm.filters.And(*filters)

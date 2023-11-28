@@ -1,25 +1,39 @@
 from __future__ import annotations
 
-from typing import Sequence, overload
+from collections.abc import Sequence
+from typing import overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from markets.client.data_classes import (
+    DomainModelApply,
+    ResourcesApplyResult,
     PygenPool,
     PygenPoolApply,
+    PygenPoolFields,
     PygenPoolList,
     PygenPoolApplyList,
-    PygenPoolFields,
     PygenPoolTextFields,
-    DomainModelApply,
 )
-from markets.client.data_classes._pygen_pool import _PYGENPOOL_PROPERTIES_BY_FIELD
+from markets.client.data_classes._pygen_pool import (
+    _PYGENPOOL_PROPERTIES_BY_FIELD,
+    _create_pygen_pool_filter,
+)
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
+from .pygen_pool_query import PygenPoolQueryAPI
 
 
-class PygenPoolAPI(TypeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
+class PygenPoolAPI(NodeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
     def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
         view_id = view_by_write_class[PygenPoolApply]
         super().__init__(
@@ -28,13 +42,76 @@ class PygenPoolAPI(TypeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
             class_type=PygenPool,
             class_apply_type=PygenPoolApply,
             class_list=PygenPoolList,
+            class_apply_list=PygenPoolApplyList,
+            view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self._view_by_write_class = view_by_write_class
+
+    def __call__(
+        self,
+        min_day_of_week: int | None = None,
+        max_day_of_week: int | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        timezone: str | list[str] | None = None,
+        timezone_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+        filter: dm.Filter | None = None,
+    ) -> PygenPoolQueryAPI[PygenPoolList]:
+        """Query starting at pygen pools.
+
+        Args:
+            min_day_of_week: The minimum value of the day of week to filter on.
+            max_day_of_week: The maximum value of the day of week to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            timezone: The timezone to filter on.
+            timezone_prefix: The prefix of the timezone to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of pygen pools to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            A query API for pygen pools.
+
+        """
+        filter_ = _create_pygen_pool_filter(
+            self._view_id,
+            min_day_of_week,
+            max_day_of_week,
+            name,
+            name_prefix,
+            timezone,
+            timezone_prefix,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        builder = QueryBuilder(
+            PygenPoolList,
+            [
+                QueryStep(
+                    name="pygen_pool",
+                    expression=dm.query.NodeResultSetExpression(
+                        from_=None,
+                        filter=filter_,
+                    ),
+                    select=dm.query.Select(
+                        [dm.query.SourceSelector(self._view_id, list(_PYGENPOOL_PROPERTIES_BY_FIELD.values()))]
+                    ),
+                    result_cls=PygenPool,
+                    max_retrieve_limit=limit,
+                )
+            ],
+        )
+        return PygenPoolQueryAPI(self._client, builder, self._view_by_write_class)
 
     def apply(
         self, pygen_pool: PygenPoolApply | Sequence[PygenPoolApply], replace: bool = False
-    ) -> dm.InstancesApplyResult:
+    ) -> ResourcesApplyResult:
         """Add or update (upsert) pygen pools.
 
         Args:
@@ -42,7 +119,7 @@ class PygenPoolAPI(TypeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes, edges, and time series.
 
         Examples:
 
@@ -55,19 +132,9 @@ class PygenPoolAPI(TypeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
                 >>> result = client.pygen_pool.apply(pygen_pool)
 
         """
-        if isinstance(pygen_pool, PygenPoolApply):
-            instances = pygen_pool.to_instances_apply(self._view_by_write_class)
-        else:
-            instances = PygenPoolApplyList(pygen_pool).to_instances_apply(self._view_by_write_class)
-        return self._client.data_modeling.instances.apply(
-            nodes=instances.nodes,
-            edges=instances.edges,
-            auto_create_start_nodes=True,
-            auto_create_end_nodes=True,
-            replace=replace,
-        )
+        return self._apply(pygen_pool, replace)
 
-    def delete(self, external_id: str | Sequence[str], space: str = "market") -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | SequenceNotStr[str], space: str = "market") -> dm.InstancesDeleteResult:
         """Delete one or more pygen pool.
 
         Args:
@@ -85,22 +152,19 @@ class PygenPoolAPI(TypeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
                 >>> client = MarketClient()
                 >>> client.pygen_pool.delete("my_pygen_pool")
         """
-        if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
-        else:
-            return self._client.data_modeling.instances.delete(
-                nodes=[(space, id) for id in external_id],
-            )
+        return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> PygenPool:
+    def retrieve(self, external_id: str) -> PygenPool | None:
         ...
 
     @overload
-    def retrieve(self, external_id: Sequence[str]) -> PygenPoolList:
+    def retrieve(self, external_id: SequenceNotStr[str]) -> PygenPoolList:
         ...
 
-    def retrieve(self, external_id: str | Sequence[str], space: str = "market") -> PygenPool | PygenPoolList:
+    def retrieve(
+        self, external_id: str | SequenceNotStr[str], space: str = "market"
+    ) -> PygenPool | PygenPoolList | None:
         """Retrieve one or more pygen pools by id(s).
 
         Args:
@@ -119,10 +183,7 @@ class PygenPoolAPI(TypeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
                 >>> pygen_pool = client.pygen_pool.retrieve("my_pygen_pool")
 
         """
-        if isinstance(external_id, str):
-            return self._retrieve((space, external_id))
-        else:
-            return self._retrieve([(space, ext_id) for ext_id in external_id])
+        return self._retrieve(external_id, space)
 
     def search(
         self,
@@ -167,7 +228,7 @@ class PygenPoolAPI(TypeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
                 >>> pygen_pools = client.pygen_pool.search('my_pygen_pool')
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_pygen_pool_filter(
             self._view_id,
             min_day_of_week,
             max_day_of_week,
@@ -282,7 +343,7 @@ class PygenPoolAPI(TypeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
 
         """
 
-        filter_ = _create_filter(
+        filter_ = _create_pygen_pool_filter(
             self._view_id,
             min_day_of_week,
             max_day_of_week,
@@ -345,7 +406,7 @@ class PygenPoolAPI(TypeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
             Bucketed histogram results.
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_pygen_pool_filter(
             self._view_id,
             min_day_of_week,
             max_day_of_week,
@@ -407,7 +468,7 @@ class PygenPoolAPI(TypeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
                 >>> pygen_pools = client.pygen_pool.list(limit=5)
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_pygen_pool_filter(
             self._view_id,
             min_day_of_week,
             max_day_of_week,
@@ -419,43 +480,4 @@ class PygenPoolAPI(TypeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
             space,
             filter,
         )
-
         return self._list(limit=limit, filter=filter_)
-
-
-def _create_filter(
-    view_id: dm.ViewId,
-    min_day_of_week: int | None = None,
-    max_day_of_week: int | None = None,
-    name: str | list[str] | None = None,
-    name_prefix: str | None = None,
-    timezone: str | list[str] | None = None,
-    timezone_prefix: str | None = None,
-    external_id_prefix: str | None = None,
-    space: str | list[str] | None = None,
-    filter: dm.Filter | None = None,
-) -> dm.Filter | None:
-    filters = []
-    if min_day_of_week or max_day_of_week:
-        filters.append(dm.filters.Range(view_id.as_property_ref("dayOfWeek"), gte=min_day_of_week, lte=max_day_of_week))
-    if name and isinstance(name, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
-    if name and isinstance(name, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("name"), values=name))
-    if name_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
-    if timezone and isinstance(timezone, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("timezone"), value=timezone))
-    if timezone and isinstance(timezone, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("timezone"), values=timezone))
-    if timezone_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("timezone"), value=timezone_prefix))
-    if external_id_prefix:
-        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
-        filters.append(dm.filters.Equals(["node", "space"], value=space))
-    if space and isinstance(space, list):
-        filters.append(dm.filters.In(["node", "space"], values=space))
-    if filter:
-        filters.append(filter)
-    return dm.filters.And(*filters) if filters else None

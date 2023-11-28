@@ -1,10 +1,21 @@
-from ._core import DomainModel, DomainModelApply
+from ._core import (
+    DomainModel,
+    DomainModelApply,
+    DomainModelList,
+    DomainRelationApply,
+    ResourcesApply,
+    ResourcesApplyResult,
+)
 {% for class_ in classes %}{{ class_.init_import }}
 {% endfor %}
 {% include import_file %}
 __all__ = [
+    "ResourcesApply",
     "DomainModel",
-    "DomainModelApply",{% for class_ in classes %}
+    "DomainModelApply",
+    "DomainModelList",
+    "DomainRelationApply",
+    "ResourcesApplyResult",{% for class_ in classes %}
     "{{ class_.read_name }}",
     "{{ class_.write_name }}",
     "{{ class_.read_list_name }}",

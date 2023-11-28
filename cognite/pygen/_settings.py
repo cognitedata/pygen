@@ -44,7 +44,10 @@ class PygenSettings(BaseModel):
         default=False, help="Whether to overwrite existing files in output directory with the new SDK."
     )
     skip_formatting: Argument = Argument(default=False, help="Whether to skip formatting the generated SDK with black.")
-    data_models: list[tuple[str, str, str]] = Field(default_factory=list, help="Data models to generate SDK for.")
+    data_models: list[tuple[str, str, str]] = Field(
+        default_factory=list,
+        help="Data models to generate SDK for.",
+    )  # type: ignore[call-arg]
 
     if is_pydantic_v2:
 

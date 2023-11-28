@@ -28,7 +28,8 @@ app = typer.Typer(
 def generate_sdks(
     overwrite: bool = typer.Option(
         False, help="Whether to overwrite the files expected to be manually maintained in the examples"
-    )
+    ),
+    sdk: str = typer.Option(None, help="Generate only the specified SDK"),
 ):
     for example_sdk in EXAMPLE_SDKS:
         if example_sdk.download_only:
@@ -71,7 +72,7 @@ def download():
             dms_model = client.data_modeling.data_models.retrieve(datamodel_id, inline_views=True)
             if not dms_model:
                 raise ValueError(f"Failed to retrieve {datamodel_id}")
-            dms_file.write_text(safe_dump(dms_model.dump(), sort_keys=True))
+            dms_file.write_text(safe_dump(dms_model.dump(camel_case=True), sort_keys=True))
             typer.echo(f"Downloaded {dms_file.relative_to(REPO_ROOT)}")
 
 

@@ -13,6 +13,18 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.31.0] - 18-11-23
+### Added
+* Support for `query`, [see documentation for more information](https://cognite-pygen.readthedocs-hosted.com/en/latest/examples/movie_domain.html#querying).
+* Support for reading and writing edges with properties.
+* Support for writing TimeSeries when calling `.apply` on a generated SDK.
+### Changed
+* Calling `.to_pandas` on generated classes does not include the node and edge properties such as `version`, `created_time`, etc.
+  by default. Instead, you can pass `include_instance_properties=True` to include these properties.
+### Fixed
+* Upgrade `pygen` to use `cognite-sdk` v7.
+* `to_pandas` on apply list failed with `KeyError`. This is now fixed.
+
 ## [0.30.5] - 06-11-23
 ### Fixed
 * Bug when calling `.list()` and `.retrieve` in generated NodeAPI classes, caused a `CogniteAPIError` with `400` status code due

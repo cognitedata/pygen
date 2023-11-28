@@ -21,6 +21,7 @@ nav:
     - Examples:
         - Movie: examples/movie_domain.ipynb
         - Working with Time Series: examples/timeseries.ipynb
+        - Working with Edges: examples/edge_properties.ipynb
     - Pygen Config:
         - Home: config/index.md
         - Naming: config/naming.md

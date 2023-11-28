@@ -1,25 +1,39 @@
 from __future__ import annotations
 
-from typing import Sequence, overload
+from collections.abc import Sequence
+from typing import overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from osdu_wells_pydantic_v1.client.data_classes import (
+    DomainModelApply,
+    ResourcesApplyResult,
     FacilityStates,
     FacilityStatesApply,
+    FacilityStatesFields,
     FacilityStatesList,
     FacilityStatesApplyList,
-    FacilityStatesFields,
     FacilityStatesTextFields,
-    DomainModelApply,
 )
-from osdu_wells_pydantic_v1.client.data_classes._facility_states import _FACILITYSTATES_PROPERTIES_BY_FIELD
+from osdu_wells_pydantic_v1.client.data_classes._facility_states import (
+    _FACILITYSTATES_PROPERTIES_BY_FIELD,
+    _create_facility_state_filter,
+)
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
+from .facility_states_query import FacilityStatesQueryAPI
 
 
-class FacilityStatesAPI(TypeAPI[FacilityStates, FacilityStatesApply, FacilityStatesList]):
+class FacilityStatesAPI(NodeAPI[FacilityStates, FacilityStatesApply, FacilityStatesList]):
     def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
         view_id = view_by_write_class[FacilityStatesApply]
         super().__init__(
@@ -28,13 +42,82 @@ class FacilityStatesAPI(TypeAPI[FacilityStates, FacilityStatesApply, FacilitySta
             class_type=FacilityStates,
             class_apply_type=FacilityStatesApply,
             class_list=FacilityStatesList,
+            class_apply_list=FacilityStatesApplyList,
+            view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self._view_by_write_class = view_by_write_class
+
+    def __call__(
+        self,
+        effective_date_time: str | list[str] | None = None,
+        effective_date_time_prefix: str | None = None,
+        facility_state_type_id: str | list[str] | None = None,
+        facility_state_type_id_prefix: str | None = None,
+        remark: str | list[str] | None = None,
+        remark_prefix: str | None = None,
+        termination_date_time: str | list[str] | None = None,
+        termination_date_time_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+        filter: dm.Filter | None = None,
+    ) -> FacilityStatesQueryAPI[FacilityStatesList]:
+        """Query starting at facility states.
+
+        Args:
+            effective_date_time: The effective date time to filter on.
+            effective_date_time_prefix: The prefix of the effective date time to filter on.
+            facility_state_type_id: The facility state type id to filter on.
+            facility_state_type_id_prefix: The prefix of the facility state type id to filter on.
+            remark: The remark to filter on.
+            remark_prefix: The prefix of the remark to filter on.
+            termination_date_time: The termination date time to filter on.
+            termination_date_time_prefix: The prefix of the termination date time to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of facility states to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            A query API for facility states.
+
+        """
+        filter_ = _create_facility_state_filter(
+            self._view_id,
+            effective_date_time,
+            effective_date_time_prefix,
+            facility_state_type_id,
+            facility_state_type_id_prefix,
+            remark,
+            remark_prefix,
+            termination_date_time,
+            termination_date_time_prefix,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        builder = QueryBuilder(
+            FacilityStatesList,
+            [
+                QueryStep(
+                    name="facility_state",
+                    expression=dm.query.NodeResultSetExpression(
+                        from_=None,
+                        filter=filter_,
+                    ),
+                    select=dm.query.Select(
+                        [dm.query.SourceSelector(self._view_id, list(_FACILITYSTATES_PROPERTIES_BY_FIELD.values()))]
+                    ),
+                    result_cls=FacilityStates,
+                    max_retrieve_limit=limit,
+                )
+            ],
+        )
+        return FacilityStatesQueryAPI(self._client, builder, self._view_by_write_class)
 
     def apply(
         self, facility_state: FacilityStatesApply | Sequence[FacilityStatesApply], replace: bool = False
-    ) -> dm.InstancesApplyResult:
+    ) -> ResourcesApplyResult:
         """Add or update (upsert) facility states.
 
         Args:
@@ -42,7 +125,7 @@ class FacilityStatesAPI(TypeAPI[FacilityStates, FacilityStatesApply, FacilitySta
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes, edges, and time series.
 
         Examples:
 
@@ -55,20 +138,10 @@ class FacilityStatesAPI(TypeAPI[FacilityStates, FacilityStatesApply, FacilitySta
                 >>> result = client.facility_states.apply(facility_state)
 
         """
-        if isinstance(facility_state, FacilityStatesApply):
-            instances = facility_state.to_instances_apply(self._view_by_write_class)
-        else:
-            instances = FacilityStatesApplyList(facility_state).to_instances_apply(self._view_by_write_class)
-        return self._client.data_modeling.instances.apply(
-            nodes=instances.nodes,
-            edges=instances.edges,
-            auto_create_start_nodes=True,
-            auto_create_end_nodes=True,
-            replace=replace,
-        )
+        return self._apply(facility_state, replace)
 
     def delete(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> dm.InstancesDeleteResult:
         """Delete one or more facility state.
 
@@ -87,24 +160,19 @@ class FacilityStatesAPI(TypeAPI[FacilityStates, FacilityStatesApply, FacilitySta
                 >>> client = OSDUClient()
                 >>> client.facility_states.delete("my_facility_state")
         """
-        if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
-        else:
-            return self._client.data_modeling.instances.delete(
-                nodes=[(space, id) for id in external_id],
-            )
+        return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> FacilityStates:
+    def retrieve(self, external_id: str) -> FacilityStates | None:
         ...
 
     @overload
-    def retrieve(self, external_id: Sequence[str]) -> FacilityStatesList:
+    def retrieve(self, external_id: SequenceNotStr[str]) -> FacilityStatesList:
         ...
 
     def retrieve(
-        self, external_id: str | Sequence[str], space: str = "IntegrationTestsImmutable"
-    ) -> FacilityStates | FacilityStatesList:
+        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+    ) -> FacilityStates | FacilityStatesList | None:
         """Retrieve one or more facility states by id(s).
 
         Args:
@@ -123,10 +191,7 @@ class FacilityStatesAPI(TypeAPI[FacilityStates, FacilityStatesApply, FacilitySta
                 >>> facility_state = client.facility_states.retrieve("my_facility_state")
 
         """
-        if isinstance(external_id, str):
-            return self._retrieve((space, external_id))
-        else:
-            return self._retrieve([(space, ext_id) for ext_id in external_id])
+        return self._retrieve(external_id, space)
 
     def search(
         self,
@@ -175,7 +240,7 @@ class FacilityStatesAPI(TypeAPI[FacilityStates, FacilityStatesApply, FacilitySta
                 >>> facility_states = client.facility_states.search('my_facility_state')
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_facility_state_filter(
             self._view_id,
             effective_date_time,
             effective_date_time_prefix,
@@ -300,7 +365,7 @@ class FacilityStatesAPI(TypeAPI[FacilityStates, FacilityStatesApply, FacilitySta
 
         """
 
-        filter_ = _create_filter(
+        filter_ = _create_facility_state_filter(
             self._view_id,
             effective_date_time,
             effective_date_time_prefix,
@@ -369,7 +434,7 @@ class FacilityStatesAPI(TypeAPI[FacilityStates, FacilityStatesApply, FacilitySta
             Bucketed histogram results.
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_facility_state_filter(
             self._view_id,
             effective_date_time,
             effective_date_time_prefix,
@@ -437,7 +502,7 @@ class FacilityStatesAPI(TypeAPI[FacilityStates, FacilityStatesApply, FacilitySta
                 >>> facility_states = client.facility_states.list(limit=5)
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_facility_state_filter(
             self._view_id,
             effective_date_time,
             effective_date_time_prefix,
@@ -451,61 +516,4 @@ class FacilityStatesAPI(TypeAPI[FacilityStates, FacilityStatesApply, FacilitySta
             space,
             filter,
         )
-
         return self._list(limit=limit, filter=filter_)
-
-
-def _create_filter(
-    view_id: dm.ViewId,
-    effective_date_time: str | list[str] | None = None,
-    effective_date_time_prefix: str | None = None,
-    facility_state_type_id: str | list[str] | None = None,
-    facility_state_type_id_prefix: str | None = None,
-    remark: str | list[str] | None = None,
-    remark_prefix: str | None = None,
-    termination_date_time: str | list[str] | None = None,
-    termination_date_time_prefix: str | None = None,
-    external_id_prefix: str | None = None,
-    space: str | list[str] | None = None,
-    filter: dm.Filter | None = None,
-) -> dm.Filter | None:
-    filters = []
-    if effective_date_time and isinstance(effective_date_time, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("EffectiveDateTime"), value=effective_date_time))
-    if effective_date_time and isinstance(effective_date_time, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("EffectiveDateTime"), values=effective_date_time))
-    if effective_date_time_prefix:
-        filters.append(
-            dm.filters.Prefix(view_id.as_property_ref("EffectiveDateTime"), value=effective_date_time_prefix)
-        )
-    if facility_state_type_id and isinstance(facility_state_type_id, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("FacilityStateTypeID"), value=facility_state_type_id))
-    if facility_state_type_id and isinstance(facility_state_type_id, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("FacilityStateTypeID"), values=facility_state_type_id))
-    if facility_state_type_id_prefix:
-        filters.append(
-            dm.filters.Prefix(view_id.as_property_ref("FacilityStateTypeID"), value=facility_state_type_id_prefix)
-        )
-    if remark and isinstance(remark, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("Remark"), value=remark))
-    if remark and isinstance(remark, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("Remark"), values=remark))
-    if remark_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("Remark"), value=remark_prefix))
-    if termination_date_time and isinstance(termination_date_time, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("TerminationDateTime"), value=termination_date_time))
-    if termination_date_time and isinstance(termination_date_time, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("TerminationDateTime"), values=termination_date_time))
-    if termination_date_time_prefix:
-        filters.append(
-            dm.filters.Prefix(view_id.as_property_ref("TerminationDateTime"), value=termination_date_time_prefix)
-        )
-    if external_id_prefix:
-        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
-        filters.append(dm.filters.Equals(["node", "space"], value=space))
-    if space and isinstance(space, list):
-        filters.append(dm.filters.In(["node", "space"], values=space))
-    if filter:
-        filters.append(filter)
-    return dm.filters.And(*filters) if filters else None

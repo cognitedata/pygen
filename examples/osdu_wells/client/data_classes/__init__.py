@@ -1,4 +1,11 @@
-from ._core import DomainModel, DomainModelApply
+from ._core import (
+    DomainModel,
+    DomainModelApply,
+    DomainModelList,
+    DomainRelationApply,
+    ResourcesApply,
+    ResourcesApplyResult,
+)
 from ._acceptable_usage import (
     AcceptableUsage,
     AcceptableUsageApply,
@@ -234,25 +241,44 @@ from ._wgs_84_coordinates import (
     WgsCoordinatesTextFields,
 )
 
+AsIngestedCoordinates.model_rebuild()
 AsIngestedCoordinatesApply.model_rebuild()
+Features.model_rebuild()
 FeaturesApply.model_rebuild()
+GeographicBottomHoleLocation.model_rebuild()
 GeographicBottomHoleLocationApply.model_rebuild()
+ProjectedBottomHoleLocation.model_rebuild()
 ProjectedBottomHoleLocationApply.model_rebuild()
+SpatialArea.model_rebuild()
 SpatialAreaApply.model_rebuild()
+SpatialLocation.model_rebuild()
 SpatialLocationApply.model_rebuild()
+SpatialPoint.model_rebuild()
 SpatialPointApply.model_rebuild()
+TechnicalAssurances.model_rebuild()
 TechnicalAssurancesApply.model_rebuild()
+Well.model_rebuild()
 WellApply.model_rebuild()
+WellData.model_rebuild()
 WellDataApply.model_rebuild()
+Wellbore.model_rebuild()
 WellboreApply.model_rebuild()
+WellboreData.model_rebuild()
 WellboreDataApply.model_rebuild()
+WellboreTrajectory.model_rebuild()
 WellboreTrajectoryApply.model_rebuild()
+WellboreTrajectoryData.model_rebuild()
 WellboreTrajectoryDataApply.model_rebuild()
+WgsCoordinates.model_rebuild()
 WgsCoordinatesApply.model_rebuild()
 
 __all__ = [
+    "ResourcesApply",
     "DomainModel",
     "DomainModelApply",
+    "DomainModelList",
+    "DomainRelationApply",
+    "ResourcesApplyResult",
     "AcceptableUsage",
     "AcceptableUsageApply",
     "AcceptableUsageList",

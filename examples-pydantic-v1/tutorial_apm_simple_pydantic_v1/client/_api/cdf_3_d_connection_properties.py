@@ -1,27 +1,39 @@
 from __future__ import annotations
 
-from typing import Sequence, overload
+from collections.abc import Sequence
+from typing import overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from ._core import Aggregations, DEFAULT_LIMIT_READ, TypeAPI, IN_FILTER_LIMIT
 from tutorial_apm_simple_pydantic_v1.client.data_classes import (
+    DomainModelApply,
+    ResourcesApplyResult,
     CdfConnectionProperties,
     CdfConnectionPropertiesApply,
+    CdfConnectionPropertiesFields,
     CdfConnectionPropertiesList,
     CdfConnectionPropertiesApplyList,
-    CdfConnectionPropertiesFields,
-    DomainModelApply,
 )
 from tutorial_apm_simple_pydantic_v1.client.data_classes._cdf_3_d_connection_properties import (
     _CDFCONNECTIONPROPERTIES_PROPERTIES_BY_FIELD,
+    _create_cdf_3_d_connection_property_filter,
 )
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
+from .cdf_3_d_connection_properties_query import CdfConnectionPropertiesQueryAPI
 
 
 class CdfConnectionPropertiesAPI(
-    TypeAPI[CdfConnectionProperties, CdfConnectionPropertiesApply, CdfConnectionPropertiesList]
+    NodeAPI[CdfConnectionProperties, CdfConnectionPropertiesApply, CdfConnectionPropertiesList]
 ):
     def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
         view_id = view_by_write_class[CdfConnectionPropertiesApply]
@@ -31,15 +43,76 @@ class CdfConnectionPropertiesAPI(
             class_type=CdfConnectionProperties,
             class_apply_type=CdfConnectionPropertiesApply,
             class_list=CdfConnectionPropertiesList,
+            class_apply_list=CdfConnectionPropertiesApplyList,
+            view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self._view_by_write_class = view_by_write_class
+
+    def __call__(
+        self,
+        min_revision_id: int | None = None,
+        max_revision_id: int | None = None,
+        min_revision_node_id: int | None = None,
+        max_revision_node_id: int | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+        filter: dm.Filter | None = None,
+    ) -> CdfConnectionPropertiesQueryAPI[CdfConnectionPropertiesList]:
+        """Query starting at cdf 3 d connection properties.
+
+        Args:
+            min_revision_id: The minimum value of the revision id to filter on.
+            max_revision_id: The maximum value of the revision id to filter on.
+            min_revision_node_id: The minimum value of the revision node id to filter on.
+            max_revision_node_id: The maximum value of the revision node id to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of cdf 3 d connection properties to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            A query API for cdf 3 d connection properties.
+
+        """
+        filter_ = _create_cdf_3_d_connection_property_filter(
+            self._view_id,
+            min_revision_id,
+            max_revision_id,
+            min_revision_node_id,
+            max_revision_node_id,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        builder = QueryBuilder(
+            CdfConnectionPropertiesList,
+            [
+                QueryStep(
+                    name="cdf_3_d_connection_property",
+                    expression=dm.query.NodeResultSetExpression(
+                        from_=None,
+                        filter=filter_,
+                    ),
+                    select=dm.query.Select(
+                        [
+                            dm.query.SourceSelector(
+                                self._view_id, list(_CDFCONNECTIONPROPERTIES_PROPERTIES_BY_FIELD.values())
+                            )
+                        ]
+                    ),
+                    result_cls=CdfConnectionProperties,
+                    max_retrieve_limit=limit,
+                )
+            ],
+        )
+        return CdfConnectionPropertiesQueryAPI(self._client, builder, self._view_by_write_class)
 
     def apply(
         self,
         cdf_3_d_connection_property: CdfConnectionPropertiesApply | Sequence[CdfConnectionPropertiesApply],
         replace: bool = False,
-    ) -> dm.InstancesApplyResult:
+    ) -> ResourcesApplyResult:
         """Add or update (upsert) cdf 3 d connection properties.
 
         Args:
@@ -47,7 +120,7 @@ class CdfConnectionPropertiesAPI(
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
-            Created instance(s), i.e., nodes and edges.
+            Created instance(s), i.e., nodes, edges, and time series.
 
         Examples:
 
@@ -60,21 +133,9 @@ class CdfConnectionPropertiesAPI(
                 >>> result = client.cdf_3_d_connection_properties.apply(cdf_3_d_connection_property)
 
         """
-        if isinstance(cdf_3_d_connection_property, CdfConnectionPropertiesApply):
-            instances = cdf_3_d_connection_property.to_instances_apply(self._view_by_write_class)
-        else:
-            instances = CdfConnectionPropertiesApplyList(cdf_3_d_connection_property).to_instances_apply(
-                self._view_by_write_class
-            )
-        return self._client.data_modeling.instances.apply(
-            nodes=instances.nodes,
-            edges=instances.edges,
-            auto_create_start_nodes=True,
-            auto_create_end_nodes=True,
-            replace=replace,
-        )
+        return self._apply(cdf_3_d_connection_property, replace)
 
-    def delete(self, external_id: str | Sequence[str], space: str = "cdf_3d_schema") -> dm.InstancesDeleteResult:
+    def delete(self, external_id: str | SequenceNotStr[str], space: str = "cdf_3d_schema") -> dm.InstancesDeleteResult:
         """Delete one or more cdf 3 d connection property.
 
         Args:
@@ -92,24 +153,19 @@ class CdfConnectionPropertiesAPI(
                 >>> client = ApmSimpleClient()
                 >>> client.cdf_3_d_connection_properties.delete("my_cdf_3_d_connection_property")
         """
-        if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
-        else:
-            return self._client.data_modeling.instances.delete(
-                nodes=[(space, id) for id in external_id],
-            )
+        return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> CdfConnectionProperties:
+    def retrieve(self, external_id: str) -> CdfConnectionProperties | None:
         ...
 
     @overload
-    def retrieve(self, external_id: Sequence[str]) -> CdfConnectionPropertiesList:
+    def retrieve(self, external_id: SequenceNotStr[str]) -> CdfConnectionPropertiesList:
         ...
 
     def retrieve(
-        self, external_id: str | Sequence[str], space: str = "cdf_3d_schema"
-    ) -> CdfConnectionProperties | CdfConnectionPropertiesList:
+        self, external_id: str | SequenceNotStr[str], space: str = "cdf_3d_schema"
+    ) -> CdfConnectionProperties | CdfConnectionPropertiesList | None:
         """Retrieve one or more cdf 3 d connection properties by id(s).
 
         Args:
@@ -128,10 +184,7 @@ class CdfConnectionPropertiesAPI(
                 >>> cdf_3_d_connection_property = client.cdf_3_d_connection_properties.retrieve("my_cdf_3_d_connection_property")
 
         """
-        if isinstance(external_id, str):
-            return self._retrieve((space, external_id))
-        else:
-            return self._retrieve([(space, ext_id) for ext_id in external_id])
+        return self._retrieve(external_id, space)
 
     @overload
     def aggregate(
@@ -218,7 +271,7 @@ class CdfConnectionPropertiesAPI(
 
         """
 
-        filter_ = _create_filter(
+        filter_ = _create_cdf_3_d_connection_property_filter(
             self._view_id,
             min_revision_id,
             max_revision_id,
@@ -271,7 +324,7 @@ class CdfConnectionPropertiesAPI(
             Bucketed histogram results.
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_cdf_3_d_connection_property_filter(
             self._view_id,
             min_revision_id,
             max_revision_id,
@@ -327,7 +380,7 @@ class CdfConnectionPropertiesAPI(
                 >>> cdf_3_d_connection_properties = client.cdf_3_d_connection_properties.list(limit=5)
 
         """
-        filter_ = _create_filter(
+        filter_ = _create_cdf_3_d_connection_property_filter(
             self._view_id,
             min_revision_id,
             max_revision_id,
@@ -337,37 +390,4 @@ class CdfConnectionPropertiesAPI(
             space,
             filter,
         )
-
         return self._list(limit=limit, filter=filter_)
-
-
-def _create_filter(
-    view_id: dm.ViewId,
-    min_revision_id: int | None = None,
-    max_revision_id: int | None = None,
-    min_revision_node_id: int | None = None,
-    max_revision_node_id: int | None = None,
-    external_id_prefix: str | None = None,
-    space: str | list[str] | None = None,
-    filter: dm.Filter | None = None,
-) -> dm.Filter | None:
-    filters = []
-    if min_revision_id or max_revision_id:
-        filters.append(
-            dm.filters.Range(view_id.as_property_ref("revisionId"), gte=min_revision_id, lte=max_revision_id)
-        )
-    if min_revision_node_id or max_revision_node_id:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("revisionNodeId"), gte=min_revision_node_id, lte=max_revision_node_id
-            )
-        )
-    if external_id_prefix:
-        filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
-        filters.append(dm.filters.Equals(["node", "space"], value=space))
-    if space and isinstance(space, list):
-        filters.append(dm.filters.In(["node", "space"], values=space))
-    if filter:
-        filters.append(filter)
-    return dm.filters.And(*filters) if filters else None
