@@ -6,7 +6,6 @@ from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
 from cognite.client.credentials import OAuthClientCredentials
 
 from ._api.equipment_module import EquipmentModuleAPI
-from ._api.start_end_time import StartEndTimeAPI
 from ._api.unit_procedure import UnitProcedureAPI
 from . import data_classes
 
@@ -42,7 +41,6 @@ class EquipmentUnitClient:
         }
 
         self.equipment_module = EquipmentModuleAPI(client, view_by_write_class)
-        self.start_end_time = StartEndTimeAPI(client, view_by_write_class)
         self.unit_procedure = UnitProcedureAPI(client, view_by_write_class)
 
     @classmethod

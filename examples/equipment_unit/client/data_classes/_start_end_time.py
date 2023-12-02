@@ -26,7 +26,6 @@ class StartEndTime(DomainRelation):
     Args:
         space: The space where the node is located.
         external_id: The external id of the start end time.
-        equipment_module: The equipment module field.
         end_time: The end time field.
         start_time: The start time field.
         created_time: The created time of the start end time node.
@@ -36,28 +35,16 @@ class StartEndTime(DomainRelation):
     """
 
     space: str = "IntegrationTestsImmutable"
-    equipment_module: Union[EquipmentModule, str]
     end_time: Optional[datetime.datetime] = None
     start_time: Optional[datetime.datetime] = None
-
-    @property
-    def unit_procedure(self) -> str:
-        return self.start_node.external_id
-
-    @model_validator(mode="before")
-    def set_equipment_module_if_missing(cls, data: Any):
-        if isinstance(data, dict) and "equipment_module" not in data:
-            data["equipment_module"] = data["end_node"]["external_id"]
-        return data
+    end_node: Union[EquipmentModule, str, dm.NodeId] = None
 
     def as_apply(self) -> StartEndTimeApply:
         """Convert this read version of start end time to the writing version."""
         return StartEndTimeApply(
             space=self.space,
             external_id=self.external_id,
-            equipment_module=self.equipment_module.as_apply()
-            if isinstance(self.equipment_module, EquipmentModule)
-            else self.equipment_module,
+            end_node=self.end_node.as_apply() if isinstance(self.end_node, DomainModelApply) else self.end_node,
             end_time=self.end_time,
             start_time=self.start_time,
         )
@@ -69,10 +56,9 @@ class StartEndTimeApply(DomainRelationApply):
     It is used to when data is sent to CDF.
 
     Args:
-        edge_type: The edge type of the start end time.
         space: The space where the node is located.
         external_id: The external id of the start end time.
-        equipment_module: The equipment module field.
+        end_node: The end node field.
         end_time: The end time field.
         start_time: The start time field.
         existing_version: Fail the ingestion request if the start end time version is greater than or equal to this value.
@@ -81,11 +67,8 @@ class StartEndTimeApply(DomainRelationApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    edge_type: dm.DirectRelationReference = dm.DirectRelationReference(
-        "IntegrationTestsImmutable", "UnitProcedure.equipment_module"
-    )
     space: str = "IntegrationTestsImmutable"
-    equipment_module: Union[EquipmentModuleApply, str]
+    end_node: Union[EquipmentModuleApply, str, dm.NodeId]
     end_time: Optional[datetime.datetime] = None
     start_time: Optional[datetime.datetime] = None
 
@@ -93,15 +76,18 @@ class StartEndTimeApply(DomainRelationApply):
         self,
         cache: set[tuple[str, str]],
         start_node: DomainModelApply,
+        edge_type: dm.DirectRelationReference,
         view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.external_id and (self.space, self.external_id) in cache:
             return resources
 
-        if isinstance(self.equipment_module, DomainModelApply):
-            end_node = self.equipment_module.as_direct_reference()
-        elif isinstance(self.equipment_module, str):
+        if isinstance(self.end_node, DomainModelApply):
+            end_node = self.end_node.as_direct_reference()
+        elif isinstance(self.end_node, str):
+            end_node = dm.DirectRelationReference(self.space, self.equipment_module)
+        elif isinstance(self.end_node, dm.NodeId):
             end_node = dm.DirectRelationReference(self.space, self.equipment_module)
         else:
             raise ValueError(f"Invalid type for equipment_module: {type(self.equipment_module)}")
@@ -122,7 +108,7 @@ class StartEndTimeApply(DomainRelationApply):
             this_edge = dm.EdgeApply(
                 space=self.space,
                 external_id=external_id,
-                type=self.edge_type,
+                type=edge_type,
                 start_node=start_node.as_direct_reference(),
                 end_node=end_node,
                 existing_version=self.existing_version,
@@ -136,8 +122,8 @@ class StartEndTimeApply(DomainRelationApply):
             resources.edges.append(this_edge)
             cache.add((self.space, external_id))
 
-        if isinstance(self.equipment_module, DomainModelApply):
-            other_resources = self.equipment_module._to_instances_apply(cache, view_by_write_class)
+        if isinstance(self.end_node, DomainModelApply):
+            other_resources = self.end_node._to_instances_apply(cache, view_by_write_class)
             resources.extend(other_resources)
 
         return resources
