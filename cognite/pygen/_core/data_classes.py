@@ -773,7 +773,8 @@ class DataClass:
 
 @dataclass
 class NodeDataClass(DataClass):
-    def import_pydantic_field(self, is_pydantic_v2: bool) -> str:
+    @property
+    def import_pydantic_field(self) -> str:
         if self.pydantic_field == "Field":
             return "from pydantic import Field"
         else:

@@ -15,18 +15,15 @@ from tests.constants import EQUIPMENT_UNIT_SDK, IS_PYDANTIC_V2, EquipmentSDKFile
 
 
 @pytest.fixture
-def sdk_generator(equipment_unit_model: dm.DataModel[dm.View]) -> SDKGenerator:
-    return SDKGenerator(EQUIPMENT_UNIT_SDK.top_level_package, EQUIPMENT_UNIT_SDK.client_name, equipment_unit_model)
+def sdk_generator(equipment_unit_model: dm.DataModel[dm.View], pygen_config: PygenConfig) -> SDKGenerator:
+    return SDKGenerator(
+        EQUIPMENT_UNIT_SDK.top_level_package, EQUIPMENT_UNIT_SDK.client_name, equipment_unit_model, config=pygen_config
+    )
 
 
 @pytest.fixture
-def multi_api_generator(equipment_unit_model, pygen_config: PygenConfig) -> MultiAPIGenerator:
-    return MultiAPIGenerator(
-        EQUIPMENT_UNIT_SDK.top_level_package,
-        EQUIPMENT_UNIT_SDK.client_name,
-        equipment_unit_model.views,
-        config=pygen_config,
-    )
+def multi_api_generator(sdk_generator: SDKGenerator) -> MultiAPIGenerator:
+    return sdk_generator._multi_api_generator
 
 
 @pytest.fixture
