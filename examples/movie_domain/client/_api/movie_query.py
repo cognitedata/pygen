@@ -38,7 +38,7 @@ class MovieQueryAPI(QueryAPI[T_DomainModelList]):
         Args:
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of work unit edges to return. Defaults to 25. Set to -1, float("inf") or None
+            limit: Maximum number of actor edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
 
         Returns:
@@ -62,26 +62,7 @@ class MovieQueryAPI(QueryAPI[T_DomainModelList]):
                 max_retrieve_limit=limit,
             )
         )
-        self._builder.append(
-            QueryStep(
-                name=self._builder.next_name("actor"),
-                expression=dm.query.NodeResultSetExpression(
-                    filter=None,
-                    from_=self._builder[-1].name,
-                ),
-                select=dm.query.Select(
-                    [
-                        dm.query.SourceSelector(
-                            self._view_by_write_class[ActorApply],
-                            list(_ACTOR_PROPERTIES_BY_FIELD.values()),
-                        )
-                    ]
-                ),
-                result_cls=Actor,
-                max_retrieve_limit=-1,
-            ),
-        )
-        return ActorQueryAPI(self._client, self._builder, self._view_by_write_class)
+        return ActorQueryAPI(self._client, self._builder, self._view_by_write_class, None, -1)
 
     def directors(
         self,
@@ -94,7 +75,7 @@ class MovieQueryAPI(QueryAPI[T_DomainModelList]):
         Args:
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of work unit edges to return. Defaults to 25. Set to -1, float("inf") or None
+            limit: Maximum number of director edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
 
         Returns:
