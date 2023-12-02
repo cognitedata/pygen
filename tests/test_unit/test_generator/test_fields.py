@@ -1,6 +1,7 @@
 from cognite.client import data_modeling as dm
 
-from cognite.pygen._core.data_classes import NodeDataClass, ViewSpaceExternalId
+from cognite.pygen._core.data_classes import ViewSpaceExternalId
+from cognite.pygen._core.data_class.data_class import NodeDataClass
 from cognite.pygen._core.generators import APIGenerator
 from cognite.pygen.config import PygenConfig
 

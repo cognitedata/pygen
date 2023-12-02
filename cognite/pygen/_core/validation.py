@@ -5,7 +5,7 @@ from cognite.client import data_modeling as dm
 
 from cognite.pygen.exceptions import NameConflict
 
-from .data_classes import APIClass, DataClass, MultiAPIClass
+from .data_classes import APIClass, MultiAPIClass, DataClass
 
 _DATACLASS_UNIQUE_PROPERTIES = [
     "file_name",

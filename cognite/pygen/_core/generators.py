@@ -15,28 +15,22 @@ from cognite.pygen.config import PygenConfig
 from cognite.pygen.utils.helper import get_pydantic_version
 
 from . import validation
-from .data_classes import (
-    APIClass,
-    DataClass,
-    EdgeDataClass,
-    EdgeWithPropertyDataClass,
-    MultiAPIClass,
-    NodeDataClass,
-    ViewSpaceExternalId,
-)
+from .data_classes import APIClass, MultiAPIClass, DataClass, NodeDataClass, EdgeDataClass, EdgeWithPropertyDataClass
 from .logic import get_unique_views
 
 
 class SDKGenerator:
     """
-    SDK generator for a data model.
+    SDK generator for data model(s).
 
     Args:
         top_level_package: The name of the top level package for the SDK. Example "movie.client"
         client_name: The name of the client class. Example "MovieClient"
-        data_model: The data model(s) to generate an SDK for.
+        data_model: The data model(s) used to generate an SDK.
+        default_instance_space: The default instance space to use for the SDK. If None, the first space in the data
+                                model will be used.
         pydantic_version: The version of pydantic to use. "infer" will use the version of pydantic installed in
-                          the environment.
+                          the environment. "v1" will use pydantic v1, while "v2" will use pydantic v2.
         logger: A logger function to use for logging. If None, print will be done.
     """
 
@@ -55,55 +49,35 @@ class SDKGenerator:
         self.client_name = client_name
         self._multi_api_classes: list[MultiAPIClass]
         if isinstance(data_model, dm.DataModel):
-            if view_ids := [view for view in data_model.views if isinstance(view, dm.ViewId)]:
-                raise ValueError(
-                    f"Data model ({data_model.space}, {data_model.external_id} contains ViewIDs: {view_ids}. "
-                    "pygen requires Views to generate an SDK."
+            data_model = [data_model]
+
+        if view_ids := [view for model in data_model for view in model.views if isinstance(view, dm.ViewId)]:
+            raise ValueError(
+                f"Data models ({', '.join(f'{model.space}, {model.external_id}' for model in data_model)}) "
+                f"contains ViewIDs: {view_ids}. pygen requires Views to generate an SDK."
+            )
+
+        self.default_instance_space = default_instance_space or data_model[0].space
+
+        self._multi_api_generator = MultiAPIGenerator(
+            top_level_package,
+            client_name,
+            [view for model in data_model for view in model.views],
+            self.default_instance_space,
+            pydantic_version,
+            logger,
+            config,
+        )
+        self._multi_api_classes = sorted(
+            (
+                MultiAPIClass.from_data_model(
+                    model, self._multi_api_generator.get_apis(model.views), config.naming.multi_api_class
                 )
-            self.default_instance_space = default_instance_space or data_model.space
-
-            self._multi_api_generator = MultiAPIGenerator(
-                top_level_package,
-                client_name,
-                data_model.views,
-                self.default_instance_space,
-                pydantic_version,
-                logger,
-                config,
-            )
-            self._multi_api_classes = []
-
-        elif isinstance(data_model, Sequence):
-            if view_ids := [view for model in data_model for view in model.views if isinstance(view, dm.ViewId)]:
-                raise ValueError(
-                    f"Data models ({', '.join(f'{model.space}, {model.external_id}' for model in data_model)}) "
-                    f"contains ViewIDs: {view_ids}. pygen requires Views to generate an SDK."
-                )
-            self.default_instance_space = default_instance_space or data_model[0].space
-
-            unique_views = get_unique_views(*[view for model in data_model for view in model.views])
-
-            self._multi_api_generator = MultiAPIGenerator(
-                top_level_package,
-                client_name,
-                unique_views,
-                self.default_instance_space,
-                pydantic_version,
-                logger,
-                config,
-            )
-            api_by_view_identifier = {api.view_identifier: api.api_class for api in self._multi_api_generator.sub_apis}
-
-            self._multi_api_classes = sorted(
-                (
-                    MultiAPIClass.from_data_model(model, api_by_view_identifier, config.naming.multi_api_class)
-                    for model in data_model
-                ),
-                key=lambda a: a.name,
-            )
-            validation.validate_multi_api_classes_unique_names(self._multi_api_classes)
-        else:
-            raise ValueError("data_model must be a DataModel or a sequence of DataModels")
+                for model in data_model
+            ),
+            key=lambda a: a.name,
+        )
+        validation.validate_multi_api_classes_unique_names(self._multi_api_classes)
 
     def generate_sdk(self) -> dict[Path, str]:
         """
@@ -118,16 +92,19 @@ class SDKGenerator:
         return sdk
 
     def _generate_api_client_file(self) -> str:
-        api_client = self._multi_api_generator.env.get_template("_api_client.py.jinja")
+        if len(self._multi_api_classes) == 1:
+            api_client = self._multi_api_generator.env.get_template("_api_client_single_model.py.jinja")
+        else:
+            api_client = self._multi_api_generator.env.get_template("_api_client_multi_model.py.jinja")
 
-        api_classes = sorted(
-            (sub_api.api_class for sub_api in self._multi_api_generator.sub_apis),
-            key=lambda api_class: api_class.name.lower(),
-        )
-
-        # In the template, we run zip(api_classes, views) and zip(multi_api_classes, view_sets)
-        # thus it is important that the order is the same for both.
-        views, view_sets = self._create_view_lists_in_order_of_api_classes(api_classes)
+        # api_classes = sorted(
+        #     (sub_api.api_class for sub_api in self._multi_api_generator.sub_apis),
+        #     key=lambda api_class: api_class.name.lower(),
+        # )
+        #
+        # # In the template, we run zip(api_classes, views) and zip(multi_api_classes, view_sets)
+        # # thus it is important that the order is the same for both.
+        # views, view_sets = self._create_view_lists_in_order_of_api_classes(api_classes)
 
         return (
             api_client.render(
@@ -135,44 +112,17 @@ class SDKGenerator:
                 pygen_version=__version__,
                 cognite_sdk_version=cognite_sdk_version,
                 pydantic_version=PYDANTIC_VERSION,
-                api_classes=api_classes,
-                is_single_model=isinstance(self._data_model, dm.DataModel),
+                # api_classes=api_classes,
+                # is_single_model=isinstance(self._data_model, dm.DataModel),
                 top_level_package=self.top_level_package,
-                data_model=self._data_model,
-                multi_api_classes=self._multi_api_classes,
-                view_sets=view_sets,
-                views=views,
-                zip=zip,
+                # data_model=self._data_model,
+                # multi_api_classes=self._multi_api_classes,
+                # view_sets=view_sets,
+                # views=views,
+                # zip=zip,
             )
             + "\n"
         )
-
-    def _create_view_lists_in_order_of_api_classes(
-        self, api_classes: list[APIClass]
-    ) -> tuple[list[dm.View], list[list[dm.View]]]:
-        api_class_order: dict[ViewSpaceExternalId, int] = {
-            api_class.view_id: i for i, api_class in enumerate(api_classes)
-        }
-
-        if isinstance(self._data_model, dm.DataModel):
-            views = sorted(
-                self._data_model.views,
-                key=lambda v: api_class_order[ViewSpaceExternalId.from_(v)],
-            )
-            return views, []
-        elif isinstance(self._data_model, Sequence):
-            multi_api_class_order = {api_class.model_id: i for i, api_class in enumerate(self._multi_api_classes)}
-            sorted_data_models = sorted(  # type: ignore[arg-type]
-                self._data_model,
-                key=lambda m: multi_api_class_order[m.as_id()],
-            )
-            view_sets: list[list[dm.View]] = []
-            for data_model in sorted_data_models:
-                views = sorted(data_model.views, key=lambda v: api_class_order[ViewSpaceExternalId.from_(v)])
-                view_sets.append(views)
-            return [], view_sets
-        else:
-            raise ValueError("data_model must be a DataModel or a sequence of DataModels")
 
 
 class MultiAPIGenerator:
@@ -193,10 +143,9 @@ class MultiAPIGenerator:
         self._pydantic_version = pydantic_version
         self._logger = logger or print
 
-        self.sub_apis: list[APIGenerator] = [APIGenerator(view, config) for view in views]
-        data_class_by_view_id: dict[ViewSpaceExternalId, DataClass] = {
-            api.view_identifier: api.data_class for api in self.sub_apis
-        }
+        self.sub_apis: list[APIGenerator] = [APIGenerator(view, default_instance_space, config) for view in views]
+
+        data_class_by_view_id: dict[dm.ViewId, DataClass] = {api.view_id: api.data_class for api in self.sub_apis}
         for api, view in zip(self.sub_apis, views):
             if isinstance(api.data_class, EdgeWithPropertyDataClass):
                 api.data_class.update_nodes(data_class_by_view_id, views, config.naming.field)
@@ -205,9 +154,9 @@ class MultiAPIGenerator:
         validation.validate_data_classes_unique_name([api.data_class for api in self.sub_apis])
         validation.validate_api_classes_unique_names([api.api_class for api in self.sub_apis])
 
-    def __getitem__(self, item: dm.View | dm.ViewId) -> APIGenerator | None:
+    def __getitem__(self, item: dm.ViewId) -> APIGenerator | None:
         return next(
-            (api for api in self.sub_apis if api.view_identifier == ViewSpaceExternalId.from_(item)),
+            (api for api in self.sub_apis if api.view_id == item),
             None,
         )
 
@@ -245,7 +194,6 @@ class MultiAPIGenerator:
         sdk[api_dir / "_core.py"] = self.generate_api_core_file()
 
         sdk[data_classes_dir / "_core.py"] = self.generate_data_class_core_file()
-        # if self.pydantic_version == "v2":
         return sdk
 
     def generate_api_core_file(self) -> str:
@@ -304,15 +252,14 @@ class MultiAPIGenerator:
 
 
 class APIGenerator:
-    def __init__(self, view: dm.View, config: PygenConfig):
+    def __init__(self, view: dm.View, default_instance_space: str, config: PygenConfig):
         self._env = Environment(
             loader=PackageLoader("cognite.pygen._core", "templates"), autoescape=select_autoescape()
         )
-        self.view_identifier = ViewSpaceExternalId.from_(view)
+        self.view_id = view.as_id()
+        self.default_instance_space = default_instance_space
         self.data_class = DataClass.from_view(view, config.naming.data_class)
         self.api_class = APIClass.from_view(view, config.naming.api_class, self.data_class)
-
-        # List method cannot be generated here, as we need all data class fields to bo updated first.
         self._config = config
 
     def generate_data_class_file(self, is_pydantic_v2: bool) -> str:
@@ -326,9 +273,8 @@ class APIGenerator:
         return (
             type_data.render(
                 data_class=self.data_class,
-                space=self.view_identifier.space,
                 list_method=self.data_class.list_method,
-                instance_space=self.view_identifier.space,
+                instance_space=self.default_instance_space,
                 is_pydantic_v2=is_pydantic_v2,
             )
             + "\n"
@@ -344,6 +290,7 @@ class APIGenerator:
                 api_class=self.api_class,
                 data_class=self.data_class,
                 list_method=self.data_class.list_method,
+                default_instance_space=self.default_instance_space,
             )
             + "\n"
         )
@@ -366,6 +313,7 @@ class APIGenerator:
     def generate_edge_api_files(self, top_level_package: str, client_name: str) -> Iterator[tuple[str, str]]:
         edge_api = self._env.get_template("api_class_edge.py.jinja")
         for field in self.data_class.one_to_many_edges:
+            # Todo: There should be no if-condition here
             if isinstance(field.data_class, NodeDataClass):
                 edge_class = EdgeDataClass.from_field_data_classes(
                     field,
@@ -386,7 +334,7 @@ class APIGenerator:
                     api_class=self.api_class,
                     data_class=edge_class,
                     list_method=list_method,
-                    instance_space=self.view_identifier.space,
+                    default_instance_space=self.default_instance_space,
                 )
                 + "\n"
             )

@@ -9,15 +9,11 @@ from cognite.client import data_modeling as dm
 from yaml import safe_load
 
 from cognite.pygen._core.data_classes import (
-    EdgeOneToOne,
-    Field,
-    FilterCondition,
-    FilterParameter,
-    NodeDataClass,
-    PrimitiveField,
-    PrimitiveListField,
     ViewSpaceExternalId,
 )
+from cognite.pygen._core.data_class.data_class import NodeDataClass
+from cognite.pygen._core.data_class.fields import Field, PrimitiveField, PrimitiveListField, EdgeOneToOne
+from cognite.pygen._core.data_class.filter_method import FilterParameter, FilterCondition
 from cognite.pygen.config import PygenConfig
 from cognite.pygen.warnings import (
     ParameterNameCollisionWarning,

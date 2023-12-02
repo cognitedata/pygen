@@ -9,17 +9,15 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.views import ViewProperty
 
 from cognite.pygen._core.data_classes import (
-    EdgeOneToMany,
-    EdgeOneToOne,
-    Field,
+    ViewSpaceExternalId,
+)
+from cognite.pygen._core.data_class.data_class import NodeDataClass
+from cognite.pygen._core.data_class.fields import Field, PrimitiveField, PrimitiveListField, EdgeOneToOne, EdgeOneToMany
+from cognite.pygen._core.data_class.filter_method import (
+    FilterParameter,
     FilterCondition,
     FilterConditionOnetoOneEdge,
-    FilterParameter,
-    ListMethod,
-    NodeDataClass,
-    PrimitiveField,
-    PrimitiveListField,
-    ViewSpaceExternalId,
+    FilterMethod,
 )
 from cognite.pygen._core.generators import APIGenerator, MultiAPIGenerator, SDKGenerator
 from cognite.pygen._generator import CodeFormatter
@@ -126,7 +124,7 @@ def create_fields_test_cases():
             edge_api_attribute="roles_edge",
             edge_api_class="PersonRolesAPI",
             edge_api_file_name="person_roles",
-            _list_method=ListMethod.from_fields([], config.filtering, is_edge_class=True),
+            _list_method=FilterMethod.from_fields([], config.filtering, is_edge_class=True),
         ),
         "Union[list[Role], list[str], None] = Field(default=None, repr=False)",
         "Union[list[RoleApply], list[str], None] = Field(default=None, repr=False)",
@@ -434,7 +432,7 @@ def test_create_list_method(person_view: dm.View, pygen_config: PygenConfig) -> 
         FilterParameter("external_id_prefix", "str", description="The prefix of the external ID to filter on."),
         FilterParameter("space", "str | list[str]", description="The space to filter on."),
     ]
-    expected = ListMethod(
+    expected = FilterMethod(
         parameters=parameters,
         filters=[
             FilterCondition(
@@ -450,7 +448,7 @@ def test_create_list_method(person_view: dm.View, pygen_config: PygenConfig) -> 
     )
 
     # Act
-    actual = ListMethod.from_fields(data_class.fields, pygen_config.filtering)
+    actual = FilterMethod.from_fields(data_class.fields, pygen_config.filtering)
 
     # Assert
     assert actual.parameters == expected.parameters
@@ -490,7 +488,7 @@ def test_create_list_method_actors(actor_view: dm.View, pygen_config: PygenConfi
         FilterParameter("external_id_prefix", "str", description="The prefix of the external ID to filter on."),
         FilterParameter("space", "str | list[str]", description="The space to filter on."),
     ]
-    expected = ListMethod(
+    expected = FilterMethod(
         parameters=parameters,
         filters=[
             FilterConditionOnetoOneEdge(
@@ -513,7 +511,7 @@ def test_create_list_method_actors(actor_view: dm.View, pygen_config: PygenConfi
     )
 
     # Act
-    actual = ListMethod.from_fields(data_class.fields, pygen_config.filtering)
+    actual = FilterMethod.from_fields(data_class.fields, pygen_config.filtering)
 
     # Assert
     assert actual.parameters == expected.parameters
