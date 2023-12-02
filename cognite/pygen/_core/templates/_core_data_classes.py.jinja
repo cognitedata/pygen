@@ -230,7 +230,6 @@ T_DomainModelApplyList = TypeVar("T_DomainModelApplyList", bound=DomainModelAppl
 class DomainRelation(DomainModelCore):
     type: dm.DirectRelationReference
     start_node: dm.DirectRelationReference
-    end_node: dm.DirectRelationReference
     version: int
     last_updated_time: datetime.datetime
     created_time: datetime.datetime
@@ -262,6 +261,7 @@ class DomainRelationApply(BaseModel{% if is_pydantic_v2 %}, extra=Extra.forbid, 
         self,
         cache: set[tuple[str, str]],
         start_node: DomainModelApply,
+        edge_type: dm.DirectRelationReference,
         view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
     ) -> ResourcesApply:
         raise NotImplementedError()

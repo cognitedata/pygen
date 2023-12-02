@@ -4,8 +4,8 @@ from pathlib import Path
 
 from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
 from cognite.client.credentials import OAuthClientCredentials
-{% for class_ in api_classes %}
-from ._api.{{ class_.file_name }} import {{ class_.name }}{% endfor %}
+{% for class_ in api_classes %}{% if not class_.data_class.is_edge_class %}
+from ._api.{{ class_.file_name }} import {{ class_.name }}{% endif %}{% endfor %}
 from . import data_classes
 
 {% if not is_single_model %}{% for multi_api_class, views in zip(multi_api_classes, view_sets) %}
@@ -24,8 +24,8 @@ class {{ multi_api_class.name }}:
         view_by_write_class = {% raw %}{{% endraw %}{% for sub, view in zip(multi_api_class.sub_apis, views) %}
             data_classes.{{ sub.data_class.write_name }}: dm.ViewId("{{ view.space }}", "{{ view.external_id }}", "{{ view.version }}"),{% endfor %}
         {% raw %}}{% endraw %}
-        {% for sub, view in zip(multi_api_class.sub_apis, views) %}
-        self.{{ sub.client_attribute }} = {{ sub.name }}(client, view_by_write_class){% endfor %}
+        {% for sub, view in zip(multi_api_class.sub_apis, views) %}{% if not sub.data_class.is_edge_class %}
+        self.{{ sub.client_attribute }} = {{ sub.name }}(client, view_by_write_class){% endif %}{% endfor %}
 
 {% endfor %}{% endif %}
 class {{ client_name }}:
@@ -53,8 +53,8 @@ class {{ client_name }}:
         view_by_write_class = {% raw %}{{% endraw %}{% for api_class, view in zip(api_classes, views) %}
             data_classes.{{ api_class.data_class.write_name }}: dm.ViewId("{{ view.space }}", "{{ view.external_id }}", "{{ view.version }}"),{% endfor %}
         {% raw %}}{% endraw %}
-        {% for api_class, view in zip(api_classes, views) %}
-        self.{{ api_class.client_attribute }} = {{ api_class.name }}(client, view_by_write_class){% endfor %}{% else %}{% for multi_api_class in multi_api_classes %}
+        {% for api_class, view in zip(api_classes, views) %}{% if not api_class.data_class.is_edge_class %}
+        self.{{ api_class.client_attribute }} = {{ api_class.name }}(client, view_by_write_class){% endif %}{% endfor %}{% else %}{% for multi_api_class in multi_api_classes %}
         self.{{ multi_api_class.client_attribute }} = {{ multi_api_class.name }}(client){% endfor %}{% endif %}
 
     @classmethod
