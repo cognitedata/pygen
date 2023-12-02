@@ -10,7 +10,7 @@
   - createdTime: 1690467703871
     externalId: Cdf3dModel
     isGlobal: true
-    lastUpdatedTime: 1699879660707
+    lastUpdatedTime: 1701095065955
     properties:
       entities:
         connectionType: multi_edge_connection
@@ -52,7 +52,7 @@
   - createdTime: 1690467703871
     externalId: Cdf3dEntity
     isGlobal: true
-    lastUpdatedTime: 1699879660707
+    lastUpdatedTime: 1701095065955
     properties:
       inModel3d:
         connectionType: multi_edge_connection
@@ -79,7 +79,7 @@
   - createdTime: 1690467703871
     externalId: Cdf3dConnectionProperties
     isGlobal: true
-    lastUpdatedTime: 1699879660707
+    lastUpdatedTime: 1701095065955
     properties:
       revisionId:
         autoIncrement: false

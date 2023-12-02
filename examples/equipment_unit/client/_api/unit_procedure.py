@@ -30,7 +30,6 @@ from ._core import (
     Aggregations,
     NodeAPI,
     SequenceNotStr,
-    QueryStep,
     QueryBuilder,
 )
 from .unit_procedure_work_units import UnitProcedureWorkUnitsAPI
@@ -130,7 +129,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
 
         Args:
             external_id: External id of the unit procedure to delete.
-            space: The space where all the unit procedure are located.
+            space: The space where all the unit procedures are located.
 
         Returns:
             The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
