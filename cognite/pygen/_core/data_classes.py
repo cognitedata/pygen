@@ -389,7 +389,7 @@ class EdgeOneToOne(EdgeField):
         return self._type_hint(self.data_class.write_name)
 
     def _type_hint(self, data_class_name: str) -> str:
-        left_side = f"Union[{data_class_name}, str, None] ="
+        left_side = f"Union[{data_class_name}, str, dm.NodeId, None] ="
         # Edge fields are always nullable
         if self.need_alias:
             return f'{left_side} {self.pydantic_field}(None, repr=False, alias="{self.prop_name}")'

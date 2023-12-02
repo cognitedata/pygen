@@ -209,8 +209,8 @@ def create_fields_test_cases():
             data_class=data_class,
             pydantic_field="Field",
         ),
-        "Union[Person, str, None] = Field(None, repr=False)",
-        "Union[PersonApply, str, None] = Field(None, repr=False)",
+        "Union[Person, str, dm.NodeId, None] = Field(None, repr=False)",
+        "Union[PersonApply, str, dm.NodeId, None] = Field(None, repr=False)",
         id="Edge to another view",
     )
 
