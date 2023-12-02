@@ -33,7 +33,7 @@ class ActorQueryAPI(QueryAPI[T_DomainModelList]):
             QueryStep(
                 name=self._builder.next_name("actor"),
                 expression=dm.query.NodeResultSetExpression(
-                    from_=None,
+                    from_=self._builder[-1].name if self._builder else None,
                     filter=filter_,
                 ),
                 select=dm.query.Select([dm.query.SourceSelector(self._view_by_write_class[ActorApply], ["*"])]),

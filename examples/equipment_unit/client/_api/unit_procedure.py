@@ -91,24 +91,8 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
             space,
             filter,
         )
-        builder = QueryBuilder(
-            UnitProcedureList,
-            [
-                QueryStep(
-                    name="unit_procedure",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_UNITPROCEDURE_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=UnitProcedure,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return UnitProcedureQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(UnitProcedureList)
+        return UnitProcedureQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(
         self, unit_procedure: UnitProcedureApply | Sequence[UnitProcedureApply], replace: bool = False

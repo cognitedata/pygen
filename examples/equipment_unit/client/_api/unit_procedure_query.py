@@ -3,26 +3,54 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING
 from cognite.client import data_modeling as dm
-from ._core import DEFAULT_QUERY_LIMIT, QueryStep, QueryAPI, T_DomainModelList
+from cognite.client import CogniteClient
+from ._core import DEFAULT_QUERY_LIMIT, QueryStep, QueryAPI, T_DomainModelList, QueryBuilder
 from equipment_unit.client.data_classes import (
     UnitProcedure,
     UnitProcedureApply,
     StartEndTime,
     StartEndTimeApply,
-)
-from equipment_unit.client.data_classes._unit_procedure import (
-    _UNITPROCEDURE_PROPERTIES_BY_FIELD,
+    DomainModelApply,
 )
 from equipment_unit.client.data_classes._start_end_time import (
-    _STARTENDTIME_PROPERTIES_BY_FIELD,
     _create_start_end_time_filter,
 )
+
 
 if TYPE_CHECKING:
     from .equipment_module_query import EquipmentModuleQueryAPI
 
 
 class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
+    def __init__(
+        self,
+        client: CogniteClient,
+        builder: QueryBuilder[T_DomainModelList],
+        view_by_write_class: dict[type[DomainModelApply], dm.ViewId],
+        filter_: dm.filters.Filter | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+    ):
+        super().__init__(client, builder, view_by_write_class)
+        self._builder.append(
+            QueryStep(
+                name=self._builder.next_name("unit_procedure"),
+                expression=dm.query.NodeResultSetExpression(
+                    from_=self._builder[-1].name if self._builder else None,
+                    filter=filter_,
+                ),
+                select=dm.query.Select(
+                    [
+                        dm.query.SourceSelector(
+                            self._view_by_write_class[UnitProcedureApply],
+                            ["*"],
+                        )
+                    ]
+                ),
+                result_cls=UnitProcedure,
+                max_retrieve_limit=limit,
+            ),
+        )
+
     def work_units(
         self,
         min_end_time: datetime.datetime | None = None,
@@ -68,48 +96,21 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
                     filter=edge_filter,
                     from_=self._builder[-1].name,
                 ),
-                select=dm.query.Select(
-                    [dm.query.SourceSelector(edge_view, list(_STARTENDTIME_PROPERTIES_BY_FIELD.values()))]
-                ),
+                select=dm.query.Select([dm.query.SourceSelector(edge_view, ["*"])]),
                 result_cls=StartEndTime,
                 max_retrieve_limit=limit,
             )
         )
-        return EquipmentModuleQueryAPI(self._client, self._builder, self._view_by_write_class)
+
+        return EquipmentModuleQueryAPI(self._client, self._builder, self._view_by_write_class, None, limit)
 
     def query(
         self,
-        retrieve_unit_procedure: bool = True,
     ) -> T_DomainModelList:
         """Execute query and return the result.
-
-        Args:
-            retrieve_unit_procedure: Whether to retrieve the unit procedure or not.
 
         Returns:
             The list of the source nodes of the query.
 
         """
-        from_ = self._builder[-1].name
-        if retrieve_unit_procedure and not self._builder[-1].name.startswith("unit_procedure"):
-            self._builder.append(
-                QueryStep(
-                    name=self._builder.next_name("unit_procedure"),
-                    expression=dm.query.NodeResultSetExpression(
-                        filter=None,
-                        from_=from_,
-                    ),
-                    select=dm.query.Select(
-                        [
-                            dm.query.SourceSelector(
-                                self._view_by_write_class[UnitProcedureApply],
-                                list(_UNITPROCEDURE_PROPERTIES_BY_FIELD.values()),
-                            )
-                        ]
-                    ),
-                    result_cls=UnitProcedure,
-                    max_retrieve_limit=-1,
-                ),
-            )
-
         return self._query()
