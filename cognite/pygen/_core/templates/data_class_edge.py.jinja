@@ -4,9 +4,9 @@ import datetime{% endif %}
 from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
-{{ data_class.import_pydantic_field(is_pydantic_v2) }}
+{{ data_class.import_pydantic_field }}
 
-from ._core import DomainModelApply, DomainRelation, DomainRelationApply, DomainRelationList, ResourcesApply
+from ._core import DEFAULT_INSTANCE_SPACE, DomainModelApply, DomainRelation, DomainRelationApply, DomainRelationList, ResourcesApply
 from .{{data_class.end_class.file_name }} import {{ data_class.end_class.read_name }}, {{ data_class.end_class.write_name }}
 
 __all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data_class.read_list_name }}", "{{ data_class.write_list_name }}"{% if data_class.has_primitive_fields %}, "{{ data_class.field_names }}"{% endif %}{% if data_class.has_text_field %}, "{{ data_class.text_field_names }}"{% endif %}]
@@ -34,18 +34,9 @@ class {{ data_class.read_name }}(DomainRelation):
         deleted_time: If present, the deleted time of the {{ data_class.doc_name }} node.
         version: The version of the {{ data_class.doc_name }} node.
     """
-    space: str = "{{ space }}"{% for field in data_class %}
+    space: str = DEFAULT_INSTANCE_SPACE
+    end_node: Union[str, dm.NodeId] = None{% for field in data_class %}
     {{ field.name }}: {{ field.as_read_type_hint() }}{% endfor %}
-
-    @property
-    def {{ data_class.start_class.variable }}(self) -> str:
-        return self.start_node.external_id
-
-    {% if is_pydantic_v2 %}@model_validator(mode="before"){% else %}@root_validator(pre=True){% endif %}
-    def set_{{ data_class.end_class.variable }}_if_missing(cls, data: Any):
-        if isinstance(data, dict) and "{{ data_class.end_class.variable }}" not in data:
-            data["{{ data_class.end_class.variable }}"] = data["end_node"]["external_id"]
-        return data
 
     def as_apply(self) -> {{ data_class.write_name }}:
         """Convert this read version of {{ data_class.doc_name }} to the writing version."""
@@ -71,28 +62,29 @@ class {{ data_class.write_name }}(DomainRelationApply):
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
-    edge_type: dm.DirectRelationReference = dm.DirectRelationReference(
-        "{{ data_class.edge_type.space }}", "{{ data_class.edge_type.external_id }}"
-    )
-    space: str = "{{ space }}"{% for field in data_class %}
+    space: str = DEFAULT_INSTANCE_SPACE
+    end_node: str{% for field in data_class %}
     {{ field.name }}: {{ field.as_write_type_hint() }}{% endfor %}
 
     def _to_instances_apply(
         self,
         cache: set[tuple[str, str]],
         start_node: DomainModelApply,
+        edge_type: dm.DirectRelationReference,
         view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.external_id and (self.space, self.external_id) in cache:
             return resources
 
-        if isinstance(self.{{ data_class.end_class.variable }}, DomainModelApply):
-            end_node = self.{{ data_class.end_class.variable }}.as_direct_reference()
-        elif isinstance(self.{{ data_class.end_class.variable }}, str):
-            end_node = dm.DirectRelationReference(self.space, self.{{ data_class.end_class.variable }})
+        if isinstance(self.end_node, DomainModelApply):
+            end_node = self.end_node.as_direct_reference()
+        elif isinstance(self.end_node, str):
+            end_node = dm.DirectRelationReference(self.space, self.end_node)
+        elif isinstance(self.end_node, dm.NodeId):
+            end_node = dm.DirectRelationReference(self.end_node.space, self.end_node.external_id)
         else:
-            raise ValueError(f"Invalid type for equipment_module: {type(self.{{ data_class.end_class.variable }})}")
+            raise ValueError(f"Invalid type for equipment_module: {type(self.end_node)}")
 
         self.external_id = external_id = DomainRelationApply.external_id_factory(start_node, end_node, self.edge_type)
 
@@ -111,7 +103,7 @@ class {{ data_class.write_name }}(DomainRelationApply):
             this_edge = dm.EdgeApply(
                 space=self.space,
                 external_id=external_id,
-                type=self.edge_type,
+                type=edge_type,
                 start_node=start_node.as_direct_reference(),
                 end_node=end_node,
                 existing_version=self.existing_version,
@@ -148,9 +140,9 @@ def {{ data_class.filter_name }}(
     edge_type: dm.DirectRelationReference,
     view_id: dm.ViewId,
     start_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-    start_node_space: str = "{{ instance_space }}",
+    start_node_space: str = DEFAULT_INSTANCE_SPACE,
     end_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-    space_end_node: str = "{{ instance_space }}",{% for parm in list_method.parameters %}
+    space_end_node: str = DEFAULT_INSTANCE_SPACE,{% for parm in list_method.parameters %}
     {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
     filter: dm.Filter | None = None,
 ) -> dm.Filter:

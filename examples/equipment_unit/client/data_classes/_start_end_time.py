@@ -4,9 +4,16 @@ import datetime
 from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
-from pydantic import Field, model_validator
+from pydantic import Field
 
-from ._core import DomainModelApply, DomainRelation, DomainRelationApply, DomainRelationList, ResourcesApply
+from ._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DomainModelApply,
+    DomainRelation,
+    DomainRelationApply,
+    DomainRelationList,
+    ResourcesApply,
+)
 from ._equipment_module import EquipmentModule, EquipmentModuleApply
 
 __all__ = ["StartEndTime", "StartEndTimeApply", "StartEndTimeList", "StartEndTimeApplyList", "StartEndTimeFields"]
@@ -34,10 +41,10 @@ class StartEndTime(DomainRelation):
         version: The version of the start end time node.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
+    end_node: Union[EquipmentModule, str, dm.NodeId] = None
     end_time: Optional[datetime.datetime] = None
     start_time: Optional[datetime.datetime] = None
-    end_node: Union[EquipmentModule, str, dm.NodeId] = None
 
     def as_apply(self) -> StartEndTimeApply:
         """Convert this read version of start end time to the writing version."""
@@ -67,7 +74,7 @@ class StartEndTimeApply(DomainRelationApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     end_node: Union[EquipmentModuleApply, str, dm.NodeId]
     end_time: Optional[datetime.datetime] = None
     start_time: Optional[datetime.datetime] = None
@@ -145,9 +152,9 @@ def _create_start_end_time_filter(
     edge_type: dm.DirectRelationReference,
     view_id: dm.ViewId,
     start_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-    start_node_space: str = "IntegrationTestsImmutable",
+    start_node_space: str = DEFAULT_INSTANCE_SPACE,
     end_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-    space_end_node: str = "IntegrationTestsImmutable",
+    space_end_node: str = DEFAULT_INSTANCE_SPACE,
     min_end_time: datetime.datetime | None = None,
     max_end_time: datetime.datetime | None = None,
     min_start_time: datetime.datetime | None = None,

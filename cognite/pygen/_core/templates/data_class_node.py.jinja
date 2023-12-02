@@ -5,9 +5,10 @@ import datetime{% endif %}
 
 from cognite.client import data_modeling as dm{% if data_class.has_single_timeseries_fields %}
 from cognite.client.data_classes import TimeSeries{% if is_pydantic_v2 %} as CogniteTimeSeries{% endif %}{% endif %}{% if data_class.use_pydantic_field %}
-{{ data_class.import_pydantic_field(is_pydantic_v2) }}{% endif %}
+{{ data_class.import_pydantic_field }}{% endif %}
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -46,7 +47,7 @@ class {{ data_class.read_name }}(DomainModel):
         deleted_time: If present, the deleted time of the {{ data_class.doc_name }} node.
         version: The version of the {{ data_class.doc_name }} node.
     """
-    space: str = "{{ space }}"{% for field in data_class %}
+    space: str = DEFAULT_INSTANCE_SPACE{% for field in data_class %}
     {{ field.name }}: {{ field.as_read_type_hint() }}{% endfor %}
 
     def as_apply(self) -> {{ data_class.write_name }}:
@@ -72,7 +73,7 @@ class {{ data_class.write_name }}(DomainModelApply):
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
-    space: str = "{{ space }}"{% for field in data_class %}
+    space: str = DEFAULT_INSTANCE_SPACE{% for field in data_class %}
     {{ field.name }}: {{ field.as_write_type_hint() }}{% endfor %}
 
     def _to_instances_apply(

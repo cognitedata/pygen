@@ -45,6 +45,7 @@ class SDKGenerator:
         top_level_package: str,
         client_name: str,
         data_model: dm.DataModel | Sequence[dm.DataModel],
+        default_instance_space: str | None = None,
         pydantic_version: Literal["v1", "v2", "infer"] = "infer",
         logger: Callable[[str], None] | None = None,
         config: PygenConfig = PygenConfig(),
@@ -59,22 +60,37 @@ class SDKGenerator:
                     f"Data model ({data_model.space}, {data_model.external_id} contains ViewIDs: {view_ids}. "
                     "pygen requires Views to generate an SDK."
                 )
+            self.default_instance_space = default_instance_space or data_model.space
 
             self._multi_api_generator = MultiAPIGenerator(
-                top_level_package, client_name, data_model.views, pydantic_version, logger, config
+                top_level_package,
+                client_name,
+                data_model.views,
+                self.default_instance_space,
+                pydantic_version,
+                logger,
+                config,
             )
             self._multi_api_classes = []
+
         elif isinstance(data_model, Sequence):
             if view_ids := [view for model in data_model for view in model.views if isinstance(view, dm.ViewId)]:
                 raise ValueError(
                     f"Data models ({', '.join(f'{model.space}, {model.external_id}' for model in data_model)}) "
                     f"contains ViewIDs: {view_ids}. pygen requires Views to generate an SDK."
                 )
+            self.default_instance_space = default_instance_space or data_model[0].space
 
             unique_views = get_unique_views(*[view for model in data_model for view in model.views])
 
             self._multi_api_generator = MultiAPIGenerator(
-                top_level_package, client_name, unique_views, pydantic_version, logger, config
+                top_level_package,
+                client_name,
+                unique_views,
+                self.default_instance_space,
+                pydantic_version,
+                logger,
+                config,
             )
             api_by_view_identifier = {api.view_identifier: api.api_class for api in self._multi_api_generator.sub_apis}
 
@@ -165,6 +181,7 @@ class MultiAPIGenerator:
         top_level_package: str,
         client_name: str,
         views: Sequence[dm.View],
+        default_instance_space: str,
         pydantic_version: Literal["v1", "v2", "infer"] = "infer",
         logger: Callable[[str], None] | None = None,
         config: PygenConfig = PygenConfig(),
@@ -172,6 +189,7 @@ class MultiAPIGenerator:
         self.env = Environment(loader=PackageLoader("cognite.pygen._core", "templates"), autoescape=select_autoescape())
         self.top_level_package = top_level_package
         self.client_name = client_name
+        self.default_instance_space = default_instance_space
         self._pydantic_version = pydantic_version
         self._logger = logger or print
 
@@ -236,7 +254,12 @@ class MultiAPIGenerator:
 
     def generate_data_class_core_file(self) -> str:
         data_class_core = self.env.get_template("_core_data_classes.py.jinja")
-        return data_class_core.render(is_pydantic_v2=self.pydantic_version == "v2") + "\n"
+        return (
+            data_class_core.render(
+                is_pydantic_v2=self.pydantic_version == "v2", default_instance_space=self.default_instance_space
+            )
+            + "\n"
+        )
 
     def generate_client_init_file(self) -> str:
         client_init = self.env.get_template("_client_init.py.jinja")

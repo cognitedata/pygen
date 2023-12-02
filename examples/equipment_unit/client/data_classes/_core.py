@@ -36,6 +36,9 @@ TimeSeries = Annotated[
 ]
 
 
+DEFAULT_INSTANCE_SPACE = "IntegrationTestsImmutable"
+
+
 @dataclass
 class ResourcesApply:
     nodes: dm.NodeApplyList = field(default_factory=lambda: dm.NodeApplyList([]))

@@ -36,6 +36,9 @@ TimeSeries = Annotated[
 ]{% endif %}
 
 
+DEFAULT_INSTANCE_SPACE = "{{ default_instance_space }}"
+
+
 @dataclass
 class ResourcesApply:
     nodes: dm.NodeApplyList = field(default_factory=lambda: dm.NodeApplyList([]))

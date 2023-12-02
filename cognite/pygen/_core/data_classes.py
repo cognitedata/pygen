@@ -943,9 +943,10 @@ class EdgeWithPropertyDataClass(DataClass):
                     return view, prop, prop_name
         raise ValueError("Could not find source view and property")
 
-    def import_pydantic_field(self, is_pydantic_v2: bool) -> str:
+    @property
+    def import_pydantic_field(self) -> str:
         if self.pydantic_field == "Field":
-            return "from pydantic import Field" + (", model_validator" if is_pydantic_v2 else ", root_validator")
+            return "from pydantic import Field"
         else:
             return "import pydantic"
 

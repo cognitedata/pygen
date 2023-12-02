@@ -28,6 +28,7 @@ def generate_sdk(
     client: Optional[CogniteClient] = None,
     top_level_package: Optional[str] = None,
     client_name: Optional[str] = None,
+    default_instance_space: str | None = None,
     output_dir: Optional[Path] = None,
     logger: Optional[Callable[[str], None]] = None,
     pydantic_version: Literal["v1", "v2", "infer"] = "infer",
@@ -49,6 +50,8 @@ def generate_sdk(
             the package will be [external_id:snake].client of the first data model given, while
             the client name will be [external_id:pascal_case]
         client_name: The name of the client class. For example, `APMClient`. See above for more details.
+        default_instance_space: The default instance space to use for the generated SDK. Defaults to the
+            instance space of the first data model given.
         output_dir: The location to output the generated SDK. Defaults to the current working directory.
         logger: A logger function to log progress. Defaults to print.
         pydantic_version: The version of pydantic to use. Defaults to "infer" which will use
@@ -68,7 +71,13 @@ def generate_sdk(
         client_name = _default_client_name(external_id)
 
     sdk_generator = SDKGenerator(
-        top_level_package, client_name, data_model, pydantic_version, logger, config or PygenConfig()
+        top_level_package,
+        client_name,
+        data_model,
+        default_instance_space,
+        pydantic_version,
+        logger,
+        config or PygenConfig(),
     )
     sdk = sdk_generator.generate_sdk()
     output_dir = output_dir or Path.cwd()
@@ -82,6 +91,7 @@ def generate_sdk_notebook(
     client: Optional[CogniteClient] = None,
     top_level_package: Optional[str] = None,
     client_name: Optional[str] = None,
+    default_instance_space: str | None = None,
     config: Optional[PygenConfig] = None,
 ) -> Any:
     """
@@ -107,6 +117,8 @@ def generate_sdk_notebook(
             the package will be [external_id:snake].client of the first data model given, while
             the client name will be [external_id:pascal_case]
         client_name: The name of the client class. For example, `APMClient`. See above for more details.
+        default_instance_space: The default instance space to use for the generated SDK. Defaults to the
+            instance space of the first data model given.
         config: The configuration used to control how to generate the SDK.
 
     Returns:
@@ -124,6 +136,7 @@ def generate_sdk_notebook(
         client,
         top_level_package=top_level_package,
         client_name=client_name,
+        default_instance_space=default_instance_space,
         output_dir=output_dir,
         overwrite=True,
         format_code=False,
