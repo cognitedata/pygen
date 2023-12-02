@@ -5,13 +5,13 @@ from typing import TYPE_CHECKING
 from cognite.client import data_modeling as dm, CogniteClient
 
 from movie_domain.client.data_classes import (
+    DomainModelApply,
     Actor,
     ActorApply,
     Person,
     PersonApply,
-    DomainModelApply,
 )
-from ._core import DEFAULT_QUERY_LIMIT, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter, QueryBuilder
+from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
 
 if TYPE_CHECKING:
     from .movie_query import MovieQueryAPI
@@ -97,7 +97,7 @@ class ActorQueryAPI(QueryAPI[T_DomainModelList]):
         Args:
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of work unit edges to return. Defaults to 25. Set to -1, float("inf") or None
+            limit: Maximum number of nomination edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
             retrieve_person: Whether to retrieve the person for each actor or not.
 
@@ -107,6 +107,7 @@ class ActorQueryAPI(QueryAPI[T_DomainModelList]):
         from .nomination_query import NominationQueryAPI
 
         from_ = self._builder[-1].name
+
         edge_filter = _create_edge_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "Role.nomination"),
             external_id_prefix=external_id_prefix,

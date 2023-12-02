@@ -2,20 +2,20 @@ from __future__ import annotations
 {% if data_class.has_time_field_on_property_edge %}
 import datetime{% endif %}
 from typing import TYPE_CHECKING
-from cognite.client import data_modeling as dm
-from ._core import DEFAULT_QUERY_LIMIT, QueryStep, QueryAPI, T_DomainModelList{% if not data_class.all_one_to_many_is_property_edges %}, _create_edge_filter{% endif %}
+
+from cognite.client import data_modeling as dm, CogniteClient
+
 from {{ top_level_package }}.data_classes import (
+    DomainModelApply,
     {{ data_class.read_name }},
-    {{ data_class.write_name }},{% for field in data_class.one_to_many_edges %}
+    {{ data_class.write_name }},{% for field in data_class.one_to_one_edges %}
     {{ field.data_class.read_name }},
     {{ field.data_class.write_name }},{% endfor %}
-){% if not data_class.has_only_one_to_many_edges %}
-from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import (
-    {{ data_class.properties_dict_name }},
-){% endif %}{% for field in data_class.one_to_many_edges %}
+)
+from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList{% if not data_class.all_one_to_many_is_property_edges %}, _create_edge_filter{% endif %}
+{% for field in data_class.property_edges %}
 from {{ top_level_package }}.data_classes.{{ field.data_class.file_name }} import (
-    {{ field.data_class.properties_dict_name }},{% if field.is_property_edge %}
-    {{ field.data_class.filter_name }},{% endif %}
+    {{ field.data_class.filter_name }},
 ){% endfor %}{% if data_class.has_one_to_many_edges %}
 if TYPE_CHECKING:{% for field in data_class.one_to_many_edges %}{% if field.data_class.is_edge_class %}
     from .{{ field.data_class.end_class.query_file_name}} import {{ field.data_class.end_class.query_class_name}}{% else %}
@@ -23,24 +23,51 @@ if TYPE_CHECKING:{% for field in data_class.one_to_many_edges %}{% if field.data
 {% endif %}
 
 
-class {{ data_class.query_class_name }}(QueryAPI[T_DomainModelList]):{% for field in data_class.one_to_many_edges %}
+class {{ data_class.query_class_name }}(QueryAPI[T_DomainModelList]):
+    def __init__(
+        self,
+        client: CogniteClient,
+        builder: QueryBuilder[T_DomainModelList],
+        view_by_write_class: dict[type[DomainModelApply], dm.ViewId],
+        filter_: dm.filters.Filter | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+    ):
+        super().__init__(client, builder, view_by_write_class)
+
+        self._builder.append(
+            QueryStep(
+                name=self._builder.next_name("{{ data_class.variable }}"),
+                expression=dm.query.NodeResultSetExpression(
+                    from_=self._builder[-1].name if self._builder else None,
+                    filter=filter_,
+                ),
+                select=dm.query.Select([dm.query.SourceSelector(self._view_by_write_class[{{ data_class.write_name }}], ["*"])]),
+                result_cls={{ data_class.read_name }},
+                max_retrieve_limit=limit,
+            )
+        )
+{% for field in data_class.one_to_many_edges %}
     def {{ field.name }}(
         self,{% for parm in field.list_method.parameters %}
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
-        limit: int | None = DEFAULT_QUERY_LIMIT,
+        limit: int | None = DEFAULT_QUERY_LIMIT,{% for field in data_class.one_to_one_edges %}
+        retrieve_{{ field.name }}: bool = False,{% endfor %}
     ) -> {% if field.data_class.is_edge_class %}{{ field.data_class.end_class.query_class_name }}{% else %}{{ field.data_class.query_class_name }}{% endif %}[T_DomainModelList]:
         """Query along the {{ field.doc_name }} edges of the {{ data_class.doc_name}}.
 
         Args:{% for parm in field.list_method.parameters %}
             {{ parm.name }}: {{ parm.description }}{% endfor %}
-            limit: Maximum number of work unit edges to return. Defaults to 25. Set to -1, float("inf") or None
-                to return all items.
+            limit: Maximum number of {{ field.doc_name }} edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.{% for field in data_class.one_to_one_edges %}
+            retrieve_{{ field.name }}: Whether to retrieve the {{ field.doc_name }} for each {{ data_class.doc_name }} or not.{% endfor %}
 
         Returns:
             {% if field.data_class.is_edge_class %}{{ field.data_class.end_class.query_class_name }}{% else %}{{ field.data_class.query_class_name }}{% endif %}: The query API for the {% if field.data_class.is_edge_class %}{{ field.data_class.end_class.doc_name }}{% else %}{{ field.data_class.doc_name }}{% endif %}.
         """{% if field.data_class.is_edge_class %}
         from .{{ field.data_class.end_class.query_file_name}} import {{ field.data_class.end_class.query_class_name}}{% else %}
         from .{{ field.data_class.query_file_name }} import {{ field.data_class.query_class_name }}{% endif %}
+
+        from_ = self._builder[-1].name
 {% if field.data_class.is_edge_class %}
         edge_view = self._view_by_write_class[{{ field.data_class.write_name }}]{% endif %}
         edge_filter = {% if field.is_property_edge %}{{ field.data_class.filter_name }}{% else %}_create_edge_filter{% endif %}(
@@ -53,7 +80,7 @@ class {{ data_class.query_class_name }}(QueryAPI[T_DomainModelList]):{% for fiel
                 name=self._builder.next_name("{{ field.name }}"),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
-                    from_=self._builder[-1].name,
+                    from_=from_,
                 ),{% if field.data_class.is_edge_class %}
                 select=dm.query.Select(
                     [dm.query.SourceSelector(edge_view, list({{ field.data_class.properties_dict_name }}.values()))]
@@ -62,61 +89,43 @@ class {{ data_class.query_class_name }}(QueryAPI[T_DomainModelList]):{% for fiel
                 select=dm.query.Select(),{% endif %}
                 max_retrieve_limit=limit,
             )
-        ){% if not field.is_property_edge %}
-        self._builder.append(
-            QueryStep(
-                name=self._builder.next_name("{{ field.data_class.variable }}"),
-                expression=dm.query.NodeResultSetExpression(
-                    filter=None,
-                    from_=self._builder[-1].name,
-                ),
-                select=dm.query.Select(
-                    [
-                        dm.query.SourceSelector(
-                            self._view_by_write_class[{{ field.data_class.write_name }}],
-                            list({{ field.data_class.properties_dict_name }}.values()),
-                        )
-                    ]
-                ),
-                result_cls={{ field.data_class.read_name }},
-                max_retrieve_limit=-1,
-            ),
-        ){% endif %}
-        return {% if field.data_class.is_edge_class %}{{ field.data_class.end_class.query_class_name }}{% else %}{{ field.data_class.query_class_name }}{% endif %}(self._client, self._builder, self._view_by_write_class)
+        ){% for field in data_class.one_to_one_edges %}
+        if retrieve_{{ field.name }}:
+            self._query_append_{{ field.name }}(from_){% endfor %}
+        return {% if field.data_class.is_edge_class %}{{ field.data_class.end_class.query_class_name }}{% else %}{{ field.data_class.query_class_name }}{% endif %}(self._client, self._builder, self._view_by_write_class, None, limit)
     {% endfor %}
     def query(
-        self,
-        retrieve_{{ data_class.variable }}: bool = True,
+        self,{% for field in data_class.one_to_one_edges %}
+        retrieve_{{ field.name }}: bool = False,{% endfor %}
     ) -> T_DomainModelList:
         """Execute query and return the result.
 
-        Args:
-            retrieve_{{ data_class.variable }}: Whether to retrieve the {{ data_class.doc_name }} or not.
+        Args:{% for field in data_class.one_to_one_edges %}
+            retrieve_{{ field.name }}: Whether to retrieve the {{ field.doc_name }} for each {{ data_class.doc_name }} or not.{% endfor %}
 
         Returns:
             The list of the source nodes of the query.
 
         """
-        from_ = self._builder[-1].name
-        if retrieve_{{ data_class.variable }} and not self._builder[-1].name.startswith("{{ data_class.variable }}"):
-            self._builder.append(
-                QueryStep(
-                    name=self._builder.next_name("{{ data_class.variable }}"),
-                    expression=dm.query.NodeResultSetExpression(
-                        filter=None,
-                        from_=from_,
-                    ),
-                    select=dm.query.Select(
-                        [
-                            dm.query.SourceSelector(
-                                self._view_by_write_class[{{ data_class.write_name }}],
-                                list({{ data_class.properties_dict_name }}.values()),
-                            )
-                        ]
-                    ),
-                    result_cls={{ data_class.read_name }},
-                    max_retrieve_limit=-1,
-                ),
-            )
-
+        from_ = self._builder[-1].name{% for field in data_class.one_to_one_edges %}
+        if retrieve_{{ field.name }}:
+            self._query_append_{{ field.name }}(from_){% endfor %}
         return self._query()
+{% for field in data_class.one_to_one_edges %}
+    def _query_append_person(self, from_: str) -> None:
+        view_id = self._view_by_write_class[{{ field.data_class.write_name }}]
+        self._builder.append(
+            QueryStep(
+                name=self._builder.next_name("{{ field.name }}"),
+                expression=dm.query.NodeResultSetExpression(
+                    filter=dm.filters.HasData(views=[view_id]),
+                    from_=from_,
+                    through=self._view_by_write_class[{{ data_class.write_name }}].as_property_ref("person"),
+                    direction="outwards",
+                ),
+                select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
+                max_retrieve_limit=-1,
+                result_cls={{ field.data_class.read_name }},
+            ),
+        )
+{% endfor %}
