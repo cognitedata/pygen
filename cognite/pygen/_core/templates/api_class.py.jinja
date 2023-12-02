@@ -66,29 +66,14 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
             A query API for {{ data_class.doc_list_name}}.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = {{ data_class.filter_name }}(
             self._view_id,{% for parm in list_method.parameters %}
             {{ parm.name }},{% endfor %}
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            {{ data_class.read_list_name }},
-            [
-                QueryStep(
-                    name="{{ data_class.variable }}",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list({{ data_class.properties_dict_name }}.values()))]
-                    ),
-                    result_cls= {{ data_class.read_name}},
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return {{ data_class.query_class_name }}(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder({{ data_class.read_list_name }})
+        return {{ data_class.query_class_name }}(self._client, builder, self._view_by_write_class, filter_, limit)
 
 
     def apply(self, {{ data_class.variable }}: {{ data_class.write_name }} | Sequence[{{ data_class.write_name }}], replace: bool = False) -> ResourcesApplyResult:
