@@ -9,19 +9,18 @@ from equipment_unit.client.data_classes import (
     DomainModelApply,
     UnitProcedure,
     UnitProcedureApply,
+    StartEndTimeApply,
+    StartEndTime,
 )
 from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList
 
 from equipment_unit.client.data_classes._start_end_time import (
     _create_start_end_time_filter,
 )
-from equipment_unit.client.data_classes._start_end_time import (
-    _create_start_end_time_filter,
-)
 
 if TYPE_CHECKING:
     from .work_order_query import WorkOrderQueryAPI
-    from .work_order_query import WorkOrderQueryAPI
+    from .equipment_module_query import EquipmentModuleQueryAPI
 
 
 class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
@@ -129,7 +128,7 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
         Returns:
             WorkOrderQueryAPI: The query API for the work order.
         """
-        from .work_order_query import WorkOrderQueryAPI
+        from .equipment_module_query import EquipmentModuleQueryAPI
 
         from_ = self._builder[-1].name
 
