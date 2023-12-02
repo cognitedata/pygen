@@ -205,6 +205,7 @@ MOVIE_SDK.append_manual_files(MovieSDKFiles)
 
 class EquipmentSDKFiles:
     client_dir = EQUIPMENT_UNIT_SDK.client_dir
+    client = client_dir / "_api_client.py"
     data_classes = client_dir / "data_classes"
     core_data = data_classes / "_core.py"
     start_end_time_data = data_classes / "_start_end_time.py"

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import platform
+
 import pytest
 from cognite.client import data_modeling as dm
 
@@ -226,6 +228,22 @@ def test_generate_data_class_core_file(multi_api_generator: MultiAPIGenerator) -
 
     # Act
     actual = multi_api_generator.generate_data_class_core_file()
+
+    # Assert
+    assert actual == expected
+
+
+@pytest.mark.skipif(
+    not platform.platform().startswith("Windows"),
+    reason="There is currently some strange problem with the diff on non-windows",
+)
+def test_create_api_client(sdk_generator: SDKGenerator, code_formatter: CodeFormatter):
+    # Arrange
+    expected = EquipmentSDKFiles.client.read_text()
+
+    # Act
+    actual = sdk_generator._generate_api_client_file()
+    actual = code_formatter.format_code(actual)
 
     # Assert
     assert actual == expected
