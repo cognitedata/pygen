@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import Any, Literal, Optional, Union
+from typing import Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -14,7 +14,9 @@ from ._core import (
     DomainRelationList,
     ResourcesApply,
 )
+from ._unit_procedure import UnitProcedureApply
 from ._work_order import WorkOrder, WorkOrderApply
+from ._equipment_module import EquipmentModule, EquipmentModuleApply
 
 __all__ = ["StartEndTime", "StartEndTimeApply", "StartEndTimeList", "StartEndTimeApplyList", "StartEndTimeFields"]
 StartEndTimeFields = Literal["end_time", "start_time"]
@@ -42,7 +44,7 @@ class StartEndTime(DomainRelation):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    end_node: Union[EquipmentModule, str, dm.NodeId] = None
+    end_node: Union[EquipmentModule, WorkOrder, str, dm.NodeId] = None
     end_time: Optional[datetime.datetime] = None
     start_time: Optional[datetime.datetime] = None
 
@@ -65,7 +67,7 @@ class StartEndTimeApply(DomainRelationApply):
     Args:
         space: The space where the node is located.
         external_id: The external id of the start end time.
-        end_node: The end node field.
+        end_node: The end node of this edge.
         end_time: The end time field.
         start_time: The start time field.
         existing_version: Fail the ingestion request if the start end time version is greater than or equal to this value.
@@ -75,7 +77,7 @@ class StartEndTimeApply(DomainRelationApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    end_node: Union[EquipmentModuleApply, str, dm.NodeId]
+    end_node: Union[EquipmentModuleApply, WorkOrderApply, str, dm.NodeId]
     end_time: Optional[datetime.datetime] = None
     start_time: Optional[datetime.datetime] = None
 
@@ -89,6 +91,8 @@ class StartEndTimeApply(DomainRelationApply):
         resources = ResourcesApply()
         if self.external_id and (self.space, self.external_id) in cache:
             return resources
+
+        _validate_end_node(start_node, self.end_node)
 
         if isinstance(self.end_node, DomainModelApply):
             end_node = self.end_node.as_direct_reference()
@@ -234,3 +238,25 @@ def _create_start_end_time_filter(
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters)
+
+
+_EXPECTED_START_BY_END_NODE = {
+    EquipmentModuleApply: UnitProcedureApply,
+    WorkOrderApply: UnitProcedureApply,
+}
+
+
+def _validate_end_node(
+    start_node: DomainModelApply, end_node: Union[EquipmentModuleApply, WorkOrderApply, str, dm.NodeId]
+) -> None:
+    if isinstance(end_node, (str, dm.NodeId)):
+        # Nothing to validate
+        return
+    if type(end_node) not in _EXPECTED_START_BY_END_NODE:
+        raise ValueError(
+            f"Invalid end node type: {type(end_node)}. Should be one of {[t.__name__ for t in _EXPECTED_START_BY_END_NODE.keys()]}"
+        )
+    if not isinstance(start_node, _EXPECTED_START_BY_END_NODE[type(end_node)]):
+        raise ValueError(
+            f"Invalid end node type: {type(end_node)}. Expected: {_EXPECTED_START_BY_END_NODE[type(end_node)]}"
+        )

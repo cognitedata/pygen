@@ -103,8 +103,6 @@ class UnitProcedureApply(DomainModelApply):
         cache: set[tuple[str, str]],
         view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
     ) -> ResourcesApply:
-        from ._start_end_time import StartEndTimeApply
-
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
             return resources
@@ -136,12 +134,22 @@ class UnitProcedureApply(DomainModelApply):
 
         for work_order in self.work_orders or []:
             if isinstance(work_order, DomainRelationApply):
-                other_resources = work_order._to_instances_apply(cache, self, view_by_write_class)
+                other_resources = work_order._to_instances_apply(
+                    cache,
+                    self,
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.work_order"),
+                    view_by_write_class,
+                )
                 resources.extend(other_resources)
 
         for work_unit in self.work_units or []:
             if isinstance(work_unit, DomainRelationApply):
-                other_resources = work_unit._to_instances_apply(cache, self, view_by_write_class)
+                other_resources = work_unit._to_instances_apply(
+                    cache,
+                    self,
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.equipment_module"),
+                    view_by_write_class,
+                )
                 resources.extend(other_resources)
 
         return resources
