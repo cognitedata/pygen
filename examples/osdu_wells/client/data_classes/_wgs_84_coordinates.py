@@ -6,6 +6,7 @@ from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -54,7 +55,7 @@ class WgsCoordinates(DomainModel):
         version: The version of the wgs 84 coordinate node.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     bbox: Optional[list[float]] = None
     features: Union[list[Features], list[str], None] = Field(default=None, repr=False)
     type_: Optional[str] = Field(None, alias="type")
@@ -89,7 +90,7 @@ class WgsCoordinatesApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     bbox: Optional[list[float]] = None
     features: Union[list[FeaturesApply], list[str], None] = Field(default=None, repr=False)
     type_: Optional[str] = Field(None, alias="type")

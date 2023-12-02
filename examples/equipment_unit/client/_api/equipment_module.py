@@ -80,6 +80,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleApply, Equipmen
             A query API for equipment modules.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_equipment_module_filter(
             self._view_id,
             description,
@@ -90,7 +91,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleApply, Equipmen
             type_prefix,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(EquipmentModuleList)
         return EquipmentModuleQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)

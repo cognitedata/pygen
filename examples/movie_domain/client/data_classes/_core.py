@@ -36,6 +36,9 @@ TimeSeries = Annotated[
 ]
 
 
+DEFAULT_INSTANCE_SPACE = "IntegrationTestsImmutable"
+
+
 @dataclass
 class ResourcesApply:
     nodes: dm.NodeApplyList = field(default_factory=lambda: dm.NodeApplyList([]))
@@ -81,7 +84,7 @@ class DomainModelCore(Core):
     @classmethod
     def from_instance(cls: type[T_DomainModelCore], instance: Instance) -> T_DomainModelCore:
         data = instance.dump(camel_case=False)
-        return cls(**{**data, **unpack_properties(instance.properties, instance_space=instance.space)})
+        return cls(**{**data, **unpack_properties(instance.properties)})
 
 
 T_DomainModelCore = TypeVar("T_DomainModelCore", bound=DomainModelCore)
@@ -218,7 +221,6 @@ T_DomainModelApplyList = TypeVar("T_DomainModelApplyList", bound=DomainModelAppl
 class DomainRelation(DomainModelCore):
     type: dm.DirectRelationReference
     start_node: dm.DirectRelationReference
-    end_node: dm.DirectRelationReference
     version: int
     last_updated_time: datetime.datetime
     created_time: datetime.datetime
@@ -246,6 +248,7 @@ class DomainRelationApply(BaseModel, extra=Extra.forbid, populate_by_name=True):
         self,
         cache: set[tuple[str, str]],
         start_node: DomainModelApply,
+        edge_type: dm.DirectRelationReference,
         view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
     ) -> ResourcesApply:
         raise NotImplementedError()
@@ -303,15 +306,12 @@ class DomainRelationList(CoreList[T_DomainRelation]):
 T_DomainRelationList = TypeVar("T_DomainRelationList", bound=DomainRelationList)
 
 
-def unpack_properties(properties: Properties, instance_space: str) -> Mapping[str, PropertyValue]:
+def unpack_properties(properties: Properties) -> Mapping[str, PropertyValue]:
     unpacked: dict[str, PropertyValue] = {}
     for view_properties in properties.values():
         for prop_name, prop_value in view_properties.items():
             if isinstance(prop_value, dict) and "externalId" in prop_value and "space" in prop_value:
-                if instance_space == prop_value["space"]:
-                    unpacked[prop_name] = prop_value["externalId"]
-                else:
-                    unpacked[prop_name] = dm.NodeId(space=prop_value["space"], external_id=prop_value["externalId"])
+                unpacked[prop_name] = prop_value["externalId"]
             else:
                 unpacked[prop_name] = prop_value
     return unpacked

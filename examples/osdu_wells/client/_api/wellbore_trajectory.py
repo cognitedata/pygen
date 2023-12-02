@@ -106,6 +106,7 @@ class WellboreTrajectoryAPI(NodeAPI[WellboreTrajectory, WellboreTrajectoryApply,
             A query API for wellbore trajectories.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_wellbore_trajectory_filter(
             self._view_id,
             acl,
@@ -129,26 +130,10 @@ class WellboreTrajectoryAPI(NodeAPI[WellboreTrajectory, WellboreTrajectoryApply,
             max_version_,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            WellboreTrajectoryList,
-            [
-                QueryStep(
-                    name="wellbore_trajectory",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_WELLBORETRAJECTORY_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=WellboreTrajectory,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return WellboreTrajectoryQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(WellboreTrajectoryList)
+        return WellboreTrajectoryQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(
         self, wellbore_trajectory: WellboreTrajectoryApply | Sequence[WellboreTrajectoryApply], replace: bool = False

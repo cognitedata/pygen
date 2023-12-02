@@ -14,7 +14,7 @@ from ._core import (
     DomainRelationList,
     ResourcesApply,
 )
-from ._equipment_module import EquipmentModule, EquipmentModuleApply
+from ._work_order import WorkOrder, WorkOrderApply
 
 __all__ = ["StartEndTime", "StartEndTimeApply", "StartEndTimeList", "StartEndTimeApplyList", "StartEndTimeFields"]
 StartEndTimeFields = Literal["end_time", "start_time"]
@@ -93,11 +93,11 @@ class StartEndTimeApply(DomainRelationApply):
         if isinstance(self.end_node, DomainModelApply):
             end_node = self.end_node.as_direct_reference()
         elif isinstance(self.end_node, str):
-            end_node = dm.DirectRelationReference(self.space, self.equipment_module)
+            end_node = dm.DirectRelationReference(self.space, self.end_node)
         elif isinstance(self.end_node, dm.NodeId):
-            end_node = dm.DirectRelationReference(self.space, self.equipment_module)
+            end_node = dm.DirectRelationReference(self.end_node.space, self.end_node.external_id)
         else:
-            raise ValueError(f"Invalid type for equipment_module: {type(self.equipment_module)}")
+            raise ValueError(f"Invalid type for equipment_module: {type(self.end_node)}")
 
         self.external_id = external_id = DomainRelationApply.external_id_factory(start_node, end_node, self.edge_type)
 

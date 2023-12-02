@@ -116,6 +116,7 @@ class AssetAPI(NodeAPI[Asset, AssetApply, AssetList]):
             A query API for assets.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_asset_filter(
             self._view_id,
             min_area_id,
@@ -137,26 +138,10 @@ class AssetAPI(NodeAPI[Asset, AssetApply, AssetList]):
             max_updated_date,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            AssetList,
-            [
-                QueryStep(
-                    name="asset",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_ASSET_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=Asset,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return AssetQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(AssetList)
+        return AssetQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(self, asset: AssetApply | Sequence[AssetApply], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) assets.

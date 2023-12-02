@@ -70,32 +70,17 @@ class TagsAPI(NodeAPI[Tags, TagsApply, TagsList]):
             A query API for tags.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_tag_filter(
             self._view_id,
             name_of_key,
             name_of_key_prefix,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            TagsList,
-            [
-                QueryStep(
-                    name="tag",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_TAGS_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=Tags,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return TagsQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(TagsList)
+        return TagsQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(self, tag: TagsApply | Sequence[TagsApply], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) tags.

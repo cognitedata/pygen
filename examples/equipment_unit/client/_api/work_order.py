@@ -7,19 +7,19 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
-from osdu_wells.client.data_classes import (
+from equipment_unit.client.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
-    WgsCoordinates,
-    WgsCoordinatesApply,
-    WgsCoordinatesFields,
-    WgsCoordinatesList,
-    WgsCoordinatesApplyList,
-    WgsCoordinatesTextFields,
+    WorkOrder,
+    WorkOrderApply,
+    WorkOrderFields,
+    WorkOrderList,
+    WorkOrderApplyList,
+    WorkOrderTextFields,
 )
-from osdu_wells.client.data_classes._wgs_84_coordinates import (
-    _WGSCOORDINATES_PROPERTIES_BY_FIELD,
-    _create_wgs_84_coordinate_filter,
+from equipment_unit.client.data_classes._work_order import (
+    _WORKORDER_PROPERTIES_BY_FIELD,
+    _create_work_order_filter,
 )
 from ._core import (
     DEFAULT_LIMIT_READ,
@@ -30,71 +30,77 @@ from ._core import (
     QueryStep,
     QueryBuilder,
 )
-from .wgs_84_coordinates_features import WgsCoordinatesFeaturesAPI
-from .wgs_84_coordinates_query import WgsCoordinatesQueryAPI
+from .work_order_query import WorkOrderQueryAPI
 
 
-class WgsCoordinatesAPI(NodeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordinatesList]):
+class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
     def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
-        view_id = view_by_write_class[WgsCoordinatesApply]
+        view_id = view_by_write_class[WorkOrderApply]
         super().__init__(
             client=client,
             sources=view_id,
-            class_type=WgsCoordinates,
-            class_apply_type=WgsCoordinatesApply,
-            class_list=WgsCoordinatesList,
-            class_apply_list=WgsCoordinatesApplyList,
+            class_type=WorkOrder,
+            class_apply_type=WorkOrderApply,
+            class_list=WorkOrderList,
+            class_apply_list=WorkOrderApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self.features_edge = WgsCoordinatesFeaturesAPI(client)
 
     def __call__(
         self,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        performed_by: str | list[str] | None = None,
+        performed_by_prefix: str | None = None,
         type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
-    ) -> WgsCoordinatesQueryAPI[WgsCoordinatesList]:
-        """Query starting at wgs 84 coordinates.
+    ) -> WorkOrderQueryAPI[WorkOrderList]:
+        """Query starting at work orders.
 
         Args:
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            performed_by: The performed by to filter on.
+            performed_by_prefix: The prefix of the performed by to filter on.
             type_: The type to filter on.
             type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of wgs 84 coordinates to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            limit: Maximum number of work orders to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
-            A query API for wgs 84 coordinates.
+            A query API for work orders.
 
         """
         has_data = dm.filters.HasData(views=[self._view_id])
-        filter_ = _create_wgs_84_coordinate_filter(
+        filter_ = _create_work_order_filter(
             self._view_id,
+            description,
+            description_prefix,
+            performed_by,
+            performed_by_prefix,
             type_,
             type_prefix,
             external_id_prefix,
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(WgsCoordinatesList)
-        return WgsCoordinatesQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
+        builder = QueryBuilder(WorkOrderList)
+        return WorkOrderQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(
-        self, wgs_84_coordinate: WgsCoordinatesApply | Sequence[WgsCoordinatesApply], replace: bool = False
+        self, work_order: WorkOrderApply | Sequence[WorkOrderApply], replace: bool = False
     ) -> ResourcesApplyResult:
-        """Add or update (upsert) wgs 84 coordinates.
-
-        Note: This method iterates through all nodes and timeseries linked to wgs_84_coordinate and creates them including the edges
-        between the nodes. For example, if any of `features` are set, then these
-        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+        """Add or update (upsert) work orders.
 
         Args:
-            wgs_84_coordinate: Wgs 84 coordinate or sequence of wgs 84 coordinates to upsert.
+            work_order: Work order or sequence of work orders to upsert.
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
@@ -102,125 +108,126 @@ class WgsCoordinatesAPI(NodeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
 
         Examples:
 
-            Create a new wgs_84_coordinate:
+            Create a new work_order:
 
-                >>> from osdu_wells.client import OSDUClient
-                >>> from osdu_wells.client.data_classes import WgsCoordinatesApply
-                >>> client = OSDUClient()
-                >>> wgs_84_coordinate = WgsCoordinatesApply(external_id="my_wgs_84_coordinate", ...)
-                >>> result = client.wgs_84_coordinates.apply(wgs_84_coordinate)
+                >>> from equipment_unit.client import EquipmentUnitClient
+                >>> from equipment_unit.client.data_classes import WorkOrderApply
+                >>> client = EquipmentUnitClient()
+                >>> work_order = WorkOrderApply(external_id="my_work_order", ...)
+                >>> result = client.work_order.apply(work_order)
 
         """
-        return self._apply(wgs_84_coordinate, replace)
+        return self._apply(work_order, replace)
 
     def delete(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
     ) -> dm.InstancesDeleteResult:
-        """Delete one or more wgs 84 coordinate.
+        """Delete one or more work order.
 
         Args:
-            external_id: External id of the wgs 84 coordinate to delete.
-            space: The space where all the wgs 84 coordinate are located.
+            external_id: External id of the work order to delete.
+            space: The space where all the work order are located.
 
         Returns:
             The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
 
         Examples:
 
-            Delete wgs_84_coordinate by id:
+            Delete work_order by id:
 
-                >>> from osdu_wells.client import OSDUClient
-                >>> client = OSDUClient()
-                >>> client.wgs_84_coordinates.delete("my_wgs_84_coordinate")
+                >>> from equipment_unit.client import EquipmentUnitClient
+                >>> client = EquipmentUnitClient()
+                >>> client.work_order.delete("my_work_order")
         """
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> WgsCoordinates | None:
+    def retrieve(self, external_id: str) -> WorkOrder | None:
         ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str]) -> WgsCoordinatesList:
+    def retrieve(self, external_id: SequenceNotStr[str]) -> WorkOrderList:
         ...
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
-    ) -> WgsCoordinates | WgsCoordinatesList | None:
-        """Retrieve one or more wgs 84 coordinates by id(s).
+    ) -> WorkOrder | WorkOrderList | None:
+        """Retrieve one or more work orders by id(s).
 
         Args:
-            external_id: External id or list of external ids of the wgs 84 coordinates.
-            space: The space where all the wgs 84 coordinates are located.
+            external_id: External id or list of external ids of the work orders.
+            space: The space where all the work orders are located.
 
         Returns:
-            The requested wgs 84 coordinates.
+            The requested work orders.
 
         Examples:
 
-            Retrieve wgs_84_coordinate by id:
+            Retrieve work_order by id:
 
-                >>> from osdu_wells.client import OSDUClient
-                >>> client = OSDUClient()
-                >>> wgs_84_coordinate = client.wgs_84_coordinates.retrieve("my_wgs_84_coordinate")
+                >>> from equipment_unit.client import EquipmentUnitClient
+                >>> client = EquipmentUnitClient()
+                >>> work_order = client.work_order.retrieve("my_work_order")
 
         """
-        return self._retrieve(
-            external_id,
-            space,
-            retrieve_edges=True,
-            edge_api_name_type_triple=[
-                (
-                    self.features_edge,
-                    "features",
-                    dm.DirectRelationReference("IntegrationTestsImmutable", "Wgs84Coordinates.features"),
-                ),
-            ],
-        )
+        return self._retrieve(external_id, space)
 
     def search(
         self,
         query: str,
-        properties: WgsCoordinatesTextFields | Sequence[WgsCoordinatesTextFields] | None = None,
+        properties: WorkOrderTextFields | Sequence[WorkOrderTextFields] | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        performed_by: str | list[str] | None = None,
+        performed_by_prefix: str | None = None,
         type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> WgsCoordinatesList:
-        """Search wgs 84 coordinates
+    ) -> WorkOrderList:
+        """Search work orders
 
         Args:
             query: The search query,
             properties: The property to search, if nothing is passed all text fields will be searched.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            performed_by: The performed by to filter on.
+            performed_by_prefix: The prefix of the performed by to filter on.
             type_: The type to filter on.
             type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of wgs 84 coordinates to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            limit: Maximum number of work orders to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
-            Search results wgs 84 coordinates matching the query.
+            Search results work orders matching the query.
 
         Examples:
 
-           Search for 'my_wgs_84_coordinate' in all text properties:
+           Search for 'my_work_order' in all text properties:
 
-                >>> from osdu_wells.client import OSDUClient
-                >>> client = OSDUClient()
-                >>> wgs_84_coordinates = client.wgs_84_coordinates.search('my_wgs_84_coordinate')
+                >>> from equipment_unit.client import EquipmentUnitClient
+                >>> client = EquipmentUnitClient()
+                >>> work_orders = client.work_order.search('my_work_order')
 
         """
-        filter_ = _create_wgs_84_coordinate_filter(
+        filter_ = _create_work_order_filter(
             self._view_id,
+            description,
+            description_prefix,
+            performed_by,
+            performed_by_prefix,
             type_,
             type_prefix,
             external_id_prefix,
             space,
             filter,
         )
-        return self._search(self._view_id, query, _WGSCOORDINATES_PROPERTIES_BY_FIELD, properties, filter_, limit)
+        return self._search(self._view_id, query, _WORKORDER_PROPERTIES_BY_FIELD, properties, filter_, limit)
 
     @overload
     def aggregate(
@@ -229,10 +236,14 @@ class WgsCoordinatesAPI(NodeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
         | dm.aggregations.MetricAggregation
         | Sequence[Aggregations]
         | Sequence[dm.aggregations.MetricAggregation],
-        property: WgsCoordinatesFields | Sequence[WgsCoordinatesFields] | None = None,
+        property: WorkOrderFields | Sequence[WorkOrderFields] | None = None,
         group_by: None = None,
         query: str | None = None,
-        search_properties: WgsCoordinatesTextFields | Sequence[WgsCoordinatesTextFields] | None = None,
+        search_properties: WorkOrderTextFields | Sequence[WorkOrderTextFields] | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        performed_by: str | list[str] | None = None,
+        performed_by_prefix: str | None = None,
         type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -249,10 +260,14 @@ class WgsCoordinatesAPI(NodeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
         | dm.aggregations.MetricAggregation
         | Sequence[Aggregations]
         | Sequence[dm.aggregations.MetricAggregation],
-        property: WgsCoordinatesFields | Sequence[WgsCoordinatesFields] | None = None,
-        group_by: WgsCoordinatesFields | Sequence[WgsCoordinatesFields] = None,
+        property: WorkOrderFields | Sequence[WorkOrderFields] | None = None,
+        group_by: WorkOrderFields | Sequence[WorkOrderFields] = None,
         query: str | None = None,
-        search_properties: WgsCoordinatesTextFields | Sequence[WgsCoordinatesTextFields] | None = None,
+        search_properties: WorkOrderTextFields | Sequence[WorkOrderTextFields] | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        performed_by: str | list[str] | None = None,
+        performed_by_prefix: str | None = None,
         type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -268,10 +283,14 @@ class WgsCoordinatesAPI(NodeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
         | dm.aggregations.MetricAggregation
         | Sequence[Aggregations]
         | Sequence[dm.aggregations.MetricAggregation],
-        property: WgsCoordinatesFields | Sequence[WgsCoordinatesFields] | None = None,
-        group_by: WgsCoordinatesFields | Sequence[WgsCoordinatesFields] | None = None,
+        property: WorkOrderFields | Sequence[WorkOrderFields] | None = None,
+        group_by: WorkOrderFields | Sequence[WorkOrderFields] | None = None,
         query: str | None = None,
-        search_property: WgsCoordinatesTextFields | Sequence[WgsCoordinatesTextFields] | None = None,
+        search_property: WorkOrderTextFields | Sequence[WorkOrderTextFields] | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        performed_by: str | list[str] | None = None,
+        performed_by_prefix: str | None = None,
         type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -279,7 +298,7 @@ class WgsCoordinatesAPI(NodeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
-        """Aggregate data across wgs 84 coordinates
+        """Aggregate data across work orders
 
         Args:
             aggregate: The aggregation to perform.
@@ -287,11 +306,15 @@ class WgsCoordinatesAPI(NodeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
             group_by: The property to group by when doing the aggregation.
             query: The query to search for in the text field.
             search_property: The text field to search in.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            performed_by: The performed by to filter on.
+            performed_by_prefix: The prefix of the performed by to filter on.
             type_: The type to filter on.
             type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of wgs 84 coordinates to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            limit: Maximum number of work orders to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
@@ -299,16 +322,20 @@ class WgsCoordinatesAPI(NodeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
 
         Examples:
 
-            Count wgs 84 coordinates in space `my_space`:
+            Count work orders in space `my_space`:
 
-                >>> from osdu_wells.client import OSDUClient
-                >>> client = OSDUClient()
-                >>> result = client.wgs_84_coordinates.aggregate("count", space="my_space")
+                >>> from equipment_unit.client import EquipmentUnitClient
+                >>> client = EquipmentUnitClient()
+                >>> result = client.work_order.aggregate("count", space="my_space")
 
         """
 
-        filter_ = _create_wgs_84_coordinate_filter(
+        filter_ = _create_work_order_filter(
             self._view_id,
+            description,
+            description_prefix,
+            performed_by,
+            performed_by_prefix,
             type_,
             type_prefix,
             external_id_prefix,
@@ -318,7 +345,7 @@ class WgsCoordinatesAPI(NodeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
         return self._aggregate(
             self._view_id,
             aggregate,
-            _WGSCOORDINATES_PROPERTIES_BY_FIELD,
+            _WORKORDER_PROPERTIES_BY_FIELD,
             property,
             group_by,
             query,
@@ -329,10 +356,14 @@ class WgsCoordinatesAPI(NodeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
 
     def histogram(
         self,
-        property: WgsCoordinatesFields,
+        property: WorkOrderFields,
         interval: float,
         query: str | None = None,
-        search_property: WgsCoordinatesTextFields | Sequence[WgsCoordinatesTextFields] | None = None,
+        search_property: WorkOrderTextFields | Sequence[WorkOrderTextFields] | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        performed_by: str | list[str] | None = None,
+        performed_by_prefix: str | None = None,
         type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -340,26 +371,34 @@ class WgsCoordinatesAPI(NodeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
-        """Produces histograms for wgs 84 coordinates
+        """Produces histograms for work orders
 
         Args:
             property: The property to use as the value in the histogram.
             interval: The interval to use for the histogram bins.
             query: The query to search for in the text field.
             search_property: The text field to search in.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            performed_by: The performed by to filter on.
+            performed_by_prefix: The prefix of the performed by to filter on.
             type_: The type to filter on.
             type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of wgs 84 coordinates to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            limit: Maximum number of work orders to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             Bucketed histogram results.
 
         """
-        filter_ = _create_wgs_84_coordinate_filter(
+        filter_ = _create_work_order_filter(
             self._view_id,
+            description,
+            description_prefix,
+            performed_by,
+            performed_by_prefix,
             type_,
             type_prefix,
             external_id_prefix,
@@ -370,7 +409,7 @@ class WgsCoordinatesAPI(NodeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
             self._view_id,
             property,
             interval,
-            _WGSCOORDINATES_PROPERTIES_BY_FIELD,
+            _WORKORDER_PROPERTIES_BY_FIELD,
             query,
             search_property,
             limit,
@@ -379,55 +418,53 @@ class WgsCoordinatesAPI(NodeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
 
     def list(
         self,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        performed_by: str | list[str] | None = None,
+        performed_by_prefix: str | None = None,
         type_: str | list[str] | None = None,
         type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-        retrieve_edges: bool = True,
-    ) -> WgsCoordinatesList:
-        """List/filter wgs 84 coordinates
+    ) -> WorkOrderList:
+        """List/filter work orders
 
         Args:
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            performed_by: The performed by to filter on.
+            performed_by_prefix: The prefix of the performed by to filter on.
             type_: The type to filter on.
             type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of wgs 84 coordinates to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            limit: Maximum number of work orders to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            retrieve_edges: Whether to retrieve `features` external ids for the wgs 84 coordinates. Defaults to True.
 
         Returns:
-            List of requested wgs 84 coordinates
+            List of requested work orders
 
         Examples:
 
-            List wgs 84 coordinates and limit to 5:
+            List work orders and limit to 5:
 
-                >>> from osdu_wells.client import OSDUClient
-                >>> client = OSDUClient()
-                >>> wgs_84_coordinates = client.wgs_84_coordinates.list(limit=5)
+                >>> from equipment_unit.client import EquipmentUnitClient
+                >>> client = EquipmentUnitClient()
+                >>> work_orders = client.work_order.list(limit=5)
 
         """
-        filter_ = _create_wgs_84_coordinate_filter(
+        filter_ = _create_work_order_filter(
             self._view_id,
+            description,
+            description_prefix,
+            performed_by,
+            performed_by_prefix,
             type_,
             type_prefix,
             external_id_prefix,
             space,
             filter,
         )
-
-        return self._list(
-            limit=limit,
-            filter=filter_,
-            retrieve_edges=retrieve_edges,
-            edge_api_name_type_triple=[
-                (
-                    self.features_edge,
-                    "features",
-                    dm.DirectRelationReference("IntegrationTestsImmutable", "Wgs84Coordinates.features"),
-                ),
-            ],
-        )
+        return self._list(limit=limit, filter=filter_)

@@ -96,6 +96,7 @@ class AsIngestedCoordinatesAPI(NodeAPI[AsIngestedCoordinates, AsIngestedCoordina
             A query API for as ingested coordinates.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_as_ingested_coordinate_filter(
             self._view_id,
             coordinate_reference_system_id,
@@ -114,30 +115,10 @@ class AsIngestedCoordinatesAPI(NodeAPI[AsIngestedCoordinates, AsIngestedCoordina
             type_prefix,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            AsIngestedCoordinatesList,
-            [
-                QueryStep(
-                    name="as_ingested_coordinate",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [
-                            dm.query.SourceSelector(
-                                self._view_id, list(_ASINGESTEDCOORDINATES_PROPERTIES_BY_FIELD.values())
-                            )
-                        ]
-                    ),
-                    result_cls=AsIngestedCoordinates,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return AsIngestedCoordinatesQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(AsIngestedCoordinatesList)
+        return AsIngestedCoordinatesQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(
         self,

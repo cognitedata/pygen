@@ -6,6 +6,7 @@ from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -45,8 +46,8 @@ class Process(DomainModel):
         version: The version of the proces node.
     """
 
-    space: str = "market"
-    bid: Union[Bid, str, None] = Field(None, repr=False)
+    space: str = DEFAULT_INSTANCE_SPACE
+    bid: Union[Bid, str, dm.NodeId, None] = Field(None, repr=False)
     name: Optional[str] = None
 
     def as_apply(self) -> ProcessApply:
@@ -75,8 +76,8 @@ class ProcessApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "market"
-    bid: Union[BidApply, str, None] = Field(None, repr=False)
+    space: str = DEFAULT_INSTANCE_SPACE
+    bid: Union[BidApply, str, dm.NodeId, None] = Field(None, repr=False)
     name: Optional[str] = None
 
     def _to_instances_apply(

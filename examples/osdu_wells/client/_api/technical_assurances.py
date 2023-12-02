@@ -84,6 +84,7 @@ class TechnicalAssurancesAPI(NodeAPI[TechnicalAssurances, TechnicalAssurancesApp
             A query API for technical assurances.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_technical_assurance_filter(
             self._view_id,
             comment,
@@ -94,30 +95,10 @@ class TechnicalAssurancesAPI(NodeAPI[TechnicalAssurances, TechnicalAssurancesApp
             technical_assurance_type_id_prefix,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            TechnicalAssurancesList,
-            [
-                QueryStep(
-                    name="technical_assurance",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [
-                            dm.query.SourceSelector(
-                                self._view_id, list(_TECHNICALASSURANCES_PROPERTIES_BY_FIELD.values())
-                            )
-                        ]
-                    ),
-                    result_cls=TechnicalAssurances,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return TechnicalAssurancesQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(TechnicalAssurancesList)
+        return TechnicalAssurancesQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(
         self, technical_assurance: TechnicalAssurancesApply | Sequence[TechnicalAssurancesApply], replace: bool = False

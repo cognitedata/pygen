@@ -6,6 +6,7 @@ from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -63,7 +64,7 @@ class WorkItem(DomainModel):
         version: The version of the work item node.
     """
 
-    space: str = "tutorial_apm_simple"
+    space: str = DEFAULT_INSTANCE_SPACE
     criticality: Optional[str] = None
     description: Optional[str] = None
     is_completed: Optional[bool] = Field(None, alias="isCompleted")
@@ -73,7 +74,7 @@ class WorkItem(DomainModel):
     method: Optional[str] = None
     title: Optional[str] = None
     to_be_done: Optional[bool] = Field(None, alias="toBeDone")
-    work_order: Union[WorkOrder, str, None] = Field(None, repr=False, alias="workOrder")
+    work_order: Union[WorkOrder, str, dm.NodeId, None] = Field(None, repr=False, alias="workOrder")
 
     def as_apply(self) -> WorkItemApply:
         """Convert this read version of work item to the writing version."""
@@ -120,7 +121,7 @@ class WorkItemApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "tutorial_apm_simple"
+    space: str = DEFAULT_INSTANCE_SPACE
     criticality: Optional[str] = None
     description: Optional[str] = None
     is_completed: Optional[bool] = Field(None, alias="isCompleted")
@@ -130,7 +131,7 @@ class WorkItemApply(DomainModelApply):
     method: Optional[str] = None
     title: Optional[str] = None
     to_be_done: Optional[bool] = Field(None, alias="toBeDone")
-    work_order: Union[WorkOrderApply, str, None] = Field(None, repr=False, alias="workOrder")
+    work_order: Union[WorkOrderApply, str, dm.NodeId, None] = Field(None, repr=False, alias="workOrder")
 
     def _to_instances_apply(
         self,

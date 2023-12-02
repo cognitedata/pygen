@@ -19,6 +19,9 @@ from equipment_unit.client.data_classes import (
     StartEndTime,
     StartEndTimeApply,
     StartEndTimeList,
+    StartEndTime,
+    StartEndTimeApply,
+    StartEndTimeList,
 )
 from equipment_unit.client.data_classes._unit_procedure import (
     _UNITPROCEDURE_PROPERTIES_BY_FIELD,
@@ -30,8 +33,10 @@ from ._core import (
     Aggregations,
     NodeAPI,
     SequenceNotStr,
+    QueryStep,
     QueryBuilder,
 )
+from .unit_procedure_work_orders import UnitProcedureWorkOrdersAPI
 from .unit_procedure_work_units import UnitProcedureWorkUnitsAPI
 from .unit_procedure_query import UnitProcedureQueryAPI
 
@@ -49,6 +54,9 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
+        self.work_orders_edge = UnitProcedureWorkOrdersAPI(
+            client, view_by_write_class, StartEndTime, StartEndTimeApply, StartEndTimeList
+        )
         self.work_units_edge = UnitProcedureWorkUnitsAPI(
             client, view_by_write_class, StartEndTime, StartEndTimeApply, StartEndTimeList
         )
@@ -80,6 +88,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
             A query API for unit procedures.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_unit_procedure_filter(
             self._view_id,
             name,
@@ -88,7 +97,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
             type_prefix,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(UnitProcedureList)
         return UnitProcedureQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
@@ -99,7 +108,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
         """Add or update (upsert) unit procedures.
 
         Note: This method iterates through all nodes and timeseries linked to unit_procedure and creates them including the edges
-        between the nodes. For example, if any of `work_units` are set, then these
+        between the nodes. For example, if any of `work_orders` or `work_units` are set, then these
         nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
 
         Args:
@@ -129,7 +138,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
 
         Args:
             external_id: External id of the unit procedure to delete.
-            space: The space where all the unit procedures are located.
+            space: The space where all the unit procedure are located.
 
         Returns:
             The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
@@ -178,6 +187,11 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
             space,
             retrieve_edges=True,
             edge_api_name_type_triple=[
+                (
+                    self.work_orders_edge,
+                    "work_orders",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.work_order"),
+                ),
                 (
                     self.work_units_edge,
                     "work_units",
@@ -431,7 +445,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
             space: The space to filter on.
             limit: Maximum number of unit procedures to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            retrieve_edges: Whether to retrieve `work_units` external ids for the unit procedures. Defaults to True.
+            retrieve_edges: Whether to retrieve `work_orders` or `work_units` external ids for the unit procedures. Defaults to True.
 
         Returns:
             List of requested unit procedures
@@ -461,6 +475,11 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
             filter=filter_,
             retrieve_edges=retrieve_edges,
             edge_api_name_type_triple=[
+                (
+                    self.work_orders_edge,
+                    "work_orders",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.work_order"),
+                ),
                 (
                     self.work_units_edge,
                     "work_units",

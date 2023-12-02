@@ -6,6 +6,7 @@ from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -248,7 +249,7 @@ class WellboreTrajectoryData(DomainModel):
         version: The version of the wellbore trajectory datum node.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     acquisition_date: Optional[str] = Field(None, alias="AcquisitionDate")
     acquisition_remark: Optional[str] = Field(None, alias="AcquisitionRemark")
     active_indicator: Optional[bool] = Field(None, alias="ActiveIndicator")
@@ -291,8 +292,8 @@ class WellboreTrajectoryData(DomainModel):
     resource_security_classification: Optional[str] = Field(None, alias="ResourceSecurityClassification")
     service_company_id: Optional[str] = Field(None, alias="ServiceCompanyID")
     source: Optional[str] = Field(None, alias="Source")
-    spatial_area: Union[SpatialArea, str, None] = Field(None, repr=False, alias="SpatialArea")
-    spatial_point: Union[SpatialPoint, str, None] = Field(None, repr=False, alias="SpatialPoint")
+    spatial_area: Union[SpatialArea, str, dm.NodeId, None] = Field(None, repr=False, alias="SpatialArea")
+    spatial_point: Union[SpatialPoint, str, dm.NodeId, None] = Field(None, repr=False, alias="SpatialPoint")
     start_date_time: Optional[str] = Field(None, alias="StartDateTime")
     submitter_name: Optional[str] = Field(None, alias="SubmitterName")
     surface_grid_convergence: Optional[float] = Field(None, alias="SurfaceGridConvergence")
@@ -309,7 +310,9 @@ class WellboreTrajectoryData(DomainModel):
     tie_true_vertical_depth: Optional[int] = Field(None, alias="TieTrueVerticalDepth")
     top_depth_measured_depth: Optional[int] = Field(None, alias="TopDepthMeasuredDepth")
     tortuosity: Optional[float] = Field(None, alias="Tortuosity")
-    vertical_measurement: Union[VerticalMeasurement, str, None] = Field(None, repr=False, alias="VerticalMeasurement")
+    vertical_measurement: Union[VerticalMeasurement, str, dm.NodeId, None] = Field(
+        None, repr=False, alias="VerticalMeasurement"
+    )
     wellbore_id: Optional[str] = Field(None, alias="WellboreID")
 
     def as_apply(self) -> WellboreTrajectoryDataApply:
@@ -472,7 +475,7 @@ class WellboreTrajectoryDataApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     acquisition_date: Optional[str] = Field(None, alias="AcquisitionDate")
     acquisition_remark: Optional[str] = Field(None, alias="AcquisitionRemark")
     active_indicator: Optional[bool] = Field(None, alias="ActiveIndicator")
@@ -515,8 +518,8 @@ class WellboreTrajectoryDataApply(DomainModelApply):
     resource_security_classification: Optional[str] = Field(None, alias="ResourceSecurityClassification")
     service_company_id: Optional[str] = Field(None, alias="ServiceCompanyID")
     source: Optional[str] = Field(None, alias="Source")
-    spatial_area: Union[SpatialAreaApply, str, None] = Field(None, repr=False, alias="SpatialArea")
-    spatial_point: Union[SpatialPointApply, str, None] = Field(None, repr=False, alias="SpatialPoint")
+    spatial_area: Union[SpatialAreaApply, str, dm.NodeId, None] = Field(None, repr=False, alias="SpatialArea")
+    spatial_point: Union[SpatialPointApply, str, dm.NodeId, None] = Field(None, repr=False, alias="SpatialPoint")
     start_date_time: Optional[str] = Field(None, alias="StartDateTime")
     submitter_name: Optional[str] = Field(None, alias="SubmitterName")
     surface_grid_convergence: Optional[float] = Field(None, alias="SurfaceGridConvergence")
@@ -533,7 +536,7 @@ class WellboreTrajectoryDataApply(DomainModelApply):
     tie_true_vertical_depth: Optional[int] = Field(None, alias="TieTrueVerticalDepth")
     top_depth_measured_depth: Optional[int] = Field(None, alias="TopDepthMeasuredDepth")
     tortuosity: Optional[float] = Field(None, alias="Tortuosity")
-    vertical_measurement: Union[VerticalMeasurementApply, str, None] = Field(
+    vertical_measurement: Union[VerticalMeasurementApply, str, dm.NodeId, None] = Field(
         None, repr=False, alias="VerticalMeasurement"
     )
     wellbore_id: Optional[str] = Field(None, alias="WellboreID")

@@ -6,6 +6,7 @@ from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -45,7 +46,7 @@ class CdfModel(DomainModel):
         version: The version of the cdf 3 d model node.
     """
 
-    space: str = "cdf_3d_schema"
+    space: str = DEFAULT_INSTANCE_SPACE
     entities: Optional[list[CdfConnectionProperties]] = Field(default=None, repr=False)
     name: Optional[str] = None
 
@@ -75,7 +76,7 @@ class CdfModelApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "cdf_3d_schema"
+    space: str = DEFAULT_INSTANCE_SPACE
     entities: Optional[list[CdfConnectionPropertiesApply]] = Field(default=None, repr=False)
     name: str
 

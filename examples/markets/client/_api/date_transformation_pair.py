@@ -68,34 +68,15 @@ class DateTransformationPairAPI(
             A query API for date transformation pairs.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_date_transformation_pair_filter(
             self._view_id,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            DateTransformationPairList,
-            [
-                QueryStep(
-                    name="date_transformation_pair",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [
-                            dm.query.SourceSelector(
-                                self._view_id, list(_DATETRANSFORMATIONPAIR_PROPERTIES_BY_FIELD.values())
-                            )
-                        ]
-                    ),
-                    result_cls=DateTransformationPair,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return DateTransformationPairQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(DateTransformationPairList)
+        return DateTransformationPairQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(
         self,

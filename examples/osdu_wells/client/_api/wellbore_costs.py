@@ -74,6 +74,7 @@ class WellboreCostsAPI(NodeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsL
             A query API for wellbore costs.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_wellbore_cost_filter(
             self._view_id,
             activity_type_id,
@@ -82,26 +83,10 @@ class WellboreCostsAPI(NodeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsL
             max_cost,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            WellboreCostsList,
-            [
-                QueryStep(
-                    name="wellbore_cost",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_WELLBORECOSTS_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=WellboreCosts,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return WellboreCostsQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(WellboreCostsList)
+        return WellboreCostsQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(
         self, wellbore_cost: WellboreCostsApply | Sequence[WellboreCostsApply], replace: bool = False

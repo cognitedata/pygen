@@ -6,6 +6,7 @@ from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -237,7 +238,7 @@ class WellboreData(DomainModel):
         version: The version of the wellbore datum node.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     business_intention_id: Optional[str] = Field(None, alias="BusinessIntentionID")
     condition_id: Optional[str] = Field(None, alias="ConditionID")
     current_operator_id: Optional[str] = Field(None, alias="CurrentOperatorID")
@@ -267,7 +268,7 @@ class WellboreData(DomainModel):
     fluid_direction_id: Optional[str] = Field(None, alias="FluidDirectionID")
     formation_name_at_total_depth: Optional[str] = Field(None, alias="FormationNameAtTotalDepth")
     geo_contexts: Union[list[GeoContexts], list[str], None] = Field(default=None, repr=False, alias="GeoContexts")
-    geographic_bottom_hole_location: Union[GeographicBottomHoleLocation, str, None] = Field(
+    geographic_bottom_hole_location: Union[GeographicBottomHoleLocation, str, dm.NodeId, None] = Field(
         None, repr=False, alias="GeographicBottomHoleLocation"
     )
     historical_interests: Union[list[HistoricalInterests], list[str], None] = Field(
@@ -280,7 +281,7 @@ class WellboreData(DomainModel):
     operating_environment_id: Optional[str] = Field(None, alias="OperatingEnvironmentID")
     outcome_id: Optional[str] = Field(None, alias="OutcomeID")
     primary_product_type_id: Optional[str] = Field(None, alias="PrimaryProductTypeID")
-    projected_bottom_hole_location: Union[ProjectedBottomHoleLocation, str, None] = Field(
+    projected_bottom_hole_location: Union[ProjectedBottomHoleLocation, str, dm.NodeId, None] = Field(
         None, repr=False, alias="ProjectedBottomHoleLocation"
     )
     resource_curation_status: Optional[str] = Field(None, alias="ResourceCurationStatus")
@@ -293,7 +294,7 @@ class WellboreData(DomainModel):
     sequence_number: Optional[int] = Field(None, alias="SequenceNumber")
     show_product_type_id: Optional[str] = Field(None, alias="ShowProductTypeID")
     source: Optional[str] = Field(None, alias="Source")
-    spatial_location: Union[SpatialLocation, str, None] = Field(None, repr=False, alias="SpatialLocation")
+    spatial_location: Union[SpatialLocation, str, dm.NodeId, None] = Field(None, repr=False, alias="SpatialLocation")
     status_summary_id: Optional[str] = Field(None, alias="StatusSummaryID")
     target_formation: Optional[str] = Field(None, alias="TargetFormation")
     technical_assurance_type_id: Optional[str] = Field(None, alias="TechnicalAssuranceTypeID")
@@ -491,7 +492,7 @@ class WellboreDataApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     business_intention_id: Optional[str] = Field(None, alias="BusinessIntentionID")
     condition_id: Optional[str] = Field(None, alias="ConditionID")
     current_operator_id: Optional[str] = Field(None, alias="CurrentOperatorID")
@@ -521,7 +522,7 @@ class WellboreDataApply(DomainModelApply):
     fluid_direction_id: Optional[str] = Field(None, alias="FluidDirectionID")
     formation_name_at_total_depth: Optional[str] = Field(None, alias="FormationNameAtTotalDepth")
     geo_contexts: Union[list[GeoContextsApply], list[str], None] = Field(default=None, repr=False, alias="GeoContexts")
-    geographic_bottom_hole_location: Union[GeographicBottomHoleLocationApply, str, None] = Field(
+    geographic_bottom_hole_location: Union[GeographicBottomHoleLocationApply, str, dm.NodeId, None] = Field(
         None, repr=False, alias="GeographicBottomHoleLocation"
     )
     historical_interests: Union[list[HistoricalInterestsApply], list[str], None] = Field(
@@ -534,7 +535,7 @@ class WellboreDataApply(DomainModelApply):
     operating_environment_id: Optional[str] = Field(None, alias="OperatingEnvironmentID")
     outcome_id: Optional[str] = Field(None, alias="OutcomeID")
     primary_product_type_id: Optional[str] = Field(None, alias="PrimaryProductTypeID")
-    projected_bottom_hole_location: Union[ProjectedBottomHoleLocationApply, str, None] = Field(
+    projected_bottom_hole_location: Union[ProjectedBottomHoleLocationApply, str, dm.NodeId, None] = Field(
         None, repr=False, alias="ProjectedBottomHoleLocation"
     )
     resource_curation_status: Optional[str] = Field(None, alias="ResourceCurationStatus")
@@ -547,7 +548,9 @@ class WellboreDataApply(DomainModelApply):
     sequence_number: Optional[int] = Field(None, alias="SequenceNumber")
     show_product_type_id: Optional[str] = Field(None, alias="ShowProductTypeID")
     source: Optional[str] = Field(None, alias="Source")
-    spatial_location: Union[SpatialLocationApply, str, None] = Field(None, repr=False, alias="SpatialLocation")
+    spatial_location: Union[SpatialLocationApply, str, dm.NodeId, None] = Field(
+        None, repr=False, alias="SpatialLocation"
+    )
     status_summary_id: Optional[str] = Field(None, alias="StatusSummaryID")
     target_formation: Optional[str] = Field(None, alias="TargetFormation")
     technical_assurance_type_id: Optional[str] = Field(None, alias="TechnicalAssuranceTypeID")

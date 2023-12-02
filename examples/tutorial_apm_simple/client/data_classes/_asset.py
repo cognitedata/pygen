@@ -8,6 +8,7 @@ from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
 from pydantic import Field
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -95,7 +96,7 @@ class Asset(DomainModel):
         version: The version of the asset node.
     """
 
-    space: str = "tutorial_apm_simple"
+    space: str = DEFAULT_INSTANCE_SPACE
     area_id: Optional[int] = Field(None, alias="areaId")
     category_id: Optional[int] = Field(None, alias="categoryId")
     children: Union[list[Asset], list[str], None] = Field(default=None, repr=False)
@@ -107,7 +108,7 @@ class Asset(DomainModel):
     is_critical_line: Optional[bool] = Field(None, alias="isCriticalLine")
     measurements: Optional[list[str]] = None
     metrics: Optional[list[TimeSeries]] = None
-    parent: Union[Asset, str, None] = Field(None, repr=False)
+    parent: Union[Asset, str, dm.NodeId, None] = Field(None, repr=False)
     pressure: Union[TimeSeries, str, None] = None
     source_db: Optional[str] = Field(None, alias="sourceDb")
     specification: Union[str, None] = None
@@ -173,7 +174,7 @@ class AssetApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "tutorial_apm_simple"
+    space: str = DEFAULT_INSTANCE_SPACE
     area_id: Optional[int] = Field(None, alias="areaId")
     category_id: Optional[int] = Field(None, alias="categoryId")
     children: Union[list[AssetApply], list[str], None] = Field(default=None, repr=False)
@@ -185,7 +186,7 @@ class AssetApply(DomainModelApply):
     is_critical_line: Optional[bool] = Field(None, alias="isCriticalLine")
     measurements: Optional[list[str]] = None
     metrics: Optional[list[TimeSeries]] = None
-    parent: Union[AssetApply, str, None] = Field(None, repr=False)
+    parent: Union[AssetApply, str, dm.NodeId, None] = Field(None, repr=False)
     pressure: Union[TimeSeries, str, None] = None
     source_db: Optional[str] = Field(None, alias="sourceDb")
     specification: Union[str, None] = None

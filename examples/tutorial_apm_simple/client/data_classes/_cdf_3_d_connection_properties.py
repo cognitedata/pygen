@@ -3,9 +3,16 @@ from __future__ import annotations
 from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
-from pydantic import Field, model_validator
+from pydantic import Field
 
-from ._core import DomainModelApply, DomainRelation, DomainRelationApply, DomainRelationList, ResourcesApply
+from ._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DomainModelApply,
+    DomainRelation,
+    DomainRelationApply,
+    DomainRelationList,
+    ResourcesApply,
+)
 from ._cdf_3_d_entity import CdfEntity, CdfEntityApply
 
 __all__ = [
@@ -40,20 +47,11 @@ class CdfConnectionProperties(DomainRelation):
         version: The version of the cdf 3 d connection property node.
     """
 
-    space: str = "cdf_3d_schema"
+    space: str = DEFAULT_INSTANCE_SPACE
+    end_node: Union[str, dm.NodeId] = None
     cdf_3_d_entity: Union[CdfEntity, str]
     revision_id: Optional[int] = Field(None, alias="revisionId")
     revision_node_id: Optional[int] = Field(None, alias="revisionNodeId")
-
-    @property
-    def cdf_3_d_model(self) -> str:
-        return self.start_node.external_id
-
-    @model_validator(mode="before")
-    def set_cdf_3_d_entity_if_missing(cls, data: Any):
-        if isinstance(data, dict) and "cdf_3_d_entity" not in data:
-            data["cdf_3_d_entity"] = data["end_node"]["external_id"]
-        return data
 
     def as_apply(self) -> CdfConnectionPropertiesApply:
         """Convert this read version of cdf 3 d connection property to the writing version."""
@@ -86,8 +84,8 @@ class CdfConnectionPropertiesApply(DomainRelationApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    edge_type: dm.DirectRelationReference = dm.DirectRelationReference("cdf_3d_schema", "cdf3dEntityConnection")
-    space: str = "cdf_3d_schema"
+    space: str = DEFAULT_INSTANCE_SPACE
+    end_node: str
     cdf_3_d_entity: Union[CdfEntityApply, str]
     revision_id: int = Field(alias="revisionId")
     revision_node_id: int = Field(alias="revisionNodeId")
@@ -96,18 +94,21 @@ class CdfConnectionPropertiesApply(DomainRelationApply):
         self,
         cache: set[tuple[str, str]],
         start_node: DomainModelApply,
+        edge_type: dm.DirectRelationReference,
         view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.external_id and (self.space, self.external_id) in cache:
             return resources
 
-        if isinstance(self.cdf_3_d_entity, DomainModelApply):
-            end_node = self.cdf_3_d_entity.as_direct_reference()
-        elif isinstance(self.cdf_3_d_entity, str):
-            end_node = dm.DirectRelationReference(self.space, self.cdf_3_d_entity)
+        if isinstance(self.end_node, DomainModelApply):
+            end_node = self.end_node.as_direct_reference()
+        elif isinstance(self.end_node, str):
+            end_node = dm.DirectRelationReference(self.space, self.end_node)
+        elif isinstance(self.end_node, dm.NodeId):
+            end_node = dm.DirectRelationReference(self.end_node.space, self.end_node.external_id)
         else:
-            raise ValueError(f"Invalid type for equipment_module: {type(self.cdf_3_d_entity)}")
+            raise ValueError(f"Invalid type for equipment_module: {type(self.end_node)}")
 
         self.external_id = external_id = DomainRelationApply.external_id_factory(start_node, end_node, self.edge_type)
 
@@ -125,7 +126,7 @@ class CdfConnectionPropertiesApply(DomainRelationApply):
             this_edge = dm.EdgeApply(
                 space=self.space,
                 external_id=external_id,
-                type=self.edge_type,
+                type=edge_type,
                 start_node=start_node.as_direct_reference(),
                 end_node=end_node,
                 existing_version=self.existing_version,
@@ -162,9 +163,9 @@ def _create_cdf_3_d_connection_property_filter(
     edge_type: dm.DirectRelationReference,
     view_id: dm.ViewId,
     start_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-    start_node_space: str = "cdf_3d_schema",
+    start_node_space: str = DEFAULT_INSTANCE_SPACE,
     end_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-    space_end_node: str = "cdf_3d_schema",
+    space_end_node: str = DEFAULT_INSTANCE_SPACE,
     min_revision_id: int | None = None,
     max_revision_id: int | None = None,
     min_revision_node_id: int | None = None,

@@ -5,6 +5,7 @@ from typing import Literal, Optional
 from cognite.client import data_modeling as dm
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -49,7 +50,7 @@ class DateTransformation(DomainModel):
         version: The version of the date transformation node.
     """
 
-    space: str = "market"
+    space: str = DEFAULT_INSTANCE_SPACE
     arguments: Optional[dict] = None
     method: Optional[str] = None
 
@@ -79,7 +80,7 @@ class DateTransformationApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "market"
+    space: str = DEFAULT_INSTANCE_SPACE
     arguments: Optional[dict] = None
     method: Optional[str] = None
 

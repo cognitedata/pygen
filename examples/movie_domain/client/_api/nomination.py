@@ -74,6 +74,7 @@ class NominationAPI(NodeAPI[Nomination, NominationApply, NominationList]):
             A query API for nominations.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_nomination_filter(
             self._view_id,
             name,
@@ -82,26 +83,10 @@ class NominationAPI(NodeAPI[Nomination, NominationApply, NominationList]):
             max_year,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            NominationList,
-            [
-                QueryStep(
-                    name="nomination",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_NOMINATION_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=Nomination,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return NominationQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(NominationList)
+        return NominationQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(
         self, nomination: NominationApply | Sequence[NominationApply], replace: bool = False

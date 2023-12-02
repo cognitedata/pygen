@@ -5,6 +5,7 @@ from typing import Literal, Optional
 from cognite.client import data_modeling as dm
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -49,7 +50,7 @@ class CommandConfig(DomainModel):
         version: The version of the command config node.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     configs: Optional[list[str]] = None
     source: Union[str, None] = None
 
@@ -79,7 +80,7 @@ class CommandConfigApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     configs: list[str]
     source: Union[str, None] = None
 

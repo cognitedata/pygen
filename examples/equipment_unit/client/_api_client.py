@@ -7,6 +7,7 @@ from cognite.client.credentials import OAuthClientCredentials
 
 from ._api.equipment_module import EquipmentModuleAPI
 from ._api.unit_procedure import UnitProcedureAPI
+from ._api.work_order import WorkOrderAPI
 from . import data_classes
 
 
@@ -22,7 +23,7 @@ class EquipmentUnitClient:
     Data Model:
         space: IntegrationTestsImmutable
         externalId: EquipmentUnit
-        version: 1
+        version: 2
     """
 
     def __init__(self, config_or_client: CogniteClient | ClientConfig):
@@ -37,11 +38,13 @@ class EquipmentUnitClient:
                 "IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33"
             ),
             data_classes.StartEndTimeApply: dm.ViewId("IntegrationTestsImmutable", "StartEndTime", "d416e0ed98186b"),
-            data_classes.UnitProcedureApply: dm.ViewId("IntegrationTestsImmutable", "UnitProcedure", "f16810a7105c44"),
+            data_classes.UnitProcedureApply: dm.ViewId("IntegrationTestsImmutable", "UnitProcedure", "a6e2fea1e1c664"),
+            data_classes.WorkOrderApply: dm.ViewId("IntegrationTestsImmutable", "WorkOrder", "c5543fb2b1bc81"),
         }
 
         self.equipment_module = EquipmentModuleAPI(client, view_by_write_class)
         self.unit_procedure = UnitProcedureAPI(client, view_by_write_class)
+        self.work_order = WorkOrderAPI(client, view_by_write_class)
 
     @classmethod
     def azure_project(

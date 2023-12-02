@@ -1,24 +1,19 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-from cognite.client import data_modeling as dm
-from ._core import DEFAULT_QUERY_LIMIT, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
+
+from cognite.client import data_modeling as dm, CogniteClient
+
 from tutorial_apm_simple.client.data_classes import (
+    DomainModelApply,
     Asset,
     AssetApply,
     Asset,
     AssetApply,
-    CdfConnectionProperties,
-    CdfConnectionPropertiesApply,
 )
-from tutorial_apm_simple.client.data_classes._asset import (
-    _ASSET_PROPERTIES_BY_FIELD,
-)
-from tutorial_apm_simple.client.data_classes._asset import (
-    _ASSET_PROPERTIES_BY_FIELD,
-)
+from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
+
 from tutorial_apm_simple.client.data_classes._cdf_3_d_connection_properties import (
-    _CDFCONNECTIONPROPERTIES_PROPERTIES_BY_FIELD,
     _create_cdf_3_d_connection_property_filter,
 )
 
@@ -28,24 +23,51 @@ if TYPE_CHECKING:
 
 
 class AssetQueryAPI(QueryAPI[T_DomainModelList]):
+    def __init__(
+        self,
+        client: CogniteClient,
+        builder: QueryBuilder[T_DomainModelList],
+        view_by_write_class: dict[type[DomainModelApply], dm.ViewId],
+        filter_: dm.filters.Filter | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+    ):
+        super().__init__(client, builder, view_by_write_class)
+
+        self._builder.append(
+            QueryStep(
+                name=self._builder.next_name("asset"),
+                expression=dm.query.NodeResultSetExpression(
+                    from_=self._builder[-1].name if self._builder else None,
+                    filter=filter_,
+                ),
+                select=dm.query.Select([dm.query.SourceSelector(self._view_by_write_class[AssetApply], ["*"])]),
+                result_cls=Asset,
+                max_retrieve_limit=limit,
+            )
+        )
+
     def children(
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_QUERY_LIMIT,
+        retrieve_parent: bool = False,
     ) -> AssetQueryAPI[T_DomainModelList]:
         """Query along the child edges of the asset.
 
         Args:
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of work unit edges to return. Defaults to 25. Set to -1, float("inf") or None
+            limit: Maximum number of child edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
+            retrieve_parent: Whether to retrieve the parent for each asset or not.
 
         Returns:
             AssetQueryAPI: The query API for the asset.
         """
         from .asset_query import AssetQueryAPI
+
+        from_ = self._builder[-1].name
 
         edge_filter = _create_edge_filter(
             dm.DirectRelationReference("tutorial_apm_simple", "Asset.children"),
@@ -57,32 +79,15 @@ class AssetQueryAPI(QueryAPI[T_DomainModelList]):
                 name=self._builder.next_name("children"),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
-                    from_=self._builder[-1].name,
+                    from_=from_,
                 ),
                 select=dm.query.Select(),
                 max_retrieve_limit=limit,
             )
         )
-        self._builder.append(
-            QueryStep(
-                name=self._builder.next_name("asset"),
-                expression=dm.query.NodeResultSetExpression(
-                    filter=None,
-                    from_=self._builder[-1].name,
-                ),
-                select=dm.query.Select(
-                    [
-                        dm.query.SourceSelector(
-                            self._view_by_write_class[AssetApply],
-                            list(_ASSET_PROPERTIES_BY_FIELD.values()),
-                        )
-                    ]
-                ),
-                result_cls=Asset,
-                max_retrieve_limit=-1,
-            ),
-        )
-        return AssetQueryAPI(self._client, self._builder, self._view_by_write_class)
+        if retrieve_parent:
+            self._query_append_parent(from_)
+        return AssetQueryAPI(self._client, self._builder, self._view_by_write_class, None, limit)
 
     def in_model_3_d(
         self,
@@ -93,6 +98,7 @@ class AssetQueryAPI(QueryAPI[T_DomainModelList]):
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_QUERY_LIMIT,
+        retrieve_parent: bool = False,
     ) -> CdfEntityQueryAPI[T_DomainModelList]:
         """Query along the in model 3 d edges of the asset.
 
@@ -103,13 +109,16 @@ class AssetQueryAPI(QueryAPI[T_DomainModelList]):
             max_revision_node_id: The maximum value of the revision node id to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of work unit edges to return. Defaults to 25. Set to -1, float("inf") or None
+            limit: Maximum number of in model 3 d edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
+            retrieve_parent: Whether to retrieve the parent for each asset or not.
 
         Returns:
             CdfEntityQueryAPI: The query API for the cdf 3 d entity.
         """
         from .cdf_3_d_entity_query import CdfEntityQueryAPI
+
+        from_ = self._builder[-1].name
 
         edge_view = self._view_by_write_class[CdfConnectionPropertiesApply]
         edge_filter = _create_cdf_3_d_connection_property_filter(
@@ -127,7 +136,7 @@ class AssetQueryAPI(QueryAPI[T_DomainModelList]):
                 name=self._builder.next_name("in_model_3_d"),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
-                    from_=self._builder[-1].name,
+                    from_=from_,
                 ),
                 select=dm.query.Select(
                     [dm.query.SourceSelector(edge_view, list(_CDFCONNECTIONPROPERTIES_PROPERTIES_BY_FIELD.values()))]
@@ -136,41 +145,41 @@ class AssetQueryAPI(QueryAPI[T_DomainModelList]):
                 max_retrieve_limit=limit,
             )
         )
-        return CdfEntityQueryAPI(self._client, self._builder, self._view_by_write_class)
+        if retrieve_parent:
+            self._query_append_parent(from_)
+        return CdfEntityQueryAPI(self._client, self._builder, self._view_by_write_class, None, limit)
 
     def query(
         self,
-        retrieve_asset: bool = True,
+        retrieve_parent: bool = False,
     ) -> T_DomainModelList:
         """Execute query and return the result.
 
         Args:
-            retrieve_asset: Whether to retrieve the asset or not.
+            retrieve_parent: Whether to retrieve the parent for each asset or not.
 
         Returns:
             The list of the source nodes of the query.
 
         """
         from_ = self._builder[-1].name
-        if retrieve_asset and not self._builder[-1].name.startswith("asset"):
-            self._builder.append(
-                QueryStep(
-                    name=self._builder.next_name("asset"),
-                    expression=dm.query.NodeResultSetExpression(
-                        filter=None,
-                        from_=from_,
-                    ),
-                    select=dm.query.Select(
-                        [
-                            dm.query.SourceSelector(
-                                self._view_by_write_class[AssetApply],
-                                list(_ASSET_PROPERTIES_BY_FIELD.values()),
-                            )
-                        ]
-                    ),
-                    result_cls=Asset,
-                    max_retrieve_limit=-1,
-                ),
-            )
-
+        if retrieve_parent:
+            self._query_append_parent(from_)
         return self._query()
+
+    def _query_append_person(self, from_: str) -> None:
+        view_id = self._view_by_write_class[AssetApply]
+        self._builder.append(
+            QueryStep(
+                name=self._builder.next_name("parent"),
+                expression=dm.query.NodeResultSetExpression(
+                    filter=dm.filters.HasData(views=[view_id]),
+                    from_=from_,
+                    through=self._view_by_write_class[AssetApply].as_property_ref("person"),
+                    direction="outwards",
+                ),
+                select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
+                max_retrieve_limit=-1,
+                result_cls=Asset,
+            ),
+        )

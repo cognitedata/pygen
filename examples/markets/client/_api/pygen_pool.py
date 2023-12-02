@@ -78,6 +78,7 @@ class PygenPoolAPI(NodeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
             A query API for pygen pools.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_pygen_pool_filter(
             self._view_id,
             min_day_of_week,
@@ -88,26 +89,10 @@ class PygenPoolAPI(NodeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
             timezone_prefix,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            PygenPoolList,
-            [
-                QueryStep(
-                    name="pygen_pool",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_PYGENPOOL_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=PygenPool,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return PygenPoolQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(PygenPoolList)
+        return PygenPoolQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(
         self, pygen_pool: PygenPoolApply | Sequence[PygenPoolApply], replace: bool = False

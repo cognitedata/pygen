@@ -87,6 +87,7 @@ class PygenBidAPI(NodeAPI[PygenBid, PygenBidApply, PygenBidList]):
             A query API for pygen bids.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_pygen_bid_filter(
             self._view_id,
             min_date,
@@ -101,26 +102,10 @@ class PygenBidAPI(NodeAPI[PygenBid, PygenBidApply, PygenBidList]):
             max_price_premium,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            PygenBidList,
-            [
-                QueryStep(
-                    name="pygen_bid",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_PYGENBID_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=PygenBid,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return PygenBidQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(PygenBidList)
+        return PygenBidQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(self, pygen_bid: PygenBidApply | Sequence[PygenBidApply], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) pygen bids.

@@ -1,12 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from cognite.client import data_modeling as dm, CogniteClient
-from ._core import DEFAULT_QUERY_LIMIT, QueryStep, QueryAPI, T_DomainModelList, QueryBuilder
+
 from equipment_unit.client.data_classes import (
+    DomainModelApply,
     EquipmentModule,
     EquipmentModuleApply,
-    DomainModelApply,
 )
+from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList
 
 
 class EquipmentModuleQueryAPI(QueryAPI[T_DomainModelList]):
@@ -19,6 +22,7 @@ class EquipmentModuleQueryAPI(QueryAPI[T_DomainModelList]):
         limit: int = DEFAULT_QUERY_LIMIT,
     ):
         super().__init__(client, builder, view_by_write_class)
+
         self._builder.append(
             QueryStep(
                 name=self._builder.next_name("equipment_module"),
@@ -27,16 +31,11 @@ class EquipmentModuleQueryAPI(QueryAPI[T_DomainModelList]):
                     filter=filter_,
                 ),
                 select=dm.query.Select(
-                    [
-                        dm.query.SourceSelector(
-                            self._view_by_write_class[EquipmentModuleApply],
-                            ["*"],
-                        )
-                    ]
+                    [dm.query.SourceSelector(self._view_by_write_class[EquipmentModuleApply], ["*"])]
                 ),
                 result_cls=EquipmentModule,
                 max_retrieve_limit=limit,
-            ),
+            )
         )
 
     def query(
@@ -44,8 +43,11 @@ class EquipmentModuleQueryAPI(QueryAPI[T_DomainModelList]):
     ) -> T_DomainModelList:
         """Execute query and return the result.
 
+        Args:
+
         Returns:
             The list of the source nodes of the query.
 
         """
+        from_ = self._builder[-1].name
         return self._query()

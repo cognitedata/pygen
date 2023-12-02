@@ -74,6 +74,7 @@ class MarketAPI(NodeAPI[Market, MarketApply, MarketList]):
             A query API for markets.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_market_filter(
             self._view_id,
             name,
@@ -82,26 +83,10 @@ class MarketAPI(NodeAPI[Market, MarketApply, MarketList]):
             timezone_prefix,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            MarketList,
-            [
-                QueryStep(
-                    name="market",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_MARKET_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=Market,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return MarketQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(MarketList)
+        return MarketQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(self, market: MarketApply | Sequence[MarketApply], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) markets.

@@ -4,15 +4,15 @@ from typing import TYPE_CHECKING
 
 from cognite.client import data_modeling as dm, CogniteClient
 
-from osdu_wells.client.data_classes import (
+from equipment_unit.client.data_classes import (
     DomainModelApply,
-    LineageAssertions,
-    LineageAssertionsApply,
+    WorkOrder,
+    WorkOrderApply,
 )
 from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList
 
 
-class LineageAssertionsQueryAPI(QueryAPI[T_DomainModelList]):
+class WorkOrderQueryAPI(QueryAPI[T_DomainModelList]):
     def __init__(
         self,
         client: CogniteClient,
@@ -25,15 +25,13 @@ class LineageAssertionsQueryAPI(QueryAPI[T_DomainModelList]):
 
         self._builder.append(
             QueryStep(
-                name=self._builder.next_name("lineage_assertion"),
+                name=self._builder.next_name("work_order"),
                 expression=dm.query.NodeResultSetExpression(
                     from_=self._builder[-1].name if self._builder else None,
                     filter=filter_,
                 ),
-                select=dm.query.Select(
-                    [dm.query.SourceSelector(self._view_by_write_class[LineageAssertionsApply], ["*"])]
-                ),
-                result_cls=LineageAssertions,
+                select=dm.query.Select([dm.query.SourceSelector(self._view_by_write_class[WorkOrderApply], ["*"])]),
+                result_cls=WorkOrder,
                 max_retrieve_limit=limit,
             )
         )

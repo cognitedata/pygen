@@ -6,6 +6,7 @@ from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -68,7 +69,7 @@ class FacilityOperators(DomainModel):
         version: The version of the facility operator node.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     effective_date_time: Optional[str] = Field(None, alias="EffectiveDateTime")
     facility_operator_id: Optional[str] = Field(None, alias="FacilityOperatorID")
     facility_operator_organisation_id: Optional[str] = Field(None, alias="FacilityOperatorOrganisationID")
@@ -107,7 +108,7 @@ class FacilityOperatorsApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     effective_date_time: Optional[str] = Field(None, alias="EffectiveDateTime")
     facility_operator_id: Optional[str] = Field(None, alias="FacilityOperatorID")
     facility_operator_organisation_id: Optional[str] = Field(None, alias="FacilityOperatorOrganisationID")

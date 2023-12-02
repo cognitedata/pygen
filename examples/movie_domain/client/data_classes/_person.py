@@ -6,6 +6,7 @@ from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -47,7 +48,7 @@ class Person(DomainModel):
         version: The version of the person node.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     birth_year: Optional[int] = Field(None, alias="birthYear")
     name: Optional[str] = None
     roles: Union[list[Role], list[str], None] = Field(default=None, repr=False)
@@ -80,7 +81,7 @@ class PersonApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     birth_year: Optional[int] = Field(None, alias="birthYear")
     name: str
     roles: Union[list[RoleApply], list[str], None] = Field(default=None, repr=False)

@@ -6,6 +6,7 @@ from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -67,19 +68,19 @@ class Well(DomainModel):
         version: The version of the well node.
     """
 
-    space: str = "IntegrationTestsImmutable"
-    acl: Union[Acl, str, None] = Field(None, repr=False)
-    ancestry: Union[Ancestry, str, None] = Field(None, repr=False)
+    space: str = DEFAULT_INSTANCE_SPACE
+    acl: Union[Acl, str, dm.NodeId, None] = Field(None, repr=False)
+    ancestry: Union[Ancestry, str, dm.NodeId, None] = Field(None, repr=False)
     create_time: Optional[str] = Field(None, alias="createTime")
     create_user: Optional[str] = Field(None, alias="createUser")
-    data: Union[WellData, str, None] = Field(None, repr=False)
+    data: Union[WellData, str, dm.NodeId, None] = Field(None, repr=False)
     id_: Optional[str] = Field(None, alias="id")
     kind: Optional[str] = None
-    legal: Union[Legal, str, None] = Field(None, repr=False)
+    legal: Union[Legal, str, dm.NodeId, None] = Field(None, repr=False)
     meta: Union[list[Meta], list[str], None] = Field(default=None, repr=False)
     modify_time: Optional[str] = Field(None, alias="modifyTime")
     modify_user: Optional[str] = Field(None, alias="modifyUser")
-    tags: Union[Tags, str, None] = Field(None, repr=False)
+    tags: Union[Tags, str, dm.NodeId, None] = Field(None, repr=False)
     version_: Optional[int] = Field(None, alias="version")
 
     def as_apply(self) -> WellApply:
@@ -130,19 +131,19 @@ class WellApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "IntegrationTestsImmutable"
-    acl: Union[AclApply, str, None] = Field(None, repr=False)
-    ancestry: Union[AncestryApply, str, None] = Field(None, repr=False)
+    space: str = DEFAULT_INSTANCE_SPACE
+    acl: Union[AclApply, str, dm.NodeId, None] = Field(None, repr=False)
+    ancestry: Union[AncestryApply, str, dm.NodeId, None] = Field(None, repr=False)
     create_time: Optional[str] = Field(None, alias="createTime")
     create_user: Optional[str] = Field(None, alias="createUser")
-    data: Union[WellDataApply, str, None] = Field(None, repr=False)
+    data: Union[WellDataApply, str, dm.NodeId, None] = Field(None, repr=False)
     id_: Optional[str] = Field(None, alias="id")
     kind: Optional[str] = None
-    legal: Union[LegalApply, str, None] = Field(None, repr=False)
+    legal: Union[LegalApply, str, dm.NodeId, None] = Field(None, repr=False)
     meta: Union[list[MetaApply], list[str], None] = Field(default=None, repr=False)
     modify_time: Optional[str] = Field(None, alias="modifyTime")
     modify_user: Optional[str] = Field(None, alias="modifyUser")
-    tags: Union[TagsApply, str, None] = Field(None, repr=False)
+    tags: Union[TagsApply, str, dm.NodeId, None] = Field(None, repr=False)
     version_: Optional[int] = Field(None, alias="version")
 
     def _to_instances_apply(

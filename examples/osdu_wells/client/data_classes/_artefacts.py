@@ -6,6 +6,7 @@ from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -52,7 +53,7 @@ class Artefacts(DomainModel):
         version: The version of the artefact node.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     resource_id: Optional[str] = Field(None, alias="ResourceID")
     resource_kind: Optional[str] = Field(None, alias="ResourceKind")
     role_id: Optional[str] = Field(None, alias="RoleID")
@@ -85,7 +86,7 @@ class ArtefactsApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     resource_id: Optional[str] = Field(None, alias="ResourceID")
     resource_kind: Optional[str] = Field(None, alias="ResourceKind")
     role_id: Optional[str] = Field(None, alias="RoleID")

@@ -6,6 +6,7 @@ from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -175,7 +176,7 @@ class WellData(DomainModel):
         version: The version of the well datum node.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     business_intention_id: Optional[str] = Field(None, alias="BusinessIntentionID")
     condition_id: Optional[str] = Field(None, alias="ConditionID")
     current_operator_id: Optional[str] = Field(None, alias="CurrentOperatorID")
@@ -215,7 +216,7 @@ class WellData(DomainModel):
     resource_security_classification: Optional[str] = Field(None, alias="ResourceSecurityClassification")
     role_id: Optional[str] = Field(None, alias="RoleID")
     source: Optional[str] = Field(None, alias="Source")
-    spatial_location: Union[SpatialLocation, str, None] = Field(None, repr=False, alias="SpatialLocation")
+    spatial_location: Union[SpatialLocation, str, dm.NodeId, None] = Field(None, repr=False, alias="SpatialLocation")
     status_summary_id: Optional[str] = Field(None, alias="StatusSummaryID")
     technical_assurance_type_id: Optional[str] = Field(None, alias="TechnicalAssuranceTypeID")
     technical_assurances: Union[list[TechnicalAssurances], list[str], None] = Field(
@@ -365,7 +366,7 @@ class WellDataApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     business_intention_id: Optional[str] = Field(None, alias="BusinessIntentionID")
     condition_id: Optional[str] = Field(None, alias="ConditionID")
     current_operator_id: Optional[str] = Field(None, alias="CurrentOperatorID")
@@ -405,7 +406,9 @@ class WellDataApply(DomainModelApply):
     resource_security_classification: Optional[str] = Field(None, alias="ResourceSecurityClassification")
     role_id: Optional[str] = Field(None, alias="RoleID")
     source: Optional[str] = Field(None, alias="Source")
-    spatial_location: Union[SpatialLocationApply, str, None] = Field(None, repr=False, alias="SpatialLocation")
+    spatial_location: Union[SpatialLocationApply, str, dm.NodeId, None] = Field(
+        None, repr=False, alias="SpatialLocation"
+    )
     status_summary_id: Optional[str] = Field(None, alias="StatusSummaryID")
     technical_assurance_type_id: Optional[str] = Field(None, alias="TechnicalAssuranceTypeID")
     technical_assurances: Union[list[TechnicalAssurancesApply], list[str], None] = Field(
