@@ -73,13 +73,14 @@ class ActorAPI(NodeAPI[Actor, ActorApply, ActorList]):
             A query API for actors.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_actor_filter(
             self._view_id,
             person,
             won_oscar,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(
             ActorList,
@@ -90,9 +91,7 @@ class ActorAPI(NodeAPI[Actor, ActorApply, ActorList]):
                         from_=None,
                         filter=filter_,
                     ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_ACTOR_PROPERTIES_BY_FIELD.values()))]
-                    ),
+                    select=dm.query.Select([dm.query.SourceSelector(self._view_id, ["*"])]),
                     result_cls=Actor,
                     max_retrieve_limit=limit,
                 )

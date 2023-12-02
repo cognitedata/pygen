@@ -81,7 +81,7 @@ class DomainModelCore(Core):
     @classmethod
     def from_instance(cls: type[T_DomainModelCore], instance: Instance) -> T_DomainModelCore:
         data = instance.dump(camel_case=False)
-        return cls(**{**data, **unpack_properties(instance.properties)})
+        return cls(**{**data, **unpack_properties(instance.properties, instance_space=instance.space)})
 
 
 T_DomainModelCore = TypeVar("T_DomainModelCore", bound=DomainModelCore)
@@ -303,12 +303,15 @@ class DomainRelationList(CoreList[T_DomainRelation]):
 T_DomainRelationList = TypeVar("T_DomainRelationList", bound=DomainRelationList)
 
 
-def unpack_properties(properties: Properties) -> Mapping[str, PropertyValue]:
+def unpack_properties(properties: Properties, instance_space: str) -> Mapping[str, PropertyValue]:
     unpacked: dict[str, PropertyValue] = {}
     for view_properties in properties.values():
         for prop_name, prop_value in view_properties.items():
             if isinstance(prop_value, dict) and "externalId" in prop_value and "space" in prop_value:
-                unpacked[prop_name] = prop_value["externalId"]
+                if instance_space == prop_value["space"]:
+                    unpacked[prop_name] = prop_value["externalId"]
+                else:
+                    unpacked[prop_name] = dm.NodeId(space=prop_value["space"], external_id=prop_value["externalId"])
             else:
                 unpacked[prop_name] = prop_value
     return unpacked

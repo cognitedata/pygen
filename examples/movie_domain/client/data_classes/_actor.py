@@ -49,7 +49,7 @@ class Actor(DomainModel):
     space: str = "IntegrationTestsImmutable"
     movies: Union[list[Movie], list[str], None] = Field(default=None, repr=False)
     nomination: Union[list[Nomination], list[str], None] = Field(default=None, repr=False)
-    person: Union[Person, str, None] = Field(None, repr=False)
+    person: Union[Person, str, dm.NodeId, None] = Field(None, repr=False)
     won_oscar: Optional[bool] = Field(None, alias="wonOscar")
 
     def as_apply(self) -> ActorApply:
@@ -88,7 +88,7 @@ class ActorApply(DomainModelApply):
     space: str = "IntegrationTestsImmutable"
     movies: Union[list[MovieApply], list[str], None] = Field(default=None, repr=False)
     nomination: Union[list[NominationApply], list[str], None] = Field(default=None, repr=False)
-    person: Union[PersonApply, str, None] = Field(None, repr=False)
+    person: Union[PersonApply, str, dm.NodeId, None] = Field(None, repr=False)
     won_oscar: Optional[bool] = Field(None, alias="wonOscar")
 
     def _to_instances_apply(

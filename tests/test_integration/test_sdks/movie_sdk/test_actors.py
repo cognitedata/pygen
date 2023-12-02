@@ -89,8 +89,10 @@ def test_actor_retrieve_missing(movie_client: MovieClient) -> None:
 
 
 def test_actor_query_direct_relation(movie_client: MovieClient):
-    actor = movie_client.actor(person="person:quentin_tarantino", limit=1).query(retrieve_person=True)
+    actors = movie_client.actor(limit=2).query(retrieve_person=True)
 
-    assert len(actor) == 1
-    assert isinstance(actor[0], m.Actor)
-    assert isinstance(actor[0].person, m.Person)
+    assert len(actors) == 2
+    for actor in actors:
+        assert isinstance(actor, m.Actor)
+        assert isinstance(actor.person, m.Person)
+        assert actor.person.external_id.split(":")[1] == actor.external_id.split(":")[1]

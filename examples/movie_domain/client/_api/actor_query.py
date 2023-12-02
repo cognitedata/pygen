@@ -78,7 +78,7 @@ class ActorQueryAPI(QueryAPI[T_DomainModelList]):
                     [
                         dm.query.SourceSelector(
                             self._view_by_write_class[MovieApply],
-                            list(_MOVIE_PROPERTIES_BY_FIELD.values()),
+                            ["*"],
                         )
                     ]
                 ),
@@ -160,19 +160,17 @@ class ActorQueryAPI(QueryAPI[T_DomainModelList]):
         """
         from_ = self._builder[-1].name
         if retrieve_actor and not self._builder[-1].name.startswith("actor"):
+            view_id = self._view_by_write_class[ActorApply]
             self._builder.append(
                 QueryStep(
                     name=self._builder.next_name("actor"),
                     expression=dm.query.NodeResultSetExpression(
-                        filter=None,
+                        filter=dm.filters.HasData(views=[view_id]),
                         from_=from_,
                     ),
                     select=dm.query.Select(
                         [
-                            dm.query.SourceSelector(
-                                self._view_by_write_class[ActorApply],
-                                ["*"],
-                            )
+                            dm.query.SourceSelector(view_id, ["*"]),
                         ]
                     ),
                     result_cls=Actor,
@@ -180,16 +178,17 @@ class ActorQueryAPI(QueryAPI[T_DomainModelList]):
                 ),
             )
         if retrieve_person:
+            view_id = self._view_by_write_class[PersonApply]
             self._builder.append(
                 QueryStep(
                     name=self._builder.next_name("person"),
                     expression=dm.query.NodeResultSetExpression(
-                        filter=None,
+                        filter=dm.filters.HasData(views=[view_id]),
                         from_=from_,
-                        through=["IntegrationTestsImmutable", "Actor/2", "person"],
+                        through=self._view_by_write_class[ActorApply].as_property_ref("person"),
                         direction="outwards",
                     ),
-                    select=dm.query.Select([dm.query.SourceSelector(self._view_by_write_class[PersonApply], ["*"])]),
+                    select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
                     max_retrieve_limit=-1,
                     result_cls=Person,
                 ),
