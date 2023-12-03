@@ -15,7 +15,7 @@ from cognite.pygen.config import PygenConfig
 from cognite.pygen.utils.helper import get_pydantic_version
 
 from . import validation
-from .models import APIClass, DataClass, EdgeDataClass, EdgeWithPropertyDataClass, MultiAPIClass, NodeDataClass
+from .models import APIClass, DataClass, EdgeDataClass, MultiAPIClass, NodeDataClass
 
 
 class SDKGenerator:
@@ -139,8 +139,8 @@ class MultiAPIGenerator:
             api.view_id: api.data_class for api in self.api_by_view.values()
         }
         for api, view in zip(self.api_by_view.values(), views):
-            if isinstance(api.data_class, EdgeWithPropertyDataClass):
-                api.data_class.update_nodes(data_class_by_view_id, views, config.naming.field)
+            # if isinstance(api.data_class, EdgeWithPropertyDataClass):
+            #     api.data_class.update_nodes(data_class_by_view_id, views, config.naming.field)
             api.data_class.update_fields(view.properties, data_class_by_view_id, config)
 
         validation.validate_data_classes_unique_name([api.data_class for api in self.api_by_view.values()])
@@ -166,8 +166,8 @@ class MultiAPIGenerator:
         for api in self.apis:
             file_name = api.api_class.file_name
             sdk[data_classes_dir / f"_{file_name}.py"] = api.generate_data_class_file(self.pydantic_version == "v2")
-            if isinstance(api.data_class, EdgeWithPropertyDataClass):
-                continue
+            # if isinstance(api.data_class, EdgeWithPropertyDataClass):
+            #     continue
             sdk[api_dir / f"{file_name}.py"] = api.generate_api_file(self.top_level_package, self.client_name)
             sdk[api_dir / f"{api.data_class.query_file_name}.py"] = api.generate_api_query_file(
                 self.top_level_package, self.client_name
@@ -250,8 +250,8 @@ class APIGenerator:
     def generate_data_class_file(self, is_pydantic_v2: bool) -> str:
         if isinstance(self.data_class, NodeDataClass):
             type_data = self._env.get_template("data_class_node.py.jinja")
-        elif isinstance(self.data_class, EdgeWithPropertyDataClass):
-            type_data = self._env.get_template("data_class_edge.py.jinja")
+        # elif isinstance(self.data_class, EdgeWithPropertyDataClass):
+        #     type_data = self._env.get_template("data_class_edge.py.jinja")
         else:
             raise ValueError(f"Unknown data class {type(self.data_class)}")
 
@@ -306,8 +306,8 @@ class APIGenerator:
                     self._config,
                 )
                 list_method = edge_class.list_method
-            elif isinstance(field.data_class, EdgeWithPropertyDataClass):
-                edge_class = field.data_class
+                # elif isinstance(field.data_class, EdgeWithPropertyDataClass):
+                #     edge_class = field.data_class
                 list_method = field.data_class.list_method
             else:
                 raise ValueError(f"Unknown data class {type(self.data_class)}")

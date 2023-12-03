@@ -5,9 +5,6 @@ import platform
 import pytest
 from cognite.client import data_modeling as dm
 
-from cognite.pygen._core.data_classes import (
-    ViewSpaceExternalId,
-)
 from cognite.pygen._core.generators import APIGenerator, MultiAPIGenerator, SDKGenerator
 from cognite.pygen._generator import CodeFormatter
 from cognite.pygen.config import PygenConfig

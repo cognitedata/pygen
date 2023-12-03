@@ -6,7 +6,7 @@ from abc import abstractmethod
 from collections import defaultdict
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass, field
-from typing import cast
+from typing import cast, overload
 
 from cognite.client.data_classes import data_modeling as dm
 
@@ -18,6 +18,17 @@ from .fields import (
     EdgeOneToEndNode,
     EdgeOneToManyNodes,
     Field,
+    PrimitiveField,
+    PrimitiveFieldCore,
+    CDFExternalField,
+    EdgeField,
+    EdgeOneToMany,
+    EdgeOneToOne,
+    PrimitiveListField,
+    EdgeOneToManyEdges,
+    EdgeToOneDataClass,
+    EdgeToMultipleDataClasses,
+    T_Field,
 )
 from .filter_method import FilterMethod, FilterParameter
 
@@ -28,7 +39,7 @@ class DataClass:
     This represents a data class. It is created from a view.
     """
 
-    view_name: str
+    # view_name: str
     read_name: str
     write_name: str
     read_list_name: str
@@ -38,18 +49,15 @@ class DataClass:
     variable: str
     variable_list: str
     file_name: str
-    query_file_name: str
-    query_class_name: str
     view_id: dm.ViewId
-    view_version: str
-    fields: list[Field] = field(default_factory=list)
-    _list_method: FilterMethod | None = None
+    fields: list[Field]
+    # _list_method: FilterMethod | None = None
 
-    @property
-    def list_method(self) -> FilterMethod:
-        if self._list_method is None:
-            raise ValueError("DataClass has not been initialized.")
-        return self._list_method
+    # @property
+    # def list_method(self) -> FilterMethod:
+    #     if self._list_method is None:
+    #         raise ValueError("DataClass has not been initialized.")
+    #     return self._list_method
 
     @classmethod
     def from_view(cls, view: dm.View, data_class: pygen_config.DataClassNaming) -> DataClass:
@@ -89,7 +97,7 @@ class DataClass:
             file_name=file_name,
             query_file_name=query_file_name,
             query_class_name=query_class_name,
-            view_id=ViewSpaceExternalId.from_(view),
+            view_id=view.as_id(),
             view_version=view.version,
         )
 
@@ -103,7 +111,7 @@ class DataClass:
     def update_fields(
         self,
         properties: dict[str, dm.MappedProperty | dm.ConnectionDefinition],
-        data_class_by_view_id: dict[ViewSpaceExternalId, DataClass],
+        data_class_by_view_id: dict[dm.ViewId, DataClass],
         config: pygen_config.PygenConfig,
     ) -> None:
         pydantic_field = self.pydantic_field
@@ -153,78 +161,32 @@ class DataClass:
     def __iter__(self) -> Iterator[Field]:
         return iter(self.fields)
 
-    @property
-    def one_to_one_edges(self) -> Iterable[EdgeOneToOne]:
-        return (field_ for field_ in self.fields if isinstance(field_, EdgeOneToOne))
+    @overload
+    def fields_of_type(self, type_: type[T_Field]) -> Iterable[T_Field]:
+        ...
 
-    @property
-    def one_to_many_edges(self) -> Iterable[EdgeOneToMany]:
-        return (field_ for field_ in self.fields if isinstance(field_, EdgeOneToMany))
+    @overload
+    def fields_of_type(self, type_: tuple[type[Field], ...]) -> Iterable[tuple[type[Field], ...]]:
+        ...
 
-    @property
-    def primitive_fields(self) -> Iterable[PrimitiveField]:
-        return (field_ for field_ in self.fields if isinstance(field_, PrimitiveField))
+    def fields_of_type(
+        self, type_: type[T_Field] | tuple[type[Field], ...]
+    ) -> Iterable[T_Field] | Iterable[tuple[type[Field], ...]]:
+        return (field_ for field_ in self if isinstance(field_, type_))
 
-    @property
-    def primitive_core_fields(self) -> Iterable[PrimitiveFieldCore]:
-        return (field_ for field_ in self.fields if isinstance(field_, PrimitiveFieldCore))
+    def has_field_of_type(self, type_: type[Field] | tuple[type[Field], ...]) -> bool:
+        return any(isinstance(field_, type_) for field_ in self)
 
-    @property
-    def property_fields(self) -> Iterable[PrimitiveFieldCore | EdgeOneToOne]:
-        return (field_ for field_ in self if isinstance(field_, (PrimitiveFieldCore, EdgeOneToOne)))
+    def is_all_fields_of_type(self, type_: type[Field] | tuple[type[Field], ...]) -> bool:
+        return all(isinstance(field_, type_) for field_ in self)
 
     @property
     def text_fields(self) -> Iterable[PrimitiveFieldCore]:
         return (field_ for field_ in self.primitive_core_fields if field_.is_text_field)
 
     @property
-    def cdf_external_fields(self) -> Iterable[CDFExternalField]:
-        return (field_ for field_ in self.fields if isinstance(field_, CDFExternalField))
-
-    @property
     def single_timeseries_fields(self) -> Iterable[CDFExternalField]:
-        return (field_ for field_ in self.cdf_external_fields if isinstance(field_.prop.type, dm.TimeSeriesReference))
-
-    @property
-    def property_edges(self) -> Iterable[EdgeOneToMany]:
-        return (field_ for field_ in self.fields if isinstance(field_, EdgeOneToMany) and field_.is_property_edge)
-
-    @property
-    def has_one_to_many_edges(self) -> bool:
-        return any(isinstance(field_, EdgeOneToMany) for field_ in self.fields)
-
-    @property
-    def has_edges(self) -> bool:
-        return any(isinstance(field_, EdgeField) for field_ in self.fields)
-
-    @property
-    def has_edge_with_property(self) -> bool:
-        return any(isinstance(field_, EdgeOneToMany) and field_.is_property_edge for field_ in self.fields)
-
-    @property
-    def all_one_to_many_is_property_edges(self) -> bool:
-        return all(field_.is_property_edge for field_ in self.one_to_many_edges)
-
-    @property
-    def has_time_field_on_property_edge(self) -> bool:
-        return any(field_.is_time_field for edge in self.property_edges for field_ in edge.data_class.fields)
-
-    @property
-    def has_primitive_fields(self) -> bool:
-        return any(isinstance(field_, PrimitiveFieldCore) for field_ in self.fields)
-
-    @property
-    def has_only_one_to_many_edges(self) -> bool:
-        return all(isinstance(field_, EdgeOneToMany) for field_ in self.fields)
-
-    @property
-    def fields_by_container(self) -> dict[dm.ContainerId, list[PrimitiveFieldCore | EdgeOneToOne]]:
-        # Todo This should be deleted
-        result: dict[dm.ContainerId, list[PrimitiveFieldCore | EdgeOneToOne]] = defaultdict(list)
-        for field_ in self:
-            if isinstance(field_, (PrimitiveFieldCore, EdgeOneToOne)):
-                result[field_.prop.container].append(field_)
-        return dict(result)
+        return (field_ for field_ in self.cdf_external_fields if isinstance(field_.type_, dm.TimeSeriesReference))
 
     @property
     def has_time_field(self) -> bool:
@@ -249,7 +211,7 @@ class DataClass:
 
     @property
     def dependencies(self) -> list[DataClass]:
-        unique: dict[ViewSpaceExternalId, DataClass] = {}
+        unique: dict[dm.ViewId, DataClass] = {}
         for field_ in self.fields:
             if isinstance(field_, EdgeField):
                 # This will overwrite any existing data class with the same view id
@@ -257,9 +219,9 @@ class DataClass:
                 unique[field_.data_class.view_id] = field_.data_class
         return sorted(unique.values(), key=lambda x: x.write_name)
 
-    @property
-    def dependencies_edges(self) -> list[EdgeWithPropertyDataClass]:
-        return [data_class for data_class in self.dependencies if isinstance(data_class, EdgeWithPropertyDataClass)]
+    # @property
+    # def dependencies_edges(self) -> list[EdgeWithPropertyDataClass]:
+    #     return [data_class for data_class in self.dependencies if isinstance(data_class, EdgeWithPropertyDataClass)]
 
     @property
     def has_single_timeseries_fields(self) -> bool:
@@ -278,13 +240,13 @@ class DataClass:
     def text_fields_literals(self) -> str:
         return ", ".join(f'"{field_.name}"' for field_ in self.text_fields)
 
-    @property
-    def one_to_many_edges_docs(self) -> str:
-        edges = list(self.one_to_many_edges)
-        if len(edges) == 1:
-            return f"`{edges[0].name}`"
-        else:
-            return ", ".join(f"`{field_.name}`" for field_ in edges[:-1]) + f" or `{edges[-1].name}`"
+    # @property
+    # def one_to_many_edges_docs(self) -> str:
+    #     edges = list(self.one_to_many_edges)
+    #     if len(edges) == 1:
+    #         return f"`{edges[0].name}`"
+    #     else:
+    #         return ", ".join(f"`{field_.name}`" for field_ in edges[:-1]) + f" or `{edges[-1].name}`"
 
     @property
     def fields_literals(self) -> str:
@@ -295,9 +257,8 @@ class DataClass:
         return f"_create_{self.variable}_filter"
 
     @property
-    @abstractmethod
     def is_edge_class(self) -> bool:
-        raise NotImplementedError()
+        return False
 
 
 @dataclass
@@ -309,16 +270,15 @@ class NodeDataClass(DataClass):
         else:
             return "import pydantic"
 
-    @property
-    def is_edge_class(self) -> bool:
-        return False
-
 
 @dataclass
 class EdgeDataClass(DataClass):
     _start_class: NodeDataClass | None = None
     _end_class: NodeDataClass | None = None
     _edge_type: dm.DirectRelationReference | None = None
+
+    def is_edge_class(self) -> bool:
+        return True
 
     @property
     def start_class(self) -> NodeDataClass:
@@ -393,117 +353,117 @@ class EdgeDataClass(DataClass):
             )
 
 
-@dataclass
-class EdgeWithPropertyDataClass(DataClass):
-    _start_class: NodeDataClass | None = None
-    _end_class: NodeDataClass | None = None
-    _edge_type: dm.DirectRelationReference | None = None
-
-    @property
-    def is_edge_class(self) -> bool:
-        return True
-
-    @property
-    def start_class(self) -> NodeDataClass:
-        if self._start_class is None:
-            raise ValueError("EdgeDataClass has not been initialized.")
-        return self._start_class
-
-    @property
-    def end_class(self) -> NodeDataClass:
-        if self._end_class is None:
-            raise ValueError("EdgeDataClass has not been initialized.")
-        return self._end_class
-
-    @property
-    def edge_type(self) -> dm.DirectRelationReference:
-        if self._edge_type is None:
-            raise ValueError("EdgeDataClass has not been initialized.")
-        return self._edge_type
-
-    def update_nodes(
-        self,
-        data_class_by_view_id: dict[dm.ViewId, DataClass],
-        views: Iterable[dm.View],
-        field_naming: pygen_config.FieldNaming,
-    ):
-        source_view, source_property, prop_name = self._find_source_view_and_property(views)
-        self._start_class = cast(NodeDataClass, data_class_by_view_id[source_view.as_id()])
-        self._end_class = cast(NodeDataClass, data_class_by_view_id[source_property.source])
-        self._edge_type = source_property.type
-
-        end_class = self._end_class
-        # Todo avoid repeating the code below here and the load method
-        name = create_name(end_class.view_name, field_naming.name)
-        view_id = dm.ViewId(end_class.view_id.space, end_class.view_id.external_id, end_class.view_version)
-        if is_reserved_word(name, "field", view_id, end_class.view_name):
-            name = f"{name}_"
-
-        doc_name = to_words(name, singularize=True)
-
-        variable = create_name(end_class.view_name, field_naming.variable)
-
-        edge_api_class_input = f"{self.view_name}_{end_class.view_name}"
-        edge_api_class = f"{create_name(edge_api_class_input, field_naming.edge_api_class)}API"
-        edge_api_attribute = f"{create_name(end_class.view_name, field_naming.api_class_attribute)}_edge"
-
-        self.fields.append(
-            EdgeOneToEndNode(
-                name=name,
-                doc_name=doc_name,
-                prop_name=name,
-                pydantic_field=self.pydantic_field,
-                data_class=self.end_class,
-                prop=source_property,
-                variable=variable,
-                edge_api_class=edge_api_class,
-                edge_api_attribute=edge_api_attribute,
-            )
-        )
-
-    def _find_source_view_and_property(
-        self, views: Iterable[dm.View]
-    ) -> tuple[dm.View, dm.SingleHopConnectionDefinition, str]:
-        for view in views:
-            for prop_name, prop in view.properties.items():
-                if (
-                    isinstance(prop, dm.SingleHopConnectionDefinition)
-                    and prop.edge_source
-                    and prop.edge_source.space == self.view_id.space
-                    and prop.edge_source.external_id == self.view_id.external_id
-                ):
-                    return view, prop, prop_name
-        raise ValueError("Could not find source view and property")
-
-    @property
-    def import_pydantic_field(self) -> str:
-        if self.pydantic_field == "Field":
-            return "from pydantic import Field"
-        else:
-            return "import pydantic"
-
-    def node_parameters(self, instance_space: str) -> Iterable[FilterParameter]:
-        nodes = [
-            (self.start_class, "source", self.start_class.variable),
-            (self.end_class, "target", self.end_class.variable),
-        ]
-        if self.start_class.variable == self.end_class.variable:
-            nodes = [
-                (self.start_class, "source", f"from_{self.start_class.variable}"),
-                (self.end_class, "target", f"to_{self.end_class.variable}"),
-            ]
-
-        for class_, location, name in nodes:
-            yield FilterParameter(
-                name=name,
-                type_="str | list[str] | dm.NodeId | list[dm.NodeId]",
-                description=f"ID of the {location} { class_.doc_list_name}.",
-                default=None,
-            )
-            yield FilterParameter(
-                name=f"{name}_space",
-                type_="str",
-                description=f"Location of the {class_.doc_list_name}.",
-                default=f'"{instance_space}"',
-                is_nullable=False,
-            )
+# @dataclass
+# class EdgeWithPropertyDataClass(DataClass):
+#     _start_class: NodeDataClass | None = None
+#     _end_class: NodeDataClass | None = None
+#     _edge_type: dm.DirectRelationReference | None = None
+#
+#     @property
+#     def is_edge_class(self) -> bool:
+#         return True
+#
+#     @property
+#     def start_class(self) -> NodeDataClass:
+#         if self._start_class is None:
+#             raise ValueError("EdgeDataClass has not been initialized.")
+#         return self._start_class
+#
+#     @property
+#     def end_class(self) -> NodeDataClass:
+#         if self._end_class is None:
+#             raise ValueError("EdgeDataClass has not been initialized.")
+#         return self._end_class
+#
+#     @property
+#     def edge_type(self) -> dm.DirectRelationReference:
+#         if self._edge_type is None:
+#             raise ValueError("EdgeDataClass has not been initialized.")
+#         return self._edge_type
+#
+#     def update_nodes(
+#         self,
+#         data_class_by_view_id: dict[dm.ViewId, DataClass],
+#         views: Iterable[dm.View],
+#         field_naming: pygen_config.FieldNaming,
+#     ):
+#         source_view, source_property, prop_name = self._find_source_view_and_property(views)
+#         self._start_class = cast(NodeDataClass, data_class_by_view_id[source_view.as_id()])
+#         self._end_class = cast(NodeDataClass, data_class_by_view_id[source_property.source])
+#         self._edge_type = source_property.type
+#
+#         end_class = self._end_class
+#         # Todo avoid repeating the code below here and the load method
+#         name = create_name(end_class.view_name, field_naming.name)
+#         view_id = dm.ViewId(end_class.view_id.space, end_class.view_id.external_id, end_class.view_version)
+#         if is_reserved_word(name, "field", view_id, end_class.view_name):
+#             name = f"{name}_"
+#
+#         doc_name = to_words(name, singularize=True)
+#
+#         variable = create_name(end_class.view_name, field_naming.variable)
+#
+#         edge_api_class_input = f"{self.view_name}_{end_class.view_name}"
+#         edge_api_class = f"{create_name(edge_api_class_input, field_naming.edge_api_class)}API"
+#         edge_api_attribute = f"{create_name(end_class.view_name, field_naming.api_class_attribute)}_edge"
+#
+#         self.fields.append(
+#             EdgeOneToEndNode(
+#                 name=name,
+#                 doc_name=doc_name,
+#                 prop_name=name,
+#                 pydantic_field=self.pydantic_field,
+#                 data_class=self.end_class,
+#                 prop=source_property,
+#                 variable=variable,
+#                 edge_api_class=edge_api_class,
+#                 edge_api_attribute=edge_api_attribute,
+#             )
+#         )
+#
+#     def _find_source_view_and_property(
+#         self, views: Iterable[dm.View]
+#     ) -> tuple[dm.View, dm.SingleHopConnectionDefinition, str]:
+#         for view in views:
+#             for prop_name, prop in view.properties.items():
+#                 if (
+#                     isinstance(prop, dm.SingleHopConnectionDefinition)
+#                     and prop.edge_source
+#                     and prop.edge_source.space == self.view_id.space
+#                     and prop.edge_source.external_id == self.view_id.external_id
+#                 ):
+#                     return view, prop, prop_name
+#         raise ValueError("Could not find source view and property")
+#
+#     @property
+#     def import_pydantic_field(self) -> str:
+#         if self.pydantic_field == "Field":
+#             return "from pydantic import Field"
+#         else:
+#             return "import pydantic"
+#
+#     def node_parameters(self, instance_space: str) -> Iterable[FilterParameter]:
+#         nodes = [
+#             (self.start_class, "source", self.start_class.variable),
+#             (self.end_class, "target", self.end_class.variable),
+#         ]
+#         if self.start_class.variable == self.end_class.variable:
+#             nodes = [
+#                 (self.start_class, "source", f"from_{self.start_class.variable}"),
+#                 (self.end_class, "target", f"to_{self.end_class.variable}"),
+#             ]
+#
+#         for class_, location, name in nodes:
+#             yield FilterParameter(
+#                 name=name,
+#                 type_="str | list[str] | dm.NodeId | list[dm.NodeId]",
+#                 description=f"ID of the {location} { class_.doc_list_name}.",
+#                 default=None,
+#             )
+#             yield FilterParameter(
+#                 name=f"{name}_space",
+#                 type_="str",
+#                 description=f"Location of the {class_.doc_list_name}.",
+#                 default=f'"{instance_space}"',
+#                 is_nullable=False,
+#             )

@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, TypeVar
 
 from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.data_modeling.data_types import ListablePropertyType
@@ -20,6 +20,23 @@ if TYPE_CHECKING:
 
 _PRIMITIVE_TYPES = (dm.Text, dm.Boolean, dm.Float32, dm.Float64, dm.Int32, dm.Int64, dm.Timestamp, dm.Date, dm.Json)
 _EXTERNAL_TYPES = (dm.TimeSeriesReference, dm.FileReference, dm.SequenceReference)
+
+__all__ = [
+    "Field",
+    "PrimitiveFieldCore",
+    "PrimitiveField",
+    "PrimitiveListField",
+    "CDFExternalField",
+    "EdgeField",
+    "EdgeOneToManyEdges",
+    "EdgeOneToManyNodes",
+    "EdgeToOneDataClass",
+    "EdgeToMultipleDataClasses",
+    "EdgeOneToOne",
+    "EdgeOneToMany",
+    "EdgeOneToEndNode",
+    "T_Field",
+]
 
 
 @dataclass(frozen=True)
@@ -218,6 +235,9 @@ class Field(ABC):
     @property
     def is_text_field(self) -> bool:
         return False
+
+
+T_Field = TypeVar("T_Field", bound=Field)
 
 
 @dataclass(frozen=True)

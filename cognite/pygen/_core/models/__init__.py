@@ -1,5 +1,5 @@
 from .api_casses import APIClass, MultiAPIClass
-from .data_classes import EdgeDataClass, EdgeWithPropertyDataClass, NodeDataClass
+from .data_classes import EdgeDataClass, NodeDataClass, DataClass
 from .fields import (
     CDFExternalField,
     EdgeField,
@@ -14,10 +14,10 @@ from .fields import (
 from .filter_method import FilterCondition, FilterConditionOnetoOneEdge, FilterMethod, FilterParameter
 
 __all__ = [
+    "DataClass",
     "APIClass",
     "MultiAPIClass",
     "NodeDataClass",
-    "EdgeWithPropertyDataClass",
     "EdgeDataClass",
     "Field",
     "PrimitiveFieldCore",

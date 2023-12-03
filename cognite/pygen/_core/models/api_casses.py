@@ -1,5 +1,5 @@
 from __future__ import annotations
-
+from typing import TYPE_CHECKING
 from dataclasses import dataclass
 
 from cognite.client.data_classes import data_modeling as dm
@@ -7,7 +7,8 @@ from cognite.client.data_classes import data_modeling as dm
 from cognite.pygen import config as pygen_config
 from cognite.pygen.utils.text import create_name
 
-from . import DataClass
+if TYPE_CHECKING:
+    from . import DataClass
 
 
 @dataclass(frozen=True)
@@ -39,6 +40,12 @@ class EdgeAPIClass:
     edge_api_file_name: str
     edge_api_class: str
     edge_api_attribute: str
+
+
+@dataclass(frozen=True)
+class QueryAPIClass:
+    file_name: str
+    class_name: str
 
 
 @dataclass(frozen=True)

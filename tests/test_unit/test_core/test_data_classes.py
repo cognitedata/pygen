@@ -8,12 +8,17 @@ import pytest
 from cognite.client import data_modeling as dm
 from yaml import safe_load
 
-from cognite.pygen._core.data_classes import (
-    ViewSpaceExternalId,
+
+from cognite.pygen._core.models import (
+    NodeDataClass,
+    Field,
+    PrimitiveField,
+    PrimitiveFieldCore,
+    EdgeOneToOne,
+    FilterParameter,
+    FilterCondition,
+    PrimitiveListField,
 )
-from cognite.pygen._core.data_class.data_class import NodeDataClass
-from cognite.pygen._core.data_class.fields import Field, PrimitiveField, PrimitiveListField, EdgeOneToOne
-from cognite.pygen._core.data_class.filter_method import FilterParameter, FilterCondition
 from cognite.pygen.config import PygenConfig
 from cognite.pygen.warnings import (
     ParameterNameCollisionWarning,
@@ -47,9 +52,8 @@ def load_field_test_cases():
             name="run_events",
             prop_name="runEvents",
             pydantic_field="Field",
-            type_="str",
+            type_=dm.Text(),
             is_nullable=True,
-            prop=mapped,
             doc_name="run event",
         ),
         {},
@@ -116,7 +120,6 @@ def load_field_test_cases():
             pydantic_field="Field",
             type_="str",
             is_nullable=True,
-            prop=mapped,
             default=None,
             doc_name="name",
         ),
