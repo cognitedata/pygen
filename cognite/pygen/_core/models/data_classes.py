@@ -43,7 +43,7 @@ class DataClass:
     fields: list[Field]
 
     @staticmethod
-    def to_view_name(view: dm.View) -> str:
+    def to_base_name(view: dm.View) -> str:
         return (view.name or view.external_id).replace(" ", "_")
 
     @classmethod

@@ -140,7 +140,9 @@ class FilterMethod:
                     if selected_filter is dm.filters.Equals:
                         if field_.name not in parameters_by_name:
                             parameter = FilterParameter(
-                                name=field_.name, type_=field_.type_, description=f"The {field_.doc_name} to filter on."
+                                name=field_.name,
+                                type_=field_.type_as_string,
+                                description=f"The {field_.doc_name} to filter on.",
                             )
                             parameters_by_name[parameter.name] = parameter
                         else:
@@ -178,7 +180,7 @@ class FilterMethod:
                     elif selected_filter is dm.filters.Prefix:
                         parameter = FilterParameter(
                             name=f"{field_.name}_prefix" if field_.name[-1] != "_" else f"{field_.name}prefix",
-                            type_=field_.type_,
+                            type_=field_.type_as_string,
                             description=f"The prefix of the {field_.doc_name} to filter on.",
                         )
                         parameters_by_name[parameter.name] = parameter
@@ -193,12 +195,12 @@ class FilterMethod:
                     elif selected_filter is dm.filters.Range:
                         min_parameter = FilterParameter(
                             name=f"min_{field_.name}",
-                            type_=field_.type_,
+                            type_=field_.type_as_string,
                             description=f"The minimum value of the {field_.doc_name} to filter on.",
                         )
                         max_parameter = FilterParameter(
                             name=f"max_{field_.name}",
-                            type_=field_.type_,
+                            type_=field_.type_as_string,
                             description=f"The maximum value of the {field_.doc_name} to filter on.",
                         )
                         parameters_by_name[min_parameter.name] = min_parameter
@@ -215,7 +217,7 @@ class FilterMethod:
                         # This is a filter not supported by the list method.
                         continue
             elif isinstance(field_, EdgeOneToOne):
-                for selected_filter in config.get(field_.type_, field_.prop_name):
+                for selected_filter in config.get(dm.DirectRelation(), field_.prop_name):
                     if selected_filter is dm.filters.Equals:
                         if field_.name not in parameters_by_name:
                             parameter = FilterParameter(

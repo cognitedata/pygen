@@ -17,7 +17,7 @@ from cognite.pygen.config import PygenConfig
 from cognite.pygen.utils.helper import get_pydantic_version
 
 from . import validation
-from .models import APIClass, DataClass, EdgeDataClass, MultiAPIClass, NodeDataClass
+from .models import APIClass, DataClass, EdgeDataClass, FilterMethod, MultiAPIClass, NodeDataClass
 
 
 class SDKGenerator:
@@ -72,7 +72,10 @@ class SDKGenerator:
         self._multi_api_classes = [
             MultiAPIClass.from_data_model(
                 model,
-                {(view_id := view.as_id()): self._multi_api_generator.api_by_view_id[view_id] for view in model.views},
+                {
+                    (view_id := view.as_id()): self._multi_api_generator.api_by_view_id[view_id].api_class
+                    for view in model.views
+                },
                 config.naming.multi_api_class,
             )
             for model in data_model
@@ -136,32 +139,34 @@ class MultiAPIGenerator:
 
         for api in self.api_by_view_id.values():
             # if isinstance(api.data_class, EdgeWithPropertyDataClass):
-            # api.data_class.update_nodes(data_class_by_view_id, views, config.naming.field)
             api.data_class.update_fields(api.view.properties, data_class_by_view_id, config)
+
+    def __getitem__(self, view_id: dm.ViewId) -> APIGenerator:
+        return self.api_by_view_id[view_id]
 
     @classmethod
     def create_api_by_view_id(cls, views: list[dm.View], default_instance_space: str, config: PygenConfig):
-        def dependent_view_names(prop: dm.SingleHopConnectionDefinition | dm.MappedProperty) -> set[str]:
+        def dependent_base_names(prop: dm.SingleHopConnectionDefinition | dm.MappedProperty) -> set[str]:
             if isinstance(prop, dm.SingleHopConnectionDefinition):
-                return {DataClass.to_view_name(view_by_id[prop.edge_source or prop.source])}
+                return {DataClass.to_base_name(view_by_id[prop.edge_source or prop.source])}
             elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation) and prop.source:
-                return {DataClass.to_view_name(view_by_id[prop.source])}
+                return {DataClass.to_base_name(view_by_id[prop.source])}
             else:
-                set()
+                return set()
 
         view_by_id = {view.as_id(): view for view in views}
         api_by_view_id: dict[dm.ViewId, APIGenerator] = {}
-        dependencies_by_view_name: dict[str, set[str]] = defaultdict(set)
-        identical_view_names = set()
-        views_by_name: dict[str, list[dm.View]] = {}
-        for view_name, view_group in itertools.groupby(
-            sorted(((DataClass.to_view_name(view), view) for view in views), key=lambda pair: pair[0]),
+        dependencies_by_base_name: dict[str, set[str]] = defaultdict(set)
+        identical_base_names = set()
+        views_by_base_name: dict[str, list[dm.View]] = {}
+        for base_name, view_group in itertools.groupby(
+            sorted(((DataClass.to_base_name(view), view) for view in views), key=lambda pair: pair[0]),
             key=lambda pair: pair[0],
         ):
             view_set = [pair[1] for pair in view_group]
             if len(view_set) == 1 or len({view.as_id() for view in view_set}) == 1:
                 view = view_set[0]
-                api_by_view_id[view.as_id()] = APIGenerator(view, default_instance_space, config, view_name)
+                api_by_view_id[view.as_id()] = APIGenerator(view, default_instance_space, config, base_name)
                 continue
 
             # We have multiple views with the same name, so we need to check if they can share API.
@@ -169,18 +174,18 @@ class MultiAPIGenerator:
             for view in view_set:
                 independent_properties = {}
                 for prop in view.properties.values():
-                    dependency = dependent_view_names(prop)
+                    dependency = dependent_base_names(prop)
                     if dependency:
-                        dependencies_by_view_name[view_name].update(dependency)
+                        dependencies_by_base_name[base_name].update(dependency)
                     else:
                         independent_properties[prop.name] = prop.dump()
                 properties_set.add(json.dumps(independent_properties, sort_keys=True))
 
-            if len(properties_set) == 1 and len(dependencies_by_view_name[view_name]) == 0:
-                identical_view_names.add(view_name)
+            if len(properties_set) == 1 and len(dependencies_by_base_name[base_name]) == 0:
+                identical_base_names.add(base_name)
                 view = max(view_set, key=lambda v: v.created_time)
                 # All properties are the same, so we can share the API for these views.
-                api = APIGenerator(view, default_instance_space, config, view_name)
+                api = APIGenerator(view, default_instance_space, config, base_name)
                 for view in view_set:
                     api_by_view_id[view.as_id()] = api
                 continue
@@ -192,39 +197,39 @@ class MultiAPIGenerator:
                     if len(spaces) > 1:
                         space_suffix = f"_{view.space}"
                     api_by_view_id[view.as_id()] = APIGenerator(
-                        view, default_instance_space, config, f"{view_name}{view.version}{space_suffix}"
+                        view, default_instance_space, config, f"{base_name}{view.version}{space_suffix}"
                     )
                 continue
             else:
                 # The properties are the same, but there are dependencies, so we need to process all views before
                 # we can determine if we can share the API.
-                views_by_name[view_name] = view_set
+                views_by_base_name[base_name] = view_set
                 continue
 
-        if views_by_name:
+        if views_by_base_name:
             # We have views with the same name, but with dependencies, so we need to process them again.
             while True:
-                last_len = len(views_by_name)
-                for view_name in list(views_by_name):
-                    if all(d in identical_view_names for d in dependencies_by_view_name[view_name]):
-                        view_set = views_by_name.pop(view_name)
+                last_len = len(views_by_base_name)
+                for base_name in list(views_by_base_name):
+                    if all(d in identical_base_names for d in dependencies_by_base_name[base_name]):
+                        view_set = views_by_base_name.pop(base_name)
                         view = max(view_set, key=lambda v: v.created_time)
-                        api = APIGenerator(view, default_instance_space, config, view_name)
+                        api = APIGenerator(view, default_instance_space, config, base_name)
                         for view in view_set:
                             api_by_view_id[view.as_id()] = api
-                        views_by_name.pop(view_name, None)
-                        identical_view_names.add(view_name)
-                if len(views_by_name) == last_len:
+                        views_by_base_name.pop(base_name, None)
+                        identical_base_names.add(base_name)
+                if len(views_by_base_name) == last_len:
                     break
             # Todo Handle circular dependencies.
-            for view_name, view_set in views_by_name.items():
+            for base_name, view_set in views_by_base_name.items():
                 spaces = {view.space for view in view_set}
                 for view in view_set:
                     space_suffix = ""
                     if len(spaces) > 1:
                         space_suffix = f"_{view.space}"
                     api_by_view_id[view.as_id()] = APIGenerator(
-                        view, default_instance_space, config, f"{view_name}{view.version}{space_suffix}"
+                        view, default_instance_space, config, f"{base_name}{view.version}{space_suffix}"
                     )
 
         return api_by_view_id
@@ -247,7 +252,6 @@ class MultiAPIGenerator:
             file_name = api.api_class.file_name
             sdk[data_classes_dir / f"_{file_name}.py"] = api.generate_data_class_file(self.pydantic_version == "v2")
             # if isinstance(api.data_class, EdgeWithPropertyDataClass):
-            #     continue
             sdk[api_dir / f"{file_name}.py"] = api.generate_api_file(self.top_level_package, self.client_name)
             sdk[api_dir / f"{api.data_class.query_file_name}.py"] = api.generate_api_query_file(
                 self.top_level_package, self.client_name
@@ -317,14 +321,15 @@ class MultiAPIGenerator:
 
 
 class APIGenerator:
-    def __init__(self, view: dm.View, default_instance_space: str, config: PygenConfig, view_name: str | None = None):
+    def __init__(self, view: dm.View, default_instance_space: str, config: PygenConfig, base_name: str | None = None):
         self._env = Environment(
             loader=PackageLoader("cognite.pygen._core", "templates"), autoescape=select_autoescape()
         )
         self.view = view
+        base_name = base_name or DataClass.to_base_name(view)
         self.default_instance_space = default_instance_space
-        self.data_class = DataClass.from_view(view, view_name, config.naming.data_class)
-        self.api_class = APIClass.from_view(view, config.naming.api_class, self.data_class)
+        self.data_class = DataClass.from_view(view, base_name, config.naming.data_class)
+        self.api_class = APIClass.from_view(view, base_name, config.naming.api_class, self.data_class)
         self._config = config
 
     @property
@@ -334,8 +339,6 @@ class APIGenerator:
     def generate_data_class_file(self, is_pydantic_v2: bool) -> str:
         if isinstance(self.data_class, NodeDataClass):
             type_data = self._env.get_template("data_class_node.py.jinja")
-        # elif isinstance(self.data_class, EdgeWithPropertyDataClass):
-        #     type_data = self._env.get_template("data_class_edge.py.jinja")
         else:
             raise ValueError(f"Unknown data class {type(self.data_class)}")
 
@@ -358,7 +361,7 @@ class APIGenerator:
                 client_name=client_name,
                 api_class=self.api_class,
                 data_class=self.data_class,
-                list_method=self.data_class.list_method,
+                list_method=FilterMethod.from_fields(self.data_class.fields, self._config.filtering),
                 default_instance_space=self.default_instance_space,
             )
             + "\n"
@@ -390,8 +393,6 @@ class APIGenerator:
                     self._config,
                 )
                 list_method = edge_class.list_method
-                # elif isinstance(field.data_class, EdgeWithPropertyDataClass):
-                #     edge_class = field.data_class
                 list_method = field.data_class.list_method
             else:
                 raise ValueError(f"Unknown data class {type(self.data_class)}")

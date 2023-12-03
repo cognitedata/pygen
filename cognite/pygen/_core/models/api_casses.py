@@ -21,14 +21,13 @@ class APIClass:
     data_class: DataClass
 
     @classmethod
-    def from_view(cls, view: dm.View, api_class: pygen_config.APIClassNaming, data_class: DataClass) -> APIClass:
-        raw_name = view.name or view.external_id
-
-        raw_name = raw_name.replace(" ", "_")
-        file_name = create_name(raw_name, api_class.file_name)
-        class_name = create_name(raw_name, api_class.name)
+    def from_view(
+        cls, view: dm.View, view_name: str, api_class: pygen_config.APIClassNaming, data_class: DataClass
+    ) -> APIClass:
+        file_name = create_name(view_name, api_class.file_name)
+        class_name = create_name(view_name, api_class.name)
         return cls(
-            client_attribute=create_name(raw_name, api_class.client_attribute),
+            client_attribute=create_name(view_name, api_class.client_attribute),
             name=f"{class_name}API",
             file_name=file_name,
             view_id=view.as_id(),
@@ -73,10 +72,7 @@ class MultiAPIClass:
         api_class_by_view_id: dict[dm.ViewId, APIClass],
         multi_api_class: pygen_config.MultiAPIClassNaming,
     ) -> MultiAPIClass:
-        sub_apis = sorted(
-            [api_class_by_view_id[view.as_id()] for view in data_model.views],
-            key=lambda api: api.name,
-        )
+        sub_apis = sorted([api_class_by_view_id[view.as_id()] for view in data_model.views], key=lambda api: api.name)
 
         data_model_name = data_model.name or data_model.external_id
 
