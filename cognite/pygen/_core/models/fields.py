@@ -220,7 +220,7 @@ class PrimitiveFieldCore(Field, ABC):
 
     @property
     def is_timestamp(self) -> bool:
-        return isinstance(self.type_, dm.Date)
+        return isinstance(self.type_, dm.Timestamp)
 
     @property
     def is_text_field(self) -> bool:

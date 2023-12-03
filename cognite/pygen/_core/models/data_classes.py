@@ -209,7 +209,9 @@ class DataClass:
 
     @property
     def text_fields_literals(self) -> str:
-        return ", ".join(f'"{field_.name}"' for field_ in self.primitive_fields_of_type(dm.Text))
+        return ", ".join(
+            f'"{field_.name}"' for field_ in self.primitive_fields_of_type((dm.Text, dm.CDFExternalIdReference))
+        )
 
     @property
     def fields_literals(self) -> str:

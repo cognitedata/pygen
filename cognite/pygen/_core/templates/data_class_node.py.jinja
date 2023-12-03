@@ -1,7 +1,7 @@
 from __future__ import annotations
 {% if data_class.has_primitive_fields_of_type((dm.Timestamp, dm.Date)) %}
 import datetime{% endif %}
-{% if data_class.has_field_of_type(field_types.EdgeField) %}from typing import TYPE_CHECKING, Literal, Optional, Union{% else %}from typing import Literal, Optional{% if data_class.primitive_fields_of_type(dm.TimeSeries) %}, Union{% endif %}{% endif %}{% if not data_class.use_optional_type %}  # noqa: F401{% endif %}
+{% if data_class.has_field_of_type(ft.EdgeField) %}from typing import TYPE_CHECKING, Literal, Optional, Union{% else %}from typing import Literal, Optional{% if data_class.has_primitive_fields_of_type(dm.TimeSeriesReference) %}, Union{% endif %}{% endif %}{% if not data_class.use_optional_type %}  # noqa: F401{% endif %}
 
 from cognite.client import data_modeling as dm{% if data_class.has_primitive_fields_of_type(dm.TimeSeriesReference) %}
 from cognite.client.data_classes import TimeSeries{% if is_pydantic_v2 %} as CogniteTimeSeries{% endif %}{% endif %}{% if data_class.use_pydantic_field %}
@@ -17,18 +17,18 @@ from ._core import (
     ResourcesApply,{% if data_class.has_primitive_fields_of_type(dm.TimeSeriesReference) and is_pydantic_v2 %}
     TimeSeries,{% endif %}
 )
-{% if data_class.has_field_of_type(field_types.EdgeField) %}
+{% if data_class.has_field_of_type(ft.EdgeField) %}
 if TYPE_CHECKING:{% for dependency_class in data_class.dependencies %}
     from .{{ dependency_class.file_name }} import {{ dependency_class.read_name }}, {{ dependency_class.write_name }}{% endfor %}
 {% endif %}
 
-__all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data_class.read_list_name }}", "{{ data_class.write_list_name }}"{% if data_class.has_primitive_fields %}, "{{ data_class.field_names }}"{% endif %}{% if data_class.has_text_field %}, "{{ data_class.text_field_names }}"{% endif %}]
-{% if data_class.has_primitive_fields_of_type(dm.Text) %}
+__all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data_class.read_list_name }}", "{{ data_class.write_list_name }}"{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}, "{{ data_class.field_names }}"{% endif %}{% if data_class.has_primitive_fields_of_type((dm.Text, dm.CDFExternalIdReference)) %}, "{{ data_class.text_field_names }}"{% endif %}]
+{% if data_class.has_primitive_fields_of_type((dm.Text, dm.CDFExternalIdReference)) %}
 
 {{ data_class.text_field_names }} = Literal[{{ data_class.text_fields_literals }}]
-{% endif %}{% if data_class.has_primitive_fields %}{{ data_class.field_names }} = Literal[{{ data_class.fields_literals }}]
+{% endif %}{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}{{ data_class.field_names }} = Literal[{{ data_class.fields_literals }}]
 
-{{ data_class.properties_dict_name }} = {% raw %}{{% endraw %}{% for field in data_class.field_of_type(field_types.PrimitiveFieldCore) %}
+{{ data_class.properties_dict_name }} = {% raw %}{{% endraw %}{% for field in data_class.fields_of_type(ft.PrimitiveFieldCore) %}
     "{{ field.name }}": "{{ field.prop_name }}",{% endfor %}
 {% raw %}}{% endraw %}{% endif %}
 
@@ -90,8 +90,8 @@ class {{ data_class.write_name }}(DomainModelApply):
         write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
             "{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}"
         )
-{% if not data_class.is_all_fields_of_type(field_types.EdgeOneToMany) %}
-        properties = {}{% for field in data_class.property_fields %}
+{% if not data_class.is_all_fields_of_type(ft.EdgeOneToMany) %}
+        properties = {}{% for field in data_class.fields_of_type((ft.PrimitiveFieldCore, ft.EdgeOneToOne)) %}
         if self.{{ field.name }} is not None:
             properties["{{ field.prop_name }}"] = {% if field.is_edge %}{
                 "space":  self.space if isinstance(self.{{ field.name }}, str) else self.{{ field.name }}.space,
@@ -113,7 +113,7 @@ class {{ data_class.write_name }}(DomainModelApply):
             cache.add(self.as_tuple_id())
         {% endif %}
 
-{% for field in data_class.fields_of_type(field_types.EdgeOneToMany) %}{% if field.is_property_edge %}
+{% for field in data_class.fields_of_type(ft.EdgeOneToMany) %}{% if field.is_property_edge %}
         for {{ field.variable }} in self.{{ field.name }} or []:
             if isinstance({{ field.variable }}, DomainRelationApply):
                 other_resources = {{ field.variable }}._to_instances_apply(cache, self, view_by_write_class)
@@ -124,7 +124,7 @@ class {{ data_class.write_name }}(DomainModelApply):
                 cache, self, {{field.variable}}, edge_type, view_by_write_class
             )
             resources.extend(other_resources){% endif %}
-{% endfor %}{% for field in data_class.one_to_one_edges %}
+{% endfor %}{% for field in data_class.fields_of_type(ft.EdgeOneToOne) %}
         if isinstance(self.{{ field.name }}, DomainModelApply):
             other_resources = self.{{ field.name }}._to_instances_apply(cache, view_by_write_class)
             resources.extend(other_resources)

@@ -347,7 +347,8 @@ class APIGenerator:
                 data_class=self.data_class,
                 list_method=self.list_method,
                 is_pydantic_v2=is_pydantic_v2,
-                field_types=fields,
+                # ft = field types
+                ft=fields,
                 dm=dm,
             )
             + "\n"

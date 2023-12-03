@@ -38,8 +38,12 @@ def sdk_generator(movie_model, top_level_package, client_name) -> SDKGenerator:
 
 
 @pytest.fixture
-def multi_api_generator(movie_model, top_level_package, pygen_config: PygenConfig) -> MultiAPIGenerator:
-    return MultiAPIGenerator(top_level_package, "MovieClient", movie_model.views, config=pygen_config)
+def multi_api_generator(
+    movie_model: dm.DataModel[dm.View], top_level_package: str, pygen_config: PygenConfig
+) -> MultiAPIGenerator:
+    return MultiAPIGenerator(
+        top_level_package, "MovieClient", movie_model.views, movie_model.space, config=pygen_config
+    )
 
 
 @pytest.fixture()
@@ -228,7 +232,9 @@ def test_create_list_method(person_view: dm.View, pygen_config: PygenConfig) -> 
 
 def test_create_list_method_actors(actor_view: dm.View, pygen_config: PygenConfig) -> None:
     # Arrange
-    data_class = NodeDataClass.from_view(actor_view, pygen_config.naming.data_class)
+    data_class = NodeDataClass.from_view(
+        actor_view, NodeDataClass.to_base_name(actor_view), pygen_config.naming.data_class
+    )
 
     person_data_class = MagicMock(spec=NodeDataClass)
     person_data_class.view_id = dm.ViewId(space="IntegrationTestsImmutable", external_id="Person", version="2")
