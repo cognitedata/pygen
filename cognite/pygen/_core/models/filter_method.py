@@ -148,7 +148,7 @@ class FilterMethod:
                         else:
                             # Equals and In filter share parameter, you have to extend the type hint.
                             parameter = parameters_by_name[field_.name]
-                            parameter.type_ = f"{field_.type_} | {parameter.type_}"
+                            parameter.type_ = f"{field_.type_as_string} | {parameter.type_}"
                         list_filters.append(
                             FilterCondition(
                                 filter=selected_filter,
@@ -161,14 +161,14 @@ class FilterMethod:
                         if field_.name not in parameters_by_name:
                             parameter = FilterParameter(
                                 field_.name,
-                                type_=f"list[{field_.type_}]",
+                                type_=f"list[{field_.type_as_string}]",
                                 description=f"The {field_.doc_name} to filter on.",
                             )
                             parameters_by_name[parameter.name] = parameter
                         else:
                             # Equals and In filter share parameter, you have to extend the type hint.
                             parameter = parameters_by_name[field_.name]
-                            parameter.type_ = f"{parameter.type_} | list[{field_.type_}]"
+                            parameter.type_ = f"{parameter.type_} | list[{field_.type_as_string}]"
                         list_filters.append(
                             FilterCondition(
                                 filter=selected_filter,

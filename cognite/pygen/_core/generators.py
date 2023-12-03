@@ -17,7 +17,7 @@ from cognite.pygen.config import PygenConfig
 from cognite.pygen.utils.helper import get_pydantic_version
 
 from . import validation
-from .models import APIClass, DataClass, FilterMethod, MultiAPIClass, NodeDataClass
+from .models import APIClass, DataClass, FilterMethod, MultiAPIClass, NodeDataClass, fields
 
 
 class SDKGenerator:
@@ -346,8 +346,9 @@ class APIGenerator:
             type_data.render(
                 data_class=self.data_class,
                 list_method=self.list_method,
-                instance_space=self.default_instance_space,
                 is_pydantic_v2=is_pydantic_v2,
+                field_types=fields,
+                dm=dm,
             )
             + "\n"
         )

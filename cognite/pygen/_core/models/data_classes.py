@@ -163,7 +163,11 @@ class DataClass:
     def primitive_fields_of_type(
         self, type_: type[dm.PropertyType] | tuple[type[dm.PropertyType], ...]
     ) -> Iterable[PrimitiveFieldCore]:
-        return (field_ for field_ in self.fields_of_type(PrimitiveFieldCore) if isinstance(field_.type_, type_))
+        return (
+            field_
+            for field_ in self.fields_of_type(PrimitiveFieldCore)  # type: ignore[type-abstract]
+            if isinstance(field_.type_, type_)
+        )
 
     def has_primitive_fields_of_type(self, type_: type[dm.PropertyType] | tuple[type[dm.PropertyType], ...]) -> bool:
         return any(self.primitive_fields_of_type(type_))
