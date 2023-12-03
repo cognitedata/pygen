@@ -137,15 +137,24 @@ class MultiAPIGenerator:
         self.api_by_view_id = self.create_api_by_view_id(list(views), default_instance_space, config)
         data_class_by_view_id = {view_id: api.data_class for view_id, api in self.api_by_view_id.items()}
 
-        for api in self.api_by_view_id.values():
+        for api in self.unique_apis:
             # if isinstance(api.data_class, EdgeWithPropertyDataClass):
             api.data_class.update_fields(api.view.properties, data_class_by_view_id, config)
+
+    @property
+    def unique_apis(self) -> list[APIGenerator]:
+        seen = set()
+        return [
+            api for api in self.api_by_view_id.values() if not (api.view.as_id() in seen or seen.add(api.view.as_id()))
+        ]
 
     def __getitem__(self, view_id: dm.ViewId) -> APIGenerator:
         return self.api_by_view_id[view_id]
 
     @classmethod
-    def create_api_by_view_id(cls, views: list[dm.View], default_instance_space: str, config: PygenConfig):
+    def create_api_by_view_id(
+        cls, views: list[dm.View], default_instance_space: str, config: PygenConfig
+    ) -> dict[dm.ViewId, APIGenerator]:
         def dependent_base_names(prop: dm.SingleHopConnectionDefinition | dm.MappedProperty) -> set[str]:
             if isinstance(prop, dm.SingleHopConnectionDefinition):
                 return {DataClass.to_base_name(view_by_id[prop.edge_source or prop.source])}
@@ -328,9 +337,18 @@ class APIGenerator:
         self.view = view
         base_name = base_name or DataClass.to_base_name(view)
         self.default_instance_space = default_instance_space
+        self._config = config
+
         self.data_class = DataClass.from_view(view, base_name, config.naming.data_class)
         self.api_class = APIClass.from_view(view, base_name, config.naming.api_class, self.data_class)
-        self._config = config
+        # Data class fields are not initialized yet, so we cannot use it to initialize the list method.
+        self._list_method = None
+
+    @property
+    def list_method(self) -> FilterMethod:
+        if self._list_method is None:
+            self._list_method = FilterMethod.from_fields(self.data_class.fields, self._config.filtering)
+        return self._list_method
 
     @property
     def view_id(self) -> dm.ViewId:
@@ -345,7 +363,7 @@ class APIGenerator:
         return (
             type_data.render(
                 data_class=self.data_class,
-                list_method=self.data_class.list_method,
+                list_method=self.list_method,
                 instance_space=self.default_instance_space,
                 is_pydantic_v2=is_pydantic_v2,
             )
@@ -361,7 +379,7 @@ class APIGenerator:
                 client_name=client_name,
                 api_class=self.api_class,
                 data_class=self.data_class,
-                list_method=FilterMethod.from_fields(self.data_class.fields, self._config.filtering),
+                list_method=self.list_method,
                 default_instance_space=self.default_instance_space,
             )
             + "\n"
@@ -376,7 +394,7 @@ class APIGenerator:
                 client_name=client_name,
                 api_class=self.api_class,
                 data_class=self.data_class,
-                list_method=self.data_class.list_method,
+                list_method=self.list_method,
                 sorted=sorted,
             )
             + "\n"
@@ -393,7 +411,7 @@ class APIGenerator:
                     self._config,
                 )
                 list_method = edge_class.list_method
-                list_method = field.data_class.list_method
+                list_method = field.list_method
             else:
                 raise ValueError(f"Unknown data class {type(self.data_class)}")
             yield field.edge_api_file_name, (
@@ -419,7 +437,7 @@ class APIGenerator:
                     timeseries=timeseries,
                     api_class=self.api_class,
                     data_class=self.data_class,
-                    list_method=self.data_class.list_method,
+                    list_method=self.list_method,
                 )
                 + "\n"
             )

@@ -95,9 +95,6 @@ class DataClass:
         data_class_by_view_id: dict[dm.ViewId, DataClass],
         config: pygen_config.PygenConfig,
     ) -> None:
-        if self.fields:
-            # Data class is already initialized, this happens when a data class is used for two or more views.
-            return
         pydantic_field = self.pydantic_field
         for prop_name, prop in properties.items():
             field_ = Field.from_property(
