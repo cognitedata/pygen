@@ -7,7 +7,9 @@ from cognite.pygen.config import PygenConfig
 
 def test_is_date_field(bid_view: dm.View, market_view: dm.View, pygen_config: PygenConfig) -> None:
     # Arrange
-    market_data_class = NodeDataClass.from_view(market_view, pygen_config.naming.data_class)
+    market_data_class = NodeDataClass.from_view(
+        market_view, NodeDataClass.to_base_name(market_view), pygen_config.naming.data_class
+    )
 
     # Act
     gen = APIGenerator(bid_view, bid_view.space, pygen_config)
