@@ -4,16 +4,16 @@
 from __future__ import annotations
 
 import itertools
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable
-from typing_extensions import Self
 
 from cognite.client.data_classes import data_modeling as dm
+from typing_extensions import Self
 
 from cognite.pygen import config as pygen_config
-from cognite.pygen._core.data_class.fields import Field, PrimitiveField, EdgeOneToOne, _EXTERNAL_ID_FIELD, _SPACE_FIELD
-
 from cognite.pygen.config.reserved_words import is_reserved_word
+
+from .fields import _EXTERNAL_ID_FIELD, _SPACE_FIELD, EdgeOneToOne, Field, PrimitiveField
 
 
 @dataclass

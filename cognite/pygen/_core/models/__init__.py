@@ -1,18 +1,17 @@
 from .api_casses import APIClass, MultiAPIClass
-from .data_classes import NodeDataClass, EdgeWithPropertyDataClass, EdgeDataClass
-from ._base import DataClass
+from .data_classes import EdgeDataClass, EdgeWithPropertyDataClass, NodeDataClass
 from .fields import (
-    Field,
-    PrimitiveFieldCore,
-    PrimitiveField,
     CDFExternalField,
     EdgeField,
-    EdgeOneToMany,
+    EdgeOneToEndNode,
+    EdgeOneToManyNodes,
     EdgeOneToOne,
-    RequiredEdgeOneToOne,
+    Field,
+    PrimitiveField,
+    PrimitiveFieldCore,
     PrimitiveListField,
 )
-from .filter_method import FilterMethod, FilterParameter, FilterCondition, FilterConditionOnetoOneEdge
+from .filter_method import FilterCondition, FilterConditionOnetoOneEdge, FilterMethod, FilterParameter
 
 __all__ = [
     "APIClass",
@@ -25,9 +24,9 @@ __all__ = [
     "PrimitiveField",
     "CDFExternalField",
     "EdgeField",
-    "EdgeOneToMany",
+    "EdgeOneToManyNodes",
     "EdgeOneToOne",
-    "RequiredEdgeOneToOne",
+    "EdgeOneToEndNode",
     "PrimitiveListField",
     "FilterMethod",
     "FilterParameter",

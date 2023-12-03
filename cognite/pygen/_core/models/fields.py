@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any
+from typing import TYPE_CHECKING, Any, Literal
 
 from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.data_modeling.data_types import ListablePropertyType
@@ -13,7 +13,10 @@ from cognite.client.data_classes.data_modeling.data_types import ListablePropert
 from cognite.pygen import config as pygen_config
 from cognite.pygen.config.reserved_words import is_reserved_word
 from cognite.pygen.utils.text import create_name, to_words
-from ._base import DataClass
+
+if TYPE_CHECKING:
+    from . import DataClass
+    from .api_casses import EdgeAPIClass
 
 _PRIMITIVE_TYPES = (dm.Text, dm.Boolean, dm.Float32, dm.Float64, dm.Int32, dm.Int64, dm.Timestamp, dm.Date, dm.Json)
 _EXTERNAL_TYPES = (dm.TimeSeriesReference, dm.FileReference, dm.SequenceReference)
@@ -36,7 +39,7 @@ class Field(ABC):
     name: str
     doc_name: str
     prop_name: str
-    pydantic_field: str
+    pydantic_field: Literal["Field", "pydantic.Field"]
 
     @property
     def need_alias(self) -> bool:
@@ -51,7 +54,7 @@ class Field(ABC):
         config: pygen_config.PygenConfig,
         view_name: str,
         view_id: dm.ViewId,
-        pydantic_field: str = "Field",
+        pydantic_field: str = Literal["Field", "pydantic.Field"],
     ) -> Field:
         field_naming = config.naming.field
         name = create_name(prop_name, field_naming.name)
@@ -75,7 +78,7 @@ class Field(ABC):
                 args["_list_method"] = FilterMethod.from_fields([], config.filtering, is_edge_class=True)
             data_class = data_class_by_view_id[ViewSpaceExternalId(*edge_id)]
 
-            return EdgeOneToMany(
+            return EdgeOneToManyNodes(
                 name=name,
                 doc_name=doc_name,
                 prop_name=prop_name,
@@ -180,30 +183,6 @@ class Field(ABC):
 
     @property
     @abstractmethod
-    def is_edge(self) -> bool:
-        raise NotImplementedError()
-
-    @property
-    @abstractmethod
-    def is_time_field(self) -> bool:
-        raise NotImplementedError()
-
-    @property
-    @abstractmethod
-    def is_timestamp(self) -> bool:
-        raise NotImplementedError()
-
-    @property
-    def is_time_series(self) -> bool:
-        return False
-
-    @property
-    @abstractmethod
-    def is_text_field(self) -> bool:
-        raise NotImplementedError()
-
-    @property
-    @abstractmethod
     def description(self) -> str | None:
         raise NotImplementedError
 
@@ -219,32 +198,52 @@ class Field(ABC):
         else:
             return f"The {self.doc_name} field."
 
-
-@dataclass(frozen=True)
-class PrimitiveFieldCore(Field, ABC):
-    type_: str
-    is_nullable: bool
-    prop: dm.MappedProperty
-
+    # The properties below are overwritten in the child classes
     @property
     def is_edge(self) -> bool:
         return False
 
     @property
     def is_time_field(self) -> bool:
-        return self.type_ in ("datetime.datetime", "datetime.date")
+        return False
 
     @property
     def is_timestamp(self) -> bool:
-        return self.type_ in ("datetime.datetime",)
+        return False
+
+    @property
+    def is_time_series(self) -> bool:
+        return False
 
     @property
     def is_text_field(self) -> bool:
-        return self.type_ == "str"
+        return False
+
+
+@dataclass(frozen=True)
+class PrimitiveFieldCore(Field, ABC):
+    type_: dm.PropertyType
+    is_nullable: bool
+
+    @property
+    def is_time_field(self) -> bool:
+        return isinstance(self.type_, (dm.Timestamp, dm.Date))
+
+    @property
+    def is_timestamp(self) -> bool:
+        return isinstance(self.type_, dm.Date)
+
+    @property
+    def is_text_field(self) -> bool:
+        return isinstance(self.type_, dm.Text)
 
     @property
     def description(self) -> str | None:
         return self.prop.description
+
+    @property
+    def type_as_string(self) -> str:
+        return _to_python_type(self.type_)
 
     def as_apply(self) -> str:
         return f"self.{self.name}"
@@ -260,12 +259,12 @@ class PrimitiveField(PrimitiveFieldCore):
 
     def as_read_type_hint(self) -> str:
         if self.need_alias:
-            return f'Optional[{self.type_}] = {self.pydantic_field}({self.default}, alias="{self.prop_name}")'
+            return f'Optional[{self.type_as_string}] = {self.pydantic_field}({self.default}, alias="{self.prop_name}")'
         else:
-            return f"Optional[{self.type_}] = {self.default}"
+            return f"Optional[{self.type_as_string}] = {self.default}"
 
     def as_write_type_hint(self) -> str:
-        out_type = self.type_
+        out_type = self.type_as_string
         if self.is_nullable and self.need_alias:
             out_type = f'Optional[{out_type}] = {self.pydantic_field}({self.default}, alias="{self.prop_name}")'
         elif self.need_alias:
@@ -286,36 +285,33 @@ class PrimitiveListField(PrimitiveFieldCore):
 
     def as_read_type_hint(self) -> str:
         if self.need_alias:
-            return f'Optional[list[{self.type_}]] = {self.pydantic_field}(None, alias="{self.prop_name}")'
+            return f'Optional[list[{self.type_as_string}]] = {self.pydantic_field}(None, alias="{self.prop_name}")'
         else:
-            return f"Optional[list[{self.type_}]] = None"
+            return f"Optional[list[{self.type_as_string}]] = None"
 
     def as_write_type_hint(self) -> str:
+        type_ = self.type_as_string
         if self.is_nullable and self.need_alias:
-            return f'Optional[list[{self.type_}]] = {self.pydantic_field}(None, alias="{self.prop_name}")'
+            return f'Optional[list[{type_}]] = {self.pydantic_field}(None, alias="{self.prop_name}")'
         elif self.need_alias:
-            return f'list[{self.type_}] = {self.pydantic_field}(alias="{self.prop_name}")'
+            return f'list[{type_}] = {self.pydantic_field}(alias="{self.prop_name}")'
         elif self.is_nullable:
-            return f"Optional[list[{self.type_}]] = None"
+            return f"Optional[list[{type_}]] = None"
         else:  # not self.is_nullable and not self.need_alias
-            return f"list[{self.type_}]"
+            return f"list[{type_}]"
 
 
 @dataclass(frozen=True)
 class CDFExternalField(PrimitiveFieldCore):
-    edge_api_file_name: str
-    edge_api_class: str
-    edge_api_attribute: str
-
     @property
     def is_time_series(self) -> bool:
-        return isinstance(self.prop.type, dm.TimeSeriesReference)
+        return isinstance(self.type_, dm.TimeSeriesReference)
 
     def as_read_type_hint(self) -> str:
         return self.as_write_type_hint()
 
     def as_write_type_hint(self) -> str:
-        type_ = self.type_
+        type_ = self.type_as_string
         if type_ != "str":
             type_ = f"{type_}, str"
 
@@ -326,39 +322,40 @@ class CDFExternalField(PrimitiveFieldCore):
             out_type = f"Union[{type_}, None] = None"
         return out_type
 
+    def as_edge_api_class(self) -> EdgeAPIClass:
+        from .api_casses import EdgeAPIClass
+
+        return EdgeAPIClass(
+            edge_api_class="",
+            edge_api_attribute="",
+            edge_api_file_name="",
+        )
+
 
 @dataclass(frozen=True)
 class EdgeField(Field, ABC):
-    """
-    This represents an edge field linking to another data class.
-    """
-
-    data_class: DataClass
+    """This represents a field linking to another data class(es)."""
 
     @property
     def is_edge(self) -> bool:
         return True
 
-    @property
-    def is_time_field(self) -> bool:
-        return False
 
-    @property
-    def is_timestamp(self) -> bool:
-        return False
+class EdgeToOneDataClass(EdgeField, ABC):
+    """This represent a field linking to a single data class."""
 
-    @property
-    def is_text_field(self) -> bool:
-        return False
+    data_class: DataClass
+
+
+class EdgeToMultipleDataClasses(EdgeField, ABC):
+    """This represent a field linking to multiple data classes"""
+
+    data_classes: list[DataClass]
 
 
 @dataclass(frozen=True)
-class EdgeOneToOne(EdgeField):
-    """
-    This represents an edge field linking to another data class.
-    """
-
-    prop: dm.MappedProperty
+class EdgeOneToOne(EdgeToOneDataClass):
+    """This represent a one to one relation, which direct relation."""
 
     def as_read_type_hint(self) -> str:
         return self._type_hint(self.data_class.read_name)
@@ -383,20 +380,20 @@ class EdgeOneToOne(EdgeField):
 
 
 @dataclass(frozen=True)
-class RequiredEdgeOneToOne(EdgeField):
-    variable: str
-    edge_api_class: str
-    edge_api_attribute: str
-    prop: dm.SingleHopConnectionDefinition
+class EdgeOneToEndNode(EdgeToMultipleDataClasses):
+    """This represents a one-to-one edge where the end class can be one of multiple data classes.
+    This is used for the end_node field in edge data classes, where the end_node can be one of multiple
+    data classes.
+    """
 
     def as_read_type_hint(self) -> str:
-        return self._type_hint(self.data_class.read_name)
+        return self._type_hint([data_class.read_name for data_class in self.data_classes])
 
     def as_write_type_hint(self) -> str:
-        return self._type_hint(self.data_class.write_name)
+        return self._type_hint([data_class.write_name for data_class in self.data_classes])
 
-    def _type_hint(self, data_class_name: str) -> str:
-        left_side = f"Union[{data_class_name}, str]"
+    def _type_hint(self, data_class_names: list[str]) -> str:
+        left_side = f"Union[{', '.join(data_class_names)}, str]"
         # Required Edge fields cannot be nulled
         if self.need_alias:
             return f'{left_side} = {self.pydantic_field}(alias="{self.prop_name}")'
@@ -408,50 +405,42 @@ class RequiredEdgeOneToOne(EdgeField):
         return self.prop.description
 
     def as_apply(self) -> str:
-        return (
-            f"self.{self.variable}.as_apply() "
-            f"if isinstance(self.{self.variable}, {self.data_class.read_name}) "
-            f"else self.{self.variable}"
-        )
+        return f"self.{self.name}.as_apply() " f"if isinstance(self.{self.name}, DomainModel) " f"else self.{self.name}"
 
 
 @dataclass(frozen=True)
-class EdgeOneToMany(EdgeField):
-    """
-    This represents a list of edge fields linking to another data class.
+class EdgeOneToMany(EdgeToOneDataClass, ABC):
+    """This represents a one-to-many edge.
+    Args:
+        variable: Singular variable name used when iterating through the field.
     """
 
     variable: str
-    edge_api_file_name: str
-    edge_api_class: str
-    edge_api_attribute: str
-    prop: dm.SingleHopConnectionDefinition
-    _list_method: FilterMethod | None = None
+
+
+@dataclass(frozen=True)
+class EdgeOneToManyNodes(EdgeOneToMany):
+    """
+    This represents a list of edge fields linking to another data class.
+    """
 
     @property
     def description(self) -> str | None:
         return self.prop.description
 
-    @property
-    def is_property_edge(self) -> bool:
-        return isinstance(self.data_class, EdgeWithPropertyDataClass)
+    # @property
+    # def is_property_edge(self) -> bool:
 
-    @property
-    def list_method(self) -> FilterMethod:
-        if self.is_property_edge:
-            return self.data_class.list_method
-        if self._list_method is None:
-            raise ValueError("EdgeOneToMany has not been initialized.")
-        return self._list_method
+    # @property
+    # def list_method(self) -> FilterMethod:
+    #     if self.is_property_edge:
+    #     if self._list_method is None:
 
     def as_apply(self) -> str:
-        if self.is_property_edge:
-            return f"[{self.variable}.as_apply() for {self.variable} in self.{self.name} or []]"
-        else:
-            return (
-                f"[{self.variable}.as_apply() if isinstance({self.variable}, DomainModel) else {self.variable} "
-                f"for {self.variable} in self.{self.name} or []]"
-            )
+        return (
+            f"[{self.variable}.as_apply() if isinstance({self.variable}, DomainModel) else {self.variable} "
+            f"for {self.variable} in self.{self.name} or []]"
+        )
 
     def as_read_type_hint(self) -> str:
         return self._type_hint(self.data_class.read_name)
@@ -460,10 +449,40 @@ class EdgeOneToMany(EdgeField):
         return self._type_hint(self.data_class.write_name)
 
     def _type_hint(self, data_class_name: str) -> str:
-        if self.is_property_edge:
-            left_side = f"Optional[list[{data_class_name}]]"
+        left_side = f"Union[list[{data_class_name}], list[str], None]"
+        # Edge fields are always nullable
+        if self.need_alias:
+            return f'{left_side} = {self.pydantic_field}(default=None, repr=False, alias="{self.prop_name}")'
         else:
-            left_side = f"Union[list[{data_class_name}], list[str], None]"
+            return f"{left_side} = {self.pydantic_field}(default=None, repr=False)"
+
+
+@dataclass(frozen=True)
+class EdgeOneToManyEdges(EdgeOneToMany):
+    """
+    This represents a list of edge fields linking to another data class.
+    """
+
+    @property
+    def description(self) -> str | None:
+        return self.prop.description
+
+    # @property
+    # def list_method(self) -> FilterMethod:
+    #     if self.is_property_edge:
+    #     if self._list_method is None:
+
+    def as_apply(self) -> str:
+        return f"[{self.variable}.as_apply() for {self.variable} in self.{self.name} or []]"
+
+    def as_read_type_hint(self) -> str:
+        return self._type_hint(self.data_class.read_name)
+
+    def as_write_type_hint(self) -> str:
+        return self._type_hint(self.data_class.write_name)
+
+    def _type_hint(self, data_class_name: str) -> str:
+        left_side = f"Optional[list[{data_class_name}]]"
         # Edge fields are always nullable
         if self.need_alias:
             return f'{left_side} = {self.pydantic_field}(default=None, repr=False, alias="{self.prop_name}")'
@@ -475,33 +494,21 @@ class EdgeOneToMany(EdgeField):
 _EXTERNAL_ID_FIELD = PrimitiveField(
     name="external_id",
     prop_name="externalId",
-    type_="str",
+    type_=dm.Text(),
     doc_name="external ID",
     is_nullable=False,
     default=None,
-    prop=dm.MappedProperty(
-        container_property_identifier="externalId",
-        type=dm.Text(),
-        nullable=False,
-        auto_increment=False,
-        container=dm.ContainerId("dummy", "dummy"),
-    ),
+    # ),
     pydantic_field="Field",
 )
 _SPACE_FIELD = PrimitiveField(
     name="space",
     prop_name="space",
-    type_="str",
+    type_=dm.Text(),
     doc_name="space",
     is_nullable=False,
     default=None,
-    prop=dm.MappedProperty(
-        container_property_identifier="space",
-        type=dm.Text(),
-        nullable=False,
-        auto_increment=False,
-        container=dm.ContainerId("dummy", "dummy"),
-    ),
+    # ),
     pydantic_field="Field",
 )
 

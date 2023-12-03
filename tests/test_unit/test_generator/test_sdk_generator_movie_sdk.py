@@ -8,16 +8,16 @@ import pytest
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.views import ViewProperty
 
-from cognite.pygen._core.data_classes import (
-    ViewSpaceExternalId,
-)
 from cognite.pygen._core.data_class.data_class import NodeDataClass
-from cognite.pygen._core.data_class.fields import Field, PrimitiveField, PrimitiveListField, EdgeOneToOne, EdgeOneToMany
+from cognite.pygen._core.data_class.fields import EdgeOneToMany, EdgeOneToOne, Field, PrimitiveField, PrimitiveListField
 from cognite.pygen._core.data_class.filter_method import (
-    FilterParameter,
     FilterCondition,
     FilterConditionOnetoOneEdge,
     FilterMethod,
+    FilterParameter,
+)
+from cognite.pygen._core.data_classes import (
+    ViewSpaceExternalId,
 )
 from cognite.pygen._core.generators import APIGenerator, MultiAPIGenerator, SDKGenerator
 from cognite.pygen._generator import CodeFormatter
@@ -275,7 +275,7 @@ def test_fields_from_property(
 @pytest.fixture()
 def person_api_generator(multi_api_generator: MultiAPIGenerator, person_view: dm.View) -> APIGenerator:
     api_generator = next(
-        (api for api in multi_api_generator.sub_apis if api.view_identifier == ViewSpaceExternalId.from_(person_view)),
+        (api for api in multi_api_generator.apis if api.view_identifier == ViewSpaceExternalId.from_(person_view)),
         None,
     )
     assert api_generator is not None, "Could not find API generator for actor view"
@@ -285,7 +285,7 @@ def person_api_generator(multi_api_generator: MultiAPIGenerator, person_view: dm
 @pytest.fixture()
 def actor_api_generator(multi_api_generator: MultiAPIGenerator, actor_view: dm.View) -> APIGenerator:
     api_generator = next(
-        (api for api in multi_api_generator.sub_apis if api.view_identifier == ViewSpaceExternalId.from_(actor_view)),
+        (api for api in multi_api_generator.apis if api.view_identifier == ViewSpaceExternalId.from_(actor_view)),
         None,
     )
     assert api_generator is not None, "Could not find API generator for actor view"

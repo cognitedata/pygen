@@ -15,8 +15,7 @@ from cognite.pygen.config import PygenConfig
 from cognite.pygen.utils.helper import get_pydantic_version
 
 from . import validation
-from .data_classes import APIClass, MultiAPIClass, DataClass, NodeDataClass, EdgeDataClass, EdgeWithPropertyDataClass
-from .logic import get_unique_views
+from .models import APIClass, DataClass, EdgeDataClass, EdgeWithPropertyDataClass, MultiAPIClass, NodeDataClass
 
 
 class SDKGenerator:
@@ -71,7 +70,7 @@ class SDKGenerator:
         self._multi_api_classes = sorted(
             (
                 MultiAPIClass.from_data_model(
-                    model, self._multi_api_generator.get_apis(model.views), config.naming.multi_api_class
+                    model, self._multi_api_generator.get(model.views), config.naming.multi_api_class
                 )
                 for model in data_model
             ),
@@ -97,14 +96,9 @@ class SDKGenerator:
         else:
             api_client = self._multi_api_generator.env.get_template("_api_client_multi_model.py.jinja")
 
-        # api_classes = sorted(
-        #     (sub_api.api_class for sub_api in self._multi_api_generator.sub_apis),
-        #     key=lambda api_class: api_class.name.lower(),
-        # )
         #
         # # In the template, we run zip(api_classes, views) and zip(multi_api_classes, view_sets)
         # # thus it is important that the order is the same for both.
-        # views, view_sets = self._create_view_lists_in_order_of_api_classes(api_classes)
 
         return (
             api_client.render(
@@ -112,14 +106,7 @@ class SDKGenerator:
                 pygen_version=__version__,
                 cognite_sdk_version=cognite_sdk_version,
                 pydantic_version=PYDANTIC_VERSION,
-                # api_classes=api_classes,
-                # is_single_model=isinstance(self._data_model, dm.DataModel),
                 top_level_package=self.top_level_package,
-                # data_model=self._data_model,
-                # multi_api_classes=self._multi_api_classes,
-                # view_sets=view_sets,
-                # views=views,
-                # zip=zip,
             )
             + "\n"
         )
@@ -143,22 +130,24 @@ class MultiAPIGenerator:
         self._pydantic_version = pydantic_version
         self._logger = logger or print
 
-        self.sub_apis: list[APIGenerator] = [APIGenerator(view, default_instance_space, config) for view in views]
+        self.api_by_view: dict[dm.ViewId, APIGenerator] = {
+            view.as_id(): APIGenerator(view, default_instance_space, config) for view in views
+        }
 
-        data_class_by_view_id: dict[dm.ViewId, DataClass] = {api.view_id: api.data_class for api in self.sub_apis}
-        for api, view in zip(self.sub_apis, views):
+        # Deal with duplicates.
+        data_class_by_view_id: dict[dm.ViewId, DataClass] = {
+            api.view_id: api.data_class for api in self.api_by_view.values()
+        }
+        for api, view in zip(self.api_by_view.values(), views):
             if isinstance(api.data_class, EdgeWithPropertyDataClass):
                 api.data_class.update_nodes(data_class_by_view_id, views, config.naming.field)
             api.data_class.update_fields(view.properties, data_class_by_view_id, config)
 
-        validation.validate_data_classes_unique_name([api.data_class for api in self.sub_apis])
-        validation.validate_api_classes_unique_names([api.api_class for api in self.sub_apis])
+        validation.validate_data_classes_unique_name([api.data_class for api in self.api_by_view.values()])
+        validation.validate_api_classes_unique_names([api.api_class for api in self.api_by_view.values()])
 
     def __getitem__(self, item: dm.ViewId) -> APIGenerator | None:
-        return next(
-            (api for api in self.sub_apis if api.view_id == item),
-            None,
-        )
+        return self.api_by_view.get(item)
 
     @property
     def pydantic_version(self) -> Literal["v1", "v2"]:
@@ -174,7 +163,7 @@ class MultiAPIGenerator:
         api_dir = client_dir / "_api"
 
         sdk = {(api_dir / "__init__.py"): ""}
-        for api in self.sub_apis:
+        for api in self.apis:
             file_name = api.api_class.file_name
             sdk[data_classes_dir / f"_{file_name}.py"] = api.generate_data_class_file(self.pydantic_version == "v2")
             if isinstance(api.data_class, EdgeWithPropertyDataClass):
@@ -217,11 +206,7 @@ class MultiAPIGenerator:
         data_class_init = self.env.get_template("data_classes_init.py.jinja")
 
         data_classes_with_dependencies = sorted(
-            (
-                api.data_class
-                for api in self.sub_apis
-                if api.data_class.has_edges or api.data_class.has_edge_with_property
-            ),
+            (api.data_class for api in self.apis if api.data_class.has_edges or api.data_class.has_edge_with_property),
             key=lambda d: d.read_name,
         )
         dependencies_by_data_class_read_name: dict[str, list[DataClass]] = {}
@@ -233,7 +218,7 @@ class MultiAPIGenerator:
 
         return (
             data_class_init.render(
-                classes=sorted((api.data_class for api in self.sub_apis), key=lambda d: d.read_name),
+                classes=sorted((api.data_class for api in self.apis), key=lambda d: d.read_name),
                 # Pydantic v1 needs read and write name separated, while v2 does not.
                 dependencies_by_data_class_read_name=dependencies_by_data_class_read_name,
                 dependencies_by_data_class_write_name=dependencies_by_data_class_write_name,

@@ -6,7 +6,8 @@ from cognite.client.data_classes import data_modeling as dm
 
 from cognite.pygen import config as pygen_config
 from cognite.pygen.utils.text import create_name
-from ._base import DataClass
+
+from . import DataClass
 
 
 @dataclass(frozen=True)
@@ -31,6 +32,13 @@ class APIClass:
             view_id=view.as_id(),
             data_class=data_class,
         )
+
+
+@dataclass(frozen=True)
+class EdgeAPIClass:
+    edge_api_file_name: str
+    edge_api_class: str
+    edge_api_attribute: str
 
 
 @dataclass(frozen=True)

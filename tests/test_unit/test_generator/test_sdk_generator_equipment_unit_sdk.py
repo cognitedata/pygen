@@ -31,7 +31,7 @@ def unit_procedure_api_generator(multi_api_generator: MultiAPIGenerator, unit_pr
     api_generator = next(
         (
             api
-            for api in multi_api_generator.sub_apis
+            for api in multi_api_generator.apis
             if api.view_identifier == ViewSpaceExternalId.from_(unit_procedure_view)
         ),
         None,
@@ -47,7 +47,7 @@ def equipment_module_api_generator(
     api_generator = next(
         (
             api
-            for api in multi_api_generator.sub_apis
+            for api in multi_api_generator.apis
             if api.view_identifier == ViewSpaceExternalId.from_(equipment_module_view)
         ),
         None,
@@ -61,7 +61,7 @@ def start_end_time_api_generator(multi_api_generator: MultiAPIGenerator, start_e
     api_generator = next(
         (
             api
-            for api in multi_api_generator.sub_apis
+            for api in multi_api_generator.apis
             if api.view_identifier == ViewSpaceExternalId.from_(start_end_time_view)
         ),
         None,
