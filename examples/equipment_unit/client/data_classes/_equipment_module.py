@@ -28,7 +28,7 @@ __all__ = [
 ]
 
 
-EquipmentModuleTextFields = Literal["description", "name", "type_"]
+EquipmentModuleTextFields = Literal["description", "name", "sensor_value", "type_"]
 EquipmentModuleFields = Literal["description", "name", "sensor_value", "type_"]
 
 _EQUIPMENTMODULE_PROPERTIES_BY_FIELD = {

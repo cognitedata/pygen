@@ -134,7 +134,7 @@ class DataClass:
         import_classes = [self.read_name, self.write_name, self.read_list_name, self.write_list_name]
         if self.has_field_of_type(PrimitiveFieldCore):
             import_classes.append(self.field_names)
-        if self.has_primitive_fields_of_type(dm.Text):
+        if self.has_primitive_field_of_type(dm.Text):
             import_classes.append(self.text_field_names)
         return f"from .{self.file_name} import {', '.join(sorted(import_classes))}"
 
@@ -169,7 +169,7 @@ class DataClass:
             if isinstance(field_.type_, type_)
         )
 
-    def has_primitive_fields_of_type(self, type_: type[dm.PropertyType] | tuple[type[dm.PropertyType], ...]) -> bool:
+    def has_primitive_field_of_type(self, type_: type[dm.PropertyType] | tuple[type[dm.PropertyType], ...]) -> bool:
         return any(self.primitive_fields_of_type(type_))
 
     def is_all_primitive_fields_of_type(self, type_: type[dm.PropertyType] | tuple[type[dm.PropertyType], ...]) -> bool:
@@ -209,7 +209,9 @@ class DataClass:
 
     @property
     def text_fields_literals(self) -> str:
-        return ", ".join(f'"{field_.name}"' for field_ in self.primitive_fields_of_type((dm.Text,)))
+        return ", ".join(
+            f'"{field_.name}"' for field_ in self.primitive_fields_of_type((dm.Text, dm.CDFExternalIdReference))
+        )
 
     @property
     def fields_literals(self) -> str:

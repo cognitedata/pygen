@@ -5,7 +5,7 @@ import json
 from collections import defaultdict
 from collections.abc import Iterator, Sequence
 from pathlib import Path
-from typing import Any, Callable, Literal
+from typing import Any, Callable, Literal, cast
 
 from cognite.client import data_modeling as dm
 from cognite.client._version import __version__ as cognite_sdk_version
@@ -17,7 +17,8 @@ from cognite.pygen.config import PygenConfig
 from cognite.pygen.utils.helper import get_pydantic_version
 
 from . import validation
-from .models import APIClass, DataClass, FilterMethod, MultiAPIClass, NodeDataClass, fields
+from .models import CDFExternalField, DataClass, FilterMethod, MultiAPIClass, NodeDataClass, fields
+from .models.api_casses import EdgeAPIClass, NodeAPIClass, QueryAPIClass, TimeSeriesAPIClass
 
 
 class SDKGenerator:
@@ -317,24 +318,55 @@ class APIGenerator:
             loader=PackageLoader("cognite.pygen._core", "templates"), autoescape=select_autoescape()
         )
         self.view = view
-        base_name = base_name or DataClass.to_base_name(view)
+        self.base_name = base_name or DataClass.to_base_name(view)
         self.default_instance_space = default_instance_space
         self._config = config
 
-        self.data_class = DataClass.from_view(view, base_name, config.naming.data_class)
-        self.api_class = APIClass.from_view(view, base_name, config.naming.api_class, self.data_class)
-        # Data class fields are not initialized yet, so we cannot use it to initialize the list method.
-        self._list_method: FilterMethod | None = None
+        self.data_class = DataClass.from_view(view, self.base_name, config.naming.data_class)
+        self.api_class = NodeAPIClass.from_view(view, self.base_name, config.naming.api_class)
+        self.query_api = QueryAPIClass.from_view(self.base_name, config.naming.api_class)
 
-    @property
-    def list_method(self) -> FilterMethod:
-        if self._list_method is None:
-            self._list_method = FilterMethod.from_fields(self.data_class.fields, self._config.filtering)
-        return self._list_method
+        # These attributes require fields to be initialized
+        self._list_method: FilterMethod | None = None
+        self._timeseries_apis: list[TimeSeriesAPIClass] | None = None
+        self._edge_apis: list[EdgeAPIClass] | None = None
 
     @property
     def view_id(self) -> dm.ViewId:
         return self.view.as_id()
+
+    def _validate_initialized(self) -> None:
+        if not self.data_class.fields:
+            raise ValueError("APIGenerator has not been initialized.")
+
+    @property
+    def list_method(self) -> FilterMethod:
+        if self._list_method is None:
+            self._validate_initialized()
+            self._list_method = FilterMethod.from_fields(self.data_class.fields, self._config.filtering)
+        return self._list_method
+
+    @property
+    def timeseries_apis(self) -> list[TimeSeriesAPIClass]:
+        if self._timeseries_apis is None:
+            self._validate_initialized()
+            self._timeseries_apis = [
+                TimeSeriesAPIClass.from_field(
+                    cast(CDFExternalField, field), self.base_name, self._config.naming.api_class
+                )
+                for field in self.data_class.primitive_fields_of_type(dm.TimeSeriesReference)
+            ]
+        return self._timeseries_apis
+
+    @property
+    def edge_apis(self) -> list[EdgeAPIClass]:
+        if self._edge_apis is None:
+            self._validate_initialized()
+            self._edge_apis = [
+                EdgeAPIClass.from_field(field, self.base_name, self._config.naming.api_class)
+                for field in self.data_class.fields_of_type(fields.EdgeOneToMany)  # type: ignore[type-abstract]
+            ]
+        return self._edge_apis
 
     def generate_data_class_file(self, is_pydantic_v2: bool) -> str:
         if isinstance(self.data_class, NodeDataClass):
@@ -364,6 +396,12 @@ class APIGenerator:
                 api_class=self.api_class,
                 data_class=self.data_class,
                 list_method=self.list_method,
+                timeseries_apis=self.timeseries_apis,
+                edge_apis=self.edge_apis,
+                query_api=self.query_api,
+                # ft = field types
+                ft=fields,
+                dm=dm,
             )
             + "\n"
         )

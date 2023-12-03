@@ -1,51 +1,78 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
 
 from cognite.client.data_classes import data_modeling as dm
 
 from cognite.pygen import config as pygen_config
 from cognite.pygen.utils.text import create_name
 
-if TYPE_CHECKING:
-    from . import DataClass
+from .fields import CDFExternalField, EdgeOneToMany
 
 
 @dataclass(frozen=True)
 class APIClass:
-    client_attribute: str
+    parent_attribute: str
     name: str
     file_name: str
+
+
+@dataclass(frozen=True)
+class NodeAPIClass(APIClass):
     view_id: dm.ViewId
-    data_class: DataClass
 
     @classmethod
-    def from_view(
-        cls, view: dm.View, view_name: str, api_class: pygen_config.APIClassNaming, data_class: DataClass
-    ) -> APIClass:
-        file_name = create_name(view_name, api_class.file_name)
-        class_name = create_name(view_name, api_class.name)
+    def from_view(cls, view: dm.View, base_name: str, api_class: pygen_config.APIClassNaming) -> NodeAPIClass:
+        file_name = create_name(base_name, api_class.file_name)
+        class_name = create_name(base_name, api_class.name)
         return cls(
-            client_attribute=create_name(view_name, api_class.client_attribute),
+            parent_attribute=create_name(base_name, api_class.client_attribute),
             name=f"{class_name}API",
             file_name=file_name,
             view_id=view.as_id(),
-            data_class=data_class,
         )
 
 
-@dataclass(frozen=True)
-class EdgeAPIClass:
-    edge_api_file_name: str
-    edge_api_class: str
-    edge_api_attribute: str
+class QueryAPIClass(APIClass):
+    @classmethod
+    def from_view(cls, base_name: str, api_class: pygen_config.APIClassNaming) -> QueryAPIClass:
+        file_name = create_name(base_name, api_class.file_name)
+        class_name = create_name(base_name, api_class.name)
+        parent_attribute = create_name(base_name, api_class.client_attribute)
+        return cls(
+            parent_attribute=f"{parent_attribute}_query",  # Not used.
+            name=f"{class_name}QueryAPI",
+            file_name=f"{file_name}_query",
+        )
 
 
-@dataclass(frozen=True)
-class QueryAPIClass:
-    file_name: str
-    class_name: str
+class EdgeAPIClass(APIClass):
+    @classmethod
+    def from_field(cls, field: EdgeOneToMany, base_name: str, api_class: pygen_config.APIClassNaming) -> EdgeAPIClass:
+        file_name = create_name(base_name, api_class.file_name)
+        class_name = create_name(base_name, api_class.name)
+        parent_attribute = create_name(base_name, api_class.client_attribute)
+        return cls(
+            parent_attribute=f"{parent_attribute}_edge",
+            name=f"{class_name}EdgeAPI",
+            file_name=f"{file_name}_edge",
+        )
+
+
+class TimeSeriesAPIClass(APIClass):
+    @classmethod
+    def from_field(
+        cls, field: CDFExternalField, base_name: str, api_class: pygen_config.APIClassNaming
+    ) -> TimeSeriesAPIClass:
+        base_name = f"{base_name}_{field.name}"
+        file_name = create_name(base_name, api_class.file_name)
+        class_name = create_name(base_name, api_class.name)
+        parent_attribute = create_name(field.name, api_class.client_attribute)
+        return cls(
+            parent_attribute=f"{parent_attribute}",
+            name=f"{class_name}API",
+            file_name=f"{file_name}",
+        )
 
 
 @dataclass(frozen=True)

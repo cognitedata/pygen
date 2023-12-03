@@ -16,7 +16,6 @@ from cognite.pygen.utils.text import create_name, to_words
 
 if TYPE_CHECKING:
     from . import DataClass
-    from .api_casses import EdgeAPIClass
 
 _PRIMITIVE_TYPES = (dm.Text, dm.Boolean, dm.Float32, dm.Float64, dm.Int32, dm.Int64, dm.Timestamp, dm.Date, dm.Json)
 _EXTERNAL_TYPES = (dm.TimeSeriesReference, dm.FileReference, dm.SequenceReference)
@@ -306,15 +305,6 @@ class CDFExternalField(PrimitiveFieldCore):
         else:
             out_type = f"Union[{type_}, None] = None"
         return out_type
-
-    def as_edge_api_class(self) -> EdgeAPIClass:
-        from .api_casses import EdgeAPIClass
-
-        return EdgeAPIClass(
-            edge_api_class="",
-            edge_api_attribute="",
-            edge_api_file_name="",
-        )
 
 
 @dataclass(frozen=True)

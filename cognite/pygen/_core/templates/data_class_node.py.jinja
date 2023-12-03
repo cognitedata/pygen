@@ -23,7 +23,7 @@ if TYPE_CHECKING:{% for dependency_class in data_class.dependencies %}
 {% endif %}
 
 __all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data_class.read_list_name }}", "{{ data_class.write_list_name }}"{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}, "{{ data_class.field_names }}"{% endif %}{% if data_class.has_primitive_fields_of_type((dm.Text, dm.CDFExternalIdReference)) %}, "{{ data_class.text_field_names }}"{% endif %}]
-{% if data_class.has_primitive_fields_of_type((dm.Text, )) %}
+{% if data_class.has_primitive_fields_of_type((dm.Text, dm.CDFExternalIdReference)) %}
 
 {{ data_class.text_field_names }} = Literal[{{ data_class.text_fields_literals }}]{% endif %}{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}
 {{ data_class.field_names }} = Literal[{{ data_class.fields_literals }}]

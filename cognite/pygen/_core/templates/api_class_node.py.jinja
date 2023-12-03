@@ -5,17 +5,17 @@ from collections.abc import Sequence
 from typing import overload
 
 from cognite.client import CogniteClient
-from cognite.client import data_modeling as dm{% if data_class.has_primitive_fields %}
+from cognite.client import data_modeling as dm{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList{% endif %}
 
 from {{ top_level_package }}.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
     {{ data_class.read_name }},
-    {{ data_class.write_name }},{% if data_class.has_primitive_fields %}
+    {{ data_class.write_name }},{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}
     {{ data_class.field_names }},{% endif %}
     {{ data_class.read_list_name }},
-    {{ data_class.write_list_name }},{% if data_class.has_text_field %}
+    {{ data_class.write_list_name }},{% if data_class.has_primitive_field_of_type(dm.Text) %}
     {{ data_class.text_field_names }},{% endif %}{% for field in data_class.property_edges %}
     {{ field.data_class.read_name }},
     {{ field.data_class.write_name }},
@@ -25,10 +25,10 @@ from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import ({% 
     {{ data_class.properties_dict_name }},{%  endif %}
     {{ data_class.filter_name }},
 )
-from ._core import DEFAULT_LIMIT_READ, DEFAULT_QUERY_LIMIT, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder{% for field in data_class.one_to_many_edges %}
-from .{{ field.edge_api_file_name }} import {{ field.edge_api_class }}{% endfor %}{% for field in data_class.single_timeseries_fields %}
-from .{{ field.edge_api_file_name }} import {{ field.edge_api_class }}API{% endfor %}
-from .{{ data_class.query_file_name }} import {{ data_class.query_class_name }}
+from ._core import DEFAULT_LIMIT_READ, DEFAULT_QUERY_LIMIT, Aggregations, NodeAPI, SequenceNotStr, QueryStep, QueryBuilder{% for class_ in edge_apis %}
+from .{{ class_.file_name }} import {{ class_.name }}{% endfor %}{% for class_ in timeseries_apis %}
+from .{{ class_.file_name }} import {{ class_.name }}{% endfor %}
+from .{{ query_api.file_name }} import {{ query_api.name }}
 
 
 class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.write_name }}, {{ data_class.read_list_name }}]):
@@ -46,15 +46,15 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
         self._view_id = view_id{% for field in data_class.one_to_many_edges %}
         self.{{ field.edge_api_attribute }} = {{ field.edge_api_class }}(
             client{% if field.is_property_edge %}, view_by_write_class, {{ field.data_class.read_name }}, {{ field.data_class.write_name }}, {{ field.data_class.read_list_name }}{% endif %}
-        ){% endfor %}{% for timeseries in data_class.single_timeseries_fields %}
-        self.{{ timeseries.edge_api_attribute }} = {{ timeseries.edge_api_class }}API(client, view_id){% endfor %}
+        ){% endfor %}{% for class_ in timeseries_apis %}
+        self.{{ class_.parent_attribute }} = {{ class_.name }}(client, view_id){% endfor %}
 
     def __call__(
             self,{% for parm in list_method.parameters %}
             {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
             limit: int = DEFAULT_QUERY_LIMIT,
             filter: dm.Filter | None = None,
-    ) -> {{ data_class.query_class_name }}[{{ data_class.read_list_name }}]:
+    ) -> {{ query_api.name }}[{{ data_class.read_list_name }}]:
         """Query starting at {{ data_class.doc_list_name }}.
 
         Args:{% for parm in list_method.parameters %}
@@ -73,7 +73,7 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder({{ data_class.read_list_name }})
-        return {{ data_class.query_class_name }}(self._client, builder, self._view_by_write_class, filter_, limit)
+        return {{ query_api.name }}(self._client, builder, self._view_by_write_class, filter_, limit)
 
 
     def apply(self, {{ data_class.variable }}: {{ data_class.write_name }} | Sequence[{{ data_class.write_name }}], replace: bool = False) -> ResourcesApplyResult:
@@ -98,7 +98,7 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
                 >>> from {{ top_level_package }}.data_classes import {{ data_class.write_name }}
                 >>> client = {{ client_name }}()
                 >>> {{ data_class.variable }} = {{ data_class.write_name }}(external_id="my_{{ data_class.variable }}", ...)
-                >>> result = client.{{ api_class.client_attribute }}.apply({{ data_class.variable }})
+                >>> result = client.{{ api_class.parent_attribute }}.apply({{ data_class.variable }})
 
         """
         return self._apply({{ data_class.variable }}, replace)
@@ -119,7 +119,7 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
 
                 >>> from {{ top_level_package }} import {{ client_name }}
                 >>> client = {{ client_name }}()
-                >>> client.{{ api_class.client_attribute }}.delete("my_{{ data_class.variable }}")
+                >>> client.{{ api_class.parent_attribute }}.delete("my_{{ data_class.variable }}")
         """
         return self._delete(external_id, space)
 
@@ -147,7 +147,7 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
 
                 >>> from {{ top_level_package }} import {{ client_name }}
                 >>> client = {{ client_name }}()
-                >>> {{ data_class.variable }} = client.{{ api_class.client_attribute }}.retrieve("my_{{ data_class.variable }}")
+                >>> {{ data_class.variable }} = client.{{ api_class.parent_attribute }}.retrieve("my_{{ data_class.variable }}")
 
         """{% if data_class.has_one_to_many_edges %}
         return self._retrieve(
@@ -160,7 +160,7 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
         )
         {% else %}
         return self._retrieve(external_id, space){% endif %}
-{% if data_class.has_text_field %}
+{% if data_class.has_primitive_field_of_type(dm.Text) %}
     def search(
         self,
         query: str,
@@ -187,7 +187,7 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
 
                 >>> from {{ top_level_package }} import {{ client_name }}
                 >>> client = {{ client_name }}()
-                >>> {{ data_class.variable_list }} = client.{{ api_class.client_attribute }}.search('my_{{ data_class.variable }}')
+                >>> {{ data_class.variable_list }} = client.{{ api_class.parent_attribute }}.search('my_{{ data_class.variable }}')
 
         """
         filter_ = {{ data_class.filter_name }}(
@@ -196,7 +196,7 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
             filter,
         )
         return self._search(self._view_id, query, {{ data_class.properties_dict_name }}, properties, filter_, limit){% endif %}
-{% if data_class.has_primitive_fields %}
+{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}
     @overload
     def aggregate(
         self,
@@ -205,7 +205,7 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
         | Sequence[Aggregations]
         | Sequence[dm.aggregations.MetricAggregation],
         property: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,
-        group_by: None = None,{% if data_class.has_text_field %}
+        group_by: None = None,{% if data_class.has_primitive_field_of_type(dm.Text) %}
         query: str | None = None,
         search_properties: {{ data_class.text_field_names }} | Sequence[{{ data_class.text_field_names }}] | None = None,{% endif %}{% for parm in list_method.parameters %}
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
@@ -222,7 +222,7 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
         | Sequence[Aggregations]
         | Sequence[dm.aggregations.MetricAggregation],
         property: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,
-        group_by: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] = None,{% if data_class.has_text_field %}
+        group_by: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] = None,{% if data_class.has_primitive_field_of_type(dm.Text) %}
         query: str | None = None,
         search_properties: {{ data_class.text_field_names }} | Sequence[{{ data_class.text_field_names }}] | None = None,{% endif %}{% for parm in list_method.parameters %}
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
@@ -238,7 +238,7 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
         | Sequence[Aggregations]
         | Sequence[dm.aggregations.MetricAggregation],
         property: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,
-        group_by: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,{% if data_class.has_text_field %}
+        group_by: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,{% if data_class.has_primitive_field_of_type(dm.Text) %}
         query: str | None = None,
         search_property: {{ data_class.text_field_names }} | Sequence[{{ data_class.text_field_names }}] | None = None,{% endif %}{% for parm in list_method.parameters %}
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
@@ -250,7 +250,7 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
         Args:
             aggregate: The aggregation to perform.
             property: The property to perform aggregation on.
-            group_by: The property to group by when doing the aggregation.{% if data_class.has_text_field %}
+            group_by: The property to group by when doing the aggregation.{% if data_class.has_primitive_field_of_type(dm.Text) %}
             query: The query to search for in the text field.
             search_property: The text field to search in.{% endif %}{% for parm in list_method.parameters %}
             {{ parm.name }}: {{ parm.description }}{% endfor %}
@@ -266,7 +266,7 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
 
                 >>> from {{ top_level_package }} import {{ client_name }}
                 >>> client = {{ client_name }}()
-                >>> result = client.{{ api_class.client_attribute }}.aggregate("count", space="my_space")
+                >>> result = client.{{ api_class.parent_attribute }}.aggregate("count", space="my_space")
 
         """
 
@@ -280,7 +280,7 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
             aggregate,
             {{ data_class.properties_dict_name }},
             property,
-            group_by,{% if data_class.has_text_field %}
+            group_by,{% if data_class.has_primitive_field_of_type(dm.Text) %}
             query,
             search_property,{% else %}
             None,
@@ -292,7 +292,7 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
     def histogram(
         self,
         property: {{ data_class.field_names }},
-        interval: float,{% if data_class.has_text_field %}
+        interval: float,{% if data_class.has_primitive_field_of_type(dm.Text) %}
         query: str | None = None,
         search_property: {{ data_class.text_field_names }} | Sequence[{{ data_class.text_field_names }}] | None = None,{% endif %}{% for parm in list_method.parameters %}
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
@@ -303,7 +303,7 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
 
         Args:
             property: The property to use as the value in the histogram.
-            interval: The interval to use for the histogram bins.{% if data_class.has_text_field %}
+            interval: The interval to use for the histogram bins.{% if data_class.has_primitive_field_of_type(dm.Text) %}
             query: The query to search for in the text field.
             search_property: The text field to search in.{% endif %}{% for parm in list_method.parameters %}
             {{ parm.name }}: {{ parm.description }}{% endfor %}
@@ -323,7 +323,7 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
             self._view_id,
             property,
             interval,
-            {{ data_class.properties_dict_name }},{% if data_class.has_text_field %}
+            {{ data_class.properties_dict_name }},{% if data_class.has_primitive_field_of_type(dm.Text) %}
             query,
             search_property,{% else %}
             None,
@@ -357,7 +357,7 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
 
                 >>> from {{ top_level_package }} import {{ client_name }}
                 >>> client = {{ client_name }}()
-                >>> {{ data_class.variable_list }} = client.{{ api_class.client_attribute }}.list(limit=5)
+                >>> {{ data_class.variable_list }} = client.{{ api_class.parent_attribute }}.list(limit=5)
 
         """
         filter_ = {{ data_class.filter_name }}(
