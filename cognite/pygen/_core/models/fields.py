@@ -402,14 +402,6 @@ class EdgeOneToManyNodes(EdgeOneToMany):
     This represents a list of edge fields linking to another data class.
     """
 
-    # @property
-    # def is_property_edge(self) -> bool:
-
-    # @property
-    # def list_method(self) -> FilterMethod:
-    #     if self.is_property_edge:
-    #     if self._list_method is None:
-
     def as_apply(self) -> str:
         return (
             f"[{self.variable}.as_apply() if isinstance({self.variable}, DomainModel) else {self.variable} "
@@ -436,11 +428,6 @@ class EdgeOneToManyEdges(EdgeOneToMany):
     """
     This represents a list of edge fields linking to another data class.
     """
-
-    # @property
-    # def list_method(self) -> FilterMethod:
-    #     if self.is_property_edge:
-    #     if self._list_method is None:
 
     def as_apply(self) -> str:
         return f"[{self.variable}.as_apply() for {self.variable} in self.{self.name} or []]"

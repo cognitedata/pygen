@@ -23,10 +23,10 @@ if TYPE_CHECKING:{% for dependency_class in data_class.dependencies %}
 {% endif %}
 
 __all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data_class.read_list_name }}", "{{ data_class.write_list_name }}"{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}, "{{ data_class.field_names }}"{% endif %}{% if data_class.has_primitive_fields_of_type((dm.Text, dm.CDFExternalIdReference)) %}, "{{ data_class.text_field_names }}"{% endif %}]
-{% if data_class.has_primitive_fields_of_type((dm.Text, dm.CDFExternalIdReference)) %}
+{% if data_class.has_primitive_fields_of_type((dm.Text, )) %}
 
-{{ data_class.text_field_names }} = Literal[{{ data_class.text_fields_literals }}]
-{% endif %}{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}{{ data_class.field_names }} = Literal[{{ data_class.fields_literals }}]
+{{ data_class.text_field_names }} = Literal[{{ data_class.text_fields_literals }}]{% endif %}{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}
+{{ data_class.field_names }} = Literal[{{ data_class.fields_literals }}]
 
 {{ data_class.properties_dict_name }} = {% raw %}{{% endraw %}{% for field in data_class.fields_of_type(ft.PrimitiveFieldCore) %}
     "{{ field.name }}": "{{ field.prop_name }}",{% endfor %}
@@ -113,22 +113,28 @@ class {{ data_class.write_name }}(DomainModelApply):
             cache.add(self.as_tuple_id())
         {% endif %}
 
-{% for field in data_class.fields_of_type(ft.EdgeOneToMany) %}{% if field.is_property_edge %}
+{% for field in data_class.fields_of_type(ft.EdgeOneToManyEdges) %}
         for {{ field.variable }} in self.{{ field.name }} or []:
             if isinstance({{ field.variable }}, DomainRelationApply):
-                other_resources = {{ field.variable }}._to_instances_apply(cache, self, view_by_write_class)
-                resources.extend(other_resources){% else %}
+                other_resources = {{ field.variable }}._to_instances_apply(
+                    cache,
+                    self,
+                    dm.DirectRelationReference("{{ field.edge_type.space }}", "{{ field.edge_type.external_id }}"),
+                    view_by_write_class
+)
+                resources.extend(other_resources)
+{% endfor %}{% for field in data_class.fields_of_type(ft.EdgeOneToManyNodes) %}
         edge_type = dm.DirectRelationReference("{{ field.edge_type.space }}", "{{ field.edge_type.external_id }}")
         for {{ field.variable }} in self.{{ field.name }} or []:
             other_resources = DomainRelationApply.from_edge_to_resources(
                 cache, self, {{field.variable}}, edge_type, view_by_write_class
             )
-            resources.extend(other_resources){% endif %}
-{% endfor %}{% for field in data_class.fields_of_type(ft.EdgeOneToOne) %}
+            resources.extend(other_resources){% endfor %}
+{% for field in data_class.fields_of_type(ft.EdgeOneToOne) %}
         if isinstance(self.{{ field.name }}, DomainModelApply):
             other_resources = self.{{ field.name }}._to_instances_apply(cache, view_by_write_class)
             resources.extend(other_resources)
-{% endfor %}{% for field in data_class.single_timeseries_fields %}
+{% endfor %}{% for field in data_class.primitive_fields_of_type(dm.TimeSeriesReference) %}
         if isinstance(self.{{ field.name }}, {% if is_pydantic_v2 %}CogniteTimeSeries{% else %}TimeSeries{% endif %}):
             resources.time_series.append(self.{{ field.name }})
 {% endfor %}

@@ -86,7 +86,7 @@ class DataClass:
         if used_for == "node":
             return NodeDataClass(**args)
         elif used_for == "edge":
-            raise NotImplementedError
+            return EdgeDataClass(**args)
         else:
             raise ValueError(f"Unsupported used_for={used_for}")
 
@@ -209,9 +209,7 @@ class DataClass:
 
     @property
     def text_fields_literals(self) -> str:
-        return ", ".join(
-            f'"{field_.name}"' for field_ in self.primitive_fields_of_type((dm.Text, dm.CDFExternalIdReference))
-        )
+        return ", ".join(f'"{field_.name}"' for field_ in self.primitive_fields_of_type((dm.Text,)))
 
     @property
     def fields_literals(self) -> str:
