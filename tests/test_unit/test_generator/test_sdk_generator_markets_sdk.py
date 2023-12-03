@@ -68,9 +68,9 @@ def test_generate_date_transformation_pairs_data_class(
 
     # Act
     actual = date_transformation_generator.generate_data_class_file(IS_PYDANTIC_V2)
+    actual = code_formatter.format_code(actual)
 
     # Assert
-    actual = code_formatter.format_code(actual)
     assert actual == expected
 
 

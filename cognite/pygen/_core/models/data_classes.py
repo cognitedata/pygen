@@ -42,13 +42,12 @@ class DataClass:
     view_id: dm.ViewId
     fields: list[Field]
 
-    # @property
-    # def list_method(self) -> FilterMethod:
-    #     if self._list_method is None:
+    @staticmethod
+    def to_view_name(view: dm.View) -> str:
+        return (view.name or view.external_id).replace(" ", "_")
 
     @classmethod
-    def from_view(cls, view: dm.View, data_class: pygen_config.DataClassNaming) -> DataClass:
-        view_name = (view.name or view.external_id).replace(" ", "_")
+    def from_view(cls, view: dm.View, view_name: str, data_class: pygen_config.DataClassNaming) -> DataClass:
         class_name = create_name(view_name, data_class.name)
         if is_reserved_word(class_name, "data class", view.as_id()):
             class_name = f"{class_name}_"
@@ -96,6 +95,9 @@ class DataClass:
         data_class_by_view_id: dict[dm.ViewId, DataClass],
         config: pygen_config.PygenConfig,
     ) -> None:
+        if self.fields:
+            # Data class is already initialized, this happens when a data class is used for two or more views.
+            return
         pydantic_field = self.pydantic_field
         for prop_name, prop in properties.items():
             field_ = Field.from_property(
