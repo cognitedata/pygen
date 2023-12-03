@@ -25,14 +25,7 @@ def multi_api_generator(sdk_generator: SDKGenerator) -> MultiAPIGenerator:
 
 @pytest.fixture
 def unit_procedure_api_generator(multi_api_generator: MultiAPIGenerator, unit_procedure_view: dm.View) -> APIGenerator:
-    api_generator = next(
-        (
-            api
-            for api in multi_api_generator.apis
-            if api.view_identifier == ViewSpaceExternalId.from_(unit_procedure_view)
-        ),
-        None,
-    )
+    api_generator = multi_api_generator[unit_procedure_view.as_id()]
     assert api_generator is not None, "Could not find API generator for unit procedure view"
     return api_generator
 
@@ -41,28 +34,14 @@ def unit_procedure_api_generator(multi_api_generator: MultiAPIGenerator, unit_pr
 def equipment_module_api_generator(
     multi_api_generator: MultiAPIGenerator, equipment_module_view: dm.View
 ) -> APIGenerator:
-    api_generator = next(
-        (
-            api
-            for api in multi_api_generator.apis
-            if api.view_identifier == ViewSpaceExternalId.from_(equipment_module_view)
-        ),
-        None,
-    )
+    api_generator = multi_api_generator[equipment_module_view.as_id()]
     assert api_generator is not None, "Could not find API generator for equipment module view"
     return api_generator
 
 
 @pytest.fixture
 def start_end_time_api_generator(multi_api_generator: MultiAPIGenerator, start_end_time_view: dm.View) -> APIGenerator:
-    api_generator = next(
-        (
-            api
-            for api in multi_api_generator.apis
-            if api.view_identifier == ViewSpaceExternalId.from_(start_end_time_view)
-        ),
-        None,
-    )
+    api_generator = multi_api_generator[start_end_time_view.as_id()]
     assert api_generator is not None, "Could not find API generator for start end time view"
     return api_generator
 

@@ -6,14 +6,14 @@ from unittest.mock import MagicMock
 import pytest
 from cognite.client import data_modeling as dm
 
+from cognite.pygen._core.generators import APIGenerator, MultiAPIGenerator, SDKGenerator
 from cognite.pygen._core.models import (
-    NodeDataClass,
     FilterCondition,
     FilterConditionOnetoOneEdge,
     FilterMethod,
     FilterParameter,
+    NodeDataClass,
 )
-from cognite.pygen._core.generators import APIGenerator, MultiAPIGenerator, SDKGenerator
 from cognite.pygen._generator import CodeFormatter
 from cognite.pygen.config import PygenConfig
 from tests.constants import IS_PYDANTIC_V1, IS_PYDANTIC_V2, MovieSDKFiles
@@ -44,20 +44,14 @@ def multi_api_generator(movie_model, top_level_package, pygen_config: PygenConfi
 
 @pytest.fixture()
 def person_api_generator(multi_api_generator: MultiAPIGenerator, person_view: dm.View) -> APIGenerator:
-    api_generator = next(
-        (api for api in multi_api_generator.apis if api.view_identifier == ViewSpaceExternalId.from_(person_view)),
-        None,
-    )
+    api_generator = multi_api_generator[person_view.as_id()]
     assert api_generator is not None, "Could not find API generator for actor view"
     return api_generator
 
 
 @pytest.fixture()
 def actor_api_generator(multi_api_generator: MultiAPIGenerator, actor_view: dm.View) -> APIGenerator:
-    api_generator = next(
-        (api for api in multi_api_generator.apis if api.view_identifier == ViewSpaceExternalId.from_(actor_view)),
-        None,
-    )
+    api_generator = multi_api_generator[actor_view.as_id()]
     assert api_generator is not None, "Could not find API generator for actor view"
     return api_generator
 
@@ -187,11 +181,13 @@ def test_generate_api_core_file(multi_api_generator: MultiAPIGenerator) -> None:
 
 def test_create_list_method(person_view: dm.View, pygen_config: PygenConfig) -> None:
     # Arrange
-    data_class = NodeDataClass.from_view(person_view, pygen_config.naming.data_class)
+    data_class = NodeDataClass.from_view(
+        person_view, NodeDataClass.to_base_name(person_view), pygen_config.naming.data_class
+    )
 
     data_class.update_fields(
         person_view.properties,
-        {ViewSpaceExternalId(space="IntegrationTestsImmutable", external_id="Role"): MagicMock(spec=NodeDataClass)},
+        {dm.ViewId(space="IntegrationTestsImmutable", external_id="Role", version="2"): MagicMock(spec=NodeDataClass)},
         config=pygen_config,
     )
     parameters = [
@@ -235,15 +231,17 @@ def test_create_list_method_actors(actor_view: dm.View, pygen_config: PygenConfi
     data_class = NodeDataClass.from_view(actor_view, pygen_config.naming.data_class)
 
     person_data_class = MagicMock(spec=NodeDataClass)
-    person_data_class.view_id = ViewSpaceExternalId(space="IntegrationTestsImmutable", external_id="Person")
+    person_data_class.view_id = dm.ViewId(space="IntegrationTestsImmutable", external_id="Person", version="2")
     data_class.update_fields(
         actor_view.properties,
         {
-            ViewSpaceExternalId(space="IntegrationTestsImmutable", external_id="Movie"): MagicMock(spec=NodeDataClass),
-            ViewSpaceExternalId(space="IntegrationTestsImmutable", external_id="Nomination"): MagicMock(
+            dm.ViewId(space="IntegrationTestsImmutable", external_id="Movie", version="2"): MagicMock(
                 spec=NodeDataClass
             ),
-            ViewSpaceExternalId(space="IntegrationTestsImmutable", external_id="Person"): person_data_class,
+            dm.ViewId(space="IntegrationTestsImmutable", external_id="Nomination", version="2"): MagicMock(
+                spec=NodeDataClass
+            ),
+            dm.ViewId(space="IntegrationTestsImmutable", external_id="Person", version="2"): person_data_class,
         },
         config=pygen_config,
     )

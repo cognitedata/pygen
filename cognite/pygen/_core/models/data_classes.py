@@ -4,7 +4,7 @@ from __future__ import annotations
 import warnings
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
-from typing import Literal, cast, overload
+from typing import Literal, overload
 
 from cognite.client.data_classes import data_modeling as dm
 
@@ -14,8 +14,9 @@ from cognite.pygen.utils.text import create_name, to_words
 
 from .fields import (
     CDFExternalField,
-    EdgeField,
+    EdgeOneToEndNode,
     EdgeOneToManyNodes,
+    EdgeToOneDataClass,
     Field,
     PrimitiveField,
     PrimitiveFieldCore,
@@ -47,18 +48,18 @@ class DataClass:
         return (view.name or view.external_id).replace(" ", "_")
 
     @classmethod
-    def from_view(cls, view: dm.View, view_name: str, data_class: pygen_config.DataClassNaming) -> DataClass:
-        class_name = create_name(view_name, data_class.name)
+    def from_view(cls, view: dm.View, base_name: str, data_class: pygen_config.DataClassNaming) -> DataClass:
+        class_name = create_name(base_name, data_class.name)
         if is_reserved_word(class_name, "data class", view.as_id()):
             class_name = f"{class_name}_"
 
-        variable_name = create_name(view_name, data_class.variable)
-        variable_list = create_name(view_name, data_class.variable_list)
-        doc_name = to_words(view_name, singularize=True)
-        doc_list_name = to_words(view_name, pluralize=True)
+        variable_name = create_name(base_name, data_class.variable)
+        variable_list = create_name(base_name, data_class.variable_list)
+        doc_name = to_words(base_name, singularize=True)
+        doc_list_name = to_words(base_name, pluralize=True)
         if variable_name == variable_list:
             variable_list = f"{variable_list}_list"
-        raw_file_name = create_name(view_name, data_class.file)
+        raw_file_name = create_name(base_name, data_class.file)
         file_name = f"_{raw_file_name}"
         if is_reserved_word(file_name, "filename", view.as_id()):
             file_name = f"{file_name}_"
@@ -131,9 +132,9 @@ class DataClass:
     @property
     def init_import(self) -> str:
         import_classes = [self.read_name, self.write_name, self.read_list_name, self.write_list_name]
-        if self.has_primitive_fields:
+        if self.has_field_of_type(PrimitiveFieldCore):
             import_classes.append(self.field_names)
-        if self.has_text_field:
+        if self.has_primitive_fields_of_type(dm.Text):
             import_classes.append(self.text_field_names)
         return f"from .{self.file_name} import {', '.join(sorted(import_classes))}"
 
@@ -141,17 +142,17 @@ class DataClass:
         return iter(self.fields)
 
     @overload
-    def fields_of_type(self, type_: type[T_Field]) -> Iterable[T_Field]:
+    def fields_of_type(self, field_type: type[T_Field]) -> Iterator[T_Field]:
         ...
 
     @overload
-    def fields_of_type(self, type_: tuple[type[Field], ...]) -> Iterable[tuple[type[Field], ...]]:
+    def fields_of_type(self, field_type: tuple[type[Field], ...]) -> Iterator[tuple[Field]]:
         ...
 
     def fields_of_type(
         self, field_type: type[T_Field] | tuple[type[Field], ...]
-    ) -> Iterable[T_Field] | Iterable[tuple[type[Field], ...]]:
-        return (field_ for field_ in self if isinstance(field_, field_type))
+    ) -> Iterator[T_Field] | Iterator[tuple[Field]]:
+        return (field_ for field_ in self if isinstance(field_, field_type))  # type: ignore[return-value]
 
     def has_field_of_type(self, type_: type[Field] | tuple[type[Field], ...]) -> bool:
         return any(isinstance(field_, type_) for field_ in self)
@@ -159,7 +160,9 @@ class DataClass:
     def is_all_fields_of_type(self, type_: type[Field] | tuple[type[Field], ...]) -> bool:
         return all(isinstance(field_, type_) for field_ in self)
 
-    def primitive_fields_of_type(self, type_: type[dm.PropertyType]) -> Iterable[PrimitiveFieldCore]:
+    def primitive_fields_of_type(
+        self, type_: type[dm.PropertyType] | tuple[type[dm.PropertyType], ...]
+    ) -> Iterable[PrimitiveFieldCore]:
         return (field_ for field_ in self.fields_of_type(PrimitiveFieldCore) if isinstance(field_.type_, type_))
 
     def has_primitive_fields_of_type(self, type_: type[dm.PropertyType] | tuple[type[dm.PropertyType], ...]) -> bool:
@@ -167,22 +170,6 @@ class DataClass:
 
     def is_all_primitive_fields_of_type(self, type_: type[dm.PropertyType] | tuple[type[dm.PropertyType], ...]) -> bool:
         return all(self.primitive_fields_of_type(type_))
-
-    @property
-    def text_fields(self) -> Iterable[PrimitiveFieldCore]:
-        return (field_ for field_ in self.primitive_core_fields if field_.is_text_field)
-
-    @property
-    def single_timeseries_fields(self) -> Iterable[CDFExternalField]:
-        return (field_ for field_ in self.cdf_external_fields if isinstance(field_.type_, dm.TimeSeriesReference))
-
-    @property
-    def has_time_field(self) -> bool:
-        return any(field_.is_time_field for field_ in self.fields)
-
-    @property
-    def has_text_field(self) -> bool:
-        return any(field_.is_text_field for field_ in self.fields)
 
     @property
     def _field_type_hints(self) -> Iterable[str]:
@@ -201,19 +188,14 @@ class DataClass:
     def dependencies(self) -> list[DataClass]:
         unique: dict[dm.ViewId, DataClass] = {}
         for field_ in self.fields:
-            if isinstance(field_, EdgeField):
+            if isinstance(field_, EdgeToOneDataClass):
                 # This will overwrite any existing data class with the same view id
                 # however, this is not a problem as all data classes are uniquely identified by their view id
                 unique[field_.data_class.view_id] = field_.data_class
+            elif isinstance(field_, EdgeOneToEndNode):
+                for class_ in field_.data_classes:
+                    unique[class_.view_id] = class_
         return sorted(unique.values(), key=lambda x: x.write_name)
-
-    # @property
-    # def dependencies_edges(self) -> list[EdgeWithPropertyDataClass]:
-
-    # @property
-    # def has_single_timeseries_fields(self) -> bool:
-    #     return any(
-    #         for field_ in self.single_timeseries_fields
 
     @property
     def primitive_fields_literal(self) -> str:
@@ -223,11 +205,7 @@ class DataClass:
 
     @property
     def text_fields_literals(self) -> str:
-        return ", ".join(f'"{field_.name}"' for field_ in self.text_fields)
-
-    # @property
-    # def one_to_many_edges_docs(self) -> str:
-    #     if len(edges) == 1:
+        return ", ".join(f'"{field_.name}"' for field_ in self.primitive_fields_of_type(dm.Text))
 
     @property
     def fields_literals(self) -> str:
@@ -258,6 +236,7 @@ class EdgeDataClass(DataClass):
     _end_class: NodeDataClass | None = None
     _edge_type: dm.DirectRelationReference | None = None
 
+    @property
     def is_edge_class(self) -> bool:
         return True
 
@@ -284,28 +263,27 @@ class EdgeDataClass(DataClass):
         cls, field: EdgeOneToManyNodes, data_class: NodeDataClass, config: pygen_config.PygenConfig
     ):
         edge_fields: list[Field] = []  # Space and External ID are automatically added
-        list_method = FilterMethod.from_fields(edge_fields, config.filtering, is_edge_class=True)
-        return cls(
-            field.data_class.view_name,
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            field.data_class.view_id,
-            field.data_class.view_version,
-            edge_fields,
-            list_method,
-            data_class,
-            cast(NodeDataClass, field.data_class),
-            field.prop.type,
-        )
+        FilterMethod.from_fields(edge_fields, config.filtering, is_edge_class=True)
+        raise NotImplementedError()
+        # return cls(
+        #     field.data_class.view_name,
+        #     "",
+        #     "",
+        #     "",
+        #     "",
+        #     "",
+        #     "",
+        #     "",
+        #     "",
+        #     "",
+        #     "",
+        #     "",
+        #     field.data_class.view_id,
+        #     field.data_class.view_version,
+        #     edge_fields,
+        #     list_method,
+        #     data_class,
+        #     field.prop.type,
 
     def node_parameters(self, instance_space: str) -> Iterable[FilterParameter]:
         nodes = [

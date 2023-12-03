@@ -1,7 +1,7 @@
 from cognite.client import data_modeling as dm
 
-from cognite.pygen._core.models import NodeDataClass
 from cognite.pygen._core.generators import APIGenerator
+from cognite.pygen._core.models import NodeDataClass
 from cognite.pygen.config import PygenConfig
 
 

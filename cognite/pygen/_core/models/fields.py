@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Literal, TypeVar
+from typing import TYPE_CHECKING, Literal, TypeVar
 
 from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.data_modeling.data_types import ListablePropertyType
@@ -136,18 +136,11 @@ class Field(ABC):
                 # if (
                 #     view_id_no_version := ViewSpaceExternalId(prop.container.space, prop.container.external_id)
                 # ) in data_class_by_view_id:
-                #     target_data_class = data_class_by_view_id[view_id_no_version]
                 # elif prop.type.container and (
-                #     (
                 #         view_id_no_version := ViewSpaceExternalId(
                 #             prop.type.container.space, prop.type.container.external_id
-                #         )
-                #     )
                 #     in data_class_by_view_id
                 # ):
-                #     target_data_class = data_class_by_view_id[view_id_no_version]
-                # else:
-                #     raise ValueError(f"Could not find data class for {prop_name=}")
 
             return EdgeOneToOne(
                 name=name,

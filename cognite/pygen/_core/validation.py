@@ -2,10 +2,10 @@ from collections import defaultdict
 from typing import Any, cast
 
 from cognite.client import data_modeling as dm
+
 from cognite.pygen.exceptions import NameConflict
 
-from .models import APIClass, MultiAPIClass, DataClass
-
+from .models import APIClass, DataClass, MultiAPIClass
 
 _DATACLASS_UNIQUE_PROPERTIES = [
     "file_name",

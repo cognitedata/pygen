@@ -1,16 +1,16 @@
 from .api_casses import APIClass, MultiAPIClass
-from .data_classes import EdgeDataClass, NodeDataClass, DataClass
+from .data_classes import DataClass, EdgeDataClass, NodeDataClass
 from .fields import (
     CDFExternalField,
     EdgeField,
     EdgeOneToEndNode,
+    EdgeOneToMany,
     EdgeOneToManyNodes,
     EdgeOneToOne,
     Field,
     PrimitiveField,
     PrimitiveFieldCore,
     PrimitiveListField,
-    EdgeOneToMany,
 )
 from .filter_method import FilterCondition, FilterConditionOnetoOneEdge, FilterMethod, FilterParameter
 
