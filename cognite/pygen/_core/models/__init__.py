@@ -10,6 +10,7 @@ from .fields import (
     PrimitiveField,
     PrimitiveFieldCore,
     PrimitiveListField,
+    EdgeOneToMany,
 )
 from .filter_method import FilterCondition, FilterConditionOnetoOneEdge, FilterMethod, FilterParameter
 
@@ -32,4 +33,5 @@ __all__ = [
     "FilterParameter",
     "FilterCondition",
     "FilterConditionOnetoOneEdge",
+    "EdgeOneToMany",
 ]

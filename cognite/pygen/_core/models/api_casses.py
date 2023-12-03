@@ -35,6 +35,17 @@ class APIClass:
         )
 
 
+# edge_api_class_input = f"{view_name}_{prop_name}"
+# edge_api_file_name = f"{create_name(edge_api_class_input, field_naming.edge_api_file)}"
+# edge_api_class = f"{create_name(edge_api_class_input, field_naming.edge_api_class)}API"
+# edge_api_attribute = f"{create_name(prop_name, field_naming.api_class_attribute)}_edge"
+
+# edge_api_class_input = f"{view_name}_{prop_name}"
+# edge_api_class = f"{create_name(edge_api_class_input, field_naming.edge_api_class)}"
+# edge_api_attribute = f"{create_name(prop_name, field_naming.api_class_attribute)}"
+# edge_api_file_name = f"{create_name(edge_api_class_input, field_naming.edge_api_file)}"
+
+
 @dataclass(frozen=True)
 class EdgeAPIClass:
     edge_api_file_name: str

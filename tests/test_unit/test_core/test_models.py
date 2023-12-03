@@ -2,10 +2,12 @@ from __future__ import annotations
 
 from collections import defaultdict
 from itertools import chain
+
 from unittest.mock import MagicMock
 
 import pytest
 from cognite.client import data_modeling as dm
+from cognite.client.data_classes.data_modeling.views import ViewProperty
 from yaml import safe_load
 
 
@@ -13,11 +15,11 @@ from cognite.pygen._core.models import (
     NodeDataClass,
     Field,
     PrimitiveField,
-    PrimitiveFieldCore,
     EdgeOneToOne,
     FilterParameter,
     FilterCondition,
     PrimitiveListField,
+    EdgeOneToManyNodes,
 )
 from cognite.pygen.config import PygenConfig
 from cognite.pygen.warnings import (
@@ -52,9 +54,10 @@ def load_field_test_cases():
             name="run_events",
             prop_name="runEvents",
             pydantic_field="Field",
-            type_=dm.Text(),
+            type_=dm.Text(is_list=True),
             is_nullable=True,
             doc_name="run event",
+            description=None,
         ),
         {},
         'Optional[list[str]] = Field(None, alias="runEvents")',
@@ -86,13 +89,13 @@ def load_field_test_cases():
             name="model_template",
             prop_name="modelTemplate",
             pydantic_field="Field",
-            data_class=data_class,
-            prop=mapped,
             doc_name="model template",
+            description=None,
+            data_class=data_class,
         ),
-        {ViewSpaceExternalId("cogShop", "ModelTemplate"): data_class},
-        'Union[ModelTemplate, str, None] = Field(None, repr=False, alias="modelTemplate")',
-        'Union[ModelTemplateApply, str, None] = Field(None, repr=False, alias="modelTemplate")',
+        {dm.ViewId("cogShop", "ModelTemplate", "8ae35635bb3f8a"): data_class},
+        'Union[ModelTemplate, str, dm.NodeId, None] = Field(None, repr=False, alias="modelTemplate")',
+        'Union[ModelTemplateApply, str, dm.NodeId, None] = Field(None, repr=False, alias="modelTemplate")',
         id="EdgeField that require alias.",
     )
     raw_data = """
@@ -118,10 +121,11 @@ def load_field_test_cases():
             name="name",
             prop_name="name",
             pydantic_field="Field",
-            type_="str",
+            type_=dm.Text(),
             is_nullable=True,
             default=None,
             doc_name="name",
+            description=None,
         ),
         {},
         "Optional[str] = None",
@@ -136,7 +140,7 @@ def load_field_test_cases():
 def test_load_field(
     property_: dm.MappedProperty | dm.ConnectionDefinition,
     expected: Field,
-    data_class_by_id: dict[ViewSpaceExternalId, NodeDataClass],
+    data_class_by_id: dict[dm.ViewId, NodeDataClass],
     read_type_hint: str,
     write_type_hint: str,
     pygen_config: PygenConfig,
@@ -147,8 +151,8 @@ def test_load_field(
         property_,
         data_class_by_id,
         pygen_config,
-        view_name="dummy",
         view_id=dm.ViewId("a", "b", "c"),
+        pydantic_field="Field",
     )
 
     # Assert
@@ -225,13 +229,9 @@ def load_data_classes_test_cases():
             read_list_name="SeriesList",
             doc_name="series",
             doc_list_name="series",
-            view_id=ViewSpaceExternalId(view.space, view.external_id),
-            view_version=view.version,
+            view_id=view.as_id(),
             variable="series",
             variable_list="series_list",
-            query_class_name="SeriesQueryAPI",
-            query_file_name="series_query",
-            view_name="Series",
             file_name="_series",
             fields=[],
         ),
@@ -375,7 +375,7 @@ def test_field_from_property_expect_warning(name: str, expected_name, pygen_conf
 
     # Act
     with pytest.warns(ViewPropertyNameCollisionWarning):
-        actual = Field.from_property(name, prop, {}, pygen_config, "dummy", dm.ViewId("a", "b", "c"))
+        actual = Field.from_property(name, prop, {}, pygen_config, dm.ViewId("a", "b", "c"), pydantic_field="Field")
 
     # Assert
     assert actual.name == expected_name
@@ -451,3 +451,217 @@ def test_filter_parameter_expected_warning(name: str, expected_name: str, pygen_
 
     # Assert
     assert actual.name == expected_name
+
+
+def create_fields_test_cases():
+    prop = {
+        "container": {"space": "IntegrationTestsImmutable", "externalId": "Person"},
+        "containerPropertyIdentifier": "name",
+        "type": {"list": False, "collation": "ucs_basic", "type": "text"},
+        "nullable": False,
+        "autoIncrement": False,
+        "source": None,
+        "defaultValue": None,
+        "name": "name",
+        "description": None,
+    }
+    prop = ViewProperty.load(prop)
+    #
+    yield pytest.param(
+        "name",
+        prop,
+        {},
+        "Person",
+        PrimitiveField(
+            name="name",
+            prop_name="name",
+            doc_name="name",
+            type_=dm.Text(),
+            description=None,
+            is_nullable=False,
+            default=None,
+            pydantic_field="Field",
+        ),
+        "Optional[str] = None",
+        "str",
+        id="String property",
+    )
+    prop = {
+        "type": {"space": "IntegrationTestsImmutable", "externalId": "Person.roles"},
+        "source": {"space": "IntegrationTestsImmutable", "externalId": "Role", "version": "2", "type": "view"},
+        "name": "roles",
+        "description": None,
+        "edgeSource": None,
+        "direction": "outwards",
+    }
+    prop = ViewProperty.load(prop)
+    data_class = NodeDataClass(
+        read_name="Role",
+        write_name="RoleApply",
+        read_list_name="RoleList",
+        write_list_name="RoleListApply",
+        doc_name="role",
+        doc_list_name="roles",
+        variable="role",
+        variable_list="roles",
+        file_name="_roles",
+        view_id=dm.ViewId("IntegrationTestsImmutable", "Role", "2"),
+        fields=[],
+    )
+    data_class_by_view_id = {dm.ViewId("IntegrationTestsImmutable", "Role", "2"): data_class}
+    yield pytest.param(
+        "roles",
+        prop,
+        data_class_by_view_id,
+        "Person",
+        EdgeOneToManyNodes(
+            name="roles",
+            prop_name="roles",
+            doc_name="role",
+            description=None,
+            data_class=data_class,
+            variable="role",
+            pydantic_field="Field",
+            edge_type=dm.DirectRelationReference("IntegrationTestsImmutable", "Person.roles"),
+        ),
+        "Union[list[Role], list[str], None] = Field(default=None, repr=False)",
+        "Union[list[RoleApply], list[str], None] = Field(default=None, repr=False)",
+        id="List of edges",
+    )
+    prop = {
+        "container": {"space": "IntegrationTestsImmutable", "externalId": "Command_Config"},
+        "containerPropertyIdentifier": "configs",
+        "type": {"list": True, "collation": "ucs_basic", "type": "text"},
+        "nullable": False,
+        "autoIncrement": False,
+        "source": None,
+        "defaultValue": None,
+        "name": "configs",
+        "description": None,
+    }
+    prop = ViewProperty.load(prop)
+    yield pytest.param(
+        "configs",
+        prop,
+        {},
+        "Command_Config",
+        PrimitiveListField(
+            name="configs",
+            prop_name="configs",
+            description=None,
+            type_=dm.Text(is_list=True),
+            is_nullable=False,
+            pydantic_field="Field",
+            doc_name="config",
+        ),
+        "Optional[list[str]] = None",
+        "list[str]",
+        id="List of strings",
+    )
+
+    prop = {
+        "container": {"space": "IntegrationTestsImmutable", "externalId": "Role"},
+        "containerPropertyIdentifier": "person",
+        "type": {
+            "container": None,
+            "type": "direct",
+            "source": {"space": "IntegrationTestsImmutable", "externalId": "Person", "version": "2"},
+        },
+        "nullable": True,
+        "autoIncrement": False,
+        "defaultValue": None,
+        "name": "person",
+        "description": None,
+    }
+    data_class = NodeDataClass(
+        read_name="Person",
+        write_name="PersonApply",
+        read_list_name="PersonList",
+        write_list_name="PersonListApply",
+        doc_name="person",
+        doc_list_name="persons",
+        variable="person",
+        file_name="_persons",
+        view_id=dm.ViewId("IntegrationTestsImmutable", "Person", "2"),
+        variable_list="persons",
+        fields=[],
+    )
+    data_class_by_view_id = {dm.ViewId("IntegrationTestsImmutable", "Person", "2"): data_class}
+
+    prop = ViewProperty.load(prop)
+    yield pytest.param(
+        "person",
+        prop,
+        data_class_by_view_id,
+        "Person",
+        EdgeOneToOne(
+            name="person",
+            prop_name="person",
+            doc_name="person",
+            data_class=data_class,
+            pydantic_field="Field",
+            description=None,
+        ),
+        "Union[Person, str, dm.NodeId, None] = Field(None, repr=False)",
+        "Union[PersonApply, str, dm.NodeId, None] = Field(None, repr=False)",
+        id="Edge to another view",
+    )
+
+    prop = {
+        "container": {"space": "IntegrationTestsImmutable", "externalId": "Role"},
+        "containerPropertyIdentifier": "wonOscar",
+        "type": {"list": False, "type": "boolean"},
+        "nullable": True,
+        "autoIncrement": False,
+        "source": None,
+        "defaultValue": None,
+        "name": "wonOscar",
+        "description": None,
+    }
+    prop = ViewProperty.load(prop)
+
+    yield pytest.param(
+        "wonOscar",
+        prop,
+        {},
+        "Person",
+        PrimitiveField(
+            name="won_oscar",
+            prop_name="wonOscar",
+            doc_name="won oscar",
+            is_nullable=True,
+            default=None,
+            type_=dm.Boolean(),
+            pydantic_field="Field",
+            description=None,
+        ),
+        'Optional[bool] = Field(None, alias="wonOscar")',
+        'Optional[bool] = Field(None, alias="wonOscar")',
+        id="Boolean property with pascal name",
+    )
+
+
+@pytest.mark.parametrize(
+    "prop_name, property_, data_class_by_view_id, view_name, expected, "
+    "expected_read_type_hint, expected_write_type_hint",
+    list(create_fields_test_cases()),
+)
+def test_fields_from_property(
+    prop_name: str,
+    property_: dm.MappedProperty | dm.ConnectionDefinition,
+    data_class_by_view_id: dict[dm.ViewId, NodeDataClass],
+    view_name: str,
+    expected: Field,
+    expected_read_type_hint: str,
+    expected_write_type_hint: str,
+    pygen_config: PygenConfig,
+):
+    # Act
+    actual = Field.from_property(
+        prop_name, property_, data_class_by_view_id, pygen_config, dm.ViewId("a", "b", "c"), pydantic_field="Field"
+    )
+
+    # Assert
+    assert actual == expected
+    assert actual.as_read_type_hint() == expected_read_type_hint
+    assert actual.as_write_type_hint() == expected_write_type_hint

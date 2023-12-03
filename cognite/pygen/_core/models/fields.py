@@ -31,7 +31,6 @@ __all__ = [
     "EdgeOneToManyEdges",
     "EdgeOneToManyNodes",
     "EdgeToOneDataClass",
-    "EdgeToMultipleDataClasses",
     "EdgeOneToOne",
     "EdgeOneToMany",
     "EdgeOneToEndNode",
@@ -56,6 +55,7 @@ class Field(ABC):
     name: str
     doc_name: str
     prop_name: str
+    description: str | None
     pydantic_field: Literal["Field", "pydantic.Field"]
 
     @property
@@ -69,9 +69,8 @@ class Field(ABC):
         prop: dm.MappedProperty | dm.ConnectionDefinition,
         data_class_by_view_id: dict[dm.ViewId, DataClass],
         config: pygen_config.PygenConfig,
-        view_name: str,
         view_id: dm.ViewId,
-        pydantic_field: str = Literal["Field", "pydantic.Field"],
+        pydantic_field: Literal["Field", "pydantic.Field"],
     ) -> Field:
         field_naming = config.naming.field
         name = create_name(prop_name, field_naming.name)
@@ -79,114 +78,96 @@ class Field(ABC):
             name = f"{name}_"
 
         doc_name = to_words(name, singularize=True)
-        if isinstance(prop, dm.SingleHopConnectionDefinition):
-            variable = create_name(prop_name, field_naming.variable)
+        variable = create_name(prop_name, field_naming.variable)
 
-            edge_api_class_input = f"{view_name}_{prop_name}"
-            edge_api_file_name = f"{create_name(edge_api_class_input, field_naming.edge_api_file)}"
-            edge_api_class = f"{create_name(edge_api_class_input, field_naming.edge_api_class)}API"
-            edge_api_attribute = f"{create_name(prop_name, field_naming.api_class_attribute)}_edge"
-            args: dict[str, Any] = {"_list_method": None}
-            if prop.edge_source:
-                # The edge has properties, i.e., it has its own view
-                edge_id = prop.edge_source.space, prop.edge_source.external_id
-            else:
-                edge_id = prop.source.space, prop.source.external_id
-                args["_list_method"] = FilterMethod.from_fields([], config.filtering, is_edge_class=True)
-            data_class = data_class_by_view_id[ViewSpaceExternalId(*edge_id)]
-
+        if isinstance(prop, dm.SingleHopConnectionDefinition) and prop.edge_source:
+            return EdgeOneToManyEdges(
+                name=name,
+                doc_name=doc_name,
+                prop_name=prop_name,
+                variable=variable,
+                data_class=data_class_by_view_id[prop.edge_source],
+                edge_type=prop.type,
+                description=prop.description,
+                pydantic_field=pydantic_field,
+            )
+        elif isinstance(prop, dm.SingleHopConnectionDefinition):
             return EdgeOneToManyNodes(
                 name=name,
                 doc_name=doc_name,
                 prop_name=prop_name,
-                prop=prop,
-                data_class=data_class,
                 variable=variable,
+                data_class=data_class_by_view_id[prop.source],
+                edge_type=prop.type,
+                description=prop.description,
                 pydantic_field=pydantic_field,
-                edge_api_file_name=edge_api_file_name,
-                edge_api_class=edge_api_class,
-                edge_api_attribute=edge_api_attribute,
-                **args,
             )
-        elif isinstance(prop, dm.MappedProperty) and (
-            isinstance(prop.type, _PRIMITIVE_TYPES) or isinstance(prop.type, _EXTERNAL_TYPES)
-        ):
-            type_ = _to_python_type(prop.type)
-            if isinstance(prop.type, ListablePropertyType) and prop.type.is_list:
-                return PrimitiveListField(
-                    name=name,
-                    prop_name=prop_name,
-                    doc_name=doc_name,
-                    type_=type_,
-                    is_nullable=prop.nullable,
-                    prop=prop,
-                    pydantic_field=pydantic_field,
-                )
-            elif isinstance(prop.type, dm.CDFExternalIdReference):
-                # Note: these are only CDF External Fields that are not listable. Listable CDF External Fields
-                # are handled above.
-                edge_api_class_input = f"{view_name}_{prop_name}"
-                edge_api_class = f"{create_name(edge_api_class_input, field_naming.edge_api_class)}"
-                edge_api_attribute = f"{create_name(prop_name, field_naming.api_class_attribute)}"
-                edge_api_file_name = f"{create_name(edge_api_class_input, field_naming.edge_api_file)}"
-                return CDFExternalField(
-                    name=name,
-                    prop_name=prop_name,
-                    doc_name=doc_name,
-                    type_=type_,
-                    is_nullable=prop.nullable,
-                    prop=prop,
-                    pydantic_field=pydantic_field,
-                    edge_api_file_name=edge_api_file_name,
-                    edge_api_class=edge_api_class,
-                    edge_api_attribute=edge_api_attribute,
-                )
-            else:
-                return PrimitiveField(
-                    name=name,
-                    prop_name=prop_name,
-                    doc_name=doc_name,
-                    type_=type_,
-                    is_nullable=prop.nullable,
-                    default=prop.default_value,
-                    prop=prop,
-                    pydantic_field=pydantic_field,
-                )
+        elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, ListablePropertyType) and prop.type.is_list:
+            return PrimitiveListField(
+                name=name,
+                prop_name=prop_name,
+                doc_name=doc_name,
+                type_=prop.type,
+                is_nullable=prop.nullable,
+                pydantic_field=pydantic_field,
+                description=prop.description,
+            )
+        elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.CDFExternalIdReference):
+            # Note: these are only CDF External Fields that are not listable. Listable CDF External Fields
+            # are handled above.
+            return CDFExternalField(
+                name=name,
+                prop_name=prop_name,
+                doc_name=doc_name,
+                type_=prop.type,
+                is_nullable=prop.nullable,
+                description=prop.description,
+                pydantic_field=pydantic_field,
+            )
         elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation):
             if prop.source is not None:
                 # Connected in View
-                target_data_class = data_class_by_view_id[
-                    ViewSpaceExternalId(prop.source.space, prop.source.external_id)
-                ]
+                target_data_class = data_class_by_view_id[prop.source]
             else:
-                # Connected in Container
-                # Todo: This is a hack, we are assuming (gambling) that the container ExternalId is the same as the
-                #   view ExternalId. This is not always true.
-                if (
-                    view_id_no_version := ViewSpaceExternalId(prop.container.space, prop.container.external_id)
-                ) in data_class_by_view_id:
-                    target_data_class = data_class_by_view_id[view_id_no_version]
-                elif prop.type.container and (
-                    (
-                        view_id_no_version := ViewSpaceExternalId(
-                            prop.type.container.space, prop.type.container.external_id
-                        )
-                    )
-                    in data_class_by_view_id
-                ):
-                    target_data_class = data_class_by_view_id[view_id_no_version]
-                else:
-                    raise ValueError(f"Could not find data class for {prop_name=}")
+                raise NotImplementedError()
+                # # Connected in Container
+                # # Todo: This is a hack, we are assuming (gambling) that the container ExternalId is the same as the
+                # #   view ExternalId. This is not always true.
+                # if (
+                #     view_id_no_version := ViewSpaceExternalId(prop.container.space, prop.container.external_id)
+                # ) in data_class_by_view_id:
+                #     target_data_class = data_class_by_view_id[view_id_no_version]
+                # elif prop.type.container and (
+                #     (
+                #         view_id_no_version := ViewSpaceExternalId(
+                #             prop.type.container.space, prop.type.container.external_id
+                #         )
+                #     )
+                #     in data_class_by_view_id
+                # ):
+                #     target_data_class = data_class_by_view_id[view_id_no_version]
+                # else:
+                #     raise ValueError(f"Could not find data class for {prop_name=}")
 
             return EdgeOneToOne(
                 name=name,
                 prop_name=prop_name,
-                prop=prop,
+                description=prop.description,
                 data_class=target_data_class,
                 pydantic_field=pydantic_field,
                 doc_name=doc_name,
             )
-
+        elif isinstance(prop, dm.MappedProperty):
+            return PrimitiveField(
+                name=name,
+                prop_name=prop_name,
+                doc_name=doc_name,
+                type_=prop.type,
+                is_nullable=prop.nullable,
+                default=prop.default_value,
+                pydantic_field=pydantic_field,
+                description=prop.description,
+            )
         else:
             raise NotImplementedError(f"Property type={type(prop)!r} is not supported")
 
@@ -197,11 +178,6 @@ class Field(ABC):
     @abstractmethod
     def as_write_type_hint(self) -> str:
         raise NotImplementedError()
-
-    @property
-    @abstractmethod
-    def description(self) -> str | None:
-        raise NotImplementedError
 
     @abstractmethod
     def as_apply(self) -> str:
@@ -256,10 +232,6 @@ class PrimitiveFieldCore(Field, ABC):
     @property
     def is_text_field(self) -> bool:
         return isinstance(self.type_, dm.Text)
-
-    @property
-    def description(self) -> str | None:
-        return self.prop.description
 
     @property
     def type_as_string(self) -> str:
@@ -361,21 +333,16 @@ class EdgeField(Field, ABC):
         return True
 
 
+@dataclass(frozen=True)
 class EdgeToOneDataClass(EdgeField, ABC):
-    """This represent a field linking to a single data class."""
+    """This represents a field linking to a single data class."""
 
     data_class: DataClass
 
 
-class EdgeToMultipleDataClasses(EdgeField, ABC):
-    """This represent a field linking to multiple data classes"""
-
-    data_classes: list[DataClass]
-
-
 @dataclass(frozen=True)
 class EdgeOneToOne(EdgeToOneDataClass):
-    """This represent a one to one relation, which direct relation."""
+    """This represents a one-to-one relation, which direct relation."""
 
     def as_read_type_hint(self) -> str:
         return self._type_hint(self.data_class.read_name)
@@ -391,20 +358,22 @@ class EdgeOneToOne(EdgeToOneDataClass):
         else:
             return f"{left_side} {self.pydantic_field}(None, repr=False)"
 
-    @property
-    def description(self) -> str | None:
-        return self.prop.description
-
     def as_apply(self) -> str:
         return f"self.{self.name}.as_apply() if isinstance(self.{self.name}, DomainModel) else self.{self.name}"
 
 
 @dataclass(frozen=True)
-class EdgeOneToEndNode(EdgeToMultipleDataClasses):
+class EdgeOneToEndNode(EdgeField):
     """This represents a one-to-one edge where the end class can be one of multiple data classes.
     This is used for the end_node field in edge data classes, where the end_node can be one of multiple
     data classes.
     """
+
+    data_class_by_edge_type: dict[dm.DirectRelationReference, DataClass]
+
+    @property
+    def data_classes(self) -> list[DataClass]:
+        return list(self.data_class_by_edge_type.values())
 
     def as_read_type_hint(self) -> str:
         return self._type_hint([data_class.read_name for data_class in self.data_classes])
@@ -414,15 +383,10 @@ class EdgeOneToEndNode(EdgeToMultipleDataClasses):
 
     def _type_hint(self, data_class_names: list[str]) -> str:
         left_side = f"Union[{', '.join(data_class_names)}, str]"
-        # Required Edge fields cannot be nulled
         if self.need_alias:
             return f'{left_side} = {self.pydantic_field}(alias="{self.prop_name}")'
         else:
             return left_side
-
-    @property
-    def description(self) -> str | None:
-        return self.prop.description
 
     def as_apply(self) -> str:
         return f"self.{self.name}.as_apply() " f"if isinstance(self.{self.name}, DomainModel) " f"else self.{self.name}"
@@ -436,6 +400,7 @@ class EdgeOneToMany(EdgeToOneDataClass, ABC):
     """
 
     variable: str
+    edge_type: dm.DirectRelationReference
 
 
 @dataclass(frozen=True)
@@ -443,10 +408,6 @@ class EdgeOneToManyNodes(EdgeOneToMany):
     """
     This represents a list of edge fields linking to another data class.
     """
-
-    @property
-    def description(self) -> str | None:
-        return self.prop.description
 
     # @property
     # def is_property_edge(self) -> bool:
@@ -483,10 +444,6 @@ class EdgeOneToManyEdges(EdgeOneToMany):
     This represents a list of edge fields linking to another data class.
     """
 
-    @property
-    def description(self) -> str | None:
-        return self.prop.description
-
     # @property
     # def list_method(self) -> FilterMethod:
     #     if self.is_property_edge:
@@ -508,29 +465,6 @@ class EdgeOneToManyEdges(EdgeOneToMany):
             return f'{left_side} = {self.pydantic_field}(default=None, repr=False, alias="{self.prop_name}")'
         else:
             return f"{left_side} = {self.pydantic_field}(default=None, repr=False)"
-
-
-# These fields are used when creating the list method.
-_EXTERNAL_ID_FIELD = PrimitiveField(
-    name="external_id",
-    prop_name="externalId",
-    type_=dm.Text(),
-    doc_name="external ID",
-    is_nullable=False,
-    default=None,
-    # ),
-    pydantic_field="Field",
-)
-_SPACE_FIELD = PrimitiveField(
-    name="space",
-    prop_name="space",
-    type_=dm.Text(),
-    doc_name="space",
-    is_nullable=False,
-    default=None,
-    # ),
-    pydantic_field="Field",
-)
 
 
 def _to_python_type(type_: dm.DirectRelationReference | dm.PropertyType) -> str:

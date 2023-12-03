@@ -13,7 +13,7 @@ from typing_extensions import Self
 from cognite.pygen import config as pygen_config
 from cognite.pygen.config.reserved_words import is_reserved_word
 
-from .fields import _EXTERNAL_ID_FIELD, _SPACE_FIELD, EdgeOneToOne, Field, PrimitiveField
+from .fields import EdgeOneToOne, Field, PrimitiveField
 
 
 @dataclass
@@ -136,7 +136,7 @@ class FilterMethod:
         for field_ in itertools.chain(fields, (_EXTERNAL_ID_FIELD, _SPACE_FIELD)):
             # Only primitive and edge one-to-one fields supported for now
             if isinstance(field_, PrimitiveField):
-                for selected_filter in config.get(field_.prop.type, field_.prop_name):
+                for selected_filter in config.get(field_.type_, field_.prop_name):
                     if selected_filter is dm.filters.Equals:
                         if field_.name not in parameters_by_name:
                             parameter = FilterParameter(
@@ -215,7 +215,7 @@ class FilterMethod:
                         # This is a filter not supported by the list method.
                         continue
             elif isinstance(field_, EdgeOneToOne):
-                for selected_filter in config.get(field_.prop.type, field_.prop_name):
+                for selected_filter in config.get(field_.type_, field_.prop_name):
                     if selected_filter is dm.filters.Equals:
                         if field_.name not in parameters_by_name:
                             parameter = FilterParameter(
@@ -271,3 +271,26 @@ class FilterMethod:
                         continue
 
         return cls(parameters=list(parameters_by_name.values()), filters=list_filters)
+
+
+# These fields are used when creating the list method.
+_EXTERNAL_ID_FIELD = PrimitiveField(
+    name="external_id",
+    prop_name="externalId",
+    type_=dm.Text(),
+    doc_name="external ID",
+    is_nullable=False,
+    default=None,
+    description=None,
+    pydantic_field="Field",
+)
+_SPACE_FIELD = PrimitiveField(
+    name="space",
+    prop_name="space",
+    type_=dm.Text(),
+    doc_name="space",
+    is_nullable=False,
+    default=None,
+    description=None,
+    pydantic_field="Field",
+)

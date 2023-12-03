@@ -6,7 +6,7 @@ from abc import abstractmethod
 from collections import defaultdict
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass, field
-from typing import cast, overload
+from typing import cast, overload, Literal
 
 from cognite.client.data_classes import data_modeling as dm
 
@@ -27,7 +27,6 @@ from .fields import (
     PrimitiveListField,
     EdgeOneToManyEdges,
     EdgeToOneDataClass,
-    EdgeToMultipleDataClasses,
     T_Field,
 )
 from .filter_method import FilterMethod, FilterParameter
@@ -85,7 +84,6 @@ class DataClass:
             warnings.warn("View used_for is set to 'all'. This is not supported. Using 'node' instead.", stacklevel=2)
 
         args = dict(
-            view_name=view_name,
             read_name=class_name,
             write_name=f"{class_name}Apply",
             read_list_name=f"{class_name}List",
@@ -95,16 +93,15 @@ class DataClass:
             variable=variable_name,
             variable_list=variable_list,
             file_name=file_name,
-            query_file_name=query_file_name,
-            query_class_name=query_class_name,
             view_id=view.as_id(),
-            view_version=view.version,
+            fields=[],
         )
 
         if used_for == "node":
             return NodeDataClass(**args)
         elif used_for == "edge":
-            return EdgeWithPropertyDataClass(**args)
+            raise NotImplementedError
+            # return EdgeWithPropertyDataClass(**args)
         else:
             raise ValueError(f"Unsupported used_for={used_for}")
 
@@ -121,8 +118,7 @@ class DataClass:
                 prop,
                 data_class_by_view_id,
                 config,
-                self.view_name,
-                dm.ViewId(self.view_id.space, self.view_id.external_id, self.view_version),
+                self.view_id,
                 pydantic_field=pydantic_field,
             )
             self.fields.append(field_)
@@ -141,7 +137,7 @@ class DataClass:
         return f"_{self.read_name.upper()}_PROPERTIES_BY_FIELD"
 
     @property
-    def pydantic_field(self) -> str:
+    def pydantic_field(self) -> Literal["Field", "pydantic.Field"]:
         if any(
             name == "Field" for name in [self.read_name, self.write_name, self.read_list_name, self.write_list_name]
         ):
