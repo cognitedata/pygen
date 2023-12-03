@@ -277,11 +277,11 @@ class MultiAPIGenerator:
         return sdk
 
     def generate_api_core_file(self) -> str:
-        api_core = self.env.get_template("_core_api.py.jinja")
+        api_core = self.env.get_template("api_core.py.jinja")
         return api_core.render(top_level_package=self.top_level_package) + "\n"
 
     def generate_data_class_core_file(self) -> str:
-        data_class_core = self.env.get_template("_core_data_classes.py.jinja")
+        data_class_core = self.env.get_template("data_classes_core.py.jinja")
         return (
             data_class_core.render(
                 is_pydantic_v2=self.pydantic_version == "v2", default_instance_space=self.default_instance_space
@@ -355,7 +355,7 @@ class APIGenerator:
         )
 
     def generate_api_file(self, top_level_package: str, client_name: str) -> str:
-        type_api = self._env.get_template("api_class.py.jinja")
+        type_api = self._env.get_template("api_class_node.py.jinja")
 
         return (
             type_api.render(
@@ -364,7 +364,6 @@ class APIGenerator:
                 api_class=self.api_class,
                 data_class=self.data_class,
                 list_method=self.list_method,
-                default_instance_space=self.default_instance_space,
             )
             + "\n"
         )
