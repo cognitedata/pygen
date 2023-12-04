@@ -389,6 +389,13 @@ class APIGenerator:
     def generate_api_file(self, top_level_package: str, client_name: str) -> str:
         type_api = self._env.get_template("api_class_node.py.jinja")
 
+        unique_edge_data_classes = []
+        seen = set()
+        for edge_api in self.edge_apis:
+            if edge_api.data_class.read_name not in seen:
+                seen.add(edge_api.data_class.read_name)
+                unique_edge_data_classes.append(edge_api.data_class)
+
         return (
             type_api.render(
                 top_level_package=top_level_package,
@@ -399,6 +406,7 @@ class APIGenerator:
                 timeseries_apis=self.timeseries_apis,
                 edge_apis=self.edge_apis,
                 query_api=self.query_api,
+                edge_data_classes=unique_edge_data_classes,
                 # ft = field types
                 ft=fields,
                 dm=dm,
@@ -426,16 +434,22 @@ class APIGenerator:
         )
 
     def generate_edge_api_files(self, top_level_package: str, client_name: str) -> Iterator[tuple[str, str]]:
-        self._env.get_template("api_class_edge.py.jinja")
-        raise NotImplementedError()
-        # for field in self.data_class.one_to_many_edges:
-        #     # Todo: There should be no if-condition here
-        #     if isinstance(field.data_class, NodeDataClass):
-        #             field,
-        #             self._config,
-        #     yield field.edge_api_file_name, (
-        #         edge_api.render(
-        #         + "\n"
+        edge_class = self._env.get_template("api_class_edge.py.jinja")
+        for edge_api in self.edge_apis:
+            yield edge_api.file_name, (
+                edge_class.render(
+                    top_level_package=top_level_package,
+                    client_name=client_name,
+                    api_class=self.api_class,
+                    data_class=self.data_class,
+                    list_method=self.list_method,
+                    edge_api=edge_api,
+                    # ft = field types
+                    ft=fields,
+                    dm=dm,
+                )
+                + "\n"
+            )
 
     def generate_timeseries_api_files(self, top_level_package: str, client_name: str) -> Iterator[tuple[str, str]]:
         timeseries_api = self._env.get_template("api_class_timeseries.py.jinja")

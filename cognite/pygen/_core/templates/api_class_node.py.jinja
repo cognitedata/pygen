@@ -16,10 +16,10 @@ from {{ top_level_package }}.data_classes import (
     {{ data_class.field_names }},{% endif %}
     {{ data_class.read_list_name }},
     {{ data_class.write_list_name }},{% if data_class.has_primitive_field_of_type(dm.Text) %}
-    {{ data_class.text_field_names }},{% endif %}{% for field in data_class.property_edges %}
-    {{ field.data_class.read_name }},
-    {{ field.data_class.write_name }},
-    {{ field.data_class.read_list_name }},{% endfor %}
+    {{ data_class.text_field_names }},{% endif %}{% for edge_data_class in edge_data_classes %}
+    {{ edge_data_class.read_name }},
+    {{ edge_data_class.write_name }},
+    {{ edge_data_class.read_list_name }},{% endfor %}
 )
 from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import ({% if not data_class.has_only_one_to_many_edges %}
     {{ data_class.properties_dict_name }},{%  endif %}
@@ -43,11 +43,11 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
             class_apply_list={{ data_class.write_list_name }},
             view_by_write_class=view_by_write_class,
         )
-        self._view_id = view_id{% for field in data_class.one_to_many_edges %}
-        self.{{ field.edge_api_attribute }} = {{ field.edge_api_class }}(
-            client{% if field.is_property_edge %}, view_by_write_class, {{ field.data_class.read_name }}, {{ field.data_class.write_name }}, {{ field.data_class.read_list_name }}{% endif %}
-        ){% endfor %}{% for class_ in timeseries_apis %}
-        self.{{ class_.parent_attribute }} = {{ class_.name }}(client, view_id){% endfor %}
+        self._view_id = view_id{% for edge_api in edge_apis %}
+        self.{{ edge_api.parent_attribute }} = {{ edge_api.name }}(
+            client{% if edge_api.has_edge_class %}, view_by_write_class, {{ edge_api.data_class.read_name }}, {{ edge_api.data_class.write_name }}, {{ edge_api.data_class.read_list_name }}{% endif %}
+        ){% endfor %}{% for timeseries_api in timeseries_apis %}
+        self.{{ timeseries_api.parent_attribute }} = {{ timeseries_api.name }}(client, view_id){% endfor %}
 
     def __call__(
             self,{% for parm in list_method.parameters %}
@@ -77,7 +77,7 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
 
 
     def apply(self, {{ data_class.variable }}: {{ data_class.write_name }} | Sequence[{{ data_class.write_name }}], replace: bool = False) -> ResourcesApplyResult:
-        """Add or update (upsert) {{data_class.doc_list_name}}.{% if data_class.has_one_to_many_edges %}
+        """Add or update (upsert) {{data_class.doc_list_name}}.{% if data_class.has_field_of_type(ft.EdgeOneToMany) %}
 
         Note: This method iterates through all nodes and timeseries linked to {{ data_class.variable }} and creates them including the edges
         between the nodes. For example, if any of {{ data_class.one_to_many_edges_docs }} are set, then these
@@ -149,13 +149,13 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
                 >>> client = {{ client_name }}()
                 >>> {{ data_class.variable }} = client.{{ api_class.parent_attribute }}.retrieve("my_{{ data_class.variable }}")
 
-        """{% if data_class.has_one_to_many_edges %}
+        """{% if data_class.has_field_of_type(ft.EdgeOneToMany) %}
         return self._retrieve(
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_type_triple=[{% for field in data_class.one_to_many_edges %}
-                (self.{{ field.edge_api_attribute }}, "{{ field.name }}", dm.DirectRelationReference("{{ field.prop.type.space }}", "{{ field.prop.type.external_id }}")),{% endfor %}
+            edge_api_name_type_triple=[{% for edge_api in edge_apis %}
+                (self.{{ edge_api.parent_attribute }}, "{{ edge_api.field_name }}", dm.DirectRelationReference("{{ edge_api.type.space }}", "{{ edge_api.type.external_id }}")),{% endfor %}
             ]
         )
         {% else %}
@@ -337,7 +337,7 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
         self,{% for parm in list_method.parameters %}
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
         limit: int = DEFAULT_LIMIT_READ,
-        filter: dm.Filter | None = None,{% if data_class.has_one_to_many_edges %}
+        filter: dm.Filter | None = None,{% if data_class.has_field_of_type(ft.EdgeOneToMany) %}
         retrieve_edges: bool = True,{% endif %}
     ) -> {{ data_class.read_list_name }}:
         """List/filter {{ data_class.doc_list_name }}
@@ -345,7 +345,7 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
         Args:{% for parm in list_method.parameters %}
             {{ parm.name }}: {{ parm.description }}{% endfor %}
             limit: Maximum number of {{ data_class.doc_list_name }} to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above. {% if data_class.has_one_to_many_edges %}
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above. {% if data_class.has_field_of_type(ft.EdgeOneToMany) %}
             retrieve_edges: Whether to retrieve {{ data_class.one_to_many_edges_docs }} external ids for the {{ data_class.doc_list_name }}. Defaults to True.{% endif %}
 
         Returns:
@@ -365,13 +365,13 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
             {{ parm.name }},{% endfor %}
             filter,
         )
-        {% if data_class.has_one_to_many_edges %}
+        {% if data_class.has_field_of_type(ft.EdgeOneToMany) %}
         return self._list(
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_type_triple=[{% for field in data_class.one_to_many_edges %}
-                (self.{{ field.edge_api_attribute }}, "{{ field.name }}", dm.DirectRelationReference("{{ field.prop.type.space }}", "{{ field.prop.type.external_id }}")),{% endfor %}
+            edge_api_name_type_triple=[{% for edge_api in edge_apis %}
+                (self.{{ edge_api.parent_attribute }}, "{{ edge_api.field_name }}", dm.DirectRelationReference("{{ edge_api.type.space }}", "{{ edge_api.type.external_id }}")),{% endfor %}
             ]
         )
         {% else %}return self._list(limit=limit, filter=filter_){% endif %}

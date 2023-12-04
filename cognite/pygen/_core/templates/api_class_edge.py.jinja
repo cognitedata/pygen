@@ -13,7 +13,7 @@ from ._core import DEFAULT_LIMIT_READ, {% if field.is_property_edge %}EdgeProper
 
 
 
-class {{ field.edge_api_class }}({% if field.is_property_edge %}EdgePropertyAPI{% else %}EdgeAPI{% endif %}):
+class {{ edge_api.name }}({% if field.is_property_edge %}EdgePropertyAPI{% else %}EdgeAPI{% endif %}):
     def list(
             self,{% for param in data_class.node_parameters( instance_space ) %}
             {{ param.name }}: {{ param.annotation }} = {{ param.default }},{% endfor %}{% for param in data_class.list_method.parameters %}

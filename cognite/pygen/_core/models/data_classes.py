@@ -15,6 +15,7 @@ from cognite.pygen.utils.text import create_name, to_words
 from .fields import (
     CDFExternalField,
     EdgeOneToEndNode,
+    EdgeOneToMany,
     EdgeOneToManyNodes,
     EdgeToOneDataClass,
     Field,
@@ -224,6 +225,14 @@ class DataClass:
     @property
     def is_edge_class(self) -> bool:
         return False
+
+    @property
+    def one_to_many_edges_docs(self) -> str:
+        edges = list(self.fields_of_type(EdgeOneToMany))  # type: ignore[type-abstract]
+        if len(edges) == 1:
+            return f"`{edges[0].name}`"
+        else:
+            return ", ".join(f"`{field_.name}`" for field_ in edges[:-1]) + f" or `{edges[-1].name}`"
 
 
 @dataclass

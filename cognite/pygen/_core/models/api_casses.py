@@ -7,7 +7,8 @@ from cognite.client.data_classes import data_modeling as dm
 from cognite.pygen import config as pygen_config
 from cognite.pygen.utils.text import create_name
 
-from .fields import CDFExternalField, EdgeOneToMany
+from .data_classes import DataClass
+from .fields import CDFExternalField, EdgeOneToMany, EdgeOneToManyEdges
 
 
 @dataclass(frozen=True)
@@ -49,15 +50,26 @@ class QueryAPIClass(APIClass):
 
 @dataclass(frozen=True)
 class EdgeAPIClass(APIClass):
+    data_class: DataClass
+    has_edge_class: bool
+    field_name: str
+    type: dm.DirectRelationReference
+
     @classmethod
     def from_field(cls, field: EdgeOneToMany, base_name: str, api_class: pygen_config.APIClassNaming) -> EdgeAPIClass:
+        base_name = f"{base_name}_{field.name}"
         file_name = create_name(base_name, api_class.file_name)
         class_name = create_name(base_name, api_class.name)
-        parent_attribute = create_name(base_name, api_class.client_attribute)
+        parent_attribute = create_name(field.name, api_class.client_attribute)
+
         return cls(
             parent_attribute=f"{parent_attribute}_edge",
-            name=f"{class_name}EdgeAPI",
-            file_name=f"{file_name}_edge",
+            name=f"{class_name}API",
+            file_name=file_name,
+            data_class=field.data_class,
+            has_edge_class=isinstance(field, EdgeOneToManyEdges),
+            field_name=field.name,
+            type=field.edge_type,
         )
 
 

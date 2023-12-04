@@ -19,9 +19,6 @@ from equipment_unit.client.data_classes import (
     StartEndTime,
     StartEndTimeApply,
     StartEndTimeList,
-    StartEndTime,
-    StartEndTimeApply,
-    StartEndTimeList,
 )
 from equipment_unit.client.data_classes._unit_procedure import (
     _UNITPROCEDURE_PROPERTIES_BY_FIELD,
