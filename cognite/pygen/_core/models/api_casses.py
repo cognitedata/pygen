@@ -33,6 +33,7 @@ class NodeAPIClass(APIClass):
         )
 
 
+@dataclass(frozen=True)
 class QueryAPIClass(APIClass):
     @classmethod
     def from_view(cls, base_name: str, api_class: pygen_config.APIClassNaming) -> QueryAPIClass:
@@ -46,6 +47,7 @@ class QueryAPIClass(APIClass):
         )
 
 
+@dataclass(frozen=True)
 class EdgeAPIClass(APIClass):
     @classmethod
     def from_field(cls, field: EdgeOneToMany, base_name: str, api_class: pygen_config.APIClassNaming) -> EdgeAPIClass:
@@ -59,7 +61,12 @@ class EdgeAPIClass(APIClass):
         )
 
 
+@dataclass(frozen=True)
 class TimeSeriesAPIClass(APIClass):
+    query_class: str
+    prop_name: str
+    variable: str
+
     @classmethod
     def from_field(
         cls, field: CDFExternalField, base_name: str, api_class: pygen_config.APIClassNaming
@@ -68,10 +75,15 @@ class TimeSeriesAPIClass(APIClass):
         file_name = create_name(base_name, api_class.file_name)
         class_name = create_name(base_name, api_class.name)
         parent_attribute = create_name(field.name, api_class.client_attribute)
+        variable = create_name(field.name, api_class.variable)
+
         return cls(
             parent_attribute=f"{parent_attribute}",
             name=f"{class_name}API",
             file_name=f"{file_name}",
+            query_class=f"{class_name}Query",
+            prop_name=field.prop_name,
+            variable=variable,
         )
 
 

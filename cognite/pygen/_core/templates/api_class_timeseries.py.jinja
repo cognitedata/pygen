@@ -14,7 +14,7 @@ from ._core import DEFAULT_LIMIT_READ, INSTANCE_QUERY_LIMIT
 
 ColumnNames = Literal[{{ data_class.primitive_fields_literal }}]
 
-class {{ timeseries.edge_api_class}}Query:
+class {{ timeseries_api.query_class}}:
     def __init__(
         self,
         client: CogniteClient,
@@ -39,7 +39,7 @@ class {{ timeseries.edge_api_class}}Query:
         limit: int | None = None,
         include_outside_points: bool = False,
     ) -> DatapointsList:
-        """`Retrieve datapoints for the `{{ data_class.variable }}.{{ timeseries.edge_api_attribute }}` timeseries.
+        """`Retrieve datapoints for the `{{ data_class.variable }}.{{ timeseries_api.parent_attribute }}` timeseries.
 
         **Performance guide**:
             In order to retrieve millions of datapoints as efficiently as possible, here are a few guidelines:
@@ -64,11 +64,11 @@ class {{ timeseries.edge_api_class}}Query:
         Examples:
 
             In this example,
-            we are using the time-ago format to get raw data for the 'my_{{ timeseries.edge_api_attribute }}' from 2 weeks ago up until now::
+            we are using the time-ago format to get raw data for the 'my_{{ timeseries_api.parent_attribute }}' from 2 weeks ago up until now::
 
                 >>> from {{ top_level_package }} import {{ client_name }}
                 >>> client = {{ client_name }}()
-                >>> {{ data_class.variable }}_datapoints = client.{{ api_class.client_attribute }}.{{ timeseries.edge_api_attribute }}(external_id="my_{{ timeseries.edge_api_attribute }}").retrieve(start="2w-ago")
+                >>> {{ data_class.variable }}_datapoints = client.{{ api_class.parent_attribute }}.{{ timeseries_api.parent_attribute }}(external_id="my_{{ timeseries_api.parent_attribute }}").retrieve(start="2w-ago")
         """
         external_ids = self._retrieve_timeseries_external_ids_with_extra()
         if external_ids:
@@ -98,7 +98,7 @@ class {{ timeseries.edge_api_class}}Query:
         limit: int | None = None,
         include_outside_points: bool = False,
     ) -> DatapointsArrayList:
-        """`Retrieve numpy arrays for the `{{ data_class.variable }}.{{ timeseries.edge_api_attribute }}` timeseries.
+        """`Retrieve numpy arrays for the `{{ data_class.variable }}.{{ timeseries_api.parent_attribute }}` timeseries.
 
         **Performance guide**:
             In order to retrieve millions of datapoints as efficiently as possible, here are a few guidelines:
@@ -123,11 +123,11 @@ class {{ timeseries.edge_api_class}}Query:
         Examples:
 
             In this example,
-            we are using the time-ago format to get raw data for the 'my_{{ timeseries.edge_api_attribute }}' from 2 weeks ago up until now::
+            we are using the time-ago format to get raw data for the 'my_{{ timeseries_api.parent_attribute }}' from 2 weeks ago up until now::
 
                 >>> from {{ top_level_package }} import {{ client_name }}
                 >>> client = {{ client_name }}()
-                >>> {{ data_class.variable }}_datapoints = client.{{ api_class.client_attribute }}.{{ timeseries.edge_api_attribute }}(external_id="my_{{ timeseries.edge_api_attribute }}").retrieve_array(start="2w-ago")
+                >>> {{ data_class.variable }}_datapoints = client.{{ api_class.parent_attribute }}.{{ timeseries_api.parent_attribute }}(external_id="my_{{ timeseries_api.parent_attribute }}").retrieve_array(start="2w-ago")
         """
         external_ids = self._retrieve_timeseries_external_ids_with_extra()
         if external_ids:
@@ -159,9 +159,9 @@ class {{ timeseries.edge_api_class}}Query:
         uniform_index: bool = False,
         include_aggregate_name: bool = True,
         include_granularity_name: bool = False,
-        column_names: ColumnNames | list[ColumnNames] = "{{ timeseries.prop_name }}",
+        column_names: ColumnNames | list[ColumnNames] = "{{ timeseries_api.prop_name }}",
     ) -> pd.DataFrame:
-        """`Retrieve DataFrames for the `{{ data_class.variable }}.{{ timeseries.edge_api_attribute }}` timeseries.
+        """`Retrieve DataFrames for the `{{ data_class.variable }}.{{ timeseries_api.parent_attribute }}` timeseries.
 
         **Performance guide**:
             In order to retrieve millions of datapoints as efficiently as possible, here are a few guidelines:
@@ -182,7 +182,7 @@ class {{ timeseries.edge_api_class}}Query:
             uniform_index: If only querying aggregates AND a single granularity is used, AND no limit is used, specifying `uniform_index=True` will return a dataframe with an equidistant datetime index from the earliest `start` to the latest `end` (missing values will be NaNs). If these requirements are not met, a ValueError is raised. Default: False
             include_aggregate_name: Include 'aggregate' in the column name, e.g. `my-ts|average`. Ignored for raw time series. Default: True
             include_granularity_name: Include 'granularity' in the column name, e.g. `my-ts|12h`. Added after 'aggregate' when present. Ignored for raw time series. Default: False
-            column_names: Which property to use for column names. Defauts to {{ timeseries.prop_name }}
+            column_names: Which property to use for column names. Defauts to {{ timeseries_api.prop_name }}
 
 
         Returns:
@@ -191,11 +191,11 @@ class {{ timeseries.edge_api_class}}Query:
         Examples:
 
             In this example,
-            we are using the time-ago format to get raw data for the 'my_{{ timeseries.edge_api_attribute }}' from 2 weeks ago up until now::
+            we are using the time-ago format to get raw data for the 'my_{{ timeseries_api.parent_attribute }}' from 2 weeks ago up until now::
 
                 >>> from {{ top_level_package }} import {{ client_name }}
                 >>> client = {{ client_name }}()
-                >>> {{ data_class.variable }}_datapoints = client.{{ api_class.client_attribute }}.{{ timeseries.edge_api_attribute }}(external_id="my_{{ timeseries.edge_api_attribute }}").retrieve_dataframe(start="2w-ago")
+                >>> {{ data_class.variable }}_datapoints = client.{{ api_class.parent_attribute }}.{{ timeseries_api.parent_attribute }}(external_id="my_{{ timeseries_api.parent_attribute }}").retrieve_dataframe(start="2w-ago")
         """
         external_ids = self._retrieve_timeseries_external_ids_with_extra(column_names)
         if external_ids:
@@ -236,9 +236,9 @@ class {{ timeseries.edge_api_class}}Query:
         uniform_index: bool = False,
         include_aggregate_name: bool = True,
         include_granularity_name: bool = False,
-        column_names: ColumnNames | list[ColumnNames] = "{{ timeseries.prop_name }}",
+        column_names: ColumnNames | list[ColumnNames] = "{{ timeseries_api.prop_name }}",
     ) -> pd.DataFrame:
-        """Retrieve DataFrames for the `{{ data_class.variable }}.{{ timeseries.edge_api_attribute }}` timeseries in Timezone.
+        """Retrieve DataFrames for the `{{ data_class.variable }}.{{ timeseries_api.parent_attribute }}` timeseries in Timezone.
 
         **Performance guide**:
             In order to retrieve millions of datapoints as efficiently as possible, here are a few guidelines:
@@ -259,7 +259,7 @@ class {{ timeseries.edge_api_class}}Query:
             uniform_index: If only querying aggregates AND a single granularity is used, AND no limit is used, specifying `uniform_index=True` will return a dataframe with an equidistant datetime index from the earliest `start` to the latest `end` (missing values will be NaNs). If these requirements are not met, a ValueError is raised. Default: False
             include_aggregate_name: Include 'aggregate' in the column name, e.g. `my-ts|average`. Ignored for raw time series. Default: True
             include_granularity_name: Include 'granularity' in the column name, e.g. `my-ts|12h`. Added after 'aggregate' when present. Ignored for raw time series. Default: False
-            column_names: Which property to use for column names. Defauts to {{ timeseries.prop_name }}
+            column_names: Which property to use for column names. Defauts to {{ timeseries_api.prop_name }}
 
 
         Returns:
@@ -268,13 +268,13 @@ class {{ timeseries.edge_api_class}}Query:
         Examples:
 
             In this example,
-            get weekly aggregates for the 'my_{{ timeseries.edge_api_attribute }}' for the first month of 2023 in Oslo time:
+            get weekly aggregates for the 'my_{{ timeseries_api.parent_attribute }}' for the first month of 2023 in Oslo time:
 
                 >>> from {{ top_level_package }} import {{ client_name }}
                 >>> from datetime import datetime, timezone
                 >>> client = {{ client_name }}()
-                >>> {{ data_class.variable }}_datapoints = client.{{ api_class.client_attribute }}.{{ timeseries.edge_api_attribute }}(
-                ...     external_id="my_{{ timeseries.edge_api_attribute }}").retrieve_dataframe_in_timezone(
+                >>> {{ data_class.variable }}_datapoints = client.{{ api_class.parent_attribute }}.{{ timeseries_api.parent_attribute }}(
+                ...     external_id="my_{{ timeseries_api.parent_attribute }}").retrieve_dataframe_in_timezone(
                 ...         datetime(2023, 1, 1, tzinfo=ZoneInfo("Europe/Oslo")),
                 ...         datetime(2023, 1, 2, tzinfo=ZoneInfo("Europe/Oslo")),
                 ...         aggregates="average",
@@ -321,9 +321,9 @@ class {{ timeseries.edge_api_class}}Query:
             return None
 
     def _retrieve_timeseries_external_ids_with_extra(
-        self, extra_properties: ColumnNames | list[ColumnNames] = "{{ timeseries.prop_name }}"
+        self, extra_properties: ColumnNames | list[ColumnNames] = "{{ timeseries_api.prop_name }}"
     ) -> dict[str, list[str]]:
-        return _retrieve_timeseries_external_ids_with_extra_{{ timeseries.name }}(
+        return _retrieve_timeseries_external_ids_with_extra_{{ timeseries_api.variable }}(
             self._client,
             self._view_id,
             self._filter,
@@ -339,7 +339,7 @@ class {{ timeseries.edge_api_class}}Query:
         include_aggregate_name: bool,
         include_granularity_name: bool,
     ) -> pd.DataFrame:
-        if isinstance(column_names, str) and column_names == "{{ timeseries.prop_name }}":
+        if isinstance(column_names, str) and column_names == "{{ timeseries_api.prop_name }}":
             return df
         splits = sum(included for included in [include_aggregate_name, include_granularity_name])
         if splits == 0:
@@ -352,7 +352,7 @@ class {{ timeseries.edge_api_class}}Query:
         return df
 
 
-class {{ timeseries.edge_api_class}}API:
+class {{ timeseries_api.name}}:
     def __init__(self, client: CogniteClient, view_id: dm.ViewId):
         self._client = client
         self._view_id = view_id
@@ -362,8 +362,8 @@ class {{ timeseries.edge_api_class}}API:
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> {{ timeseries.edge_api_class}}Query:
-        """Query timeseries `{{ data_class.variable }}.{{ timeseries.edge_api_attribute }}`
+    ) -> {{ timeseries_api.query_class}}:
+        """Query timeseries `{{ data_class.variable }}.{{ timeseries_api.parent_attribute }}`
 
         Args:{% for parm in list_method.parameters %}
             {{ parm.name }}: {{ parm.description }}{% endfor %}
@@ -371,16 +371,16 @@ class {{ timeseries.edge_api_class}}API:
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
-            A query object that can be used to retrieve datapoins for the {{ data_class.variable }}.{{ timeseries.edge_api_attribute }} timeseries
+            A query object that can be used to retrieve datapoins for the {{ data_class.variable }}.{{ timeseries_api.parent_attribute }} timeseries
             selected in this method.
 
         Examples:
 
-            Retrieve all data for 5 {{ data_class.variable }}.{{ timeseries.edge_api_attribute }} timeseries:
+            Retrieve all data for 5 {{ data_class.variable }}.{{ timeseries_api.parent_attribute }} timeseries:
 
                 >>> from {{ top_level_package }} import {{ client_name }}
                 >>> client = {{ client_name }}()
-                >>> {{ data_class.variable_list }} = client.{{ api_class.client_attribute }}.{{ timeseries.edge_api_attribute }}(limit=5).retrieve()
+                >>> {{ data_class.variable_list }} = client.{{ api_class.parent_attribute }}.{{ timeseries_api.parent_attribute }}(limit=5).retrieve()
 
         """
         filter_ = {{ data_class.filter_name }}(
@@ -389,7 +389,7 @@ class {{ timeseries.edge_api_class}}API:
             filter,
         )
 
-        return {{ timeseries.edge_api_class }}Query(
+        return {{ timeseries_api.query_class }}(
             client=self._client,
             view_id=self._view_id,
             timeseries_limit=limit,
@@ -402,7 +402,7 @@ class {{ timeseries.edge_api_class}}API:
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> TimeSeriesList:
-        """List timeseries `{{ data_class.variable }}.{{ timeseries.edge_api_attribute }}`
+        """List timeseries `{{ data_class.variable }}.{{ timeseries_api.parent_attribute }}`
 
         Args:{% for parm in list_method.parameters %}
             {{ parm.name }}: {{ parm.description }}{% endfor %}
@@ -410,15 +410,15 @@ class {{ timeseries.edge_api_class}}API:
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
-            List of Timeseries {{ data_class.variable }}.{{ timeseries.edge_api_attribute }}.
+            List of Timeseries {{ data_class.variable }}.{{ timeseries_api.parent_attribute }}.
 
         Examples:
 
-            List {{ data_class.variable }}.{{ timeseries.edge_api_attribute }} and limit to 5:
+            List {{ data_class.variable }}.{{ timeseries_api.parent_attribute }} and limit to 5:
 
                 >>> from {{ top_level_package }} import {{ client_name }}
                 >>> client = {{ client_name }}()
-                >>> {{ data_class.variable_list }} = client.{{ api_class.client_attribute }}.{{ timeseries.edge_api_attribute }}.list(limit=5)
+                >>> {{ data_class.variable_list }} = client.{{ api_class.parent_attribute }}.{{ timeseries_api.parent_attribute }}.list(limit=5)
 
         """
         filter_ = {{ data_class.filter_name }}(
@@ -426,28 +426,28 @@ class {{ timeseries.edge_api_class}}API:
             {{ parm.name }},{% endfor %}
             filter,
         )
-        external_ids = _retrieve_timeseries_external_ids_with_extra_{{ timeseries.name }}(self._client, self._view_id, filter_, limit)
+        external_ids = _retrieve_timeseries_external_ids_with_extra_{{ timeseries_api.variable }}(self._client, self._view_id, filter_, limit)
         if external_ids:
             return self._client.time_series.retrieve_multiple(external_ids=list(external_ids))
         else:
             return TimeSeriesList([])
 
 
-def _retrieve_timeseries_external_ids_with_extra_{{ timeseries.name }}(
+def _retrieve_timeseries_external_ids_with_extra_{{ timeseries_api.variable }}(
     client: CogniteClient,
     view_id: dm.ViewId,
     filter_: dm.Filter | None,
     limit: int,
-    extra_properties: ColumnNames | list[ColumnNames] = "{{ timeseries.prop_name }}",
+    extra_properties: ColumnNames | list[ColumnNames] = "{{ timeseries_api.prop_name }}",
 ) -> dict[str, list[str]]:
     limit = float("inf") if limit is None or limit == -1 else limit
-    properties = ["{{ timeseries.prop_name }}"]
-    if extra_properties == "{{ timeseries.prop_name }}":
+    properties = ["{{ timeseries_api.prop_name }}"]
+    if extra_properties == "{{ timeseries_api.prop_name }}":
         ...
-    elif isinstance(extra_properties, str) and extra_properties != "{{ timeseries.prop_name }}":
+    elif isinstance(extra_properties, str) and extra_properties != "{{ timeseries_api.prop_name }}":
         properties.append(extra_properties)
     elif isinstance(extra_properties, list):
-        properties.extend([prop for prop in extra_properties if prop != "{{ timeseries.prop_name }}"])
+        properties.extend([prop for prop in extra_properties if prop != "{{ timeseries_api.prop_name }}"])
     else:
         raise ValueError(f"Invalid value for extra_properties: {extra_properties}")
 
@@ -455,7 +455,7 @@ def _retrieve_timeseries_external_ids_with_extra_{{ timeseries.name }}(
         extra_list = [extra_properties]
     else:
         extra_list = extra_properties
-    has_data = dm.filters.HasData([dm.ContainerId("{{ timeseries.prop.container.space }}", "{{ timeseries.prop.container.external_id }}")], [view_id])
+    has_data = dm.filters.HasData(views=[view_id])
     filter_ = dm.filters.And(filter_, has_data) if filter_ else has_data
 
     cursor = None
@@ -477,7 +477,7 @@ def _retrieve_timeseries_external_ids_with_extra_{{ timeseries.name }}(
         )
         result = client.data_modeling.instances.query(query)
         batch_external_ids = {
-            node.properties[view_id]["{{ timeseries.prop_name }}"]: [node.properties[view_id].get(prop, "") for prop in extra_list]
+            node.properties[view_id]["{{ timeseries_api.prop_name }}"]: [node.properties[view_id].get(prop, "") for prop in extra_list]
             for node in result.data["nodes"].data
         }
         total_retrieved += len(batch_external_ids)

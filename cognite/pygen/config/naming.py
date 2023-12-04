@@ -126,6 +126,7 @@ class APIClassNaming:
         name: Naming convention for API class names. The api class name will be suffixed with "API".
         file_name: Naming convention for the file name of the API class.
         client_attribute: Naming convention for the client attribute.
+        variable: Naming convention for the API class variable.
 
     Examples:
 
@@ -148,6 +149,7 @@ class APIClassNaming:
     name: Naming = Naming(Case.pascal, Number.unchanged)
     file_name: Naming = Naming(Case.snake, Number.unchanged)
     client_attribute: Naming = Naming(Case.snake, Number.unchanged)
+    variable: Naming = Naming(Case.snake, Number.singular)
 
 
 @dataclass(frozen=True)

@@ -499,7 +499,7 @@ def _retrieve_timeseries_external_ids_with_extra_sensor_value(
         extra_list = [extra_properties]
     else:
         extra_list = extra_properties
-    has_data = dm.filters.HasData([dm.ContainerId("IntegrationTestsImmutable", "EquipmentModule")], [view_id])
+    has_data = dm.filters.HasData(views=[view_id])
     filter_ = dm.filters.And(filter_, has_data) if filter_ else has_data
 
     cursor = None

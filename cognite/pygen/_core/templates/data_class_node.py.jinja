@@ -1,9 +1,9 @@
 from __future__ import annotations
-{% if data_class.has_primitive_fields_of_type((dm.Timestamp, dm.Date)) %}
+{% if data_class.has_primitive_field_of_type((dm.Timestamp, dm.Date)) %}
 import datetime{% endif %}
-{% if data_class.has_field_of_type(ft.EdgeField) %}from typing import TYPE_CHECKING, Literal, Optional, Union{% else %}from typing import Literal, Optional{% if data_class.has_primitive_fields_of_type(dm.TimeSeriesReference) %}, Union{% endif %}{% endif %}{% if not data_class.use_optional_type %}  # noqa: F401{% endif %}
+{% if data_class.has_field_of_type(ft.EdgeField) %}from typing import TYPE_CHECKING, Literal, Optional, Union{% else %}from typing import Literal, Optional{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}, Union{% endif %}{% endif %}{% if not data_class.use_optional_type %}  # noqa: F401{% endif %}
 
-from cognite.client import data_modeling as dm{% if data_class.has_primitive_fields_of_type(dm.TimeSeriesReference) %}
+from cognite.client import data_modeling as dm{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}
 from cognite.client.data_classes import TimeSeries{% if is_pydantic_v2 %} as CogniteTimeSeries{% endif %}{% endif %}{% if data_class.use_pydantic_field %}
 {{ data_class.import_pydantic_field }}{% endif %}
 
@@ -14,7 +14,7 @@ from ._core import (
     DomainModelApplyList,
     DomainModelList,
     DomainRelationApply,
-    ResourcesApply,{% if data_class.has_primitive_fields_of_type(dm.TimeSeriesReference) and is_pydantic_v2 %}
+    ResourcesApply,{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) and is_pydantic_v2 %}
     TimeSeries,{% endif %}
 )
 {% if data_class.has_field_of_type(ft.EdgeField) %}
@@ -22,8 +22,8 @@ if TYPE_CHECKING:{% for dependency_class in data_class.dependencies %}
     from .{{ dependency_class.file_name }} import {{ dependency_class.read_name }}, {{ dependency_class.write_name }}{% endfor %}
 {% endif %}
 
-__all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data_class.read_list_name }}", "{{ data_class.write_list_name }}"{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}, "{{ data_class.field_names }}"{% endif %}{% if data_class.has_primitive_fields_of_type((dm.Text, dm.CDFExternalIdReference)) %}, "{{ data_class.text_field_names }}"{% endif %}]
-{% if data_class.has_primitive_fields_of_type((dm.Text, dm.CDFExternalIdReference)) %}
+__all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data_class.read_list_name }}", "{{ data_class.write_list_name }}"{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}, "{{ data_class.field_names }}"{% endif %}{% if data_class.has_primitive_field_of_type((dm.Text, dm.CDFExternalIdReference)) %}, "{{ data_class.text_field_names }}"{% endif %}]
+{% if data_class.has_primitive_field_of_type((dm.Text, dm.CDFExternalIdReference)) %}
 
 {{ data_class.text_field_names }} = Literal[{{ data_class.text_fields_literals }}]{% endif %}{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}
 {{ data_class.field_names }} = Literal[{{ data_class.fields_literals }}]

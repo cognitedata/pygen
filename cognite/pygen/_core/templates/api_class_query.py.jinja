@@ -1,5 +1,5 @@
 from __future__ import annotations
-{% if data_class.has_time_field_on_property_edge %}
+{% if data_class.has_primitive_field_of_type((dm.Timestamp, dm.Date)) %}
 import datetime{% endif %}
 from typing import TYPE_CHECKING
 
@@ -8,7 +8,7 @@ from cognite.client import data_modeling as dm, CogniteClient
 from {{ top_level_package }}.data_classes import (
     DomainModelApply,
     {{ data_class.read_name }},
-    {{ data_class.write_name }},{% for field in data_class.one_to_one_edges %}
+    {{ data_class.write_name }},{% for field in data_class.fields_of_type(ft.EdgeOneToMany) %}
     {{ field.data_class.read_name }},
     {{ field.data_class.write_name }},{% endfor %}
 )
@@ -23,7 +23,7 @@ if TYPE_CHECKING:{% for field in data_class.one_to_many_edges %}{% if field.data
 {% endif %}
 
 
-class {{ data_class.query_class_name }}(QueryAPI[T_DomainModelList]):
+class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
     def __init__(
         self,
         client: CogniteClient,

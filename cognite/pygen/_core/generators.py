@@ -416,6 +416,10 @@ class APIGenerator:
                 api_class=self.api_class,
                 data_class=self.data_class,
                 list_method=self.list_method,
+                query_api=self.query_api,
+                # ft = field types
+                ft=fields,
+                dm=dm,
                 sorted=sorted,
             )
             + "\n"
@@ -434,9 +438,19 @@ class APIGenerator:
         #         + "\n"
 
     def generate_timeseries_api_files(self, top_level_package: str, client_name: str) -> Iterator[tuple[str, str]]:
-        self._env.get_template("api_class_timeseries.py.jinja")
-        raise NotImplementedError()
-        # for timeseries in self.data_class.single_timeseries_fields:
-        #     yield timeseries.edge_api_file_name, (
-        #         timeseries_api.render(
-        #         + "\n"
+        timeseries_api = self._env.get_template("api_class_timeseries.py.jinja")
+        for timeseries in self.timeseries_apis:
+            yield timeseries.file_name, (
+                timeseries_api.render(
+                    top_level_package=top_level_package,
+                    client_name=client_name,
+                    api_class=self.api_class,
+                    data_class=self.data_class,
+                    list_method=self.list_method,
+                    timeseries_api=timeseries,
+                    # ft = field types
+                    ft=fields,
+                    dm=dm,
+                )
+                + "\n"
+            )
