@@ -17,7 +17,7 @@ from cognite.pygen.config import PygenConfig
 from cognite.pygen.utils.helper import get_pydantic_version
 
 from . import validation
-from .models import CDFExternalField, DataClass, FilterMethod, MultiAPIClass, NodeDataClass, fields
+from .models import CDFExternalField, DataClass, EdgeDataClass, FilterMethod, MultiAPIClass, NodeDataClass, fields
 from .models.api_casses import EdgeAPIClass, NodeAPIClass, QueryAPIClass, TimeSeriesAPIClass
 
 
@@ -139,8 +139,7 @@ class MultiAPIGenerator:
         data_class_by_view_id = {view_id: api.data_class for view_id, api in self.api_by_view_id.items()}
 
         for api in self.unique_apis:
-            # if isinstance(api.data_class, EdgeWithPropertyDataClass):
-            api.data_class.update_fields(api.view.properties, data_class_by_view_id, config)
+            api.data_class.update_fields(api.view.properties, data_class_by_view_id, list(views), config)
 
     @property
     def unique_apis(self) -> Iterator[APIGenerator]:
@@ -343,7 +342,9 @@ class APIGenerator:
     def list_method(self) -> FilterMethod:
         if self._list_method is None:
             self._validate_initialized()
-            self._list_method = FilterMethod.from_fields(self.data_class.fields, self._config.filtering)
+            self._list_method = FilterMethod.from_fields(
+                self.data_class.fields, self._config.filtering, isinstance(self.data_class, EdgeDataClass)
+            )
         return self._list_method
 
     @property
@@ -369,8 +370,16 @@ class APIGenerator:
         return self._edge_apis
 
     def generate_data_class_file(self, is_pydantic_v2: bool) -> str:
+        unique_start_classes = []
         if isinstance(self.data_class, NodeDataClass):
             type_data = self._env.get_template("data_class_node.py.jinja")
+        elif isinstance(self.data_class, EdgeDataClass):
+            type_data = self._env.get_template("data_class_edge.py.jinja")
+            seen = set()
+            for classes in self.data_class.end_node_field.edge_classes:
+                if classes.start_class.read_name not in seen:
+                    seen.add(classes.start_class.read_name)
+                    unique_start_classes.append(classes.start_class)
         else:
             raise ValueError(f"Unknown data class {type(self.data_class)}")
 
@@ -382,6 +391,8 @@ class APIGenerator:
                 # ft = field types
                 ft=fields,
                 dm=dm,
+                sorted=sorted,
+                unique_start_classes=unique_start_classes,
             )
             + "\n"
         )

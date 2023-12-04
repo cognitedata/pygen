@@ -5,7 +5,8 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Literal, TypeVar
+from functools import total_ordering
+from typing import TYPE_CHECKING, Literal, TypeVar, cast
 
 from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.data_modeling.data_types import ListablePropertyType
@@ -15,7 +16,7 @@ from cognite.pygen.config.reserved_words import is_reserved_word
 from cognite.pygen.utils.text import create_name, to_words
 
 if TYPE_CHECKING:
-    from . import DataClass
+    from . import DataClass, EdgeDataClass, NodeDataClass
 
 _PRIMITIVE_TYPES = (dm.Text, dm.Boolean, dm.Float32, dm.Float64, dm.Int32, dm.Int64, dm.Timestamp, dm.Date, dm.Json)
 _EXTERNAL_TYPES = (dm.TimeSeriesReference, dm.FileReference, dm.SequenceReference)
@@ -34,6 +35,7 @@ __all__ = [
     "EdgeOneToMany",
     "EdgeOneToEndNode",
     "T_Field",
+    "HashableDirectRelationReference",
 ]
 
 
@@ -346,26 +348,60 @@ class EdgeOneToOne(EdgeToOneDataClass):
 
 
 @dataclass(frozen=True)
+class HashableDirectRelationReference:
+    space: str
+    external_id: str
+
+    @classmethod
+    def from_direct_relation_reference(cls, ref: dm.DirectRelationReference) -> HashableDirectRelationReference:
+        return cls(ref.space, ref.external_id)
+
+
+@total_ordering
+@dataclass(frozen=True)
+class EdgeClasses:
+    """This represents a specific edge type linking two data classes."""
+
+    start_class: NodeDataClass
+    edge_type: dm.DirectRelationReference
+    end_class: NodeDataClass
+
+    def __lt__(self, other: EdgeClasses) -> bool:
+        if isinstance(other, EdgeClasses):
+            return self.end_class < other.end_class
+        return NotImplemented
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, EdgeClasses):
+            return (
+                self.end_class == other.end_class
+                and self.edge_type == other.edge_type
+                and self.start_class == other.start_class
+            )
+        return NotImplemented
+
+
+@dataclass(frozen=True)
 class EdgeOneToEndNode(EdgeField):
     """This represents a one-to-one edge where the end class can be one of multiple data classes.
     This is used for the end_node field in edge data classes, where the end_node can be one of multiple
     data classes.
     """
 
-    data_class_by_edge_type: dict[dm.DirectRelationReference, DataClass]
+    edge_classes: list[EdgeClasses]
 
     @property
-    def data_classes(self) -> list[DataClass]:
-        return list(self.data_class_by_edge_type.values())
+    def end_classes(self) -> list[DataClass]:
+        return [edge_class.end_class for edge_class in self.edge_classes]
 
     def as_read_type_hint(self) -> str:
-        return self._type_hint([data_class.read_name for data_class in self.data_classes])
+        return self._type_hint([data_class.read_name for data_class in self.end_classes])
 
     def as_write_type_hint(self) -> str:
-        return self._type_hint([data_class.write_name for data_class in self.data_classes])
+        return self._type_hint([data_class.write_name for data_class in self.end_classes])
 
     def _type_hint(self, data_class_names: list[str]) -> str:
-        left_side = f"Union[{', '.join(data_class_names)}, str]"
+        left_side = f"Union[{', '.join(sorted(data_class_names))}, str, dm.NodeId]"
         if self.need_alias:
             return f'{left_side} = {self.pydantic_field}(alias="{self.prop_name}")'
         else:
@@ -391,6 +427,12 @@ class EdgeOneToManyNodes(EdgeOneToMany):
     """
     This represents a list of edge fields linking to another data class.
     """
+
+    @property
+    def node_class(self) -> NodeDataClass:
+        from .data_classes import NodeDataClass
+
+        return cast(NodeDataClass, self.data_class)
 
     def as_apply(self) -> str:
         return (
@@ -418,6 +460,12 @@ class EdgeOneToManyEdges(EdgeOneToMany):
     """
     This represents a list of edge fields linking to another data class.
     """
+
+    @property
+    def edge_class(self) -> EdgeDataClass:
+        from .data_classes import EdgeDataClass
+
+        return cast(EdgeDataClass, self.data_class)
 
     def as_apply(self) -> str:
         return f"[{self.variable}.as_apply() for {self.variable} in self.{self.name} or []]"

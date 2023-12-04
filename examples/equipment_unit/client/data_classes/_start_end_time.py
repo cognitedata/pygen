@@ -4,10 +4,10 @@ import datetime
 from typing import Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
-from pydantic import Field
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DomainModel,
     DomainModelApply,
     DomainRelation,
     DomainRelationApply,
@@ -19,8 +19,9 @@ from ._work_order import WorkOrder, WorkOrderApply
 from ._equipment_module import EquipmentModule, EquipmentModuleApply
 
 __all__ = ["StartEndTime", "StartEndTimeApply", "StartEndTimeList", "StartEndTimeApplyList", "StartEndTimeFields"]
-StartEndTimeFields = Literal["end_time", "start_time"]
 
+
+StartEndTimeFields = Literal["end_time", "start_time"]
 _STARTENDTIME_PROPERTIES_BY_FIELD = {
     "end_time": "end_time",
     "start_time": "start_time",
@@ -35,6 +36,7 @@ class StartEndTime(DomainRelation):
     Args:
         space: The space where the node is located.
         external_id: The external id of the start end time.
+        end_node: The end node of this edge.
         end_time: The end time field.
         start_time: The start time field.
         created_time: The created time of the start end time node.
@@ -44,7 +46,7 @@ class StartEndTime(DomainRelation):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    end_node: Union[EquipmentModule, WorkOrder, str, dm.NodeId] = None
+    end_node: Union[EquipmentModule, WorkOrder, str, dm.NodeId]
     end_time: Optional[datetime.datetime] = None
     start_time: Optional[datetime.datetime] = None
 
@@ -53,7 +55,7 @@ class StartEndTime(DomainRelation):
         return StartEndTimeApply(
             space=self.space,
             external_id=self.external_id,
-            end_node=self.end_node.as_apply() if isinstance(self.end_node, DomainModelApply) else self.end_node,
+            end_node=self.end_node.as_apply() if isinstance(self.end_node, DomainModel) else self.end_node,
             end_time=self.end_time,
             start_time=self.start_time,
         )
