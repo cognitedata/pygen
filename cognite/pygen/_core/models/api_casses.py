@@ -103,19 +103,20 @@ class EdgeAPIClass(APIClass):
         class_name = create_name(base_name, api_class.name)
         parent_attribute = create_name(field.name, api_class.client_attribute)
 
+        edge_class: DataClass | None
+        end_class: DataClass
         if isinstance(field, EdgeOneToManyEdges):
-            edge_class: DataClass | None = field.data_class
+            edge_class = field.data_class
             if not isinstance(edge_class, EdgeDataClass):
                 raise ValueError("Expected EdgeOneToManyEdges")
-            end_class = next(
-                (c.end_class for c in edge_class.end_node_field.edge_classes if c.edge_type == field.edge_type), None
-            )
-            if end_class is None:
-                raise ValueError("Could not find end class")
+            try:
+                end_class = next(
+                    c.end_class for c in edge_class.end_node_field.edge_classes if c.edge_type == field.edge_type
+                )
+            except StopIteration:
+                raise ValueError("Could not find end class") from None
             filter_method = FilterMethod.from_fields(edge_class.fields, pygen_config.filtering, is_edge_class=True)
         else:
-            raise NotImplementedError()
-            # Todo create a dm.Edge class
             edge_class = None
             end_class = field.data_class
             filter_method = FilterMethod.from_fields([], pygen_config.filtering)
