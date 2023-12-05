@@ -47,12 +47,13 @@ class SDKGenerator:
         logger: Callable[[str], None] | None = None,
         config: PygenConfig = PygenConfig(),
     ):
-        self._data_model = data_model
         self.top_level_package = top_level_package
         self.client_name = client_name
         self._multi_api_classes: list[MultiAPIClass]
         if isinstance(data_model, dm.DataModel):
             data_model = [data_model]
+
+        self._data_model = data_model
 
         if view_ids := [view for model in data_model for view in model.views if isinstance(view, dm.ViewId)]:
             raise ValueError(
@@ -103,9 +104,8 @@ class SDKGenerator:
         else:
             api_client = self._multi_api_generator.env.get_template("_api_client_multi_model.py.jinja")
 
-        #
-        # # In the template, we run zip(api_classes, views) and zip(multi_api_classes, view_sets)
-        # # thus it is important that the order is the same for both.
+        # In the template, we run zip(api_classes, views) and zip(multi_api_classes, view_sets)
+        # thus it is important that the order is the same for both.
 
         return (
             api_client.render(
@@ -114,6 +114,9 @@ class SDKGenerator:
                 cognite_sdk_version=cognite_sdk_version,
                 pydantic_version=PYDANTIC_VERSION,
                 top_level_package=self.top_level_package,
+                api_classes=list(self._multi_api_generator.unique_apis),
+                data_model=self._data_model[0],
+                api_by_view_id=self._multi_api_generator.api_by_view_id,
             )
             + "\n"
         )
