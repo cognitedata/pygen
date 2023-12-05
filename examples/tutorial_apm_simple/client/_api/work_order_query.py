@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from typing import TYPE_CHECKING
 
 from cognite.client import data_modeling as dm, CogniteClient
@@ -123,11 +124,8 @@ class WorkOrderQueryAPI(QueryAPI[T_DomainModelList]):
     ) -> T_DomainModelList:
         """Execute query and return the result.
 
-        Args:
-
         Returns:
             The list of the source nodes of the query.
 
         """
-        from_ = self._builder[-1].name
         return self._query()

@@ -22,6 +22,7 @@ if TYPE_CHECKING:
 
 
 __all__ = ["Role", "RoleApply", "RoleList", "RoleApplyList", "RoleFields"]
+
 RoleFields = Literal["won_oscar"]
 
 _ROLE_PROPERTIES_BY_FIELD = {

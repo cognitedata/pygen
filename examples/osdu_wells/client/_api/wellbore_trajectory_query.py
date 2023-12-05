@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from typing import TYPE_CHECKING
 
 from cognite.client import data_modeling as dm, CogniteClient
@@ -144,7 +145,7 @@ class WellboreTrajectoryQueryAPI(QueryAPI[T_DomainModelList]):
             self._query_append_tags(from_)
         return self._query()
 
-    def _query_append_person(self, from_: str) -> None:
+    def _query_append_acl(self, from_: str) -> None:
         view_id = self._view_by_write_class[AclApply]
         self._builder.append(
             QueryStep(
@@ -152,7 +153,7 @@ class WellboreTrajectoryQueryAPI(QueryAPI[T_DomainModelList]):
                 expression=dm.query.NodeResultSetExpression(
                     filter=dm.filters.HasData(views=[view_id]),
                     from_=from_,
-                    through=self._view_by_write_class[WellboreTrajectoryApply].as_property_ref("person"),
+                    through=self._view_by_write_class[WellboreTrajectoryApply].as_property_ref("acl"),
                     direction="outwards",
                 ),
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
@@ -161,7 +162,7 @@ class WellboreTrajectoryQueryAPI(QueryAPI[T_DomainModelList]):
             ),
         )
 
-    def _query_append_person(self, from_: str) -> None:
+    def _query_append_ancestry(self, from_: str) -> None:
         view_id = self._view_by_write_class[AncestryApply]
         self._builder.append(
             QueryStep(
@@ -169,7 +170,7 @@ class WellboreTrajectoryQueryAPI(QueryAPI[T_DomainModelList]):
                 expression=dm.query.NodeResultSetExpression(
                     filter=dm.filters.HasData(views=[view_id]),
                     from_=from_,
-                    through=self._view_by_write_class[WellboreTrajectoryApply].as_property_ref("person"),
+                    through=self._view_by_write_class[WellboreTrajectoryApply].as_property_ref("ancestry"),
                     direction="outwards",
                 ),
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
@@ -178,7 +179,7 @@ class WellboreTrajectoryQueryAPI(QueryAPI[T_DomainModelList]):
             ),
         )
 
-    def _query_append_person(self, from_: str) -> None:
+    def _query_append_data(self, from_: str) -> None:
         view_id = self._view_by_write_class[WellboreTrajectoryDataApply]
         self._builder.append(
             QueryStep(
@@ -186,7 +187,7 @@ class WellboreTrajectoryQueryAPI(QueryAPI[T_DomainModelList]):
                 expression=dm.query.NodeResultSetExpression(
                     filter=dm.filters.HasData(views=[view_id]),
                     from_=from_,
-                    through=self._view_by_write_class[WellboreTrajectoryApply].as_property_ref("person"),
+                    through=self._view_by_write_class[WellboreTrajectoryApply].as_property_ref("data"),
                     direction="outwards",
                 ),
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
@@ -195,7 +196,7 @@ class WellboreTrajectoryQueryAPI(QueryAPI[T_DomainModelList]):
             ),
         )
 
-    def _query_append_person(self, from_: str) -> None:
+    def _query_append_legal(self, from_: str) -> None:
         view_id = self._view_by_write_class[LegalApply]
         self._builder.append(
             QueryStep(
@@ -203,7 +204,7 @@ class WellboreTrajectoryQueryAPI(QueryAPI[T_DomainModelList]):
                 expression=dm.query.NodeResultSetExpression(
                     filter=dm.filters.HasData(views=[view_id]),
                     from_=from_,
-                    through=self._view_by_write_class[WellboreTrajectoryApply].as_property_ref("person"),
+                    through=self._view_by_write_class[WellboreTrajectoryApply].as_property_ref("legal"),
                     direction="outwards",
                 ),
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
@@ -212,7 +213,7 @@ class WellboreTrajectoryQueryAPI(QueryAPI[T_DomainModelList]):
             ),
         )
 
-    def _query_append_person(self, from_: str) -> None:
+    def _query_append_tags(self, from_: str) -> None:
         view_id = self._view_by_write_class[TagsApply]
         self._builder.append(
             QueryStep(
@@ -220,7 +221,7 @@ class WellboreTrajectoryQueryAPI(QueryAPI[T_DomainModelList]):
                 expression=dm.query.NodeResultSetExpression(
                     filter=dm.filters.HasData(views=[view_id]),
                     from_=from_,
-                    through=self._view_by_write_class[WellboreTrajectoryApply].as_property_ref("person"),
+                    through=self._view_by_write_class[WellboreTrajectoryApply].as_property_ref("tags"),
                     direction="outwards",
                 ),
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),

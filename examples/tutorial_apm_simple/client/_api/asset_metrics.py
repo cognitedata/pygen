@@ -9,13 +9,26 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import Datapoints, DatapointsArrayList, DatapointsList, TimeSeriesList
 from cognite.client.data_classes.datapoints import Aggregate
-from movie_domain.client.data_classes._rating import _create_rating_filter
+from tutorial_apm_simple.client.data_classes._asset import _create_asset_filter
 from ._core import DEFAULT_LIMIT_READ, INSTANCE_QUERY_LIMIT
 
-ColumnNames = Literal["score", "votes"]
+ColumnNames = Literal[
+    "areaId",
+    "categoryId",
+    "createdDate",
+    "description",
+    "isActive",
+    "isCriticalLine",
+    "pressure",
+    "sourceDb",
+    "specification",
+    "tag",
+    "trajectory",
+    "updatedDate",
+]
 
 
-class RatingVotesQuery:
+class AssetMetricsQuery:
     def __init__(
         self,
         client: CogniteClient,
@@ -40,7 +53,7 @@ class RatingVotesQuery:
         limit: int | None = None,
         include_outside_points: bool = False,
     ) -> DatapointsList:
-        """`Retrieve datapoints for the `rating.votes` timeseries.
+        """`Retrieve datapoints for the `asset.metrics` timeseries.
 
         **Performance guide**:
             In order to retrieve millions of datapoints as efficiently as possible, here are a few guidelines:
@@ -65,11 +78,11 @@ class RatingVotesQuery:
         Examples:
 
             In this example,
-            we are using the time-ago format to get raw data for the 'my_votes' from 2 weeks ago up until now::
+            we are using the time-ago format to get raw data for the 'my_metrics' from 2 weeks ago up until now::
 
-                >>> from movie_domain.client import MovieClient
-                >>> client = MovieClient()
-                >>> rating_datapoints = client.rating.votes(external_id="my_votes").retrieve(start="2w-ago")
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> asset_datapoints = client.asset.metrics(external_id="my_metrics").retrieve(start="2w-ago")
         """
         external_ids = self._retrieve_timeseries_external_ids_with_extra()
         if external_ids:
@@ -99,7 +112,7 @@ class RatingVotesQuery:
         limit: int | None = None,
         include_outside_points: bool = False,
     ) -> DatapointsArrayList:
-        """`Retrieve numpy arrays for the `rating.votes` timeseries.
+        """`Retrieve numpy arrays for the `asset.metrics` timeseries.
 
         **Performance guide**:
             In order to retrieve millions of datapoints as efficiently as possible, here are a few guidelines:
@@ -124,11 +137,11 @@ class RatingVotesQuery:
         Examples:
 
             In this example,
-            we are using the time-ago format to get raw data for the 'my_votes' from 2 weeks ago up until now::
+            we are using the time-ago format to get raw data for the 'my_metrics' from 2 weeks ago up until now::
 
-                >>> from movie_domain.client import MovieClient
-                >>> client = MovieClient()
-                >>> rating_datapoints = client.rating.votes(external_id="my_votes").retrieve_array(start="2w-ago")
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> asset_datapoints = client.asset.metrics(external_id="my_metrics").retrieve_array(start="2w-ago")
         """
         external_ids = self._retrieve_timeseries_external_ids_with_extra()
         if external_ids:
@@ -160,9 +173,9 @@ class RatingVotesQuery:
         uniform_index: bool = False,
         include_aggregate_name: bool = True,
         include_granularity_name: bool = False,
-        column_names: ColumnNames | list[ColumnNames] = "votes",
+        column_names: ColumnNames | list[ColumnNames] = "metrics",
     ) -> pd.DataFrame:
-        """`Retrieve DataFrames for the `rating.votes` timeseries.
+        """`Retrieve DataFrames for the `asset.metrics` timeseries.
 
         **Performance guide**:
             In order to retrieve millions of datapoints as efficiently as possible, here are a few guidelines:
@@ -183,7 +196,7 @@ class RatingVotesQuery:
             uniform_index: If only querying aggregates AND a single granularity is used, AND no limit is used, specifying `uniform_index=True` will return a dataframe with an equidistant datetime index from the earliest `start` to the latest `end` (missing values will be NaNs). If these requirements are not met, a ValueError is raised. Default: False
             include_aggregate_name: Include 'aggregate' in the column name, e.g. `my-ts|average`. Ignored for raw time series. Default: True
             include_granularity_name: Include 'granularity' in the column name, e.g. `my-ts|12h`. Added after 'aggregate' when present. Ignored for raw time series. Default: False
-            column_names: Which property to use for column names. Defauts to votes
+            column_names: Which property to use for column names. Defauts to metrics
 
 
         Returns:
@@ -192,11 +205,11 @@ class RatingVotesQuery:
         Examples:
 
             In this example,
-            we are using the time-ago format to get raw data for the 'my_votes' from 2 weeks ago up until now::
+            we are using the time-ago format to get raw data for the 'my_metrics' from 2 weeks ago up until now::
 
-                >>> from movie_domain.client import MovieClient
-                >>> client = MovieClient()
-                >>> rating_datapoints = client.rating.votes(external_id="my_votes").retrieve_dataframe(start="2w-ago")
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> asset_datapoints = client.asset.metrics(external_id="my_metrics").retrieve_dataframe(start="2w-ago")
         """
         external_ids = self._retrieve_timeseries_external_ids_with_extra(column_names)
         if external_ids:
@@ -237,9 +250,9 @@ class RatingVotesQuery:
         uniform_index: bool = False,
         include_aggregate_name: bool = True,
         include_granularity_name: bool = False,
-        column_names: ColumnNames | list[ColumnNames] = "votes",
+        column_names: ColumnNames | list[ColumnNames] = "metrics",
     ) -> pd.DataFrame:
-        """Retrieve DataFrames for the `rating.votes` timeseries in Timezone.
+        """Retrieve DataFrames for the `asset.metrics` timeseries in Timezone.
 
         **Performance guide**:
             In order to retrieve millions of datapoints as efficiently as possible, here are a few guidelines:
@@ -260,7 +273,7 @@ class RatingVotesQuery:
             uniform_index: If only querying aggregates AND a single granularity is used, AND no limit is used, specifying `uniform_index=True` will return a dataframe with an equidistant datetime index from the earliest `start` to the latest `end` (missing values will be NaNs). If these requirements are not met, a ValueError is raised. Default: False
             include_aggregate_name: Include 'aggregate' in the column name, e.g. `my-ts|average`. Ignored for raw time series. Default: True
             include_granularity_name: Include 'granularity' in the column name, e.g. `my-ts|12h`. Added after 'aggregate' when present. Ignored for raw time series. Default: False
-            column_names: Which property to use for column names. Defauts to votes
+            column_names: Which property to use for column names. Defauts to metrics
 
 
         Returns:
@@ -269,13 +282,13 @@ class RatingVotesQuery:
         Examples:
 
             In this example,
-            get weekly aggregates for the 'my_votes' for the first month of 2023 in Oslo time:
+            get weekly aggregates for the 'my_metrics' for the first month of 2023 in Oslo time:
 
-                >>> from movie_domain.client import MovieClient
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
                 >>> from datetime import datetime, timezone
-                >>> client = MovieClient()
-                >>> rating_datapoints = client.rating.votes(
-                ...     external_id="my_votes").retrieve_dataframe_in_timezone(
+                >>> client = ApmSimpleClient()
+                >>> asset_datapoints = client.asset.metrics(
+                ...     external_id="my_metrics").retrieve_dataframe_in_timezone(
                 ...         datetime(2023, 1, 1, tzinfo=ZoneInfo("Europe/Oslo")),
                 ...         datetime(2023, 1, 2, tzinfo=ZoneInfo("Europe/Oslo")),
                 ...         aggregates="average",
@@ -321,9 +334,9 @@ class RatingVotesQuery:
             return None
 
     def _retrieve_timeseries_external_ids_with_extra(
-        self, extra_properties: ColumnNames | list[ColumnNames] = "votes"
+        self, extra_properties: ColumnNames | list[ColumnNames] = "metrics"
     ) -> dict[str, list[str]]:
-        return _retrieve_timeseries_external_ids_with_extra_vote(
+        return _retrieve_timeseries_external_ids_with_extra_metric(
             self._client,
             self._view_id,
             self._filter,
@@ -339,7 +352,7 @@ class RatingVotesQuery:
         include_aggregate_name: bool,
         include_granularity_name: bool,
     ) -> pd.DataFrame:
-        if isinstance(column_names, str) and column_names == "votes":
+        if isinstance(column_names, str) and column_names == "metrics":
             return df
         splits = sum(included for included in [include_aggregate_name, include_granularity_name])
         if splits == 0:
@@ -352,47 +365,98 @@ class RatingVotesQuery:
         return df
 
 
-class RatingVotesAPI:
+class AssetMetricsAPI:
     def __init__(self, client: CogniteClient, view_id: dm.ViewId):
         self._client = client
         self._view_id = view_id
 
     def __call__(
         self,
+        min_area_id: int | None = None,
+        max_area_id: int | None = None,
+        min_category_id: int | None = None,
+        max_category_id: int | None = None,
+        min_created_date: datetime.datetime | None = None,
+        max_created_date: datetime.datetime | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        is_active: bool | None = None,
+        is_critical_line: bool | None = None,
+        parent: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        source_db: str | list[str] | None = None,
+        source_db_prefix: str | None = None,
+        tag: str | list[str] | None = None,
+        tag_prefix: str | None = None,
+        min_updated_date: datetime.datetime | None = None,
+        max_updated_date: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> RatingVotesQuery:
-        """Query timeseries `rating.votes`
+    ) -> AssetMetricsQuery:
+        """Query timeseries `asset.metrics`
 
         Args:
+            min_area_id: The minimum value of the area id to filter on.
+            max_area_id: The maximum value of the area id to filter on.
+            min_category_id: The minimum value of the category id to filter on.
+            max_category_id: The maximum value of the category id to filter on.
+            min_created_date: The minimum value of the created date to filter on.
+            max_created_date: The maximum value of the created date to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            is_active: The is active to filter on.
+            is_critical_line: The is critical line to filter on.
+            parent: The parent to filter on.
+            source_db: The source db to filter on.
+            source_db_prefix: The prefix of the source db to filter on.
+            tag: The tag to filter on.
+            tag_prefix: The prefix of the tag to filter on.
+            min_updated_date: The minimum value of the updated date to filter on.
+            max_updated_date: The maximum value of the updated date to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of ratings to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            limit: Maximum number of assets to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
-            A query object that can be used to retrieve datapoins for the rating.votes timeseries
+            A query object that can be used to retrieve datapoins for the asset.metrics timeseries
             selected in this method.
 
         Examples:
 
-            Retrieve all data for 5 rating.votes timeseries:
+            Retrieve all data for 5 asset.metrics timeseries:
 
-                >>> from movie_domain.client import MovieClient
-                >>> client = MovieClient()
-                >>> ratings = client.rating.votes(limit=5).retrieve()
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> assets = client.asset.metrics(limit=5).retrieve()
 
         """
-        filter_ = _create_rating_filter(
+        filter_ = _create_asset_filter(
             self._view_id,
+            min_area_id,
+            max_area_id,
+            min_category_id,
+            max_category_id,
+            min_created_date,
+            max_created_date,
+            description,
+            description_prefix,
+            is_active,
+            is_critical_line,
+            parent,
+            source_db,
+            source_db_prefix,
+            tag,
+            tag_prefix,
+            min_updated_date,
+            max_updated_date,
             external_id_prefix,
             space,
             filter,
         )
 
-        return RatingVotesQuery(
+        return AssetMetricsQuery(
             client=self._client,
             view_id=self._view_id,
             timeseries_limit=limit,
@@ -401,59 +465,110 @@ class RatingVotesAPI:
 
     def list(
         self,
+        min_area_id: int | None = None,
+        max_area_id: int | None = None,
+        min_category_id: int | None = None,
+        max_category_id: int | None = None,
+        min_created_date: datetime.datetime | None = None,
+        max_created_date: datetime.datetime | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        is_active: bool | None = None,
+        is_critical_line: bool | None = None,
+        parent: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        source_db: str | list[str] | None = None,
+        source_db_prefix: str | None = None,
+        tag: str | list[str] | None = None,
+        tag_prefix: str | None = None,
+        min_updated_date: datetime.datetime | None = None,
+        max_updated_date: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> TimeSeriesList:
-        """List timeseries `rating.votes`
+        """List timeseries `asset.metrics`
 
         Args:
+            min_area_id: The minimum value of the area id to filter on.
+            max_area_id: The maximum value of the area id to filter on.
+            min_category_id: The minimum value of the category id to filter on.
+            max_category_id: The maximum value of the category id to filter on.
+            min_created_date: The minimum value of the created date to filter on.
+            max_created_date: The maximum value of the created date to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            is_active: The is active to filter on.
+            is_critical_line: The is critical line to filter on.
+            parent: The parent to filter on.
+            source_db: The source db to filter on.
+            source_db_prefix: The prefix of the source db to filter on.
+            tag: The tag to filter on.
+            tag_prefix: The prefix of the tag to filter on.
+            min_updated_date: The minimum value of the updated date to filter on.
+            max_updated_date: The maximum value of the updated date to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of ratings to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            limit: Maximum number of assets to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
-            List of Timeseries rating.votes.
+            List of Timeseries asset.metrics.
 
         Examples:
 
-            List rating.votes and limit to 5:
+            List asset.metrics and limit to 5:
 
-                >>> from movie_domain.client import MovieClient
-                >>> client = MovieClient()
-                >>> ratings = client.rating.votes.list(limit=5)
+                >>> from tutorial_apm_simple.client import ApmSimpleClient
+                >>> client = ApmSimpleClient()
+                >>> assets = client.asset.metrics.list(limit=5)
 
         """
-        filter_ = _create_rating_filter(
+        filter_ = _create_asset_filter(
             self._view_id,
+            min_area_id,
+            max_area_id,
+            min_category_id,
+            max_category_id,
+            min_created_date,
+            max_created_date,
+            description,
+            description_prefix,
+            is_active,
+            is_critical_line,
+            parent,
+            source_db,
+            source_db_prefix,
+            tag,
+            tag_prefix,
+            min_updated_date,
+            max_updated_date,
             external_id_prefix,
             space,
             filter,
         )
-        external_ids = _retrieve_timeseries_external_ids_with_extra_vote(self._client, self._view_id, filter_, limit)
+        external_ids = _retrieve_timeseries_external_ids_with_extra_metric(self._client, self._view_id, filter_, limit)
         if external_ids:
             return self._client.time_series.retrieve_multiple(external_ids=list(external_ids))
         else:
             return TimeSeriesList([])
 
 
-def _retrieve_timeseries_external_ids_with_extra_vote(
+def _retrieve_timeseries_external_ids_with_extra_metric(
     client: CogniteClient,
     view_id: dm.ViewId,
     filter_: dm.Filter | None,
     limit: int,
-    extra_properties: ColumnNames | list[ColumnNames] = "votes",
+    extra_properties: ColumnNames | list[ColumnNames] = "metrics",
 ) -> dict[str, list[str]]:
     limit = float("inf") if limit is None or limit == -1 else limit
-    properties = ["votes"]
-    if extra_properties == "votes":
+    properties = ["metrics"]
+    if extra_properties == "metrics":
         ...
-    elif isinstance(extra_properties, str) and extra_properties != "votes":
+    elif isinstance(extra_properties, str) and extra_properties != "metrics":
         properties.append(extra_properties)
     elif isinstance(extra_properties, list):
-        properties.extend([prop for prop in extra_properties if prop != "votes"])
+        properties.extend([prop for prop in extra_properties if prop != "metrics"])
     else:
         raise ValueError(f"Invalid value for extra_properties: {extra_properties}")
 
@@ -483,7 +598,7 @@ def _retrieve_timeseries_external_ids_with_extra_vote(
         )
         result = client.data_modeling.instances.query(query)
         batch_external_ids = {
-            node.properties[view_id]["votes"]: [node.properties[view_id].get(prop, "") for prop in extra_list]
+            node.properties[view_id]["metrics"]: [node.properties[view_id].get(prop, "") for prop in extra_list]
             for node in result.data["nodes"].data
         }
         total_retrieved += len(batch_external_ids)

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from typing import TYPE_CHECKING
 
 from cognite.client import data_modeling as dm, CogniteClient
@@ -146,7 +147,7 @@ class MovieQueryAPI(QueryAPI[T_DomainModelList]):
             self._query_append_rating(from_)
         return self._query()
 
-    def _query_append_person(self, from_: str) -> None:
+    def _query_append_rating(self, from_: str) -> None:
         view_id = self._view_by_write_class[RatingApply]
         self._builder.append(
             QueryStep(
@@ -154,7 +155,7 @@ class MovieQueryAPI(QueryAPI[T_DomainModelList]):
                 expression=dm.query.NodeResultSetExpression(
                     filter=dm.filters.HasData(views=[view_id]),
                     from_=from_,
-                    through=self._view_by_write_class[MovieApply].as_property_ref("person"),
+                    through=self._view_by_write_class[MovieApply].as_property_ref("rating"),
                     direction="outwards",
                 ),
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),

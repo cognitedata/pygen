@@ -4,15 +4,16 @@ from __future__ import annotations
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, EdgeAPI, _create_edge_filter
+from movie_domain.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 
 class RoleMoviesAPI(EdgeAPI):
     def list(
         self,
-        role: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        role_space: str = "IntegrationTestsImmutable",
-        movie: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        movie_space: str = "IntegrationTestsImmutable",
+        from_role: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        from_role_space: str = DEFAULT_INSTANCE_SPACE,
+        to_movie: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        to_movie_space: str = DEFAULT_INSTANCE_SPACE,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit=DEFAULT_LIMIT_READ,
@@ -20,10 +21,10 @@ class RoleMoviesAPI(EdgeAPI):
         """List movie edges of a role.
 
         Args:
-            role: ID of the source roles.
-            role_space: Location of the roles.
-            movie: ID of the target movies.
-            movie_space: Location of the movies.
+            from_role: ID of the source role.
+            from_role_space: Location of the roles.
+            to_movie: ID of the target movie.
+            to_movie_space: Location of the movies.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of movie edges to return. Defaults to 25. Set to -1, float("inf") or None
@@ -43,10 +44,10 @@ class RoleMoviesAPI(EdgeAPI):
         """
         filter_ = _create_edge_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "Role.movies"),
-            role,
-            role_space,
-            movie,
-            movie_space,
+            from_role,
+            from_role_space,
+            to_movie,
+            to_movie_space,
             external_id_prefix,
             space,
         )

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from typing import TYPE_CHECKING
 
 from cognite.client import data_modeling as dm, CogniteClient
@@ -9,7 +10,7 @@ from osdu_wells.client.data_classes import (
     AcceptableUsage,
     AcceptableUsageApply,
 )
-from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList
+from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
 
 
 class AcceptableUsageQueryAPI(QueryAPI[T_DomainModelList]):
@@ -43,11 +44,8 @@ class AcceptableUsageQueryAPI(QueryAPI[T_DomainModelList]):
     ) -> T_DomainModelList:
         """Execute query and return the result.
 
-        Args:
-
         Returns:
             The list of the source nodes of the query.
 
         """
-        from_ = self._builder[-1].name
         return self._query()

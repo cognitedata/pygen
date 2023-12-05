@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from typing import TYPE_CHECKING
 
 from cognite.client import data_modeling as dm, CogniteClient
@@ -642,7 +643,7 @@ class WellboreDataQueryAPI(QueryAPI[T_DomainModelList]):
             self._query_append_spatial_location(from_)
         return self._query()
 
-    def _query_append_person(self, from_: str) -> None:
+    def _query_append_geographic_bottom_hole_location(self, from_: str) -> None:
         view_id = self._view_by_write_class[GeographicBottomHoleLocationApply]
         self._builder.append(
             QueryStep(
@@ -650,7 +651,9 @@ class WellboreDataQueryAPI(QueryAPI[T_DomainModelList]):
                 expression=dm.query.NodeResultSetExpression(
                     filter=dm.filters.HasData(views=[view_id]),
                     from_=from_,
-                    through=self._view_by_write_class[WellboreDataApply].as_property_ref("person"),
+                    through=self._view_by_write_class[WellboreDataApply].as_property_ref(
+                        "geographic_bottom_hole_location"
+                    ),
                     direction="outwards",
                 ),
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
@@ -659,7 +662,7 @@ class WellboreDataQueryAPI(QueryAPI[T_DomainModelList]):
             ),
         )
 
-    def _query_append_person(self, from_: str) -> None:
+    def _query_append_projected_bottom_hole_location(self, from_: str) -> None:
         view_id = self._view_by_write_class[ProjectedBottomHoleLocationApply]
         self._builder.append(
             QueryStep(
@@ -667,7 +670,9 @@ class WellboreDataQueryAPI(QueryAPI[T_DomainModelList]):
                 expression=dm.query.NodeResultSetExpression(
                     filter=dm.filters.HasData(views=[view_id]),
                     from_=from_,
-                    through=self._view_by_write_class[WellboreDataApply].as_property_ref("person"),
+                    through=self._view_by_write_class[WellboreDataApply].as_property_ref(
+                        "projected_bottom_hole_location"
+                    ),
                     direction="outwards",
                 ),
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
@@ -676,7 +681,7 @@ class WellboreDataQueryAPI(QueryAPI[T_DomainModelList]):
             ),
         )
 
-    def _query_append_person(self, from_: str) -> None:
+    def _query_append_spatial_location(self, from_: str) -> None:
         view_id = self._view_by_write_class[SpatialLocationApply]
         self._builder.append(
             QueryStep(
@@ -684,7 +689,7 @@ class WellboreDataQueryAPI(QueryAPI[T_DomainModelList]):
                 expression=dm.query.NodeResultSetExpression(
                     filter=dm.filters.HasData(views=[view_id]),
                     from_=from_,
-                    through=self._view_by_write_class[WellboreDataApply].as_property_ref("person"),
+                    through=self._view_by_write_class[WellboreDataApply].as_property_ref("spatial_location"),
                     direction="outwards",
                 ),
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),

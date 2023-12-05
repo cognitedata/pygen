@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from typing import TYPE_CHECKING
 
 from cognite.client import data_modeling as dm, CogniteClient
@@ -11,7 +12,7 @@ from markets.client.data_classes import (
     Market,
     MarketApply,
 )
-from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList
+from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
 
 
 class PygenBidQueryAPI(QueryAPI[T_DomainModelList]):
@@ -56,7 +57,7 @@ class PygenBidQueryAPI(QueryAPI[T_DomainModelList]):
             self._query_append_market(from_)
         return self._query()
 
-    def _query_append_person(self, from_: str) -> None:
+    def _query_append_market(self, from_: str) -> None:
         view_id = self._view_by_write_class[MarketApply]
         self._builder.append(
             QueryStep(
@@ -64,7 +65,7 @@ class PygenBidQueryAPI(QueryAPI[T_DomainModelList]):
                 expression=dm.query.NodeResultSetExpression(
                     filter=dm.filters.HasData(views=[view_id]),
                     from_=from_,
-                    through=self._view_by_write_class[PygenBidApply].as_property_ref("person"),
+                    through=self._view_by_write_class[PygenBidApply].as_property_ref("market"),
                     direction="outwards",
                 ),
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),

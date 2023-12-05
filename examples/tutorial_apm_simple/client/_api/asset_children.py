@@ -4,15 +4,16 @@ from __future__ import annotations
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, EdgeAPI, _create_edge_filter
+from tutorial_apm_simple.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 
 class AssetChildrenAPI(EdgeAPI):
     def list(
         self,
         from_asset: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        from_asset_space: str = "tutorial_apm_simple",
+        from_asset_space: str = DEFAULT_INSTANCE_SPACE,
         to_asset: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        to_asset_space: str = "tutorial_apm_simple",
+        to_asset_space: str = DEFAULT_INSTANCE_SPACE,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit=DEFAULT_LIMIT_READ,
@@ -20,9 +21,9 @@ class AssetChildrenAPI(EdgeAPI):
         """List child edges of a asset.
 
         Args:
-            from_asset: ID of the source assets.
+            from_asset: ID of the source asset.
             from_asset_space: Location of the assets.
-            to_asset: ID of the target assets.
+            to_asset: ID of the target asset.
             to_asset_space: Location of the assets.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
@@ -43,10 +44,10 @@ class AssetChildrenAPI(EdgeAPI):
         """
         filter_ = _create_edge_filter(
             dm.DirectRelationReference("tutorial_apm_simple", "Asset.children"),
-            asset,
-            asset_space,
-            asset,
-            asset_space,
+            from_asset,
+            from_asset_space,
+            to_asset,
+            to_asset_space,
             external_id_prefix,
             space,
         )

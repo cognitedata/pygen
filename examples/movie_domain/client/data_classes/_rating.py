@@ -17,7 +17,10 @@ from ._core import (
 )
 
 
-__all__ = ["Rating", "RatingApply", "RatingList", "RatingApplyList", "RatingFields"]
+__all__ = ["Rating", "RatingApply", "RatingList", "RatingApplyList", "RatingFields", "RatingTextFields"]
+
+
+RatingTextFields = Literal["score", "votes"]
 RatingFields = Literal["score", "votes"]
 
 _RATING_PROPERTIES_BY_FIELD = {

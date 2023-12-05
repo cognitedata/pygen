@@ -4,15 +4,16 @@ from __future__ import annotations
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, EdgeAPI, _create_edge_filter
+from osdu_wells.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 
 class WellboreDataFacilityEventsAPI(EdgeAPI):
     def list(
         self,
-        wellbore_datum: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        wellbore_datum_space: str = "IntegrationTestsImmutable",
-        facility_event: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        facility_event_space: str = "IntegrationTestsImmutable",
+        from_wellbore_datum: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        from_wellbore_datum_space: str = DEFAULT_INSTANCE_SPACE,
+        to_facility_event: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        to_facility_event_space: str = DEFAULT_INSTANCE_SPACE,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit=DEFAULT_LIMIT_READ,
@@ -20,10 +21,10 @@ class WellboreDataFacilityEventsAPI(EdgeAPI):
         """List facility event edges of a wellbore datum.
 
         Args:
-            wellbore_datum: ID of the source wellbore data.
-            wellbore_datum_space: Location of the wellbore data.
-            facility_event: ID of the target facility events.
-            facility_event_space: Location of the facility events.
+            from_wellbore_datum: ID of the source wellbore datum.
+            from_wellbore_datum_space: Location of the wellbore data.
+            to_facility_event: ID of the target facility event.
+            to_facility_event_space: Location of the facility events.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of facility event edges to return. Defaults to 25. Set to -1, float("inf") or None
@@ -43,10 +44,10 @@ class WellboreDataFacilityEventsAPI(EdgeAPI):
         """
         filter_ = _create_edge_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.FacilityEvents"),
-            wellbore_datum,
-            wellbore_datum_space,
-            facility_event,
-            facility_event_space,
+            from_wellbore_datum,
+            from_wellbore_datum_space,
+            to_facility_event,
+            to_facility_event_space,
             external_id_prefix,
             space,
         )

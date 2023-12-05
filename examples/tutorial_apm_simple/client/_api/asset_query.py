@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from typing import TYPE_CHECKING
 
 from cognite.client import data_modeling as dm, CogniteClient
@@ -8,6 +9,8 @@ from tutorial_apm_simple.client.data_classes import (
     DomainModelApply,
     Asset,
     AssetApply,
+    CdfConnectionProperties,
+    CdfConnectionPropertiesApply,
     Asset,
     AssetApply,
 )
@@ -139,7 +142,7 @@ class AssetQueryAPI(QueryAPI[T_DomainModelList]):
                     from_=from_,
                 ),
                 select=dm.query.Select(
-                    [dm.query.SourceSelector(edge_view, list(_CDFCONNECTIONPROPERTIES_PROPERTIES_BY_FIELD.values()))]
+                    [dm.query.SourceSelector(edge_view, ["*"])],
                 ),
                 result_cls=CdfConnectionProperties,
                 max_retrieve_limit=limit,
@@ -167,7 +170,7 @@ class AssetQueryAPI(QueryAPI[T_DomainModelList]):
             self._query_append_parent(from_)
         return self._query()
 
-    def _query_append_person(self, from_: str) -> None:
+    def _query_append_parent(self, from_: str) -> None:
         view_id = self._view_by_write_class[AssetApply]
         self._builder.append(
             QueryStep(
@@ -175,7 +178,7 @@ class AssetQueryAPI(QueryAPI[T_DomainModelList]):
                 expression=dm.query.NodeResultSetExpression(
                     filter=dm.filters.HasData(views=[view_id]),
                     from_=from_,
-                    through=self._view_by_write_class[AssetApply].as_property_ref("person"),
+                    through=self._view_by_write_class[AssetApply].as_property_ref("parent"),
                     direction="outwards",
                 ),
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from typing import TYPE_CHECKING
 
 from cognite.client import data_modeling as dm, CogniteClient
@@ -9,7 +10,7 @@ from equipment_unit.client.data_classes import (
     WorkOrder,
     WorkOrderApply,
 )
-from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList
+from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
 
 
 class WorkOrderQueryAPI(QueryAPI[T_DomainModelList]):
@@ -40,8 +41,6 @@ class WorkOrderQueryAPI(QueryAPI[T_DomainModelList]):
         self,
     ) -> T_DomainModelList:
         """Execute query and return the result.
-
-        Args:
 
         Returns:
             The list of the source nodes of the query.

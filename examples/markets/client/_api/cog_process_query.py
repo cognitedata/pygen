@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from typing import TYPE_CHECKING
 
 from cognite.client import data_modeling as dm, CogniteClient
@@ -15,7 +16,7 @@ from markets.client.data_classes import (
     ValueTransformation,
     ValueTransformationApply,
 )
-from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList
+from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
 
 
 class CogProcessQueryAPI(QueryAPI[T_DomainModelList]):
@@ -68,7 +69,7 @@ class CogProcessQueryAPI(QueryAPI[T_DomainModelList]):
             self._query_append_transformation(from_)
         return self._query()
 
-    def _query_append_person(self, from_: str) -> None:
+    def _query_append_bid(self, from_: str) -> None:
         view_id = self._view_by_write_class[BidApply]
         self._builder.append(
             QueryStep(
@@ -76,7 +77,7 @@ class CogProcessQueryAPI(QueryAPI[T_DomainModelList]):
                 expression=dm.query.NodeResultSetExpression(
                     filter=dm.filters.HasData(views=[view_id]),
                     from_=from_,
-                    through=self._view_by_write_class[CogProcessApply].as_property_ref("person"),
+                    through=self._view_by_write_class[CogProcessApply].as_property_ref("bid"),
                     direction="outwards",
                 ),
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
@@ -85,7 +86,7 @@ class CogProcessQueryAPI(QueryAPI[T_DomainModelList]):
             ),
         )
 
-    def _query_append_person(self, from_: str) -> None:
+    def _query_append_date_transformations(self, from_: str) -> None:
         view_id = self._view_by_write_class[DateTransformationPairApply]
         self._builder.append(
             QueryStep(
@@ -93,7 +94,7 @@ class CogProcessQueryAPI(QueryAPI[T_DomainModelList]):
                 expression=dm.query.NodeResultSetExpression(
                     filter=dm.filters.HasData(views=[view_id]),
                     from_=from_,
-                    through=self._view_by_write_class[CogProcessApply].as_property_ref("person"),
+                    through=self._view_by_write_class[CogProcessApply].as_property_ref("date_transformations"),
                     direction="outwards",
                 ),
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
@@ -102,7 +103,7 @@ class CogProcessQueryAPI(QueryAPI[T_DomainModelList]):
             ),
         )
 
-    def _query_append_person(self, from_: str) -> None:
+    def _query_append_transformation(self, from_: str) -> None:
         view_id = self._view_by_write_class[ValueTransformationApply]
         self._builder.append(
             QueryStep(
@@ -110,7 +111,7 @@ class CogProcessQueryAPI(QueryAPI[T_DomainModelList]):
                 expression=dm.query.NodeResultSetExpression(
                     filter=dm.filters.HasData(views=[view_id]),
                     from_=from_,
-                    through=self._view_by_write_class[CogProcessApply].as_property_ref("person"),
+                    through=self._view_by_write_class[CogProcessApply].as_property_ref("transformation"),
                     direction="outwards",
                 ),
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),

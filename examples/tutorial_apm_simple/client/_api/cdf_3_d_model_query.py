@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from typing import TYPE_CHECKING
 
 from cognite.client import data_modeling as dm, CogniteClient
@@ -8,8 +9,10 @@ from tutorial_apm_simple.client.data_classes import (
     DomainModelApply,
     CdfModel,
     CdfModelApply,
+    CdfConnectionProperties,
+    CdfConnectionPropertiesApply,
 )
-from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList
+from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
 
 from tutorial_apm_simple.client.data_classes._cdf_3_d_connection_properties import (
     _create_cdf_3_d_connection_property_filter,
@@ -91,7 +94,7 @@ class CdfModelQueryAPI(QueryAPI[T_DomainModelList]):
                     from_=from_,
                 ),
                 select=dm.query.Select(
-                    [dm.query.SourceSelector(edge_view, list(_CDFCONNECTIONPROPERTIES_PROPERTIES_BY_FIELD.values()))]
+                    [dm.query.SourceSelector(edge_view, ["*"])],
                 ),
                 result_cls=CdfConnectionProperties,
                 max_retrieve_limit=limit,
@@ -104,11 +107,8 @@ class CdfModelQueryAPI(QueryAPI[T_DomainModelList]):
     ) -> T_DomainModelList:
         """Execute query and return the result.
 
-        Args:
-
         Returns:
             The list of the source nodes of the query.
 
         """
-        from_ = self._builder[-1].name
         return self._query()

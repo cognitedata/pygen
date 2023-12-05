@@ -1,19 +1,25 @@
 from __future__ import annotations
 
-from typing import Any, Literal, Optional, Union
+from typing import Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DomainModel,
     DomainModelApply,
     DomainRelation,
     DomainRelationApply,
     DomainRelationList,
     ResourcesApply,
 )
+from ._cdf_3_d_model import CdfModelApply
+from ._cdf_3_d_entity import CdfEntityApply
+from ._asset import AssetApply
 from ._cdf_3_d_entity import CdfEntity, CdfEntityApply
+from ._cdf_3_d_model import CdfModel, CdfModelApply
+from ._cdf_3_d_model import CdfModel, CdfModelApply
 
 __all__ = [
     "CdfConnectionProperties",
@@ -22,8 +28,9 @@ __all__ = [
     "CdfConnectionPropertiesApplyList",
     "CdfConnectionPropertiesFields",
 ]
-CdfConnectionPropertiesFields = Literal["revision_id", "revision_node_id"]
 
+
+CdfConnectionPropertiesFields = Literal["revision_id", "revision_node_id"]
 _CDFCONNECTIONPROPERTIES_PROPERTIES_BY_FIELD = {
     "revision_id": "revisionId",
     "revision_node_id": "revisionNodeId",
@@ -38,7 +45,7 @@ class CdfConnectionProperties(DomainRelation):
     Args:
         space: The space where the node is located.
         external_id: The external id of the cdf 3 d connection property.
-        cdf_3_d_entity: Collection of Cdf3dEntity that are part of this Cdf3dModel
+        end_node: The end node of this edge.
         revision_id: The revision id field.
         revision_node_id: The revision node id field.
         created_time: The created time of the cdf 3 d connection property node.
@@ -48,8 +55,7 @@ class CdfConnectionProperties(DomainRelation):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    end_node: Union[str, dm.NodeId] = None
-    cdf_3_d_entity: Union[CdfEntity, str]
+    end_node: Union[CdfEntity, CdfModel, CdfModel, str, dm.NodeId]
     revision_id: Optional[int] = Field(None, alias="revisionId")
     revision_node_id: Optional[int] = Field(None, alias="revisionNodeId")
 
@@ -58,9 +64,7 @@ class CdfConnectionProperties(DomainRelation):
         return CdfConnectionPropertiesApply(
             space=self.space,
             external_id=self.external_id,
-            cdf_3_d_entity=self.cdf_3_d_entity.as_apply()
-            if isinstance(self.cdf_3_d_entity, CdfEntity)
-            else self.cdf_3_d_entity,
+            end_node=self.end_node.as_apply() if isinstance(self.end_node, DomainModel) else self.end_node,
             revision_id=self.revision_id,
             revision_node_id=self.revision_node_id,
         )
@@ -72,10 +76,9 @@ class CdfConnectionPropertiesApply(DomainRelationApply):
     It is used to when data is sent to CDF.
 
     Args:
-        edge_type: The edge type of the cdf 3 d connection property.
         space: The space where the node is located.
         external_id: The external id of the cdf 3 d connection property.
-        cdf_3_d_entity: Collection of Cdf3dEntity that are part of this Cdf3dModel
+        end_node: The end node of this edge.
         revision_id: The revision id field.
         revision_node_id: The revision node id field.
         existing_version: Fail the ingestion request if the cdf 3 d connection property version is greater than or equal to this value.
@@ -85,8 +88,7 @@ class CdfConnectionPropertiesApply(DomainRelationApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    end_node: str
-    cdf_3_d_entity: Union[CdfEntityApply, str]
+    end_node: Union[CdfEntityApply, CdfModelApply, CdfModelApply, str, dm.NodeId]
     revision_id: int = Field(alias="revisionId")
     revision_node_id: int = Field(alias="revisionNodeId")
 
@@ -100,6 +102,8 @@ class CdfConnectionPropertiesApply(DomainRelationApply):
         resources = ResourcesApply()
         if self.external_id and (self.space, self.external_id) in cache:
             return resources
+
+        _validate_end_node(start_node, self.end_node)
 
         if isinstance(self.end_node, DomainModelApply):
             end_node = self.end_node.as_direct_reference()
@@ -140,8 +144,8 @@ class CdfConnectionPropertiesApply(DomainRelationApply):
             resources.edges.append(this_edge)
             cache.add((self.space, external_id))
 
-        if isinstance(self.cdf_3_d_entity, DomainModelApply):
-            other_resources = self.cdf_3_d_entity._to_instances_apply(cache, view_by_write_class)
+        if isinstance(self.end_node, DomainModelApply):
+            other_resources = self.end_node._to_instances_apply(cache, view_by_write_class)
             resources.extend(other_resources)
 
         return resources
@@ -239,3 +243,26 @@ def _create_cdf_3_d_connection_property_filter(
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters)
+
+
+_EXPECTED_START_BY_END_NODE = {
+    CdfEntityApply: CdfModelApply,
+    CdfModelApply: CdfEntityApply,
+    CdfModelApply: AssetApply,
+}
+
+
+def _validate_end_node(
+    start_node: DomainModelApply, end_node: Union[CdfEntityApply, CdfModelApply, CdfModelApply, str, dm.NodeId]
+) -> None:
+    if isinstance(end_node, (str, dm.NodeId)):
+        # Nothing to validate
+        return
+    if type(end_node) not in _EXPECTED_START_BY_END_NODE:
+        raise ValueError(
+            f"Invalid end node type: {type(end_node)}. Should be one of {[t.__name__ for t in _EXPECTED_START_BY_END_NODE.keys()]}"
+        )
+    if not isinstance(start_node, _EXPECTED_START_BY_END_NODE[type(end_node)]):
+        raise ValueError(
+            f"Invalid end node type: {type(end_node)}. Expected: {_EXPECTED_START_BY_END_NODE[type(end_node)]}"
+        )

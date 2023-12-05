@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from typing import TYPE_CHECKING
 
 from cognite.client import data_modeling as dm, CogniteClient
@@ -13,7 +14,7 @@ from osdu_wells.client.data_classes import (
     WgsCoordinates,
     WgsCoordinatesApply,
 )
-from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList
+from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
 
 
 class SpatialAreaQueryAPI(QueryAPI[T_DomainModelList]):
@@ -62,7 +63,7 @@ class SpatialAreaQueryAPI(QueryAPI[T_DomainModelList]):
             self._query_append_wgs_84_coordinates(from_)
         return self._query()
 
-    def _query_append_person(self, from_: str) -> None:
+    def _query_append_as_ingested_coordinates(self, from_: str) -> None:
         view_id = self._view_by_write_class[AsIngestedCoordinatesApply]
         self._builder.append(
             QueryStep(
@@ -70,7 +71,7 @@ class SpatialAreaQueryAPI(QueryAPI[T_DomainModelList]):
                 expression=dm.query.NodeResultSetExpression(
                     filter=dm.filters.HasData(views=[view_id]),
                     from_=from_,
-                    through=self._view_by_write_class[SpatialAreaApply].as_property_ref("person"),
+                    through=self._view_by_write_class[SpatialAreaApply].as_property_ref("as_ingested_coordinates"),
                     direction="outwards",
                 ),
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
@@ -79,7 +80,7 @@ class SpatialAreaQueryAPI(QueryAPI[T_DomainModelList]):
             ),
         )
 
-    def _query_append_person(self, from_: str) -> None:
+    def _query_append_wgs_84_coordinates(self, from_: str) -> None:
         view_id = self._view_by_write_class[WgsCoordinatesApply]
         self._builder.append(
             QueryStep(
@@ -87,7 +88,7 @@ class SpatialAreaQueryAPI(QueryAPI[T_DomainModelList]):
                 expression=dm.query.NodeResultSetExpression(
                     filter=dm.filters.HasData(views=[view_id]),
                     from_=from_,
-                    through=self._view_by_write_class[SpatialAreaApply].as_property_ref("person"),
+                    through=self._view_by_write_class[SpatialAreaApply].as_property_ref("wgs_84_coordinates"),
                     direction="outwards",
                 ),
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),

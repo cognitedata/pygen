@@ -4,15 +4,16 @@ from __future__ import annotations
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, EdgeAPI, _create_edge_filter
+from movie_domain.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 
 class DirectorMoviesAPI(EdgeAPI):
     def list(
         self,
-        director: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        director_space: str = "IntegrationTestsImmutable",
-        movie: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        movie_space: str = "IntegrationTestsImmutable",
+        from_director: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        from_director_space: str = DEFAULT_INSTANCE_SPACE,
+        to_movie: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        to_movie_space: str = DEFAULT_INSTANCE_SPACE,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit=DEFAULT_LIMIT_READ,
@@ -20,10 +21,10 @@ class DirectorMoviesAPI(EdgeAPI):
         """List movie edges of a director.
 
         Args:
-            director: ID of the source directors.
-            director_space: Location of the directors.
-            movie: ID of the target movies.
-            movie_space: Location of the movies.
+            from_director: ID of the source director.
+            from_director_space: Location of the directors.
+            to_movie: ID of the target movie.
+            to_movie_space: Location of the movies.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of movie edges to return. Defaults to 25. Set to -1, float("inf") or None
@@ -43,10 +44,10 @@ class DirectorMoviesAPI(EdgeAPI):
         """
         filter_ = _create_edge_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "Role.movies"),
-            director,
-            director_space,
-            movie,
-            movie_space,
+            from_director,
+            from_director_space,
+            to_movie,
+            to_movie_space,
             external_id_prefix,
             space,
         )

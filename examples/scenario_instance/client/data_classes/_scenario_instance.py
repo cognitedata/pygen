@@ -29,7 +29,7 @@ __all__ = [
 ]
 
 
-ScenarioInstanceTextFields = Literal["aggregation", "country", "market", "price_area", "scenario"]
+ScenarioInstanceTextFields = Literal["aggregation", "country", "market", "price_area", "price_forecast", "scenario"]
 ScenarioInstanceFields = Literal[
     "aggregation", "country", "instance", "market", "price_area", "price_forecast", "scenario", "start"
 ]

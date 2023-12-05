@@ -59,20 +59,20 @@ from ._value_transformation import (
     ValueTransformationTextFields,
 )
 
-Bid.model_rebuild()
-BidApply.model_rebuild()
 CogBid.model_rebuild()
 CogBidApply.model_rebuild()
 CogProcess.model_rebuild()
 CogProcessApply.model_rebuild()
-DateTransformationPair.model_rebuild()
-DateTransformationPairApply.model_rebuild()
-Process.model_rebuild()
-ProcessApply.model_rebuild()
 PygenBid.model_rebuild()
 PygenBidApply.model_rebuild()
 PygenProcess.model_rebuild()
 PygenProcessApply.model_rebuild()
+Bid.model_rebuild()
+BidApply.model_rebuild()
+DateTransformationPair.model_rebuild()
+DateTransformationPairApply.model_rebuild()
+Process.model_rebuild()
+ProcessApply.model_rebuild()
 
 __all__ = [
     "ResourcesApply",

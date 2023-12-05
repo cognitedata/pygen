@@ -4,15 +4,16 @@ from __future__ import annotations
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, EdgeAPI, _create_edge_filter
+from osdu_wells.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 
 class AsIngestedCoordinatesFeaturesAPI(EdgeAPI):
     def list(
         self,
-        as_ingested_coordinate: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        as_ingested_coordinate_space: str = "IntegrationTestsImmutable",
-        feature: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        feature_space: str = "IntegrationTestsImmutable",
+        from_as_ingested_coordinate: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        from_as_ingested_coordinate_space: str = DEFAULT_INSTANCE_SPACE,
+        to_feature: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        to_feature_space: str = DEFAULT_INSTANCE_SPACE,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit=DEFAULT_LIMIT_READ,
@@ -20,10 +21,10 @@ class AsIngestedCoordinatesFeaturesAPI(EdgeAPI):
         """List feature edges of a as ingested coordinate.
 
         Args:
-            as_ingested_coordinate: ID of the source as ingested coordinates.
-            as_ingested_coordinate_space: Location of the as ingested coordinates.
-            feature: ID of the target features.
-            feature_space: Location of the features.
+            from_as_ingested_coordinate: ID of the source as ingested coordinate.
+            from_as_ingested_coordinate_space: Location of the as ingested coordinates.
+            to_feature: ID of the target feature.
+            to_feature_space: Location of the features.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of feature edges to return. Defaults to 25. Set to -1, float("inf") or None
@@ -43,10 +44,10 @@ class AsIngestedCoordinatesFeaturesAPI(EdgeAPI):
         """
         filter_ = _create_edge_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "AsIngestedCoordinates.features"),
-            as_ingested_coordinate,
-            as_ingested_coordinate_space,
-            feature,
-            feature_space,
+            from_as_ingested_coordinate,
+            from_as_ingested_coordinate_space,
+            to_feature,
+            to_feature_space,
             external_id_prefix,
             space,
         )

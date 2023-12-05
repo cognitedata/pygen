@@ -22,6 +22,7 @@ if TYPE_CHECKING:
 
 
 __all__ = ["Director", "DirectorApply", "DirectorList", "DirectorApplyList", "DirectorFields"]
+
 DirectorFields = Literal["won_oscar"]
 
 _DIRECTOR_PROPERTIES_BY_FIELD = {

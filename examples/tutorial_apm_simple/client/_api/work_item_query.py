@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from typing import TYPE_CHECKING
 
 from cognite.client import data_modeling as dm, CogniteClient
@@ -102,7 +103,7 @@ class WorkItemQueryAPI(QueryAPI[T_DomainModelList]):
             self._query_append_work_order(from_)
         return self._query()
 
-    def _query_append_person(self, from_: str) -> None:
+    def _query_append_work_order(self, from_: str) -> None:
         view_id = self._view_by_write_class[WorkOrderApply]
         self._builder.append(
             QueryStep(
@@ -110,7 +111,7 @@ class WorkItemQueryAPI(QueryAPI[T_DomainModelList]):
                 expression=dm.query.NodeResultSetExpression(
                     filter=dm.filters.HasData(views=[view_id]),
                     from_=from_,
-                    through=self._view_by_write_class[WorkItemApply].as_property_ref("person"),
+                    through=self._view_by_write_class[WorkItemApply].as_property_ref("work_order"),
                     direction="outwards",
                 ),
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),

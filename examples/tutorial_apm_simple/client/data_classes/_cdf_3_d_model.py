@@ -85,8 +85,6 @@ class CdfModelApply(DomainModelApply):
         cache: set[tuple[str, str]],
         view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
     ) -> ResourcesApply:
-        from ._cdf_3_d_connection_properties import CdfConnectionPropertiesApply
-
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
             return resources
@@ -116,7 +114,12 @@ class CdfModelApply(DomainModelApply):
 
         for entity in self.entities or []:
             if isinstance(entity, DomainRelationApply):
-                other_resources = entity._to_instances_apply(cache, self, view_by_write_class)
+                other_resources = entity._to_instances_apply(
+                    cache,
+                    self,
+                    dm.DirectRelationReference("cdf_3d_schema", "cdf3dEntityConnection"),
+                    view_by_write_class,
+                )
                 resources.extend(other_resources)
 
         return resources

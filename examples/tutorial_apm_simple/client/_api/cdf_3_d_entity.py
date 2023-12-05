@@ -29,7 +29,7 @@ from ._core import (
     QueryStep,
     QueryBuilder,
 )
-from .cdf_3_d_entity_in_model_3_d import CdfEntityInModelAPI
+from .cdf_3_d_entity_in_model_3_d import CdfEntityInModelDAPI
 from .cdf_3_d_entity_query import CdfEntityQueryAPI
 
 
@@ -46,7 +46,7 @@ class CdfEntityAPI(NodeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self.in_model_3_d_edge = CdfEntityInModelAPI(
+        self.in_model_3_d_edge = CdfEntityInModelDAPI(
             client,
             view_by_write_class,
             CdfConnectionProperties,

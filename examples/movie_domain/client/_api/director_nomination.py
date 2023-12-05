@@ -4,15 +4,16 @@ from __future__ import annotations
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, EdgeAPI, _create_edge_filter
+from movie_domain.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 
 class DirectorNominationAPI(EdgeAPI):
     def list(
         self,
-        director: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        director_space: str = "IntegrationTestsImmutable",
-        nomination: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        nomination_space: str = "IntegrationTestsImmutable",
+        from_director: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        from_director_space: str = DEFAULT_INSTANCE_SPACE,
+        to_nomination: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        to_nomination_space: str = DEFAULT_INSTANCE_SPACE,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit=DEFAULT_LIMIT_READ,
@@ -20,10 +21,10 @@ class DirectorNominationAPI(EdgeAPI):
         """List nomination edges of a director.
 
         Args:
-            director: ID of the source directors.
-            director_space: Location of the directors.
-            nomination: ID of the target nominations.
-            nomination_space: Location of the nominations.
+            from_director: ID of the source director.
+            from_director_space: Location of the directors.
+            to_nomination: ID of the target nomination.
+            to_nomination_space: Location of the nominations.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of nomination edges to return. Defaults to 25. Set to -1, float("inf") or None
@@ -43,10 +44,10 @@ class DirectorNominationAPI(EdgeAPI):
         """
         filter_ = _create_edge_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "Role.nomination"),
-            director,
-            director_space,
-            nomination,
-            nomination_space,
+            from_director,
+            from_director_space,
+            to_nomination,
+            to_nomination_space,
             external_id_prefix,
             space,
         )

@@ -35,7 +35,8 @@ from ._core import (
     QueryBuilder,
 )
 from .asset_children import AssetChildrenAPI
-from .asset_in_model_3_d import AssetInModelAPI
+from .asset_in_model_3_d import AssetInModelDAPI
+from .asset_metrics import AssetMetricsAPI
 from .asset_pressure import AssetPressureAPI
 from .asset_query import AssetQueryAPI
 
@@ -54,13 +55,14 @@ class AssetAPI(NodeAPI[Asset, AssetApply, AssetList]):
         )
         self._view_id = view_id
         self.children_edge = AssetChildrenAPI(client)
-        self.in_model_3_d_edge = AssetInModelAPI(
+        self.in_model_3_d_edge = AssetInModelDAPI(
             client,
             view_by_write_class,
             CdfConnectionProperties,
             CdfConnectionPropertiesApply,
             CdfConnectionPropertiesList,
         )
+        self.metrics = AssetMetricsAPI(client, view_id)
         self.pressure = AssetPressureAPI(client, view_id)
 
     def __call__(
