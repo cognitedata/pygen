@@ -47,5 +47,4 @@ class WorkOrderQueryAPI(QueryAPI[T_DomainModelList]):
             The list of the source nodes of the query.
 
         """
-        from_ = self._builder[-1].name
         return self._query()

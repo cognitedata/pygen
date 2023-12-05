@@ -9,8 +9,8 @@ from equipment_unit.client.data_classes import (
     DomainModelApply,
     UnitProcedure,
     UnitProcedureApply,
-    StartEndTimeApply,
     StartEndTime,
+    StartEndTimeApply,
 )
 from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList
 

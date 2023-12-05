@@ -1,6 +1,6 @@
 from __future__ import annotations
-{% if data_class.has_primitive_field_of_type((dm.Timestamp, dm.Date)) %}
-import datetime{% endif %}
+
+import datetime
 from typing import TYPE_CHECKING
 
 from cognite.client import data_modeling as dm, CogniteClient
@@ -8,18 +8,17 @@ from cognite.client import data_modeling as dm, CogniteClient
 from {{ top_level_package }}.data_classes import (
     DomainModelApply,
     {{ data_class.read_name }},
-    {{ data_class.write_name }},{% for field in data_class.fields_of_type(ft.EdgeOneToMany) %}
-    {{ field.data_class.read_name }},
-    {{ field.data_class.write_name }},{% endfor %}
+    {{ data_class.write_name }},{% for class_ in unique_edge_data_classes %}
+    {{ class_.read_name }},
+    {{ class_.write_name }},{% endfor %}
 )
-from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList{% if not data_class.all_one_to_many_is_property_edges %}, _create_edge_filter{% endif %}
-{% for field in data_class.property_edges %}
-from {{ top_level_package }}.data_classes.{{ field.data_class.file_name }} import (
-    {{ field.data_class.filter_name }},
-){% endfor %}{% if data_class.has_one_to_many_edges %}
-if TYPE_CHECKING:{% for field in data_class.one_to_many_edges %}{% if field.data_class.is_edge_class %}
-    from .{{ field.data_class.end_class.query_file_name}} import {{ field.data_class.end_class.query_class_name}}{% else %}
-    from .{{ field.data_class.query_file_name }} import {{ field.data_class.query_class_name }}{% endif %}{% endfor %}
+from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList{% if not query_api.is_only_one_to_many_edges  %}, _create_edge_filter{% endif %}
+{% for class_ in unique_edge_data_classes %}
+from {{ top_level_package }}.data_classes.{{ class_.file_name }} import (
+    {{ class_.filter_name }},
+){% endfor %}{% if query_api.has_relation %}
+if TYPE_CHECKING:{% for relation in query_api.relations %}
+    from .{{ relation.file_name}} import {{ relation.name }}{% endfor %}
 {% endif %}
 
 
@@ -46,13 +45,13 @@ class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
                 max_retrieve_limit=limit,
             )
         )
-{% for field in data_class.one_to_many_edges %}
-    def {{ field.name }}(
+{% for relation in query_api.relations %}
+    def {{ relation. }}(
         self,{% for parm in field.list_method.parameters %}
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
         limit: int | None = DEFAULT_QUERY_LIMIT,{% for field in data_class.one_to_one_edges %}
         retrieve_{{ field.name }}: bool = False,{% endfor %}
-    ) -> {% if field.data_class.is_edge_class %}{{ field.data_class.end_class.query_class_name }}{% else %}{{ field.data_class.query_class_name }}{% endif %}[T_DomainModelList]:
+    ) -> {{ relation.name }}[T_DomainModelList]:
         """Query along the {{ field.doc_name }} edges of the {{ data_class.doc_name}}.
 
         Args:{% for parm in field.list_method.parameters %}

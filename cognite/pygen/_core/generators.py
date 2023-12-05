@@ -137,9 +137,11 @@ class MultiAPIGenerator:
         self._logger = logger or print
         self.api_by_view_id = self.create_api_by_view_id(list(views), default_instance_space, config)
         data_class_by_view_id = {view_id: api.data_class for view_id, api in self.api_by_view_id.items()}
+        query_class_by_view_id = {view_id: api.query_api for view_id, api in self.api_by_view_id.items()}
 
         for api in self.unique_apis:
             api.data_class.update_fields(api.view.properties, data_class_by_view_id, list(views), config)
+            api.query_api.update(query_class_by_view_id)
 
     @property
     def unique_apis(self) -> Iterator[APIGenerator]:
@@ -323,7 +325,7 @@ class APIGenerator:
 
         self.data_class = DataClass.from_view(view, self.base_name, config.naming.data_class)
         self.api_class = NodeAPIClass.from_view(view, self.base_name, config.naming.api_class)
-        self.query_api = QueryAPIClass.from_view(self.base_name, config.naming.api_class)
+        self.query_api: QueryAPIClass = QueryAPIClass.create(self.data_class, self.base_name, config.naming.api_class)
 
         # These attributes require fields to be initialized
         self._list_method: FilterMethod | None = None
@@ -364,7 +366,7 @@ class APIGenerator:
         if self._edge_apis is None:
             self._validate_initialized()
             self._edge_apis = [
-                EdgeAPIClass.from_field(field, self.data_class, self.base_name, self._config)
+                EdgeAPIClass.from_fields(field, self.data_class, self.base_name, self._config)
                 for field in self.data_class.fields_of_type(fields.EdgeOneToMany)  # type: ignore[type-abstract]
             ]
         return self._edge_apis
@@ -400,14 +402,9 @@ class APIGenerator:
     def generate_api_file(self, top_level_package: str, client_name: str) -> str:
         type_api = self._env.get_template("api_class_node.py.jinja")
 
-        unique_edge_data_classes = []
-        seen = set()
-        for edge_api in self.edge_apis:
-            if edge_api.edge_class is None:
-                continue
-            if edge_api.edge_class.read_name not in seen:
-                seen.add(edge_api.edge_class.read_name)
-                unique_edge_data_classes.append(edge_api.edge_class)
+        unique_edge_data_classes = self._unique_data_classes(
+            [api.edge_class for api in self.edge_apis if api.has_edge_class]
+        )
 
         return (
             type_api.render(
@@ -427,8 +424,22 @@ class APIGenerator:
             + "\n"
         )
 
+    @classmethod
+    def _unique_data_classes(cls, data_classes: Sequence[DataClass]) -> list[DataClass]:
+        unique_data_classes: list[DataClass] = []
+        seen = set()
+        for data_class in data_classes:
+            if data_class.read_name not in seen:
+                seen.add(data_class.read_name)
+                unique_data_classes.append(data_class)
+        return unique_data_classes
+
     def generate_api_query_file(self, top_level_package: str, client_name: str) -> str:
         query_api = self._env.get_template("api_class_query.py.jinja")
+
+        unique_edge_data_classes = self._unique_data_classes(
+            [api.edge_class for api in self.edge_apis if api.has_edge_class]
+        )
 
         return (
             query_api.render(
@@ -438,6 +449,8 @@ class APIGenerator:
                 data_class=self.data_class,
                 list_method=self.list_method,
                 query_api=self.query_api,
+                edge_apis=self.edge_apis,
+                unique_edge_data_classes=unique_edge_data_classes,
                 # ft = field types
                 ft=fields,
                 dm=dm,
