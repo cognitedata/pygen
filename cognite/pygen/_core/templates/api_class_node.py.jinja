@@ -1,5 +1,5 @@
 from __future__ import annotations
-{% if data_class.has_time_field %}
+{% if data_class.has_primitive_field_of_type((dm.Timestamp, dm.Date)) %}
 import datetime{% endif %}
 from collections.abc import Sequence
 from typing import overload
