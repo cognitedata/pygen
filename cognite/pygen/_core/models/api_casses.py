@@ -104,7 +104,7 @@ class EdgeAPIClass(APIClass):
         parent_attribute = create_name(field.name, api_class.client_attribute)
 
         if isinstance(field, EdgeOneToManyEdges):
-            edge_class = field.data_class
+            edge_class: DataClass | None = field.data_class
             if not isinstance(edge_class, EdgeDataClass):
                 raise ValueError("Expected EdgeOneToManyEdges")
             end_class = next(
@@ -116,7 +116,7 @@ class EdgeAPIClass(APIClass):
         else:
             raise NotImplementedError()
             # Todo create a dm.Edge class
-            edge_class = object()
+            edge_class = None
             end_class = field.data_class
             filter_method = FilterMethod.from_fields([], pygen_config.filtering)
 
