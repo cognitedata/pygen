@@ -129,8 +129,8 @@ class {{ data_class.write_name }}(DomainModelApply):
             other_resources = DomainRelationApply.from_edge_to_resources(
                 cache, self, {{field.variable}}, edge_type, view_by_write_class
             )
-            resources.extend(other_resources){% endfor %}
-{% for field in data_class.fields_of_type(ft.EdgeOneToOne) %}
+            resources.extend(other_resources)
+{% endfor %}{% for field in data_class.fields_of_type(ft.EdgeOneToOne) %}
         if isinstance(self.{{ field.name }}, DomainModelApply):
             other_resources = self.{{ field.name }}._to_instances_apply(cache, view_by_write_class)
             resources.extend(other_resources)

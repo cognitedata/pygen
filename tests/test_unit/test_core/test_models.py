@@ -252,7 +252,12 @@ def test_data_class_is_time(pygen_config: PygenConfig) -> None:
 
     # Act
     data_class = NodeDataClass.from_view(view, NodeDataClass.to_base_name(view), pygen_config.naming.data_class)
-    data_class.update_fields(view.properties, defaultdict(lambda: MagicMock(spec=NodeDataClass)), pygen_config)
+    data_class.update_fields(
+        view.properties,
+        defaultdict(lambda: MagicMock(spec=NodeDataClass)),
+        [MagicMock(spec=NodeDataClass)],
+        pygen_config,
+    )
 
     # Assert
     assert data_class.has_primitive_field_of_type(dm.TimeSeriesReference) is True
