@@ -65,7 +65,7 @@ class EdgeAPIClass(APIClass):
             yield FilterParameter(
                 name=f"from_{self.start_class.variable}",
                 type_="str | list[str] | dm.NodeId | list[dm.NodeId]",
-                description=f"ID of the source { self.start_class.doc_list_name}.",
+                description=f"ID of the source { self.start_class.doc_name}.",
                 default=None,
             )
             yield FilterParameter(
@@ -78,7 +78,7 @@ class EdgeAPIClass(APIClass):
             yield FilterParameter(
                 name=f"to_{self.end_class.variable}",
                 type_="str | list[str] | dm.NodeId | list[dm.NodeId]",
-                description=f"ID of the target { self.end_class.doc_list_name}.",
+                description=f"ID of the target { self.end_class.doc_name}.",
                 default=None,
             )
             yield FilterParameter(

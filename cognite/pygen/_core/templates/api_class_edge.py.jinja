@@ -19,7 +19,7 @@ class {{ edge_api.name }}({% if edge_api.has_edge_class %}EdgePropertyAPI{% else
             {{ param.name }}: {{ param.annotation }} = {{ param.default }},{% endfor %}
             limit=DEFAULT_LIMIT_READ,
     ) ->{% if edge_api.has_edge_class %}{{ edge_api.edge_class.read_list_name }}{% else %}dm.EdgeList{% endif %}:
-        """List {{edge_api.doc_name}} edges of a {{ edge_api.doc_name }}.
+        """List {{edge_api.doc_name}} edges of a {{ edge_api.start_class.doc_name }}.
 
         Args:{% for param in edge_api.filter_parameters() %}
             {{ param.name }}: {{ param.description }}{% endfor %}

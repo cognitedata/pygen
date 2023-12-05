@@ -151,7 +151,7 @@ class APIClassNaming:
     file_name: Naming = Naming(Case.snake, Number.unchanged)
     client_attribute: Naming = Naming(Case.snake, Number.unchanged)
     variable: Naming = Naming(Case.snake, Number.singular)
-    doc_name: Naming = Naming(Case.human, Number.unchanged)
+    doc_name: Naming = Naming(Case.human, Number.singular)
 
 
 @dataclass(frozen=True)

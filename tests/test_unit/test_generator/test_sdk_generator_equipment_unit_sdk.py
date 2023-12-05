@@ -161,11 +161,14 @@ def test_create_view_api_classes_unit_procedure_work_units(
     expected = EquipmentSDKFiles.unit_procedure_work_units.read_text()
 
     # Act
-    _, actual = next(
-        unit_procedure_api_generator.generate_edge_api_files(
+
+    actual_by_file_name = {
+        filename: content
+        for filename, content in unit_procedure_api_generator.generate_edge_api_files(
             EQUIPMENT_UNIT_SDK.top_level_package, EQUIPMENT_UNIT_SDK.client_name
         )
-    )
+    }
+    actual = actual_by_file_name[EquipmentSDKFiles.unit_procedure_work_units.stem]
     actual = code_formatter.format_code(actual)
 
     # Assert

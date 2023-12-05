@@ -17,8 +17,8 @@ class UnitProcedureWorkOrdersAPI(EdgePropertyAPI):
         self,
         unit_procedure: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
         unit_procedure_space: str = "IntegrationTestsImmutable",
-        work_order: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        work_order_space: str = "IntegrationTestsImmutable",
+        to_equipment_module: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        to_equipment_module_space: str = "IntegrationTestsImmutable",
         min_end_time: datetime.datetime | None = None,
         max_end_time: datetime.datetime | None = None,
         min_start_time: datetime.datetime | None = None,
@@ -32,8 +32,8 @@ class UnitProcedureWorkOrdersAPI(EdgePropertyAPI):
         Args:
             unit_procedure: ID of the source unit procedures.
             unit_procedure_space: Location of the unit procedures.
-            work_order: ID of the target work orders.
-            work_order_space: Location of the work orders.
+            to_equipment_module: ID of the target equipment modules.
+            to_equipment_module_space: Location of the equipment modules.
             min_end_time: The minimum value of the end time to filter on.
             max_end_time: The maximum value of the end time to filter on.
             min_start_time: The minimum value of the start time to filter on.
@@ -60,8 +60,8 @@ class UnitProcedureWorkOrdersAPI(EdgePropertyAPI):
             self._view_id,
             unit_procedure,
             unit_procedure_space,
-            work_order,
-            work_order_space,
+            to_equipment_module,
+            to_equipment_module_space,
             min_end_time,
             max_end_time,
             min_start_time,
