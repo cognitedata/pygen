@@ -15,9 +15,9 @@ _DATACLASS_UNIQUE_PROPERTIES = [
     "write_list_name",
 ]
 
-_APICLASS_UNIQUE_PROPERTIES = ["file_name", "name", "client_attribute"]
+_APICLASS_UNIQUE_PROPERTIES = ["file_name", "name", "parent_attribute"]
 
-_MULTIAPICLASS_UNIQUE_PROPERTIES = ["name", "client_attribute"]
+_MULTIAPICLASS_UNIQUE_PROPERTIES = ["name"]
 
 
 def validate_data_classes_unique_name(data_classes: list[DataClass]) -> None:

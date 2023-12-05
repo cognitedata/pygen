@@ -22,17 +22,21 @@ class APIClass:
 
 @dataclass(frozen=True)
 class NodeAPIClass(APIClass):
+    is_edge_class: bool
     view_id: dm.ViewId
 
     @classmethod
-    def from_view(cls, view: dm.View, base_name: str, api_class: pygen_config.APIClassNaming) -> NodeAPIClass:
+    def from_view(
+        cls, view_id: dm.ViewId, base_name: str, is_edge_class: bool, api_class: pygen_config.APIClassNaming
+    ) -> NodeAPIClass:
         file_name = create_name(base_name, api_class.file_name)
         class_name = create_name(base_name, api_class.name)
         return cls(
             parent_attribute=create_name(base_name, api_class.client_attribute),
             name=f"{class_name}API",
             file_name=file_name,
-            view_id=view.as_id(),
+            is_edge_class=is_edge_class,
+            view_id=view_id,
         )
 
 
@@ -183,7 +187,7 @@ class MultiAPIClass:
     """
 
     sub_apis: list[APIClass]
-    client_attribute: str
+    parent_attribute: str
     name: str
     model: dm.DataModel[dm.View]
 
@@ -204,7 +208,7 @@ class MultiAPIClass:
 
         return cls(
             sub_apis=sub_apis,
-            client_attribute=create_name(data_model_name, multi_api_class.client_attribute),
+            parent_attribute=create_name(data_model_name, multi_api_class.client_attribute),
             name=f"{create_name(data_model_name, multi_api_class.name)}APIs",
             model=data_model,
         )

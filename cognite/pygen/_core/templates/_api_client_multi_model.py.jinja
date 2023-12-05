@@ -4,30 +4,30 @@ from pathlib import Path
 
 from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
 from cognite.client.credentials import OAuthClientCredentials
-{% for class_ in api_classes %}{% if not class_.data_class.is_edge_class %}
-from ._api.{{ class_.file_name }} import {{ class_.name }}{% endif %}{% endfor %}
+{% for api in api_classes %}{% if not api.data_class.is_edge_class %}
+from ._api.{{ api.api_class.file_name }} import {{ api.api_class.name }}{% endif %}{% endfor %}
 from . import data_classes
 
-{% if not is_single_model %}{% for multi_api_class, views in zip(multi_api_classes, view_sets) %}
-class {{ multi_api_class.name }}:
+{% for api in multi_apis %}
+class {{ api.name }}:
     """
-    {{ multi_api_class.name }}
+    {{ api.name }}
 
     Data Model:
-        space: {{ multi_api_class.model_id.space }}
-        externalId: {{ multi_api_class.model_id.external_id }}
-        version: {{ multi_api_class.model_id.version }}
+        space: {{ api.model.space }}
+        externalId: {{ api.model.external_id }}
+        version: {{ api.model.version }}
 
     """
 
     def __init__(self, client: CogniteClient):
-        view_by_write_class = {% raw %}{{% endraw %}{% for sub, view in zip(multi_api_class.sub_apis, views) %}
-            data_classes.{{ sub.data_class.write_name }}: dm.ViewId("{{ view.space }}", "{{ view.external_id }}", "{{ view.version }}"),{% endfor %}
+        view_by_write_class = {% raw %}{{% endraw %}{% for sub in api.sub_apis %}
+            data_classes.{{ api_by_view_id[sub.view_id].data_class.write_name }}: dm.ViewId("{{ sub.view_id.space }}", "{{ sub.view_id.external_id }}", "{{ sub.view_id.version }}"),{% endfor %}
         {% raw %}}{% endraw %}
-        {% for sub, view in zip(multi_api_class.sub_apis, views) %}{% if not sub.data_class.is_edge_class %}
-        self.{{ sub.client_attribute }} = {{ sub.name }}(client, view_by_write_class){% endif %}{% endfor %}
+        {% for sub in api.sub_apis %}{% if not sub.is_edge_class %}
+        self.{{ sub.parent_attribute }} = {{ sub.name }}(client, view_by_write_class){% endif %}{% endfor %}
 
-{% endfor %}{% endif %}
+{% endfor %}
 class {{ client_name }}:
     """
     {{ client_name }}
@@ -36,11 +36,7 @@ class {{ client_name }}:
         pygen = {{ pygen_version }}
         cognite-sdk = {{ cognite_sdk_version }}
         pydantic = {{ pydantic_version }}
-{% if is_single_model %}
-    Data Model:
-        space: {{ data_model.space }}
-        externalId: {{ data_model.external_id }}
-        version: {{ data_model.version }}{% endif %}
+
     """
 
     def __init__(self, config_or_client: CogniteClient | ClientConfig):
@@ -49,13 +45,8 @@ class {{ client_name }}:
         elif isinstance(config_or_client, ClientConfig):
             client = CogniteClient(config_or_client)
         else:
-            raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}"){% if is_single_model %}
-        view_by_write_class = {% raw %}{{% endraw %}{% for api_class, view in zip(api_classes, views) %}
-            data_classes.{{ api_class.data_class.write_name }}: dm.ViewId("{{ view.space }}", "{{ view.external_id }}", "{{ view.version }}"),{% endfor %}
-        {% raw %}}{% endraw %}
-        {% for api_class, view in zip(api_classes, views) %}{% if not api_class.data_class.is_edge_class %}
-        self.{{ api_class.client_attribute }} = {{ api_class.name }}(client, view_by_write_class){% endif %}{% endfor %}{% else %}{% for multi_api_class in multi_api_classes %}
-        self.{{ multi_api_class.client_attribute }} = {{ multi_api_class.name }}(client){% endfor %}{% endif %}
+            raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}"){% for api in multi_apis %}
+        self.{{ api.parent_attribute }} = {{ api.name }}(client){% endfor %}
 
     @classmethod
     def azure_project(

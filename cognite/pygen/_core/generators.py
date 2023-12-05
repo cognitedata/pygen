@@ -20,6 +20,7 @@ from cognite.pygen.utils.helper import get_pydantic_version
 from . import validation
 from .models import CDFExternalField, DataClass, EdgeDataClass, FilterMethod, MultiAPIClass, NodeDataClass, fields
 from .models.api_casses import EdgeAPIClass, NodeAPIClass, QueryAPIClass, TimeSeriesAPIClass
+from .validation import validate_api_classes_unique_names, validate_data_classes_unique_name
 
 
 class SDKGenerator:
@@ -81,7 +82,7 @@ class SDKGenerator:
                 },
                 config.naming.multi_api_class,
             )
-            for model in data_model
+            for model in sorted(data_model, key=lambda model: (model.space, model.external_id, model.version))
         ]
 
         validation.validate_multi_api_classes_unique_names(self._multi_api_classes)
@@ -104,9 +105,6 @@ class SDKGenerator:
         else:
             api_client = self._multi_api_generator.env.get_template("_api_client_multi_model.py.jinja")
 
-        # In the template, we run zip(api_classes, views) and zip(multi_api_classes, view_sets)
-        # thus it is important that the order is the same for both.
-
         return (
             api_client.render(
                 client_name=self.client_name,
@@ -114,9 +112,10 @@ class SDKGenerator:
                 cognite_sdk_version=cognite_sdk_version,
                 pydantic_version=PYDANTIC_VERSION,
                 top_level_package=self.top_level_package,
-                api_classes=list(self._multi_api_generator.unique_apis),
+                api_classes=sorted(self._multi_api_generator.unique_apis),
                 data_model=self._data_model[0],
                 api_by_view_id=self._multi_api_generator.api_by_view_id,
+                multi_apis=self._multi_api_classes,
             )
             + "\n"
         )
@@ -146,6 +145,9 @@ class MultiAPIGenerator:
         for api in self.unique_apis:
             api.data_class.update_fields(api.view.properties, data_class_by_view_id, list(views), config)
             api.create_edge_apis(query_class_by_view_id)
+
+        validate_api_classes_unique_names([api.api_class for api in self.unique_apis])
+        validate_data_classes_unique_name([api.data_class for api in self.unique_apis])
 
     @property
     def unique_apis(self) -> Iterator[APIGenerator]:
@@ -337,7 +339,9 @@ class APIGenerator:
         self._config = config
 
         self.data_class = DataClass.from_view(view, self.base_name, config.naming.data_class)
-        self.api_class = NodeAPIClass.from_view(view, self.base_name, config.naming.api_class)
+        self.api_class = NodeAPIClass.from_view(
+            view.as_id(), self.base_name, isinstance(self.data_class, EdgeDataClass), config.naming.api_class
+        )
         self.query_api: QueryAPIClass = QueryAPIClass.create(self.data_class, self.base_name, config.naming.api_class)
 
         # These attributes require fields to be initialized
