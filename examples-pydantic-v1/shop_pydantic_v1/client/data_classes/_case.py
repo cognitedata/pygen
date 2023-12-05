@@ -7,6 +7,7 @@ from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -64,11 +65,11 @@ class Case(DomainModel):
         version: The version of the case node.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     arguments: Optional[str] = None
     bid: Union[str, None] = None
     bid_history: Optional[list[str]] = None
-    commands: Union[CommandConfig, str, None] = Field(None, repr=False)
+    commands: Union[CommandConfig, str, dm.NodeId, None] = Field(None, repr=False)
     cut_files: Optional[list[str]] = None
     end_time: Optional[datetime.datetime] = None
     name: Optional[str] = None
@@ -118,11 +119,11 @@ class CaseApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     arguments: Optional[str] = None
     bid: Union[str, None] = None
     bid_history: Optional[list[str]] = None
-    commands: Union[CommandConfigApply, str, None] = Field(None, repr=False)
+    commands: Union[CommandConfigApply, str, dm.NodeId, None] = Field(None, repr=False)
     cut_files: Optional[list[str]] = None
     end_time: Optional[datetime.datetime] = None
     name: str

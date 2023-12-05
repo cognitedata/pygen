@@ -6,6 +6,7 @@ from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -60,7 +61,7 @@ class GeoContexts(DomainModel):
         version: The version of the geo context node.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     basin_id: Optional[str] = Field(None, alias="BasinID")
     field_id: Optional[str] = Field(None, alias="FieldID")
     geo_political_entity_id: Optional[str] = Field(None, alias="GeoPoliticalEntityID")
@@ -102,7 +103,7 @@ class GeoContextsApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     basin_id: Optional[str] = Field(None, alias="BasinID")
     field_id: Optional[str] = Field(None, alias="FieldID")
     geo_political_entity_id: Optional[str] = Field(None, alias="GeoPoliticalEntityID")

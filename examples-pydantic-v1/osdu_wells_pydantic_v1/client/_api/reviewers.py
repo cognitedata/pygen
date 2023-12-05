@@ -86,6 +86,7 @@ class ReviewersAPI(NodeAPI[Reviewers, ReviewersApply, ReviewersList]):
             A query API for reviewers.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_reviewer_filter(
             self._view_id,
             data_governance_role_type_id,
@@ -100,26 +101,10 @@ class ReviewersAPI(NodeAPI[Reviewers, ReviewersApply, ReviewersList]):
             workflow_persona_type_id_prefix,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            ReviewersList,
-            [
-                QueryStep(
-                    name="reviewer",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_REVIEWERS_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=Reviewers,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return ReviewersQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(ReviewersList)
+        return ReviewersQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(self, reviewer: ReviewersApply | Sequence[ReviewersApply], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) reviewers.

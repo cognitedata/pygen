@@ -86,6 +86,7 @@ class CogPoolAPI(NodeAPI[CogPool, CogPoolApply, CogPoolList]):
             A query API for cog pools.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_cog_pool_filter(
             self._view_id,
             min_max_price,
@@ -100,26 +101,10 @@ class CogPoolAPI(NodeAPI[CogPool, CogPoolApply, CogPoolList]):
             timezone_prefix,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            CogPoolList,
-            [
-                QueryStep(
-                    name="cog_pool",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_COGPOOL_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=CogPool,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return CogPoolQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(CogPoolList)
+        return CogPoolQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(self, cog_pool: CogPoolApply | Sequence[CogPoolApply], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) cog pools.

@@ -98,6 +98,7 @@ class SpatialPointAPI(NodeAPI[SpatialPoint, SpatialPointApply, SpatialPointList]
             A query API for spatial points.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_spatial_point_filter(
             self._view_id,
             as_ingested_coordinates,
@@ -118,26 +119,10 @@ class SpatialPointAPI(NodeAPI[SpatialPoint, SpatialPointApply, SpatialPointList]
             wgs_84_coordinates,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            SpatialPointList,
-            [
-                QueryStep(
-                    name="spatial_point",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_SPATIALPOINT_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=SpatialPoint,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return SpatialPointQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(SpatialPointList)
+        return SpatialPointQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(
         self, spatial_point: SpatialPointApply | Sequence[SpatialPointApply], replace: bool = False

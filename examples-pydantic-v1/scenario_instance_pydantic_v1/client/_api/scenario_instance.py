@@ -97,6 +97,7 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
             A query API for scenario instances.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_scenario_instance_filter(
             self._view_id,
             aggregation,
@@ -115,26 +116,10 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
             max_start,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            ScenarioInstanceList,
-            [
-                QueryStep(
-                    name="scenario_instance",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_SCENARIOINSTANCE_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=ScenarioInstance,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return ScenarioInstanceQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(ScenarioInstanceList)
+        return ScenarioInstanceQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(
         self, scenario_instance: ScenarioInstanceApply | Sequence[ScenarioInstanceApply], replace: bool = False

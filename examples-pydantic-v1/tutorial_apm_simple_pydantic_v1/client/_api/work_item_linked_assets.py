@@ -4,15 +4,16 @@ from __future__ import annotations
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, EdgeAPI, _create_edge_filter
+from tutorial_apm_simple_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 
 class WorkItemLinkedAssetsAPI(EdgeAPI):
     def list(
         self,
-        work_item: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        work_item_space: str = "tutorial_apm_simple",
-        asset: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        asset_space: str = "tutorial_apm_simple",
+        from_work_item: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        from_work_item_space: str = DEFAULT_INSTANCE_SPACE,
+        to_asset: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        to_asset_space: str = DEFAULT_INSTANCE_SPACE,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit=DEFAULT_LIMIT_READ,
@@ -20,10 +21,10 @@ class WorkItemLinkedAssetsAPI(EdgeAPI):
         """List linked asset edges of a work item.
 
         Args:
-            work_item: ID of the source work items.
-            work_item_space: Location of the work items.
-            asset: ID of the target assets.
-            asset_space: Location of the assets.
+            from_work_item: ID of the source work item.
+            from_work_item_space: Location of the work items.
+            to_asset: ID of the target asset.
+            to_asset_space: Location of the assets.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of linked asset edges to return. Defaults to 25. Set to -1, float("inf") or None
@@ -43,10 +44,10 @@ class WorkItemLinkedAssetsAPI(EdgeAPI):
         """
         filter_ = _create_edge_filter(
             dm.DirectRelationReference("tutorial_apm_simple", "WorkItem.linkedAssets"),
-            work_item,
-            work_item_space,
-            asset,
-            asset_space,
+            from_work_item,
+            from_work_item_space,
+            to_asset,
+            to_asset_space,
             external_id_prefix,
             space,
         )

@@ -59,56 +59,62 @@ from ._value_transformation import (
     ValueTransformationTextFields,
 )
 
-Bid.update_forward_refs(
-    Market=Market,
-)
+
 CogBid.update_forward_refs(
     Market=Market,
 )
+CogBidApply.update_forward_refs(
+    MarketApply=MarketApply,
+)
+
 CogProcess.update_forward_refs(
     Bid=Bid,
     DateTransformationPair=DateTransformationPair,
     ValueTransformation=ValueTransformation,
-)
-DateTransformationPair.update_forward_refs(
-    DateTransformation=DateTransformation,
-)
-Process.update_forward_refs(
-    Bid=Bid,
-)
-PygenBid.update_forward_refs(
-    Market=Market,
-)
-PygenProcess.update_forward_refs(
-    Bid=Bid,
-    DateTransformationPair=DateTransformationPair,
-    ValueTransformation=ValueTransformation,
-)
-
-BidApply.update_forward_refs(
-    MarketApply=MarketApply,
-)
-CogBidApply.update_forward_refs(
-    MarketApply=MarketApply,
 )
 CogProcessApply.update_forward_refs(
     BidApply=BidApply,
     DateTransformationPairApply=DateTransformationPairApply,
     ValueTransformationApply=ValueTransformationApply,
 )
-DateTransformationPairApply.update_forward_refs(
-    DateTransformationApply=DateTransformationApply,
-)
-ProcessApply.update_forward_refs(
-    BidApply=BidApply,
+
+PygenBid.update_forward_refs(
+    Market=Market,
 )
 PygenBidApply.update_forward_refs(
     MarketApply=MarketApply,
+)
+
+PygenProcess.update_forward_refs(
+    Bid=Bid,
+    DateTransformationPair=DateTransformationPair,
+    ValueTransformation=ValueTransformation,
 )
 PygenProcessApply.update_forward_refs(
     BidApply=BidApply,
     DateTransformationPairApply=DateTransformationPairApply,
     ValueTransformationApply=ValueTransformationApply,
+)
+
+Bid.update_forward_refs(
+    Market=Market,
+)
+BidApply.update_forward_refs(
+    MarketApply=MarketApply,
+)
+
+DateTransformationPair.update_forward_refs(
+    DateTransformation=DateTransformation,
+)
+DateTransformationPairApply.update_forward_refs(
+    DateTransformationApply=DateTransformationApply,
+)
+
+Process.update_forward_refs(
+    Bid=Bid,
+)
+ProcessApply.update_forward_refs(
+    BidApply=BidApply,
 )
 
 __all__ = [

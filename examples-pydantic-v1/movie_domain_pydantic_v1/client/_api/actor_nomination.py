@@ -4,15 +4,16 @@ from __future__ import annotations
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, EdgeAPI, _create_edge_filter
+from movie_domain_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 
 class ActorNominationAPI(EdgeAPI):
     def list(
         self,
-        actor: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        actor_space: str = "IntegrationTestsImmutable",
-        nomination: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        nomination_space: str = "IntegrationTestsImmutable",
+        from_actor: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        from_actor_space: str = DEFAULT_INSTANCE_SPACE,
+        to_nomination: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        to_nomination_space: str = DEFAULT_INSTANCE_SPACE,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit=DEFAULT_LIMIT_READ,
@@ -20,10 +21,10 @@ class ActorNominationAPI(EdgeAPI):
         """List nomination edges of a actor.
 
         Args:
-            actor: ID of the source actors.
-            actor_space: Location of the actors.
-            nomination: ID of the target nominations.
-            nomination_space: Location of the nominations.
+            from_actor: ID of the source actor.
+            from_actor_space: Location of the actors.
+            to_nomination: ID of the target nomination.
+            to_nomination_space: Location of the nominations.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of nomination edges to return. Defaults to 25. Set to -1, float("inf") or None
@@ -43,10 +44,10 @@ class ActorNominationAPI(EdgeAPI):
         """
         filter_ = _create_edge_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "Role.nomination"),
-            actor,
-            actor_space,
-            nomination,
-            nomination_space,
+            from_actor,
+            from_actor_space,
+            to_nomination,
+            to_nomination_space,
             external_id_prefix,
             space,
         )

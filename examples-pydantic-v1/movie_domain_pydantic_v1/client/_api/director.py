@@ -73,32 +73,17 @@ class DirectorAPI(NodeAPI[Director, DirectorApply, DirectorList]):
             A query API for directors.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_director_filter(
             self._view_id,
             person,
             won_oscar,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            DirectorList,
-            [
-                QueryStep(
-                    name="director",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_DIRECTOR_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=Director,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return DirectorQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(DirectorList)
+        return DirectorQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(self, director: DirectorApply | Sequence[DirectorApply], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) directors.

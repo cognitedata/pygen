@@ -4,15 +4,16 @@ from __future__ import annotations
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, EdgeAPI, _create_edge_filter
+from markets_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 
 class DateTransformationPairStartAPI(EdgeAPI):
     def list(
         self,
-        date_transformation_pair: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        date_transformation_pair_space: str = "market",
-        date_transformation: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        date_transformation_space: str = "market",
+        from_date_transformation_pair: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        from_date_transformation_pair_space: str = DEFAULT_INSTANCE_SPACE,
+        to_date_transformation: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        to_date_transformation_space: str = DEFAULT_INSTANCE_SPACE,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit=DEFAULT_LIMIT_READ,
@@ -20,10 +21,10 @@ class DateTransformationPairStartAPI(EdgeAPI):
         """List start edges of a date transformation pair.
 
         Args:
-            date_transformation_pair: ID of the source date transformation pairs.
-            date_transformation_pair_space: Location of the date transformation pairs.
-            date_transformation: ID of the target date transformations.
-            date_transformation_space: Location of the date transformations.
+            from_date_transformation_pair: ID of the source date transformation pair.
+            from_date_transformation_pair_space: Location of the date transformation pairs.
+            to_date_transformation: ID of the target date transformation.
+            to_date_transformation_space: Location of the date transformations.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of start edges to return. Defaults to 25. Set to -1, float("inf") or None
@@ -43,10 +44,10 @@ class DateTransformationPairStartAPI(EdgeAPI):
         """
         filter_ = _create_edge_filter(
             dm.DirectRelationReference("market", "DateTransformationPair.start"),
-            date_transformation_pair,
-            date_transformation_pair_space,
-            date_transformation,
-            date_transformation_space,
+            from_date_transformation_pair,
+            from_date_transformation_pair_space,
+            to_date_transformation,
+            to_date_transformation_space,
             external_id_prefix,
             space,
         )

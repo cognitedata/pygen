@@ -1,17 +1,27 @@
 from __future__ import annotations
 
 import datetime
-from typing import Any, Literal, Optional, Union
+from typing import Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
-from pydantic import Field, root_validator
 
-from ._core import DomainModelApply, DomainRelation, DomainRelationApply, DomainRelationList, ResourcesApply
+from ._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DomainModel,
+    DomainModelApply,
+    DomainRelation,
+    DomainRelationApply,
+    DomainRelationList,
+    ResourcesApply,
+)
+from ._unit_procedure import UnitProcedureApply
+from ._work_order import WorkOrder, WorkOrderApply
 from ._equipment_module import EquipmentModule, EquipmentModuleApply
 
 __all__ = ["StartEndTime", "StartEndTimeApply", "StartEndTimeList", "StartEndTimeApplyList", "StartEndTimeFields"]
-StartEndTimeFields = Literal["end_time", "start_time"]
 
+
+StartEndTimeFields = Literal["end_time", "start_time"]
 _STARTENDTIME_PROPERTIES_BY_FIELD = {
     "end_time": "end_time",
     "start_time": "start_time",
@@ -26,7 +36,7 @@ class StartEndTime(DomainRelation):
     Args:
         space: The space where the node is located.
         external_id: The external id of the start end time.
-        equipment_module: The equipment module field.
+        end_node: The end node of this edge.
         end_time: The end time field.
         start_time: The start time field.
         created_time: The created time of the start end time node.
@@ -35,29 +45,17 @@ class StartEndTime(DomainRelation):
         version: The version of the start end time node.
     """
 
-    space: str = "IntegrationTestsImmutable"
-    equipment_module: Union[EquipmentModule, str]
+    space: str = DEFAULT_INSTANCE_SPACE
+    end_node: Union[EquipmentModule, WorkOrder, str, dm.NodeId]
     end_time: Optional[datetime.datetime] = None
     start_time: Optional[datetime.datetime] = None
-
-    @property
-    def unit_procedure(self) -> str:
-        return self.start_node.external_id
-
-    @root_validator(pre=True)
-    def set_equipment_module_if_missing(cls, data: Any):
-        if isinstance(data, dict) and "equipment_module" not in data:
-            data["equipment_module"] = data["end_node"]["external_id"]
-        return data
 
     def as_apply(self) -> StartEndTimeApply:
         """Convert this read version of start end time to the writing version."""
         return StartEndTimeApply(
             space=self.space,
             external_id=self.external_id,
-            equipment_module=self.equipment_module.as_apply()
-            if isinstance(self.equipment_module, EquipmentModule)
-            else self.equipment_module,
+            end_node=self.end_node.as_apply() if isinstance(self.end_node, DomainModel) else self.end_node,
             end_time=self.end_time,
             start_time=self.start_time,
         )
@@ -69,10 +67,9 @@ class StartEndTimeApply(DomainRelationApply):
     It is used to when data is sent to CDF.
 
     Args:
-        edge_type: The edge type of the start end time.
         space: The space where the node is located.
         external_id: The external id of the start end time.
-        equipment_module: The equipment module field.
+        end_node: The end node of this edge.
         end_time: The end time field.
         start_time: The start time field.
         existing_version: Fail the ingestion request if the start end time version is greater than or equal to this value.
@@ -81,11 +78,8 @@ class StartEndTimeApply(DomainRelationApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    edge_type: dm.DirectRelationReference = dm.DirectRelationReference(
-        "IntegrationTestsImmutable", "UnitProcedure.equipment_module"
-    )
-    space: str = "IntegrationTestsImmutable"
-    equipment_module: Union[EquipmentModuleApply, str]
+    space: str = DEFAULT_INSTANCE_SPACE
+    end_node: Union[EquipmentModuleApply, WorkOrderApply, str, dm.NodeId]
     end_time: Optional[datetime.datetime] = None
     start_time: Optional[datetime.datetime] = None
 
@@ -93,20 +87,25 @@ class StartEndTimeApply(DomainRelationApply):
         self,
         cache: set[tuple[str, str]],
         start_node: DomainModelApply,
+        edge_type: dm.DirectRelationReference,
         view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.external_id and (self.space, self.external_id) in cache:
             return resources
 
-        if isinstance(self.equipment_module, DomainModelApply):
-            end_node = self.equipment_module.as_direct_reference()
-        elif isinstance(self.equipment_module, str):
-            end_node = dm.DirectRelationReference(self.space, self.equipment_module)
-        else:
-            raise ValueError(f"Invalid type for equipment_module: {type(self.equipment_module)}")
+        _validate_end_node(start_node, self.end_node)
 
-        self.external_id = external_id = DomainRelationApply.external_id_factory(start_node, end_node, self.edge_type)
+        if isinstance(self.end_node, DomainModelApply):
+            end_node = self.end_node.as_direct_reference()
+        elif isinstance(self.end_node, str):
+            end_node = dm.DirectRelationReference(self.space, self.end_node)
+        elif isinstance(self.end_node, dm.NodeId):
+            end_node = dm.DirectRelationReference(self.end_node.space, self.end_node.external_id)
+        else:
+            raise ValueError(f"Invalid type for equipment_module: {type(self.end_node)}")
+
+        self.external_id = external_id = DomainRelationApply.external_id_factory(start_node, end_node, edge_type)
 
         write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
             "IntegrationTestsImmutable", "StartEndTime", "d416e0ed98186b"
@@ -122,7 +121,7 @@ class StartEndTimeApply(DomainRelationApply):
             this_edge = dm.EdgeApply(
                 space=self.space,
                 external_id=external_id,
-                type=self.edge_type,
+                type=edge_type,
                 start_node=start_node.as_direct_reference(),
                 end_node=end_node,
                 existing_version=self.existing_version,
@@ -136,8 +135,8 @@ class StartEndTimeApply(DomainRelationApply):
             resources.edges.append(this_edge)
             cache.add((self.space, external_id))
 
-        if isinstance(self.equipment_module, DomainModelApply):
-            other_resources = self.equipment_module._to_instances_apply(cache, view_by_write_class)
+        if isinstance(self.end_node, DomainModelApply):
+            other_resources = self.end_node._to_instances_apply(cache, view_by_write_class)
             resources.extend(other_resources)
 
         return resources
@@ -159,9 +158,9 @@ def _create_start_end_time_filter(
     edge_type: dm.DirectRelationReference,
     view_id: dm.ViewId,
     start_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-    start_node_space: str = "IntegrationTestsImmutable",
+    start_node_space: str = DEFAULT_INSTANCE_SPACE,
     end_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-    space_end_node: str = "IntegrationTestsImmutable",
+    space_end_node: str = DEFAULT_INSTANCE_SPACE,
     min_end_time: datetime.datetime | None = None,
     max_end_time: datetime.datetime | None = None,
     min_start_time: datetime.datetime | None = None,
@@ -241,3 +240,25 @@ def _create_start_end_time_filter(
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters)
+
+
+_EXPECTED_START_BY_END_NODE = {
+    EquipmentModuleApply: UnitProcedureApply,
+    WorkOrderApply: UnitProcedureApply,
+}
+
+
+def _validate_end_node(
+    start_node: DomainModelApply, end_node: Union[EquipmentModuleApply, WorkOrderApply, str, dm.NodeId]
+) -> None:
+    if isinstance(end_node, (str, dm.NodeId)):
+        # Nothing to validate
+        return
+    if type(end_node) not in _EXPECTED_START_BY_END_NODE:
+        raise ValueError(
+            f"Invalid end node type: {type(end_node)}. Should be one of {[t.__name__ for t in _EXPECTED_START_BY_END_NODE.keys()]}"
+        )
+    if not isinstance(start_node, _EXPECTED_START_BY_END_NODE[type(end_node)]):
+        raise ValueError(
+            f"Invalid end node type: {type(end_node)}. Expected: {_EXPECTED_START_BY_END_NODE[type(end_node)]}"
+        )

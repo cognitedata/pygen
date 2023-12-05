@@ -74,6 +74,7 @@ class BestDirectorAPI(NodeAPI[BestDirector, BestDirectorApply, BestDirectorList]
             A query API for best directors.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_best_director_filter(
             self._view_id,
             name,
@@ -82,26 +83,10 @@ class BestDirectorAPI(NodeAPI[BestDirector, BestDirectorApply, BestDirectorList]
             max_year,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            BestDirectorList,
-            [
-                QueryStep(
-                    name="best_director",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_BESTDIRECTOR_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=BestDirector,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return BestDirectorQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(BestDirectorList)
+        return BestDirectorQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(
         self, best_director: BestDirectorApply | Sequence[BestDirectorApply], replace: bool = False

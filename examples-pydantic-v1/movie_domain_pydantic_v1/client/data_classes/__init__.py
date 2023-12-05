@@ -45,47 +45,51 @@ from ._person import Person, PersonApply, PersonApplyList, PersonFields, PersonL
 from ._rating import Rating, RatingApply, RatingApplyList, RatingFields, RatingList
 from ._role import Role, RoleApply, RoleApplyList, RoleFields, RoleList
 
+
 Actor.update_forward_refs(
     Movie=Movie,
     Nomination=Nomination,
     Person=Person,
 )
-Director.update_forward_refs(
-    Movie=Movie,
-    Nomination=Nomination,
-    Person=Person,
-)
-Movie.update_forward_refs(
-    Actor=Actor,
-    Director=Director,
-    Rating=Rating,
-)
-Person.update_forward_refs(
-    Role=Role,
-)
-Role.update_forward_refs(
-    Movie=Movie,
-    Nomination=Nomination,
-    Person=Person,
-)
-
 ActorApply.update_forward_refs(
     MovieApply=MovieApply,
     NominationApply=NominationApply,
     PersonApply=PersonApply,
+)
+
+Director.update_forward_refs(
+    Movie=Movie,
+    Nomination=Nomination,
+    Person=Person,
 )
 DirectorApply.update_forward_refs(
     MovieApply=MovieApply,
     NominationApply=NominationApply,
     PersonApply=PersonApply,
 )
+
+Movie.update_forward_refs(
+    Actor=Actor,
+    Director=Director,
+    Rating=Rating,
+)
 MovieApply.update_forward_refs(
     ActorApply=ActorApply,
     DirectorApply=DirectorApply,
     RatingApply=RatingApply,
 )
+
+Person.update_forward_refs(
+    Role=Role,
+)
 PersonApply.update_forward_refs(
     RoleApply=RoleApply,
+)
+
+Role.update_forward_refs(
+    Movie=Movie,
+    Nomination=Nomination,
+    Person=Person,
 )
 RoleApply.update_forward_refs(
     MovieApply=MovieApply,

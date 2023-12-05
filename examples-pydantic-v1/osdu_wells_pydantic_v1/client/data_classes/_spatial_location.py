@@ -6,6 +6,7 @@ from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -90,9 +91,9 @@ class SpatialLocation(DomainModel):
         version: The version of the spatial location node.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     applied_operations: Optional[list[str]] = Field(None, alias="AppliedOperations")
-    as_ingested_coordinates: Union[AsIngestedCoordinates, str, None] = Field(
+    as_ingested_coordinates: Union[AsIngestedCoordinates, str, dm.NodeId, None] = Field(
         None, repr=False, alias="AsIngestedCoordinates"
     )
     coordinate_quality_check_date_time: Optional[str] = Field(None, alias="CoordinateQualityCheckDateTime")
@@ -103,7 +104,7 @@ class SpatialLocation(DomainModel):
     spatial_geometry_type_id: Optional[str] = Field(None, alias="SpatialGeometryTypeID")
     spatial_location_coordinates_date: Optional[str] = Field(None, alias="SpatialLocationCoordinatesDate")
     spatial_parameter_type_id: Optional[str] = Field(None, alias="SpatialParameterTypeID")
-    wgs_84_coordinates: Union[WgsCoordinates, str, None] = Field(None, repr=False, alias="Wgs84Coordinates")
+    wgs_84_coordinates: Union[WgsCoordinates, str, dm.NodeId, None] = Field(None, repr=False, alias="Wgs84Coordinates")
 
     def as_apply(self) -> SpatialLocationApply:
         """Convert this read version of spatial location to the writing version."""
@@ -153,9 +154,9 @@ class SpatialLocationApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     applied_operations: Optional[list[str]] = Field(None, alias="AppliedOperations")
-    as_ingested_coordinates: Union[AsIngestedCoordinatesApply, str, None] = Field(
+    as_ingested_coordinates: Union[AsIngestedCoordinatesApply, str, dm.NodeId, None] = Field(
         None, repr=False, alias="AsIngestedCoordinates"
     )
     coordinate_quality_check_date_time: Optional[str] = Field(None, alias="CoordinateQualityCheckDateTime")
@@ -166,7 +167,9 @@ class SpatialLocationApply(DomainModelApply):
     spatial_geometry_type_id: Optional[str] = Field(None, alias="SpatialGeometryTypeID")
     spatial_location_coordinates_date: Optional[str] = Field(None, alias="SpatialLocationCoordinatesDate")
     spatial_parameter_type_id: Optional[str] = Field(None, alias="SpatialParameterTypeID")
-    wgs_84_coordinates: Union[WgsCoordinatesApply, str, None] = Field(None, repr=False, alias="Wgs84Coordinates")
+    wgs_84_coordinates: Union[WgsCoordinatesApply, str, dm.NodeId, None] = Field(
+        None, repr=False, alias="Wgs84Coordinates"
+    )
 
     def _to_instances_apply(
         self,

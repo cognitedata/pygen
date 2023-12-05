@@ -7,6 +7,7 @@ from cognite.client.data_classes import TimeSeries
 from pydantic import Field
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -26,7 +27,7 @@ __all__ = [
 ]
 
 
-EquipmentModuleTextFields = Literal["description", "name", "type_"]
+EquipmentModuleTextFields = Literal["description", "name", "sensor_value", "type_"]
 EquipmentModuleFields = Literal["description", "name", "sensor_value", "type_"]
 
 _EQUIPMENTMODULE_PROPERTIES_BY_FIELD = {
@@ -55,7 +56,7 @@ class EquipmentModule(DomainModel):
         version: The version of the equipment module node.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     description: Optional[str] = None
     name: Optional[str] = None
     sensor_value: Union[TimeSeries, str, None] = None
@@ -91,7 +92,7 @@ class EquipmentModuleApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     description: Optional[str] = None
     name: Optional[str] = None
     sensor_value: Union[TimeSeries, str, None] = None

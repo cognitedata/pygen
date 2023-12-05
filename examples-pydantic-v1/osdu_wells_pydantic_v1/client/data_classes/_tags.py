@@ -6,6 +6,7 @@ from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -41,7 +42,7 @@ class Tags(DomainModel):
         version: The version of the tag node.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     name_of_key: Optional[str] = Field(None, alias="NameOfKey")
 
     def as_apply(self) -> TagsApply:
@@ -68,7 +69,7 @@ class TagsApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     name_of_key: Optional[str] = Field(None, alias="NameOfKey")
 
     def _to_instances_apply(

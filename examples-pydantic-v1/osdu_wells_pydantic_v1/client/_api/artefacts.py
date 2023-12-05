@@ -78,6 +78,7 @@ class ArtefactsAPI(NodeAPI[Artefacts, ArtefactsApply, ArtefactsList]):
             A query API for artefacts.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_artefact_filter(
             self._view_id,
             resource_id,
@@ -88,26 +89,10 @@ class ArtefactsAPI(NodeAPI[Artefacts, ArtefactsApply, ArtefactsList]):
             role_id_prefix,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            ArtefactsList,
-            [
-                QueryStep(
-                    name="artefact",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_ARTEFACTS_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=Artefacts,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return ArtefactsQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(ArtefactsList)
+        return ArtefactsQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(self, artefact: ArtefactsApply | Sequence[ArtefactsApply], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) artefacts.

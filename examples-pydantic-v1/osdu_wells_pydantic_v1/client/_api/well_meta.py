@@ -4,15 +4,16 @@ from __future__ import annotations
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, EdgeAPI, _create_edge_filter
+from osdu_wells_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 
 class WellMetaAPI(EdgeAPI):
     def list(
         self,
-        well: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        well_space: str = "IntegrationTestsImmutable",
-        meta: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        meta_space: str = "IntegrationTestsImmutable",
+        from_well: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        from_well_space: str = DEFAULT_INSTANCE_SPACE,
+        to_meta: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        to_meta_space: str = DEFAULT_INSTANCE_SPACE,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit=DEFAULT_LIMIT_READ,
@@ -20,10 +21,10 @@ class WellMetaAPI(EdgeAPI):
         """List meta edges of a well.
 
         Args:
-            well: ID of the source wells.
-            well_space: Location of the wells.
-            meta: ID of the target metas.
-            meta_space: Location of the metas.
+            from_well: ID of the source well.
+            from_well_space: Location of the wells.
+            to_meta: ID of the target meta.
+            to_meta_space: Location of the metas.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of meta edges to return. Defaults to 25. Set to -1, float("inf") or None
@@ -43,10 +44,10 @@ class WellMetaAPI(EdgeAPI):
         """
         filter_ = _create_edge_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "Well.meta"),
-            well,
-            well_space,
-            meta,
-            meta_space,
+            from_well,
+            from_well_space,
+            to_meta,
+            to_meta_space,
             external_id_prefix,
             space,
         )

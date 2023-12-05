@@ -72,6 +72,7 @@ class FeaturesAPI(NodeAPI[Features, FeaturesApply, FeaturesList]):
             A query API for features.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_feature_filter(
             self._view_id,
             geometry,
@@ -79,26 +80,10 @@ class FeaturesAPI(NodeAPI[Features, FeaturesApply, FeaturesList]):
             type_prefix,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            FeaturesList,
-            [
-                QueryStep(
-                    name="feature",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_FEATURES_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=Features,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return FeaturesQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(FeaturesList)
+        return FeaturesQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(self, feature: FeaturesApply | Sequence[FeaturesApply], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) features.

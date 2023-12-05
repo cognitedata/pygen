@@ -70,36 +70,17 @@ class ValueTransformationAPI(NodeAPI[ValueTransformation, ValueTransformationApp
             A query API for value transformations.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_value_transformation_filter(
             self._view_id,
             method,
             method_prefix,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            ValueTransformationList,
-            [
-                QueryStep(
-                    name="value_transformation",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [
-                            dm.query.SourceSelector(
-                                self._view_id, list(_VALUETRANSFORMATION_PROPERTIES_BY_FIELD.values())
-                            )
-                        ]
-                    ),
-                    result_cls=ValueTransformation,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return ValueTransformationQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(ValueTransformationList)
+        return ValueTransformationQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(
         self, value_transformation: ValueTransformationApply | Sequence[ValueTransformationApply], replace: bool = False

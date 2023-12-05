@@ -29,16 +29,27 @@ from ._unit_procedure import (
     UnitProcedureList,
     UnitProcedureTextFields,
 )
+from ._work_order import (
+    WorkOrder,
+    WorkOrderApply,
+    WorkOrderApplyList,
+    WorkOrderFields,
+    WorkOrderList,
+    WorkOrderTextFields,
+)
+
 
 StartEndTime.update_forward_refs(
     EquipmentModule=EquipmentModule,
+    WorkOrder=WorkOrder,
 )
-UnitProcedure.update_forward_refs(
-    StartEndTime=StartEndTime,
-)
-
 StartEndTimeApply.update_forward_refs(
     EquipmentModuleApply=EquipmentModuleApply,
+    WorkOrderApply=WorkOrderApply,
+)
+
+UnitProcedure.update_forward_refs(
+    StartEndTime=StartEndTime,
 )
 UnitProcedureApply.update_forward_refs(
     StartEndTimeApply=StartEndTimeApply,
@@ -68,4 +79,10 @@ __all__ = [
     "UnitProcedureApplyList",
     "UnitProcedureFields",
     "UnitProcedureTextFields",
+    "WorkOrder",
+    "WorkOrderApply",
+    "WorkOrderList",
+    "WorkOrderApplyList",
+    "WorkOrderFields",
+    "WorkOrderTextFields",
 ]

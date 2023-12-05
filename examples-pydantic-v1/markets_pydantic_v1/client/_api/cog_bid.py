@@ -89,6 +89,7 @@ class CogBidAPI(NodeAPI[CogBid, CogBidApply, CogBidList]):
             A query API for cog bids.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_cog_bid_filter(
             self._view_id,
             min_date,
@@ -104,26 +105,10 @@ class CogBidAPI(NodeAPI[CogBid, CogBidApply, CogBidList]):
             max_quantity,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            CogBidList,
-            [
-                QueryStep(
-                    name="cog_bid",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_COGBID_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=CogBid,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return CogBidQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(CogBidList)
+        return CogBidQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(self, cog_bid: CogBidApply | Sequence[CogBidApply], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) cog bids.

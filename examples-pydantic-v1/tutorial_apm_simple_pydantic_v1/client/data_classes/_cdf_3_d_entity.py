@@ -6,6 +6,7 @@ from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -36,7 +37,7 @@ class CdfEntity(DomainModel):
         version: The version of the cdf 3 d entity node.
     """
 
-    space: str = "cdf_3d_schema"
+    space: str = DEFAULT_INSTANCE_SPACE
     in_model_3_d: Optional[list[CdfConnectionProperties]] = Field(default=None, repr=False, alias="inModel3d")
 
     def as_apply(self) -> CdfEntityApply:
@@ -63,7 +64,7 @@ class CdfEntityApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "cdf_3d_schema"
+    space: str = DEFAULT_INSTANCE_SPACE
     in_model_3_d: Optional[list[CdfConnectionPropertiesApply]] = Field(default=None, repr=False, alias="inModel3d")
 
     def _to_instances_apply(
@@ -71,8 +72,6 @@ class CdfEntityApply(DomainModelApply):
         cache: set[tuple[str, str]],
         view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
     ) -> ResourcesApply:
-        from ._cdf_3_d_connection_properties import CdfConnectionPropertiesApply
-
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
             return resources
@@ -83,7 +82,12 @@ class CdfEntityApply(DomainModelApply):
 
         for in_model_3_d in self.in_model_3_d or []:
             if isinstance(in_model_3_d, DomainRelationApply):
-                other_resources = in_model_3_d._to_instances_apply(cache, self, view_by_write_class)
+                other_resources = in_model_3_d._to_instances_apply(
+                    cache,
+                    self,
+                    dm.DirectRelationReference("cdf_3d_schema", "cdf3dEntityConnection"),
+                    view_by_write_class,
+                )
                 resources.extend(other_resources)
 
         return resources

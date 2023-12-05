@@ -74,6 +74,7 @@ class BestLeadingActressAPI(NodeAPI[BestLeadingActress, BestLeadingActressApply,
             A query API for best leading actresses.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_best_leading_actress_filter(
             self._view_id,
             name,
@@ -82,26 +83,10 @@ class BestLeadingActressAPI(NodeAPI[BestLeadingActress, BestLeadingActressApply,
             max_year,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            BestLeadingActressList,
-            [
-                QueryStep(
-                    name="best_leading_actress",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_BESTLEADINGACTRESS_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=BestLeadingActress,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return BestLeadingActressQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(BestLeadingActressList)
+        return BestLeadingActressQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(
         self, best_leading_actress: BestLeadingActressApply | Sequence[BestLeadingActressApply], replace: bool = False

@@ -29,7 +29,7 @@ from ._core import (
     QueryStep,
     QueryBuilder,
 )
-from .cdf_3_d_entity_in_model_3_d import CdfEntityInModelAPI
+from .cdf_3_d_entity_in_model_3_d import CdfEntityInModelDAPI
 from .cdf_3_d_entity_query import CdfEntityQueryAPI
 
 
@@ -46,7 +46,7 @@ class CdfEntityAPI(NodeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self.in_model_3_d_edge = CdfEntityInModelAPI(
+        self.in_model_3_d_edge = CdfEntityInModelDAPI(
             client,
             view_by_write_class,
             CdfConnectionProperties,
@@ -73,30 +73,15 @@ class CdfEntityAPI(NodeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
             A query API for cdf 3 d entities.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_cdf_3_d_entity_filter(
             self._view_id,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            CdfEntityList,
-            [
-                QueryStep(
-                    name="cdf_3_d_entity",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_CDFENTITY_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=CdfEntity,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return CdfEntityQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(CdfEntityList)
+        return CdfEntityQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(
         self, cdf_3_d_entity: CdfEntityApply | Sequence[CdfEntityApply], replace: bool = False

@@ -26,44 +26,51 @@ from ._work_order import (
     WorkOrderTextFields,
 )
 
+
 Asset.update_forward_refs(
     Asset=Asset,
     CdfConnectionProperties=CdfConnectionProperties,
 )
-CdfConnectionProperties.update_forward_refs(
-    CdfEntity=CdfEntity,
-)
-CdfEntity.update_forward_refs(
-    CdfConnectionProperties=CdfConnectionProperties,
-)
-CdfModel.update_forward_refs(
-    CdfConnectionProperties=CdfConnectionProperties,
-)
-WorkItem.update_forward_refs(
-    Asset=Asset,
-    WorkOrder=WorkOrder,
-)
-WorkOrder.update_forward_refs(
-    Asset=Asset,
-    WorkItem=WorkItem,
-)
-
 AssetApply.update_forward_refs(
     AssetApply=AssetApply,
     CdfConnectionPropertiesApply=CdfConnectionPropertiesApply,
 )
+
+CdfConnectionProperties.update_forward_refs(
+    CdfEntity=CdfEntity,
+    CdfModel=CdfModel,
+)
 CdfConnectionPropertiesApply.update_forward_refs(
     CdfEntityApply=CdfEntityApply,
+    CdfModelApply=CdfModelApply,
+)
+
+CdfEntity.update_forward_refs(
+    CdfConnectionProperties=CdfConnectionProperties,
 )
 CdfEntityApply.update_forward_refs(
     CdfConnectionPropertiesApply=CdfConnectionPropertiesApply,
 )
+
+CdfModel.update_forward_refs(
+    CdfConnectionProperties=CdfConnectionProperties,
+)
 CdfModelApply.update_forward_refs(
     CdfConnectionPropertiesApply=CdfConnectionPropertiesApply,
+)
+
+WorkItem.update_forward_refs(
+    Asset=Asset,
+    WorkOrder=WorkOrder,
 )
 WorkItemApply.update_forward_refs(
     AssetApply=AssetApply,
     WorkOrderApply=WorkOrderApply,
+)
+
+WorkOrder.update_forward_refs(
+    Asset=Asset,
+    WorkItem=WorkItem,
 )
 WorkOrderApply.update_forward_refs(
     AssetApply=AssetApply,

@@ -4,15 +4,16 @@ from __future__ import annotations
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, EdgeAPI, _create_edge_filter
+from osdu_wells_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 
 class WellDataHistoricalInterestsAPI(EdgeAPI):
     def list(
         self,
-        well_datum: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        well_datum_space: str = "IntegrationTestsImmutable",
-        historical_interest: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        historical_interest_space: str = "IntegrationTestsImmutable",
+        from_well_datum: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        from_well_datum_space: str = DEFAULT_INSTANCE_SPACE,
+        to_historical_interest: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        to_historical_interest_space: str = DEFAULT_INSTANCE_SPACE,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit=DEFAULT_LIMIT_READ,
@@ -20,10 +21,10 @@ class WellDataHistoricalInterestsAPI(EdgeAPI):
         """List historical interest edges of a well datum.
 
         Args:
-            well_datum: ID of the source well data.
-            well_datum_space: Location of the well data.
-            historical_interest: ID of the target historical interests.
-            historical_interest_space: Location of the historical interests.
+            from_well_datum: ID of the source well datum.
+            from_well_datum_space: Location of the well data.
+            to_historical_interest: ID of the target historical interest.
+            to_historical_interest_space: Location of the historical interests.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of historical interest edges to return. Defaults to 25. Set to -1, float("inf") or None
@@ -43,10 +44,10 @@ class WellDataHistoricalInterestsAPI(EdgeAPI):
         """
         filter_ = _create_edge_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "WellData.HistoricalInterests"),
-            well_datum,
-            well_datum_space,
-            historical_interest,
-            historical_interest_space,
+            from_well_datum,
+            from_well_datum_space,
+            to_historical_interest,
+            to_historical_interest_space,
             external_id_prefix,
             space,
         )

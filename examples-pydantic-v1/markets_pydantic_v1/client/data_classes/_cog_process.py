@@ -6,6 +6,7 @@ from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -56,13 +57,13 @@ class CogProcess(DomainModel):
         version: The version of the cog proces node.
     """
 
-    space: str = "market"
-    bid: Union[Bid, str, None] = Field(None, repr=False)
-    date_transformations: Union[DateTransformationPair, str, None] = Field(
+    space: str = DEFAULT_INSTANCE_SPACE
+    bid: Union[Bid, str, dm.NodeId, None] = Field(None, repr=False)
+    date_transformations: Union[DateTransformationPair, str, dm.NodeId, None] = Field(
         None, repr=False, alias="dateTransformations"
     )
     name: Optional[str] = None
-    transformation: Union[ValueTransformation, str, None] = Field(None, repr=False)
+    transformation: Union[ValueTransformation, str, dm.NodeId, None] = Field(None, repr=False)
 
     def as_apply(self) -> CogProcessApply:
         """Convert this read version of cog proces to the writing version."""
@@ -98,13 +99,13 @@ class CogProcessApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "market"
-    bid: Union[BidApply, str, None] = Field(None, repr=False)
-    date_transformations: Union[DateTransformationPairApply, str, None] = Field(
+    space: str = DEFAULT_INSTANCE_SPACE
+    bid: Union[BidApply, str, dm.NodeId, None] = Field(None, repr=False)
+    date_transformations: Union[DateTransformationPairApply, str, dm.NodeId, None] = Field(
         None, repr=False, alias="dateTransformations"
     )
     name: Optional[str] = None
-    transformation: Union[ValueTransformationApply, str, None] = Field(None, repr=False)
+    transformation: Union[ValueTransformationApply, str, dm.NodeId, None] = Field(None, repr=False)
 
     def _to_instances_apply(
         self,

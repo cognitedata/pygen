@@ -66,30 +66,15 @@ class AclAPI(NodeAPI[Acl, AclApply, AclList]):
             A query API for acls.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_acl_filter(
             self._view_id,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            AclList,
-            [
-                QueryStep(
-                    name="acl",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_ACL_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=Acl,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return AclQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(AclList)
+        return AclQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(self, acl: AclApply | Sequence[AclApply], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) acls.

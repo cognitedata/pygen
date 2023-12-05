@@ -10,15 +10,16 @@ from equipment_unit_pydantic_v1.client.data_classes import (
 from equipment_unit_pydantic_v1.client.data_classes._start_end_time import _create_start_end_time_filter
 
 from ._core import DEFAULT_LIMIT_READ, EdgePropertyAPI
+from equipment_unit_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 
 class UnitProcedureWorkUnitsAPI(EdgePropertyAPI):
     def list(
         self,
-        unit_procedure: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        unit_procedure_space: str = "IntegrationTestsImmutable",
-        equipment_module: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        equipment_module_space: str = "IntegrationTestsImmutable",
+        from_unit_procedure: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        from_unit_procedure_space: str = DEFAULT_INSTANCE_SPACE,
+        to_equipment_module: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        to_equipment_module_space: str = DEFAULT_INSTANCE_SPACE,
         min_end_time: datetime.datetime | None = None,
         max_end_time: datetime.datetime | None = None,
         min_start_time: datetime.datetime | None = None,
@@ -30,10 +31,10 @@ class UnitProcedureWorkUnitsAPI(EdgePropertyAPI):
         """List work unit edges of a unit procedure.
 
         Args:
-            unit_procedure: ID of the source unit procedures.
-            unit_procedure_space: Location of the unit procedures.
-            equipment_module: ID of the target equipment modules.
-            equipment_module_space: Location of the equipment modules.
+            from_unit_procedure: ID of the source unit procedure.
+            from_unit_procedure_space: Location of the unit procedures.
+            to_equipment_module: ID of the target equipment module.
+            to_equipment_module_space: Location of the equipment modules.
             min_end_time: The minimum value of the end time to filter on.
             max_end_time: The maximum value of the end time to filter on.
             min_start_time: The minimum value of the start time to filter on.
@@ -58,10 +59,10 @@ class UnitProcedureWorkUnitsAPI(EdgePropertyAPI):
         filter_ = _create_start_end_time_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.equipment_module"),
             self._view_id,
-            unit_procedure,
-            unit_procedure_space,
-            equipment_module,
-            equipment_module_space,
+            from_unit_procedure,
+            from_unit_procedure_space,
+            to_equipment_module,
+            to_equipment_module_space,
             min_end_time,
             max_end_time,
             min_start_time,

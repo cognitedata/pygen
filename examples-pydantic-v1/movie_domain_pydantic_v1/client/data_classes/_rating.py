@@ -6,6 +6,7 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeries
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -15,7 +16,10 @@ from ._core import (
 )
 
 
-__all__ = ["Rating", "RatingApply", "RatingList", "RatingApplyList", "RatingFields"]
+__all__ = ["Rating", "RatingApply", "RatingList", "RatingApplyList", "RatingFields", "RatingTextFields"]
+
+
+RatingTextFields = Literal["score", "votes"]
 RatingFields = Literal["score", "votes"]
 
 _RATING_PROPERTIES_BY_FIELD = {
@@ -40,7 +44,7 @@ class Rating(DomainModel):
         version: The version of the rating node.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     score: Union[TimeSeries, str, None] = None
     votes: Union[TimeSeries, str, None] = None
 
@@ -70,7 +74,7 @@ class RatingApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     score: Union[TimeSeries, str, None] = None
     votes: Union[TimeSeries, str, None] = None
 

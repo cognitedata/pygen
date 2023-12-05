@@ -6,6 +6,7 @@ from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -54,7 +55,7 @@ class FacilityEvents(DomainModel):
         version: The version of the facility event node.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     effective_date_time: Optional[str] = Field(None, alias="EffectiveDateTime")
     facility_event_type_id: Optional[str] = Field(None, alias="FacilityEventTypeID")
     remark: Optional[str] = Field(None, alias="Remark")
@@ -90,7 +91,7 @@ class FacilityEventsApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     effective_date_time: Optional[str] = Field(None, alias="EffectiveDateTime")
     facility_event_type_id: Optional[str] = Field(None, alias="FacilityEventTypeID")
     remark: Optional[str] = Field(None, alias="Remark")
