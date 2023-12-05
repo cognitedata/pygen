@@ -186,7 +186,7 @@ class MultiAPIClass:
     The motivation for having this class is the case when you want to create one SDK for multiple data models.
     """
 
-    sub_apis: list[APIClass]
+    sub_apis_by_view_id: dict[dm.ViewId, APIClass]
     parent_attribute: str
     name: str
     model: dm.DataModel[dm.View]
@@ -202,12 +202,15 @@ class MultiAPIClass:
         api_class_by_view_id: dict[dm.ViewId, APIClass],
         multi_api_class: pygen_config.MultiAPIClassNaming,
     ) -> MultiAPIClass:
-        sub_apis = sorted([api_class_by_view_id[view.as_id()] for view in data_model.views], key=lambda api: api.name)
+        sub_apis: dict[dm.ViewId, APIClass] = {}
+        for view in sorted(data_model.views, key=lambda v: (v.name, v.external_id, v.space, v.version)):
+            if view.as_id() in api_class_by_view_id:
+                sub_apis[view.as_id()] = api_class_by_view_id[view.as_id()]
 
         data_model_name = data_model.name or data_model.external_id
 
         return cls(
-            sub_apis=sub_apis,
+            sub_apis_by_view_id=sub_apis,
             parent_attribute=create_name(data_model_name, multi_api_class.client_attribute),
             name=f"{create_name(data_model_name, multi_api_class.name)}APIs",
             model=data_model,
