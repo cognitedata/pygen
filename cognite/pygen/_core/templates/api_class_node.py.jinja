@@ -45,7 +45,7 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
         )
         self._view_id = view_id{% for edge_api in edge_apis %}
         self.{{ edge_api.parent_attribute }} = {{ edge_api.name }}(
-            client{% if edge_api.has_edge_class %}, view_by_write_class, {{ edge_api.data_class.read_name }}, {{ edge_api.data_class.write_name }}, {{ edge_api.data_class.read_list_name }}{% endif %}
+            client{% if edge_api.has_edge_class %}, view_by_write_class, {{ edge_api.edge_class.read_name }}, {{ edge_api.edge_class.write_name }}, {{ edge_api.edge_class.read_list_name }}{% endif %}
         ){% endfor %}{% for timeseries_api in timeseries_apis %}
         self.{{ timeseries_api.parent_attribute }} = {{ timeseries_api.name }}(client, view_id){% endfor %}
 
