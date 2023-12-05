@@ -22,6 +22,7 @@ class Case(Enum):
     pascal = "pascal"
     snake = "snake"
     camel = "camel"
+    human = "human"
 
 
 class Number(Enum):
@@ -150,6 +151,7 @@ class APIClassNaming:
     file_name: Naming = Naming(Case.snake, Number.unchanged)
     client_attribute: Naming = Naming(Case.snake, Number.unchanged)
     variable: Naming = Naming(Case.snake, Number.singular)
+    doc_name: Naming = Naming(Case.human, Number.unchanged)
 
 
 @dataclass(frozen=True)

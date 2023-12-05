@@ -1,52 +1,46 @@
 from __future__ import annotations
-{% if data_class.has_time_field %}
+{% if edge_api.has_edge_class and  edge_api.edge_class.has_primitive_field_of_type((dm.Timestamp, dm.Date)) %}
 import datetime{% endif %}
 
 from cognite.client import data_modeling as dm
-{% if field.is_property_edge %}
+{% if edge_api.has_edge_class %}
 from {{ top_level_package }}.data_classes import (
-    {{ field.data_class.read_list_name }},
+    {{ edge_api.edge_class.read_list_name }},
 )
-from {{ top_level_package }}.data_classes.{{ field.data_class.file_name }} import {{ field.data_class.filter_name }}
+from {{ top_level_package }}.data_classes.{{ edge_api.edge_class.file_name }} import {{ edge_api.edge_class.filter_name }}
 {% endif %}
-from ._core import DEFAULT_LIMIT_READ, {% if field.is_property_edge %}EdgePropertyAPI{% else %}EdgeAPI, _create_edge_filter{% endif %}
+from ._core import DEFAULT_LIMIT_READ, {% if edge_api.has_edge_class %}EdgePropertyAPI{% else %}EdgeAPI, _create_edge_filter{% endif %}
+from {{ top_level_package }}.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 
-
-class {{ edge_api.name }}({% if field.is_property_edge %}EdgePropertyAPI{% else %}EdgeAPI{% endif %}):
+class {{ edge_api.name }}({% if edge_api.has_edge_class %}EdgePropertyAPI{% else %}EdgeAPI{% endif %}):
     def list(
-            self,{% for param in data_class.node_parameters( instance_space ) %}
-            {{ param.name }}: {{ param.annotation }} = {{ param.default }},{% endfor %}{% for param in data_class.list_method.parameters %}
+            self,{% for param in edge_api.filter_parameters() %}
             {{ param.name }}: {{ param.annotation }} = {{ param.default }},{% endfor %}
             limit=DEFAULT_LIMIT_READ,
-    ) ->{% if field.is_property_edge %}{{ field.data_class.read_list_name }}{% else %}dm.EdgeList{% endif %}:
-        """List {{field.doc_name}} edges of a {{ data_class.start_class.doc_name }}.
+    ) ->{% if edge_api.has_edge_class %}{{ edge_api.edge_class.read_list_name }}{% else %}dm.EdgeList{% endif %}:
+        """List {{edge_api.doc_name}} edges of a {{ edge_api.doc_name }}.
 
-        Args:{% for param in data_class.node_parameters( instance_space ) %}
-            {{ param.name }}: {{ param.description }}{% endfor %}{% for parm in data_class.list_method.parameters %}
-            {{ parm.name }}: {{ parm.description }}{% endfor %}
-            limit: Maximum number of {{ field.doc_name }} edges to return. Defaults to 25. Set to -1, float("inf") or None
+        Args:{% for param in edge_api.filter_parameters() %}
+            {{ param.name }}: {{ param.description }}{% endfor %}
+            limit: Maximum number of {{ edge_api.doc_name }} edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
 
         Returns:
-            The requested {{ field.doc_name }} edges.
+            The requested {{ edge_api.doc_name }} edges.
 
         Examples:
 
-            List 5 {{field.doc_name}} edges connected to "my_{{ data_class.start_class.variable }}":
+            List 5 {{edge_api.doc_name}} edges connected to "my_{{ edge_api.start_class.variable }}":
 
                 >>> from {{ top_level_package }} import {{ client_name }}
                 >>> client = {{ client_name }}()
-                >>> {{ data_class.start_class.variable }} = client.{{ api_class.client_attribute }}.{{ field.edge_api_attribute }}.list("my_{{ data_class.start_class.variable }}", limit=5)
+                >>> {{ edge_api.start_class.variable }} = client.{{ api_class.parent_attribute }}.{{ edge_api.parent_attribute }}.list("my_{{ edge_api.start_class.variable }}", limit=5)
 
         """
-        filter_ = {% if field.is_property_edge %}{{ field.data_class.filter_name }}{% else %}_create_edge_filter{% endif %}(
-            dm.DirectRelationReference("{{ data_class.edge_type.space }}", "{{ data_class.edge_type.external_id }}"),
-            {%  if field.is_property_edge  %}self._view_id,{% endif %}
-            {{ data_class.start_class.variable }},
-            {{ data_class.start_class.variable }}_space,
-            {{ data_class.end_class.variable }},
-            {{ data_class.end_class.variable }}_space,{% for parm in data_class.list_method.parameters %}
+        filter_ = {% if edge_api.has_edge_class %}{{ edge_api.edge_class.filter_name }}{% else %}_create_edge_filter{% endif %}(
+            dm.DirectRelationReference("{{ edge_api.type.space }}", "{{ edge_api.type.external_id }}"),
+            {%  if edge_api.has_edge_class  %}self._view_id,{% endif %}{% for parm in edge_api.filter_parameters() %}
             {{ parm.name }},{% endfor %}
         )
         return self._list(filter_=filter_, limit=limit)

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Iterator
 from dataclasses import dataclass
 
 from cognite.client.data_classes import data_modeling as dm
@@ -9,6 +10,7 @@ from cognite.pygen.utils.text import create_name
 
 from .data_classes import DataClass, EdgeDataClass
 from .fields import CDFExternalField, EdgeOneToMany, EdgeOneToManyEdges
+from .filter_method import FilterMethod, FilterParameter
 
 
 @dataclass(frozen=True)
@@ -55,19 +57,52 @@ class EdgeAPIClass(APIClass):
     edge_class: DataClass | None
     field_name: str
     type: dm.DirectRelationReference
+    filter_method: FilterMethod
+    doc_name: str
 
-    @property
+    def filter_parameters(self, include_nodes: bool = True) -> Iterator[FilterParameter]:
+        if include_nodes:
+            yield FilterParameter(
+                name=f"from_{self.start_class.variable}",
+                type_="str | list[str] | dm.NodeId | list[dm.NodeId]",
+                description=f"ID of the source { self.start_class.doc_list_name}.",
+                default=None,
+            )
+            yield FilterParameter(
+                name=f"from_{self.start_class.variable}_space",
+                type_="str",
+                description=f"Location of the {self.start_class.doc_list_name}.",
+                default="DEFAULT_INSTANCE_SPACE",
+                is_nullable=False,
+            )
+            yield FilterParameter(
+                name=f"to_{self.end_class.variable}",
+                type_="str | list[str] | dm.NodeId | list[dm.NodeId]",
+                description=f"ID of the target { self.end_class.doc_list_name}.",
+                default=None,
+            )
+            yield FilterParameter(
+                name=f"to_{self.end_class.variable}_space",
+                type_="str",
+                description=f"Location of the {self.end_class.doc_list_name}.",
+                default="DEFAULT_INSTANCE_SPACE",
+                is_nullable=False,
+            )
+        yield from self.filter_method.parameters
+
     def has_edge_class(self) -> bool:
         return self.edge_class is not None
 
     @classmethod
     def from_field(
-        cls, field: EdgeOneToMany, data_class: DataClass, base_name: str, api_class: pygen_config.APIClassNaming
+        cls, field: EdgeOneToMany, data_class: DataClass, base_name: str, pygen_config: pygen_config.PygenConfig
     ) -> EdgeAPIClass:
+        api_class = pygen_config.naming.api_class
         base_name = f"{base_name}_{field.name}"
         file_name = create_name(base_name, api_class.file_name)
         class_name = create_name(base_name, api_class.name)
         parent_attribute = create_name(field.name, api_class.client_attribute)
+
         if isinstance(field, EdgeOneToManyEdges):
             edge_class = field.data_class
             if not isinstance(edge_class, EdgeDataClass):
@@ -77,11 +112,13 @@ class EdgeAPIClass(APIClass):
             )
             if end_class is None:
                 raise ValueError("Could not find end class")
+            filter_method = FilterMethod.from_fields(edge_class.fields, pygen_config.filtering, is_edge_class=True)
         else:
             raise NotImplementedError()
             # Todo create a dm.Edge class
             edge_class = object()
             end_class = field.data_class
+            filter_method = FilterMethod.from_fields([], pygen_config.filtering)
 
         return cls(
             parent_attribute=f"{parent_attribute}_edge",
@@ -92,6 +129,8 @@ class EdgeAPIClass(APIClass):
             type=field.edge_type,
             start_class=data_class,
             end_class=end_class,
+            filter_method=filter_method,
+            doc_name=create_name(field.name, api_class.doc_name),
         )
 
 
