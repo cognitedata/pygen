@@ -7,7 +7,7 @@ from cognite.client.data_classes import data_modeling as dm
 from cognite.pygen import config as pygen_config
 from cognite.pygen.utils.text import create_name
 
-from .data_classes import DataClass
+from .data_classes import DataClass, EdgeDataClass
 from .fields import CDFExternalField, EdgeOneToMany, EdgeOneToManyEdges
 
 
@@ -50,26 +50,48 @@ class QueryAPIClass(APIClass):
 
 @dataclass(frozen=True)
 class EdgeAPIClass(APIClass):
-    data_class: DataClass
-    has_edge_class: bool
+    start_class: DataClass
+    end_class: DataClass
+    edge_class: DataClass | None
     field_name: str
     type: dm.DirectRelationReference
 
+    @property
+    def has_edge_class(self) -> bool:
+        return self.edge_class is not None
+
     @classmethod
-    def from_field(cls, field: EdgeOneToMany, base_name: str, api_class: pygen_config.APIClassNaming) -> EdgeAPIClass:
+    def from_field(
+        cls, field: EdgeOneToMany, data_class: DataClass, base_name: str, api_class: pygen_config.APIClassNaming
+    ) -> EdgeAPIClass:
         base_name = f"{base_name}_{field.name}"
         file_name = create_name(base_name, api_class.file_name)
         class_name = create_name(base_name, api_class.name)
         parent_attribute = create_name(field.name, api_class.client_attribute)
+        if isinstance(field, EdgeOneToManyEdges):
+            edge_class = field.data_class
+            if not isinstance(edge_class, EdgeDataClass):
+                raise ValueError("Expected EdgeOneToManyEdges")
+            end_class = next(
+                (c.end_class for c in edge_class.end_node_field.edge_classes if c.edge_type == field.edge_type), None
+            )
+            if end_class is None:
+                raise ValueError("Could not find end class")
+        else:
+            raise NotImplementedError()
+            # Todo create a dm.Edge class
+            edge_class = object()
+            end_class = field.data_class
 
         return cls(
             parent_attribute=f"{parent_attribute}_edge",
             name=f"{class_name}API",
             file_name=file_name,
-            data_class=field.data_class,
-            has_edge_class=isinstance(field, EdgeOneToManyEdges),
+            edge_class=edge_class,
             field_name=field.name,
             type=field.edge_type,
+            start_class=data_class,
+            end_class=end_class,
         )
 
 

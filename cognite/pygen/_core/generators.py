@@ -364,7 +364,7 @@ class APIGenerator:
         if self._edge_apis is None:
             self._validate_initialized()
             self._edge_apis = [
-                EdgeAPIClass.from_field(field, self.base_name, self._config.naming.api_class)
+                EdgeAPIClass.from_field(field, self.data_class, self.base_name, self._config.naming.api_class)
                 for field in self.data_class.fields_of_type(fields.EdgeOneToMany)  # type: ignore[type-abstract]
             ]
         return self._edge_apis
@@ -403,9 +403,11 @@ class APIGenerator:
         unique_edge_data_classes = []
         seen = set()
         for edge_api in self.edge_apis:
-            if edge_api.data_class.read_name not in seen:
-                seen.add(edge_api.data_class.read_name)
-                unique_edge_data_classes.append(edge_api.data_class)
+            if edge_api.edge_class is None:
+                continue
+            if edge_api.edge_class.read_name not in seen:
+                seen.add(edge_api.edge_class.read_name)
+                unique_edge_data_classes.append(edge_api.edge_class)
 
         return (
             type_api.render(
