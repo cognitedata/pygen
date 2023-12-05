@@ -39,12 +39,6 @@ class NodeAPIClass(APIClass):
 @dataclass(frozen=True)
 class QueryAPIClass(APIClass):
     data_class: DataClass
-    relations: list[QueryAPIClass]
-    is_only_one_to_many_edges: bool
-
-    @property
-    def has_relation(self) -> bool:
-        return bool(self.relations)
 
     @classmethod
     def create(cls, data_class: DataClass, base_name: str, api_class: pygen_config.APIClassNaming) -> QueryAPIClass:
@@ -56,38 +50,7 @@ class QueryAPIClass(APIClass):
             name=f"{class_name}QueryAPI",
             file_name=f"{file_name}_query",
             data_class=data_class,
-            relations=[],
-            is_only_one_to_many_edges=False,
         )
-
-    def update(
-        self,
-        query_class_by_view_id: dict[dm.ViewId, QueryAPIClass],
-    ):
-        has_relation = False
-        has_node_relation = False
-        for field in self.data_class.fields_of_type(EdgeOneToMany):
-            has_relation = True
-            if isinstance(field, EdgeOneToManyNodes):
-                end_class = field.data_class
-                has_node_relation = True
-            elif isinstance(field, EdgeOneToManyEdges):
-                try:
-                    end_class = next(
-                        triple.end_class
-                        for triple in field.edge_class.end_node_field.edge_classes
-                        if triple.edge_type == field.edge_type
-                    )
-                except StopIteration:
-                    raise ValueError("Could not find end class") from None
-            else:
-                raise ValueError(f"Expected EdgeOneToMany: {type(field)}")
-            relation = query_class_by_view_id[end_class.view_id]
-            self.relations.append(relation)
-
-        if has_relation and not has_node_relation:
-            # The data class is frozen, so we need to access __setattr__ directly.
-            object.__setattr__(self, "is_only_one_to_many_edges", True)
 
 
 @dataclass(frozen=True)
@@ -99,6 +62,7 @@ class EdgeAPIClass(APIClass):
     type: dm.DirectRelationReference
     filter_method: FilterMethod
     doc_name: str
+    query: QueryAPIClass
 
     @property
     def has_edge_class(self) -> bool:
@@ -136,7 +100,12 @@ class EdgeAPIClass(APIClass):
 
     @classmethod
     def from_fields(
-        cls, field: EdgeOneToMany, data_class: DataClass, base_name: str, pygen_config: pygen_config.PygenConfig
+        cls,
+        field: EdgeOneToMany,
+        data_class: DataClass,
+        base_name: str,
+        query_class_by_view_id: dict[dm.ViewId, QueryAPIClass],
+        pygen_config: pygen_config.PygenConfig,
     ) -> EdgeAPIClass:
         api_class = pygen_config.naming.api_class
         base_name = f"{base_name}_{field.name}"
@@ -157,10 +126,12 @@ class EdgeAPIClass(APIClass):
             except StopIteration:
                 raise ValueError("Could not find end class") from None
             filter_method = FilterMethod.from_fields(edge_class.fields, pygen_config.filtering, is_edge_class=True)
-        else:
+        elif isinstance(field, EdgeOneToManyNodes):
             edge_class = None
             end_class = field.data_class
             filter_method = FilterMethod.from_fields([], pygen_config.filtering)
+        else:
+            raise ValueError(f"Expected EdgeOneToMany: {type(field)}")
 
         return cls(
             parent_attribute=f"{parent_attribute}_edge",
@@ -173,6 +144,7 @@ class EdgeAPIClass(APIClass):
             end_class=end_class,
             filter_method=filter_method,
             doc_name=create_name(field.name, api_class.doc_name),
+            query=query_class_by_view_id[end_class.view_id],
         )
 
 

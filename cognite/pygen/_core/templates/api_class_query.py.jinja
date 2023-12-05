@@ -16,9 +16,9 @@ from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_Dom
 {% for class_ in unique_edge_data_classes %}
 from {{ top_level_package }}.data_classes.{{ class_.file_name }} import (
     {{ class_.filter_name }},
-){% endfor %}{% if query_api.has_relation %}
-if TYPE_CHECKING:{% for relation in query_api.relations %}
-    from .{{ relation.file_name}} import {{ relation.name }}{% endfor %}
+){% endfor %}{% if edge_apis %}
+if TYPE_CHECKING:{% for edge_api in edge_apis %}
+    from .{{ edge_api.query.file_name}} import {{ edge_api.query.name }}{% endfor %}
 {% endif %}
 
 
@@ -45,73 +45,72 @@ class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
                 max_retrieve_limit=limit,
             )
         )
-{% for relation in query_api.relations %}
-    def {{ relation. }}(
-        self,{% for parm in field.list_method.parameters %}
+{% for edge_api in edge_apis %}
+    def {{ edge_api.field_name }}(
+        self,{% for parm in edge_api.filter_parameters(False) %}
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},{% endfor %}
         limit: int | None = DEFAULT_QUERY_LIMIT,{% for field in data_class.one_to_one_edges %}
         retrieve_{{ field.name }}: bool = False,{% endfor %}
-    ) -> {{ relation.name }}[T_DomainModelList]:
-        """Query along the {{ field.doc_name }} edges of the {{ data_class.doc_name}}.
+    ) -> {{ edge_api.query.name }}[T_DomainModelList]:
+        """Query along the {{ edge_api.doc_name }} edges of the {{ data_class.doc_name}}.
 
-        Args:{% for parm in field.list_method.parameters %}
+        Args:{% for parm in edge_api.filter_parameters(False) %}
             {{ parm.name }}: {{ parm.description }}{% endfor %}
-            limit: Maximum number of {{ field.doc_name }} edges to return. Defaults to 25. Set to -1, float("inf") or None
+            limit: Maximum number of {{ edge_api.doc_name }} edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.{% for field in data_class.one_to_one_edges %}
             retrieve_{{ field.name }}: Whether to retrieve the {{ field.doc_name }} for each {{ data_class.doc_name }} or not.{% endfor %}
 
         Returns:
-            {% if field.data_class.is_edge_class %}{{ field.data_class.end_class.query_class_name }}{% else %}{{ field.data_class.query_class_name }}{% endif %}: The query API for the {% if field.data_class.is_edge_class %}{{ field.data_class.end_class.doc_name }}{% else %}{{ field.data_class.doc_name }}{% endif %}.
-        """{% if field.data_class.is_edge_class %}
-        from .{{ field.data_class.end_class.query_file_name}} import {{ field.data_class.end_class.query_class_name}}{% else %}
-        from .{{ field.data_class.query_file_name }} import {{ field.data_class.query_class_name }}{% endif %}
+            {{ edge_api.query.name }}: The query API for the {{ edge_api.end_class.doc_name }}.
+        """
+        from .{{ edge_api.query.file_name }} import {{ edge_api.query.name}}
 
         from_ = self._builder[-1].name
-{% if field.data_class.is_edge_class %}
-        edge_view = self._view_by_write_class[{{ field.data_class.write_name }}]{% endif %}
-        edge_filter = {% if field.is_property_edge %}{{ field.data_class.filter_name }}{% else %}_create_edge_filter{% endif %}(
-            dm.DirectRelationReference("{{ field.prop.type.space }}", "{{ field.prop.type.external_id }}"),
-            {% if field.data_class.is_edge_class %}edge_view,{% endif %}{% for parm in field.list_method.parameters %}
+{% if edge_api.has_edge_class %}
+        edge_view = self._view_by_write_class[{{ edge_api.edge_class.write_name }}]{% endif %}
+        edge_filter = {% if edge_api.has_edge_class %}{{ edge_api.edge_class.filter_name }}{% else %}_create_edge_filter{% endif %}(
+            dm.DirectRelationReference("{{ edge_api.type.space }}", "{{ edge_api.type.external_id }}"),
+            {% if edge_api.has_edge_class %}edge_view,{% endif %}{% for parm in edge_api.filter_parameters(False) %}
             {{ parm.name }}={{ parm.name }},{% endfor %}
         )
         self._builder.append(
             QueryStep(
-                name=self._builder.next_name("{{ field.name }}"),
+                name=self._builder.next_name("{{ edge_api.field_name }}"),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
                     from_=from_,
-                ),{% if field.data_class.is_edge_class %}
+                ),{% if edge_api.has_edge_class %}
                 select=dm.query.Select(
-                    [dm.query.SourceSelector(edge_view, list({{ field.data_class.properties_dict_name }}.values()))]
+                    [dm.query.SourceSelector(edge_view, ["*"])],
                 ),
-                result_cls= {{ field.data_class.read_name }},{% else %}
+                result_cls= {{ edge_api.edge_class.read_name }},{% else %}
                 select=dm.query.Select(),{% endif %}
                 max_retrieve_limit=limit,
             )
         ){% for field in data_class.one_to_one_edges %}
         if retrieve_{{ field.name }}:
             self._query_append_{{ field.name }}(from_){% endfor %}
-        return {% if field.data_class.is_edge_class %}{{ field.data_class.end_class.query_class_name }}{% else %}{{ field.data_class.query_class_name }}{% endif %}(self._client, self._builder, self._view_by_write_class, None, limit)
+        return {{ edge_api.query.name }}(self._client, self._builder, self._view_by_write_class, None, limit)
     {% endfor %}
     def query(
         self,{% for field in data_class.one_to_one_edges %}
         retrieve_{{ field.name }}: bool = False,{% endfor %}
     ) -> T_DomainModelList:
         """Execute query and return the result.
-
-        Args:{% for field in data_class.one_to_one_edges %}
+{% if data_class.has_field_of_type(ft.EdgeOneToOne) %}
+        Args:{% for field in data_class.fields_of_type(ft.EdgeOneToOne) %}
             retrieve_{{ field.name }}: Whether to retrieve the {{ field.doc_name }} for each {{ data_class.doc_name }} or not.{% endfor %}
-
+{% endif %}
         Returns:
             The list of the source nodes of the query.
 
-        """
-        from_ = self._builder[-1].name{% for field in data_class.one_to_one_edges %}
+        """{% if data_class.has_field_of_type(ft.EdgeOneToOne) %}
+        from_ = self._builder[-1].name{% endif %}{% for field in data_class.one_to_one_edges %}
         if retrieve_{{ field.name }}:
             self._query_append_{{ field.name }}(from_){% endfor %}
         return self._query()
 {% for field in data_class.one_to_one_edges %}
-    def _query_append_person(self, from_: str) -> None:
+    def _query_append_{{ field.name }}(self, from_: str) -> None:
         view_id = self._view_by_write_class[{{ field.data_class.write_name }}]
         self._builder.append(
             QueryStep(
@@ -119,7 +118,7 @@ class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
                 expression=dm.query.NodeResultSetExpression(
                     filter=dm.filters.HasData(views=[view_id]),
                     from_=from_,
-                    through=self._view_by_write_class[{{ data_class.write_name }}].as_property_ref("person"),
+                    through=self._view_by_write_class[{{ data_class.write_name }}].as_property_ref("{{ field.name }}"),
                     direction="outwards",
                 ),
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),

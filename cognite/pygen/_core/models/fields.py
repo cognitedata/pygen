@@ -35,7 +35,6 @@ __all__ = [
     "EdgeOneToMany",
     "EdgeOneToEndNode",
     "T_Field",
-    "HashableDirectRelationReference",
 ]
 
 
@@ -345,16 +344,6 @@ class EdgeOneToOne(EdgeToOneDataClass):
 
     def as_apply(self) -> str:
         return f"self.{self.name}.as_apply() if isinstance(self.{self.name}, DomainModel) else self.{self.name}"
-
-
-@dataclass(frozen=True)
-class HashableDirectRelationReference:
-    space: str
-    external_id: str
-
-    @classmethod
-    def from_direct_relation_reference(cls, ref: dm.DirectRelationReference) -> HashableDirectRelationReference:
-        return cls(ref.space, ref.external_id)
 
 
 @total_ordering

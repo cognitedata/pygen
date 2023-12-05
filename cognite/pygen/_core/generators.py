@@ -141,7 +141,7 @@ class MultiAPIGenerator:
 
         for api in self.unique_apis:
             api.data_class.update_fields(api.view.properties, data_class_by_view_id, list(views), config)
-            api.query_api.update(query_class_by_view_id)
+            api.create_edge_apis(query_class_by_view_id)
 
     @property
     def unique_apis(self) -> Iterator[APIGenerator]:
@@ -361,14 +361,16 @@ class APIGenerator:
             ]
         return self._timeseries_apis
 
+    def create_edge_apis(self, query_api_by_view_id: dict[dm.ViewId, QueryAPIClass]) -> None:
+        self._edge_apis = [
+            EdgeAPIClass.from_fields(field, self.data_class, self.base_name, query_api_by_view_id, self._config)
+            for field in self.data_class.fields_of_type(fields.EdgeOneToMany)  # type: ignore[type-abstract]
+        ]
+
     @property
     def edge_apis(self) -> list[EdgeAPIClass]:
         if self._edge_apis is None:
-            self._validate_initialized()
-            self._edge_apis = [
-                EdgeAPIClass.from_fields(field, self.data_class, self.base_name, self._config)
-                for field in self.data_class.fields_of_type(fields.EdgeOneToMany)  # type: ignore[type-abstract]
-            ]
+            raise ValueError("Please call create_edge_apis before accessing edge_apis.")
         return self._edge_apis
 
     def generate_data_class_file(self, is_pydantic_v2: bool) -> str:
@@ -403,7 +405,7 @@ class APIGenerator:
         type_api = self._env.get_template("api_class_node.py.jinja")
 
         unique_edge_data_classes = self._unique_data_classes(
-            [api.edge_class for api in self.edge_apis if api.has_edge_class]
+            [api.edge_class for api in self.edge_apis if api.edge_class]
         )
 
         return (
@@ -438,7 +440,7 @@ class APIGenerator:
         query_api = self._env.get_template("api_class_query.py.jinja")
 
         unique_edge_data_classes = self._unique_data_classes(
-            [api.edge_class for api in self.edge_apis if api.has_edge_class]
+            [api.edge_class for api in self.edge_apis if api.edge_class]
         )
 
         return (

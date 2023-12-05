@@ -12,7 +12,7 @@ from equipment_unit.client.data_classes import (
     StartEndTime,
     StartEndTimeApply,
 )
-from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList
+from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
 
 from equipment_unit.client.data_classes._start_end_time import (
     _create_start_end_time_filter,
@@ -126,7 +126,7 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
                 to return all items.
 
         Returns:
-            WorkOrderQueryAPI: The query API for the work order.
+            EquipmentModuleQueryAPI: The query API for the equipment module.
         """
         from .equipment_module_query import EquipmentModuleQueryAPI
 
@@ -150,12 +150,13 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
                     filter=edge_filter,
                     from_=from_,
                 ),
-                select=dm.query.Select([dm.query.SourceSelector(edge_view, ["*"])]),
+                select=dm.query.Select(
+                    [dm.query.SourceSelector(edge_view, ["*"])],
+                ),
                 result_cls=StartEndTime,
                 max_retrieve_limit=limit,
             )
         )
-
         return EquipmentModuleQueryAPI(self._client, self._builder, self._view_by_write_class, None, limit)
 
     def query(
