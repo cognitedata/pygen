@@ -114,7 +114,7 @@ class CdfConnectionPropertiesApply(DomainRelationApply):
         else:
             raise ValueError(f"Invalid type for equipment_module: {type(self.end_node)}")
 
-        self.external_id = external_id = DomainRelationApply.external_id_factory(start_node, end_node, self.edge_type)
+        self.external_id = external_id = DomainRelationApply.external_id_factory(start_node, end_node, edge_type)
 
         write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
             "cdf_3d_schema", "Cdf3dConnectionProperties", "1"
