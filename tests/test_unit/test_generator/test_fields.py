@@ -16,8 +16,9 @@ def test_is_date_field(bid_view: dm.View, market_view: dm.View, pygen_config: Py
     gen.data_class.update_fields(
         bid_view.properties,
         {market_view.as_id(): market_data_class},
+        [market_view],
         pygen_config,
     )
 
     # Assert
-    assert gen.data_class.has_time_field
+    assert gen.data_class.has_primitive_field_of_type(dm.Date)
