@@ -203,7 +203,7 @@ class MultiAPIClass:
         multi_api_class: pygen_config.MultiAPIClassNaming,
     ) -> MultiAPIClass:
         sub_apis: dict[dm.ViewId, APIClass] = {}
-        for view in sorted(data_model.views, key=lambda v: (v.name, v.external_id, v.space, v.version)):
+        for view in sorted(data_model.views, key=lambda v: (v.name or v.external_id, v.space, v.version)):
             if view.as_id() in api_class_by_view_id:
                 sub_apis[view.as_id()] = api_class_by_view_id[view.as_id()]
 

@@ -144,6 +144,8 @@ class MultiAPIGenerator:
 
         for api in self.unique_apis:
             api.data_class.update_fields(api.view.properties, data_class_by_view_id, list(views), config)
+        # All data classes have been updated, before we can create edge APIs.
+        for api in self.unique_apis:
             api.create_edge_apis(query_class_by_view_id)
 
         validate_api_classes_unique_names([api.api_class for api in self.unique_apis])
