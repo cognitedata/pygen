@@ -8,7 +8,16 @@ from ._core import (
 )
 {% for class_ in classes %}{{ class_.init_import }}
 {% endfor %}
-{% include import_file %}
+{% if is_pydantic_v2 %}{% for (read_name, write_name) in dependencies_by_names %}{{ read_name }}.model_rebuild()
+{{ write_name }}.model_rebuild()
+{% endfor %}{% else %}{% for (read_name, write_name), dependencies in dependencies_by_names.items() %}
+{{ read_name }}.update_forward_refs({% for dependency in dependencies %}
+    {{ dependency.read_name }}={{ dependency.read_name }},{%  endfor %}
+)
+{{ write_name }}.update_forward_refs({% for dependency in dependencies %}
+    {{ dependency.write_name }}={{ dependency.write_name }},{%  endfor %}
+)
+{% endfor %}{% endif %}
 __all__ = [
     "ResourcesApply",
     "DomainModel",
@@ -19,7 +28,7 @@ __all__ = [
     "{{ class_.read_name }}",
     "{{ class_.write_name }}",
     "{{ class_.read_list_name }}",
-    "{{ class_.write_list_name }}",{% if class_.has_primitive_fields %}
-    "{{ class_.field_names }}",{% endif %}{% if class_.has_text_field %}
+    "{{ class_.write_list_name }}",{% if class_.has_field_of_type(ft.PrimitiveFieldCore) %}
+    "{{ class_.field_names }}",{% endif %}{% if class_.has_primitive_field_of_type(dm.Text) %}
     "{{ class_.text_field_names }}", {% endif %}{% endfor %}
 ]

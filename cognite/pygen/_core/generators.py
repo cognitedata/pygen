@@ -4,6 +4,7 @@ import itertools
 import json
 from collections import defaultdict
 from collections.abc import Iterator, Sequence
+from functools import total_ordering
 from pathlib import Path
 from typing import Any, Callable, Literal, cast
 
@@ -296,23 +297,26 @@ class MultiAPIGenerator:
         return client_init.render(client_name=self.client_name, top_level_package=self.top_level_package) + "\n"
 
     def generate_data_classes_init_file(self) -> str:
-        self.env.get_template("data_classes_init.py.jinja")
-        raise NotImplementedError()
-        #         api.data_class
-        #         for api in self.unique_apis
-        #         if api.data_class.has_edges or api.data_class.has_edge_with_property
-        #     ),
-        # for data_class in data_classes_with_dependencies:
-        #
-        # return (
-        #     data_class_init.render(
-        #         # Pydantic v1 needs read and write name separated, while v2 does not.
-        #         # Pydantic v2 we just need a list of the names
-        #         ),
-        #         }[self.pydantic_version],
-        #     + "\n"
+        data_class_init = self.env.get_template("data_classes_init.py.jinja")
+
+        dependencies_by_names: dict[tuple[str, str], list[DataClass]] = defaultdict(list)
+        for api in self.unique_apis:
+            for dep in api.data_class.dependencies:
+                dependencies_by_names[(api.data_class.read_name, api.data_class.write_name)].append(dep)
+
+        return (
+            data_class_init.render(
+                classes=sorted([api.data_class for api in self.unique_apis]),
+                is_pydantic_v2=self.pydantic_version == "v2",
+                dependencies_by_names=dependencies_by_names,
+                ft=fields,
+                dm=dm,
+            )
+            + "\n"
+        )
 
 
+@total_ordering
 class APIGenerator:
     def __init__(self, view: dm.View, default_instance_space: str, config: PygenConfig, base_name: str | None = None):
         self._env = Environment(
@@ -331,6 +335,16 @@ class APIGenerator:
         self._list_method: FilterMethod | None = None
         self._timeseries_apis: list[TimeSeriesAPIClass] | None = None
         self._edge_apis: list[EdgeAPIClass] | None = None
+
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, APIGenerator):
+            return NotImplemented
+        return (self.base_name, self.view_id) == (other.base_name, other.view_id)
+
+    def __lt__(self, other: Any) -> bool:
+        if not isinstance(other, APIGenerator):
+            return NotImplemented
+        return (self.base_name, self.view_id) < (other.base_name, other.view_id)
 
     @property
     def view_id(self) -> dm.ViewId:
