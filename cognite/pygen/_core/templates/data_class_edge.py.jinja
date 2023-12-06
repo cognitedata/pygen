@@ -7,8 +7,8 @@ from cognite.client import data_modeling as dm{% if data_class.use_pydantic_fiel
 {{ data_class.import_pydantic_field }}{% endif %}
 
 from ._core import DEFAULT_INSTANCE_SPACE, DomainModel, DomainModelApply, DomainRelation, DomainRelationApply, DomainRelationList, ResourcesApply{% for class_ in unique_start_classes %}
-from .{{class_.file_name }} import {{ class_.write_name }}{% endfor %}{% for classes in data_class.end_node_field.edge_classes %}
-from .{{classes.end_class.file_name }} import {{ classes.end_class.read_name }}, {{ classes.end_class.write_name }}{% endfor %}
+from .{{class_.file_name }} import {{ class_.write_name }}{% endfor %}{% for classes in unique_end_classes %}
+from .{{classes.file_name }} import {{ classes.read_name }}, {{ classes.write_name }}{% endfor %}
 
 __all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data_class.read_list_name }}", "{{ data_class.write_list_name }}"{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}, "{{ data_class.field_names }}"{% endif %}{% if data_class.has_primitive_field_of_type((dm.Text, dm.CDFExternalIdReference)) %}, "{{ data_class.text_field_names }}"{% endif %}]
 
@@ -198,8 +198,8 @@ def {{ data_class.filter_name }}(
     return dm.filters.And(*filters)
 
 
-_EXPECTED_START_BY_END_NODE = {% raw %}{{% endraw %}{% for classes in sorted(data_class.end_node_field.edge_classes) %}
-    {{ classes.end_class.write_name }}: {{ classes.start_class.write_name }},{% endfor %}
+_EXPECTED_START_NODES_BY_END_NODE = {% raw %}{{% endraw %}{% for end_class, classes in grouped_edge_classes %}
+    {{ end_class.write_name }}: {{ create_start_node_set(classes) }},{% endfor %}
 {% raw %}}{% endraw %}
 
 
@@ -209,11 +209,11 @@ def _validate_end_node(
     if isinstance(end_node, (str, dm.NodeId)):
         # Nothing to validate
         return
-    if type(end_node) not in _EXPECTED_START_BY_END_NODE:
+    if type(end_node) not in _EXPECTED_START_NODES_BY_END_NODE:
         raise ValueError(
-            f"Invalid end node type: {type(end_node)}. Should be one of {[t.__name__ for t in _EXPECTED_START_BY_END_NODE.keys()]}"
+            f"Invalid end node type: {type(end_node)}. Should be one of {[t.__name__ for t in _EXPECTED_START_NODES_BY_END_NODE.keys()]}"
         )
-    if not isinstance(start_node, _EXPECTED_START_BY_END_NODE[type(end_node)]):
+    if type(start_node) not in _EXPECTED_START_NODES_BY_END_NODE[type(end_node)]:
         raise ValueError(
-            f"Invalid end node type: {type(end_node)}. Expected: {_EXPECTED_START_BY_END_NODE[type(end_node)]}"
+            f"Invalid end node type: {type(end_node)}. Expected one of: {_EXPECTED_START_NODES_BY_END_NODE[type(end_node)]}"
         )

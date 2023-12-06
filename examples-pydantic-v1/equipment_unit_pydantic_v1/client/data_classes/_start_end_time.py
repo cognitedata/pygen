@@ -15,8 +15,8 @@ from ._core import (
     ResourcesApply,
 )
 from ._unit_procedure import UnitProcedureApply
-from ._work_order import WorkOrder, WorkOrderApply
 from ._equipment_module import EquipmentModule, EquipmentModuleApply
+from ._work_order import WorkOrder, WorkOrderApply
 
 __all__ = ["StartEndTime", "StartEndTimeApply", "StartEndTimeList", "StartEndTimeApplyList", "StartEndTimeFields"]
 
@@ -242,9 +242,9 @@ def _create_start_end_time_filter(
     return dm.filters.And(*filters)
 
 
-_EXPECTED_START_BY_END_NODE = {
-    EquipmentModuleApply: UnitProcedureApply,
-    WorkOrderApply: UnitProcedureApply,
+_EXPECTED_START_NODES_BY_END_NODE = {
+    EquipmentModuleApply: {UnitProcedureApply},
+    WorkOrderApply: {UnitProcedureApply},
 }
 
 
@@ -254,11 +254,11 @@ def _validate_end_node(
     if isinstance(end_node, (str, dm.NodeId)):
         # Nothing to validate
         return
-    if type(end_node) not in _EXPECTED_START_BY_END_NODE:
+    if type(end_node) not in _EXPECTED_START_NODES_BY_END_NODE:
         raise ValueError(
-            f"Invalid end node type: {type(end_node)}. Should be one of {[t.__name__ for t in _EXPECTED_START_BY_END_NODE.keys()]}"
+            f"Invalid end node type: {type(end_node)}. Should be one of {[t.__name__ for t in _EXPECTED_START_NODES_BY_END_NODE.keys()]}"
         )
-    if not isinstance(start_node, _EXPECTED_START_BY_END_NODE[type(end_node)]):
+    if type(start_node) not in _EXPECTED_START_NODES_BY_END_NODE[type(end_node)]:
         raise ValueError(
-            f"Invalid end node type: {type(end_node)}. Expected: {_EXPECTED_START_BY_END_NODE[type(end_node)]}"
+            f"Invalid end node type: {type(end_node)}. Expected one of: {_EXPECTED_START_NODES_BY_END_NODE[type(end_node)]}"
         )
