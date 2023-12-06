@@ -14,11 +14,10 @@ from ._core import (
     DomainRelationList,
     ResourcesApply,
 )
-from ._cdf_3_d_model import CdfModelApply
-from ._cdf_3_d_entity import CdfEntityApply
 from ._asset import AssetApply
+from ._cdf_3_d_entity import CdfEntityApply
+from ._cdf_3_d_model import CdfModelApply
 from ._cdf_3_d_entity import CdfEntity, CdfEntityApply
-from ._cdf_3_d_model import CdfModel, CdfModelApply
 from ._cdf_3_d_model import CdfModel, CdfModelApply
 
 __all__ = [
@@ -55,7 +54,7 @@ class CdfConnectionProperties(DomainRelation):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    end_node: Union[CdfEntity, CdfModel, CdfModel, str, dm.NodeId]
+    end_node: Union[CdfEntity, CdfModel, str, dm.NodeId]
     revision_id: Optional[int] = Field(None, alias="revisionId")
     revision_node_id: Optional[int] = Field(None, alias="revisionNodeId")
 
@@ -88,7 +87,7 @@ class CdfConnectionPropertiesApply(DomainRelationApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    end_node: Union[CdfEntityApply, CdfModelApply, CdfModelApply, str, dm.NodeId]
+    end_node: Union[CdfEntityApply, CdfModelApply, str, dm.NodeId]
     revision_id: int = Field(alias="revisionId")
     revision_node_id: int = Field(alias="revisionNodeId")
 
@@ -245,24 +244,23 @@ def _create_cdf_3_d_connection_property_filter(
     return dm.filters.And(*filters)
 
 
-_EXPECTED_START_BY_END_NODE = {
-    CdfEntityApply: CdfModelApply,
-    CdfModelApply: CdfEntityApply,
-    CdfModelApply: AssetApply,
+_EXPECTED_START_NODES_BY_END_NODE = {
+    CdfEntityApply: {CdfModelApply},
+    CdfModelApply: {CdfEntityApply, AssetApply},
 }
 
 
 def _validate_end_node(
-    start_node: DomainModelApply, end_node: Union[CdfEntityApply, CdfModelApply, CdfModelApply, str, dm.NodeId]
+    start_node: DomainModelApply, end_node: Union[CdfEntityApply, CdfModelApply, str, dm.NodeId]
 ) -> None:
     if isinstance(end_node, (str, dm.NodeId)):
         # Nothing to validate
         return
-    if type(end_node) not in _EXPECTED_START_BY_END_NODE:
+    if type(end_node) not in _EXPECTED_START_NODES_BY_END_NODE:
         raise ValueError(
-            f"Invalid end node type: {type(end_node)}. Should be one of {[t.__name__ for t in _EXPECTED_START_BY_END_NODE.keys()]}"
+            f"Invalid end node type: {type(end_node)}. Should be one of {[t.__name__ for t in _EXPECTED_START_NODES_BY_END_NODE.keys()]}"
         )
-    if not isinstance(start_node, _EXPECTED_START_BY_END_NODE[type(end_node)]):
+    if start_node not in _EXPECTED_START_NODES_BY_END_NODE[type(end_node)]:
         raise ValueError(
-            f"Invalid end node type: {type(end_node)}. Expected: {_EXPECTED_START_BY_END_NODE[type(end_node)]}"
+            f"Invalid end node type: {type(end_node)}. Expected one of: {_EXPECTED_START_NODES_BY_END_NODE[type(end_node)]}"
         )
