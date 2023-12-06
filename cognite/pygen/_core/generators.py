@@ -406,6 +406,7 @@ class APIGenerator:
         unique_start_classes = []
         if isinstance(self.data_class, NodeDataClass):
             type_data = self._env.get_template("data_class_node.py.jinja")
+            grouped_edge_classes = []
         elif isinstance(self.data_class, EdgeDataClass):
             type_data = self._env.get_template("data_class_edge.py.jinja")
             seen = set()
@@ -413,8 +414,17 @@ class APIGenerator:
                 if classes.start_class.read_name not in seen:
                     seen.add(classes.start_class.read_name)
                     unique_start_classes.append(classes.start_class)
+            grouped_edge_classes = [
+                (key, list(group))
+                for key, group in itertools.groupby(
+                    sorted(self.data_class.end_node_field.edge_classes), key=lambda c: c.end_class
+                )
+            ]
         else:
             raise ValueError(f"Unknown data class {type(self.data_class)}")
+
+        def create_start_node_set(group: list[EdgeAPIClass]) -> str:
+            return "{%s}" % ", ".join([g.start_class.write_name for g in group])
 
         return (
             type_data.render(
@@ -426,6 +436,8 @@ class APIGenerator:
                 dm=dm,
                 sorted=sorted,
                 unique_start_classes=unique_start_classes,
+                grouped_edge_classes=grouped_edge_classes,
+                create_start_node_set=create_start_node_set,
             )
             + "\n"
         )
