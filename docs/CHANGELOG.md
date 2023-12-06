@@ -26,6 +26,8 @@ Changes are grouped as follows
   all node types that can be connected to the start node. For example, in the `EquipmentUnit` with the data class
   `StartEndTime` used to have a field `equipment_module` which is now replaced with `end_node` which can be of type
   `EquipmentModule` or any other end node that uses a `StartEndTime` edge.
+### Added
+* Option for setting a default instance space when generating an SDK.
 
 ## [0.31.0] - 28-11-23
 ### Added
