@@ -563,7 +563,8 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
                     if (nodes := nodes_by_type.get(edge_name)) and (
                         node := nodes.get((relation.end_node.space, relation.end_node.external_id))
                     ):
-                        setattr(relation, edge_name, node)
+                        # Relations always have an end node.
+                        relation.end_node = node
 
         for (node_name, node_attribute), edges_by_start_node in edges_by_type_by_start_node.items():
             for node in nodes_by_type[node_name].values():
