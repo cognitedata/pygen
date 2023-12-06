@@ -15,8 +15,8 @@ from ._core import (
     ResourcesApply,
 )
 from ._unit_procedure import UnitProcedureApply
-from ._work_order import WorkOrder, WorkOrderApply
 from ._equipment_module import EquipmentModule, EquipmentModuleApply
+from ._work_order import WorkOrder, WorkOrderApply
 
 __all__ = ["StartEndTime", "StartEndTimeApply", "StartEndTimeList", "StartEndTimeApplyList", "StartEndTimeFields"]
 

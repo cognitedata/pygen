@@ -14,11 +14,10 @@ from ._core import (
     DomainRelationList,
     ResourcesApply,
 )
-from ._cdf_3_d_model import CdfModelApply
-from ._cdf_3_d_entity import CdfEntityApply
 from ._asset import AssetApply
+from ._cdf_3_d_entity import CdfEntityApply
+from ._cdf_3_d_model import CdfModelApply
 from ._cdf_3_d_entity import CdfEntity, CdfEntityApply
-from ._cdf_3_d_model import CdfModel, CdfModelApply
 from ._cdf_3_d_model import CdfModel, CdfModelApply
 
 __all__ = [

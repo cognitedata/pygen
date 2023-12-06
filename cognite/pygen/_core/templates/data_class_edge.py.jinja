@@ -7,8 +7,8 @@ from cognite.client import data_modeling as dm{% if data_class.use_pydantic_fiel
 {{ data_class.import_pydantic_field }}{% endif %}
 
 from ._core import DEFAULT_INSTANCE_SPACE, DomainModel, DomainModelApply, DomainRelation, DomainRelationApply, DomainRelationList, ResourcesApply{% for class_ in unique_start_classes %}
-from .{{class_.file_name }} import {{ class_.write_name }}{% endfor %}{% for classes in data_class.end_node_field.edge_classes %}
-from .{{classes.end_class.file_name }} import {{ classes.end_class.read_name }}, {{ classes.end_class.write_name }}{% endfor %}
+from .{{class_.file_name }} import {{ class_.write_name }}{% endfor %}{% for classes in unique_end_classes %}
+from .{{classes.file_name }} import {{ classes.read_name }}, {{ classes.write_name }}{% endfor %}
 
 __all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data_class.read_list_name }}", "{{ data_class.write_list_name }}"{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}, "{{ data_class.field_names }}"{% endif %}{% if data_class.has_primitive_field_of_type((dm.Text, dm.CDFExternalIdReference)) %}, "{{ data_class.text_field_names }}"{% endif %}]
 

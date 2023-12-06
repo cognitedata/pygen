@@ -404,16 +404,19 @@ class APIGenerator:
 
     def generate_data_class_file(self, is_pydantic_v2: bool) -> str:
         unique_start_classes = []
+        unique_end_classes = []
+        grouped_edge_classes = []
         if isinstance(self.data_class, NodeDataClass):
             type_data = self._env.get_template("data_class_node.py.jinja")
-            grouped_edge_classes = []
         elif isinstance(self.data_class, EdgeDataClass):
             type_data = self._env.get_template("data_class_edge.py.jinja")
-            seen = set()
-            for classes in self.data_class.end_node_field.edge_classes:
-                if classes.start_class.read_name not in seen:
-                    seen.add(classes.start_class.read_name)
-                    unique_start_classes.append(classes.start_class)
+            unique_start_classes = sorted(
+                _unique_data_classes([edge.start_class for edge in self.data_class.end_node_field.edge_classes])
+            )
+            unique_end_classes = sorted(
+                _unique_data_classes([edge.end_class for edge in self.data_class.end_node_field.edge_classes])
+            )
+
             grouped_edge_classes = [
                 (key, list(group))
                 for key, group in itertools.groupby(
@@ -436,6 +439,7 @@ class APIGenerator:
                 dm=dm,
                 sorted=sorted,
                 unique_start_classes=unique_start_classes,
+                unique_end_classes=unique_end_classes,
                 grouped_edge_classes=grouped_edge_classes,
                 create_start_node_set=create_start_node_set,
             )
@@ -445,9 +449,7 @@ class APIGenerator:
     def generate_api_file(self, top_level_package: str, client_name: str) -> str:
         type_api = self._env.get_template("api_class_node.py.jinja")
 
-        unique_edge_data_classes = self._unique_data_classes(
-            [api.edge_class for api in self.edge_apis if api.edge_class]
-        )
+        unique_edge_data_classes = _unique_data_classes([api.edge_class for api in self.edge_apis if api.edge_class])
 
         return (
             type_api.render(
@@ -467,22 +469,10 @@ class APIGenerator:
             + "\n"
         )
 
-    @classmethod
-    def _unique_data_classes(cls, data_classes: Sequence[DataClass]) -> list[DataClass]:
-        unique_data_classes: list[DataClass] = []
-        seen = set()
-        for data_class in data_classes:
-            if data_class.read_name not in seen:
-                seen.add(data_class.read_name)
-                unique_data_classes.append(data_class)
-        return unique_data_classes
-
     def generate_api_query_file(self, top_level_package: str, client_name: str) -> str:
         query_api = self._env.get_template("api_class_query.py.jinja")
 
-        unique_edge_data_classes = self._unique_data_classes(
-            [api.edge_class for api in self.edge_apis if api.edge_class]
-        )
+        unique_edge_data_classes = _unique_data_classes([api.edge_class for api in self.edge_apis if api.edge_class])
 
         return (
             query_api.render(
@@ -535,3 +525,13 @@ class APIGenerator:
                 )
                 + "\n"
             )
+
+
+def _unique_data_classes(data_classes: Sequence[DataClass]) -> list[DataClass]:
+    unique_data_classes: list[DataClass] = []
+    seen = set()
+    for data_class in data_classes:
+        if data_class.read_name not in seen:
+            seen.add(data_class.read_name)
+            unique_data_classes.append(data_class)
+    return unique_data_classes
