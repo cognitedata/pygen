@@ -69,7 +69,11 @@ def load_cognite_client_from_toml(
     if section is not None:
         toml_content = toml_content[section]
 
-    return CogniteClient.default_oauth_client_credentials(**toml_content)
+    login_flow = toml_content.pop("login_flow", None)
+    if login_flow == "interactive":
+        return CogniteClient.default_oauth_interactive(**toml_content)
+    else:
+        return CogniteClient.default_oauth_client_credentials(**toml_content)
 
 
 class _CogniteCoreResourceAPI(Protocol[T_CogniteResourceList]):

@@ -80,7 +80,7 @@ def test_filter_unit_procedure_through_edge(workorder: EquipmentUnitClient) -> N
     for unit_procedure in unit_procedures:
         for work_unit in unit_procedure.work_units:
             assert isinstance(work_unit, StartEndTime)
-            assert isinstance(work_unit.equipment_module, EquipmentModule)
+            assert isinstance(work_unit.end_node, EquipmentModule)
 
 
 def test_apply_unit_procedure_with_edge(workorder: EquipmentUnitClient, cognite_client: CogniteClient) -> None:
