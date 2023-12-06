@@ -213,7 +213,7 @@ def _validate_end_node(
         raise ValueError(
             f"Invalid end node type: {type(end_node)}. Should be one of {[t.__name__ for t in _EXPECTED_START_NODES_BY_END_NODE.keys()]}"
         )
-    if start_node not in _EXPECTED_START_NODES_BY_END_NODE[type(end_node)]:
+    if type(start_node) not in _EXPECTED_START_NODES_BY_END_NODE[type(end_node)]:
         raise ValueError(
             f"Invalid end node type: {type(end_node)}. Expected one of: {_EXPECTED_START_NODES_BY_END_NODE[type(end_node)]}"
         )
