@@ -14,7 +14,12 @@ Changes are grouped as follows
 - `Security` in case of vulnerabilities.
 
 
-## [0.31.1] - 02-12-23
+## [0.31.2] - 06-12-23
+### Fixed
+* The `end_node` in the generated edge data classes field did not handle multiple edges of the same type.
+  This is now fixed.
+
+## [0.31.1] - 06-12-23
 ### Fixed
 * Query supports direct relations. This was not the case for the `query` method in the generated SDK. This is now fixed.
 * Direct relations can have start and end nodes in different spaces.
