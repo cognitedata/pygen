@@ -390,6 +390,7 @@ class EdgeOneToEndNode(EdgeField):
         return self._type_hint([data_class.write_name for data_class in self.end_classes])
 
     def _type_hint(self, data_class_names: list[str]) -> str:
+        data_class_names = list(set(data_class_names))
         left_side = f"Union[{', '.join(sorted(data_class_names))}, str, dm.NodeId]"
         if self.need_alias:
             return f'{left_side} = {self.pydantic_field}(alias="{self.prop_name}")'

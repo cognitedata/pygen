@@ -703,7 +703,7 @@ def field_type_hints_test_cases():
     )
 
 
-@pytest.mark.parametrize("field, expected_write_hint, expected_read_hint", list(field_type_hints_test_cases()))
-def test_fields_type_hints(field: Field, expected_write_hint: str, expected_read_hint: str) -> None:
+@pytest.mark.parametrize("field,expected_read_hint, expected_write_hint", list(field_type_hints_test_cases()))
+def test_fields_type_hints(field: Field, expected_read_hint: str, expected_write_hint: str) -> None:
     assert field.as_write_type_hint() == expected_write_hint
     assert field.as_read_type_hint() == expected_read_hint
