@@ -70,32 +70,17 @@ class GeometryAPI(NodeAPI[Geometry, GeometryApply, GeometryList]):
             A query API for geometries.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_geometry_filter(
             self._view_id,
             type_,
             type_prefix,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            GeometryList,
-            [
-                QueryStep(
-                    name="geometry",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_GEOMETRY_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=Geometry,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return GeometryQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(GeometryList)
+        return GeometryQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(self, geometry: GeometryApply | Sequence[GeometryApply], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) geometries.

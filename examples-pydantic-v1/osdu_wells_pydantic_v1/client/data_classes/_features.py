@@ -6,6 +6,7 @@ from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -47,9 +48,9 @@ class Features(DomainModel):
         version: The version of the feature node.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     bbox: Optional[list[float]] = None
-    geometry: Union[Geometry, str, None] = Field(None, repr=False)
+    geometry: Union[Geometry, str, dm.NodeId, None] = Field(None, repr=False)
     type_: Optional[str] = Field(None, alias="type")
 
     def as_apply(self) -> FeaturesApply:
@@ -80,9 +81,9 @@ class FeaturesApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     bbox: Optional[list[float]] = None
-    geometry: Union[GeometryApply, str, None] = Field(None, repr=False)
+    geometry: Union[GeometryApply, str, dm.NodeId, None] = Field(None, repr=False)
     type_: Optional[str] = Field(None, alias="type")
 
     def _to_instances_apply(

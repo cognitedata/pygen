@@ -70,32 +70,17 @@ class DateTransformationAPI(NodeAPI[DateTransformation, DateTransformationApply,
             A query API for date transformations.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_date_transformation_filter(
             self._view_id,
             method,
             method_prefix,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            DateTransformationList,
-            [
-                QueryStep(
-                    name="date_transformation",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_DATETRANSFORMATION_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=DateTransformation,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return DateTransformationQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(DateTransformationList)
+        return DateTransformationQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(
         self, date_transformation: DateTransformationApply | Sequence[DateTransformationApply], replace: bool = False

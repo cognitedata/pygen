@@ -72,32 +72,17 @@ class WgsCoordinatesAPI(NodeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
             A query API for wgs 84 coordinates.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_wgs_84_coordinate_filter(
             self._view_id,
             type_,
             type_prefix,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            WgsCoordinatesList,
-            [
-                QueryStep(
-                    name="wgs_84_coordinate",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_WGSCOORDINATES_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=WgsCoordinates,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return WgsCoordinatesQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(WgsCoordinatesList)
+        return WgsCoordinatesQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(
         self, wgs_84_coordinate: WgsCoordinatesApply | Sequence[WgsCoordinatesApply], replace: bool = False

@@ -1,0 +1,247 @@
+- createdTime: 1701512520803
+  description: Used for testing an edge property
+  externalId: EquipmentUnit
+  isGlobal: false
+  lastUpdatedTime: 1701512520803
+  name: EquipmentUnit
+  space: IntegrationTestsImmutable
+  version: '2'
+  views:
+  - createdTime: 1699895900210
+    externalId: StartEndTime
+    isGlobal: false
+    lastUpdatedTime: 1699895900210
+    name: StartEndTime
+    properties:
+      end_time:
+        autoIncrement: false
+        container:
+          externalId: StartEndTime
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: end_time
+        defaultValue: null
+        description: null
+        name: end_time
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: timestamp
+      start_time:
+        autoIncrement: false
+        container:
+          externalId: StartEndTime
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: start_time
+        defaultValue: null
+        description: null
+        name: start_time
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: timestamp
+    space: IntegrationTestsImmutable
+    usedFor: edge
+    version: d416e0ed98186b
+    writable: true
+  - createdTime: 1701512519646
+    externalId: UnitProcedure
+    isGlobal: false
+    lastUpdatedTime: 1701512519646
+    name: UnitProcedure
+    properties:
+      name:
+        autoIncrement: false
+        container:
+          externalId: UnitProcedure
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: name
+        defaultValue: null
+        description: null
+        name: name
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      type:
+        autoIncrement: false
+        container:
+          externalId: UnitProcedure
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: type
+        defaultValue: null
+        description: null
+        name: type
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      work_orders:
+        connectionType: multi_edge_connection
+        description: null
+        direction: outwards
+        edgeSource:
+          externalId: StartEndTime
+          space: IntegrationTestsImmutable
+          type: view
+          version: d416e0ed98186b
+        name: work_orders
+        source:
+          externalId: WorkOrder
+          space: IntegrationTestsImmutable
+          type: view
+          version: c5543fb2b1bc81
+        type:
+          externalId: UnitProcedure.work_order
+          space: IntegrationTestsImmutable
+      work_units:
+        connectionType: multi_edge_connection
+        description: null
+        direction: outwards
+        edgeSource:
+          externalId: StartEndTime
+          space: IntegrationTestsImmutable
+          type: view
+          version: d416e0ed98186b
+        name: work_units
+        source:
+          externalId: EquipmentModule
+          space: IntegrationTestsImmutable
+          type: view
+          version: b1cd4bf14a7a33
+        type:
+          externalId: UnitProcedure.equipment_module
+          space: IntegrationTestsImmutable
+    space: IntegrationTestsImmutable
+    usedFor: node
+    version: a6e2fea1e1c664
+    writable: true
+  - createdTime: 1699895900210
+    externalId: EquipmentModule
+    isGlobal: false
+    lastUpdatedTime: 1699895900210
+    name: EquipmentModule
+    properties:
+      description:
+        autoIncrement: false
+        container:
+          externalId: EquipmentModule
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: description
+        defaultValue: null
+        description: null
+        name: description
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      name:
+        autoIncrement: false
+        container:
+          externalId: EquipmentModule
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: name
+        defaultValue: null
+        description: null
+        name: name
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      sensor_value:
+        autoIncrement: false
+        container:
+          externalId: EquipmentModule
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: sensor_value
+        defaultValue: null
+        description: null
+        name: sensor_value
+        nullable: true
+        source: null
+        type:
+          list: false
+          type: timeseries
+      type:
+        autoIncrement: false
+        container:
+          externalId: EquipmentModule
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: type
+        defaultValue: null
+        description: null
+        name: type
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+    space: IntegrationTestsImmutable
+    usedFor: node
+    version: b1cd4bf14a7a33
+    writable: true
+  - createdTime: 1701512519646
+    externalId: WorkOrder
+    isGlobal: false
+    lastUpdatedTime: 1701512519646
+    name: WorkOrder
+    properties:
+      description:
+        autoIncrement: false
+        container:
+          externalId: WorkOrder
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: description
+        defaultValue: null
+        description: null
+        name: description
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      performedBy:
+        autoIncrement: false
+        container:
+          externalId: WorkOrder
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: performedBy
+        defaultValue: null
+        description: null
+        name: performedBy
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+      type:
+        autoIncrement: false
+        container:
+          externalId: WorkOrder
+          space: IntegrationTestsImmutable
+        containerPropertyIdentifier: type
+        defaultValue: null
+        description: null
+        name: type
+        nullable: true
+        source: null
+        type:
+          collation: ucs_basic
+          list: false
+          type: text
+    space: IntegrationTestsImmutable
+    usedFor: node
+    version: c5543fb2b1bc81
+    writable: true

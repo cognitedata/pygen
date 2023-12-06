@@ -100,6 +100,7 @@ class ProjectedBottomHoleLocationAPI(
             A query API for projected bottom hole locations.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_projected_bottom_hole_location_filter(
             self._view_id,
             as_ingested_coordinates,
@@ -120,30 +121,10 @@ class ProjectedBottomHoleLocationAPI(
             wgs_84_coordinates,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            ProjectedBottomHoleLocationList,
-            [
-                QueryStep(
-                    name="projected_bottom_hole_location",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [
-                            dm.query.SourceSelector(
-                                self._view_id, list(_PROJECTEDBOTTOMHOLELOCATION_PROPERTIES_BY_FIELD.values())
-                            )
-                        ]
-                    ),
-                    result_cls=ProjectedBottomHoleLocation,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return ProjectedBottomHoleLocationQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(ProjectedBottomHoleLocationList)
+        return ProjectedBottomHoleLocationQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(
         self,

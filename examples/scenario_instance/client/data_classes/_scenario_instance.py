@@ -8,6 +8,7 @@ from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
 from pydantic import Field
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -28,7 +29,7 @@ __all__ = [
 ]
 
 
-ScenarioInstanceTextFields = Literal["aggregation", "country", "market", "price_area", "scenario"]
+ScenarioInstanceTextFields = Literal["aggregation", "country", "market", "price_area", "price_forecast", "scenario"]
 ScenarioInstanceFields = Literal[
     "aggregation", "country", "instance", "market", "price_area", "price_forecast", "scenario", "start"
 ]
@@ -67,7 +68,7 @@ class ScenarioInstance(DomainModel):
         version: The version of the scenario instance node.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     aggregation: Optional[str] = None
     country: Optional[str] = None
     instance: Optional[datetime.datetime] = None
@@ -115,7 +116,7 @@ class ScenarioInstanceApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     aggregation: Optional[str] = None
     country: Optional[str] = None
     instance: Optional[datetime.datetime] = None

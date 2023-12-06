@@ -122,6 +122,7 @@ class VerticalMeasurementsAPI(NodeAPI[VerticalMeasurements, VerticalMeasurements
             A query API for vertical measurements.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_vertical_measurement_filter(
             self._view_id,
             effective_date_time,
@@ -154,30 +155,10 @@ class VerticalMeasurementsAPI(NodeAPI[VerticalMeasurements, VerticalMeasurements
             wellbore_tvd_trajectory_id_prefix,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            VerticalMeasurementsList,
-            [
-                QueryStep(
-                    name="vertical_measurement",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [
-                            dm.query.SourceSelector(
-                                self._view_id, list(_VERTICALMEASUREMENTS_PROPERTIES_BY_FIELD.values())
-                            )
-                        ]
-                    ),
-                    result_cls=VerticalMeasurements,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return VerticalMeasurementsQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(VerticalMeasurementsList)
+        return VerticalMeasurementsQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(
         self,

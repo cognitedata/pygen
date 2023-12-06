@@ -6,7 +6,6 @@ from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
 from cognite.client.credentials import OAuthClientCredentials
 
 from ._api.asset import AssetAPI
-from ._api.cdf_3_d_connection_properties import CdfConnectionPropertiesAPI
 from ._api.cdf_3_d_entity import CdfEntityAPI
 from ._api.cdf_3_d_model import CdfModelAPI
 from ._api.work_item import WorkItemAPI
@@ -19,9 +18,9 @@ class ApmSimpleClient:
     ApmSimpleClient
 
     Generated with:
-        pygen = 0.31.0
-        cognite-sdk = 7.0.3
-        pydantic = 2.5.1
+        pygen = 0.31.1
+        cognite-sdk = 7.5.1
+        pydantic = 2.5.2
 
     Data Model:
         space: tutorial_apm_simple
@@ -46,7 +45,6 @@ class ApmSimpleClient:
         }
 
         self.asset = AssetAPI(client, view_by_write_class)
-        self.cdf_3_d_connection_properties = CdfConnectionPropertiesAPI(client, view_by_write_class)
         self.cdf_3_d_entity = CdfEntityAPI(client, view_by_write_class)
         self.cdf_3_d_model = CdfModelAPI(client, view_by_write_class)
         self.work_item = WorkItemAPI(client, view_by_write_class)

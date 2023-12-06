@@ -5,6 +5,7 @@ from typing import Literal, Optional
 from cognite.client import data_modeling as dm
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -40,7 +41,7 @@ class Ancestry(DomainModel):
         version: The version of the ancestry node.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     parents: Optional[list[str]] = None
 
     def as_apply(self) -> AncestryApply:
@@ -67,7 +68,7 @@ class AncestryApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     parents: Optional[list[str]] = None
 
     def _to_instances_apply(

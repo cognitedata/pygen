@@ -1,12 +1,25 @@
 from __future__ import annotations
 
-from typing import Any, Literal, Optional, Union
+from typing import Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
-from pydantic import Field, model_validator
+from pydantic import Field
 
-from ._core import DomainModelApply, DomainRelation, DomainRelationApply, DomainRelationList, ResourcesApply
+from ._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DomainModel,
+    DomainModelApply,
+    DomainRelation,
+    DomainRelationApply,
+    DomainRelationList,
+    ResourcesApply,
+)
+from ._cdf_3_d_model import CdfModelApply
+from ._cdf_3_d_entity import CdfEntityApply
+from ._asset import AssetApply
 from ._cdf_3_d_entity import CdfEntity, CdfEntityApply
+from ._cdf_3_d_model import CdfModel, CdfModelApply
+from ._cdf_3_d_model import CdfModel, CdfModelApply
 
 __all__ = [
     "CdfConnectionProperties",
@@ -15,8 +28,9 @@ __all__ = [
     "CdfConnectionPropertiesApplyList",
     "CdfConnectionPropertiesFields",
 ]
-CdfConnectionPropertiesFields = Literal["revision_id", "revision_node_id"]
 
+
+CdfConnectionPropertiesFields = Literal["revision_id", "revision_node_id"]
 _CDFCONNECTIONPROPERTIES_PROPERTIES_BY_FIELD = {
     "revision_id": "revisionId",
     "revision_node_id": "revisionNodeId",
@@ -31,7 +45,7 @@ class CdfConnectionProperties(DomainRelation):
     Args:
         space: The space where the node is located.
         external_id: The external id of the cdf 3 d connection property.
-        cdf_3_d_entity: Collection of Cdf3dEntity that are part of this Cdf3dModel
+        end_node: The end node of this edge.
         revision_id: The revision id field.
         revision_node_id: The revision node id field.
         created_time: The created time of the cdf 3 d connection property node.
@@ -40,29 +54,17 @@ class CdfConnectionProperties(DomainRelation):
         version: The version of the cdf 3 d connection property node.
     """
 
-    space: str = "cdf_3d_schema"
-    cdf_3_d_entity: Union[CdfEntity, str]
+    space: str = DEFAULT_INSTANCE_SPACE
+    end_node: Union[CdfEntity, CdfModel, CdfModel, str, dm.NodeId]
     revision_id: Optional[int] = Field(None, alias="revisionId")
     revision_node_id: Optional[int] = Field(None, alias="revisionNodeId")
-
-    @property
-    def cdf_3_d_model(self) -> str:
-        return self.start_node.external_id
-
-    @model_validator(mode="before")
-    def set_cdf_3_d_entity_if_missing(cls, data: Any):
-        if isinstance(data, dict) and "cdf_3_d_entity" not in data:
-            data["cdf_3_d_entity"] = data["end_node"]["external_id"]
-        return data
 
     def as_apply(self) -> CdfConnectionPropertiesApply:
         """Convert this read version of cdf 3 d connection property to the writing version."""
         return CdfConnectionPropertiesApply(
             space=self.space,
             external_id=self.external_id,
-            cdf_3_d_entity=self.cdf_3_d_entity.as_apply()
-            if isinstance(self.cdf_3_d_entity, CdfEntity)
-            else self.cdf_3_d_entity,
+            end_node=self.end_node.as_apply() if isinstance(self.end_node, DomainModel) else self.end_node,
             revision_id=self.revision_id,
             revision_node_id=self.revision_node_id,
         )
@@ -74,10 +76,9 @@ class CdfConnectionPropertiesApply(DomainRelationApply):
     It is used to when data is sent to CDF.
 
     Args:
-        edge_type: The edge type of the cdf 3 d connection property.
         space: The space where the node is located.
         external_id: The external id of the cdf 3 d connection property.
-        cdf_3_d_entity: Collection of Cdf3dEntity that are part of this Cdf3dModel
+        end_node: The end node of this edge.
         revision_id: The revision id field.
         revision_node_id: The revision node id field.
         existing_version: Fail the ingestion request if the cdf 3 d connection property version is greater than or equal to this value.
@@ -86,9 +87,8 @@ class CdfConnectionPropertiesApply(DomainRelationApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    edge_type: dm.DirectRelationReference = dm.DirectRelationReference("cdf_3d_schema", "cdf3dEntityConnection")
-    space: str = "cdf_3d_schema"
-    cdf_3_d_entity: Union[CdfEntityApply, str]
+    space: str = DEFAULT_INSTANCE_SPACE
+    end_node: Union[CdfEntityApply, CdfModelApply, CdfModelApply, str, dm.NodeId]
     revision_id: int = Field(alias="revisionId")
     revision_node_id: int = Field(alias="revisionNodeId")
 
@@ -96,20 +96,25 @@ class CdfConnectionPropertiesApply(DomainRelationApply):
         self,
         cache: set[tuple[str, str]],
         start_node: DomainModelApply,
+        edge_type: dm.DirectRelationReference,
         view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.external_id and (self.space, self.external_id) in cache:
             return resources
 
-        if isinstance(self.cdf_3_d_entity, DomainModelApply):
-            end_node = self.cdf_3_d_entity.as_direct_reference()
-        elif isinstance(self.cdf_3_d_entity, str):
-            end_node = dm.DirectRelationReference(self.space, self.cdf_3_d_entity)
-        else:
-            raise ValueError(f"Invalid type for equipment_module: {type(self.cdf_3_d_entity)}")
+        _validate_end_node(start_node, self.end_node)
 
-        self.external_id = external_id = DomainRelationApply.external_id_factory(start_node, end_node, self.edge_type)
+        if isinstance(self.end_node, DomainModelApply):
+            end_node = self.end_node.as_direct_reference()
+        elif isinstance(self.end_node, str):
+            end_node = dm.DirectRelationReference(self.space, self.end_node)
+        elif isinstance(self.end_node, dm.NodeId):
+            end_node = dm.DirectRelationReference(self.end_node.space, self.end_node.external_id)
+        else:
+            raise ValueError(f"Invalid type for equipment_module: {type(self.end_node)}")
+
+        self.external_id = external_id = DomainRelationApply.external_id_factory(start_node, end_node, edge_type)
 
         write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
             "cdf_3d_schema", "Cdf3dConnectionProperties", "1"
@@ -125,7 +130,7 @@ class CdfConnectionPropertiesApply(DomainRelationApply):
             this_edge = dm.EdgeApply(
                 space=self.space,
                 external_id=external_id,
-                type=self.edge_type,
+                type=edge_type,
                 start_node=start_node.as_direct_reference(),
                 end_node=end_node,
                 existing_version=self.existing_version,
@@ -139,8 +144,8 @@ class CdfConnectionPropertiesApply(DomainRelationApply):
             resources.edges.append(this_edge)
             cache.add((self.space, external_id))
 
-        if isinstance(self.cdf_3_d_entity, DomainModelApply):
-            other_resources = self.cdf_3_d_entity._to_instances_apply(cache, view_by_write_class)
+        if isinstance(self.end_node, DomainModelApply):
+            other_resources = self.end_node._to_instances_apply(cache, view_by_write_class)
             resources.extend(other_resources)
 
         return resources
@@ -162,9 +167,9 @@ def _create_cdf_3_d_connection_property_filter(
     edge_type: dm.DirectRelationReference,
     view_id: dm.ViewId,
     start_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-    start_node_space: str = "cdf_3d_schema",
+    start_node_space: str = DEFAULT_INSTANCE_SPACE,
     end_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-    space_end_node: str = "cdf_3d_schema",
+    space_end_node: str = DEFAULT_INSTANCE_SPACE,
     min_revision_id: int | None = None,
     max_revision_id: int | None = None,
     min_revision_node_id: int | None = None,
@@ -238,3 +243,26 @@ def _create_cdf_3_d_connection_property_filter(
     if filter:
         filters.append(filter)
     return dm.filters.And(*filters)
+
+
+_EXPECTED_START_BY_END_NODE = {
+    CdfEntityApply: CdfModelApply,
+    CdfModelApply: CdfEntityApply,
+    CdfModelApply: AssetApply,
+}
+
+
+def _validate_end_node(
+    start_node: DomainModelApply, end_node: Union[CdfEntityApply, CdfModelApply, CdfModelApply, str, dm.NodeId]
+) -> None:
+    if isinstance(end_node, (str, dm.NodeId)):
+        # Nothing to validate
+        return
+    if type(end_node) not in _EXPECTED_START_BY_END_NODE:
+        raise ValueError(
+            f"Invalid end node type: {type(end_node)}. Should be one of {[t.__name__ for t in _EXPECTED_START_BY_END_NODE.keys()]}"
+        )
+    if not isinstance(start_node, _EXPECTED_START_BY_END_NODE[type(end_node)]):
+        raise ValueError(
+            f"Invalid end node type: {type(end_node)}. Expected: {_EXPECTED_START_BY_END_NODE[type(end_node)]}"
+        )

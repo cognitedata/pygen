@@ -6,6 +6,7 @@ from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -56,7 +57,7 @@ class AvailableTrajectoryStationProperties(DomainModel):
         version: The version of the available trajectory station property node.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     name: Optional[str] = Field(None, alias="Name")
     station_property_unit_id: Optional[str] = Field(None, alias="StationPropertyUnitID")
     trajectory_station_property_type_id: Optional[str] = Field(None, alias="TrajectoryStationPropertyTypeID")
@@ -89,7 +90,7 @@ class AvailableTrajectoryStationPropertiesApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     name: Optional[str] = Field(None, alias="Name")
     station_property_unit_id: Optional[str] = Field(None, alias="StationPropertyUnitID")
     trajectory_station_property_type_id: Optional[str] = Field(None, alias="TrajectoryStationPropertyTypeID")

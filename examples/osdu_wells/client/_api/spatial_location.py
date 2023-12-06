@@ -98,6 +98,7 @@ class SpatialLocationAPI(NodeAPI[SpatialLocation, SpatialLocationApply, SpatialL
             A query API for spatial locations.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_spatial_location_filter(
             self._view_id,
             as_ingested_coordinates,
@@ -118,26 +119,10 @@ class SpatialLocationAPI(NodeAPI[SpatialLocation, SpatialLocationApply, SpatialL
             wgs_84_coordinates,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            SpatialLocationList,
-            [
-                QueryStep(
-                    name="spatial_location",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_SPATIALLOCATION_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=SpatialLocation,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return SpatialLocationQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(SpatialLocationList)
+        return SpatialLocationQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(
         self, spatial_location: SpatialLocationApply | Sequence[SpatialLocationApply], replace: bool = False

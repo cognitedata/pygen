@@ -6,6 +6,7 @@ from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -60,7 +61,7 @@ class NameAliases(DomainModel):
         version: The version of the name alias node.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     alias_name: Optional[str] = Field(None, alias="AliasName")
     alias_name_type_id: Optional[str] = Field(None, alias="AliasNameTypeID")
     definition_organisation_id: Optional[str] = Field(None, alias="DefinitionOrganisationID")
@@ -99,7 +100,7 @@ class NameAliasesApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     alias_name: Optional[str] = Field(None, alias="AliasName")
     alias_name_type_id: Optional[str] = Field(None, alias="AliasNameTypeID")
     definition_organisation_id: Optional[str] = Field(None, alias="DefinitionOrganisationID")

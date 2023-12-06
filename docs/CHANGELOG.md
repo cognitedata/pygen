@@ -13,7 +13,26 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## [0.31.0] - 18-11-23
+
+## [0.31.1] - 02-12-23
+### Fixed
+* Query supports direct relations. This was not the case for the `query` method in the generated SDK. This is now fixed.
+* Direct relations can have start and end nodes in different spaces.
+* Edges with properties were assumed to have all edges of the same type. Now, an edge with properties (a view), can
+  be used with edges of different types.
+* Lowered required version of `typing_extensions` to `>=4.0`.
+* `pygen` no longer generates API and Query API class for edge views.
+### Changed
+* Data classes for edges no longer have an end node of a specific type. Instead, the `end_node` field supports
+  all node types that can be connected to the start node. For example, in the `EquipmentUnit` with the data class
+  `StartEndTime` used to have a field `equipment_module` which is now replaced with `end_node` which can be of type
+  `EquipmentModule` or any other end node that uses a `StartEndTime` edge.
+* When calling `.query()` in the generated SDK, including the end node is automatically included in the query,
+  and no longer optional.
+### Added
+* Option for setting a default instance space when generating an SDK.
+
+## [0.31.0] - 28-11-23
 ### Added
 * Support for `query`, [see documentation for more information](https://cognite-pygen.readthedocs-hosted.com/en/latest/examples/movie_domain.html#querying).
 * Support for reading and writing edges with properties.

@@ -36,6 +36,9 @@ TimeSeries = Annotated[
 ]
 
 
+DEFAULT_INSTANCE_SPACE = "tutorial_apm_simple"
+
+
 @dataclass
 class ResourcesApply:
     nodes: dm.NodeApplyList = field(default_factory=lambda: dm.NodeApplyList([]))
@@ -218,7 +221,6 @@ T_DomainModelApplyList = TypeVar("T_DomainModelApplyList", bound=DomainModelAppl
 class DomainRelation(DomainModelCore):
     type: dm.DirectRelationReference
     start_node: dm.DirectRelationReference
-    end_node: dm.DirectRelationReference
     version: int
     last_updated_time: datetime.datetime
     created_time: datetime.datetime
@@ -246,6 +248,7 @@ class DomainRelationApply(BaseModel, extra=Extra.forbid, populate_by_name=True):
         self,
         cache: set[tuple[str, str]],
         start_node: DomainModelApply,
+        edge_type: dm.DirectRelationReference,
         view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
     ) -> ResourcesApply:
         raise NotImplementedError()

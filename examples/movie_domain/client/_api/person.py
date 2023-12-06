@@ -76,6 +76,7 @@ class PersonAPI(NodeAPI[Person, PersonApply, PersonList]):
             A query API for persons.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_person_filter(
             self._view_id,
             min_birth_year,
@@ -84,26 +85,10 @@ class PersonAPI(NodeAPI[Person, PersonApply, PersonList]):
             name_prefix,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            PersonList,
-            [
-                QueryStep(
-                    name="person",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_PERSON_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=Person,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return PersonQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(PersonList)
+        return PersonQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(self, person: PersonApply | Sequence[PersonApply], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) persons.

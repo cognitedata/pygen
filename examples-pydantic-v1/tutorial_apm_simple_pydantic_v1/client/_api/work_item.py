@@ -98,6 +98,7 @@ class WorkItemAPI(NodeAPI[WorkItem, WorkItemApply, WorkItemList]):
             A query API for work items.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_work_item_filter(
             self._view_id,
             criticality,
@@ -117,26 +118,10 @@ class WorkItemAPI(NodeAPI[WorkItem, WorkItemApply, WorkItemList]):
             work_order,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            WorkItemList,
-            [
-                QueryStep(
-                    name="work_item",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_WORKITEM_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=WorkItem,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return WorkItemQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(WorkItemList)
+        return WorkItemQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(self, work_item: WorkItemApply | Sequence[WorkItemApply], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) work items.

@@ -29,6 +29,14 @@ from ._unit_procedure import (
     UnitProcedureList,
     UnitProcedureTextFields,
 )
+from ._work_order import (
+    WorkOrder,
+    WorkOrderApply,
+    WorkOrderApplyList,
+    WorkOrderFields,
+    WorkOrderList,
+    WorkOrderTextFields,
+)
 
 StartEndTime.model_rebuild()
 StartEndTimeApply.model_rebuild()
@@ -59,4 +67,10 @@ __all__ = [
     "UnitProcedureApplyList",
     "UnitProcedureFields",
     "UnitProcedureTextFields",
+    "WorkOrder",
+    "WorkOrderApply",
+    "WorkOrderList",
+    "WorkOrderApplyList",
+    "WorkOrderFields",
+    "WorkOrderTextFields",
 ]

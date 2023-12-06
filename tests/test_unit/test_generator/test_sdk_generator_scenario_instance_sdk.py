@@ -16,7 +16,10 @@ def sdk_generator(scenario_instance_model: dm.DataModel[dm.View]) -> SDKGenerato
 @pytest.fixture
 def multi_api_generator(scenario_instance_model: dm.DataModel[dm.View]) -> MultiAPIGenerator:
     return MultiAPIGenerator(
-        SCENARIO_INSTANCE_SDK.top_level_package, SCENARIO_INSTANCE_SDK.client_name, scenario_instance_model.views
+        SCENARIO_INSTANCE_SDK.top_level_package,
+        SCENARIO_INSTANCE_SDK.client_name,
+        scenario_instance_model.views,
+        scenario_instance_model.space,
     )
 
 
@@ -24,7 +27,7 @@ def multi_api_generator(scenario_instance_model: dm.DataModel[dm.View]) -> Multi
 def scenario_instance_api_generator(
     multi_api_generator: MultiAPIGenerator, scenario_instance_view: dm.View
 ) -> APIGenerator:
-    api_generator = multi_api_generator[scenario_instance_view]
+    api_generator = multi_api_generator[scenario_instance_view.as_id()]
     assert api_generator is not None, "Could not find API generator for scenario instance view"
     return api_generator
 
@@ -34,7 +37,7 @@ def test_generate_api_file_scenario_instance(
 ) -> None:
     # Arrange
     expected = ScenarioInstanceFiles.scenario_instance_api.read_text()
-    assert scenario_instance_api_generator.data_class.has_single_timeseries_fields
+    assert scenario_instance_api_generator.data_class.has_primitive_field_of_type(dm.TimeSeriesReference)
 
     # Act
     actual = scenario_instance_api_generator.generate_api_file(

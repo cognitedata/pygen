@@ -4,15 +4,16 @@ from __future__ import annotations
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, EdgeAPI, _create_edge_filter
+from osdu_wells_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 
 class WellboreDataNameAliasesAPI(EdgeAPI):
     def list(
         self,
-        wellbore_datum: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        wellbore_datum_space: str = "IntegrationTestsImmutable",
-        name_alias: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        name_alias_space: str = "IntegrationTestsImmutable",
+        from_wellbore_datum: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        from_wellbore_datum_space: str = DEFAULT_INSTANCE_SPACE,
+        to_name_alias: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        to_name_alias_space: str = DEFAULT_INSTANCE_SPACE,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit=DEFAULT_LIMIT_READ,
@@ -20,10 +21,10 @@ class WellboreDataNameAliasesAPI(EdgeAPI):
         """List name alias edges of a wellbore datum.
 
         Args:
-            wellbore_datum: ID of the source wellbore data.
-            wellbore_datum_space: Location of the wellbore data.
-            name_alias: ID of the target name aliases.
-            name_alias_space: Location of the name aliases.
+            from_wellbore_datum: ID of the source wellbore datum.
+            from_wellbore_datum_space: Location of the wellbore data.
+            to_name_alias: ID of the target name alias.
+            to_name_alias_space: Location of the name aliases.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of name alias edges to return. Defaults to 25. Set to -1, float("inf") or None
@@ -43,10 +44,10 @@ class WellboreDataNameAliasesAPI(EdgeAPI):
         """
         filter_ = _create_edge_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.NameAliases"),
-            wellbore_datum,
-            wellbore_datum_space,
-            name_alias,
-            name_alias_space,
+            from_wellbore_datum,
+            from_wellbore_datum_space,
+            to_name_alias,
+            to_name_alias_space,
             external_id_prefix,
             space,
         )

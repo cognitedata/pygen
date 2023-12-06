@@ -1,25 +1,18 @@
 from __future__ import annotations
 
+import datetime
 from typing import TYPE_CHECKING
-from cognite.client import data_modeling as dm
-from ._core import DEFAULT_QUERY_LIMIT, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
+
+from cognite.client import data_modeling as dm, CogniteClient
+
 from movie_domain.client.data_classes import (
+    DomainModelApply,
     Actor,
     ActorApply,
-    Movie,
-    MovieApply,
-    Nomination,
-    NominationApply,
+    Person,
+    PersonApply,
 )
-from movie_domain.client.data_classes._actor import (
-    _ACTOR_PROPERTIES_BY_FIELD,
-)
-from movie_domain.client.data_classes._movie import (
-    _MOVIE_PROPERTIES_BY_FIELD,
-)
-from movie_domain.client.data_classes._nomination import (
-    _NOMINATION_PROPERTIES_BY_FIELD,
-)
+from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
 
 if TYPE_CHECKING:
     from .movie_query import MovieQueryAPI
@@ -27,24 +20,51 @@ if TYPE_CHECKING:
 
 
 class ActorQueryAPI(QueryAPI[T_DomainModelList]):
+    def __init__(
+        self,
+        client: CogniteClient,
+        builder: QueryBuilder[T_DomainModelList],
+        view_by_write_class: dict[type[DomainModelApply], dm.ViewId],
+        filter_: dm.filters.Filter | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+    ):
+        super().__init__(client, builder, view_by_write_class)
+
+        self._builder.append(
+            QueryStep(
+                name=self._builder.next_name("actor"),
+                expression=dm.query.NodeResultSetExpression(
+                    from_=self._builder[-1].name if self._builder else None,
+                    filter=filter_,
+                ),
+                select=dm.query.Select([dm.query.SourceSelector(self._view_by_write_class[ActorApply], ["*"])]),
+                result_cls=Actor,
+                max_retrieve_limit=limit,
+            )
+        )
+
     def movies(
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_QUERY_LIMIT,
+        retrieve_person: bool = False,
     ) -> MovieQueryAPI[T_DomainModelList]:
         """Query along the movie edges of the actor.
 
         Args:
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of work unit edges to return. Defaults to 25. Set to -1, float("inf") or None
+            limit: Maximum number of movie edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
+            retrieve_person: Whether to retrieve the person for each actor or not.
 
         Returns:
             MovieQueryAPI: The query API for the movie.
         """
         from .movie_query import MovieQueryAPI
+
+        from_ = self._builder[-1].name
 
         edge_filter = _create_edge_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "Role.movies"),
@@ -56,51 +76,38 @@ class ActorQueryAPI(QueryAPI[T_DomainModelList]):
                 name=self._builder.next_name("movies"),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
-                    from_=self._builder[-1].name,
+                    from_=from_,
                 ),
                 select=dm.query.Select(),
                 max_retrieve_limit=limit,
             )
         )
-        self._builder.append(
-            QueryStep(
-                name=self._builder.next_name("movie"),
-                expression=dm.query.NodeResultSetExpression(
-                    filter=None,
-                    from_=self._builder[-1].name,
-                ),
-                select=dm.query.Select(
-                    [
-                        dm.query.SourceSelector(
-                            self._view_by_write_class[MovieApply],
-                            list(_MOVIE_PROPERTIES_BY_FIELD.values()),
-                        )
-                    ]
-                ),
-                result_cls=Movie,
-                max_retrieve_limit=-1,
-            ),
-        )
-        return MovieQueryAPI(self._client, self._builder, self._view_by_write_class)
+        if retrieve_person:
+            self._query_append_person(from_)
+        return MovieQueryAPI(self._client, self._builder, self._view_by_write_class, None, limit)
 
     def nomination(
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_QUERY_LIMIT,
+        retrieve_person: bool = False,
     ) -> NominationQueryAPI[T_DomainModelList]:
         """Query along the nomination edges of the actor.
 
         Args:
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of work unit edges to return. Defaults to 25. Set to -1, float("inf") or None
+            limit: Maximum number of nomination edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
+            retrieve_person: Whether to retrieve the person for each actor or not.
 
         Returns:
             NominationQueryAPI: The query API for the nomination.
         """
         from .nomination_query import NominationQueryAPI
+
+        from_ = self._builder[-1].name
 
         edge_filter = _create_edge_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "Role.nomination"),
@@ -112,66 +119,47 @@ class ActorQueryAPI(QueryAPI[T_DomainModelList]):
                 name=self._builder.next_name("nomination"),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
-                    from_=self._builder[-1].name,
+                    from_=from_,
                 ),
                 select=dm.query.Select(),
                 max_retrieve_limit=limit,
             )
         )
-        self._builder.append(
-            QueryStep(
-                name=self._builder.next_name("nomination"),
-                expression=dm.query.NodeResultSetExpression(
-                    filter=None,
-                    from_=self._builder[-1].name,
-                ),
-                select=dm.query.Select(
-                    [
-                        dm.query.SourceSelector(
-                            self._view_by_write_class[NominationApply],
-                            list(_NOMINATION_PROPERTIES_BY_FIELD.values()),
-                        )
-                    ]
-                ),
-                result_cls=Nomination,
-                max_retrieve_limit=-1,
-            ),
-        )
-        return NominationQueryAPI(self._client, self._builder, self._view_by_write_class)
+        if retrieve_person:
+            self._query_append_person(from_)
+        return NominationQueryAPI(self._client, self._builder, self._view_by_write_class, None, limit)
 
     def query(
         self,
-        retrieve_actor: bool = True,
+        retrieve_person: bool = False,
     ) -> T_DomainModelList:
         """Execute query and return the result.
 
         Args:
-            retrieve_actor: Whether to retrieve the actor or not.
+            retrieve_person: Whether to retrieve the person for each actor or not.
 
         Returns:
             The list of the source nodes of the query.
 
         """
         from_ = self._builder[-1].name
-        if retrieve_actor and not self._builder[-1].name.startswith("actor"):
-            self._builder.append(
-                QueryStep(
-                    name=self._builder.next_name("actor"),
-                    expression=dm.query.NodeResultSetExpression(
-                        filter=None,
-                        from_=from_,
-                    ),
-                    select=dm.query.Select(
-                        [
-                            dm.query.SourceSelector(
-                                self._view_by_write_class[ActorApply],
-                                list(_ACTOR_PROPERTIES_BY_FIELD.values()),
-                            )
-                        ]
-                    ),
-                    result_cls=Actor,
-                    max_retrieve_limit=-1,
-                ),
-            )
-
+        if retrieve_person:
+            self._query_append_person(from_)
         return self._query()
+
+    def _query_append_person(self, from_: str) -> None:
+        view_id = self._view_by_write_class[PersonApply]
+        self._builder.append(
+            QueryStep(
+                name=self._builder.next_name("person"),
+                expression=dm.query.NodeResultSetExpression(
+                    filter=dm.filters.HasData(views=[view_id]),
+                    from_=from_,
+                    through=self._view_by_write_class[ActorApply].as_property_ref("person"),
+                    direction="outwards",
+                ),
+                select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
+                max_retrieve_limit=-1,
+                result_cls=Person,
+            ),
+        )

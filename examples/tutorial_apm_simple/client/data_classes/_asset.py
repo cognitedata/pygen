@@ -8,6 +8,7 @@ from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
 from pydantic import Field
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -25,7 +26,9 @@ if TYPE_CHECKING:
 __all__ = ["Asset", "AssetApply", "AssetList", "AssetApplyList", "AssetFields", "AssetTextFields"]
 
 
-AssetTextFields = Literal["description", "documents", "measurements", "source_db", "specification", "tag", "trajectory"]
+AssetTextFields = Literal[
+    "description", "documents", "measurements", "metrics", "pressure", "source_db", "specification", "tag", "trajectory"
+]
 AssetFields = Literal[
     "area_id",
     "category_id",
@@ -95,7 +98,7 @@ class Asset(DomainModel):
         version: The version of the asset node.
     """
 
-    space: str = "tutorial_apm_simple"
+    space: str = DEFAULT_INSTANCE_SPACE
     area_id: Optional[int] = Field(None, alias="areaId")
     category_id: Optional[int] = Field(None, alias="categoryId")
     children: Union[list[Asset], list[str], None] = Field(default=None, repr=False)
@@ -107,7 +110,7 @@ class Asset(DomainModel):
     is_critical_line: Optional[bool] = Field(None, alias="isCriticalLine")
     measurements: Optional[list[str]] = None
     metrics: Optional[list[TimeSeries]] = None
-    parent: Union[Asset, str, None] = Field(None, repr=False)
+    parent: Union[Asset, str, dm.NodeId, None] = Field(None, repr=False)
     pressure: Union[TimeSeries, str, None] = None
     source_db: Optional[str] = Field(None, alias="sourceDb")
     specification: Union[str, None] = None
@@ -173,7 +176,7 @@ class AssetApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "tutorial_apm_simple"
+    space: str = DEFAULT_INSTANCE_SPACE
     area_id: Optional[int] = Field(None, alias="areaId")
     category_id: Optional[int] = Field(None, alias="categoryId")
     children: Union[list[AssetApply], list[str], None] = Field(default=None, repr=False)
@@ -185,7 +188,7 @@ class AssetApply(DomainModelApply):
     is_critical_line: Optional[bool] = Field(None, alias="isCriticalLine")
     measurements: Optional[list[str]] = None
     metrics: Optional[list[TimeSeries]] = None
-    parent: Union[AssetApply, str, None] = Field(None, repr=False)
+    parent: Union[AssetApply, str, dm.NodeId, None] = Field(None, repr=False)
     pressure: Union[TimeSeries, str, None] = None
     source_db: Optional[str] = Field(None, alias="sourceDb")
     specification: Union[str, None] = None
@@ -198,8 +201,6 @@ class AssetApply(DomainModelApply):
         cache: set[tuple[str, str]],
         view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
     ) -> ResourcesApply:
-        from ._cdf_3_d_connection_properties import CdfConnectionPropertiesApply
-
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
             return resources
@@ -260,6 +261,16 @@ class AssetApply(DomainModelApply):
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
 
+        for in_model_3_d in self.in_model_3_d or []:
+            if isinstance(in_model_3_d, DomainRelationApply):
+                other_resources = in_model_3_d._to_instances_apply(
+                    cache,
+                    self,
+                    dm.DirectRelationReference("cdf_3d_schema", "cdf3dEntityConnection"),
+                    view_by_write_class,
+                )
+                resources.extend(other_resources)
+
         edge_type = dm.DirectRelationReference("tutorial_apm_simple", "Asset.children")
         for child in self.children or []:
             other_resources = DomainRelationApply.from_edge_to_resources(
@@ -267,14 +278,12 @@ class AssetApply(DomainModelApply):
             )
             resources.extend(other_resources)
 
-        for in_model_3_d in self.in_model_3_d or []:
-            if isinstance(in_model_3_d, DomainRelationApply):
-                other_resources = in_model_3_d._to_instances_apply(cache, self, view_by_write_class)
-                resources.extend(other_resources)
-
         if isinstance(self.parent, DomainModelApply):
             other_resources = self.parent._to_instances_apply(cache, view_by_write_class)
             resources.extend(other_resources)
+
+        if isinstance(self.metrics, CogniteTimeSeries):
+            resources.time_series.append(self.metrics)
 
         if isinstance(self.pressure, CogniteTimeSeries):
             resources.time_series.append(self.pressure)

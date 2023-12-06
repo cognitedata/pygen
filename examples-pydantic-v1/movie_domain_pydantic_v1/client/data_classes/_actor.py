@@ -6,6 +6,7 @@ from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -21,6 +22,7 @@ if TYPE_CHECKING:
 
 
 __all__ = ["Actor", "ActorApply", "ActorList", "ActorApplyList", "ActorFields"]
+
 ActorFields = Literal["won_oscar"]
 
 _ACTOR_PROPERTIES_BY_FIELD = {
@@ -46,10 +48,10 @@ class Actor(DomainModel):
         version: The version of the actor node.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     movies: Union[list[Movie], list[str], None] = Field(default=None, repr=False)
     nomination: Union[list[Nomination], list[str], None] = Field(default=None, repr=False)
-    person: Union[Person, str, None] = Field(None, repr=False)
+    person: Union[Person, str, dm.NodeId, None] = Field(None, repr=False)
     won_oscar: Optional[bool] = Field(None, alias="wonOscar")
 
     def as_apply(self) -> ActorApply:
@@ -85,10 +87,10 @@ class ActorApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     movies: Union[list[MovieApply], list[str], None] = Field(default=None, repr=False)
     nomination: Union[list[NominationApply], list[str], None] = Field(default=None, repr=False)
-    person: Union[PersonApply, str, None] = Field(None, repr=False)
+    person: Union[PersonApply, str, dm.NodeId, None] = Field(None, repr=False)
     won_oscar: Optional[bool] = Field(None, alias="wonOscar")
 
     def _to_instances_apply(

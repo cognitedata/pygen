@@ -4,15 +4,16 @@ from __future__ import annotations
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, EdgeAPI, _create_edge_filter
+from osdu_wells_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 
 class WellboreTrajectoryDataAvailableTrajectoryStationPropertiesAPI(EdgeAPI):
     def list(
         self,
-        wellbore_trajectory_datum: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        wellbore_trajectory_datum_space: str = "IntegrationTestsImmutable",
-        available_trajectory_station_property: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        available_trajectory_station_property_space: str = "IntegrationTestsImmutable",
+        from_wellbore_trajectory_datum: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        from_wellbore_trajectory_datum_space: str = DEFAULT_INSTANCE_SPACE,
+        to_available_trajectory_station_property: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        to_available_trajectory_station_property_space: str = DEFAULT_INSTANCE_SPACE,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit=DEFAULT_LIMIT_READ,
@@ -20,10 +21,10 @@ class WellboreTrajectoryDataAvailableTrajectoryStationPropertiesAPI(EdgeAPI):
         """List available trajectory station property edges of a wellbore trajectory datum.
 
         Args:
-            wellbore_trajectory_datum: ID of the source wellbore trajectory data.
-            wellbore_trajectory_datum_space: Location of the wellbore trajectory data.
-            available_trajectory_station_property: ID of the target available trajectory station properties.
-            available_trajectory_station_property_space: Location of the available trajectory station properties.
+            from_wellbore_trajectory_datum: ID of the source wellbore trajectory datum.
+            from_wellbore_trajectory_datum_space: Location of the wellbore trajectory data.
+            to_available_trajectory_station_property: ID of the target available trajectory station property.
+            to_available_trajectory_station_property_space: Location of the available trajectory station properties.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of available trajectory station property edges to return. Defaults to 25. Set to -1, float("inf") or None
@@ -45,10 +46,10 @@ class WellboreTrajectoryDataAvailableTrajectoryStationPropertiesAPI(EdgeAPI):
             dm.DirectRelationReference(
                 "IntegrationTestsImmutable", "WellboreTrajectoryData.AvailableTrajectoryStationProperties"
             ),
-            wellbore_trajectory_datum,
-            wellbore_trajectory_datum_space,
-            available_trajectory_station_property,
-            available_trajectory_station_property_space,
+            from_wellbore_trajectory_datum,
+            from_wellbore_trajectory_datum_space,
+            to_available_trajectory_station_property,
+            to_available_trajectory_station_property_space,
             external_id_prefix,
             space,
         )

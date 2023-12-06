@@ -86,6 +86,7 @@ class UnacceptableUsageAPI(NodeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
             A query API for unacceptable usages.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_unacceptable_usage_filter(
             self._view_id,
             data_quality_id,
@@ -100,26 +101,10 @@ class UnacceptableUsageAPI(NodeAPI[UnacceptableUsage, UnacceptableUsageApply, Un
             workflow_usage_type_id_prefix,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            UnacceptableUsageList,
-            [
-                QueryStep(
-                    name="unacceptable_usage",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_UNACCEPTABLEUSAGE_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=UnacceptableUsage,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return UnacceptableUsageQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(UnacceptableUsageList)
+        return UnacceptableUsageQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(
         self, unacceptable_usage: UnacceptableUsageApply | Sequence[UnacceptableUsageApply], replace: bool = False

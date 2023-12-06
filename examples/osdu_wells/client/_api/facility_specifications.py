@@ -98,6 +98,7 @@ class FacilitySpecificationsAPI(
             A query API for facility specifications.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_facility_specification_filter(
             self._view_id,
             effective_date_time,
@@ -117,30 +118,10 @@ class FacilitySpecificationsAPI(
             unit_of_measure_id_prefix,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            FacilitySpecificationsList,
-            [
-                QueryStep(
-                    name="facility_specification",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [
-                            dm.query.SourceSelector(
-                                self._view_id, list(_FACILITYSPECIFICATIONS_PROPERTIES_BY_FIELD.values())
-                            )
-                        ]
-                    ),
-                    result_cls=FacilitySpecifications,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return FacilitySpecificationsQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(FacilitySpecificationsList)
+        return FacilitySpecificationsQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(
         self,

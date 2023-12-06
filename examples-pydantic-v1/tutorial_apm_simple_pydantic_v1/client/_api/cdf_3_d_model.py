@@ -81,32 +81,17 @@ class CdfModelAPI(NodeAPI[CdfModel, CdfModelApply, CdfModelList]):
             A query API for cdf 3 d models.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_cdf_3_d_model_filter(
             self._view_id,
             name,
             name_prefix,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            CdfModelList,
-            [
-                QueryStep(
-                    name="cdf_3_d_model",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_CDFMODEL_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=CdfModel,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return CdfModelQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(CdfModelList)
+        return CdfModelQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(
         self, cdf_3_d_model: CdfModelApply | Sequence[CdfModelApply], replace: bool = False

@@ -4,15 +4,16 @@ from __future__ import annotations
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, EdgeAPI, _create_edge_filter
+from osdu_wells.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 
 class TechnicalAssurancesAcceptableUsageAPI(EdgeAPI):
     def list(
         self,
-        technical_assurance: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        technical_assurance_space: str = "IntegrationTestsImmutable",
-        acceptable_usage: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        acceptable_usage_space: str = "IntegrationTestsImmutable",
+        from_technical_assurance: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        from_technical_assurance_space: str = DEFAULT_INSTANCE_SPACE,
+        to_acceptable_usage: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        to_acceptable_usage_space: str = DEFAULT_INSTANCE_SPACE,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit=DEFAULT_LIMIT_READ,
@@ -20,10 +21,10 @@ class TechnicalAssurancesAcceptableUsageAPI(EdgeAPI):
         """List acceptable usage edges of a technical assurance.
 
         Args:
-            technical_assurance: ID of the source technical assurances.
-            technical_assurance_space: Location of the technical assurances.
-            acceptable_usage: ID of the target acceptable usages.
-            acceptable_usage_space: Location of the acceptable usages.
+            from_technical_assurance: ID of the source technical assurance.
+            from_technical_assurance_space: Location of the technical assurances.
+            to_acceptable_usage: ID of the target acceptable usage.
+            to_acceptable_usage_space: Location of the acceptable usages.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of acceptable usage edges to return. Defaults to 25. Set to -1, float("inf") or None
@@ -43,10 +44,10 @@ class TechnicalAssurancesAcceptableUsageAPI(EdgeAPI):
         """
         filter_ = _create_edge_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "TechnicalAssurances.AcceptableUsage"),
-            technical_assurance,
-            technical_assurance_space,
-            acceptable_usage,
-            acceptable_usage_space,
+            from_technical_assurance,
+            from_technical_assurance_space,
+            to_acceptable_usage,
+            to_acceptable_usage_space,
             external_id_prefix,
             space,
         )

@@ -1,70 +1,22 @@
 from __future__ import annotations
 
+import datetime
 from typing import TYPE_CHECKING
-from cognite.client import data_modeling as dm
-from ._core import DEFAULT_QUERY_LIMIT, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
+
+from cognite.client import data_modeling as dm, CogniteClient
+
 from osdu_wells.client.data_classes import (
+    DomainModelApply,
     WellboreData,
     WellboreDataApply,
-    DrillingReasons,
-    DrillingReasonsApply,
-    FacilityEvents,
-    FacilityEventsApply,
-    FacilityOperators,
-    FacilityOperatorsApply,
-    FacilitySpecifications,
-    FacilitySpecificationsApply,
-    FacilityStates,
-    FacilityStatesApply,
-    GeoContexts,
-    GeoContextsApply,
-    HistoricalInterests,
-    HistoricalInterestsApply,
-    NameAliases,
-    NameAliasesApply,
-    TechnicalAssurances,
-    TechnicalAssurancesApply,
-    VerticalMeasurements,
-    VerticalMeasurementsApply,
-    WellboreCosts,
-    WellboreCostsApply,
+    GeographicBottomHoleLocation,
+    GeographicBottomHoleLocationApply,
+    ProjectedBottomHoleLocation,
+    ProjectedBottomHoleLocationApply,
+    SpatialLocation,
+    SpatialLocationApply,
 )
-from osdu_wells.client.data_classes._wellbore_data import (
-    _WELLBOREDATA_PROPERTIES_BY_FIELD,
-)
-from osdu_wells.client.data_classes._drilling_reasons import (
-    _DRILLINGREASONS_PROPERTIES_BY_FIELD,
-)
-from osdu_wells.client.data_classes._facility_events import (
-    _FACILITYEVENTS_PROPERTIES_BY_FIELD,
-)
-from osdu_wells.client.data_classes._facility_operators import (
-    _FACILITYOPERATORS_PROPERTIES_BY_FIELD,
-)
-from osdu_wells.client.data_classes._facility_specifications import (
-    _FACILITYSPECIFICATIONS_PROPERTIES_BY_FIELD,
-)
-from osdu_wells.client.data_classes._facility_states import (
-    _FACILITYSTATES_PROPERTIES_BY_FIELD,
-)
-from osdu_wells.client.data_classes._geo_contexts import (
-    _GEOCONTEXTS_PROPERTIES_BY_FIELD,
-)
-from osdu_wells.client.data_classes._historical_interests import (
-    _HISTORICALINTERESTS_PROPERTIES_BY_FIELD,
-)
-from osdu_wells.client.data_classes._name_aliases import (
-    _NAMEALIASES_PROPERTIES_BY_FIELD,
-)
-from osdu_wells.client.data_classes._technical_assurances import (
-    _TECHNICALASSURANCES_PROPERTIES_BY_FIELD,
-)
-from osdu_wells.client.data_classes._vertical_measurements import (
-    _VERTICALMEASUREMENTS_PROPERTIES_BY_FIELD,
-)
-from osdu_wells.client.data_classes._wellbore_costs import (
-    _WELLBORECOSTS_PROPERTIES_BY_FIELD,
-)
+from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
 
 if TYPE_CHECKING:
     from .drilling_reasons_query import DrillingReasonsQueryAPI
@@ -81,24 +33,55 @@ if TYPE_CHECKING:
 
 
 class WellboreDataQueryAPI(QueryAPI[T_DomainModelList]):
+    def __init__(
+        self,
+        client: CogniteClient,
+        builder: QueryBuilder[T_DomainModelList],
+        view_by_write_class: dict[type[DomainModelApply], dm.ViewId],
+        filter_: dm.filters.Filter | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+    ):
+        super().__init__(client, builder, view_by_write_class)
+
+        self._builder.append(
+            QueryStep(
+                name=self._builder.next_name("wellbore_datum"),
+                expression=dm.query.NodeResultSetExpression(
+                    from_=self._builder[-1].name if self._builder else None,
+                    filter=filter_,
+                ),
+                select=dm.query.Select([dm.query.SourceSelector(self._view_by_write_class[WellboreDataApply], ["*"])]),
+                result_cls=WellboreData,
+                max_retrieve_limit=limit,
+            )
+        )
+
     def drilling_reasons(
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_QUERY_LIMIT,
+        retrieve_geographic_bottom_hole_location: bool = False,
+        retrieve_projected_bottom_hole_location: bool = False,
+        retrieve_spatial_location: bool = False,
     ) -> DrillingReasonsQueryAPI[T_DomainModelList]:
         """Query along the drilling reason edges of the wellbore datum.
 
         Args:
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of work unit edges to return. Defaults to 25. Set to -1, float("inf") or None
+            limit: Maximum number of drilling reason edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
+            retrieve_geographic_bottom_hole_location: Whether to retrieve the geographic bottom hole location for each wellbore datum or not.
+            retrieve_projected_bottom_hole_location: Whether to retrieve the projected bottom hole location for each wellbore datum or not.
+            retrieve_spatial_location: Whether to retrieve the spatial location for each wellbore datum or not.
 
         Returns:
             DrillingReasonsQueryAPI: The query API for the drilling reason.
         """
         from .drilling_reasons_query import DrillingReasonsQueryAPI
+
+        from_ = self._builder[-1].name
 
         edge_filter = _create_edge_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.DrillingReasons"),
@@ -110,51 +93,46 @@ class WellboreDataQueryAPI(QueryAPI[T_DomainModelList]):
                 name=self._builder.next_name("drilling_reasons"),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
-                    from_=self._builder[-1].name,
+                    from_=from_,
                 ),
                 select=dm.query.Select(),
                 max_retrieve_limit=limit,
             )
         )
-        self._builder.append(
-            QueryStep(
-                name=self._builder.next_name("drilling_reason"),
-                expression=dm.query.NodeResultSetExpression(
-                    filter=None,
-                    from_=self._builder[-1].name,
-                ),
-                select=dm.query.Select(
-                    [
-                        dm.query.SourceSelector(
-                            self._view_by_write_class[DrillingReasonsApply],
-                            list(_DRILLINGREASONS_PROPERTIES_BY_FIELD.values()),
-                        )
-                    ]
-                ),
-                result_cls=DrillingReasons,
-                max_retrieve_limit=-1,
-            ),
-        )
-        return DrillingReasonsQueryAPI(self._client, self._builder, self._view_by_write_class)
+        if retrieve_geographic_bottom_hole_location:
+            self._query_append_geographic_bottom_hole_location(from_)
+        if retrieve_projected_bottom_hole_location:
+            self._query_append_projected_bottom_hole_location(from_)
+        if retrieve_spatial_location:
+            self._query_append_spatial_location(from_)
+        return DrillingReasonsQueryAPI(self._client, self._builder, self._view_by_write_class, None, limit)
 
     def facility_events(
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_QUERY_LIMIT,
+        retrieve_geographic_bottom_hole_location: bool = False,
+        retrieve_projected_bottom_hole_location: bool = False,
+        retrieve_spatial_location: bool = False,
     ) -> FacilityEventsQueryAPI[T_DomainModelList]:
         """Query along the facility event edges of the wellbore datum.
 
         Args:
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of work unit edges to return. Defaults to 25. Set to -1, float("inf") or None
+            limit: Maximum number of facility event edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
+            retrieve_geographic_bottom_hole_location: Whether to retrieve the geographic bottom hole location for each wellbore datum or not.
+            retrieve_projected_bottom_hole_location: Whether to retrieve the projected bottom hole location for each wellbore datum or not.
+            retrieve_spatial_location: Whether to retrieve the spatial location for each wellbore datum or not.
 
         Returns:
             FacilityEventsQueryAPI: The query API for the facility event.
         """
         from .facility_events_query import FacilityEventsQueryAPI
+
+        from_ = self._builder[-1].name
 
         edge_filter = _create_edge_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.FacilityEvents"),
@@ -166,51 +144,46 @@ class WellboreDataQueryAPI(QueryAPI[T_DomainModelList]):
                 name=self._builder.next_name("facility_events"),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
-                    from_=self._builder[-1].name,
+                    from_=from_,
                 ),
                 select=dm.query.Select(),
                 max_retrieve_limit=limit,
             )
         )
-        self._builder.append(
-            QueryStep(
-                name=self._builder.next_name("facility_event"),
-                expression=dm.query.NodeResultSetExpression(
-                    filter=None,
-                    from_=self._builder[-1].name,
-                ),
-                select=dm.query.Select(
-                    [
-                        dm.query.SourceSelector(
-                            self._view_by_write_class[FacilityEventsApply],
-                            list(_FACILITYEVENTS_PROPERTIES_BY_FIELD.values()),
-                        )
-                    ]
-                ),
-                result_cls=FacilityEvents,
-                max_retrieve_limit=-1,
-            ),
-        )
-        return FacilityEventsQueryAPI(self._client, self._builder, self._view_by_write_class)
+        if retrieve_geographic_bottom_hole_location:
+            self._query_append_geographic_bottom_hole_location(from_)
+        if retrieve_projected_bottom_hole_location:
+            self._query_append_projected_bottom_hole_location(from_)
+        if retrieve_spatial_location:
+            self._query_append_spatial_location(from_)
+        return FacilityEventsQueryAPI(self._client, self._builder, self._view_by_write_class, None, limit)
 
     def facility_operators(
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_QUERY_LIMIT,
+        retrieve_geographic_bottom_hole_location: bool = False,
+        retrieve_projected_bottom_hole_location: bool = False,
+        retrieve_spatial_location: bool = False,
     ) -> FacilityOperatorsQueryAPI[T_DomainModelList]:
         """Query along the facility operator edges of the wellbore datum.
 
         Args:
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of work unit edges to return. Defaults to 25. Set to -1, float("inf") or None
+            limit: Maximum number of facility operator edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
+            retrieve_geographic_bottom_hole_location: Whether to retrieve the geographic bottom hole location for each wellbore datum or not.
+            retrieve_projected_bottom_hole_location: Whether to retrieve the projected bottom hole location for each wellbore datum or not.
+            retrieve_spatial_location: Whether to retrieve the spatial location for each wellbore datum or not.
 
         Returns:
             FacilityOperatorsQueryAPI: The query API for the facility operator.
         """
         from .facility_operators_query import FacilityOperatorsQueryAPI
+
+        from_ = self._builder[-1].name
 
         edge_filter = _create_edge_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.FacilityOperators"),
@@ -222,51 +195,46 @@ class WellboreDataQueryAPI(QueryAPI[T_DomainModelList]):
                 name=self._builder.next_name("facility_operators"),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
-                    from_=self._builder[-1].name,
+                    from_=from_,
                 ),
                 select=dm.query.Select(),
                 max_retrieve_limit=limit,
             )
         )
-        self._builder.append(
-            QueryStep(
-                name=self._builder.next_name("facility_operator"),
-                expression=dm.query.NodeResultSetExpression(
-                    filter=None,
-                    from_=self._builder[-1].name,
-                ),
-                select=dm.query.Select(
-                    [
-                        dm.query.SourceSelector(
-                            self._view_by_write_class[FacilityOperatorsApply],
-                            list(_FACILITYOPERATORS_PROPERTIES_BY_FIELD.values()),
-                        )
-                    ]
-                ),
-                result_cls=FacilityOperators,
-                max_retrieve_limit=-1,
-            ),
-        )
-        return FacilityOperatorsQueryAPI(self._client, self._builder, self._view_by_write_class)
+        if retrieve_geographic_bottom_hole_location:
+            self._query_append_geographic_bottom_hole_location(from_)
+        if retrieve_projected_bottom_hole_location:
+            self._query_append_projected_bottom_hole_location(from_)
+        if retrieve_spatial_location:
+            self._query_append_spatial_location(from_)
+        return FacilityOperatorsQueryAPI(self._client, self._builder, self._view_by_write_class, None, limit)
 
     def facility_specifications(
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_QUERY_LIMIT,
+        retrieve_geographic_bottom_hole_location: bool = False,
+        retrieve_projected_bottom_hole_location: bool = False,
+        retrieve_spatial_location: bool = False,
     ) -> FacilitySpecificationsQueryAPI[T_DomainModelList]:
         """Query along the facility specification edges of the wellbore datum.
 
         Args:
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of work unit edges to return. Defaults to 25. Set to -1, float("inf") or None
+            limit: Maximum number of facility specification edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
+            retrieve_geographic_bottom_hole_location: Whether to retrieve the geographic bottom hole location for each wellbore datum or not.
+            retrieve_projected_bottom_hole_location: Whether to retrieve the projected bottom hole location for each wellbore datum or not.
+            retrieve_spatial_location: Whether to retrieve the spatial location for each wellbore datum or not.
 
         Returns:
             FacilitySpecificationsQueryAPI: The query API for the facility specification.
         """
         from .facility_specifications_query import FacilitySpecificationsQueryAPI
+
+        from_ = self._builder[-1].name
 
         edge_filter = _create_edge_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.FacilitySpecifications"),
@@ -278,51 +246,46 @@ class WellboreDataQueryAPI(QueryAPI[T_DomainModelList]):
                 name=self._builder.next_name("facility_specifications"),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
-                    from_=self._builder[-1].name,
+                    from_=from_,
                 ),
                 select=dm.query.Select(),
                 max_retrieve_limit=limit,
             )
         )
-        self._builder.append(
-            QueryStep(
-                name=self._builder.next_name("facility_specification"),
-                expression=dm.query.NodeResultSetExpression(
-                    filter=None,
-                    from_=self._builder[-1].name,
-                ),
-                select=dm.query.Select(
-                    [
-                        dm.query.SourceSelector(
-                            self._view_by_write_class[FacilitySpecificationsApply],
-                            list(_FACILITYSPECIFICATIONS_PROPERTIES_BY_FIELD.values()),
-                        )
-                    ]
-                ),
-                result_cls=FacilitySpecifications,
-                max_retrieve_limit=-1,
-            ),
-        )
-        return FacilitySpecificationsQueryAPI(self._client, self._builder, self._view_by_write_class)
+        if retrieve_geographic_bottom_hole_location:
+            self._query_append_geographic_bottom_hole_location(from_)
+        if retrieve_projected_bottom_hole_location:
+            self._query_append_projected_bottom_hole_location(from_)
+        if retrieve_spatial_location:
+            self._query_append_spatial_location(from_)
+        return FacilitySpecificationsQueryAPI(self._client, self._builder, self._view_by_write_class, None, limit)
 
     def facility_states(
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_QUERY_LIMIT,
+        retrieve_geographic_bottom_hole_location: bool = False,
+        retrieve_projected_bottom_hole_location: bool = False,
+        retrieve_spatial_location: bool = False,
     ) -> FacilityStatesQueryAPI[T_DomainModelList]:
         """Query along the facility state edges of the wellbore datum.
 
         Args:
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of work unit edges to return. Defaults to 25. Set to -1, float("inf") or None
+            limit: Maximum number of facility state edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
+            retrieve_geographic_bottom_hole_location: Whether to retrieve the geographic bottom hole location for each wellbore datum or not.
+            retrieve_projected_bottom_hole_location: Whether to retrieve the projected bottom hole location for each wellbore datum or not.
+            retrieve_spatial_location: Whether to retrieve the spatial location for each wellbore datum or not.
 
         Returns:
             FacilityStatesQueryAPI: The query API for the facility state.
         """
         from .facility_states_query import FacilityStatesQueryAPI
+
+        from_ = self._builder[-1].name
 
         edge_filter = _create_edge_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.FacilityStates"),
@@ -334,51 +297,46 @@ class WellboreDataQueryAPI(QueryAPI[T_DomainModelList]):
                 name=self._builder.next_name("facility_states"),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
-                    from_=self._builder[-1].name,
+                    from_=from_,
                 ),
                 select=dm.query.Select(),
                 max_retrieve_limit=limit,
             )
         )
-        self._builder.append(
-            QueryStep(
-                name=self._builder.next_name("facility_state"),
-                expression=dm.query.NodeResultSetExpression(
-                    filter=None,
-                    from_=self._builder[-1].name,
-                ),
-                select=dm.query.Select(
-                    [
-                        dm.query.SourceSelector(
-                            self._view_by_write_class[FacilityStatesApply],
-                            list(_FACILITYSTATES_PROPERTIES_BY_FIELD.values()),
-                        )
-                    ]
-                ),
-                result_cls=FacilityStates,
-                max_retrieve_limit=-1,
-            ),
-        )
-        return FacilityStatesQueryAPI(self._client, self._builder, self._view_by_write_class)
+        if retrieve_geographic_bottom_hole_location:
+            self._query_append_geographic_bottom_hole_location(from_)
+        if retrieve_projected_bottom_hole_location:
+            self._query_append_projected_bottom_hole_location(from_)
+        if retrieve_spatial_location:
+            self._query_append_spatial_location(from_)
+        return FacilityStatesQueryAPI(self._client, self._builder, self._view_by_write_class, None, limit)
 
     def geo_contexts(
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_QUERY_LIMIT,
+        retrieve_geographic_bottom_hole_location: bool = False,
+        retrieve_projected_bottom_hole_location: bool = False,
+        retrieve_spatial_location: bool = False,
     ) -> GeoContextsQueryAPI[T_DomainModelList]:
         """Query along the geo context edges of the wellbore datum.
 
         Args:
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of work unit edges to return. Defaults to 25. Set to -1, float("inf") or None
+            limit: Maximum number of geo context edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
+            retrieve_geographic_bottom_hole_location: Whether to retrieve the geographic bottom hole location for each wellbore datum or not.
+            retrieve_projected_bottom_hole_location: Whether to retrieve the projected bottom hole location for each wellbore datum or not.
+            retrieve_spatial_location: Whether to retrieve the spatial location for each wellbore datum or not.
 
         Returns:
             GeoContextsQueryAPI: The query API for the geo context.
         """
         from .geo_contexts_query import GeoContextsQueryAPI
+
+        from_ = self._builder[-1].name
 
         edge_filter = _create_edge_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.GeoContexts"),
@@ -390,51 +348,46 @@ class WellboreDataQueryAPI(QueryAPI[T_DomainModelList]):
                 name=self._builder.next_name("geo_contexts"),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
-                    from_=self._builder[-1].name,
+                    from_=from_,
                 ),
                 select=dm.query.Select(),
                 max_retrieve_limit=limit,
             )
         )
-        self._builder.append(
-            QueryStep(
-                name=self._builder.next_name("geo_context"),
-                expression=dm.query.NodeResultSetExpression(
-                    filter=None,
-                    from_=self._builder[-1].name,
-                ),
-                select=dm.query.Select(
-                    [
-                        dm.query.SourceSelector(
-                            self._view_by_write_class[GeoContextsApply],
-                            list(_GEOCONTEXTS_PROPERTIES_BY_FIELD.values()),
-                        )
-                    ]
-                ),
-                result_cls=GeoContexts,
-                max_retrieve_limit=-1,
-            ),
-        )
-        return GeoContextsQueryAPI(self._client, self._builder, self._view_by_write_class)
+        if retrieve_geographic_bottom_hole_location:
+            self._query_append_geographic_bottom_hole_location(from_)
+        if retrieve_projected_bottom_hole_location:
+            self._query_append_projected_bottom_hole_location(from_)
+        if retrieve_spatial_location:
+            self._query_append_spatial_location(from_)
+        return GeoContextsQueryAPI(self._client, self._builder, self._view_by_write_class, None, limit)
 
     def historical_interests(
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_QUERY_LIMIT,
+        retrieve_geographic_bottom_hole_location: bool = False,
+        retrieve_projected_bottom_hole_location: bool = False,
+        retrieve_spatial_location: bool = False,
     ) -> HistoricalInterestsQueryAPI[T_DomainModelList]:
         """Query along the historical interest edges of the wellbore datum.
 
         Args:
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of work unit edges to return. Defaults to 25. Set to -1, float("inf") or None
+            limit: Maximum number of historical interest edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
+            retrieve_geographic_bottom_hole_location: Whether to retrieve the geographic bottom hole location for each wellbore datum or not.
+            retrieve_projected_bottom_hole_location: Whether to retrieve the projected bottom hole location for each wellbore datum or not.
+            retrieve_spatial_location: Whether to retrieve the spatial location for each wellbore datum or not.
 
         Returns:
             HistoricalInterestsQueryAPI: The query API for the historical interest.
         """
         from .historical_interests_query import HistoricalInterestsQueryAPI
+
+        from_ = self._builder[-1].name
 
         edge_filter = _create_edge_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.HistoricalInterests"),
@@ -446,51 +399,46 @@ class WellboreDataQueryAPI(QueryAPI[T_DomainModelList]):
                 name=self._builder.next_name("historical_interests"),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
-                    from_=self._builder[-1].name,
+                    from_=from_,
                 ),
                 select=dm.query.Select(),
                 max_retrieve_limit=limit,
             )
         )
-        self._builder.append(
-            QueryStep(
-                name=self._builder.next_name("historical_interest"),
-                expression=dm.query.NodeResultSetExpression(
-                    filter=None,
-                    from_=self._builder[-1].name,
-                ),
-                select=dm.query.Select(
-                    [
-                        dm.query.SourceSelector(
-                            self._view_by_write_class[HistoricalInterestsApply],
-                            list(_HISTORICALINTERESTS_PROPERTIES_BY_FIELD.values()),
-                        )
-                    ]
-                ),
-                result_cls=HistoricalInterests,
-                max_retrieve_limit=-1,
-            ),
-        )
-        return HistoricalInterestsQueryAPI(self._client, self._builder, self._view_by_write_class)
+        if retrieve_geographic_bottom_hole_location:
+            self._query_append_geographic_bottom_hole_location(from_)
+        if retrieve_projected_bottom_hole_location:
+            self._query_append_projected_bottom_hole_location(from_)
+        if retrieve_spatial_location:
+            self._query_append_spatial_location(from_)
+        return HistoricalInterestsQueryAPI(self._client, self._builder, self._view_by_write_class, None, limit)
 
     def name_aliases(
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_QUERY_LIMIT,
+        retrieve_geographic_bottom_hole_location: bool = False,
+        retrieve_projected_bottom_hole_location: bool = False,
+        retrieve_spatial_location: bool = False,
     ) -> NameAliasesQueryAPI[T_DomainModelList]:
         """Query along the name alias edges of the wellbore datum.
 
         Args:
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of work unit edges to return. Defaults to 25. Set to -1, float("inf") or None
+            limit: Maximum number of name alias edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
+            retrieve_geographic_bottom_hole_location: Whether to retrieve the geographic bottom hole location for each wellbore datum or not.
+            retrieve_projected_bottom_hole_location: Whether to retrieve the projected bottom hole location for each wellbore datum or not.
+            retrieve_spatial_location: Whether to retrieve the spatial location for each wellbore datum or not.
 
         Returns:
             NameAliasesQueryAPI: The query API for the name alias.
         """
         from .name_aliases_query import NameAliasesQueryAPI
+
+        from_ = self._builder[-1].name
 
         edge_filter = _create_edge_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.NameAliases"),
@@ -502,51 +450,46 @@ class WellboreDataQueryAPI(QueryAPI[T_DomainModelList]):
                 name=self._builder.next_name("name_aliases"),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
-                    from_=self._builder[-1].name,
+                    from_=from_,
                 ),
                 select=dm.query.Select(),
                 max_retrieve_limit=limit,
             )
         )
-        self._builder.append(
-            QueryStep(
-                name=self._builder.next_name("name_alias"),
-                expression=dm.query.NodeResultSetExpression(
-                    filter=None,
-                    from_=self._builder[-1].name,
-                ),
-                select=dm.query.Select(
-                    [
-                        dm.query.SourceSelector(
-                            self._view_by_write_class[NameAliasesApply],
-                            list(_NAMEALIASES_PROPERTIES_BY_FIELD.values()),
-                        )
-                    ]
-                ),
-                result_cls=NameAliases,
-                max_retrieve_limit=-1,
-            ),
-        )
-        return NameAliasesQueryAPI(self._client, self._builder, self._view_by_write_class)
+        if retrieve_geographic_bottom_hole_location:
+            self._query_append_geographic_bottom_hole_location(from_)
+        if retrieve_projected_bottom_hole_location:
+            self._query_append_projected_bottom_hole_location(from_)
+        if retrieve_spatial_location:
+            self._query_append_spatial_location(from_)
+        return NameAliasesQueryAPI(self._client, self._builder, self._view_by_write_class, None, limit)
 
     def technical_assurances(
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_QUERY_LIMIT,
+        retrieve_geographic_bottom_hole_location: bool = False,
+        retrieve_projected_bottom_hole_location: bool = False,
+        retrieve_spatial_location: bool = False,
     ) -> TechnicalAssurancesQueryAPI[T_DomainModelList]:
         """Query along the technical assurance edges of the wellbore datum.
 
         Args:
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of work unit edges to return. Defaults to 25. Set to -1, float("inf") or None
+            limit: Maximum number of technical assurance edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
+            retrieve_geographic_bottom_hole_location: Whether to retrieve the geographic bottom hole location for each wellbore datum or not.
+            retrieve_projected_bottom_hole_location: Whether to retrieve the projected bottom hole location for each wellbore datum or not.
+            retrieve_spatial_location: Whether to retrieve the spatial location for each wellbore datum or not.
 
         Returns:
             TechnicalAssurancesQueryAPI: The query API for the technical assurance.
         """
         from .technical_assurances_query import TechnicalAssurancesQueryAPI
+
+        from_ = self._builder[-1].name
 
         edge_filter = _create_edge_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.TechnicalAssurances"),
@@ -558,51 +501,46 @@ class WellboreDataQueryAPI(QueryAPI[T_DomainModelList]):
                 name=self._builder.next_name("technical_assurances"),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
-                    from_=self._builder[-1].name,
+                    from_=from_,
                 ),
                 select=dm.query.Select(),
                 max_retrieve_limit=limit,
             )
         )
-        self._builder.append(
-            QueryStep(
-                name=self._builder.next_name("technical_assurance"),
-                expression=dm.query.NodeResultSetExpression(
-                    filter=None,
-                    from_=self._builder[-1].name,
-                ),
-                select=dm.query.Select(
-                    [
-                        dm.query.SourceSelector(
-                            self._view_by_write_class[TechnicalAssurancesApply],
-                            list(_TECHNICALASSURANCES_PROPERTIES_BY_FIELD.values()),
-                        )
-                    ]
-                ),
-                result_cls=TechnicalAssurances,
-                max_retrieve_limit=-1,
-            ),
-        )
-        return TechnicalAssurancesQueryAPI(self._client, self._builder, self._view_by_write_class)
+        if retrieve_geographic_bottom_hole_location:
+            self._query_append_geographic_bottom_hole_location(from_)
+        if retrieve_projected_bottom_hole_location:
+            self._query_append_projected_bottom_hole_location(from_)
+        if retrieve_spatial_location:
+            self._query_append_spatial_location(from_)
+        return TechnicalAssurancesQueryAPI(self._client, self._builder, self._view_by_write_class, None, limit)
 
     def vertical_measurements(
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_QUERY_LIMIT,
+        retrieve_geographic_bottom_hole_location: bool = False,
+        retrieve_projected_bottom_hole_location: bool = False,
+        retrieve_spatial_location: bool = False,
     ) -> VerticalMeasurementsQueryAPI[T_DomainModelList]:
         """Query along the vertical measurement edges of the wellbore datum.
 
         Args:
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of work unit edges to return. Defaults to 25. Set to -1, float("inf") or None
+            limit: Maximum number of vertical measurement edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
+            retrieve_geographic_bottom_hole_location: Whether to retrieve the geographic bottom hole location for each wellbore datum or not.
+            retrieve_projected_bottom_hole_location: Whether to retrieve the projected bottom hole location for each wellbore datum or not.
+            retrieve_spatial_location: Whether to retrieve the spatial location for each wellbore datum or not.
 
         Returns:
             VerticalMeasurementsQueryAPI: The query API for the vertical measurement.
         """
         from .vertical_measurements_query import VerticalMeasurementsQueryAPI
+
+        from_ = self._builder[-1].name
 
         edge_filter = _create_edge_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.VerticalMeasurements"),
@@ -614,51 +552,46 @@ class WellboreDataQueryAPI(QueryAPI[T_DomainModelList]):
                 name=self._builder.next_name("vertical_measurements"),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
-                    from_=self._builder[-1].name,
+                    from_=from_,
                 ),
                 select=dm.query.Select(),
                 max_retrieve_limit=limit,
             )
         )
-        self._builder.append(
-            QueryStep(
-                name=self._builder.next_name("vertical_measurement"),
-                expression=dm.query.NodeResultSetExpression(
-                    filter=None,
-                    from_=self._builder[-1].name,
-                ),
-                select=dm.query.Select(
-                    [
-                        dm.query.SourceSelector(
-                            self._view_by_write_class[VerticalMeasurementsApply],
-                            list(_VERTICALMEASUREMENTS_PROPERTIES_BY_FIELD.values()),
-                        )
-                    ]
-                ),
-                result_cls=VerticalMeasurements,
-                max_retrieve_limit=-1,
-            ),
-        )
-        return VerticalMeasurementsQueryAPI(self._client, self._builder, self._view_by_write_class)
+        if retrieve_geographic_bottom_hole_location:
+            self._query_append_geographic_bottom_hole_location(from_)
+        if retrieve_projected_bottom_hole_location:
+            self._query_append_projected_bottom_hole_location(from_)
+        if retrieve_spatial_location:
+            self._query_append_spatial_location(from_)
+        return VerticalMeasurementsQueryAPI(self._client, self._builder, self._view_by_write_class, None, limit)
 
     def wellbore_costs(
         self,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_QUERY_LIMIT,
+        retrieve_geographic_bottom_hole_location: bool = False,
+        retrieve_projected_bottom_hole_location: bool = False,
+        retrieve_spatial_location: bool = False,
     ) -> WellboreCostsQueryAPI[T_DomainModelList]:
         """Query along the wellbore cost edges of the wellbore datum.
 
         Args:
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of work unit edges to return. Defaults to 25. Set to -1, float("inf") or None
+            limit: Maximum number of wellbore cost edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
+            retrieve_geographic_bottom_hole_location: Whether to retrieve the geographic bottom hole location for each wellbore datum or not.
+            retrieve_projected_bottom_hole_location: Whether to retrieve the projected bottom hole location for each wellbore datum or not.
+            retrieve_spatial_location: Whether to retrieve the spatial location for each wellbore datum or not.
 
         Returns:
             WellboreCostsQueryAPI: The query API for the wellbore cost.
         """
         from .wellbore_costs_query import WellboreCostsQueryAPI
+
+        from_ = self._builder[-1].name
 
         edge_filter = _create_edge_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.WellboreCosts"),
@@ -670,66 +603,97 @@ class WellboreDataQueryAPI(QueryAPI[T_DomainModelList]):
                 name=self._builder.next_name("wellbore_costs"),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
-                    from_=self._builder[-1].name,
+                    from_=from_,
                 ),
                 select=dm.query.Select(),
                 max_retrieve_limit=limit,
             )
         )
-        self._builder.append(
-            QueryStep(
-                name=self._builder.next_name("wellbore_cost"),
-                expression=dm.query.NodeResultSetExpression(
-                    filter=None,
-                    from_=self._builder[-1].name,
-                ),
-                select=dm.query.Select(
-                    [
-                        dm.query.SourceSelector(
-                            self._view_by_write_class[WellboreCostsApply],
-                            list(_WELLBORECOSTS_PROPERTIES_BY_FIELD.values()),
-                        )
-                    ]
-                ),
-                result_cls=WellboreCosts,
-                max_retrieve_limit=-1,
-            ),
-        )
-        return WellboreCostsQueryAPI(self._client, self._builder, self._view_by_write_class)
+        if retrieve_geographic_bottom_hole_location:
+            self._query_append_geographic_bottom_hole_location(from_)
+        if retrieve_projected_bottom_hole_location:
+            self._query_append_projected_bottom_hole_location(from_)
+        if retrieve_spatial_location:
+            self._query_append_spatial_location(from_)
+        return WellboreCostsQueryAPI(self._client, self._builder, self._view_by_write_class, None, limit)
 
     def query(
         self,
-        retrieve_wellbore_datum: bool = True,
+        retrieve_geographic_bottom_hole_location: bool = False,
+        retrieve_projected_bottom_hole_location: bool = False,
+        retrieve_spatial_location: bool = False,
     ) -> T_DomainModelList:
         """Execute query and return the result.
 
         Args:
-            retrieve_wellbore_datum: Whether to retrieve the wellbore datum or not.
+            retrieve_geographic_bottom_hole_location: Whether to retrieve the geographic bottom hole location for each wellbore datum or not.
+            retrieve_projected_bottom_hole_location: Whether to retrieve the projected bottom hole location for each wellbore datum or not.
+            retrieve_spatial_location: Whether to retrieve the spatial location for each wellbore datum or not.
 
         Returns:
             The list of the source nodes of the query.
 
         """
         from_ = self._builder[-1].name
-        if retrieve_wellbore_datum and not self._builder[-1].name.startswith("wellbore_datum"):
-            self._builder.append(
-                QueryStep(
-                    name=self._builder.next_name("wellbore_datum"),
-                    expression=dm.query.NodeResultSetExpression(
-                        filter=None,
-                        from_=from_,
-                    ),
-                    select=dm.query.Select(
-                        [
-                            dm.query.SourceSelector(
-                                self._view_by_write_class[WellboreDataApply],
-                                list(_WELLBOREDATA_PROPERTIES_BY_FIELD.values()),
-                            )
-                        ]
-                    ),
-                    result_cls=WellboreData,
-                    max_retrieve_limit=-1,
-                ),
-            )
-
+        if retrieve_geographic_bottom_hole_location:
+            self._query_append_geographic_bottom_hole_location(from_)
+        if retrieve_projected_bottom_hole_location:
+            self._query_append_projected_bottom_hole_location(from_)
+        if retrieve_spatial_location:
+            self._query_append_spatial_location(from_)
         return self._query()
+
+    def _query_append_geographic_bottom_hole_location(self, from_: str) -> None:
+        view_id = self._view_by_write_class[GeographicBottomHoleLocationApply]
+        self._builder.append(
+            QueryStep(
+                name=self._builder.next_name("geographic_bottom_hole_location"),
+                expression=dm.query.NodeResultSetExpression(
+                    filter=dm.filters.HasData(views=[view_id]),
+                    from_=from_,
+                    through=self._view_by_write_class[WellboreDataApply].as_property_ref(
+                        "geographic_bottom_hole_location"
+                    ),
+                    direction="outwards",
+                ),
+                select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
+                max_retrieve_limit=-1,
+                result_cls=GeographicBottomHoleLocation,
+            ),
+        )
+
+    def _query_append_projected_bottom_hole_location(self, from_: str) -> None:
+        view_id = self._view_by_write_class[ProjectedBottomHoleLocationApply]
+        self._builder.append(
+            QueryStep(
+                name=self._builder.next_name("projected_bottom_hole_location"),
+                expression=dm.query.NodeResultSetExpression(
+                    filter=dm.filters.HasData(views=[view_id]),
+                    from_=from_,
+                    through=self._view_by_write_class[WellboreDataApply].as_property_ref(
+                        "projected_bottom_hole_location"
+                    ),
+                    direction="outwards",
+                ),
+                select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
+                max_retrieve_limit=-1,
+                result_cls=ProjectedBottomHoleLocation,
+            ),
+        )
+
+    def _query_append_spatial_location(self, from_: str) -> None:
+        view_id = self._view_by_write_class[SpatialLocationApply]
+        self._builder.append(
+            QueryStep(
+                name=self._builder.next_name("spatial_location"),
+                expression=dm.query.NodeResultSetExpression(
+                    filter=dm.filters.HasData(views=[view_id]),
+                    from_=from_,
+                    through=self._view_by_write_class[WellboreDataApply].as_property_ref("spatial_location"),
+                    direction="outwards",
+                ),
+                select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
+                max_retrieve_limit=-1,
+                result_cls=SpatialLocation,
+            ),
+        )

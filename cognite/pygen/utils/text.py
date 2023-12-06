@@ -27,6 +27,8 @@ def create_name(raw_name: str, naming: Naming) -> str:
         return to_snake(raw_name, is_plural, is_singular)
     elif naming.case is Case.camel:
         return to_camel(raw_name, is_plural, is_singular)
+    elif naming.case is Case.human:
+        return to_words(raw_name, is_plural, is_singular)
     else:
         return raw_name
 

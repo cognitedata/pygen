@@ -16,10 +16,10 @@ from ._command_config import (
     CommandConfigTextFields,
 )
 
+
 Case.update_forward_refs(
     CommandConfig=CommandConfig,
 )
-
 CaseApply.update_forward_refs(
     CommandConfigApply=CommandConfigApply,
 )

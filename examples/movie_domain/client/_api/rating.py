@@ -69,30 +69,15 @@ class RatingAPI(NodeAPI[Rating, RatingApply, RatingList]):
             A query API for ratings.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_rating_filter(
             self._view_id,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            RatingList,
-            [
-                QueryStep(
-                    name="rating",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_RATING_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=Rating,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return RatingQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(RatingList)
+        return RatingQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(self, rating: RatingApply | Sequence[RatingApply], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) ratings.

@@ -86,6 +86,7 @@ class AcceptableUsageAPI(NodeAPI[AcceptableUsage, AcceptableUsageApply, Acceptab
             A query API for acceptable usages.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_acceptable_usage_filter(
             self._view_id,
             data_quality_id,
@@ -100,26 +101,10 @@ class AcceptableUsageAPI(NodeAPI[AcceptableUsage, AcceptableUsageApply, Acceptab
             workflow_usage_type_id_prefix,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            AcceptableUsageList,
-            [
-                QueryStep(
-                    name="acceptable_usage",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_ACCEPTABLEUSAGE_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=AcceptableUsage,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return AcceptableUsageQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(AcceptableUsageList)
+        return AcceptableUsageQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(
         self, acceptable_usage: AcceptableUsageApply | Sequence[AcceptableUsageApply], replace: bool = False

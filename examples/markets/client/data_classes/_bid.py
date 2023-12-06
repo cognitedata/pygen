@@ -7,6 +7,7 @@ from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -48,9 +49,9 @@ class Bid(DomainModel):
         version: The version of the bid node.
     """
 
-    space: str = "market"
+    space: str = DEFAULT_INSTANCE_SPACE
     date: Optional[datetime.date] = None
-    market: Union[Market, str, None] = Field(None, repr=False)
+    market: Union[Market, str, dm.NodeId, None] = Field(None, repr=False)
     name: Optional[str] = None
 
     def as_apply(self) -> BidApply:
@@ -81,9 +82,9 @@ class BidApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "market"
+    space: str = DEFAULT_INSTANCE_SPACE
     date: Optional[datetime.date] = None
-    market: Union[MarketApply, str, None] = Field(None, repr=False)
+    market: Union[MarketApply, str, dm.NodeId, None] = Field(None, repr=False)
     name: Optional[str] = None
 
     def _to_instances_apply(

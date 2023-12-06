@@ -4,15 +4,16 @@ from __future__ import annotations
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, EdgeAPI, _create_edge_filter
+from tutorial_apm_simple.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 
 class WorkOrderLinkedAssetsAPI(EdgeAPI):
     def list(
         self,
-        work_order: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        work_order_space: str = "tutorial_apm_simple",
-        asset: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        asset_space: str = "tutorial_apm_simple",
+        from_work_order: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        from_work_order_space: str = DEFAULT_INSTANCE_SPACE,
+        to_asset: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        to_asset_space: str = DEFAULT_INSTANCE_SPACE,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit=DEFAULT_LIMIT_READ,
@@ -20,10 +21,10 @@ class WorkOrderLinkedAssetsAPI(EdgeAPI):
         """List linked asset edges of a work order.
 
         Args:
-            work_order: ID of the source work orders.
-            work_order_space: Location of the work orders.
-            asset: ID of the target assets.
-            asset_space: Location of the assets.
+            from_work_order: ID of the source work order.
+            from_work_order_space: Location of the work orders.
+            to_asset: ID of the target asset.
+            to_asset_space: Location of the assets.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of linked asset edges to return. Defaults to 25. Set to -1, float("inf") or None
@@ -43,10 +44,10 @@ class WorkOrderLinkedAssetsAPI(EdgeAPI):
         """
         filter_ = _create_edge_filter(
             dm.DirectRelationReference("tutorial_apm_simple", "WorkOrder.linkedAssets"),
-            work_order,
-            work_order_space,
-            asset,
-            asset_space,
+            from_work_order,
+            from_work_order_space,
+            to_asset,
+            to_asset_space,
             external_id_prefix,
             space,
         )

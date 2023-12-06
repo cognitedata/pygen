@@ -190,6 +190,7 @@ class WellDataAPI(NodeAPI[WellData, WellDataApply, WellDataList]):
             A query API for well data.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_well_datum_filter(
             self._view_id,
             business_intention_id,
@@ -247,26 +248,10 @@ class WellDataAPI(NodeAPI[WellData, WellDataApply, WellDataList]):
             was_business_interest_technical,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            WellDataList,
-            [
-                QueryStep(
-                    name="well_datum",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_WELLDATA_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=WellData,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return WellDataQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(WellDataList)
+        return WellDataQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(self, well_datum: WellDataApply | Sequence[WellDataApply], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) well data.

@@ -323,7 +323,7 @@ class RatingVotesQuery:
     def _retrieve_timeseries_external_ids_with_extra(
         self, extra_properties: ColumnNames | list[ColumnNames] = "votes"
     ) -> dict[str, list[str]]:
-        return _retrieve_timeseries_external_ids_with_extra_votes(
+        return _retrieve_timeseries_external_ids_with_extra_vote(
             self._client,
             self._view_id,
             self._filter,
@@ -432,14 +432,14 @@ class RatingVotesAPI:
             space,
             filter,
         )
-        external_ids = _retrieve_timeseries_external_ids_with_extra_votes(self._client, self._view_id, filter_, limit)
+        external_ids = _retrieve_timeseries_external_ids_with_extra_vote(self._client, self._view_id, filter_, limit)
         if external_ids:
             return self._client.time_series.retrieve_multiple(external_ids=list(external_ids))
         else:
             return TimeSeriesList([])
 
 
-def _retrieve_timeseries_external_ids_with_extra_votes(
+def _retrieve_timeseries_external_ids_with_extra_vote(
     client: CogniteClient,
     view_id: dm.ViewId,
     filter_: dm.Filter | None,
@@ -461,7 +461,7 @@ def _retrieve_timeseries_external_ids_with_extra_votes(
         extra_list = [extra_properties]
     else:
         extra_list = extra_properties
-    has_data = dm.filters.HasData([dm.ContainerId("IntegrationTestsImmutable", "Rating")], [view_id])
+    has_data = dm.filters.HasData(views=[view_id])
     filter_ = dm.filters.And(filter_, has_data) if filter_ else has_data
 
     cursor = None

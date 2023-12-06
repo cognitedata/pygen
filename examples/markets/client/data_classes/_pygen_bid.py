@@ -7,6 +7,7 @@ from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -54,10 +55,10 @@ class PygenBid(DomainModel):
         version: The version of the pygen bid node.
     """
 
-    space: str = "market"
+    space: str = DEFAULT_INSTANCE_SPACE
     date: Optional[datetime.date] = None
     is_block: Optional[bool] = Field(None, alias="isBlock")
-    market: Union[Market, str, None] = Field(None, repr=False)
+    market: Union[Market, str, dm.NodeId, None] = Field(None, repr=False)
     minimum_price: Optional[float] = Field(None, alias="minimumPrice")
     name: Optional[str] = None
     price_premium: Optional[float] = Field(None, alias="pricePremium")
@@ -96,10 +97,10 @@ class PygenBidApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "market"
+    space: str = DEFAULT_INSTANCE_SPACE
     date: Optional[datetime.date] = None
     is_block: Optional[bool] = Field(None, alias="isBlock")
-    market: Union[MarketApply, str, None] = Field(None, repr=False)
+    market: Union[MarketApply, str, dm.NodeId, None] = Field(None, repr=False)
     minimum_price: Optional[float] = Field(None, alias="minimumPrice")
     name: Optional[str] = None
     price_premium: Optional[float] = Field(None, alias="pricePremium")

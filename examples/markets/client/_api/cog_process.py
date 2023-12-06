@@ -76,6 +76,7 @@ class CogProcessAPI(NodeAPI[CogProcess, CogProcessApply, CogProcessList]):
             A query API for cog process.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_cog_proces_filter(
             self._view_id,
             bid,
@@ -85,26 +86,10 @@ class CogProcessAPI(NodeAPI[CogProcess, CogProcessApply, CogProcessList]):
             transformation,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            CogProcessList,
-            [
-                QueryStep(
-                    name="cog_proces",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_COGPROCESS_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=CogProcess,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return CogProcessQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(CogProcessList)
+        return CogProcessQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(
         self, cog_proces: CogProcessApply | Sequence[CogProcessApply], replace: bool = False

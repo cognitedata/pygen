@@ -98,6 +98,7 @@ class SpatialAreaAPI(NodeAPI[SpatialArea, SpatialAreaApply, SpatialAreaList]):
             A query API for spatial areas.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_spatial_area_filter(
             self._view_id,
             as_ingested_coordinates,
@@ -118,26 +119,10 @@ class SpatialAreaAPI(NodeAPI[SpatialArea, SpatialAreaApply, SpatialAreaList]):
             wgs_84_coordinates,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            SpatialAreaList,
-            [
-                QueryStep(
-                    name="spatial_area",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_SPATIALAREA_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=SpatialArea,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return SpatialAreaQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(SpatialAreaList)
+        return SpatialAreaQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(
         self, spatial_area: SpatialAreaApply | Sequence[SpatialAreaApply], replace: bool = False

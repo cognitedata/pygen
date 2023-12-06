@@ -6,6 +6,7 @@ from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -68,7 +69,7 @@ class UnacceptableUsage(DomainModel):
         version: The version of the unacceptable usage node.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     data_quality_id: Optional[str] = Field(None, alias="DataQualityID")
     data_quality_rule_set_id: Optional[str] = Field(None, alias="DataQualityRuleSetID")
     value_chain_status_type_id: Optional[str] = Field(None, alias="ValueChainStatusTypeID")
@@ -107,7 +108,7 @@ class UnacceptableUsageApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     data_quality_id: Optional[str] = Field(None, alias="DataQualityID")
     data_quality_rule_set_id: Optional[str] = Field(None, alias="DataQualityRuleSetID")
     value_chain_status_type_id: Optional[str] = Field(None, alias="ValueChainStatusTypeID")

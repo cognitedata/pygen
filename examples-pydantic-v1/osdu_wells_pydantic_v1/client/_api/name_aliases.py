@@ -86,6 +86,7 @@ class NameAliasesAPI(NodeAPI[NameAliases, NameAliasesApply, NameAliasesList]):
             A query API for name aliases.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_name_alias_filter(
             self._view_id,
             alias_name,
@@ -100,26 +101,10 @@ class NameAliasesAPI(NodeAPI[NameAliases, NameAliasesApply, NameAliasesList]):
             termination_date_time_prefix,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            NameAliasesList,
-            [
-                QueryStep(
-                    name="name_alias",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_NAMEALIASES_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=NameAliases,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return NameAliasesQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(NameAliasesList)
+        return NameAliasesQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(
         self, name_alias: NameAliasesApply | Sequence[NameAliasesApply], replace: bool = False

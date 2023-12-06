@@ -6,6 +6,7 @@ from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -83,7 +84,7 @@ class AsIngestedCoordinates(DomainModel):
         version: The version of the as ingested coordinate node.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     coordinate_reference_system_id: Optional[str] = Field(None, alias="CoordinateReferenceSystemID")
     vertical_coordinate_reference_system_id: Optional[str] = Field(None, alias="VerticalCoordinateReferenceSystemID")
     vertical_unit_id: Optional[str] = Field(None, alias="VerticalUnitID")
@@ -136,7 +137,7 @@ class AsIngestedCoordinatesApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     coordinate_reference_system_id: Optional[str] = Field(None, alias="CoordinateReferenceSystemID")
     vertical_coordinate_reference_system_id: Optional[str] = Field(None, alias="VerticalCoordinateReferenceSystemID")
     vertical_unit_id: Optional[str] = Field(None, alias="VerticalUnitID")

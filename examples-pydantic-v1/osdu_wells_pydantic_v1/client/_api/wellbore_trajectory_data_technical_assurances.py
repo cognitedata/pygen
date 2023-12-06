@@ -4,15 +4,16 @@ from __future__ import annotations
 from cognite.client import data_modeling as dm
 
 from ._core import DEFAULT_LIMIT_READ, EdgeAPI, _create_edge_filter
+from osdu_wells_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 
 class WellboreTrajectoryDataTechnicalAssurancesAPI(EdgeAPI):
     def list(
         self,
-        wellbore_trajectory_datum: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        wellbore_trajectory_datum_space: str = "IntegrationTestsImmutable",
-        technical_assurance: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
-        technical_assurance_space: str = "IntegrationTestsImmutable",
+        from_wellbore_trajectory_datum: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        from_wellbore_trajectory_datum_space: str = DEFAULT_INSTANCE_SPACE,
+        to_technical_assurance: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
+        to_technical_assurance_space: str = DEFAULT_INSTANCE_SPACE,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit=DEFAULT_LIMIT_READ,
@@ -20,10 +21,10 @@ class WellboreTrajectoryDataTechnicalAssurancesAPI(EdgeAPI):
         """List technical assurance edges of a wellbore trajectory datum.
 
         Args:
-            wellbore_trajectory_datum: ID of the source wellbore trajectory data.
-            wellbore_trajectory_datum_space: Location of the wellbore trajectory data.
-            technical_assurance: ID of the target technical assurances.
-            technical_assurance_space: Location of the technical assurances.
+            from_wellbore_trajectory_datum: ID of the source wellbore trajectory datum.
+            from_wellbore_trajectory_datum_space: Location of the wellbore trajectory data.
+            to_technical_assurance: ID of the target technical assurance.
+            to_technical_assurance_space: Location of the technical assurances.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of technical assurance edges to return. Defaults to 25. Set to -1, float("inf") or None
@@ -43,10 +44,10 @@ class WellboreTrajectoryDataTechnicalAssurancesAPI(EdgeAPI):
         """
         filter_ = _create_edge_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreTrajectoryData.TechnicalAssurances"),
-            wellbore_trajectory_datum,
-            wellbore_trajectory_datum_space,
-            technical_assurance,
-            technical_assurance_space,
+            from_wellbore_trajectory_datum,
+            from_wellbore_trajectory_datum_space,
+            to_technical_assurance,
+            to_technical_assurance_space,
             external_id_prefix,
             space,
         )

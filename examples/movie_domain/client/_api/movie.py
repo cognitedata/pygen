@@ -84,6 +84,7 @@ class MovieAPI(NodeAPI[Movie, MovieApply, MovieList]):
             A query API for movies.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_movie_filter(
             self._view_id,
             rating,
@@ -95,26 +96,10 @@ class MovieAPI(NodeAPI[Movie, MovieApply, MovieList]):
             title_prefix,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            MovieList,
-            [
-                QueryStep(
-                    name="movie",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_MOVIE_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=Movie,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return MovieQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(MovieList)
+        return MovieQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(self, movie: MovieApply | Sequence[MovieApply], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) movies.

@@ -1,51 +1,75 @@
 from __future__ import annotations
 
+import datetime
 from typing import TYPE_CHECKING
-from cognite.client import data_modeling as dm
-from ._core import DEFAULT_QUERY_LIMIT, QueryStep, QueryAPI, T_DomainModelList
+
+from cognite.client import data_modeling as dm, CogniteClient
+
 from markets.client.data_classes import (
+    DomainModelApply,
     PygenBid,
     PygenBidApply,
+    Market,
+    MarketApply,
 )
-from markets.client.data_classes._pygen_bid import (
-    _PYGENBID_PROPERTIES_BY_FIELD,
-)
+from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
 
 
 class PygenBidQueryAPI(QueryAPI[T_DomainModelList]):
+    def __init__(
+        self,
+        client: CogniteClient,
+        builder: QueryBuilder[T_DomainModelList],
+        view_by_write_class: dict[type[DomainModelApply], dm.ViewId],
+        filter_: dm.filters.Filter | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+    ):
+        super().__init__(client, builder, view_by_write_class)
+
+        self._builder.append(
+            QueryStep(
+                name=self._builder.next_name("pygen_bid"),
+                expression=dm.query.NodeResultSetExpression(
+                    from_=self._builder[-1].name if self._builder else None,
+                    filter=filter_,
+                ),
+                select=dm.query.Select([dm.query.SourceSelector(self._view_by_write_class[PygenBidApply], ["*"])]),
+                result_cls=PygenBid,
+                max_retrieve_limit=limit,
+            )
+        )
+
     def query(
         self,
-        retrieve_pygen_bid: bool = True,
+        retrieve_market: bool = False,
     ) -> T_DomainModelList:
         """Execute query and return the result.
 
         Args:
-            retrieve_pygen_bid: Whether to retrieve the pygen bid or not.
+            retrieve_market: Whether to retrieve the market for each pygen bid or not.
 
         Returns:
             The list of the source nodes of the query.
 
         """
         from_ = self._builder[-1].name
-        if retrieve_pygen_bid and not self._builder[-1].name.startswith("pygen_bid"):
-            self._builder.append(
-                QueryStep(
-                    name=self._builder.next_name("pygen_bid"),
-                    expression=dm.query.NodeResultSetExpression(
-                        filter=None,
-                        from_=from_,
-                    ),
-                    select=dm.query.Select(
-                        [
-                            dm.query.SourceSelector(
-                                self._view_by_write_class[PygenBidApply],
-                                list(_PYGENBID_PROPERTIES_BY_FIELD.values()),
-                            )
-                        ]
-                    ),
-                    result_cls=PygenBid,
-                    max_retrieve_limit=-1,
-                ),
-            )
-
+        if retrieve_market:
+            self._query_append_market(from_)
         return self._query()
+
+    def _query_append_market(self, from_: str) -> None:
+        view_id = self._view_by_write_class[MarketApply]
+        self._builder.append(
+            QueryStep(
+                name=self._builder.next_name("market"),
+                expression=dm.query.NodeResultSetExpression(
+                    filter=dm.filters.HasData(views=[view_id]),
+                    from_=from_,
+                    through=self._view_by_write_class[PygenBidApply].as_property_ref("market"),
+                    direction="outwards",
+                ),
+                select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
+                max_retrieve_limit=-1,
+                result_cls=Market,
+            ),
+        )

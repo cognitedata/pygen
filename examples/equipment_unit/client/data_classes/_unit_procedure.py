@@ -6,6 +6,7 @@ from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -47,6 +48,7 @@ class UnitProcedure(DomainModel):
         external_id: The external id of the unit procedure.
         name: The name field.
         type_: The type field.
+        work_orders: The work order field.
         work_units: The work unit field.
         created_time: The created time of the unit procedure node.
         last_updated_time: The last updated time of the unit procedure node.
@@ -54,9 +56,10 @@ class UnitProcedure(DomainModel):
         version: The version of the unit procedure node.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     name: Optional[str] = None
     type_: Optional[str] = Field(None, alias="type")
+    work_orders: Optional[list[StartEndTime]] = Field(default=None, repr=False)
     work_units: Optional[list[StartEndTime]] = Field(default=None, repr=False)
 
     def as_apply(self) -> UnitProcedureApply:
@@ -66,6 +69,7 @@ class UnitProcedure(DomainModel):
             external_id=self.external_id,
             name=self.name,
             type_=self.type_,
+            work_orders=[work_order.as_apply() for work_order in self.work_orders or []],
             work_units=[work_unit.as_apply() for work_unit in self.work_units or []],
         )
 
@@ -80,6 +84,7 @@ class UnitProcedureApply(DomainModelApply):
         external_id: The external id of the unit procedure.
         name: The name field.
         type_: The type field.
+        work_orders: The work order field.
         work_units: The work unit field.
         existing_version: Fail the ingestion request if the unit procedure version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
@@ -87,9 +92,10 @@ class UnitProcedureApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     name: Optional[str] = None
     type_: Optional[str] = Field(None, alias="type")
+    work_orders: Optional[list[StartEndTimeApply]] = Field(default=None, repr=False)
     work_units: Optional[list[StartEndTimeApply]] = Field(default=None, repr=False)
 
     def _to_instances_apply(
@@ -97,14 +103,12 @@ class UnitProcedureApply(DomainModelApply):
         cache: set[tuple[str, str]],
         view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
     ) -> ResourcesApply:
-        from ._start_end_time import StartEndTimeApply
-
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
             return resources
 
         write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
-            "IntegrationTestsImmutable", "UnitProcedure", "f16810a7105c44"
+            "IntegrationTestsImmutable", "UnitProcedure", "a6e2fea1e1c664"
         )
 
         properties = {}
@@ -128,9 +132,24 @@ class UnitProcedureApply(DomainModelApply):
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
 
+        for work_order in self.work_orders or []:
+            if isinstance(work_order, DomainRelationApply):
+                other_resources = work_order._to_instances_apply(
+                    cache,
+                    self,
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.work_order"),
+                    view_by_write_class,
+                )
+                resources.extend(other_resources)
+
         for work_unit in self.work_units or []:
             if isinstance(work_unit, DomainRelationApply):
-                other_resources = work_unit._to_instances_apply(cache, self, view_by_write_class)
+                other_resources = work_unit._to_instances_apply(
+                    cache,
+                    self,
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.equipment_module"),
+                    view_by_write_class,
+                )
                 resources.extend(other_resources)
 
         return resources

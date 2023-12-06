@@ -139,6 +139,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
             A query API for work orders.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_work_order_filter(
             self._view_id,
             min_actual_hours,
@@ -177,26 +178,10 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
             work_package_number_prefix,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            WorkOrderList,
-            [
-                QueryStep(
-                    name="work_order",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_WORKORDER_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=WorkOrder,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return WorkOrderQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(WorkOrderList)
+        return WorkOrderQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(
         self, work_order: WorkOrderApply | Sequence[WorkOrderApply], replace: bool = False

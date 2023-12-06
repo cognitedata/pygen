@@ -59,7 +59,7 @@ def test_single_unit_procedure_to_pandas(unit_procedure_list: UnitProcedureList)
     procedure = unit_procedure_list[0]
 
     series = procedure.to_pandas()
-    assert len(series) == 4, "We only have the three properties and the external id"
+    assert len(series) == 5, "We only have the four properties and the external id"
 
 
 def test_filter_start_end_time_edges(start_end_time_edges: StartEndTimeList, workorder: EquipmentUnitClient) -> None:
@@ -73,16 +73,14 @@ def test_filter_start_end_time_edges(start_end_time_edges: StartEndTimeList, wor
 
 
 def test_filter_unit_procedure_through_edge(workorder: EquipmentUnitClient) -> None:
-    unit_procedures = (
-        workorder.unit_procedure(type_="red", limit=3).work_units(limit=5).query(retrieve_equipment_module=True)
-    )
+    unit_procedures = workorder.unit_procedure(type_="red", limit=3).work_units(limit=5).query()
 
     assert 1 <= len(unit_procedures) <= 3
     assert all(procedure.type_ == "red" for procedure in unit_procedures)
     for unit_procedure in unit_procedures:
         for work_unit in unit_procedure.work_units:
             assert isinstance(work_unit, StartEndTime)
-            assert isinstance(work_unit.equipment_module, EquipmentModule)
+            assert isinstance(work_unit.end_node, EquipmentModule)
 
 
 def test_apply_unit_procedure_with_edge(workorder: EquipmentUnitClient, cognite_client: CogniteClient) -> None:
@@ -94,7 +92,7 @@ def test_apply_unit_procedure_with_edge(workorder: EquipmentUnitClient, cognite_
             StartEndTimeApply(
                 start_time="2021-01-01T00:00:00Z",
                 end_time="2021-01-01T00:00:00Z",
-                equipment_module=EquipmentModuleApply(
+                end_node=EquipmentModuleApply(
                     external_id="module:new_module",
                     name="New module",
                     type_="New type",

@@ -36,12 +36,12 @@ from ._api.unacceptable_usage import UnacceptableUsageAPI
 from ._api.vertical_measurement import VerticalMeasurementAPI
 from ._api.vertical_measurements import VerticalMeasurementsAPI
 from ._api.well import WellAPI
+from ._api.well_data import WellDataAPI
 from ._api.wellbore import WellboreAPI
 from ._api.wellbore_costs import WellboreCostsAPI
 from ._api.wellbore_data import WellboreDataAPI
 from ._api.wellbore_trajectory import WellboreTrajectoryAPI
 from ._api.wellbore_trajectory_data import WellboreTrajectoryDataAPI
-from ._api.well_data import WellDataAPI
 from ._api.wgs_84_coordinates import WgsCoordinatesAPI
 from . import data_classes
 
@@ -51,9 +51,9 @@ class OSDUClient:
     OSDUClient
 
     Generated with:
-        pygen = 0.31.0
-        cognite-sdk = 7.0.3
-        pydantic = 2.5.1
+        pygen = 0.31.1
+        cognite-sdk = 7.5.1
+        pydantic = 2.5.2
 
     Data Model:
         space: IntegrationTestsImmutable
@@ -134,6 +134,7 @@ class OSDUClient:
                 "IntegrationTestsImmutable", "VerticalMeasurements", "d8c3b28a0d0dfb"
             ),
             data_classes.WellApply: dm.ViewId("IntegrationTestsImmutable", "Well", "952d7e55cdf2cc"),
+            data_classes.WellDataApply: dm.ViewId("IntegrationTestsImmutable", "WellData", "ed82310421bd56"),
             data_classes.WellboreApply: dm.ViewId("IntegrationTestsImmutable", "Wellbore", "7a44cf38aa4fe7"),
             data_classes.WellboreCostsApply: dm.ViewId("IntegrationTestsImmutable", "WellboreCosts", "b4f71248f398a2"),
             data_classes.WellboreDataApply: dm.ViewId("IntegrationTestsImmutable", "WellboreData", "6349cf734b294e"),
@@ -143,7 +144,6 @@ class OSDUClient:
             data_classes.WellboreTrajectoryDataApply: dm.ViewId(
                 "IntegrationTestsImmutable", "WellboreTrajectoryData", "d35eace9691587"
             ),
-            data_classes.WellDataApply: dm.ViewId("IntegrationTestsImmutable", "WellData", "ed82310421bd56"),
             data_classes.WgsCoordinatesApply: dm.ViewId(
                 "IntegrationTestsImmutable", "Wgs84Coordinates", "d6030081373896"
             ),
@@ -182,12 +182,12 @@ class OSDUClient:
         self.vertical_measurement = VerticalMeasurementAPI(client, view_by_write_class)
         self.vertical_measurements = VerticalMeasurementsAPI(client, view_by_write_class)
         self.well = WellAPI(client, view_by_write_class)
+        self.well_data = WellDataAPI(client, view_by_write_class)
         self.wellbore = WellboreAPI(client, view_by_write_class)
         self.wellbore_costs = WellboreCostsAPI(client, view_by_write_class)
         self.wellbore_data = WellboreDataAPI(client, view_by_write_class)
         self.wellbore_trajectory = WellboreTrajectoryAPI(client, view_by_write_class)
         self.wellbore_trajectory_data = WellboreTrajectoryDataAPI(client, view_by_write_class)
-        self.well_data = WellDataAPI(client, view_by_write_class)
         self.wgs_84_coordinates = WgsCoordinatesAPI(client, view_by_write_class)
 
     @classmethod

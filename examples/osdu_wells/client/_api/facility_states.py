@@ -82,6 +82,7 @@ class FacilityStatesAPI(NodeAPI[FacilityStates, FacilityStatesApply, FacilitySta
             A query API for facility states.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_facility_state_filter(
             self._view_id,
             effective_date_time,
@@ -94,26 +95,10 @@ class FacilityStatesAPI(NodeAPI[FacilityStates, FacilityStatesApply, FacilitySta
             termination_date_time_prefix,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            FacilityStatesList,
-            [
-                QueryStep(
-                    name="facility_state",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_FACILITYSTATES_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=FacilityStates,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return FacilityStatesQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(FacilityStatesList)
+        return FacilityStatesQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(
         self, facility_state: FacilityStatesApply | Sequence[FacilityStatesApply], replace: bool = False

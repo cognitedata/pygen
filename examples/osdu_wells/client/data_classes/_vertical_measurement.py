@@ -6,6 +6,7 @@ from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -95,7 +96,7 @@ class VerticalMeasurement(DomainModel):
         version: The version of the vertical measurement node.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     effective_date_time: Optional[str] = Field(None, alias="EffectiveDateTime")
     termination_date_time: Optional[str] = Field(None, alias="TerminationDateTime")
     vertical_crsid: Optional[str] = Field(None, alias="VerticalCRSID")
@@ -155,7 +156,7 @@ class VerticalMeasurementApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     effective_date_time: Optional[str] = Field(None, alias="EffectiveDateTime")
     termination_date_time: Optional[str] = Field(None, alias="TerminationDateTime")
     vertical_crsid: Optional[str] = Field(None, alias="VerticalCRSID")

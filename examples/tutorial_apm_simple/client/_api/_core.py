@@ -517,7 +517,7 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
             name = step.name
             from_ = step.expression.from_
 
-            if isinstance(step.expression, dm.query.NodeResultSetExpression) and step.expression.from_:
+            if isinstance(step.expression, dm.query.NodeResultSetExpression) and from_:
                 node_attribute_to_node_type[from_] = name
 
             if step.result_cls is None:  # This is a data model edge.
@@ -536,6 +536,24 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
                     domain = step.result_cls.from_instance(edge)
                     relation_by_type_by_start_node[(from_, name)][domain.start_node.as_tuple()].append(domain)
 
+            # Link direct relations
+            is_direct_relation = (
+                isinstance(step.expression, dm.query.NodeResultSetExpression) and from_ and from_ in nodes_by_type
+            )
+            if is_direct_relation:
+                end_nodes = nodes_by_type[name]
+                attribute_name = node_attribute_to_node_type[from_]
+                for parent_node in nodes_by_type[from_].values():
+                    attribute_value = getattr(parent_node, attribute_name)
+                    if isinstance(attribute_value, str):
+                        end_id = (parent_node.space, attribute_value)
+                    elif isinstance(attribute_value, dm.NodeId):
+                        end_id = attribute_value.space, attribute_value.external_id
+                    else:
+                        continue
+                    if end_id in end_nodes:
+                        setattr(parent_node, attribute_name, end_nodes[end_id])
+
         for (node_name, node_attribute), relations_by_start_node in relation_by_type_by_start_node.items():
             for node in nodes_by_type[node_name].values():
                 setattr(node, node_attribute, relations_by_start_node.get(node.as_tuple_id(), []))
@@ -545,7 +563,8 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
                     if (nodes := nodes_by_type.get(edge_name)) and (
                         node := nodes.get((relation.end_node.space, relation.end_node.external_id))
                     ):
-                        setattr(relation, edge_name, node)
+                        # Relations always have an end node.
+                        relation.end_node = node
 
         for (node_name, node_attribute), edges_by_start_node in edges_by_type_by_start_node.items():
             for node in nodes_by_type[node_name].values():

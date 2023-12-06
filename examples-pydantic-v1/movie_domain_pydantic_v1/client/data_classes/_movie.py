@@ -6,6 +6,7 @@ from cognite.client import data_modeling as dm
 from pydantic import Field
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
     DomainModel,
     DomainModelApply,
     DomainModelApplyList,
@@ -55,11 +56,11 @@ class Movie(DomainModel):
         version: The version of the movie node.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     actors: Union[list[Actor], list[str], None] = Field(default=None, repr=False)
     directors: Union[list[Director], list[str], None] = Field(default=None, repr=False)
     meta: Optional[dict] = None
-    rating: Union[Rating, str, None] = Field(None, repr=False)
+    rating: Union[Rating, str, dm.NodeId, None] = Field(None, repr=False)
     release_year: Optional[int] = Field(None, alias="releaseYear")
     run_time_minutes: Optional[float] = Field(None, alias="runTimeMinutes")
     title: Optional[str] = None
@@ -103,11 +104,11 @@ class MovieApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = "IntegrationTestsImmutable"
+    space: str = DEFAULT_INSTANCE_SPACE
     actors: Union[list[ActorApply], list[str], None] = Field(default=None, repr=False)
     directors: Union[list[DirectorApply], list[str], None] = Field(default=None, repr=False)
     meta: Optional[dict] = None
-    rating: Union[RatingApply, str, None] = Field(None, repr=False)
+    rating: Union[RatingApply, str, dm.NodeId, None] = Field(None, repr=False)
     release_year: Optional[int] = Field(None, alias="releaseYear")
     run_time_minutes: Optional[float] = Field(None, alias="runTimeMinutes")
     title: str

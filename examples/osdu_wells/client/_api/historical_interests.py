@@ -78,6 +78,7 @@ class HistoricalInterestsAPI(NodeAPI[HistoricalInterests, HistoricalInterestsApp
             A query API for historical interests.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_historical_interest_filter(
             self._view_id,
             effective_date_time,
@@ -88,30 +89,10 @@ class HistoricalInterestsAPI(NodeAPI[HistoricalInterests, HistoricalInterestsApp
             termination_date_time_prefix,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            HistoricalInterestsList,
-            [
-                QueryStep(
-                    name="historical_interest",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [
-                            dm.query.SourceSelector(
-                                self._view_id, list(_HISTORICALINTERESTS_PROPERTIES_BY_FIELD.values())
-                            )
-                        ]
-                    ),
-                    result_cls=HistoricalInterests,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return HistoricalInterestsQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(HistoricalInterestsList)
+        return HistoricalInterestsQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(
         self, historical_interest: HistoricalInterestsApply | Sequence[HistoricalInterestsApply], replace: bool = False

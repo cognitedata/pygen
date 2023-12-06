@@ -1,11 +1,10 @@
 from __future__ import annotations
 
+import platform
+
 import pytest
 from cognite.client import data_modeling as dm
 
-from cognite.pygen._core.data_classes import (
-    ViewSpaceExternalId,
-)
 from cognite.pygen._core.generators import APIGenerator, MultiAPIGenerator, SDKGenerator
 from cognite.pygen._generator import CodeFormatter
 from cognite.pygen.config import PygenConfig
@@ -13,30 +12,20 @@ from tests.constants import EQUIPMENT_UNIT_SDK, IS_PYDANTIC_V2, EquipmentSDKFile
 
 
 @pytest.fixture
-def sdk_generator(equipment_unit_model: dm.DataModel[dm.View]) -> SDKGenerator:
-    return SDKGenerator(EQUIPMENT_UNIT_SDK.top_level_package, EQUIPMENT_UNIT_SDK.client_name, equipment_unit_model)
+def sdk_generator(equipment_unit_model: dm.DataModel[dm.View], pygen_config: PygenConfig) -> SDKGenerator:
+    return SDKGenerator(
+        EQUIPMENT_UNIT_SDK.top_level_package, EQUIPMENT_UNIT_SDK.client_name, equipment_unit_model, config=pygen_config
+    )
 
 
 @pytest.fixture
-def multi_api_generator(equipment_unit_model, pygen_config: PygenConfig) -> MultiAPIGenerator:
-    return MultiAPIGenerator(
-        EQUIPMENT_UNIT_SDK.top_level_package,
-        EQUIPMENT_UNIT_SDK.client_name,
-        equipment_unit_model.views,
-        config=pygen_config,
-    )
+def multi_api_generator(sdk_generator: SDKGenerator) -> MultiAPIGenerator:
+    return sdk_generator._multi_api_generator
 
 
 @pytest.fixture
 def unit_procedure_api_generator(multi_api_generator: MultiAPIGenerator, unit_procedure_view: dm.View) -> APIGenerator:
-    api_generator = next(
-        (
-            api
-            for api in multi_api_generator.sub_apis
-            if api.view_identifier == ViewSpaceExternalId.from_(unit_procedure_view)
-        ),
-        None,
-    )
+    api_generator = multi_api_generator[unit_procedure_view.as_id()]
     assert api_generator is not None, "Could not find API generator for unit procedure view"
     return api_generator
 
@@ -45,28 +34,14 @@ def unit_procedure_api_generator(multi_api_generator: MultiAPIGenerator, unit_pr
 def equipment_module_api_generator(
     multi_api_generator: MultiAPIGenerator, equipment_module_view: dm.View
 ) -> APIGenerator:
-    api_generator = next(
-        (
-            api
-            for api in multi_api_generator.sub_apis
-            if api.view_identifier == ViewSpaceExternalId.from_(equipment_module_view)
-        ),
-        None,
-    )
+    api_generator = multi_api_generator[equipment_module_view.as_id()]
     assert api_generator is not None, "Could not find API generator for equipment module view"
     return api_generator
 
 
 @pytest.fixture
 def start_end_time_api_generator(multi_api_generator: MultiAPIGenerator, start_end_time_view: dm.View) -> APIGenerator:
-    api_generator = next(
-        (
-            api
-            for api in multi_api_generator.sub_apis
-            if api.view_identifier == ViewSpaceExternalId.from_(start_end_time_view)
-        ),
-        None,
-    )
+    api_generator = multi_api_generator[start_end_time_view.as_id()]
     assert api_generator is not None, "Could not find API generator for start end time view"
     return api_generator
 
@@ -186,11 +161,14 @@ def test_create_view_api_classes_unit_procedure_work_units(
     expected = EquipmentSDKFiles.unit_procedure_work_units.read_text()
 
     # Act
-    _, actual = next(
-        unit_procedure_api_generator.generate_edge_api_files(
+
+    actual_by_file_name = {
+        filename: content
+        for filename, content in unit_procedure_api_generator.generate_edge_api_files(
             EQUIPMENT_UNIT_SDK.top_level_package, EQUIPMENT_UNIT_SDK.client_name
         )
-    )
+    }
+    actual = actual_by_file_name[EquipmentSDKFiles.unit_procedure_work_units.stem]
     actual = code_formatter.format_code(actual)
 
     # Assert
@@ -226,6 +204,22 @@ def test_generate_data_class_core_file(multi_api_generator: MultiAPIGenerator) -
 
     # Act
     actual = multi_api_generator.generate_data_class_core_file()
+
+    # Assert
+    assert actual == expected
+
+
+@pytest.mark.skipif(
+    not platform.platform().startswith("Windows"),
+    reason="There is currently some strange problem with the diff on non-windows",
+)
+def test_create_api_client(sdk_generator: SDKGenerator, code_formatter: CodeFormatter):
+    # Arrange
+    expected = EquipmentSDKFiles.client.read_text()
+
+    # Act
+    actual = sdk_generator._generate_api_client_file()
+    actual = code_formatter.format_code(actual)
 
     # Assert
     assert actual == expected

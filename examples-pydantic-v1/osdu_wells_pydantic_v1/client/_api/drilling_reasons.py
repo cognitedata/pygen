@@ -82,6 +82,7 @@ class DrillingReasonsAPI(NodeAPI[DrillingReasons, DrillingReasonsApply, Drilling
             A query API for drilling reasons.
 
         """
+        has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_drilling_reason_filter(
             self._view_id,
             effective_date_time,
@@ -94,26 +95,10 @@ class DrillingReasonsAPI(NodeAPI[DrillingReasons, DrillingReasonsApply, Drilling
             termination_date_time_prefix,
             external_id_prefix,
             space,
-            filter,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(
-            DrillingReasonsList,
-            [
-                QueryStep(
-                    name="drilling_reason",
-                    expression=dm.query.NodeResultSetExpression(
-                        from_=None,
-                        filter=filter_,
-                    ),
-                    select=dm.query.Select(
-                        [dm.query.SourceSelector(self._view_id, list(_DRILLINGREASONS_PROPERTIES_BY_FIELD.values()))]
-                    ),
-                    result_cls=DrillingReasons,
-                    max_retrieve_limit=limit,
-                )
-            ],
-        )
-        return DrillingReasonsQueryAPI(self._client, builder, self._view_by_write_class)
+        builder = QueryBuilder(DrillingReasonsList)
+        return DrillingReasonsQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(
         self, drilling_reason: DrillingReasonsApply | Sequence[DrillingReasonsApply], replace: bool = False

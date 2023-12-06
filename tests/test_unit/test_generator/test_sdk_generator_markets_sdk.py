@@ -39,7 +39,7 @@ def multi_api_generator(sdk_generator: SDKGenerator) -> SDKGenerator:
 def date_transformation_generator(
     multi_api_generator: MultiAPIGenerator, date_transformation_pair_view: dm.View
 ) -> APIGenerator:
-    api_generator = multi_api_generator[date_transformation_pair_view]
+    api_generator = multi_api_generator[date_transformation_pair_view.as_id()]
     assert api_generator is not None, "Could not find API generator for date transformation view"
     return api_generator
 
@@ -68,9 +68,9 @@ def test_generate_date_transformation_pairs_data_class(
 
     # Act
     actual = date_transformation_generator.generate_data_class_file(IS_PYDANTIC_V2)
+    actual = code_formatter.format_code(actual)
 
     # Assert
-    actual = code_formatter.format_code(actual)
     assert actual == expected
 
 
