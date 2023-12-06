@@ -10,6 +10,7 @@ from cognite.client.data_classes.data_modeling.views import ViewProperty
 from yaml import safe_load
 
 from cognite.pygen._core.models import (
+    EdgeOneToEndNode,
     EdgeOneToManyNodes,
     EdgeOneToOne,
     Field,
@@ -19,6 +20,7 @@ from cognite.pygen._core.models import (
     PrimitiveField,
     PrimitiveListField,
 )
+from cognite.pygen._core.models.fields import EdgeClasses
 from cognite.pygen.config import PygenConfig
 from cognite.pygen.warnings import (
     ParameterNameCollisionWarning,
@@ -670,3 +672,38 @@ _VIEW_WITH_TIME_PROPERTY_RAW = {
     "lastUpdatedTime": 1692020117686,
     "createdTime": 1692020117686,
 }
+
+
+def field_type_hints_test_cases():
+    site_apply_edge = MagicMock(spec=EdgeClasses)
+    site_apply1 = MagicMock(spec=NodeDataClass)
+    site_apply1.read_name = "Site"
+    site_apply1.write_name = "SiteApply"
+    site_apply_edge.end_class = site_apply1
+
+    site_apply_edge2 = MagicMock(spec=EdgeClasses)
+    site_apply2 = MagicMock(spec=NodeDataClass)
+    site_apply2.read_name = "Site"
+    site_apply2.write_name = "SiteApply"
+    site_apply_edge2.end_class = site_apply2
+
+    field = EdgeOneToEndNode(
+        name="end_node",
+        doc_name="end node",
+        prop_name="end_node",
+        description=None,
+        pydantic_field="Field",
+        edge_classes=[site_apply_edge, site_apply_edge2],
+    )
+    yield pytest.param(
+        field,
+        "Union[Site, str, dm.NodeId]",
+        "Union[SiteApply, str, dm.NodeId]",
+        id="EdgeOneToEndNode",
+    )
+
+
+@pytest.mark.parametrize("field, expected_write_hint, expected_read_hint", list(field_type_hints_test_cases()))
+def test_fields_type_hints(field: Field, expected_write_hint: str, expected_read_hint: str) -> None:
+    assert field.as_write_type_hint() == expected_write_hint
+    assert field.as_read_type_hint() == expected_read_hint
