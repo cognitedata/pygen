@@ -7,6 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
+from osdu_wells.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from osdu_wells.client.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
@@ -124,7 +125,7 @@ class MetaAPI(NodeAPI[Meta, MetaApply, MetaList]):
         return self._apply(meta, replace)
 
     def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> dm.InstancesDeleteResult:
         """Delete one or more meta.
 
@@ -146,15 +147,15 @@ class MetaAPI(NodeAPI[Meta, MetaApply, MetaList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> Meta | None:
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> Meta | None:
         ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str]) -> MetaList:
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> MetaList:
         ...
 
     def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> Meta | MetaList | None:
         """Retrieve one or more metas by id(s).
 

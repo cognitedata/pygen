@@ -7,6 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
+from osdu_wells.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from osdu_wells.client.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
@@ -365,7 +366,7 @@ class WellboreDataAPI(NodeAPI[WellboreData, WellboreDataApply, WellboreDataList]
         return self._apply(wellbore_datum, replace)
 
     def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> dm.InstancesDeleteResult:
         """Delete one or more wellbore datum.
 
@@ -387,15 +388,15 @@ class WellboreDataAPI(NodeAPI[WellboreData, WellboreDataApply, WellboreDataList]
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> WellboreData | None:
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> WellboreData | None:
         ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str]) -> WellboreDataList:
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> WellboreDataList:
         ...
 
     def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> WellboreData | WellboreDataList | None:
         """Retrieve one or more wellbore data by id(s).
 

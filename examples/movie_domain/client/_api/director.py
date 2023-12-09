@@ -7,6 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
+from movie_domain.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from movie_domain.client.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
@@ -113,7 +114,7 @@ class DirectorAPI(NodeAPI[Director, DirectorApply, DirectorList]):
         return self._apply(director, replace)
 
     def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> dm.InstancesDeleteResult:
         """Delete one or more director.
 
@@ -135,15 +136,15 @@ class DirectorAPI(NodeAPI[Director, DirectorApply, DirectorList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> Director | None:
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> Director | None:
         ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str]) -> DirectorList:
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> DirectorList:
         ...
 
     def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> Director | DirectorList | None:
         """Retrieve one or more directors by id(s).
 

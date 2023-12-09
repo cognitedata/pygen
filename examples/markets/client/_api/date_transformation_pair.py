@@ -6,6 +6,7 @@ from typing import overload
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
+from markets.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from markets.client.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
@@ -109,7 +110,9 @@ class DateTransformationPairAPI(
         """
         return self._apply(date_transformation_pair, replace)
 
-    def delete(self, external_id: str | SequenceNotStr[str], space: str = "market") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> dm.InstancesDeleteResult:
         """Delete one or more date transformation pair.
 
         Args:
@@ -130,15 +133,17 @@ class DateTransformationPairAPI(
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> DateTransformationPair | None:
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> DateTransformationPair | None:
         ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str]) -> DateTransformationPairList:
+    def retrieve(
+        self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> DateTransformationPairList:
         ...
 
     def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str = "market"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> DateTransformationPair | DateTransformationPairList | None:
         """Retrieve one or more date transformation pairs by id(s).
 

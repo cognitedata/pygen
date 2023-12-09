@@ -6,6 +6,7 @@ from typing import overload
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
+from tutorial_apm_simple.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from tutorial_apm_simple.client.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
@@ -112,7 +113,9 @@ class CdfEntityAPI(NodeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
         """
         return self._apply(cdf_3_d_entity, replace)
 
-    def delete(self, external_id: str | SequenceNotStr[str], space: str = "cdf_3d_schema") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> dm.InstancesDeleteResult:
         """Delete one or more cdf 3 d entity.
 
         Args:
@@ -133,15 +136,15 @@ class CdfEntityAPI(NodeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> CdfEntity | None:
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> CdfEntity | None:
         ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str]) -> CdfEntityList:
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> CdfEntityList:
         ...
 
     def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str = "cdf_3d_schema"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> CdfEntity | CdfEntityList | None:
         """Retrieve one or more cdf 3 d entities by id(s).
 

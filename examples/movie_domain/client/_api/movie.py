@@ -7,6 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
+from movie_domain.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from movie_domain.client.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
@@ -129,7 +130,7 @@ class MovieAPI(NodeAPI[Movie, MovieApply, MovieList]):
         return self._apply(movie, replace)
 
     def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> dm.InstancesDeleteResult:
         """Delete one or more movie.
 
@@ -151,15 +152,15 @@ class MovieAPI(NodeAPI[Movie, MovieApply, MovieList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> Movie | None:
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> Movie | None:
         ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str]) -> MovieList:
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> MovieList:
         ...
 
     def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> Movie | MovieList | None:
         """Retrieve one or more movies by id(s).
 

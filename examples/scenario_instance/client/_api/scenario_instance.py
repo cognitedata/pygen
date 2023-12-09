@@ -8,6 +8,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
+from scenario_instance.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from scenario_instance.client.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
@@ -147,7 +148,7 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
         return self._apply(scenario_instance, replace)
 
     def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> dm.InstancesDeleteResult:
         """Delete one or more scenario instance.
 
@@ -169,15 +170,15 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> ScenarioInstance | None:
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> ScenarioInstance | None:
         ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str]) -> ScenarioInstanceList:
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> ScenarioInstanceList:
         ...
 
     def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> ScenarioInstance | ScenarioInstanceList | None:
         """Retrieve one or more scenario instances by id(s).
 

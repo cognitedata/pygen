@@ -8,6 +8,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
+from markets.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from markets.client.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
@@ -133,7 +134,9 @@ class CogBidAPI(NodeAPI[CogBid, CogBidApply, CogBidList]):
         """
         return self._apply(cog_bid, replace)
 
-    def delete(self, external_id: str | SequenceNotStr[str], space: str = "market") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> dm.InstancesDeleteResult:
         """Delete one or more cog bid.
 
         Args:
@@ -154,14 +157,16 @@ class CogBidAPI(NodeAPI[CogBid, CogBidApply, CogBidList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> CogBid | None:
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> CogBid | None:
         ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str]) -> CogBidList:
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> CogBidList:
         ...
 
-    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = "market") -> CogBid | CogBidList | None:
+    def retrieve(
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> CogBid | CogBidList | None:
         """Retrieve one or more cog bids by id(s).
 
         Args:

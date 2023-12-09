@@ -7,6 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
+from movie_domain.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from movie_domain.client.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
@@ -118,7 +119,7 @@ class PersonAPI(NodeAPI[Person, PersonApply, PersonList]):
         return self._apply(person, replace)
 
     def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> dm.InstancesDeleteResult:
         """Delete one or more person.
 
@@ -140,15 +141,15 @@ class PersonAPI(NodeAPI[Person, PersonApply, PersonList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> Person | None:
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> Person | None:
         ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str]) -> PersonList:
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> PersonList:
         ...
 
     def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> Person | PersonList | None:
         """Retrieve one or more persons by id(s).
 

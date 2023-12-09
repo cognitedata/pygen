@@ -7,6 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
+from movie_domain.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from movie_domain.client.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
@@ -113,7 +114,7 @@ class RoleAPI(NodeAPI[Role, RoleApply, RoleList]):
         return self._apply(role, replace)
 
     def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> dm.InstancesDeleteResult:
         """Delete one or more role.
 
@@ -135,15 +136,15 @@ class RoleAPI(NodeAPI[Role, RoleApply, RoleList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> Role | None:
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> Role | None:
         ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str]) -> RoleList:
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> RoleList:
         ...
 
     def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> Role | RoleList | None:
         """Retrieve one or more roles by id(s).
 

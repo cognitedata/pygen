@@ -7,6 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
+from osdu_wells.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from osdu_wells.client.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
@@ -126,7 +127,7 @@ class DrillingReasonsAPI(NodeAPI[DrillingReasons, DrillingReasonsApply, Drilling
         return self._apply(drilling_reason, replace)
 
     def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> dm.InstancesDeleteResult:
         """Delete one or more drilling reason.
 
@@ -148,15 +149,15 @@ class DrillingReasonsAPI(NodeAPI[DrillingReasons, DrillingReasonsApply, Drilling
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> DrillingReasons | None:
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> DrillingReasons | None:
         ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str]) -> DrillingReasonsList:
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> DrillingReasonsList:
         ...
 
     def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> DrillingReasons | DrillingReasonsList | None:
         """Retrieve one or more drilling reasons by id(s).
 
