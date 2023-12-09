@@ -7,6 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
+from equipment_unit_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from equipment_unit_pydantic_v1.client.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
@@ -129,7 +130,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
         return self._apply(unit_procedure, replace)
 
     def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> dm.InstancesDeleteResult:
         """Delete one or more unit procedure.
 
@@ -151,15 +152,15 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> UnitProcedure | None:
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> UnitProcedure | None:
         ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str]) -> UnitProcedureList:
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> UnitProcedureList:
         ...
 
     def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> UnitProcedure | UnitProcedureList | None:
         """Retrieve one or more unit procedures by id(s).
 

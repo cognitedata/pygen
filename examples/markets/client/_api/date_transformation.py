@@ -7,6 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
+from markets.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from markets.client.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
@@ -107,7 +108,9 @@ class DateTransformationAPI(NodeAPI[DateTransformation, DateTransformationApply,
         """
         return self._apply(date_transformation, replace)
 
-    def delete(self, external_id: str | SequenceNotStr[str], space: str = "market") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> dm.InstancesDeleteResult:
         """Delete one or more date transformation.
 
         Args:
@@ -128,15 +131,15 @@ class DateTransformationAPI(NodeAPI[DateTransformation, DateTransformationApply,
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> DateTransformation | None:
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> DateTransformation | None:
         ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str]) -> DateTransformationList:
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> DateTransformationList:
         ...
 
     def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str = "market"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> DateTransformation | DateTransformationList | None:
         """Retrieve one or more date transformations by id(s).
 

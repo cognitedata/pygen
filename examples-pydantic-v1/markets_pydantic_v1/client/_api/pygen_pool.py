@@ -7,6 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
+from markets_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from markets_pydantic_v1.client.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
@@ -119,7 +120,9 @@ class PygenPoolAPI(NodeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
         """
         return self._apply(pygen_pool, replace)
 
-    def delete(self, external_id: str | SequenceNotStr[str], space: str = "market") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> dm.InstancesDeleteResult:
         """Delete one or more pygen pool.
 
         Args:
@@ -140,15 +143,15 @@ class PygenPoolAPI(NodeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> PygenPool | None:
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> PygenPool | None:
         ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str]) -> PygenPoolList:
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> PygenPoolList:
         ...
 
     def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str = "market"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> PygenPool | PygenPoolList | None:
         """Retrieve one or more pygen pools by id(s).
 

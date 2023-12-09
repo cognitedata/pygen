@@ -7,6 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
+from movie_domain_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from movie_domain_pydantic_v1.client.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
@@ -103,7 +104,7 @@ class RatingAPI(NodeAPI[Rating, RatingApply, RatingList]):
         return self._apply(rating, replace)
 
     def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> dm.InstancesDeleteResult:
         """Delete one or more rating.
 
@@ -125,15 +126,15 @@ class RatingAPI(NodeAPI[Rating, RatingApply, RatingList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> Rating | None:
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> Rating | None:
         ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str]) -> RatingList:
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> RatingList:
         ...
 
     def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> Rating | RatingList | None:
         """Retrieve one or more ratings by id(s).
 

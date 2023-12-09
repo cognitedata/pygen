@@ -310,6 +310,14 @@
     isGlobal: false
     lastUpdatedTime: 1684079343668
     name: Actor
+    filter:
+      equals:
+        property:
+        - node
+        - type
+        value:
+          space: IntegrationTestsImmutable
+          externalId: RoleActor
     properties:
       movies:
         connectionType: multi_edge_connection
@@ -446,6 +454,14 @@
     usedFor: node
     version: '2'
     writable: true
+    filter:
+      equals:
+        property:
+          - node
+          - type
+        value:
+          space: IntegrationTestsImmutable
+          externalId: RoleDirector
   - createdTime: 1684079343668
     externalId: Rating
     isGlobal: false

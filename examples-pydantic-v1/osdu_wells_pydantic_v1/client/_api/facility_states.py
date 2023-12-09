@@ -7,6 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
+from osdu_wells_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from osdu_wells_pydantic_v1.client.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
@@ -126,7 +127,7 @@ class FacilityStatesAPI(NodeAPI[FacilityStates, FacilityStatesApply, FacilitySta
         return self._apply(facility_state, replace)
 
     def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> dm.InstancesDeleteResult:
         """Delete one or more facility state.
 
@@ -148,15 +149,15 @@ class FacilityStatesAPI(NodeAPI[FacilityStates, FacilityStatesApply, FacilitySta
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> FacilityStates | None:
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> FacilityStates | None:
         ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str]) -> FacilityStatesList:
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> FacilityStatesList:
         ...
 
     def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> FacilityStates | FacilityStatesList | None:
         """Retrieve one or more facility states by id(s).
 

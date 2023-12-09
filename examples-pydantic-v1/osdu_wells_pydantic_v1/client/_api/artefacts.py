@@ -7,6 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
+from osdu_wells_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from osdu_wells_pydantic_v1.client.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
@@ -118,7 +119,7 @@ class ArtefactsAPI(NodeAPI[Artefacts, ArtefactsApply, ArtefactsList]):
         return self._apply(artefact, replace)
 
     def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> dm.InstancesDeleteResult:
         """Delete one or more artefact.
 
@@ -140,15 +141,15 @@ class ArtefactsAPI(NodeAPI[Artefacts, ArtefactsApply, ArtefactsList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> Artefacts | None:
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> Artefacts | None:
         ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str]) -> ArtefactsList:
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> ArtefactsList:
         ...
 
     def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> Artefacts | ArtefactsList | None:
         """Retrieve one or more artefacts by id(s).
 

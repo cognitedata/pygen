@@ -7,6 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
+from markets_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from markets_pydantic_v1.client.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
@@ -129,7 +130,9 @@ class CogPoolAPI(NodeAPI[CogPool, CogPoolApply, CogPoolList]):
         """
         return self._apply(cog_pool, replace)
 
-    def delete(self, external_id: str | SequenceNotStr[str], space: str = "market") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> dm.InstancesDeleteResult:
         """Delete one or more cog pool.
 
         Args:
@@ -150,14 +153,16 @@ class CogPoolAPI(NodeAPI[CogPool, CogPoolApply, CogPoolList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> CogPool | None:
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> CogPool | None:
         ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str]) -> CogPoolList:
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> CogPoolList:
         ...
 
-    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = "market") -> CogPool | CogPoolList | None:
+    def retrieve(
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> CogPool | CogPoolList | None:
         """Retrieve one or more cog pools by id(s).
 
         Args:

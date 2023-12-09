@@ -7,6 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
+from osdu_wells_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from osdu_wells_pydantic_v1.client.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
@@ -138,7 +139,7 @@ class GeoContextsAPI(NodeAPI[GeoContexts, GeoContextsApply, GeoContextsList]):
         return self._apply(geo_context, replace)
 
     def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> dm.InstancesDeleteResult:
         """Delete one or more geo context.
 
@@ -160,15 +161,15 @@ class GeoContextsAPI(NodeAPI[GeoContexts, GeoContextsApply, GeoContextsList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> GeoContexts | None:
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> GeoContexts | None:
         ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str]) -> GeoContextsList:
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> GeoContextsList:
         ...
 
     def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> GeoContexts | GeoContextsList | None:
         """Retrieve one or more geo contexts by id(s).
 

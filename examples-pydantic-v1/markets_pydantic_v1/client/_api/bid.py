@@ -8,6 +8,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
+from markets_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from markets_pydantic_v1.client.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
@@ -115,7 +116,9 @@ class BidAPI(NodeAPI[Bid, BidApply, BidList]):
         """
         return self._apply(bid, replace)
 
-    def delete(self, external_id: str | SequenceNotStr[str], space: str = "market") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> dm.InstancesDeleteResult:
         """Delete one or more bid.
 
         Args:
@@ -136,14 +139,16 @@ class BidAPI(NodeAPI[Bid, BidApply, BidList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> Bid | None:
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> Bid | None:
         ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str]) -> BidList:
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> BidList:
         ...
 
-    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = "market") -> Bid | BidList | None:
+    def retrieve(
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> Bid | BidList | None:
         """Retrieve one or more bids by id(s).
 
         Args:

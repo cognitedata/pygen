@@ -7,6 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
+from shop.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from shop.client.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
@@ -102,7 +103,7 @@ class CommandConfigAPI(NodeAPI[CommandConfig, CommandConfigApply, CommandConfigL
         return self._apply(command_config, replace)
 
     def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> dm.InstancesDeleteResult:
         """Delete one or more command config.
 
@@ -124,15 +125,15 @@ class CommandConfigAPI(NodeAPI[CommandConfig, CommandConfigApply, CommandConfigL
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> CommandConfig | None:
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> CommandConfig | None:
         ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str]) -> CommandConfigList:
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> CommandConfigList:
         ...
 
     def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> CommandConfig | CommandConfigList | None:
         """Retrieve one or more command configs by id(s).
 

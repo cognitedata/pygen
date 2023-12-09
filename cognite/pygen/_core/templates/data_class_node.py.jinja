@@ -102,7 +102,8 @@ class {{ data_class.write_name }}(DomainModelApply):
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
-                existing_version=self.existing_version,
+                existing_version=self.existing_version,{% if data_class.node_type %}
+                type=dm.DirectRelationReference("{{ data_class.node_type.space }}", "{{ data_class.node_type.external_id }}"),{% endif %}
                 sources=[
                     dm.NodeOrEdgeData(
                         source=write_view,

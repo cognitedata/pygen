@@ -7,6 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
+from osdu_wells.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from osdu_wells.client.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
@@ -131,7 +132,7 @@ class AvailableTrajectoryStationPropertiesAPI(
         return self._apply(available_trajectory_station_property, replace)
 
     def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> dm.InstancesDeleteResult:
         """Delete one or more available trajectory station property.
 
@@ -153,15 +154,19 @@ class AvailableTrajectoryStationPropertiesAPI(
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> AvailableTrajectoryStationProperties | None:
+    def retrieve(
+        self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE
+    ) -> AvailableTrajectoryStationProperties | None:
         ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str]) -> AvailableTrajectoryStationPropertiesList:
+    def retrieve(
+        self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> AvailableTrajectoryStationPropertiesList:
         ...
 
     def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> AvailableTrajectoryStationProperties | AvailableTrajectoryStationPropertiesList | None:
         """Retrieve one or more available trajectory station properties by id(s).
 

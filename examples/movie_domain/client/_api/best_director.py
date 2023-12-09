@@ -7,6 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
+from movie_domain.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from movie_domain.client.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
@@ -114,7 +115,7 @@ class BestDirectorAPI(NodeAPI[BestDirector, BestDirectorApply, BestDirectorList]
         return self._apply(best_director, replace)
 
     def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> dm.InstancesDeleteResult:
         """Delete one or more best director.
 
@@ -136,15 +137,15 @@ class BestDirectorAPI(NodeAPI[BestDirector, BestDirectorApply, BestDirectorList]
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> BestDirector | None:
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> BestDirector | None:
         ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str]) -> BestDirectorList:
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> BestDirectorList:
         ...
 
     def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> BestDirector | BestDirectorList | None:
         """Retrieve one or more best directors by id(s).
 

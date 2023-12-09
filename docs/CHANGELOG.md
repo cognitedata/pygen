@@ -14,6 +14,17 @@ Changes are grouped as follows
 - `Security` in case of vulnerabilities.
 
 
+## [0.32.0] - 09-12-23
+### Added
+* Support for views defined with an equals filter node type. This is a common pattern for views that you
+  need to account for when you create the nodes that are connected to the view. For example, if you have a
+  view `Pump` with a filter `type = "pump"`, then, all nodes connected to the view must have the type `pump`.
+  This is now automatically enforced in the generated SDK.
+### Fixed
+* Using the `DEFAULT_INSTANCE_SPACE` constants in the generated `.retrieve` and `.delete` methods generated
+  for each node view APIs as the default space.
+* Overload methods was missing `space` in `.retrieve` for node view APIs.
+
 ## [0.31.2] - 06-12-23
 ### Fixed
 * The `end_node` in the generated edge data classes field did not handle multiple edges of the same type.

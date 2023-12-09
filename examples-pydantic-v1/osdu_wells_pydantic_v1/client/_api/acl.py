@@ -7,6 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
+from osdu_wells_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from osdu_wells_pydantic_v1.client.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
@@ -100,7 +101,7 @@ class AclAPI(NodeAPI[Acl, AclApply, AclList]):
         return self._apply(acl, replace)
 
     def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> dm.InstancesDeleteResult:
         """Delete one or more acl.
 
@@ -122,15 +123,15 @@ class AclAPI(NodeAPI[Acl, AclApply, AclList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> Acl | None:
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> Acl | None:
         ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str]) -> AclList:
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> AclList:
         ...
 
     def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> Acl | AclList | None:
         """Retrieve one or more acls by id(s).
 
