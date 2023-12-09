@@ -8,6 +8,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
+from shop_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from shop_pydantic_v1.client.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
@@ -140,7 +141,7 @@ class CaseAPI(NodeAPI[Case, CaseApply, CaseList]):
         return self._apply(case, replace)
 
     def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> dm.InstancesDeleteResult:
         """Delete one or more case.
 
@@ -162,15 +163,15 @@ class CaseAPI(NodeAPI[Case, CaseApply, CaseList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> Case | None:
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> Case | None:
         ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str]) -> CaseList:
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> CaseList:
         ...
 
     def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> Case | CaseList | None:
         """Retrieve one or more cases by id(s).
 

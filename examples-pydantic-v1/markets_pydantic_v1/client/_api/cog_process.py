@@ -7,6 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
+from markets_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from markets_pydantic_v1.client.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
@@ -116,7 +117,9 @@ class CogProcessAPI(NodeAPI[CogProcess, CogProcessApply, CogProcessList]):
         """
         return self._apply(cog_proces, replace)
 
-    def delete(self, external_id: str | SequenceNotStr[str], space: str = "market") -> dm.InstancesDeleteResult:
+    def delete(
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> dm.InstancesDeleteResult:
         """Delete one or more cog proces.
 
         Args:
@@ -137,15 +140,15 @@ class CogProcessAPI(NodeAPI[CogProcess, CogProcessApply, CogProcessList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> CogProcess | None:
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> CogProcess | None:
         ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str]) -> CogProcessList:
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> CogProcessList:
         ...
 
     def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str = "market"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> CogProcess | CogProcessList | None:
         """Retrieve one or more cog process by id(s).
 

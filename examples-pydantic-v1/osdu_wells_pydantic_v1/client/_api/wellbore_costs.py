@@ -7,6 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
+from osdu_wells_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from osdu_wells_pydantic_v1.client.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
@@ -114,7 +115,7 @@ class WellboreCostsAPI(NodeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsL
         return self._apply(wellbore_cost, replace)
 
     def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> dm.InstancesDeleteResult:
         """Delete one or more wellbore cost.
 
@@ -136,15 +137,15 @@ class WellboreCostsAPI(NodeAPI[WellboreCosts, WellboreCostsApply, WellboreCostsL
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> WellboreCosts | None:
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> WellboreCosts | None:
         ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str]) -> WellboreCostsList:
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> WellboreCostsList:
         ...
 
     def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> WellboreCosts | WellboreCostsList | None:
         """Retrieve one or more wellbore costs by id(s).
 

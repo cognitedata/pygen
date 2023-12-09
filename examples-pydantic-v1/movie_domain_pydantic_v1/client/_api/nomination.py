@@ -7,6 +7,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 
+from movie_domain_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from movie_domain_pydantic_v1.client.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
@@ -114,7 +115,7 @@ class NominationAPI(NodeAPI[Nomination, NominationApply, NominationList]):
         return self._apply(nomination, replace)
 
     def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> dm.InstancesDeleteResult:
         """Delete one or more nomination.
 
@@ -136,15 +137,15 @@ class NominationAPI(NodeAPI[Nomination, NominationApply, NominationList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str) -> Nomination | None:
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> Nomination | None:
         ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str]) -> NominationList:
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> NominationList:
         ...
 
     def retrieve(
-        self, external_id: str | SequenceNotStr[str], space: str = "IntegrationTestsImmutable"
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> Nomination | NominationList | None:
         """Retrieve one or more nominations by id(s).
 
