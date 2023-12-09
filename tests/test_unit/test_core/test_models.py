@@ -20,6 +20,7 @@ from cognite.pygen._core.models import (
     PrimitiveField,
     PrimitiveListField,
 )
+from cognite.pygen._core.models.data_classes import find_node_type
 from cognite.pygen._core.models.fields import EdgeClasses
 from cognite.pygen.config import PygenConfig
 from cognite.pygen.warnings import (
@@ -234,6 +235,7 @@ def load_data_classes_test_cases():
             variable_list="series_list",
             file_name="_series",
             fields=[],
+            node_type=None,
         ),
         id="DataClass variable and variable_list the same.",
     )
@@ -445,6 +447,7 @@ def create_fields_test_cases():
         file_name="_roles",
         view_id=dm.ViewId("IntegrationTestsImmutable", "Role", "2"),
         fields=[],
+        node_type=None,
     )
     data_class_by_view_id = {dm.ViewId("IntegrationTestsImmutable", "Role", "2"): data_class}
     yield pytest.param(
@@ -523,6 +526,7 @@ def create_fields_test_cases():
         view_id=dm.ViewId("IntegrationTestsImmutable", "Person", "2"),
         variable_list="persons",
         fields=[],
+        node_type=None,
     )
     data_class_by_view_id = {dm.ViewId("IntegrationTestsImmutable", "Person", "2"): data_class}
 
@@ -707,3 +711,30 @@ def field_type_hints_test_cases():
 def test_fields_type_hints(field: Field, expected_read_hint: str, expected_write_hint: str) -> None:
     assert field.as_write_type_hint() == expected_write_hint
     assert field.as_read_type_hint() == expected_read_hint
+
+
+@pytest.mark.parametrize(
+    "filter_, expected",
+    [
+        (None, None),
+        (
+            dm.filters.Equals(["node", "type"], {"space": "mySpace", "externalId": "myType"}),
+            dm.DirectRelationReference("mySpace", "myType"),
+        ),
+        (
+            dm.filters.And(dm.filters.Equals(["node", "type"], {"space": "mySpace", "externalId": "myType"})),
+            dm.DirectRelationReference("mySpace", "myType"),
+        ),
+        (
+            dm.filters.Equals(["node", "space"], "mySpace"),
+            None,
+        ),
+        (dm.filters.Not(dm.filters.Equals(["node", "type"], {"space": "mySpace", "externalId": "myType"})), None),
+    ],
+)
+def test_find_node_type(filter_: dm.Filter | None, expected: dm.DirectRelationReference | None) -> None:
+    # Act
+    actual = find_node_type(filter_)
+
+    # Assert
+    assert actual == expected

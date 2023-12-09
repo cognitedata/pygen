@@ -98,7 +98,9 @@ class DataClass:
         )
 
         if used_for == "node":
-            return NodeDataClass(**args)
+            node_type = find_node_type(view.filter)
+
+            return NodeDataClass(**args, node_type=node_type)
         elif used_for == "edge":
             return EdgeDataClass(**args)
         else:
@@ -258,7 +260,7 @@ class DataClass:
 
 @dataclass
 class NodeDataClass(DataClass):
-    ...
+    node_type: dm.DirectRelationReference | None
 
 
 @dataclass
@@ -305,3 +307,30 @@ class EdgeDataClass(DataClass):
             )
         )
         super().update_fields(properties, data_class_by_view_id, views, config)
+
+
+def find_node_type(filter_: dm.filters.Filter | None) -> dm.DirectRelationReference | None:
+    """
+    Find the node type if the filter has a node type equals filter.
+
+    Args:
+        filter_: The filter to search in.
+
+    Returns:
+        The node type if found, otherwise None.
+    """
+    if filter_ is None:
+        return None
+    elif isinstance(filter_, dm.filters.Equals):
+        dumped = filter_.dump()
+        property_, value = dumped["equals"]["property"], dumped["equals"]["value"]
+        if list(property_) == ["node", "type"] and "space" in value and "externalId" in value:
+            return dm.DirectRelationReference(space=value["space"], external_id=value["externalId"])
+        else:
+            return None
+    elif isinstance(filter_, (dm.filters.And, dm.filters.Or)):
+        for f in filter_._filters:
+            if node_type := find_node_type(f):
+                return node_type
+
+    return None
