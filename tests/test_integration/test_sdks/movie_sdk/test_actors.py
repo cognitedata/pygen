@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import pytest
+from cognite.client import CogniteClient
 
 from tests.constants import IS_PYDANTIC_V2
 
@@ -20,7 +21,7 @@ def test_actor_list(movie_client: MovieClient):
     assert all(isinstance(nomination, str) for actor in actors for nomination in actor.nomination or [])
 
 
-def test_actor_apply_with_person(movie_client: MovieClient):
+def test_actor_apply_retrieve_with_person(movie_client: MovieClient, cognite_client: CogniteClient):
     # Arrange
     actor = m.ActorApply(
         external_id="actor:anders",
@@ -28,6 +29,8 @@ def test_actor_apply_with_person(movie_client: MovieClient):
         nomination=[],
         person=m.PersonApply(external_id="person:anders", name="Anders", birth_year=0),
     )
+    resources = actor.to_instances_apply()
+    node_ids = resources.nodes.as_ids()
 
     try:
         # Act
@@ -36,9 +39,14 @@ def test_actor_apply_with_person(movie_client: MovieClient):
         # Assert
         assert len(created.nodes) == 2
         assert len(created.edges) == 0
+
+        # Act
+        retrieve = movie_client.actor.retrieve(external_id=actor.external_id)
+
+        # Assert
+        assert retrieve is not None
     finally:
-        movie_client.actor.delete(actor.external_id)
-        movie_client.person.delete(actor.person.external_id)
+        cognite_client.data_modeling.instances.delete(nodes=node_ids)
 
 
 @pytest.mark.parametrize(
