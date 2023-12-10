@@ -62,18 +62,18 @@ def test_actor_apply_retrieve_with_person(movie_client: MovieClient, cognite_cli
         ),
     ],
 )
-def test_actor_list_filter_on_direct_edge(
+def test_director_list_filter_on_direct_edge(
     person: str | list[str] | tuple[str, str] | list[tuple[str, str]],
     expected_count: int,
     expected_person: list[str],
     movie_client: MovieClient,
 ) -> None:
     # Act
-    actors = movie_client.actor.list(person=person, limit=expected_count + 1, retrieve_edges=False)
+    directors = movie_client.director.list(person=person, limit=expected_count + 1, retrieve_edges=False)
 
     # Assert
-    assert len(actors) == expected_count
-    assert sorted([actor.person for actor in actors]) == sorted(expected_person)
+    assert len(directors) == expected_count
+    assert sorted([actor.person for actor in directors]) == sorted(expected_person)
 
 
 def test_circular_query_from_actor(movie_client: MovieClient):
