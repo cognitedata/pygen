@@ -416,13 +416,13 @@ def _create_work_order_filter(
                 lte=max_end_time.isoformat(timespec="milliseconds") if max_end_time else None,
             )
         )
-    if is_active and isinstance(is_active, str):
+    if is_active and isinstance(is_active, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("isActive"), value=is_active))
-    if is_cancelled and isinstance(is_cancelled, str):
+    if is_cancelled and isinstance(is_cancelled, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("isCancelled"), value=is_cancelled))
-    if is_completed and isinstance(is_completed, str):
+    if is_completed and isinstance(is_completed, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("isCompleted"), value=is_completed))
-    if is_safety_critical and isinstance(is_safety_critical, str):
+    if is_safety_critical and isinstance(is_safety_critical, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("isSafetyCritical"), value=is_safety_critical))
     if min_percentage_progress or max_percentage_progress:
         filters.append(

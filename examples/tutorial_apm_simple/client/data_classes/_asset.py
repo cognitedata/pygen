@@ -351,9 +351,9 @@ def _create_asset_filter(
         filters.append(dm.filters.In(view_id.as_property_ref("description"), values=description))
     if description_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("description"), value=description_prefix))
-    if is_active and isinstance(is_active, str):
+    if is_active and isinstance(is_active, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("isActive"), value=is_active))
-    if is_critical_line and isinstance(is_critical_line, str):
+    if is_critical_line and isinstance(is_critical_line, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("isCriticalLine"), value=is_critical_line))
     if parent and isinstance(parent, str):
         filters.append(

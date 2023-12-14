@@ -198,7 +198,7 @@ def _create_pygen_bid_filter(
                 lte=max_date.isoformat() if max_date else None,
             )
         )
-    if is_block and isinstance(is_block, str):
+    if is_block and isinstance(is_block, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("isBlock"), value=is_block))
     if market and isinstance(market, str):
         filters.append(

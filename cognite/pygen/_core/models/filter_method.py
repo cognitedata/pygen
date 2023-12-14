@@ -55,11 +55,14 @@ class FilterCondition:
     @property
     def condition(self) -> str:
         if self.filter is dm.filters.In:
-            parameter = next(iter(self.keyword_arguments.values())).name
-            return f"{parameter} and isinstance({parameter}, list)"
+            parameter_name = next(iter(self.keyword_arguments.values())).name
+            return f"{parameter_name} and isinstance({parameter_name}, list)"
         elif self.filter is dm.filters.Equals:
-            parameter = next(iter(self.keyword_arguments.values())).name
-            return f"{parameter} and isinstance({parameter}, str)"
+            parameter = next(iter(self.keyword_arguments.values()))
+            parameter_type = parameter.type_
+            if "|" in parameter_type:
+                parameter_type = parameter_type.split("|")[0].strip()
+            return f"{parameter.name} and isinstance({parameter.name}, {parameter_type})"
 
         return " or ".join(arg.name for arg in self.keyword_arguments.values())
 

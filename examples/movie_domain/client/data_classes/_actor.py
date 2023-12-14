@@ -200,7 +200,7 @@ def _create_actor_filter(
                 view_id.as_property_ref("person"), values=[{"space": item[0], "externalId": item[1]} for item in person]
             )
         )
-    if won_oscar and isinstance(won_oscar, str):
+    if won_oscar and isinstance(won_oscar, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("wonOscar"), value=won_oscar))
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))

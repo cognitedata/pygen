@@ -104,3 +104,12 @@ def test_actor_query_direct_relation(movie_client: MovieClient):
         assert isinstance(actor, m.Actor)
         assert isinstance(actor.person, m.Person)
         assert actor.person.external_id.split(":")[1] == actor.external_id.split(":")[1]
+
+
+def test_actor_filter_on_boolean(movie_client: MovieClient):
+    actors = movie_client.actor.list(won_oscar=True, limit=-1)
+
+    assert len(actors) > 0
+    assert not (
+        no_oscars := [actor for actor in actors if actor.won_oscar is False]
+    ), f"Found actors without oscars {no_oscars}"
