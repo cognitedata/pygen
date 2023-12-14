@@ -14,6 +14,10 @@ Changes are grouped as follows
 - `Security` in case of vulnerabilities.
 
 
+## [0.32.1] - 14-12-23
+### Fixed
+* Filtering on a boolean value in the generated SDK returned both `True` and `False` values. This is now fixed.
+
 ## [0.32.0] - 09-12-23
 ### Added
 * Support for views defined with an equals filter node type. This is a common pattern for views that you

@@ -95,7 +95,7 @@ class MarketClient:
     MarketClient
 
     Generated with:
-        pygen = 0.32.0
+        pygen = 0.32.1
         cognite-sdk = 7.5.1
         pydantic = 2.5.2
 
@@ -109,7 +109,7 @@ class MarketClient:
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = "CognitePygen:0.32.0"
+        client.config.client_name = "CognitePygen:0.32.1"
 
         self.cog_pool = CogPoolAPIs(client)
         self.pygen_pool = PygenPoolAPIs(client)
