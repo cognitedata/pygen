@@ -35,6 +35,9 @@ class ApmSimpleClient:
             client = CogniteClient(config_or_client)
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
+        # The client name is used for aggregated logging of Pygen Usage
+        client.config.client_name = "CognitePygen:0.32.0"
+
         view_by_write_class = {
             data_classes.AssetApply: dm.ViewId("tutorial_apm_simple", "Asset", "beb2bebdcbb4ad"),
             data_classes.CdfConnectionPropertiesApply: dm.ViewId("cdf_3d_schema", "Cdf3dConnectionProperties", "1"),

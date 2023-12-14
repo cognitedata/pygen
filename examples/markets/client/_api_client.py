@@ -108,6 +108,9 @@ class MarketClient:
             client = CogniteClient(config_or_client)
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
+        # The client name is used for aggregated logging of Pygen Usage
+        client.config.client_name = "CognitePygen:0.32.0"
+
         self.cog_pool = CogPoolAPIs(client)
         self.pygen_pool = PygenPoolAPIs(client)
 
