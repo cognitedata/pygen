@@ -45,7 +45,10 @@ class {{ client_name }}:
         elif isinstance(config_or_client, ClientConfig):
             client = CogniteClient(config_or_client)
         else:
-            raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}"){% for api in multi_apis %}
+            raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
+        # The client name is used for aggregated logging of Pygen Usage
+        client.config.client_name = "CognitePygen:{{ pygen_version }}"
+{% for api in multi_apis %}
         self.{{ api.parent_attribute }} = {{ api.name }}(client){% endfor %}
 
     @classmethod

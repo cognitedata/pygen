@@ -33,6 +33,9 @@ class EquipmentUnitClient:
             client = CogniteClient(config_or_client)
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
+        # The client name is used for aggregated logging of Pygen Usage
+        client.config.client_name = "CognitePygen:0.32.0"
+
         view_by_write_class = {
             data_classes.EquipmentModuleApply: dm.ViewId(
                 "IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33"
