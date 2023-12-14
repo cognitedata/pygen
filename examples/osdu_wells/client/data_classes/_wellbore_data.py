@@ -1322,27 +1322,27 @@ def _create_wellbore_datum_filter(
         filters.append(
             dm.filters.Prefix(view_id.as_property_ref("VersionCreationReason"), value=version_creation_reason_prefix)
         )
-    if was_business_interest_financial_non_operated and isinstance(was_business_interest_financial_non_operated, str):
+    if was_business_interest_financial_non_operated and isinstance(was_business_interest_financial_non_operated, bool):
         filters.append(
             dm.filters.Equals(
                 view_id.as_property_ref("WasBusinessInterestFinancialNonOperated"),
                 value=was_business_interest_financial_non_operated,
             )
         )
-    if was_business_interest_financial_operated and isinstance(was_business_interest_financial_operated, str):
+    if was_business_interest_financial_operated and isinstance(was_business_interest_financial_operated, bool):
         filters.append(
             dm.filters.Equals(
                 view_id.as_property_ref("WasBusinessInterestFinancialOperated"),
                 value=was_business_interest_financial_operated,
             )
         )
-    if was_business_interest_obligatory and isinstance(was_business_interest_obligatory, str):
+    if was_business_interest_obligatory and isinstance(was_business_interest_obligatory, bool):
         filters.append(
             dm.filters.Equals(
                 view_id.as_property_ref("WasBusinessInterestObligatory"), value=was_business_interest_obligatory
             )
         )
-    if was_business_interest_technical and isinstance(was_business_interest_technical, str):
+    if was_business_interest_technical and isinstance(was_business_interest_technical, bool):
         filters.append(
             dm.filters.Equals(
                 view_id.as_property_ref("WasBusinessInterestTechnical"), value=was_business_interest_technical

@@ -250,7 +250,7 @@ def _create_facility_specification_filter(
                 view_id.as_property_ref("FacilitySpecificationDateTime"), value=facility_specification_date_time_prefix
             )
         )
-    if facility_specification_indicator and isinstance(facility_specification_indicator, str):
+    if facility_specification_indicator and isinstance(facility_specification_indicator, bool):
         filters.append(
             dm.filters.Equals(
                 view_id.as_property_ref("FacilitySpecificationIndicator"), value=facility_specification_indicator

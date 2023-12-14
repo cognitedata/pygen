@@ -862,7 +862,7 @@ def _create_wellbore_trajectory_datum_filter(
         filters.append(dm.filters.In(view_id.as_property_ref("AcquisitionRemark"), values=acquisition_remark))
     if acquisition_remark_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("AcquisitionRemark"), value=acquisition_remark_prefix))
-    if active_indicator and isinstance(active_indicator, str):
+    if active_indicator and isinstance(active_indicator, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("ActiveIndicator"), value=active_indicator))
     if applied_operations_date_time and isinstance(applied_operations_date_time, str):
         filters.append(
@@ -991,9 +991,9 @@ def _create_wellbore_trajectory_datum_filter(
         filters.append(dm.filters.In(view_id.as_property_ref("GeographicCRSID"), values=geographic_crsid))
     if geographic_crsid_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("GeographicCRSID"), value=geographic_crsid_prefix))
-    if is_discoverable and isinstance(is_discoverable, str):
+    if is_discoverable and isinstance(is_discoverable, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("IsDiscoverable"), value=is_discoverable))
-    if is_extended_load and isinstance(is_extended_load, str):
+    if is_extended_load and isinstance(is_extended_load, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("IsExtendedLoad"), value=is_extended_load))
     if name and isinstance(name, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("Name"), value=name))

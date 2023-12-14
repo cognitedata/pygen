@@ -248,7 +248,7 @@ def _create_work_item_filter(
         filters.append(dm.filters.In(view_id.as_property_ref("description"), values=description))
     if description_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("description"), value=description_prefix))
-    if is_completed and isinstance(is_completed, str):
+    if is_completed and isinstance(is_completed, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("isCompleted"), value=is_completed))
     if item_info and isinstance(item_info, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("itemInfo"), value=item_info))
@@ -274,7 +274,7 @@ def _create_work_item_filter(
         filters.append(dm.filters.In(view_id.as_property_ref("title"), values=title))
     if title_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("title"), value=title_prefix))
-    if to_be_done and isinstance(to_be_done, str):
+    if to_be_done and isinstance(to_be_done, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("toBeDone"), value=to_be_done))
     if work_order and isinstance(work_order, str):
         filters.append(
