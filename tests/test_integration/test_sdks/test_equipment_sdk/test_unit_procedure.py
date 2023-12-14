@@ -96,7 +96,11 @@ def test_apply_unit_procedure_with_edge(workorder: EquipmentUnitClient, cognite_
                     external_id="module:new_module",
                     name="New module",
                     type_="New type",
-                    sensor_value=TimeSeries(external_id="timeseries:123"),
+                    sensor_value=TimeSeries(
+                        external_id="timeseries:123",
+                        is_step=True,
+                        description="This is a test timeseries, it should not persist",
+                    ),
                     description="New description",
                 ),
             ),
