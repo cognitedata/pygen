@@ -236,45 +236,45 @@ def _create_work_item_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
-    if criticality and isinstance(criticality, str):
+    if criticality is not None and isinstance(criticality, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("criticality"), value=criticality))
     if criticality and isinstance(criticality, list):
         filters.append(dm.filters.In(view_id.as_property_ref("criticality"), values=criticality))
     if criticality_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("criticality"), value=criticality_prefix))
-    if description and isinstance(description, str):
+    if description is not None and isinstance(description, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("description"), value=description))
     if description and isinstance(description, list):
         filters.append(dm.filters.In(view_id.as_property_ref("description"), values=description))
     if description_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("description"), value=description_prefix))
-    if is_completed and isinstance(is_completed, bool):
+    if is_completed is not None and isinstance(is_completed, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("isCompleted"), value=is_completed))
-    if item_info and isinstance(item_info, str):
+    if item_info is not None and isinstance(item_info, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("itemInfo"), value=item_info))
     if item_info and isinstance(item_info, list):
         filters.append(dm.filters.In(view_id.as_property_ref("itemInfo"), values=item_info))
     if item_info_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("itemInfo"), value=item_info_prefix))
-    if item_name and isinstance(item_name, str):
+    if item_name is not None and isinstance(item_name, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("itemName"), value=item_name))
     if item_name and isinstance(item_name, list):
         filters.append(dm.filters.In(view_id.as_property_ref("itemName"), values=item_name))
     if item_name_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("itemName"), value=item_name_prefix))
-    if method and isinstance(method, str):
+    if method is not None and isinstance(method, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("method"), value=method))
     if method and isinstance(method, list):
         filters.append(dm.filters.In(view_id.as_property_ref("method"), values=method))
     if method_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("method"), value=method_prefix))
-    if title and isinstance(title, str):
+    if title is not None and isinstance(title, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("title"), value=title))
     if title and isinstance(title, list):
         filters.append(dm.filters.In(view_id.as_property_ref("title"), values=title))
     if title_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("title"), value=title_prefix))
-    if to_be_done and isinstance(to_be_done, bool):
+    if to_be_done is not None and isinstance(to_be_done, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("toBeDone"), value=to_be_done))
     if work_order and isinstance(work_order, str):
         filters.append(
@@ -304,7 +304,7 @@ def _create_work_item_filter(
         )
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
+    if space is not None and isinstance(space, str):
         filters.append(dm.filters.Equals(["node", "space"], value=space))
     if space and isinstance(space, list):
         filters.append(dm.filters.In(["node", "space"], values=space))

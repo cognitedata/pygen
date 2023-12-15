@@ -191,19 +191,19 @@ def _create_geo_context_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
-    if basin_id and isinstance(basin_id, str):
+    if basin_id is not None and isinstance(basin_id, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("BasinID"), value=basin_id))
     if basin_id and isinstance(basin_id, list):
         filters.append(dm.filters.In(view_id.as_property_ref("BasinID"), values=basin_id))
     if basin_id_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("BasinID"), value=basin_id_prefix))
-    if field_id and isinstance(field_id, str):
+    if field_id is not None and isinstance(field_id, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("FieldID"), value=field_id))
     if field_id and isinstance(field_id, list):
         filters.append(dm.filters.In(view_id.as_property_ref("FieldID"), values=field_id))
     if field_id_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("FieldID"), value=field_id_prefix))
-    if geo_political_entity_id and isinstance(geo_political_entity_id, str):
+    if geo_political_entity_id is not None and isinstance(geo_political_entity_id, str):
         filters.append(
             dm.filters.Equals(view_id.as_property_ref("GeoPoliticalEntityID"), value=geo_political_entity_id)
         )
@@ -213,19 +213,19 @@ def _create_geo_context_filter(
         filters.append(
             dm.filters.Prefix(view_id.as_property_ref("GeoPoliticalEntityID"), value=geo_political_entity_id_prefix)
         )
-    if geo_type_id and isinstance(geo_type_id, str):
+    if geo_type_id is not None and isinstance(geo_type_id, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("GeoTypeID"), value=geo_type_id))
     if geo_type_id and isinstance(geo_type_id, list):
         filters.append(dm.filters.In(view_id.as_property_ref("GeoTypeID"), values=geo_type_id))
     if geo_type_id_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("GeoTypeID"), value=geo_type_id_prefix))
-    if play_id and isinstance(play_id, str):
+    if play_id is not None and isinstance(play_id, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("PlayID"), value=play_id))
     if play_id and isinstance(play_id, list):
         filters.append(dm.filters.In(view_id.as_property_ref("PlayID"), values=play_id))
     if play_id_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("PlayID"), value=play_id_prefix))
-    if prospect_id and isinstance(prospect_id, str):
+    if prospect_id is not None and isinstance(prospect_id, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("ProspectID"), value=prospect_id))
     if prospect_id and isinstance(prospect_id, list):
         filters.append(dm.filters.In(view_id.as_property_ref("ProspectID"), values=prospect_id))
@@ -233,7 +233,7 @@ def _create_geo_context_filter(
         filters.append(dm.filters.Prefix(view_id.as_property_ref("ProspectID"), value=prospect_id_prefix))
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
+    if space is not None and isinstance(space, str):
         filters.append(dm.filters.Equals(["node", "space"], value=space))
     if space and isinstance(space, list):
         filters.append(dm.filters.In(["node", "space"], values=space))

@@ -298,7 +298,7 @@ def _create_vertical_measurement_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
-    if effective_date_time and isinstance(effective_date_time, str):
+    if effective_date_time is not None and isinstance(effective_date_time, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("EffectiveDateTime"), value=effective_date_time))
     if effective_date_time and isinstance(effective_date_time, list):
         filters.append(dm.filters.In(view_id.as_property_ref("EffectiveDateTime"), values=effective_date_time))
@@ -306,13 +306,13 @@ def _create_vertical_measurement_filter(
         filters.append(
             dm.filters.Prefix(view_id.as_property_ref("EffectiveDateTime"), value=effective_date_time_prefix)
         )
-    if rig_id and isinstance(rig_id, str):
+    if rig_id is not None and isinstance(rig_id, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("RigID"), value=rig_id))
     if rig_id and isinstance(rig_id, list):
         filters.append(dm.filters.In(view_id.as_property_ref("RigID"), values=rig_id))
     if rig_id_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("RigID"), value=rig_id_prefix))
-    if termination_date_time and isinstance(termination_date_time, str):
+    if termination_date_time is not None and isinstance(termination_date_time, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("TerminationDateTime"), value=termination_date_time))
     if termination_date_time and isinstance(termination_date_time, list):
         filters.append(dm.filters.In(view_id.as_property_ref("TerminationDateTime"), values=termination_date_time))
@@ -320,7 +320,7 @@ def _create_vertical_measurement_filter(
         filters.append(
             dm.filters.Prefix(view_id.as_property_ref("TerminationDateTime"), value=termination_date_time_prefix)
         )
-    if vertical_crsid and isinstance(vertical_crsid, str):
+    if vertical_crsid is not None and isinstance(vertical_crsid, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("VerticalCRSID"), value=vertical_crsid))
     if vertical_crsid and isinstance(vertical_crsid, list):
         filters.append(dm.filters.In(view_id.as_property_ref("VerticalCRSID"), values=vertical_crsid))
@@ -334,7 +334,7 @@ def _create_vertical_measurement_filter(
                 lte=max_vertical_measurement,
             )
         )
-    if vertical_measurement_description and isinstance(vertical_measurement_description, str):
+    if vertical_measurement_description is not None and isinstance(vertical_measurement_description, str):
         filters.append(
             dm.filters.Equals(
                 view_id.as_property_ref("VerticalMeasurementDescription"), value=vertical_measurement_description
@@ -352,7 +352,7 @@ def _create_vertical_measurement_filter(
                 view_id.as_property_ref("VerticalMeasurementDescription"), value=vertical_measurement_description_prefix
             )
         )
-    if vertical_measurement_id and isinstance(vertical_measurement_id, str):
+    if vertical_measurement_id is not None and isinstance(vertical_measurement_id, str):
         filters.append(
             dm.filters.Equals(view_id.as_property_ref("VerticalMeasurementID"), value=vertical_measurement_id)
         )
@@ -362,7 +362,7 @@ def _create_vertical_measurement_filter(
         filters.append(
             dm.filters.Prefix(view_id.as_property_ref("VerticalMeasurementID"), value=vertical_measurement_id_prefix)
         )
-    if vertical_measurement_path_id and isinstance(vertical_measurement_path_id, str):
+    if vertical_measurement_path_id is not None and isinstance(vertical_measurement_path_id, str):
         filters.append(
             dm.filters.Equals(view_id.as_property_ref("VerticalMeasurementPathID"), value=vertical_measurement_path_id)
         )
@@ -376,7 +376,7 @@ def _create_vertical_measurement_filter(
                 view_id.as_property_ref("VerticalMeasurementPathID"), value=vertical_measurement_path_id_prefix
             )
         )
-    if vertical_measurement_source_id and isinstance(vertical_measurement_source_id, str):
+    if vertical_measurement_source_id is not None and isinstance(vertical_measurement_source_id, str):
         filters.append(
             dm.filters.Equals(
                 view_id.as_property_ref("VerticalMeasurementSourceID"), value=vertical_measurement_source_id
@@ -392,7 +392,7 @@ def _create_vertical_measurement_filter(
                 view_id.as_property_ref("VerticalMeasurementSourceID"), value=vertical_measurement_source_id_prefix
             )
         )
-    if vertical_measurement_type_id and isinstance(vertical_measurement_type_id, str):
+    if vertical_measurement_type_id is not None and isinstance(vertical_measurement_type_id, str):
         filters.append(
             dm.filters.Equals(view_id.as_property_ref("VerticalMeasurementTypeID"), value=vertical_measurement_type_id)
         )
@@ -406,7 +406,7 @@ def _create_vertical_measurement_filter(
                 view_id.as_property_ref("VerticalMeasurementTypeID"), value=vertical_measurement_type_id_prefix
             )
         )
-    if vertical_measurement_unit_of_measure_id and isinstance(vertical_measurement_unit_of_measure_id, str):
+    if vertical_measurement_unit_of_measure_id is not None and isinstance(vertical_measurement_unit_of_measure_id, str):
         filters.append(
             dm.filters.Equals(
                 view_id.as_property_ref("VerticalMeasurementUnitOfMeasureID"),
@@ -427,7 +427,7 @@ def _create_vertical_measurement_filter(
                 value=vertical_measurement_unit_of_measure_id_prefix,
             )
         )
-    if vertical_reference_entity_id and isinstance(vertical_reference_entity_id, str):
+    if vertical_reference_entity_id is not None and isinstance(vertical_reference_entity_id, str):
         filters.append(
             dm.filters.Equals(view_id.as_property_ref("VerticalReferenceEntityID"), value=vertical_reference_entity_id)
         )
@@ -441,7 +441,7 @@ def _create_vertical_measurement_filter(
                 view_id.as_property_ref("VerticalReferenceEntityID"), value=vertical_reference_entity_id_prefix
             )
         )
-    if vertical_reference_id and isinstance(vertical_reference_id, str):
+    if vertical_reference_id is not None and isinstance(vertical_reference_id, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("VerticalReferenceID"), value=vertical_reference_id))
     if vertical_reference_id and isinstance(vertical_reference_id, list):
         filters.append(dm.filters.In(view_id.as_property_ref("VerticalReferenceID"), values=vertical_reference_id))
@@ -449,7 +449,7 @@ def _create_vertical_measurement_filter(
         filters.append(
             dm.filters.Prefix(view_id.as_property_ref("VerticalReferenceID"), value=vertical_reference_id_prefix)
         )
-    if wellbore_tvd_trajectory_id and isinstance(wellbore_tvd_trajectory_id, str):
+    if wellbore_tvd_trajectory_id is not None and isinstance(wellbore_tvd_trajectory_id, str):
         filters.append(
             dm.filters.Equals(view_id.as_property_ref("WellboreTVDTrajectoryID"), value=wellbore_tvd_trajectory_id)
         )
@@ -465,7 +465,7 @@ def _create_vertical_measurement_filter(
         )
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
+    if space is not None and isinstance(space, str):
         filters.append(dm.filters.Equals(["node", "space"], value=space))
     if space and isinstance(space, list):
         filters.append(dm.filters.In(["node", "space"], values=space))

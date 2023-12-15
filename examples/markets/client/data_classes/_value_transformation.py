@@ -146,7 +146,7 @@ def _create_value_transformation_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
-    if method and isinstance(method, str):
+    if method is not None and isinstance(method, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("method"), value=method))
     if method and isinstance(method, list):
         filters.append(dm.filters.In(view_id.as_property_ref("method"), values=method))
@@ -154,7 +154,7 @@ def _create_value_transformation_filter(
         filters.append(dm.filters.Prefix(view_id.as_property_ref("method"), value=method_prefix))
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
+    if space is not None and isinstance(space, str):
         filters.append(dm.filters.Equals(["node", "space"], value=space))
     if space and isinstance(space, list):
         filters.append(dm.filters.In(["node", "space"], values=space))

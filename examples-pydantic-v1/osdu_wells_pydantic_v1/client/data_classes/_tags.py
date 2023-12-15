@@ -132,7 +132,7 @@ def _create_tag_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
-    if name_of_key and isinstance(name_of_key, str):
+    if name_of_key is not None and isinstance(name_of_key, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("NameOfKey"), value=name_of_key))
     if name_of_key and isinstance(name_of_key, list):
         filters.append(dm.filters.In(view_id.as_property_ref("NameOfKey"), values=name_of_key))
@@ -140,7 +140,7 @@ def _create_tag_filter(
         filters.append(dm.filters.Prefix(view_id.as_property_ref("NameOfKey"), value=name_of_key_prefix))
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
+    if space is not None and isinstance(space, str):
         filters.append(dm.filters.Equals(["node", "space"], value=space))
     if space and isinstance(space, list):
         filters.append(dm.filters.In(["node", "space"], values=space))

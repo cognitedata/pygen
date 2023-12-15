@@ -850,21 +850,21 @@ def _create_wellbore_trajectory_datum_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
-    if acquisition_date and isinstance(acquisition_date, str):
+    if acquisition_date is not None and isinstance(acquisition_date, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("AcquisitionDate"), value=acquisition_date))
     if acquisition_date and isinstance(acquisition_date, list):
         filters.append(dm.filters.In(view_id.as_property_ref("AcquisitionDate"), values=acquisition_date))
     if acquisition_date_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("AcquisitionDate"), value=acquisition_date_prefix))
-    if acquisition_remark and isinstance(acquisition_remark, str):
+    if acquisition_remark is not None and isinstance(acquisition_remark, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("AcquisitionRemark"), value=acquisition_remark))
     if acquisition_remark and isinstance(acquisition_remark, list):
         filters.append(dm.filters.In(view_id.as_property_ref("AcquisitionRemark"), values=acquisition_remark))
     if acquisition_remark_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("AcquisitionRemark"), value=acquisition_remark_prefix))
-    if active_indicator and isinstance(active_indicator, bool):
+    if active_indicator is not None and isinstance(active_indicator, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("ActiveIndicator"), value=active_indicator))
-    if applied_operations_date_time and isinstance(applied_operations_date_time, str):
+    if applied_operations_date_time is not None and isinstance(applied_operations_date_time, str):
         filters.append(
             dm.filters.Equals(view_id.as_property_ref("AppliedOperationsDateTime"), value=applied_operations_date_time)
         )
@@ -878,7 +878,7 @@ def _create_wellbore_trajectory_datum_filter(
                 view_id.as_property_ref("AppliedOperationsDateTime"), value=applied_operations_date_time_prefix
             )
         )
-    if applied_operations_remarks and isinstance(applied_operations_remarks, str):
+    if applied_operations_remarks is not None and isinstance(applied_operations_remarks, str):
         filters.append(
             dm.filters.Equals(view_id.as_property_ref("AppliedOperationsRemarks"), value=applied_operations_remarks)
         )
@@ -892,7 +892,7 @@ def _create_wellbore_trajectory_datum_filter(
                 view_id.as_property_ref("AppliedOperationsRemarks"), value=applied_operations_remarks_prefix
             )
         )
-    if applied_operations_user and isinstance(applied_operations_user, str):
+    if applied_operations_user is not None and isinstance(applied_operations_user, str):
         filters.append(
             dm.filters.Equals(view_id.as_property_ref("AppliedOperationsUser"), value=applied_operations_user)
         )
@@ -902,7 +902,7 @@ def _create_wellbore_trajectory_datum_filter(
         filters.append(
             dm.filters.Prefix(view_id.as_property_ref("AppliedOperationsUser"), value=applied_operations_user_prefix)
         )
-    if azimuth_reference_type and isinstance(azimuth_reference_type, str):
+    if azimuth_reference_type is not None and isinstance(azimuth_reference_type, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("AzimuthReferenceType"), value=azimuth_reference_type))
     if azimuth_reference_type and isinstance(azimuth_reference_type, list):
         filters.append(dm.filters.In(view_id.as_property_ref("AzimuthReferenceType"), values=azimuth_reference_type))
@@ -918,7 +918,7 @@ def _create_wellbore_trajectory_datum_filter(
                 lte=max_base_depth_measured_depth,
             )
         )
-    if calculation_method_type and isinstance(calculation_method_type, str):
+    if calculation_method_type is not None and isinstance(calculation_method_type, str):
         filters.append(
             dm.filters.Equals(view_id.as_property_ref("CalculationMethodType"), value=calculation_method_type)
         )
@@ -928,31 +928,31 @@ def _create_wellbore_trajectory_datum_filter(
         filters.append(
             dm.filters.Prefix(view_id.as_property_ref("CalculationMethodType"), value=calculation_method_type_prefix)
         )
-    if company_id and isinstance(company_id, str):
+    if company_id is not None and isinstance(company_id, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("CompanyID"), value=company_id))
     if company_id and isinstance(company_id, list):
         filters.append(dm.filters.In(view_id.as_property_ref("CompanyID"), values=company_id))
     if company_id_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("CompanyID"), value=company_id_prefix))
-    if creation_date_time and isinstance(creation_date_time, str):
+    if creation_date_time is not None and isinstance(creation_date_time, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("CreationDateTime"), value=creation_date_time))
     if creation_date_time and isinstance(creation_date_time, list):
         filters.append(dm.filters.In(view_id.as_property_ref("CreationDateTime"), values=creation_date_time))
     if creation_date_time_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("CreationDateTime"), value=creation_date_time_prefix))
-    if description and isinstance(description, str):
+    if description is not None and isinstance(description, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("Description"), value=description))
     if description and isinstance(description, list):
         filters.append(dm.filters.In(view_id.as_property_ref("Description"), values=description))
     if description_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("Description"), value=description_prefix))
-    if end_date_time and isinstance(end_date_time, str):
+    if end_date_time is not None and isinstance(end_date_time, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("EndDateTime"), value=end_date_time))
     if end_date_time and isinstance(end_date_time, list):
         filters.append(dm.filters.In(view_id.as_property_ref("EndDateTime"), values=end_date_time))
     if end_date_time_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("EndDateTime"), value=end_date_time_prefix))
-    if existence_kind and isinstance(existence_kind, str):
+    if existence_kind is not None and isinstance(existence_kind, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("ExistenceKind"), value=existence_kind))
     if existence_kind and isinstance(existence_kind, list):
         filters.append(dm.filters.In(view_id.as_property_ref("ExistenceKind"), values=existence_kind))
@@ -966,7 +966,7 @@ def _create_wellbore_trajectory_datum_filter(
                 lte=max_extrapolated_measured_depth,
             )
         )
-    if extrapolated_measured_depth_remark and isinstance(extrapolated_measured_depth_remark, str):
+    if extrapolated_measured_depth_remark is not None and isinstance(extrapolated_measured_depth_remark, str):
         filters.append(
             dm.filters.Equals(
                 view_id.as_property_ref("ExtrapolatedMeasuredDepthRemark"), value=extrapolated_measured_depth_remark
@@ -985,29 +985,29 @@ def _create_wellbore_trajectory_datum_filter(
                 value=extrapolated_measured_depth_remark_prefix,
             )
         )
-    if geographic_crsid and isinstance(geographic_crsid, str):
+    if geographic_crsid is not None and isinstance(geographic_crsid, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("GeographicCRSID"), value=geographic_crsid))
     if geographic_crsid and isinstance(geographic_crsid, list):
         filters.append(dm.filters.In(view_id.as_property_ref("GeographicCRSID"), values=geographic_crsid))
     if geographic_crsid_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("GeographicCRSID"), value=geographic_crsid_prefix))
-    if is_discoverable and isinstance(is_discoverable, bool):
+    if is_discoverable is not None and isinstance(is_discoverable, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("IsDiscoverable"), value=is_discoverable))
-    if is_extended_load and isinstance(is_extended_load, bool):
+    if is_extended_load is not None and isinstance(is_extended_load, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("IsExtendedLoad"), value=is_extended_load))
-    if name and isinstance(name, str):
+    if name is not None and isinstance(name, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("Name"), value=name))
     if name and isinstance(name, list):
         filters.append(dm.filters.In(view_id.as_property_ref("Name"), values=name))
     if name_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("Name"), value=name_prefix))
-    if projected_crsid and isinstance(projected_crsid, str):
+    if projected_crsid is not None and isinstance(projected_crsid, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("ProjectedCRSID"), value=projected_crsid))
     if projected_crsid and isinstance(projected_crsid, list):
         filters.append(dm.filters.In(view_id.as_property_ref("ProjectedCRSID"), values=projected_crsid))
     if projected_crsid_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("ProjectedCRSID"), value=projected_crsid_prefix))
-    if resource_curation_status and isinstance(resource_curation_status, str):
+    if resource_curation_status is not None and isinstance(resource_curation_status, str):
         filters.append(
             dm.filters.Equals(view_id.as_property_ref("ResourceCurationStatus"), value=resource_curation_status)
         )
@@ -1019,7 +1019,7 @@ def _create_wellbore_trajectory_datum_filter(
         filters.append(
             dm.filters.Prefix(view_id.as_property_ref("ResourceCurationStatus"), value=resource_curation_status_prefix)
         )
-    if resource_home_region_id and isinstance(resource_home_region_id, str):
+    if resource_home_region_id is not None and isinstance(resource_home_region_id, str):
         filters.append(
             dm.filters.Equals(view_id.as_property_ref("ResourceHomeRegionID"), value=resource_home_region_id)
         )
@@ -1029,7 +1029,7 @@ def _create_wellbore_trajectory_datum_filter(
         filters.append(
             dm.filters.Prefix(view_id.as_property_ref("ResourceHomeRegionID"), value=resource_home_region_id_prefix)
         )
-    if resource_lifecycle_status and isinstance(resource_lifecycle_status, str):
+    if resource_lifecycle_status is not None and isinstance(resource_lifecycle_status, str):
         filters.append(
             dm.filters.Equals(view_id.as_property_ref("ResourceLifecycleStatus"), value=resource_lifecycle_status)
         )
@@ -1043,7 +1043,7 @@ def _create_wellbore_trajectory_datum_filter(
                 view_id.as_property_ref("ResourceLifecycleStatus"), value=resource_lifecycle_status_prefix
             )
         )
-    if resource_security_classification and isinstance(resource_security_classification, str):
+    if resource_security_classification is not None and isinstance(resource_security_classification, str):
         filters.append(
             dm.filters.Equals(
                 view_id.as_property_ref("ResourceSecurityClassification"), value=resource_security_classification
@@ -1061,13 +1061,13 @@ def _create_wellbore_trajectory_datum_filter(
                 view_id.as_property_ref("ResourceSecurityClassification"), value=resource_security_classification_prefix
             )
         )
-    if service_company_id and isinstance(service_company_id, str):
+    if service_company_id is not None and isinstance(service_company_id, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("ServiceCompanyID"), value=service_company_id))
     if service_company_id and isinstance(service_company_id, list):
         filters.append(dm.filters.In(view_id.as_property_ref("ServiceCompanyID"), values=service_company_id))
     if service_company_id_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("ServiceCompanyID"), value=service_company_id_prefix))
-    if source and isinstance(source, str):
+    if source is not None and isinstance(source, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("Source"), value=source))
     if source and isinstance(source, list):
         filters.append(dm.filters.In(view_id.as_property_ref("Source"), values=source))
@@ -1128,13 +1128,13 @@ def _create_wellbore_trajectory_datum_filter(
                 values=[{"space": item[0], "externalId": item[1]} for item in spatial_point],
             )
         )
-    if start_date_time and isinstance(start_date_time, str):
+    if start_date_time is not None and isinstance(start_date_time, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("StartDateTime"), value=start_date_time))
     if start_date_time and isinstance(start_date_time, list):
         filters.append(dm.filters.In(view_id.as_property_ref("StartDateTime"), values=start_date_time))
     if start_date_time_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("StartDateTime"), value=start_date_time_prefix))
-    if submitter_name and isinstance(submitter_name, str):
+    if submitter_name is not None and isinstance(submitter_name, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("SubmitterName"), value=submitter_name))
     if submitter_name and isinstance(submitter_name, list):
         filters.append(dm.filters.In(view_id.as_property_ref("SubmitterName"), values=submitter_name))
@@ -1156,7 +1156,7 @@ def _create_wellbore_trajectory_datum_filter(
                 lte=max_surface_scale_factor,
             )
         )
-    if survey_reference_identifier and isinstance(survey_reference_identifier, str):
+    if survey_reference_identifier is not None and isinstance(survey_reference_identifier, str):
         filters.append(
             dm.filters.Equals(view_id.as_property_ref("SurveyReferenceIdentifier"), value=survey_reference_identifier)
         )
@@ -1170,19 +1170,19 @@ def _create_wellbore_trajectory_datum_filter(
                 view_id.as_property_ref("SurveyReferenceIdentifier"), value=survey_reference_identifier_prefix
             )
         )
-    if survey_tool_type_id and isinstance(survey_tool_type_id, str):
+    if survey_tool_type_id is not None and isinstance(survey_tool_type_id, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("SurveyToolTypeID"), value=survey_tool_type_id))
     if survey_tool_type_id and isinstance(survey_tool_type_id, list):
         filters.append(dm.filters.In(view_id.as_property_ref("SurveyToolTypeID"), values=survey_tool_type_id))
     if survey_tool_type_id_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("SurveyToolTypeID"), value=survey_tool_type_id_prefix))
-    if survey_type and isinstance(survey_type, str):
+    if survey_type is not None and isinstance(survey_type, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("SurveyType"), value=survey_type))
     if survey_type and isinstance(survey_type, list):
         filters.append(dm.filters.In(view_id.as_property_ref("SurveyType"), values=survey_type))
     if survey_type_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("SurveyType"), value=survey_type_prefix))
-    if survey_version and isinstance(survey_version, str):
+    if survey_version is not None and isinstance(survey_version, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("SurveyVersion"), value=survey_version))
     if survey_version and isinstance(survey_version, list):
         filters.append(dm.filters.In(view_id.as_property_ref("SurveyVersion"), values=survey_version))
@@ -1240,7 +1240,7 @@ def _create_wellbore_trajectory_datum_filter(
                 values=[{"space": item[0], "externalId": item[1]} for item in vertical_measurement],
             )
         )
-    if wellbore_id and isinstance(wellbore_id, str):
+    if wellbore_id is not None and isinstance(wellbore_id, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("WellboreID"), value=wellbore_id))
     if wellbore_id and isinstance(wellbore_id, list):
         filters.append(dm.filters.In(view_id.as_property_ref("WellboreID"), values=wellbore_id))
@@ -1248,7 +1248,7 @@ def _create_wellbore_trajectory_datum_filter(
         filters.append(dm.filters.Prefix(view_id.as_property_ref("WellboreID"), value=wellbore_id_prefix))
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
+    if space is not None and isinstance(space, str):
         filters.append(dm.filters.Equals(["node", "space"], value=space))
     if space and isinstance(space, list):
         filters.append(dm.filters.In(["node", "space"], values=space))

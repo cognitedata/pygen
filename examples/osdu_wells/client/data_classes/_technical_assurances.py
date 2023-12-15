@@ -217,19 +217,19 @@ def _create_technical_assurance_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
-    if comment and isinstance(comment, str):
+    if comment is not None and isinstance(comment, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("Comment"), value=comment))
     if comment and isinstance(comment, list):
         filters.append(dm.filters.In(view_id.as_property_ref("Comment"), values=comment))
     if comment_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("Comment"), value=comment_prefix))
-    if effective_date and isinstance(effective_date, str):
+    if effective_date is not None and isinstance(effective_date, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("EffectiveDate"), value=effective_date))
     if effective_date and isinstance(effective_date, list):
         filters.append(dm.filters.In(view_id.as_property_ref("EffectiveDate"), values=effective_date))
     if effective_date_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("EffectiveDate"), value=effective_date_prefix))
-    if technical_assurance_type_id and isinstance(technical_assurance_type_id, str):
+    if technical_assurance_type_id is not None and isinstance(technical_assurance_type_id, str):
         filters.append(
             dm.filters.Equals(view_id.as_property_ref("TechnicalAssuranceTypeID"), value=technical_assurance_type_id)
         )
@@ -245,7 +245,7 @@ def _create_technical_assurance_filter(
         )
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
+    if space is not None and isinstance(space, str):
         filters.append(dm.filters.Equals(["node", "space"], value=space))
     if space and isinstance(space, list):
         filters.append(dm.filters.In(["node", "space"], values=space))

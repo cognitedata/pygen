@@ -159,7 +159,7 @@ def _create_historical_interest_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
-    if effective_date_time and isinstance(effective_date_time, str):
+    if effective_date_time is not None and isinstance(effective_date_time, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("EffectiveDateTime"), value=effective_date_time))
     if effective_date_time and isinstance(effective_date_time, list):
         filters.append(dm.filters.In(view_id.as_property_ref("EffectiveDateTime"), values=effective_date_time))
@@ -167,13 +167,13 @@ def _create_historical_interest_filter(
         filters.append(
             dm.filters.Prefix(view_id.as_property_ref("EffectiveDateTime"), value=effective_date_time_prefix)
         )
-    if interest_type_id and isinstance(interest_type_id, str):
+    if interest_type_id is not None and isinstance(interest_type_id, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("InterestTypeID"), value=interest_type_id))
     if interest_type_id and isinstance(interest_type_id, list):
         filters.append(dm.filters.In(view_id.as_property_ref("InterestTypeID"), values=interest_type_id))
     if interest_type_id_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("InterestTypeID"), value=interest_type_id_prefix))
-    if termination_date_time and isinstance(termination_date_time, str):
+    if termination_date_time is not None and isinstance(termination_date_time, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("TerminationDateTime"), value=termination_date_time))
     if termination_date_time and isinstance(termination_date_time, list):
         filters.append(dm.filters.In(view_id.as_property_ref("TerminationDateTime"), values=termination_date_time))
@@ -183,7 +183,7 @@ def _create_historical_interest_filter(
         )
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
+    if space is not None and isinstance(space, str):
         filters.append(dm.filters.Equals(["node", "space"], value=space))
     if space and isinstance(space, list):
         filters.append(dm.filters.In(["node", "space"], values=space))

@@ -390,7 +390,7 @@ def _create_work_order_filter(
                 lte=max_created_date.isoformat(timespec="milliseconds") if max_created_date else None,
             )
         )
-    if description and isinstance(description, str):
+    if description is not None and isinstance(description, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("description"), value=description))
     if description and isinstance(description, list):
         filters.append(dm.filters.In(view_id.as_property_ref("description"), values=description))
@@ -416,13 +416,13 @@ def _create_work_order_filter(
                 lte=max_end_time.isoformat(timespec="milliseconds") if max_end_time else None,
             )
         )
-    if is_active and isinstance(is_active, bool):
+    if is_active is not None and isinstance(is_active, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("isActive"), value=is_active))
-    if is_cancelled and isinstance(is_cancelled, bool):
+    if is_cancelled is not None and isinstance(is_cancelled, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("isCancelled"), value=is_cancelled))
-    if is_completed and isinstance(is_completed, bool):
+    if is_completed is not None and isinstance(is_completed, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("isCompleted"), value=is_completed))
-    if is_safety_critical and isinstance(is_safety_critical, bool):
+    if is_safety_critical is not None and isinstance(is_safety_critical, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("isSafetyCritical"), value=is_safety_critical))
     if min_percentage_progress or max_percentage_progress:
         filters.append(
@@ -438,7 +438,7 @@ def _create_work_order_filter(
                 lte=max_planned_start.isoformat(timespec="milliseconds") if max_planned_start else None,
             )
         )
-    if priority_description and isinstance(priority_description, str):
+    if priority_description is not None and isinstance(priority_description, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("priorityDescription"), value=priority_description))
     if priority_description and isinstance(priority_description, list):
         filters.append(dm.filters.In(view_id.as_property_ref("priorityDescription"), values=priority_description))
@@ -446,7 +446,7 @@ def _create_work_order_filter(
         filters.append(
             dm.filters.Prefix(view_id.as_property_ref("priorityDescription"), value=priority_description_prefix)
         )
-    if program_number and isinstance(program_number, str):
+    if program_number is not None and isinstance(program_number, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("programNumber"), value=program_number))
     if program_number and isinstance(program_number, list):
         filters.append(dm.filters.In(view_id.as_property_ref("programNumber"), values=program_number))
@@ -460,25 +460,25 @@ def _create_work_order_filter(
                 lte=max_start_time.isoformat(timespec="milliseconds") if max_start_time else None,
             )
         )
-    if status and isinstance(status, str):
+    if status is not None and isinstance(status, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("status"), value=status))
     if status and isinstance(status, list):
         filters.append(dm.filters.In(view_id.as_property_ref("status"), values=status))
     if status_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("status"), value=status_prefix))
-    if title and isinstance(title, str):
+    if title is not None and isinstance(title, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("title"), value=title))
     if title and isinstance(title, list):
         filters.append(dm.filters.In(view_id.as_property_ref("title"), values=title))
     if title_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("title"), value=title_prefix))
-    if work_order_number and isinstance(work_order_number, str):
+    if work_order_number is not None and isinstance(work_order_number, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("workOrderNumber"), value=work_order_number))
     if work_order_number and isinstance(work_order_number, list):
         filters.append(dm.filters.In(view_id.as_property_ref("workOrderNumber"), values=work_order_number))
     if work_order_number_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("workOrderNumber"), value=work_order_number_prefix))
-    if work_package_number and isinstance(work_package_number, str):
+    if work_package_number is not None and isinstance(work_package_number, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("workPackageNumber"), value=work_package_number))
     if work_package_number and isinstance(work_package_number, list):
         filters.append(dm.filters.In(view_id.as_property_ref("workPackageNumber"), values=work_package_number))
@@ -488,7 +488,7 @@ def _create_work_order_filter(
         )
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
+    if space is not None and isinstance(space, str):
         filters.append(dm.filters.Equals(["node", "space"], value=space))
     if space and isinstance(space, list):
         filters.append(dm.filters.In(["node", "space"], values=space))

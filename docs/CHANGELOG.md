@@ -14,6 +14,11 @@ Changes are grouped as follows
 - `Security` in case of vulnerabilities.
 
 
+## [0.32.2] - 15-12-23
+### Fixed
+* Filtering on a boolean value in the generated SDK with value `False` returned both `True` and `False` values. This is now fixed.
+  (The fix from yesterday only solved the issue for `True` values).
+
 ## [0.32.1] - 14-12-23
 ### Fixed
 * Filtering on a boolean value in the generated SDK returned both `True` and `False` values. This is now fixed.

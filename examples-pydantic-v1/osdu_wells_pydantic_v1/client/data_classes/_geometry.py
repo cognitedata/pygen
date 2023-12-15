@@ -148,7 +148,7 @@ def _create_geometry_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
-    if type_ and isinstance(type_, str):
+    if type_ is not None and isinstance(type_, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("type"), value=type_))
     if type_ and isinstance(type_, list):
         filters.append(dm.filters.In(view_id.as_property_ref("type"), values=type_))
@@ -156,7 +156,7 @@ def _create_geometry_filter(
         filters.append(dm.filters.Prefix(view_id.as_property_ref("type"), value=type_prefix))
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
+    if space is not None and isinstance(space, str):
         filters.append(dm.filters.Equals(["node", "space"], value=space))
     if space and isinstance(space, list):
         filters.append(dm.filters.In(["node", "space"], values=space))

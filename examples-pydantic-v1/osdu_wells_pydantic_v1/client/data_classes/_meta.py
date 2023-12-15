@@ -170,19 +170,19 @@ def _create_meta_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
-    if kind and isinstance(kind, str):
+    if kind is not None and isinstance(kind, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("kind"), value=kind))
     if kind and isinstance(kind, list):
         filters.append(dm.filters.In(view_id.as_property_ref("kind"), values=kind))
     if kind_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("kind"), value=kind_prefix))
-    if name and isinstance(name, str):
+    if name is not None and isinstance(name, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
     if name and isinstance(name, list):
         filters.append(dm.filters.In(view_id.as_property_ref("name"), values=name))
     if name_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
-    if persistable_reference and isinstance(persistable_reference, str):
+    if persistable_reference is not None and isinstance(persistable_reference, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("persistableReference"), value=persistable_reference))
     if persistable_reference and isinstance(persistable_reference, list):
         filters.append(dm.filters.In(view_id.as_property_ref("persistableReference"), values=persistable_reference))
@@ -190,7 +190,7 @@ def _create_meta_filter(
         filters.append(
             dm.filters.Prefix(view_id.as_property_ref("persistableReference"), value=persistable_reference_prefix)
         )
-    if unit_of_measure_id and isinstance(unit_of_measure_id, str):
+    if unit_of_measure_id is not None and isinstance(unit_of_measure_id, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("unitOfMeasureID"), value=unit_of_measure_id))
     if unit_of_measure_id and isinstance(unit_of_measure_id, list):
         filters.append(dm.filters.In(view_id.as_property_ref("unitOfMeasureID"), values=unit_of_measure_id))
@@ -198,7 +198,7 @@ def _create_meta_filter(
         filters.append(dm.filters.Prefix(view_id.as_property_ref("unitOfMeasureID"), value=unit_of_measure_id_prefix))
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
+    if space is not None and isinstance(space, str):
         filters.append(dm.filters.Equals(["node", "space"], value=space))
     if space and isinstance(space, list):
         filters.append(dm.filters.In(["node", "space"], values=space))

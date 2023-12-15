@@ -191,13 +191,13 @@ def _create_unacceptable_usage_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
-    if data_quality_id and isinstance(data_quality_id, str):
+    if data_quality_id is not None and isinstance(data_quality_id, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("DataQualityID"), value=data_quality_id))
     if data_quality_id and isinstance(data_quality_id, list):
         filters.append(dm.filters.In(view_id.as_property_ref("DataQualityID"), values=data_quality_id))
     if data_quality_id_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("DataQualityID"), value=data_quality_id_prefix))
-    if data_quality_rule_set_id and isinstance(data_quality_rule_set_id, str):
+    if data_quality_rule_set_id is not None and isinstance(data_quality_rule_set_id, str):
         filters.append(
             dm.filters.Equals(view_id.as_property_ref("DataQualityRuleSetID"), value=data_quality_rule_set_id)
         )
@@ -207,7 +207,7 @@ def _create_unacceptable_usage_filter(
         filters.append(
             dm.filters.Prefix(view_id.as_property_ref("DataQualityRuleSetID"), value=data_quality_rule_set_id_prefix)
         )
-    if value_chain_status_type_id and isinstance(value_chain_status_type_id, str):
+    if value_chain_status_type_id is not None and isinstance(value_chain_status_type_id, str):
         filters.append(
             dm.filters.Equals(view_id.as_property_ref("ValueChainStatusTypeID"), value=value_chain_status_type_id)
         )
@@ -221,7 +221,7 @@ def _create_unacceptable_usage_filter(
                 view_id.as_property_ref("ValueChainStatusTypeID"), value=value_chain_status_type_id_prefix
             )
         )
-    if workflow_persona_type_id and isinstance(workflow_persona_type_id, str):
+    if workflow_persona_type_id is not None and isinstance(workflow_persona_type_id, str):
         filters.append(
             dm.filters.Equals(view_id.as_property_ref("WorkflowPersonaTypeID"), value=workflow_persona_type_id)
         )
@@ -231,7 +231,7 @@ def _create_unacceptable_usage_filter(
         filters.append(
             dm.filters.Prefix(view_id.as_property_ref("WorkflowPersonaTypeID"), value=workflow_persona_type_id_prefix)
         )
-    if workflow_usage_type_id and isinstance(workflow_usage_type_id, str):
+    if workflow_usage_type_id is not None and isinstance(workflow_usage_type_id, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("WorkflowUsageTypeID"), value=workflow_usage_type_id))
     if workflow_usage_type_id and isinstance(workflow_usage_type_id, list):
         filters.append(dm.filters.In(view_id.as_property_ref("WorkflowUsageTypeID"), values=workflow_usage_type_id))
@@ -241,7 +241,7 @@ def _create_unacceptable_usage_filter(
         )
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
+    if space is not None and isinstance(space, str):
         filters.append(dm.filters.Equals(["node", "space"], value=space))
     if space and isinstance(space, list):
         filters.append(dm.filters.In(["node", "space"], values=space))

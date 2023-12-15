@@ -183,19 +183,19 @@ def _create_name_alias_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
-    if alias_name and isinstance(alias_name, str):
+    if alias_name is not None and isinstance(alias_name, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("AliasName"), value=alias_name))
     if alias_name and isinstance(alias_name, list):
         filters.append(dm.filters.In(view_id.as_property_ref("AliasName"), values=alias_name))
     if alias_name_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("AliasName"), value=alias_name_prefix))
-    if alias_name_type_id and isinstance(alias_name_type_id, str):
+    if alias_name_type_id is not None and isinstance(alias_name_type_id, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("AliasNameTypeID"), value=alias_name_type_id))
     if alias_name_type_id and isinstance(alias_name_type_id, list):
         filters.append(dm.filters.In(view_id.as_property_ref("AliasNameTypeID"), values=alias_name_type_id))
     if alias_name_type_id_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("AliasNameTypeID"), value=alias_name_type_id_prefix))
-    if definition_organisation_id and isinstance(definition_organisation_id, str):
+    if definition_organisation_id is not None and isinstance(definition_organisation_id, str):
         filters.append(
             dm.filters.Equals(view_id.as_property_ref("DefinitionOrganisationID"), value=definition_organisation_id)
         )
@@ -209,7 +209,7 @@ def _create_name_alias_filter(
                 view_id.as_property_ref("DefinitionOrganisationID"), value=definition_organisation_id_prefix
             )
         )
-    if effective_date_time and isinstance(effective_date_time, str):
+    if effective_date_time is not None and isinstance(effective_date_time, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("EffectiveDateTime"), value=effective_date_time))
     if effective_date_time and isinstance(effective_date_time, list):
         filters.append(dm.filters.In(view_id.as_property_ref("EffectiveDateTime"), values=effective_date_time))
@@ -217,7 +217,7 @@ def _create_name_alias_filter(
         filters.append(
             dm.filters.Prefix(view_id.as_property_ref("EffectiveDateTime"), value=effective_date_time_prefix)
         )
-    if termination_date_time and isinstance(termination_date_time, str):
+    if termination_date_time is not None and isinstance(termination_date_time, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("TerminationDateTime"), value=termination_date_time))
     if termination_date_time and isinstance(termination_date_time, list):
         filters.append(dm.filters.In(view_id.as_property_ref("TerminationDateTime"), values=termination_date_time))
@@ -227,7 +227,7 @@ def _create_name_alias_filter(
         )
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
+    if space is not None and isinstance(space, str):
         filters.append(dm.filters.Equals(["node", "space"], value=space))
     if space and isinstance(space, list):
         filters.append(dm.filters.In(["node", "space"], values=space))

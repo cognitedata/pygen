@@ -148,7 +148,7 @@ def _create_legal_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
-    if status and isinstance(status, str):
+    if status is not None and isinstance(status, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("status"), value=status))
     if status and isinstance(status, list):
         filters.append(dm.filters.In(view_id.as_property_ref("status"), values=status))
@@ -156,7 +156,7 @@ def _create_legal_filter(
         filters.append(dm.filters.Prefix(view_id.as_property_ref("status"), value=status_prefix))
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
+    if space is not None and isinstance(space, str):
         filters.append(dm.filters.Equals(["node", "space"], value=space))
     if space and isinstance(space, list):
         filters.append(dm.filters.In(["node", "space"], values=space))

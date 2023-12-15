@@ -149,13 +149,13 @@ def _create_lineage_assertion_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
-    if id_ and isinstance(id_, str):
+    if id_ is not None and isinstance(id_, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("ID"), value=id_))
     if id_ and isinstance(id_, list):
         filters.append(dm.filters.In(view_id.as_property_ref("ID"), values=id_))
     if id_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("ID"), value=id_prefix))
-    if lineage_relationship_type and isinstance(lineage_relationship_type, str):
+    if lineage_relationship_type is not None and isinstance(lineage_relationship_type, str):
         filters.append(
             dm.filters.Equals(view_id.as_property_ref("LineageRelationshipType"), value=lineage_relationship_type)
         )
@@ -171,7 +171,7 @@ def _create_lineage_assertion_filter(
         )
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
+    if space is not None and isinstance(space, str):
         filters.append(dm.filters.Equals(["node", "space"], value=space))
     if space and isinstance(space, list):
         filters.append(dm.filters.In(["node", "space"], values=space))

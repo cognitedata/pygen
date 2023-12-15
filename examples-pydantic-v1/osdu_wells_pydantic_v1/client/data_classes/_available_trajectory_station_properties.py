@@ -163,13 +163,13 @@ def _create_available_trajectory_station_property_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
-    if name and isinstance(name, str):
+    if name is not None and isinstance(name, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("Name"), value=name))
     if name and isinstance(name, list):
         filters.append(dm.filters.In(view_id.as_property_ref("Name"), values=name))
     if name_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("Name"), value=name_prefix))
-    if station_property_unit_id and isinstance(station_property_unit_id, str):
+    if station_property_unit_id is not None and isinstance(station_property_unit_id, str):
         filters.append(
             dm.filters.Equals(view_id.as_property_ref("StationPropertyUnitID"), value=station_property_unit_id)
         )
@@ -179,7 +179,7 @@ def _create_available_trajectory_station_property_filter(
         filters.append(
             dm.filters.Prefix(view_id.as_property_ref("StationPropertyUnitID"), value=station_property_unit_id_prefix)
         )
-    if trajectory_station_property_type_id and isinstance(trajectory_station_property_type_id, str):
+    if trajectory_station_property_type_id is not None and isinstance(trajectory_station_property_type_id, str):
         filters.append(
             dm.filters.Equals(
                 view_id.as_property_ref("TrajectoryStationPropertyTypeID"), value=trajectory_station_property_type_id
@@ -200,7 +200,7 @@ def _create_available_trajectory_station_property_filter(
         )
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
+    if space is not None and isinstance(space, str):
         filters.append(dm.filters.Equals(["node", "space"], value=space))
     if space and isinstance(space, list):
         filters.append(dm.filters.In(["node", "space"], values=space))

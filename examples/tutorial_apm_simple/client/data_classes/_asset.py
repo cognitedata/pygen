@@ -345,15 +345,15 @@ def _create_asset_filter(
                 lte=max_created_date.isoformat(timespec="milliseconds") if max_created_date else None,
             )
         )
-    if description and isinstance(description, str):
+    if description is not None and isinstance(description, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("description"), value=description))
     if description and isinstance(description, list):
         filters.append(dm.filters.In(view_id.as_property_ref("description"), values=description))
     if description_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("description"), value=description_prefix))
-    if is_active and isinstance(is_active, bool):
+    if is_active is not None and isinstance(is_active, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("isActive"), value=is_active))
-    if is_critical_line and isinstance(is_critical_line, bool):
+    if is_critical_line is not None and isinstance(is_critical_line, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("isCriticalLine"), value=is_critical_line))
     if parent and isinstance(parent, str):
         filters.append(
@@ -378,13 +378,13 @@ def _create_asset_filter(
                 view_id.as_property_ref("parent"), values=[{"space": item[0], "externalId": item[1]} for item in parent]
             )
         )
-    if source_db and isinstance(source_db, str):
+    if source_db is not None and isinstance(source_db, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("sourceDb"), value=source_db))
     if source_db and isinstance(source_db, list):
         filters.append(dm.filters.In(view_id.as_property_ref("sourceDb"), values=source_db))
     if source_db_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("sourceDb"), value=source_db_prefix))
-    if tag and isinstance(tag, str):
+    if tag is not None and isinstance(tag, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("tag"), value=tag))
     if tag and isinstance(tag, list):
         filters.append(dm.filters.In(view_id.as_property_ref("tag"), values=tag))
@@ -400,7 +400,7 @@ def _create_asset_filter(
         )
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
+    if space is not None and isinstance(space, str):
         filters.append(dm.filters.Equals(["node", "space"], value=space))
     if space and isinstance(space, list):
         filters.append(dm.filters.In(["node", "space"], values=space))
