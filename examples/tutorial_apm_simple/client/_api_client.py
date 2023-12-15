@@ -18,7 +18,7 @@ class ApmSimpleClient:
     ApmSimpleClient
 
     Generated with:
-        pygen = 0.32.1
+        pygen = 0.32.2
         cognite-sdk = 7.5.1
         pydantic = 2.5.2
 
@@ -36,7 +36,7 @@ class ApmSimpleClient:
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = "CognitePygen:0.32.1"
+        client.config.client_name = "CognitePygen:0.32.2"
 
         view_by_write_class = {
             data_classes.AssetApply: dm.ViewId("tutorial_apm_simple", "Asset", "beb2bebdcbb4ad"),
