@@ -62,7 +62,7 @@ class FilterCondition:
             parameter_type = parameter.type_
             if "|" in parameter_type:
                 parameter_type = parameter_type.split("|")[0].strip()
-            return f"{parameter.name} and isinstance({parameter.name}, {parameter_type})"
+            return f"{parameter.name} is not None and isinstance({parameter.name}, {parameter_type})"
 
         return " or ".join(arg.name for arg in self.keyword_arguments.values())
 
