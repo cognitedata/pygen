@@ -159,19 +159,19 @@ def _create_artefact_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
-    if resource_id and isinstance(resource_id, str):
+    if resource_id is not None and isinstance(resource_id, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("ResourceID"), value=resource_id))
     if resource_id and isinstance(resource_id, list):
         filters.append(dm.filters.In(view_id.as_property_ref("ResourceID"), values=resource_id))
     if resource_id_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("ResourceID"), value=resource_id_prefix))
-    if resource_kind and isinstance(resource_kind, str):
+    if resource_kind is not None and isinstance(resource_kind, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("ResourceKind"), value=resource_kind))
     if resource_kind and isinstance(resource_kind, list):
         filters.append(dm.filters.In(view_id.as_property_ref("ResourceKind"), values=resource_kind))
     if resource_kind_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("ResourceKind"), value=resource_kind_prefix))
-    if role_id and isinstance(role_id, str):
+    if role_id is not None and isinstance(role_id, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("RoleID"), value=role_id))
     if role_id and isinstance(role_id, list):
         filters.append(dm.filters.In(view_id.as_property_ref("RoleID"), values=role_id))
@@ -179,7 +179,7 @@ def _create_artefact_filter(
         filters.append(dm.filters.Prefix(view_id.as_property_ref("RoleID"), value=role_id_prefix))
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
+    if space is not None and isinstance(space, str):
         filters.append(dm.filters.Equals(["node", "space"], value=space))
     if space and isinstance(space, list):
         filters.append(dm.filters.In(["node", "space"], values=space))

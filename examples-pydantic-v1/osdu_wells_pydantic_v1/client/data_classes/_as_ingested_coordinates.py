@@ -241,7 +241,7 @@ def _create_as_ingested_coordinate_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
-    if coordinate_reference_system_id and isinstance(coordinate_reference_system_id, str):
+    if coordinate_reference_system_id is not None and isinstance(coordinate_reference_system_id, str):
         filters.append(
             dm.filters.Equals(
                 view_id.as_property_ref("CoordinateReferenceSystemID"), value=coordinate_reference_system_id
@@ -257,7 +257,7 @@ def _create_as_ingested_coordinate_filter(
                 view_id.as_property_ref("CoordinateReferenceSystemID"), value=coordinate_reference_system_id_prefix
             )
         )
-    if vertical_coordinate_reference_system_id and isinstance(vertical_coordinate_reference_system_id, str):
+    if vertical_coordinate_reference_system_id is not None and isinstance(vertical_coordinate_reference_system_id, str):
         filters.append(
             dm.filters.Equals(
                 view_id.as_property_ref("VerticalCoordinateReferenceSystemID"),
@@ -278,13 +278,13 @@ def _create_as_ingested_coordinate_filter(
                 value=vertical_coordinate_reference_system_id_prefix,
             )
         )
-    if vertical_unit_id and isinstance(vertical_unit_id, str):
+    if vertical_unit_id is not None and isinstance(vertical_unit_id, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("VerticalUnitID"), value=vertical_unit_id))
     if vertical_unit_id and isinstance(vertical_unit_id, list):
         filters.append(dm.filters.In(view_id.as_property_ref("VerticalUnitID"), values=vertical_unit_id))
     if vertical_unit_id_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("VerticalUnitID"), value=vertical_unit_id_prefix))
-    if persistable_reference_crs and isinstance(persistable_reference_crs, str):
+    if persistable_reference_crs is not None and isinstance(persistable_reference_crs, str):
         filters.append(
             dm.filters.Equals(view_id.as_property_ref("persistableReferenceCrs"), value=persistable_reference_crs)
         )
@@ -298,7 +298,7 @@ def _create_as_ingested_coordinate_filter(
                 view_id.as_property_ref("persistableReferenceCrs"), value=persistable_reference_crs_prefix
             )
         )
-    if persistable_reference_unit_z and isinstance(persistable_reference_unit_z, str):
+    if persistable_reference_unit_z is not None and isinstance(persistable_reference_unit_z, str):
         filters.append(
             dm.filters.Equals(view_id.as_property_ref("persistableReferenceUnitZ"), value=persistable_reference_unit_z)
         )
@@ -312,7 +312,7 @@ def _create_as_ingested_coordinate_filter(
                 view_id.as_property_ref("persistableReferenceUnitZ"), value=persistable_reference_unit_z_prefix
             )
         )
-    if persistable_reference_vertical_crs and isinstance(persistable_reference_vertical_crs, str):
+    if persistable_reference_vertical_crs is not None and isinstance(persistable_reference_vertical_crs, str):
         filters.append(
             dm.filters.Equals(
                 view_id.as_property_ref("persistableReferenceVerticalCrs"), value=persistable_reference_vertical_crs
@@ -331,7 +331,7 @@ def _create_as_ingested_coordinate_filter(
                 value=persistable_reference_vertical_crs_prefix,
             )
         )
-    if type_ and isinstance(type_, str):
+    if type_ is not None and isinstance(type_, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("type"), value=type_))
     if type_ and isinstance(type_, list):
         filters.append(dm.filters.In(view_id.as_property_ref("type"), values=type_))
@@ -339,7 +339,7 @@ def _create_as_ingested_coordinate_filter(
         filters.append(dm.filters.Prefix(view_id.as_property_ref("type"), value=type_prefix))
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
+    if space is not None and isinstance(space, str):
         filters.append(dm.filters.Equals(["node", "space"], value=space))
     if space and isinstance(space, list):
         filters.append(dm.filters.In(["node", "space"], values=space))

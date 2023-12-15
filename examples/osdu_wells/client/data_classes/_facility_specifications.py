@@ -224,7 +224,7 @@ def _create_facility_specification_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
-    if effective_date_time and isinstance(effective_date_time, str):
+    if effective_date_time is not None and isinstance(effective_date_time, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("EffectiveDateTime"), value=effective_date_time))
     if effective_date_time and isinstance(effective_date_time, list):
         filters.append(dm.filters.In(view_id.as_property_ref("EffectiveDateTime"), values=effective_date_time))
@@ -232,7 +232,7 @@ def _create_facility_specification_filter(
         filters.append(
             dm.filters.Prefix(view_id.as_property_ref("EffectiveDateTime"), value=effective_date_time_prefix)
         )
-    if facility_specification_date_time and isinstance(facility_specification_date_time, str):
+    if facility_specification_date_time is not None and isinstance(facility_specification_date_time, str):
         filters.append(
             dm.filters.Equals(
                 view_id.as_property_ref("FacilitySpecificationDateTime"), value=facility_specification_date_time
@@ -250,7 +250,7 @@ def _create_facility_specification_filter(
                 view_id.as_property_ref("FacilitySpecificationDateTime"), value=facility_specification_date_time_prefix
             )
         )
-    if facility_specification_indicator and isinstance(facility_specification_indicator, bool):
+    if facility_specification_indicator is not None and isinstance(facility_specification_indicator, bool):
         filters.append(
             dm.filters.Equals(
                 view_id.as_property_ref("FacilitySpecificationIndicator"), value=facility_specification_indicator
@@ -264,7 +264,7 @@ def _create_facility_specification_filter(
                 lte=max_facility_specification_quantity,
             )
         )
-    if facility_specification_text and isinstance(facility_specification_text, str):
+    if facility_specification_text is not None and isinstance(facility_specification_text, str):
         filters.append(
             dm.filters.Equals(view_id.as_property_ref("FacilitySpecificationText"), value=facility_specification_text)
         )
@@ -278,13 +278,13 @@ def _create_facility_specification_filter(
                 view_id.as_property_ref("FacilitySpecificationText"), value=facility_specification_text_prefix
             )
         )
-    if parameter_type_id and isinstance(parameter_type_id, str):
+    if parameter_type_id is not None and isinstance(parameter_type_id, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("ParameterTypeID"), value=parameter_type_id))
     if parameter_type_id and isinstance(parameter_type_id, list):
         filters.append(dm.filters.In(view_id.as_property_ref("ParameterTypeID"), values=parameter_type_id))
     if parameter_type_id_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("ParameterTypeID"), value=parameter_type_id_prefix))
-    if termination_date_time and isinstance(termination_date_time, str):
+    if termination_date_time is not None and isinstance(termination_date_time, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("TerminationDateTime"), value=termination_date_time))
     if termination_date_time and isinstance(termination_date_time, list):
         filters.append(dm.filters.In(view_id.as_property_ref("TerminationDateTime"), values=termination_date_time))
@@ -292,7 +292,7 @@ def _create_facility_specification_filter(
         filters.append(
             dm.filters.Prefix(view_id.as_property_ref("TerminationDateTime"), value=termination_date_time_prefix)
         )
-    if unit_of_measure_id and isinstance(unit_of_measure_id, str):
+    if unit_of_measure_id is not None and isinstance(unit_of_measure_id, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("UnitOfMeasureID"), value=unit_of_measure_id))
     if unit_of_measure_id and isinstance(unit_of_measure_id, list):
         filters.append(dm.filters.In(view_id.as_property_ref("UnitOfMeasureID"), values=unit_of_measure_id))
@@ -300,7 +300,7 @@ def _create_facility_specification_filter(
         filters.append(dm.filters.Prefix(view_id.as_property_ref("UnitOfMeasureID"), value=unit_of_measure_id_prefix))
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
+    if space is not None and isinstance(space, str):
         filters.append(dm.filters.Equals(["node", "space"], value=space))
     if space and isinstance(space, list):
         filters.append(dm.filters.In(["node", "space"], values=space))

@@ -335,13 +335,13 @@ def _create_well_filter(
                 values=[{"space": item[0], "externalId": item[1]} for item in ancestry],
             )
         )
-    if create_time and isinstance(create_time, str):
+    if create_time is not None and isinstance(create_time, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("createTime"), value=create_time))
     if create_time and isinstance(create_time, list):
         filters.append(dm.filters.In(view_id.as_property_ref("createTime"), values=create_time))
     if create_time_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("createTime"), value=create_time_prefix))
-    if create_user and isinstance(create_user, str):
+    if create_user is not None and isinstance(create_user, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("createUser"), value=create_user))
     if create_user and isinstance(create_user, list):
         filters.append(dm.filters.In(view_id.as_property_ref("createUser"), values=create_user))
@@ -370,13 +370,13 @@ def _create_well_filter(
                 view_id.as_property_ref("data"), values=[{"space": item[0], "externalId": item[1]} for item in data]
             )
         )
-    if id_ and isinstance(id_, str):
+    if id_ is not None and isinstance(id_, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("id"), value=id_))
     if id_ and isinstance(id_, list):
         filters.append(dm.filters.In(view_id.as_property_ref("id"), values=id_))
     if id_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("id"), value=id_prefix))
-    if kind and isinstance(kind, str):
+    if kind is not None and isinstance(kind, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("kind"), value=kind))
     if kind and isinstance(kind, list):
         filters.append(dm.filters.In(view_id.as_property_ref("kind"), values=kind))
@@ -405,13 +405,13 @@ def _create_well_filter(
                 view_id.as_property_ref("legal"), values=[{"space": item[0], "externalId": item[1]} for item in legal]
             )
         )
-    if modify_time and isinstance(modify_time, str):
+    if modify_time is not None and isinstance(modify_time, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("modifyTime"), value=modify_time))
     if modify_time and isinstance(modify_time, list):
         filters.append(dm.filters.In(view_id.as_property_ref("modifyTime"), values=modify_time))
     if modify_time_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("modifyTime"), value=modify_time_prefix))
-    if modify_user and isinstance(modify_user, str):
+    if modify_user is not None and isinstance(modify_user, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("modifyUser"), value=modify_user))
     if modify_user and isinstance(modify_user, list):
         filters.append(dm.filters.In(view_id.as_property_ref("modifyUser"), values=modify_user))
@@ -444,7 +444,7 @@ def _create_well_filter(
         filters.append(dm.filters.Range(view_id.as_property_ref("version"), gte=min_version_, lte=max_version_))
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
+    if space is not None and isinstance(space, str):
         filters.append(dm.filters.Equals(["node", "space"], value=space))
     if space and isinstance(space, list):
         filters.append(dm.filters.In(["node", "space"], values=space))

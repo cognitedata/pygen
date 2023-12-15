@@ -235,7 +235,7 @@ def _create_cdf_3_d_connection_property_filter(
         )
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["edge", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
+    if space is not None and isinstance(space, str):
         filters.append(dm.filters.Equals(["edge", "space"], value=space))
     if space and isinstance(space, list):
         filters.append(dm.filters.In(["edge", "space"], values=space))

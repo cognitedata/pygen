@@ -321,7 +321,7 @@ def _create_spatial_point_filter(
                 values=[{"space": item[0], "externalId": item[1]} for item in as_ingested_coordinates],
             )
         )
-    if coordinate_quality_check_date_time and isinstance(coordinate_quality_check_date_time, str):
+    if coordinate_quality_check_date_time is not None and isinstance(coordinate_quality_check_date_time, str):
         filters.append(
             dm.filters.Equals(
                 view_id.as_property_ref("CoordinateQualityCheckDateTime"), value=coordinate_quality_check_date_time
@@ -340,7 +340,7 @@ def _create_spatial_point_filter(
                 value=coordinate_quality_check_date_time_prefix,
             )
         )
-    if coordinate_quality_check_performed_by and isinstance(coordinate_quality_check_performed_by, str):
+    if coordinate_quality_check_performed_by is not None and isinstance(coordinate_quality_check_performed_by, str):
         filters.append(
             dm.filters.Equals(
                 view_id.as_property_ref("CoordinateQualityCheckPerformedBy"),
@@ -361,7 +361,7 @@ def _create_spatial_point_filter(
                 value=coordinate_quality_check_performed_by_prefix,
             )
         )
-    if qualitative_spatial_accuracy_type_id and isinstance(qualitative_spatial_accuracy_type_id, str):
+    if qualitative_spatial_accuracy_type_id is not None and isinstance(qualitative_spatial_accuracy_type_id, str):
         filters.append(
             dm.filters.Equals(
                 view_id.as_property_ref("QualitativeSpatialAccuracyTypeID"), value=qualitative_spatial_accuracy_type_id
@@ -380,7 +380,7 @@ def _create_spatial_point_filter(
                 value=qualitative_spatial_accuracy_type_id_prefix,
             )
         )
-    if quantitative_accuracy_band_id and isinstance(quantitative_accuracy_band_id, str):
+    if quantitative_accuracy_band_id is not None and isinstance(quantitative_accuracy_band_id, str):
         filters.append(
             dm.filters.Equals(
                 view_id.as_property_ref("QuantitativeAccuracyBandID"), value=quantitative_accuracy_band_id
@@ -396,7 +396,7 @@ def _create_spatial_point_filter(
                 view_id.as_property_ref("QuantitativeAccuracyBandID"), value=quantitative_accuracy_band_id_prefix
             )
         )
-    if spatial_geometry_type_id and isinstance(spatial_geometry_type_id, str):
+    if spatial_geometry_type_id is not None and isinstance(spatial_geometry_type_id, str):
         filters.append(
             dm.filters.Equals(view_id.as_property_ref("SpatialGeometryTypeID"), value=spatial_geometry_type_id)
         )
@@ -406,7 +406,7 @@ def _create_spatial_point_filter(
         filters.append(
             dm.filters.Prefix(view_id.as_property_ref("SpatialGeometryTypeID"), value=spatial_geometry_type_id_prefix)
         )
-    if spatial_location_coordinates_date and isinstance(spatial_location_coordinates_date, str):
+    if spatial_location_coordinates_date is not None and isinstance(spatial_location_coordinates_date, str):
         filters.append(
             dm.filters.Equals(
                 view_id.as_property_ref("SpatialLocationCoordinatesDate"), value=spatial_location_coordinates_date
@@ -425,7 +425,7 @@ def _create_spatial_point_filter(
                 value=spatial_location_coordinates_date_prefix,
             )
         )
-    if spatial_parameter_type_id and isinstance(spatial_parameter_type_id, str):
+    if spatial_parameter_type_id is not None and isinstance(spatial_parameter_type_id, str):
         filters.append(
             dm.filters.Equals(view_id.as_property_ref("SpatialParameterTypeID"), value=spatial_parameter_type_id)
         )
@@ -467,7 +467,7 @@ def _create_spatial_point_filter(
         )
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
+    if space is not None and isinstance(space, str):
         filters.append(dm.filters.Equals(["node", "space"], value=space))
     if space and isinstance(space, list):
         filters.append(dm.filters.In(["node", "space"], values=space))

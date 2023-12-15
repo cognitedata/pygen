@@ -183,7 +183,7 @@ def _create_reviewer_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
-    if data_governance_role_type_id and isinstance(data_governance_role_type_id, str):
+    if data_governance_role_type_id is not None and isinstance(data_governance_role_type_id, str):
         filters.append(
             dm.filters.Equals(view_id.as_property_ref("DataGovernanceRoleTypeID"), value=data_governance_role_type_id)
         )
@@ -197,25 +197,25 @@ def _create_reviewer_filter(
                 view_id.as_property_ref("DataGovernanceRoleTypeID"), value=data_governance_role_type_id_prefix
             )
         )
-    if name and isinstance(name, str):
+    if name is not None and isinstance(name, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("Name"), value=name))
     if name and isinstance(name, list):
         filters.append(dm.filters.In(view_id.as_property_ref("Name"), values=name))
     if name_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("Name"), value=name_prefix))
-    if organisation_id and isinstance(organisation_id, str):
+    if organisation_id is not None and isinstance(organisation_id, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("OrganisationID"), value=organisation_id))
     if organisation_id and isinstance(organisation_id, list):
         filters.append(dm.filters.In(view_id.as_property_ref("OrganisationID"), values=organisation_id))
     if organisation_id_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("OrganisationID"), value=organisation_id_prefix))
-    if role_type_id and isinstance(role_type_id, str):
+    if role_type_id is not None and isinstance(role_type_id, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("RoleTypeID"), value=role_type_id))
     if role_type_id and isinstance(role_type_id, list):
         filters.append(dm.filters.In(view_id.as_property_ref("RoleTypeID"), values=role_type_id))
     if role_type_id_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("RoleTypeID"), value=role_type_id_prefix))
-    if workflow_persona_type_id and isinstance(workflow_persona_type_id, str):
+    if workflow_persona_type_id is not None and isinstance(workflow_persona_type_id, str):
         filters.append(
             dm.filters.Equals(view_id.as_property_ref("WorkflowPersonaTypeID"), value=workflow_persona_type_id)
         )
@@ -227,7 +227,7 @@ def _create_reviewer_filter(
         )
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
-    if space and isinstance(space, str):
+    if space is not None and isinstance(space, str):
         filters.append(dm.filters.Equals(["node", "space"], value=space))
     if space and isinstance(space, list):
         filters.append(dm.filters.In(["node", "space"], values=space))
