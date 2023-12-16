@@ -100,7 +100,7 @@ SHOP_SDK = ExampleSDK(
 )
 
 MOVIE_SDK = ExampleSDK(
-    data_models=[DataModelId("IntegrationTestsImmutable", "Movie", "2")],
+    data_models=[DataModelId("IntegrationTestsImmutable", "Movie", "4")],
     _top_level_package="movie_domain.client",
     client_name="MovieClient",
 )
