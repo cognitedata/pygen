@@ -21,6 +21,18 @@ def test_actor_list(movie_client: MovieClient):
     assert all(isinstance(nomination, str) for actor in actors for nomination in actor.nomination or [])
 
 
+def test_actor_retrieve(movie_client: MovieClient) -> None:
+    # Act
+    actor = movie_client.actor.retrieve("actor:quentin_tarantino")
+
+    # Assert
+    assert actor is not None
+    assert isinstance(actor, m.Actor)
+    assert actor.external_id == "actor:quentin_tarantino"
+    assert len(actor.movies or []) > 0
+    assert len(actor.nomination or []) == 0
+
+
 def test_actor_apply_retrieve_with_person(movie_client: MovieClient, cognite_client: CogniteClient):
     # Arrange
     actor = m.ActorApply(
