@@ -134,14 +134,18 @@ class ActorApply(DomainModelApply):
         edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "Movie.actors")
         for movie in self.movies or []:
             other_resources = DomainRelationApply.from_edge_to_resources(
-                cache, self, movie, edge_type, view_by_write_class
+                cache, start_node=movie, end_node=self, edge_type=edge_type, view_by_write_class=view_by_write_class
             )
             resources.extend(other_resources)
 
         edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "Role.nomination")
         for nomination in self.nomination or []:
             other_resources = DomainRelationApply.from_edge_to_resources(
-                cache, self, nomination, edge_type, view_by_write_class
+                cache,
+                start_node=self,
+                end_node=nomination,
+                edge_type=edge_type,
+                view_by_write_class=view_by_write_class,
             )
             resources.extend(other_resources)
 
