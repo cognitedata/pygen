@@ -155,9 +155,9 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_type_triple=[{% for edge_api in edge_apis %}
-                (self.{{ edge_api.parent_attribute }}, "{{ edge_api.field_name }}", dm.DirectRelationReference("{{ edge_api.type.space }}", "{{ edge_api.type.external_id }}")),{% endfor %}
-            ]
+            edge_api_name_type_direction_quad=[{% for edge_api in edge_apis %}
+                (self.{{ edge_api.parent_attribute }}, "{{ edge_api.field_name }}", dm.DirectRelationReference("{{ edge_api.type.space }}", "{{ edge_api.type.external_id }}")), {% endfor %}
+                                               ]
         )
         {% else %}
         return self._retrieve(external_id, space){% endif %}

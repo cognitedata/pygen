@@ -129,7 +129,10 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
         external_id: str,
         space: str,
         retrieve_edges: bool = False,
-        edge_api_name_type_triple: list[tuple[EdgeAPI, str, dm.DirectRelationReference]] | None = None,
+        edge_api_name_type_direction_quad: list[
+            tuple[EdgeAPI, str, dm.DirectRelationReference, Literal["outwards", "inwards"]]
+        ]
+        | None = None,
     ) -> T_DomainModel | None:
         ...
 
@@ -139,7 +142,10 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
         external_id: SequenceNotStr[str],
         space: str,
         retrieve_edges: bool = False,
-        edge_api_name_type_triple: list[tuple[EdgeAPI, str, dm.DirectRelationReference]] | None = None,
+        edge_api_name_type_direction_quad: list[
+            tuple[EdgeAPI, str, dm.DirectRelationReference, Literal["outwards", "inwards"]]
+        ]
+        | None = None,
     ) -> T_DomainModelList:
         ...
 
@@ -148,7 +154,10 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
         external_id: str | SequenceNotStr[str],
         space: str,
         retrieve_edges: bool = False,
-        edge_api_name_type_triple: list[tuple[EdgeAPI, str, dm.DirectRelationReference]] | None = None,
+        edge_api_name_type_direction_quad: list[
+            tuple[EdgeAPI, str, dm.DirectRelationReference, Literal["outwards", "inwards"]]
+        ]
+        | None = None,
     ) -> T_DomainModel | T_DomainModelList | None:
         is_multiple = True
         if isinstance(external_id, str):
@@ -161,7 +170,7 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
         nodes = self._class_list([self._class_type.from_instance(node) for node in instances.nodes])
 
         if retrieve_edges and nodes:
-            self._retrieve_and_set_edge_types(nodes, edge_api_name_type_triple)
+            self._retrieve_and_set_edge_types(nodes, edge_api_name_type_direction_quad)
 
         if not nodes:
             return None
@@ -337,9 +346,12 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
     def _retrieve_and_set_edge_types(
         cls,
         nodes: T_DomainModelList,
-        edge_api_name_type_triple: list[tuple[EdgeAPI, str, dm.DirectRelationReference]] | None = None,
+        edge_api_name_type_direction_quad: list[
+            tuple[EdgeAPI, str, dm.DirectRelationReference, Literal["outwards", "inwards"]]
+        ]
+        | None = None,
     ):
-        for edge_api, edge_name, edge_type in edge_api_name_type_triple or []:
+        for edge_api, edge_name, edge_type, direction in edge_api_name_type_direction_quad or []:
             is_type = dm.filters.Equals(
                 ["edge", "type"],
                 {"space": edge_type.space, "externalId": edge_type.external_id},
@@ -348,22 +360,35 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
                 edges = edge_api._list(limit=-1, filter_=is_type)
             else:
                 is_nodes = dm.filters.In(
-                    ["edge", "startNode"],
+                    ["edge", "startNode"] if direction == "outwards" else ["edge", "endNode"],
                     values=[id_.dump(camel_case=True, include_instance_type=False) for id_ in ids],
                 )
                 edges = edge_api._list(limit=-1, filter_=dm.filters.And(is_type, is_nodes))
-            cls._set_edges(nodes, edges, edge_name)
+            cls._set_edges(nodes, edges, edge_name, direction)
 
     @staticmethod
-    def _set_edges(nodes: Sequence[DomainModel], edges: Sequence[dm.Edge], edge_name: str):
-        edges_by_start_node: dict[tuple, list] = defaultdict(list)
+    def _set_edges(
+        nodes: Sequence[DomainModel],
+        edges: Sequence[dm.Edge],
+        edge_name: str,
+        direction: Literal["outwards", "inwards"],
+    ):
+        edges_by_node: dict[tuple, list] = defaultdict(list)
         for edge in edges:
-            edges_by_start_node[edge.start_node.as_tuple()].append(edge)
+            node_id = edge.start_node.as_tuple() if direction == "outwards" else edge.end_node.as_tuple()
+            edges_by_node[node_id].append(edge)
 
         for node in nodes:
             node_id = node.as_tuple_id()
-            if node_id in edges_by_start_node:
-                setattr(node, edge_name, [edge.end_node.external_id for edge in edges_by_start_node[node_id]])
+            if node_id in edges_by_node:
+                setattr(
+                    node,
+                    edge_name,
+                    [
+                        edge.end_node.external_id if direction == "outwards" else edge.start_node.external_id
+                        for edge in edges_by_node[node_id]
+                    ],
+                )
 
 
 class EdgeAPI:

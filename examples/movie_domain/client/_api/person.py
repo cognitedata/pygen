@@ -173,7 +173,7 @@ class PersonAPI(NodeAPI[Person, PersonApply, PersonList]):
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_type_triple=[
+            edge_api_name_type_direction_quad=[
                 (self.roles_edge, "roles", dm.DirectRelationReference("IntegrationTestsImmutable", "Person.roles")),
             ],
         )

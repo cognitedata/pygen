@@ -166,7 +166,7 @@ class RoleAPI(NodeAPI[Role, RoleApply, RoleList]):
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_type_triple=[
+            edge_api_name_type_direction_quad=[
                 (
                     self.nomination_edge,
                     "nomination",

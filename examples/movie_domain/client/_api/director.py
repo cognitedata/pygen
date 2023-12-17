@@ -168,7 +168,7 @@ class DirectorAPI(NodeAPI[Director, DirectorApply, DirectorList]):
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_type_triple=[
+            edge_api_name_type_direction_quad=[
                 (
                     self.movies_edge,
                     "movies",
