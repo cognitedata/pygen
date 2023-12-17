@@ -96,7 +96,7 @@ class PersonApply(DomainModelApply):
             return resources
 
         write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
-            "IntegrationTestsImmutable", "Person", "2"
+            "IntegrationTestsImmutable", "Person", "3"
         )
 
         properties = {}

@@ -16,7 +16,6 @@ from ._core import (
 )
 
 if TYPE_CHECKING:
-    from ._movie import Movie, MovieApply
     from ._nomination import Nomination, NominationApply
     from ._person import Person, PersonApply
 
@@ -38,7 +37,6 @@ class Role(DomainModel):
     Args:
         space: The space where the node is located.
         external_id: The external id of the role.
-        movies: The movie field.
         nomination: The nomination field.
         person: The person field.
         won_oscar: The won oscar field.
@@ -49,7 +47,6 @@ class Role(DomainModel):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    movies: Union[list[Movie], list[str], None] = Field(default=None, repr=False)
     nomination: Union[list[Nomination], list[str], None] = Field(default=None, repr=False)
     person: Union[Person, str, dm.NodeId, None] = Field(None, repr=False)
     won_oscar: Optional[bool] = Field(None, alias="wonOscar")
@@ -59,7 +56,6 @@ class Role(DomainModel):
         return RoleApply(
             space=self.space,
             external_id=self.external_id,
-            movies=[movie.as_apply() if isinstance(movie, DomainModel) else movie for movie in self.movies or []],
             nomination=[
                 nomination.as_apply() if isinstance(nomination, DomainModel) else nomination
                 for nomination in self.nomination or []
@@ -77,7 +73,6 @@ class RoleApply(DomainModelApply):
     Args:
         space: The space where the node is located.
         external_id: The external id of the role.
-        movies: The movie field.
         nomination: The nomination field.
         person: The person field.
         won_oscar: The won oscar field.
@@ -88,7 +83,6 @@ class RoleApply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    movies: Union[list[MovieApply], list[str], None] = Field(default=None, repr=False)
     nomination: Union[list[NominationApply], list[str], None] = Field(default=None, repr=False)
     person: Union[PersonApply, str, dm.NodeId, None] = Field(None, repr=False)
     won_oscar: Optional[bool] = Field(None, alias="wonOscar")
@@ -103,7 +97,7 @@ class RoleApply(DomainModelApply):
             return resources
 
         write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
-            "IntegrationTestsImmutable", "Role", "2"
+            "IntegrationTestsImmutable", "Role", "3"
         )
 
         properties = {}
@@ -129,13 +123,6 @@ class RoleApply(DomainModelApply):
             )
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
-
-        edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "Role.movies")
-        for movie in self.movies or []:
-            other_resources = DomainRelationApply.from_edge_to_resources(
-                cache, self, movie, edge_type, view_by_write_class
-            )
-            resources.extend(other_resources)
 
         edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "Role.nomination")
         for nomination in self.nomination or []:

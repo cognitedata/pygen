@@ -67,7 +67,7 @@ class ActorQueryAPI(QueryAPI[T_DomainModelList]):
         from_ = self._builder[-1].name
 
         edge_filter = _create_edge_filter(
-            dm.DirectRelationReference("IntegrationTestsImmutable", "Role.movies"),
+            dm.DirectRelationReference("IntegrationTestsImmutable", "Movie.actors"),
             external_id_prefix=external_id_prefix,
             space=space,
         )

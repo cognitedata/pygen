@@ -169,7 +169,11 @@ class DirectorAPI(NodeAPI[Director, DirectorApply, DirectorList]):
             space,
             retrieve_edges=True,
             edge_api_name_type_triple=[
-                (self.movies_edge, "movies", dm.DirectRelationReference("IntegrationTestsImmutable", "Role.movies")),
+                (
+                    self.movies_edge,
+                    "movies",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "Movie.directors"),
+                ),
                 (
                     self.nomination_edge,
                     "nomination",
@@ -368,7 +372,11 @@ class DirectorAPI(NodeAPI[Director, DirectorApply, DirectorList]):
             filter=filter_,
             retrieve_edges=retrieve_edges,
             edge_api_name_type_triple=[
-                (self.movies_edge, "movies", dm.DirectRelationReference("IntegrationTestsImmutable", "Role.movies")),
+                (
+                    self.movies_edge,
+                    "movies",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "Movie.directors"),
+                ),
                 (
                     self.nomination_edge,
                     "nomination",
