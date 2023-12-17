@@ -82,8 +82,10 @@ def test_circular_query_from_actor(movie_client: MovieClient):
     assert len(actors) > 0
     for actor in actors:
         assert isinstance(actor, m.Actor)
+        assert len(actor.movies or []) > 0
         for movie in actor.movies:
             assert isinstance(movie, m.Movie)
+            assert len(movie.actors or []) > 0
             for movie_actor in movie.actors:
                 assert isinstance(movie_actor, m.Actor)
 
