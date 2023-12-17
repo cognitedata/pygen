@@ -533,7 +533,7 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
 
     def unpack(self) -> T_DomainModelList:
         nodes_by_type: dict[str | None, dict[tuple[str, str], DomainModel]] = defaultdict(dict)
-        edges_by_type_by_start_node: dict[tuple[str, str], dict[tuple[str, str], list[dm.Edge]]] = defaultdict(
+        edges_by_type_by_source_node: dict[tuple[str, str, str], dict[tuple[str, str], list[dm.Edge]]] = defaultdict(
             lambda: defaultdict(list)
         )
         relation_by_type_by_start_node: dict[
@@ -551,8 +551,9 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
             if step.result_cls is None:  # This is a data model edge.
                 for edge in step.results:
                     edge = cast(dm.Edge, edge)
-                    edges_by_type_by_start_node[(from_, name)][
-                        (edge.start_node.space, edge.start_node.external_id)
+                    edge_source = edge.start_node if step.expression.direction == "outwards" else edge.end_node
+                    edges_by_type_by_source_node[(from_, name, step.expression.direction)][
+                        (edge_source.space, edge_source.external_id)
                     ].append(edge)
             elif issubclass(step.result_cls, DomainModel):
                 for node in step.results:
@@ -594,11 +595,20 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
                         # Relations always have an end node.
                         relation.end_node = node
 
-        for (node_name, node_attribute), edges_by_start_node in edges_by_type_by_start_node.items():
+        for (node_name, node_attribute, direction), edges_by_source_node in edges_by_type_by_source_node.items():
             for node in nodes_by_type[node_name].values():
-                edges = edges_by_start_node.get(node.as_tuple_id(), [])
+                edges = edges_by_source_node.get(node.as_tuple_id(), [])
                 nodes = nodes_by_type.get(node_attribute_to_node_type.get(node_attribute), {})
-                setattr(node, node_attribute, [node for edge in edges if (node := nodes.get(edge.end_node.as_tuple()))])
+                if direction == "outwards":
+                    setattr(
+                        node, node_attribute, [node for edge in edges if (node := nodes.get(edge.end_node.as_tuple()))]
+                    )
+                else:  # inwards
+                    setattr(
+                        node,
+                        node_attribute,
+                        [node for edge in edges if (node := nodes.get(edge.start_node.as_tuple()))],
+                    )
 
         return self._result_cls(nodes_by_type[self[0].name].values())
 
