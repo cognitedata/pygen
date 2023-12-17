@@ -191,7 +191,7 @@ def test_create_list_method(person_view: dm.View, pygen_config: PygenConfig) -> 
 
     data_class.update_fields(
         person_view.properties,
-        {dm.ViewId(space="IntegrationTestsImmutable", external_id="Role", version="2"): MagicMock(spec=NodeDataClass)},
+        {dm.ViewId(space="IntegrationTestsImmutable", external_id="Role", version="3"): MagicMock(spec=NodeDataClass)},
         [],
         config=pygen_config,
     )
@@ -238,13 +238,13 @@ def test_create_list_method_actors(actor_view: dm.View, pygen_config: PygenConfi
     )
 
     person_data_class = MagicMock(spec=NodeDataClass)
-    person_data_class.view_id = dm.ViewId(space="IntegrationTestsImmutable", external_id="Person", version="2")
+    person_data_class.view_id = dm.ViewId(space="IntegrationTestsImmutable", external_id="Person", version="3")
     data_class_by_view_id = {
-        dm.ViewId(space="IntegrationTestsImmutable", external_id="Movie", version="2"): MagicMock(spec=NodeDataClass),
-        dm.ViewId(space="IntegrationTestsImmutable", external_id="Nomination", version="2"): MagicMock(
+        dm.ViewId(space="IntegrationTestsImmutable", external_id="Movie", version="3"): MagicMock(spec=NodeDataClass),
+        dm.ViewId(space="IntegrationTestsImmutable", external_id="Nomination", version="3"): MagicMock(
             spec=NodeDataClass
         ),
-        dm.ViewId(space="IntegrationTestsImmutable", external_id="Person", version="2"): person_data_class,
+        dm.ViewId(space="IntegrationTestsImmutable", external_id="Person", version="3"): person_data_class,
     }
     data_class.update_fields(
         actor_view.properties,
