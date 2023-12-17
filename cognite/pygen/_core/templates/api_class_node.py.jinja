@@ -371,8 +371,8 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_type_triple=[{% for edge_api in edge_apis %}
-                (self.{{ edge_api.parent_attribute }}, "{{ edge_api.field_name }}", dm.DirectRelationReference("{{ edge_api.type.space }}", "{{ edge_api.type.external_id }}")),{% endfor %}
-            ]
+            edge_api_name_type_direction_quad=[{% for edge_api in edge_apis %}
+                (self.{{ edge_api.parent_attribute }}, "{{ edge_api.field_name }}", dm.DirectRelationReference("{{ edge_api.type.space }}", "{{ edge_api.type.external_id }}")), {% endfor %}
+                                               ]
         )
         {% else %}return self._list(limit=limit, filter=filter_){% endif %}

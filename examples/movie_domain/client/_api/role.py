@@ -364,7 +364,7 @@ class RoleAPI(NodeAPI[Role, RoleApply, RoleList]):
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_type_triple=[
+            edge_api_name_type_direction_quad=[
                 (
                     self.nomination_edge,
                     "nomination",

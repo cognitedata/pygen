@@ -333,12 +333,15 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
         limit: int,
         filter: dm.Filter,
         retrieve_edges: bool = False,
-        edge_api_name_type_triple: list[tuple[EdgeAPI, str, dm.DirectRelationReference]] | None = None,
+        edge_api_name_type_direction_quad: list[
+            tuple[EdgeAPI, str, dm.DirectRelationReference, Literal["outwards", "inwards"]]
+        ]
+        | None = None,
     ) -> T_DomainModelList:
         nodes = self._client.data_modeling.instances.list("node", sources=self._sources, limit=limit, filter=filter)
         node_list = self._class_list([self._class_type.from_instance(node) for node in nodes])
         if retrieve_edges and node_list:
-            self._retrieve_and_set_edge_types(node_list, edge_api_name_type_triple)
+            self._retrieve_and_set_edge_types(node_list, edge_api_name_type_direction_quad)
 
         return node_list
 

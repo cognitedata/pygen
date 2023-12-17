@@ -510,7 +510,7 @@ class MovieAPI(NodeAPI[Movie, MovieApply, MovieList]):
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_type_triple=[
+            edge_api_name_type_direction_quad=[
                 (self.actors_edge, "actors", dm.DirectRelationReference("IntegrationTestsImmutable", "Movie.actors")),
                 (
                     self.directors_edge,
