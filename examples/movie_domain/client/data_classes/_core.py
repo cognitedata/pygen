@@ -15,6 +15,7 @@ from typing import (
     Iterator,
     TypeVar,
     overload,
+    Union,
 )
 
 import pandas as pd
@@ -240,7 +241,7 @@ def default_edge_external_id_factory(
 
 class DomainRelationApply(BaseModel, extra=Extra.forbid, populate_by_name=True):
     external_id_factory: ClassVar[
-        Callable[[DomainModelApply | str, DomainModelApply | str, dm.DirectRelationReference], str]
+        Callable[[Union[DomainModelApply, str], Union[DomainModelApply, str], dm.DirectRelationReference], str]
     ] = default_edge_external_id_factory
     existing_version: Optional[int] = None
     external_id: Optional[str] = Field(None, min_length=1, max_length=255)
@@ -305,6 +306,9 @@ class DomainRelationApply(BaseModel, extra=Extra.forbid, populate_by_name=True):
 
         if isinstance(end_node, DomainModelApply):
             other_resources = end_node._to_instances_apply(cache, view_by_write_class)
+            resources.extend(other_resources)
+        if isinstance(start_node, DomainModelApply):
+            other_resources = start_node._to_instances_apply(cache, view_by_write_class)
             resources.extend(other_resources)
         return resources
 
