@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 from dataclasses import dataclass
+from typing import Literal
 
 from cognite.client.data_classes import data_modeling as dm
 
@@ -64,6 +65,7 @@ class EdgeAPIClass(APIClass):
     edge_class: DataClass | None
     field_name: str
     type: dm.DirectRelationReference
+    direction: Literal["outwards", "inwards"]
     filter_method: FilterMethod
     doc_name: str
     query: QueryAPIClass
@@ -149,6 +151,7 @@ class EdgeAPIClass(APIClass):
             filter_method=filter_method,
             doc_name=create_name(field.name, api_class.doc_name),
             query=query_class_by_view_id[end_class.view_id],
+            direction=field.edge_direction,
         )
 
 

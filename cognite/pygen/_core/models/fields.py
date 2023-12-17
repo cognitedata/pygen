@@ -88,6 +88,7 @@ class Field(ABC):
                 variable=variable,
                 data_class=data_class_by_view_id[prop.edge_source],
                 edge_type=prop.type,
+                edge_direction=prop.direction,
                 description=prop.description,
                 pydantic_field=pydantic_field,
             )
@@ -99,6 +100,7 @@ class Field(ABC):
                 variable=variable,
                 data_class=data_class_by_view_id[prop.source],
                 edge_type=prop.type,
+                edge_direction=prop.direction,
                 description=prop.description,
                 pydantic_field=pydantic_field,
             )
@@ -410,6 +412,7 @@ class EdgeOneToMany(EdgeToOneDataClass, ABC):
 
     variable: str
     edge_type: dm.DirectRelationReference
+    edge_direction: Literal["outwards", "inwards"]
 
 
 @dataclass(frozen=True)
