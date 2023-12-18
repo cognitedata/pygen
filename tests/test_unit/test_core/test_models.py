@@ -713,28 +713,15 @@ def test_fields_type_hints(field: Field, expected_read_hint: str, expected_write
     assert field.as_read_type_hint() == expected_read_hint
 
 
-@pytest.mark.parametrize(
-    "filter_, expected",
-    [
-        (None, None),
-        (
-            dm.filters.Equals(["node", "type"], {"space": "mySpace", "externalId": "myType"}),
-            dm.DirectRelationReference("mySpace", "myType"),
-        ),
-        (
-            dm.filters.And(dm.filters.Equals(["node", "type"], {"space": "mySpace", "externalId": "myType"})),
-            dm.DirectRelationReference("mySpace", "myType"),
-        ),
-        (
-            dm.filters.Equals(["node", "space"], "mySpace"),
-            None,
-        ),
-        (dm.filters.Not(dm.filters.Equals(["node", "type"], {"space": "mySpace", "externalId": "myType"})), None),
-    ],
-)
-def test_find_node_type(filter_: dm.Filter | None, expected: dm.DirectRelationReference | None) -> None:
+def test_find_node_type() -> None:
+    # Arrange
+    view = dm.View(
+        space="mySpace", external_id="myType", version="myVersion", created_time=1, last_updated_time=2, properties={}
+    )
+    expected = dm.DirectRelationReference("mySpace", "myType")
+
     # Act
-    actual = find_node_type(filter_)
+    actual = find_node_type(view)
 
     # Assert
     assert actual == expected
