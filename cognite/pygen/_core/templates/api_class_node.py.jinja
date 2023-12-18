@@ -156,7 +156,12 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
             space,
             retrieve_edges=True,
             edge_api_name_type_direction_quad=[{% for edge_api in edge_apis %}
-                (self.{{ edge_api.parent_attribute }}, "{{ edge_api.field_name }}", dm.DirectRelationReference("{{ edge_api.type.space }}", "{{ edge_api.type.external_id }}")), {% endfor %}
+                (
+                    self.{{ edge_api.parent_attribute }},
+                    "{{ edge_api.field_name }}",
+                    dm.DirectRelationReference("{{ edge_api.type.space }}", "{{ edge_api.type.external_id }}"),
+                    "{{ edge_api.direction }}",
+                ),{% endfor %}
                                                ]
         )
         {% else %}
@@ -372,7 +377,12 @@ class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.wri
             filter=filter_,
             retrieve_edges=retrieve_edges,
             edge_api_name_type_direction_quad=[{% for edge_api in edge_apis %}
-                (self.{{ edge_api.parent_attribute }}, "{{ edge_api.field_name }}", dm.DirectRelationReference("{{ edge_api.type.space }}", "{{ edge_api.type.external_id }}")), {% endfor %}
+                (
+                    self.{{ edge_api.parent_attribute }},
+                    "{{ edge_api.field_name }}",
+                    dm.DirectRelationReference("{{ edge_api.type.space }}", "{{ edge_api.type.external_id }}"),
+                    "{{ edge_api.direction }}",
+                ),{% endfor %}
                                                ]
         )
         {% else %}return self._list(limit=limit, filter=filter_){% endif %}
