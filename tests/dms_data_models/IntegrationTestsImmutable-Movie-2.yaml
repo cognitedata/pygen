@@ -461,7 +461,7 @@
           - type
         value:
           space: IntegrationTestsImmutable
-          externalId: RoleDirector
+          externalId: Director
   - createdTime: 1684079343668
     externalId: Rating
     isGlobal: false

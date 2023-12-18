@@ -143,6 +143,7 @@ class GeoContextsApply(DomainModelApply):
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
+                type=dm.DirectRelationReference("IntegrationTestsImmutable", "GeoContexts"),
                 sources=[
                     dm.NodeOrEdgeData(
                         source=write_view,

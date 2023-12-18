@@ -53,7 +53,7 @@ class OSDUClient:
     Generated with:
         pygen = 0.32.2
         cognite-sdk = 7.5.1
-        pydantic = 1.10.7
+        pydantic = 1.10.13
 
     Data Model:
         space: IntegrationTestsImmutable
