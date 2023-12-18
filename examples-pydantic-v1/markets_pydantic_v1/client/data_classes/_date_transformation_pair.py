@@ -85,6 +85,7 @@ class DateTransformationPairApply(DomainModelApply):
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
             return resources
+        cache.add(self.as_tuple_id())
 
         write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
             "market", "DateTransformationPair", "310f933a9aca9b"
