@@ -92,6 +92,7 @@ class CdfModelQueryAPI(QueryAPI[T_DomainModelList]):
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
                     from_=from_,
+                    direction="inwards",
                 ),
                 select=dm.query.Select(
                     [dm.query.SourceSelector(edge_view, ["*"])],

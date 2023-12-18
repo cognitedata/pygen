@@ -173,11 +173,13 @@ class DirectorAPI(NodeAPI[Director, DirectorApply, DirectorList]):
                     self.movies_edge,
                     "movies",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "Movie.directors"),
+                    "inwards",
                 ),
                 (
                     self.nomination_edge,
                     "nomination",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "Role.nomination"),
+                    "outwards",
                 ),
             ],
         )
@@ -376,11 +378,13 @@ class DirectorAPI(NodeAPI[Director, DirectorApply, DirectorList]):
                     self.movies_edge,
                     "movies",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "Movie.directors"),
+                    "inwards",
                 ),
                 (
                     self.nomination_edge,
                     "nomination",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "Role.nomination"),
+                    "outwards",
                 ),
             ],
         )

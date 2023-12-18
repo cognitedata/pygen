@@ -715,77 +715,121 @@ class WellboreDataApply(DomainModelApply):
         edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.DrillingReasons")
         for drilling_reason in self.drilling_reasons or []:
             other_resources = DomainRelationApply.from_edge_to_resources(
-                cache, self, drilling_reason, edge_type, view_by_write_class
+                cache,
+                start_node=self,
+                end_node=drilling_reason,
+                edge_type=edge_type,
+                view_by_write_class=view_by_write_class,
             )
             resources.extend(other_resources)
 
         edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.FacilityEvents")
         for facility_event in self.facility_events or []:
             other_resources = DomainRelationApply.from_edge_to_resources(
-                cache, self, facility_event, edge_type, view_by_write_class
+                cache,
+                start_node=self,
+                end_node=facility_event,
+                edge_type=edge_type,
+                view_by_write_class=view_by_write_class,
             )
             resources.extend(other_resources)
 
         edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.FacilityOperators")
         for facility_operator in self.facility_operators or []:
             other_resources = DomainRelationApply.from_edge_to_resources(
-                cache, self, facility_operator, edge_type, view_by_write_class
+                cache,
+                start_node=self,
+                end_node=facility_operator,
+                edge_type=edge_type,
+                view_by_write_class=view_by_write_class,
             )
             resources.extend(other_resources)
 
         edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.FacilitySpecifications")
         for facility_specification in self.facility_specifications or []:
             other_resources = DomainRelationApply.from_edge_to_resources(
-                cache, self, facility_specification, edge_type, view_by_write_class
+                cache,
+                start_node=self,
+                end_node=facility_specification,
+                edge_type=edge_type,
+                view_by_write_class=view_by_write_class,
             )
             resources.extend(other_resources)
 
         edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.FacilityStates")
         for facility_state in self.facility_states or []:
             other_resources = DomainRelationApply.from_edge_to_resources(
-                cache, self, facility_state, edge_type, view_by_write_class
+                cache,
+                start_node=self,
+                end_node=facility_state,
+                edge_type=edge_type,
+                view_by_write_class=view_by_write_class,
             )
             resources.extend(other_resources)
 
         edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.GeoContexts")
         for geo_context in self.geo_contexts or []:
             other_resources = DomainRelationApply.from_edge_to_resources(
-                cache, self, geo_context, edge_type, view_by_write_class
+                cache,
+                start_node=self,
+                end_node=geo_context,
+                edge_type=edge_type,
+                view_by_write_class=view_by_write_class,
             )
             resources.extend(other_resources)
 
         edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.HistoricalInterests")
         for historical_interest in self.historical_interests or []:
             other_resources = DomainRelationApply.from_edge_to_resources(
-                cache, self, historical_interest, edge_type, view_by_write_class
+                cache,
+                start_node=self,
+                end_node=historical_interest,
+                edge_type=edge_type,
+                view_by_write_class=view_by_write_class,
             )
             resources.extend(other_resources)
 
         edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.NameAliases")
         for name_alias in self.name_aliases or []:
             other_resources = DomainRelationApply.from_edge_to_resources(
-                cache, self, name_alias, edge_type, view_by_write_class
+                cache,
+                start_node=self,
+                end_node=name_alias,
+                edge_type=edge_type,
+                view_by_write_class=view_by_write_class,
             )
             resources.extend(other_resources)
 
         edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.TechnicalAssurances")
         for technical_assurance in self.technical_assurances or []:
             other_resources = DomainRelationApply.from_edge_to_resources(
-                cache, self, technical_assurance, edge_type, view_by_write_class
+                cache,
+                start_node=self,
+                end_node=technical_assurance,
+                edge_type=edge_type,
+                view_by_write_class=view_by_write_class,
             )
             resources.extend(other_resources)
 
         edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.VerticalMeasurements")
         for vertical_measurement in self.vertical_measurements or []:
             other_resources = DomainRelationApply.from_edge_to_resources(
-                cache, self, vertical_measurement, edge_type, view_by_write_class
+                cache,
+                start_node=self,
+                end_node=vertical_measurement,
+                edge_type=edge_type,
+                view_by_write_class=view_by_write_class,
             )
             resources.extend(other_resources)
 
         edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreData.WellboreCosts")
         for wellbore_cost in self.wellbore_costs or []:
             other_resources = DomainRelationApply.from_edge_to_resources(
-                cache, self, wellbore_cost, edge_type, view_by_write_class
+                cache,
+                start_node=self,
+                end_node=wellbore_cost,
+                edge_type=edge_type,
+                view_by_write_class=view_by_write_class,
             )
             resources.extend(other_resources)
 

@@ -171,6 +171,7 @@ class RoleAPI(NodeAPI[Role, RoleApply, RoleList]):
                     self.nomination_edge,
                     "nomination",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "Role.nomination"),
+                    "outwards",
                 ),
             ],
         )
@@ -369,6 +370,7 @@ class RoleAPI(NodeAPI[Role, RoleApply, RoleList]):
                     self.nomination_edge,
                     "nomination",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "Role.nomination"),
+                    "outwards",
                 ),
             ],
         )

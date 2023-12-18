@@ -60,10 +60,10 @@ class CdfModelEntitiesAPI(EdgePropertyAPI):
         filter_ = _create_cdf_3_d_connection_property_filter(
             dm.DirectRelationReference("cdf_3d_schema", "cdf3dEntityConnection"),
             self._view_id,
-            from_cdf_3_d_model,
-            from_cdf_3_d_model_space,
             to_cdf_3_d_entity,
             to_cdf_3_d_entity_space,
+            from_cdf_3_d_model,
+            from_cdf_3_d_model_space,
             min_revision_id,
             max_revision_id,
             min_revision_node_id,

@@ -169,11 +169,12 @@ class WgsCoordinatesAPI(NodeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_type_triple=[
+            edge_api_name_type_direction_quad=[
                 (
                     self.features_edge,
                     "features",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "Wgs84Coordinates.features"),
+                    "outwards",
                 ),
             ],
         )
@@ -424,11 +425,12 @@ class WgsCoordinatesAPI(NodeAPI[WgsCoordinates, WgsCoordinatesApply, WgsCoordina
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_type_triple=[
+            edge_api_name_type_direction_quad=[
                 (
                     self.features_edge,
                     "features",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "Wgs84Coordinates.features"),
+                    "outwards",
                 ),
             ],
         )

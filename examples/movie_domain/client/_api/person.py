@@ -174,7 +174,12 @@ class PersonAPI(NodeAPI[Person, PersonApply, PersonList]):
             space,
             retrieve_edges=True,
             edge_api_name_type_direction_quad=[
-                (self.roles_edge, "roles", dm.DirectRelationReference("IntegrationTestsImmutable", "Person.roles")),
+                (
+                    self.roles_edge,
+                    "roles",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "Person.roles"),
+                    "outwards",
+                ),
             ],
         )
 
@@ -453,6 +458,11 @@ class PersonAPI(NodeAPI[Person, PersonApply, PersonList]):
             filter=filter_,
             retrieve_edges=retrieve_edges,
             edge_api_name_type_direction_quad=[
-                (self.roles_edge, "roles", dm.DirectRelationReference("IntegrationTestsImmutable", "Person.roles")),
+                (
+                    self.roles_edge,
+                    "roles",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "Person.roles"),
+                    "outwards",
+                ),
             ],
         )

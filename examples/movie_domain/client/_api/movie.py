@@ -185,11 +185,17 @@ class MovieAPI(NodeAPI[Movie, MovieApply, MovieList]):
             space,
             retrieve_edges=True,
             edge_api_name_type_direction_quad=[
-                (self.actors_edge, "actors", dm.DirectRelationReference("IntegrationTestsImmutable", "Movie.actors")),
+                (
+                    self.actors_edge,
+                    "actors",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "Movie.actors"),
+                    "outwards",
+                ),
                 (
                     self.directors_edge,
                     "directors",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "Movie.directors"),
+                    "outwards",
                 ),
             ],
         )
@@ -511,11 +517,17 @@ class MovieAPI(NodeAPI[Movie, MovieApply, MovieList]):
             filter=filter_,
             retrieve_edges=retrieve_edges,
             edge_api_name_type_direction_quad=[
-                (self.actors_edge, "actors", dm.DirectRelationReference("IntegrationTestsImmutable", "Movie.actors")),
+                (
+                    self.actors_edge,
+                    "actors",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "Movie.actors"),
+                    "outwards",
+                ),
                 (
                     self.directors_edge,
                     "directors",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "Movie.directors"),
+                    "outwards",
                 ),
             ],
         )
