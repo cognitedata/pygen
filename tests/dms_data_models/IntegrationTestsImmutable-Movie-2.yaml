@@ -317,7 +317,7 @@
         - type
         value:
           space: IntegrationTestsImmutable
-          externalId: RoleActor
+          externalId: Actor
     properties:
       movies:
         connectionType: multi_edge_connection
