@@ -126,10 +126,13 @@ class {{ data_class.write_name }}(DomainModelApply):
                 resources.extend(other_resources)
 {% endfor %}{% for field in data_class.fields_of_type(ft.EdgeOneToManyNodes) %}
         edge_type = dm.DirectRelationReference("{{ field.edge_type.space }}", "{{ field.edge_type.external_id }}")
-        for {{ field.variable }} in self.{{ field.name }} or []:
+        for {{ field.variable }} in self.{{ field.name }} or []:{% if field.edge_direction == 'outwards' %}
             other_resources = DomainRelationApply.from_edge_to_resources(
-                cache, self, {{field.variable}}, edge_type, view_by_write_class
-            )
+                cache, start_node=self, end_node={{field.variable}}, edge_type=edge_type, view_by_write_class=view_by_write_class
+            ){% else %}
+            other_resources = DomainRelationApply.from_edge_to_resources(
+                cache, start_node={{field.variable}}, end_node=self, edge_type=edge_type, view_by_write_class=view_by_write_class
+            ){% endif %}
             resources.extend(other_resources)
 {% endfor %}{% for field in data_class.fields_of_type(ft.EdgeOneToOne) %}
         if isinstance(self.{{ field.name }}, DomainModelApply):
