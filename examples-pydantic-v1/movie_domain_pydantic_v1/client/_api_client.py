@@ -23,14 +23,14 @@ class MovieClient:
     MovieClient
 
     Generated with:
-        pygen = 0.32.2
+        pygen = 0.32.3
         cognite-sdk = 7.5.1
         pydantic = 1.10.7
 
     Data Model:
         space: IntegrationTestsImmutable
         externalId: Movie
-        version: 2
+        version: 4
     """
 
     def __init__(self, config_or_client: CogniteClient | ClientConfig):
@@ -41,19 +41,19 @@ class MovieClient:
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = "CognitePygen:0.32.2"
+        client.config.client_name = "CognitePygen:0.32.3"
 
         view_by_write_class = {
-            data_classes.ActorApply: dm.ViewId("IntegrationTestsImmutable", "Actor", "2"),
-            data_classes.BestDirectorApply: dm.ViewId("IntegrationTestsImmutable", "BestDirector", "2"),
-            data_classes.BestLeadingActorApply: dm.ViewId("IntegrationTestsImmutable", "BestLeadingActor", "2"),
-            data_classes.BestLeadingActressApply: dm.ViewId("IntegrationTestsImmutable", "BestLeadingActress", "2"),
-            data_classes.DirectorApply: dm.ViewId("IntegrationTestsImmutable", "Director", "2"),
-            data_classes.MovieApply: dm.ViewId("IntegrationTestsImmutable", "Movie", "2"),
-            data_classes.NominationApply: dm.ViewId("IntegrationTestsImmutable", "Nomination", "2"),
-            data_classes.PersonApply: dm.ViewId("IntegrationTestsImmutable", "Person", "2"),
-            data_classes.RatingApply: dm.ViewId("IntegrationTestsImmutable", "Rating", "2"),
-            data_classes.RoleApply: dm.ViewId("IntegrationTestsImmutable", "Role", "2"),
+            data_classes.ActorApply: dm.ViewId("IntegrationTestsImmutable", "Actor", "3"),
+            data_classes.BestDirectorApply: dm.ViewId("IntegrationTestsImmutable", "BestDirector", "3"),
+            data_classes.BestLeadingActorApply: dm.ViewId("IntegrationTestsImmutable", "BestLeadingActor", "3"),
+            data_classes.BestLeadingActressApply: dm.ViewId("IntegrationTestsImmutable", "BestLeadingActress", "3"),
+            data_classes.DirectorApply: dm.ViewId("IntegrationTestsImmutable", "Director", "3"),
+            data_classes.MovieApply: dm.ViewId("IntegrationTestsImmutable", "Movie", "3"),
+            data_classes.NominationApply: dm.ViewId("IntegrationTestsImmutable", "Nomination", "3"),
+            data_classes.PersonApply: dm.ViewId("IntegrationTestsImmutable", "Person", "3"),
+            data_classes.RatingApply: dm.ViewId("IntegrationTestsImmutable", "Rating", "3"),
+            data_classes.RoleApply: dm.ViewId("IntegrationTestsImmutable", "Role", "3"),
         }
 
         self.actor = ActorAPI(client, view_by_write_class)

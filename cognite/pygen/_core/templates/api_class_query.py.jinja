@@ -81,6 +81,7 @@ class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
                     from_=from_,
+                    direction="{{ edge_api.direction }}",
                 ),{% if edge_api.has_edge_class %}
                 select=dm.query.Select(
                     [dm.query.SourceSelector(edge_view, ["*"])],

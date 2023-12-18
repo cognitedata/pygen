@@ -67,7 +67,7 @@ class ActorQueryAPI(QueryAPI[T_DomainModelList]):
         from_ = self._builder[-1].name
 
         edge_filter = _create_edge_filter(
-            dm.DirectRelationReference("IntegrationTestsImmutable", "Role.movies"),
+            dm.DirectRelationReference("IntegrationTestsImmutable", "Movie.actors"),
             external_id_prefix=external_id_prefix,
             space=space,
         )
@@ -77,6 +77,7 @@ class ActorQueryAPI(QueryAPI[T_DomainModelList]):
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
                     from_=from_,
+                    direction="inwards",
                 ),
                 select=dm.query.Select(),
                 max_retrieve_limit=limit,
@@ -120,6 +121,7 @@ class ActorQueryAPI(QueryAPI[T_DomainModelList]):
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
                     from_=from_,
+                    direction="outwards",
                 ),
                 select=dm.query.Select(),
                 max_retrieve_limit=limit,

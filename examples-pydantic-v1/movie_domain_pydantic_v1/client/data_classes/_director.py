@@ -103,7 +103,7 @@ class DirectorApply(DomainModelApply):
             return resources
 
         write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
-            "IntegrationTestsImmutable", "Director", "2"
+            "IntegrationTestsImmutable", "Director", "3"
         )
 
         properties = {}
@@ -131,17 +131,21 @@ class DirectorApply(DomainModelApply):
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
 
-        edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "Role.movies")
+        edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "Movie.directors")
         for movie in self.movies or []:
             other_resources = DomainRelationApply.from_edge_to_resources(
-                cache, self, movie, edge_type, view_by_write_class
+                cache, start_node=movie, end_node=self, edge_type=edge_type, view_by_write_class=view_by_write_class
             )
             resources.extend(other_resources)
 
         edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "Role.nomination")
         for nomination in self.nomination or []:
             other_resources = DomainRelationApply.from_edge_to_resources(
-                cache, self, nomination, edge_type, view_by_write_class
+                cache,
+                start_node=self,
+                end_node=nomination,
+                edge_type=edge_type,
+                view_by_write_class=view_by_write_class,
             )
             resources.extend(other_resources)
 

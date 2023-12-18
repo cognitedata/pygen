@@ -168,12 +168,18 @@ class ActorAPI(NodeAPI[Actor, ActorApply, ActorList]):
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_type_triple=[
-                (self.movies_edge, "movies", dm.DirectRelationReference("IntegrationTestsImmutable", "Role.movies")),
+            edge_api_name_type_direction_quad=[
+                (
+                    self.movies_edge,
+                    "movies",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "Movie.actors"),
+                    "inwards",
+                ),
                 (
                     self.nomination_edge,
                     "nomination",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "Role.nomination"),
+                    "outwards",
                 ),
             ],
         )
@@ -367,12 +373,18 @@ class ActorAPI(NodeAPI[Actor, ActorApply, ActorList]):
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_type_triple=[
-                (self.movies_edge, "movies", dm.DirectRelationReference("IntegrationTestsImmutable", "Role.movies")),
+            edge_api_name_type_direction_quad=[
+                (
+                    self.movies_edge,
+                    "movies",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "Movie.actors"),
+                    "inwards",
+                ),
                 (
                     self.nomination_edge,
                     "nomination",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "Role.nomination"),
+                    "outwards",
                 ),
             ],
         )

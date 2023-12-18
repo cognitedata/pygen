@@ -30,7 +30,6 @@ from ._core import (
     QueryStep,
     QueryBuilder,
 )
-from .role_movies import RoleMoviesAPI
 from .role_nomination import RoleNominationAPI
 from .role_query import RoleQueryAPI
 
@@ -48,7 +47,6 @@ class RoleAPI(NodeAPI[Role, RoleApply, RoleList]):
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self.movies_edge = RoleMoviesAPI(client)
         self.nomination_edge = RoleNominationAPI(client)
 
     def __call__(
@@ -90,7 +88,7 @@ class RoleAPI(NodeAPI[Role, RoleApply, RoleList]):
         """Add or update (upsert) roles.
 
         Note: This method iterates through all nodes and timeseries linked to role and creates them including the edges
-        between the nodes. For example, if any of `movies` or `nomination` are set, then these
+        between the nodes. For example, if any of `nomination` are set, then these
         nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
 
         Args:
@@ -168,12 +166,12 @@ class RoleAPI(NodeAPI[Role, RoleApply, RoleList]):
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_type_triple=[
-                (self.movies_edge, "movies", dm.DirectRelationReference("IntegrationTestsImmutable", "Role.movies")),
+            edge_api_name_type_direction_quad=[
                 (
                     self.nomination_edge,
                     "nomination",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "Role.nomination"),
+                    "outwards",
                 ),
             ],
         )
@@ -340,7 +338,7 @@ class RoleAPI(NodeAPI[Role, RoleApply, RoleList]):
             space: The space to filter on.
             limit: Maximum number of roles to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            retrieve_edges: Whether to retrieve `movies` or `nomination` external ids for the roles. Defaults to True.
+            retrieve_edges: Whether to retrieve `nomination` external ids for the roles. Defaults to True.
 
         Returns:
             List of requested roles
@@ -367,12 +365,12 @@ class RoleAPI(NodeAPI[Role, RoleApply, RoleList]):
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_type_triple=[
-                (self.movies_edge, "movies", dm.DirectRelationReference("IntegrationTestsImmutable", "Role.movies")),
+            edge_api_name_type_direction_quad=[
                 (
                     self.nomination_edge,
                     "nomination",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "Role.nomination"),
+                    "outwards",
                 ),
             ],
         )

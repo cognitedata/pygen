@@ -206,11 +206,12 @@ class WorkItemAPI(NodeAPI[WorkItem, WorkItemApply, WorkItemList]):
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_type_triple=[
+            edge_api_name_type_direction_quad=[
                 (
                     self.linked_assets_edge,
                     "linked_assets",
                     dm.DirectRelationReference("tutorial_apm_simple", "WorkItem.linkedAssets"),
+                    "outwards",
                 ),
             ],
         )
@@ -643,11 +644,12 @@ class WorkItemAPI(NodeAPI[WorkItem, WorkItemApply, WorkItemList]):
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_type_triple=[
+            edge_api_name_type_direction_quad=[
                 (
                     self.linked_assets_edge,
                     "linked_assets",
                     dm.DirectRelationReference("tutorial_apm_simple", "WorkItem.linkedAssets"),
+                    "outwards",
                 ),
             ],
         )

@@ -15,6 +15,7 @@ from typing import (
     Iterator,
     TypeVar,
     overload,
+    Union,
 )
 
 import pandas as pd
@@ -226,14 +227,16 @@ T_DomainRelation = TypeVar("T_DomainRelation", bound=DomainRelation)
 
 
 def default_edge_external_id_factory(
-    start_node: DomainModelApply, end_node: dm.DirectRelationReference, edge_type: dm.DirectRelationReference
+    start_node: DomainModelApply | str, end_node: DomainModelApply | str, edge_type: dm.DirectRelationReference
 ) -> str:
-    return f"{start_node.external_id}:{end_node.external_id}"
+    start = start_node if isinstance(start_node, str) else start_node.external_id
+    end = end_node if isinstance(end_node, str) else end_node.external_id
+    return f"{start}:{end}"
 
 
 class DomainRelationApply(BaseModel):
     external_id_factory: ClassVar[
-        Callable[[DomainModelApply, dm.DirectRelationReference, dm.DirectRelationReference], str]
+        Callable[[Union[DomainModelApply, str], Union[DomainModelApply, str], dm.DirectRelationReference], str]
     ] = default_edge_external_id_factory
     existing_version: Optional[int] = None
     external_id: Optional[str] = Field(None, min_length=1, max_length=255)
@@ -254,20 +257,34 @@ class DomainRelationApply(BaseModel):
 
     @classmethod
     def create_edge(
-        cls, start_node: DomainModelApply, end_node: DomainModelApply | str, edge_type: dm.DirectRelationReference
+        cls, start_node: DomainModelApply | str, end_node: DomainModelApply | str, edge_type: dm.DirectRelationReference
     ) -> dm.EdgeApply:
+        if isinstance(start_node, DomainModelApply):
+            space = start_node.space
+        elif isinstance(start_node, DomainModelApply):
+            space = start_node.space
+        else:
+            raise TypeError(f"Either pass in a start or end node of type {DomainRelationApply.__name__}")
+
         if isinstance(end_node, str):
-            end_ref = dm.DirectRelationReference(start_node.space, end_node)
+            end_ref = dm.DirectRelationReference(space, end_node)
         elif isinstance(end_node, DomainModelApply):
             end_ref = end_node.as_direct_reference()
         else:
             raise TypeError(f"Expected str or subclass of {DomainRelationApply.__name__}, got {type(end_node)}")
 
+        if isinstance(start_node, str):
+            start_ref = dm.DirectRelationReference(space, start_node)
+        elif isinstance(start_node, DomainModelApply):
+            start_ref = start_node.as_direct_reference()
+        else:
+            raise TypeError(f"Expected str or subclass of {DomainRelationApply.__name__}, got {type(start_node)}")
+
         return dm.EdgeApply(
-            space=start_node.space,
-            external_id=cls.external_id_factory(start_node, end_ref, edge_type),
+            space=space,
+            external_id=cls.external_id_factory(start_node, end_node, edge_type),
             type=edge_type,
-            start_node=start_node.as_direct_reference(),
+            start_node=start_ref,
             end_node=end_ref,
         )
 
@@ -275,7 +292,7 @@ class DomainRelationApply(BaseModel):
     def from_edge_to_resources(
         cls,
         cache: set[tuple[str, str]],
-        start_node: DomainModelApply,
+        start_node: DomainModelApply | str,
         end_node: DomainModelApply | str,
         edge_type: dm.DirectRelationReference,
         view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None = None,
@@ -289,6 +306,10 @@ class DomainRelationApply(BaseModel):
         if isinstance(end_node, DomainModelApply):
             other_resources = end_node._to_instances_apply(cache, view_by_write_class)
             resources.extend(other_resources)
+        if isinstance(start_node, DomainModelApply):
+            other_resources = start_node._to_instances_apply(cache, view_by_write_class)
+            resources.extend(other_resources)
+
         return resources
 
 

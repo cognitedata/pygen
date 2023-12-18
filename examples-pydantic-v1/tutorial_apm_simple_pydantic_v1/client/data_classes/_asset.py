@@ -273,7 +273,7 @@ class AssetApply(DomainModelApply):
         edge_type = dm.DirectRelationReference("tutorial_apm_simple", "Asset.children")
         for child in self.children or []:
             other_resources = DomainRelationApply.from_edge_to_resources(
-                cache, self, child, edge_type, view_by_write_class
+                cache, start_node=self, end_node=child, edge_type=edge_type, view_by_write_class=view_by_write_class
             )
             resources.extend(other_resources)
 

@@ -167,9 +167,19 @@ class DateTransformationPairAPI(
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_type_triple=[
-                (self.end_edge, "end", dm.DirectRelationReference("market", "DateTransformationPair.end")),
-                (self.start_edge, "start", dm.DirectRelationReference("market", "DateTransformationPair.start")),
+            edge_api_name_type_direction_quad=[
+                (
+                    self.end_edge,
+                    "end",
+                    dm.DirectRelationReference("market", "DateTransformationPair.end"),
+                    "outwards",
+                ),
+                (
+                    self.start_edge,
+                    "start",
+                    dm.DirectRelationReference("market", "DateTransformationPair.start"),
+                    "outwards",
+                ),
             ],
         )
 
@@ -213,8 +223,18 @@ class DateTransformationPairAPI(
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_type_triple=[
-                (self.end_edge, "end", dm.DirectRelationReference("market", "DateTransformationPair.end")),
-                (self.start_edge, "start", dm.DirectRelationReference("market", "DateTransformationPair.start")),
+            edge_api_name_type_direction_quad=[
+                (
+                    self.end_edge,
+                    "end",
+                    dm.DirectRelationReference("market", "DateTransformationPair.end"),
+                    "outwards",
+                ),
+                (
+                    self.start_edge,
+                    "start",
+                    dm.DirectRelationReference("market", "DateTransformationPair.start"),
+                    "outwards",
+                ),
             ],
         )

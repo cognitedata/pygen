@@ -268,16 +268,18 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_type_triple=[
+            edge_api_name_type_direction_quad=[
                 (
                     self.linked_assets_edge,
                     "linked_assets",
                     dm.DirectRelationReference("tutorial_apm_simple", "WorkOrder.linkedAssets"),
+                    "outwards",
                 ),
                 (
                     self.work_items_edge,
                     "work_items",
                     dm.DirectRelationReference("tutorial_apm_simple", "WorkOrder.workItems"),
+                    "outwards",
                 ),
             ],
         )
@@ -976,16 +978,18 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_type_triple=[
+            edge_api_name_type_direction_quad=[
                 (
                     self.linked_assets_edge,
                     "linked_assets",
                     dm.DirectRelationReference("tutorial_apm_simple", "WorkOrder.linkedAssets"),
+                    "outwards",
                 ),
                 (
                     self.work_items_edge,
                     "work_items",
                     dm.DirectRelationReference("tutorial_apm_simple", "WorkOrder.workItems"),
+                    "outwards",
                 ),
             ],
         )
