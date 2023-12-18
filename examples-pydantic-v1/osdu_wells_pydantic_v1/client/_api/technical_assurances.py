@@ -187,21 +187,24 @@ class TechnicalAssurancesAPI(NodeAPI[TechnicalAssurances, TechnicalAssurancesApp
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_type_triple=[
+            edge_api_name_type_direction_quad=[
                 (
                     self.acceptable_usage_edge,
                     "acceptable_usage",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "TechnicalAssurances.AcceptableUsage"),
+                    "outwards",
                 ),
                 (
                     self.reviewers_edge,
                     "reviewers",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "TechnicalAssurances.Reviewers"),
+                    "outwards",
                 ),
                 (
                     self.unacceptable_usage_edge,
                     "unacceptable_usage",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "TechnicalAssurances.UnacceptableUsage"),
+                    "outwards",
                 ),
             ],
         )
@@ -508,21 +511,24 @@ class TechnicalAssurancesAPI(NodeAPI[TechnicalAssurances, TechnicalAssurancesApp
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_type_triple=[
+            edge_api_name_type_direction_quad=[
                 (
                     self.acceptable_usage_edge,
                     "acceptable_usage",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "TechnicalAssurances.AcceptableUsage"),
+                    "outwards",
                 ),
                 (
                     self.reviewers_edge,
                     "reviewers",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "TechnicalAssurances.Reviewers"),
+                    "outwards",
                 ),
                 (
                     self.unacceptable_usage_edge,
                     "unacceptable_usage",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "TechnicalAssurances.UnacceptableUsage"),
+                    "outwards",
                 ),
             ],
         )

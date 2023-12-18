@@ -123,7 +123,7 @@ class MovieApply(DomainModelApply):
             return resources
 
         write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
-            "IntegrationTestsImmutable", "Movie", "2"
+            "IntegrationTestsImmutable", "Movie", "3"
         )
 
         properties = {}
@@ -159,14 +159,14 @@ class MovieApply(DomainModelApply):
         edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "Movie.actors")
         for actor in self.actors or []:
             other_resources = DomainRelationApply.from_edge_to_resources(
-                cache, self, actor, edge_type, view_by_write_class
+                cache, start_node=self, end_node=actor, edge_type=edge_type, view_by_write_class=view_by_write_class
             )
             resources.extend(other_resources)
 
         edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "Movie.directors")
         for director in self.directors or []:
             other_resources = DomainRelationApply.from_edge_to_resources(
-                cache, self, director, edge_type, view_by_write_class
+                cache, start_node=self, end_node=director, edge_type=edge_type, view_by_write_class=view_by_write_class
             )
             resources.extend(other_resources)
 
