@@ -209,11 +209,12 @@ class AsIngestedCoordinatesAPI(NodeAPI[AsIngestedCoordinates, AsIngestedCoordina
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_type_triple=[
+            edge_api_name_type_direction_quad=[
                 (
                     self.features_edge,
                     "features",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "AsIngestedCoordinates.features"),
+                    "outwards",
                 ),
             ],
         )
@@ -634,11 +635,12 @@ class AsIngestedCoordinatesAPI(NodeAPI[AsIngestedCoordinates, AsIngestedCoordina
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_type_triple=[
+            edge_api_name_type_direction_quad=[
                 (
                     self.features_edge,
                     "features",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "AsIngestedCoordinates.features"),
+                    "outwards",
                 ),
             ],
         )

@@ -133,7 +133,7 @@ class WgsCoordinatesApply(DomainModelApply):
         edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "Wgs84Coordinates.features")
         for feature in self.features or []:
             other_resources = DomainRelationApply.from_edge_to_resources(
-                cache, self, feature, edge_type, view_by_write_class
+                cache, start_node=self, end_node=feature, edge_type=edge_type, view_by_write_class=view_by_write_class
             )
             resources.extend(other_resources)
 

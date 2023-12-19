@@ -40,7 +40,7 @@ class {{ edge_api.name }}({% if edge_api.has_edge_class %}EdgePropertyAPI{% else
         """
         filter_ = {% if edge_api.has_edge_class %}{{ edge_api.edge_class.filter_name }}{% else %}_create_edge_filter{% endif %}(
             dm.DirectRelationReference("{{ edge_api.type.space }}", "{{ edge_api.type.external_id }}"),
-            {%  if edge_api.has_edge_class  %}self._view_id,{% endif %}{% for parm in edge_api.filter_parameters() %}
+            {%  if edge_api.has_edge_class  %}self._view_id,{% endif %}{% for parm in edge_api.filter_parameters(case="filter_call") %}
             {{ parm.name }},{% endfor %}
         )
         return self._list(filter_=filter_, limit=limit)

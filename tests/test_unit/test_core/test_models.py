@@ -464,6 +464,7 @@ def create_fields_test_cases():
             variable="role",
             pydantic_field="Field",
             edge_type=dm.DirectRelationReference("IntegrationTestsImmutable", "Person.roles"),
+            edge_direction="outwards",
         ),
         "Union[list[Role], list[str], None] = Field(default=None, repr=False)",
         "Union[list[RoleApply], list[str], None] = Field(default=None, repr=False)",

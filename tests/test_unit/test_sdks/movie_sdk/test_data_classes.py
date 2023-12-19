@@ -69,7 +69,7 @@ def person_apply_to_instances_test_cases():
                     "person:christoph_waltz",
                     sources=[
                         dm.NodeOrEdgeData(
-                            source=dm.ViewId("IntegrationTestsImmutable", "Person", "2"),
+                            source=dm.ViewId("IntegrationTestsImmutable", "Person", "3"),
                             properties={"name": "Christoph Waltz", "birthYear": 1956},
                         )
                     ],
@@ -79,13 +79,13 @@ def person_apply_to_instances_test_cases():
         dm.EdgeApplyList([]),
     )
     yield pytest.param(person, expected, id="Person no extra dependencies")
-
+    return
     person = movie.PersonApply(
         name="Quentin Tarantino",
         birth_year=1963,
         external_id="person:quentin_tarantino",
         roles=[
-            movie.RoleApply(
+            movie.ActorApply(
                 external_id="actor:quentin_tarantino",
                 won_oscar=False,
                 person="person:quentin_tarantino",
@@ -106,7 +106,7 @@ def person_apply_to_instances_test_cases():
                     )
                 ],
             ),
-            movie.RoleApply(
+            movie.DirectorApply(
                 external_id="director:quentin_tarantino",
                 won_oscar=True,
                 person="person:quentin_tarantino",

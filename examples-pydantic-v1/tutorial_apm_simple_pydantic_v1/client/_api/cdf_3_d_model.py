@@ -178,8 +178,13 @@ class CdfModelAPI(NodeAPI[CdfModel, CdfModelApply, CdfModelList]):
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_type_triple=[
-                (self.entities_edge, "entities", dm.DirectRelationReference("cdf_3d_schema", "cdf3dEntityConnection")),
+            edge_api_name_type_direction_quad=[
+                (
+                    self.entities_edge,
+                    "entities",
+                    dm.DirectRelationReference("cdf_3d_schema", "cdf3dEntityConnection"),
+                    "inwards",
+                ),
             ],
         )
 
@@ -429,7 +434,12 @@ class CdfModelAPI(NodeAPI[CdfModel, CdfModelApply, CdfModelList]):
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_type_triple=[
-                (self.entities_edge, "entities", dm.DirectRelationReference("cdf_3d_schema", "cdf3dEntityConnection")),
+            edge_api_name_type_direction_quad=[
+                (
+                    self.entities_edge,
+                    "entities",
+                    dm.DirectRelationReference("cdf_3d_schema", "cdf3dEntityConnection"),
+                    "inwards",
+                ),
             ],
         )

@@ -308,14 +308,18 @@ class WorkOrderApply(DomainModelApply):
         edge_type = dm.DirectRelationReference("tutorial_apm_simple", "WorkOrder.linkedAssets")
         for linked_asset in self.linked_assets or []:
             other_resources = DomainRelationApply.from_edge_to_resources(
-                cache, self, linked_asset, edge_type, view_by_write_class
+                cache,
+                start_node=self,
+                end_node=linked_asset,
+                edge_type=edge_type,
+                view_by_write_class=view_by_write_class,
             )
             resources.extend(other_resources)
 
         edge_type = dm.DirectRelationReference("tutorial_apm_simple", "WorkOrder.workItems")
         for work_item in self.work_items or []:
             other_resources = DomainRelationApply.from_edge_to_resources(
-                cache, self, work_item, edge_type, view_by_write_class
+                cache, start_node=self, end_node=work_item, edge_type=edge_type, view_by_write_class=view_by_write_class
             )
             resources.extend(other_resources)
 

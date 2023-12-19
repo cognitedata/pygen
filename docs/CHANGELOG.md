@@ -14,6 +14,10 @@ Changes are grouped as follows
 - `Security` in case of vulnerabilities.
 
 
+## [0.32.3] - 18-12-23
+### Fixed
+* `pygen` now handles connections with directions `inwards` instead of assuming `outwards` for all connections.
+
 ## [0.32.2] - 15-12-23
 ### Fixed
 * Filtering on a boolean value in the generated SDK with value `False` returned both `True` and `False` values. This is now fixed.

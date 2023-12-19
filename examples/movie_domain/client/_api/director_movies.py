@@ -43,11 +43,11 @@ class DirectorMoviesAPI(EdgeAPI):
 
         """
         filter_ = _create_edge_filter(
-            dm.DirectRelationReference("IntegrationTestsImmutable", "Role.movies"),
-            from_director,
-            from_director_space,
+            dm.DirectRelationReference("IntegrationTestsImmutable", "Movie.directors"),
             to_movie,
             to_movie_space,
+            from_director,
+            from_director_space,
             external_id_prefix,
             space,
         )

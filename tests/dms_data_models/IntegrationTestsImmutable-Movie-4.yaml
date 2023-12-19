@@ -6,7 +6,7 @@
   lastUpdatedTime: 1689262760507
   name: Movie
   space: IntegrationTestsImmutable
-  version: '2'
+  version: '4'
   views:
   - createdTime: 1684079343668
     externalId: Person
@@ -53,13 +53,13 @@
           externalId: Role
           space: IntegrationTestsImmutable
           type: view
-          version: '2'
+          version: '3'
         type:
           externalId: Person.roles
           space: IntegrationTestsImmutable
     space: IntegrationTestsImmutable
     usedFor: node
-    version: '2'
+    version: '3'
     writable: true
   - createdTime: 1684079343668
     externalId: Nomination
@@ -98,7 +98,7 @@
           type: int32
     space: IntegrationTestsImmutable
     usedFor: node
-    version: '2'
+    version: '3'
     writable: true
   - createdTime: 1684079343668
     externalId: BestDirector
@@ -106,7 +106,7 @@
     - externalId: Nomination
       space: IntegrationTestsImmutable
       type: view
-      version: '2'
+      version: '3'
     isGlobal: false
     lastUpdatedTime: 1684079343668
     name: BestDirector
@@ -142,7 +142,7 @@
           type: int32
     space: IntegrationTestsImmutable
     usedFor: node
-    version: '2'
+    version: '3'
     writable: true
   - createdTime: 1684079343668
     externalId: BestLeadingActor
@@ -150,7 +150,7 @@
     - externalId: Nomination
       space: IntegrationTestsImmutable
       type: view
-      version: '2'
+      version: '3'
     isGlobal: false
     lastUpdatedTime: 1684079343668
     name: BestLeadingActor
@@ -186,7 +186,7 @@
           type: int32
     space: IntegrationTestsImmutable
     usedFor: node
-    version: '2'
+    version: '3'
     writable: true
   - createdTime: 1684079343668
     externalId: BestLeadingActress
@@ -194,7 +194,7 @@
     - externalId: Nomination
       space: IntegrationTestsImmutable
       type: view
-      version: '2'
+      version: '3'
     isGlobal: false
     lastUpdatedTime: 1684079343668
     name: BestLeadingActress
@@ -230,7 +230,7 @@
           type: int32
     space: IntegrationTestsImmutable
     usedFor: node
-    version: '2'
+    version: '3'
     writable: true
   - createdTime: 1684079343668
     externalId: Role
@@ -238,20 +238,6 @@
     lastUpdatedTime: 1684079343668
     name: Role
     properties:
-      movies:
-        connectionType: multi_edge_connection
-        description: null
-        direction: outwards
-        edgeSource: null
-        name: movies
-        source:
-          externalId: Movie
-          space: IntegrationTestsImmutable
-          type: view
-          version: '2'
-        type:
-          externalId: Role.movies
-          space: IntegrationTestsImmutable
       nomination:
         connectionType: multi_edge_connection
         description: null
@@ -262,7 +248,7 @@
           externalId: Nomination
           space: IntegrationTestsImmutable
           type: view
-          version: '2'
+          version: '3'
         type:
           externalId: Role.nomination
           space: IntegrationTestsImmutable
@@ -280,7 +266,7 @@
           source:
             externalId: Person
             space: IntegrationTestsImmutable
-            version: '2'
+            version: '3'
           type: direct
       wonOscar:
         autoIncrement: false
@@ -298,7 +284,7 @@
           type: boolean
     space: IntegrationTestsImmutable
     usedFor: node
-    version: '2'
+    version: '3'
     writable: true
   - createdTime: 1684079343668
     externalId: Actor
@@ -306,7 +292,7 @@
     - externalId: Role
       space: IntegrationTestsImmutable
       type: view
-      version: '2'
+      version: '3'
     isGlobal: false
     lastUpdatedTime: 1684079343668
     name: Actor
@@ -322,16 +308,16 @@
       movies:
         connectionType: multi_edge_connection
         description: null
-        direction: outwards
+        direction: inwards
         edgeSource: null
         name: movies
         source:
           externalId: Movie
           space: IntegrationTestsImmutable
           type: view
-          version: '2'
+          version: '3'
         type:
-          externalId: Role.movies
+          externalId: Movie.actors
           space: IntegrationTestsImmutable
       nomination:
         connectionType: multi_edge_connection
@@ -343,7 +329,7 @@
           externalId: Nomination
           space: IntegrationTestsImmutable
           type: view
-          version: '2'
+          version: '3'
         type:
           externalId: Role.nomination
           space: IntegrationTestsImmutable
@@ -361,7 +347,7 @@
           source:
             externalId: Person
             space: IntegrationTestsImmutable
-            version: '2'
+            version: '3'
           type: direct
       wonOscar:
         autoIncrement: false
@@ -379,7 +365,7 @@
           type: boolean
     space: IntegrationTestsImmutable
     usedFor: node
-    version: '2'
+    version: '3'
     writable: true
   - createdTime: 1684079343668
     externalId: Director
@@ -387,7 +373,7 @@
     - externalId: Role
       space: IntegrationTestsImmutable
       type: view
-      version: '2'
+      version: '3'
     isGlobal: false
     lastUpdatedTime: 1684079343668
     name: Director
@@ -395,16 +381,16 @@
       movies:
         connectionType: multi_edge_connection
         description: null
-        direction: outwards
+        direction: inwards
         edgeSource: null
         name: movies
         source:
           externalId: Movie
           space: IntegrationTestsImmutable
           type: view
-          version: '2'
+          version: '3'
         type:
-          externalId: Role.movies
+          externalId: Movie.directors
           space: IntegrationTestsImmutable
       nomination:
         connectionType: multi_edge_connection
@@ -416,7 +402,7 @@
           externalId: Nomination
           space: IntegrationTestsImmutable
           type: view
-          version: '2'
+          version: '3'
         type:
           externalId: Role.nomination
           space: IntegrationTestsImmutable
@@ -434,7 +420,7 @@
           source:
             externalId: Person
             space: IntegrationTestsImmutable
-            version: '2'
+            version: '3'
           type: direct
       wonOscar:
         autoIncrement: false
@@ -452,7 +438,7 @@
           type: boolean
     space: IntegrationTestsImmutable
     usedFor: node
-    version: '2'
+    version: '3'
     writable: true
     filter:
       equals:
@@ -498,7 +484,7 @@
           type: timeseries
     space: IntegrationTestsImmutable
     usedFor: node
-    version: '2'
+    version: '3'
     writable: true
   - createdTime: 1684079343668
     externalId: Movie
@@ -516,7 +502,7 @@
           externalId: Actor
           space: IntegrationTestsImmutable
           type: view
-          version: '2'
+          version: '3'
         type:
           externalId: Movie.actors
           space: IntegrationTestsImmutable
@@ -530,7 +516,7 @@
           externalId: Director
           space: IntegrationTestsImmutable
           type: view
-          version: '2'
+          version: '3'
         type:
           externalId: Movie.directors
           space: IntegrationTestsImmutable
@@ -562,7 +548,7 @@
           source:
             externalId: Rating
             space: IntegrationTestsImmutable
-            version: '2'
+            version: '3'
           type: direct
       releaseYear:
         autoIncrement: false
@@ -609,5 +595,5 @@
           type: text
     space: IntegrationTestsImmutable
     usedFor: node
-    version: '2'
+    version: '3'
     writable: true

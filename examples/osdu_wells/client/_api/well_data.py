@@ -336,51 +336,60 @@ class WellDataAPI(NodeAPI[WellData, WellDataApply, WellDataList]):
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_type_triple=[
+            edge_api_name_type_direction_quad=[
                 (
                     self.facility_events_edge,
                     "facility_events",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "WellData.FacilityEvents"),
+                    "outwards",
                 ),
                 (
                     self.facility_operators_edge,
                     "facility_operators",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "WellData.FacilityOperators"),
+                    "outwards",
                 ),
                 (
                     self.facility_specifications_edge,
                     "facility_specifications",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "WellData.FacilitySpecifications"),
+                    "outwards",
                 ),
                 (
                     self.facility_states_edge,
                     "facility_states",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "WellData.FacilityStates"),
+                    "outwards",
                 ),
                 (
                     self.geo_contexts_edge,
                     "geo_contexts",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "WellData.GeoContexts"),
+                    "outwards",
                 ),
                 (
                     self.historical_interests_edge,
                     "historical_interests",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "WellData.HistoricalInterests"),
+                    "outwards",
                 ),
                 (
                     self.name_aliases_edge,
                     "name_aliases",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "WellData.NameAliases"),
+                    "outwards",
                 ),
                 (
                     self.technical_assurances_edge,
                     "technical_assurances",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "WellData.TechnicalAssurances"),
+                    "outwards",
                 ),
                 (
                     self.vertical_measurements_edge,
                     "vertical_measurements",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "WellData.VerticalMeasurements"),
+                    "outwards",
                 ),
             ],
         )
@@ -1345,51 +1354,60 @@ class WellDataAPI(NodeAPI[WellData, WellDataApply, WellDataList]):
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_type_triple=[
+            edge_api_name_type_direction_quad=[
                 (
                     self.facility_events_edge,
                     "facility_events",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "WellData.FacilityEvents"),
+                    "outwards",
                 ),
                 (
                     self.facility_operators_edge,
                     "facility_operators",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "WellData.FacilityOperators"),
+                    "outwards",
                 ),
                 (
                     self.facility_specifications_edge,
                     "facility_specifications",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "WellData.FacilitySpecifications"),
+                    "outwards",
                 ),
                 (
                     self.facility_states_edge,
                     "facility_states",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "WellData.FacilityStates"),
+                    "outwards",
                 ),
                 (
                     self.geo_contexts_edge,
                     "geo_contexts",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "WellData.GeoContexts"),
+                    "outwards",
                 ),
                 (
                     self.historical_interests_edge,
                     "historical_interests",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "WellData.HistoricalInterests"),
+                    "outwards",
                 ),
                 (
                     self.name_aliases_edge,
                     "name_aliases",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "WellData.NameAliases"),
+                    "outwards",
                 ),
                 (
                     self.technical_assurances_edge,
                     "technical_assurances",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "WellData.TechnicalAssurances"),
+                    "outwards",
                 ),
                 (
                     self.vertical_measurements_edge,
                     "vertical_measurements",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "WellData.VerticalMeasurements"),
+                    "outwards",
                 ),
             ],
         )

@@ -423,11 +423,12 @@ class WellboreTrajectoryDataAPI(
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_type_triple=[
+            edge_api_name_type_direction_quad=[
                 (
                     self.artefacts_edge,
                     "artefacts",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreTrajectoryData.Artefacts"),
+                    "outwards",
                 ),
                 (
                     self.available_trajectory_station_properties_edge,
@@ -435,21 +436,25 @@ class WellboreTrajectoryDataAPI(
                     dm.DirectRelationReference(
                         "IntegrationTestsImmutable", "WellboreTrajectoryData.AvailableTrajectoryStationProperties"
                     ),
+                    "outwards",
                 ),
                 (
                     self.geo_contexts_edge,
                     "geo_contexts",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreTrajectoryData.GeoContexts"),
+                    "outwards",
                 ),
                 (
                     self.lineage_assertions_edge,
                     "lineage_assertions",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreTrajectoryData.LineageAssertions"),
+                    "outwards",
                 ),
                 (
                     self.name_aliases_edge,
                     "name_aliases",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreTrajectoryData.NameAliases"),
+                    "outwards",
                 ),
                 (
                     self.technical_assurances_edge,
@@ -457,6 +462,7 @@ class WellboreTrajectoryDataAPI(
                     dm.DirectRelationReference(
                         "IntegrationTestsImmutable", "WellboreTrajectoryData.TechnicalAssurances"
                     ),
+                    "outwards",
                 ),
             ],
         )
@@ -1801,11 +1807,12 @@ class WellboreTrajectoryDataAPI(
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_type_triple=[
+            edge_api_name_type_direction_quad=[
                 (
                     self.artefacts_edge,
                     "artefacts",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreTrajectoryData.Artefacts"),
+                    "outwards",
                 ),
                 (
                     self.available_trajectory_station_properties_edge,
@@ -1813,21 +1820,25 @@ class WellboreTrajectoryDataAPI(
                     dm.DirectRelationReference(
                         "IntegrationTestsImmutable", "WellboreTrajectoryData.AvailableTrajectoryStationProperties"
                     ),
+                    "outwards",
                 ),
                 (
                     self.geo_contexts_edge,
                     "geo_contexts",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreTrajectoryData.GeoContexts"),
+                    "outwards",
                 ),
                 (
                     self.lineage_assertions_edge,
                     "lineage_assertions",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreTrajectoryData.LineageAssertions"),
+                    "outwards",
                 ),
                 (
                     self.name_aliases_edge,
                     "name_aliases",
                     dm.DirectRelationReference("IntegrationTestsImmutable", "WellboreTrajectoryData.NameAliases"),
+                    "outwards",
                 ),
                 (
                     self.technical_assurances_edge,
@@ -1835,6 +1846,7 @@ class WellboreTrajectoryDataAPI(
                     dm.DirectRelationReference(
                         "IntegrationTestsImmutable", "WellboreTrajectoryData.TechnicalAssurances"
                     ),
+                    "outwards",
                 ),
             ],
         )

@@ -87,12 +87,10 @@ PersonApply.update_forward_refs(
 )
 
 Role.update_forward_refs(
-    Movie=Movie,
     Nomination=Nomination,
     Person=Person,
 )
 RoleApply.update_forward_refs(
-    MovieApply=MovieApply,
     NominationApply=NominationApply,
     PersonApply=PersonApply,
 )

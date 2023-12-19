@@ -21,32 +21,54 @@ def test_actor_list(movie_client: MovieClient):
     assert all(isinstance(nomination, str) for actor in actors for nomination in actor.nomination or [])
 
 
+def test_actor_retrieve(movie_client: MovieClient) -> None:
+    # Act
+    actor = movie_client.actor.retrieve("actor:quentin_tarantino")
+
+    # Assert
+    assert actor is not None
+    assert isinstance(actor, m.Actor)
+    assert actor.external_id == "actor:quentin_tarantino"
+    assert len(actor.movies or []) > 0
+    assert len(actor.nomination or []) == 0
+
+
 def test_actor_apply_retrieve_with_person(movie_client: MovieClient, cognite_client: CogniteClient):
     # Arrange
     actor = m.ActorApply(
         external_id="actor:anders",
-        movies=[],
+        movies=[
+            m.MovieApply(
+                external_id="movie:anders",
+                title="Anders",
+                release_year=1999,
+            )
+        ],
         nomination=[],
         person=m.PersonApply(external_id="person:anders", name="Anders", birth_year=0),
     )
     resources = actor.to_instances_apply()
     node_ids = resources.nodes.as_ids()
+    edge_ids = resources.edges.as_ids()
 
     try:
         # Act
         created = movie_client.actor.apply(actor)
 
         # Assert
-        assert len(created.nodes) == 2
-        assert len(created.edges) == 0
+        assert len(created.nodes) == 3
+        assert len(created.edges) == 1
 
         # Act
-        retrieve = movie_client.actor.retrieve(external_id=actor.external_id)
+        retrieved = movie_client.actor.retrieve(external_id=actor.external_id)
 
         # Assert
-        assert retrieve is not None
+        assert retrieved is not None
+        assert len(retrieved.movies or []) == 1
+        assert len(retrieved.nomination or []) == 0
+        assert retrieved.person is not None
     finally:
-        cognite_client.data_modeling.instances.delete(nodes=node_ids)
+        cognite_client.data_modeling.instances.delete(nodes=node_ids, edges=edge_ids)
 
 
 @pytest.mark.parametrize(
@@ -82,8 +104,10 @@ def test_circular_query_from_actor(movie_client: MovieClient):
     assert len(actors) > 0
     for actor in actors:
         assert isinstance(actor, m.Actor)
+        assert len(actor.movies or []) > 0
         for movie in actor.movies:
             assert isinstance(movie, m.Movie)
+            assert len(movie.actors or []) > 0
             for movie_actor in movie.actors:
                 assert isinstance(movie_actor, m.Actor)
 

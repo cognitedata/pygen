@@ -43,11 +43,11 @@ class ActorMoviesAPI(EdgeAPI):
 
         """
         filter_ = _create_edge_filter(
-            dm.DirectRelationReference("IntegrationTestsImmutable", "Role.movies"),
-            from_actor,
-            from_actor_space,
+            dm.DirectRelationReference("IntegrationTestsImmutable", "Movie.actors"),
             to_movie,
             to_movie_space,
+            from_actor,
+            from_actor_space,
             external_id_prefix,
             space,
         )

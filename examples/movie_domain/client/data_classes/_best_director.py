@@ -94,7 +94,7 @@ class BestDirectorApply(DomainModelApply):
             return resources
 
         write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
-            "IntegrationTestsImmutable", "BestDirector", "2"
+            "IntegrationTestsImmutable", "BestDirector", "3"
         )
 
         properties = {}

@@ -94,7 +94,7 @@ class BestLeadingActorApply(DomainModelApply):
             return resources
 
         write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
-            "IntegrationTestsImmutable", "BestLeadingActor", "2"
+            "IntegrationTestsImmutable", "BestLeadingActor", "3"
         )
 
         properties = {}

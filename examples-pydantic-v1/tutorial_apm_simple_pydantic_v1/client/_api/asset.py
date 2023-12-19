@@ -228,12 +228,18 @@ class AssetAPI(NodeAPI[Asset, AssetApply, AssetList]):
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_type_triple=[
-                (self.children_edge, "children", dm.DirectRelationReference("tutorial_apm_simple", "Asset.children")),
+            edge_api_name_type_direction_quad=[
+                (
+                    self.children_edge,
+                    "children",
+                    dm.DirectRelationReference("tutorial_apm_simple", "Asset.children"),
+                    "outwards",
+                ),
                 (
                     self.in_model_3_d_edge,
                     "in_model_3_d",
                     dm.DirectRelationReference("cdf_3d_schema", "cdf3dEntityConnection"),
+                    "outwards",
                 ),
             ],
         )
@@ -694,12 +700,18 @@ class AssetAPI(NodeAPI[Asset, AssetApply, AssetList]):
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_type_triple=[
-                (self.children_edge, "children", dm.DirectRelationReference("tutorial_apm_simple", "Asset.children")),
+            edge_api_name_type_direction_quad=[
+                (
+                    self.children_edge,
+                    "children",
+                    dm.DirectRelationReference("tutorial_apm_simple", "Asset.children"),
+                    "outwards",
+                ),
                 (
                     self.in_model_3_d_edge,
                     "in_model_3_d",
                     dm.DirectRelationReference("cdf_3d_schema", "cdf3dEntityConnection"),
+                    "outwards",
                 ),
             ],
         )

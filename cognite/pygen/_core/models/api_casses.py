@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 from dataclasses import dataclass
+from typing import Literal
 
 from cognite.client.data_classes import data_modeling as dm
 
@@ -64,6 +65,7 @@ class EdgeAPIClass(APIClass):
     edge_class: DataClass | None
     field_name: str
     type: dm.DirectRelationReference
+    direction: Literal["outwards", "inwards"]
     filter_method: FilterMethod
     doc_name: str
     query: QueryAPIClass
@@ -72,34 +74,43 @@ class EdgeAPIClass(APIClass):
     def has_edge_class(self) -> bool:
         return self.edge_class is not None
 
-    def filter_parameters(self, include_nodes: bool = True) -> Iterator[FilterParameter]:
+    def filter_parameters(
+        self, include_nodes: bool = True, case: Literal["signature", "docs", "filter_call"] = "signature"
+    ) -> Iterator[FilterParameter]:
         if include_nodes:
-            yield FilterParameter(
-                name=f"from_{self.start_class.variable}",
-                type_="str | list[str] | dm.NodeId | list[dm.NodeId]",
-                description=f"ID of the source { self.start_class.doc_name}.",
-                default=None,
-            )
-            yield FilterParameter(
-                name=f"from_{self.start_class.variable}_space",
-                type_="str",
-                description=f"Location of the {self.start_class.doc_list_name}.",
-                default="DEFAULT_INSTANCE_SPACE",
-                is_nullable=False,
-            )
-            yield FilterParameter(
-                name=f"to_{self.end_class.variable}",
-                type_="str | list[str] | dm.NodeId | list[dm.NodeId]",
-                description=f"ID of the target { self.end_class.doc_name}.",
-                default=None,
-            )
-            yield FilterParameter(
-                name=f"to_{self.end_class.variable}_space",
-                type_="str",
-                description=f"Location of the {self.end_class.doc_list_name}.",
-                default="DEFAULT_INSTANCE_SPACE",
-                is_nullable=False,
-            )
+            nodes = {
+                "from": FilterParameter(
+                    name=f"from_{self.start_class.variable}",
+                    type_="str | list[str] | dm.NodeId | list[dm.NodeId]",
+                    description=f"ID of the source { self.start_class.doc_name}.",
+                    default=None,
+                ),
+                "from_space": FilterParameter(
+                    name=f"from_{self.start_class.variable}_space",
+                    type_="str",
+                    description=f"Location of the {self.start_class.doc_list_name}.",
+                    default="DEFAULT_INSTANCE_SPACE",
+                    is_nullable=False,
+                ),
+                "to": FilterParameter(
+                    name=f"to_{self.end_class.variable}",
+                    type_="str | list[str] | dm.NodeId | list[dm.NodeId]",
+                    description=f"ID of the target { self.end_class.doc_name}.",
+                    default=None,
+                ),
+                "to_space": FilterParameter(
+                    name=f"to_{self.end_class.variable}_space",
+                    type_="str",
+                    description=f"Location of the {self.end_class.doc_list_name}.",
+                    default="DEFAULT_INSTANCE_SPACE",
+                    is_nullable=False,
+                ),
+            }
+
+            if case == "filter_call" and self.direction == "inwards":
+                yield from [nodes["to"], nodes["to_space"], nodes["from"], nodes["from_space"]]
+            else:
+                yield from nodes.values()
         yield from self.filter_method.parameters
 
     @classmethod
@@ -149,6 +160,7 @@ class EdgeAPIClass(APIClass):
             filter_method=filter_method,
             doc_name=create_name(field.name, api_class.doc_name),
             query=query_class_by_view_id[end_class.view_id],
+            direction=field.edge_direction,
         )
 
 

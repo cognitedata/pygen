@@ -218,8 +218,13 @@ class WellAPI(NodeAPI[Well, WellApply, WellList]):
             external_id,
             space,
             retrieve_edges=True,
-            edge_api_name_type_triple=[
-                (self.meta_edge, "meta", dm.DirectRelationReference("IntegrationTestsImmutable", "Well.meta")),
+            edge_api_name_type_direction_quad=[
+                (
+                    self.meta_edge,
+                    "meta",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "Well.meta"),
+                    "outwards",
+                ),
             ],
         )
 
@@ -707,7 +712,12 @@ class WellAPI(NodeAPI[Well, WellApply, WellList]):
             limit=limit,
             filter=filter_,
             retrieve_edges=retrieve_edges,
-            edge_api_name_type_triple=[
-                (self.meta_edge, "meta", dm.DirectRelationReference("IntegrationTestsImmutable", "Well.meta")),
+            edge_api_name_type_direction_quad=[
+                (
+                    self.meta_edge,
+                    "meta",
+                    dm.DirectRelationReference("IntegrationTestsImmutable", "Well.meta"),
+                    "outwards",
+                ),
             ],
         )
