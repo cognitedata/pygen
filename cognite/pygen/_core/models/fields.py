@@ -255,6 +255,31 @@ class PrimitiveFieldCore(Field, ABC):
 
 
 @dataclass(frozen=True)
+class ListFieldCore(PrimitiveFieldCore):
+    """
+    This represents a list of basic types such as list[str], list[int], list[float], list[bool],
+    list[datetime.datetime], list[datetime.date].
+    """
+
+    def as_read_type_hint(self) -> str:
+        if self.need_alias:
+            return f'Optional[list[{self.type_as_string}]] = {self.pydantic_field}(None, alias="{self.prop_name}")'
+        else:
+            return f"Optional[list[{self.type_as_string}]] = None"
+
+    def as_write_type_hint(self) -> str:
+        type_ = self.type_as_string
+        if self.is_nullable and self.need_alias:
+            return f'Optional[list[{type_}]] = {self.pydantic_field}(None, alias="{self.prop_name}")'
+        elif self.need_alias:
+            return f'list[{type_}] = {self.pydantic_field}(alias="{self.prop_name}")'
+        elif self.is_nullable:
+            return f"Optional[list[{type_}]] = None"
+        else:  # not self.is_nullable and not self.need_alias
+            return f"list[{type_}]"
+
+
+@dataclass(frozen=True)
 class PrimitiveField(PrimitiveFieldCore):
     """
     This represents a basic type such as str, int, float, bool, datetime.datetime, datetime.date.
@@ -282,28 +307,11 @@ class PrimitiveField(PrimitiveFieldCore):
 
 
 @dataclass(frozen=True)
-class PrimitiveListField(PrimitiveFieldCore):
+class PrimitiveListField(ListFieldCore):
     """
     This represents a list of basic types such as list[str], list[int], list[float], list[bool],
     list[datetime.datetime], list[datetime.date].
     """
-
-    def as_read_type_hint(self) -> str:
-        if self.need_alias:
-            return f'Optional[list[{self.type_as_string}]] = {self.pydantic_field}(None, alias="{self.prop_name}")'
-        else:
-            return f"Optional[list[{self.type_as_string}]] = None"
-
-    def as_write_type_hint(self) -> str:
-        type_ = self.type_as_string
-        if self.is_nullable and self.need_alias:
-            return f'Optional[list[{type_}]] = {self.pydantic_field}(None, alias="{self.prop_name}")'
-        elif self.need_alias:
-            return f'list[{type_}] = {self.pydantic_field}(alias="{self.prop_name}")'
-        elif self.is_nullable:
-            return f"Optional[list[{type_}]] = None"
-        else:  # not self.is_nullable and not self.need_alias
-            return f"list[{type_}]"
 
 
 @dataclass(frozen=True)
@@ -333,7 +341,7 @@ class CDFExternalField(PrimitiveFieldCore):
 
 
 @dataclass(frozen=True)
-class CDFExternalListField(CDFExternalField):
+class CDFExternalListField(ListFieldCore, CDFExternalField):
     """
     This represents a list of CDF types such as list[TimeSeries], list[Sequence].
     """
