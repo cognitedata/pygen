@@ -14,6 +14,7 @@ nav:
         - Exploration CDF Notebook: quickstart/cdf_notebook.ipynb
         - Exploration Local Notebook: quickstart/notebook.ipynb
         - Building Solution: quickstart/project.md
+        - Building Solution CDF Streamlit: quickstart/cdf_streamlit.md
         - Data Population (Ingestion): quickstart/ingestion.ipynb
         - Data Migration: quickstart/migration.ipynb
     - Installation: installation.md
