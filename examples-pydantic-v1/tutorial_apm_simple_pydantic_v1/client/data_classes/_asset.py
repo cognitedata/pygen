@@ -226,7 +226,7 @@ class AssetApply(DomainModelApply):
         if self.measurements is not None:
             properties["measurements"] = self.measurements
         if self.metrics is not None:
-            properties["metrics"] = self.metrics
+            properties["metrics"] = [value if isinstance(value, str) else value.external_id for value in self.metrics]
         if self.parent is not None:
             properties["parent"] = {
                 "space": self.space if isinstance(self.parent, str) else self.parent.space,
