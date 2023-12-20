@@ -129,14 +129,19 @@ class FacilityOperatorsApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.effective_date_time is not None:
             properties["EffectiveDateTime"] = self.effective_date_time
+
         if self.facility_operator_id is not None:
             properties["FacilityOperatorID"] = self.facility_operator_id
+
         if self.facility_operator_organisation_id is not None:
             properties["FacilityOperatorOrganisationID"] = self.facility_operator_organisation_id
+
         if self.remark is not None:
             properties["Remark"] = self.remark
+
         if self.termination_date_time is not None:
             properties["TerminationDateTime"] = self.termination_date_time
 

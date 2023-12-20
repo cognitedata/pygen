@@ -85,6 +85,7 @@ class AncestryApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.parents is not None:
             properties["parents"] = self.parents
 

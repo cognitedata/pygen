@@ -209,39 +209,55 @@ class AssetApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.area_id is not None:
             properties["areaId"] = self.area_id
+
         if self.category_id is not None:
             properties["categoryId"] = self.category_id
+
         if self.created_date is not None:
             properties["createdDate"] = self.created_date.isoformat(timespec="milliseconds")
+
         if self.description is not None:
             properties["description"] = self.description
+
         if self.documents is not None:
             properties["documents"] = self.documents
+
         if self.is_active is not None:
             properties["isActive"] = self.is_active
+
         if self.is_critical_line is not None:
             properties["isCriticalLine"] = self.is_critical_line
+
         if self.measurements is not None:
             properties["measurements"] = self.measurements
+
         if self.metrics is not None:
             properties["metrics"] = [value if isinstance(value, str) else value.external_id for value in self.metrics]
+
         if self.parent is not None:
             properties["parent"] = {
                 "space": self.space if isinstance(self.parent, str) else self.parent.space,
                 "externalId": self.parent if isinstance(self.parent, str) else self.parent.external_id,
             }
+
         if self.pressure is not None:
             properties["pressure"] = self.pressure if isinstance(self.pressure, str) else self.pressure.external_id
+
         if self.source_db is not None:
             properties["sourceDb"] = self.source_db
+
         if self.specification is not None:
             properties["specification"] = self.specification
+
         if self.tag is not None:
             properties["tag"] = self.tag
+
         if self.trajectory is not None:
             properties["trajectory"] = self.trajectory
+
         if self.updated_date is not None:
             properties["updatedDate"] = self.updated_date.isoformat(timespec="milliseconds")
 

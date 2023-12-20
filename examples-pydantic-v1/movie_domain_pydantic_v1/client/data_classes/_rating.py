@@ -92,8 +92,10 @@ class RatingApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.score is not None:
             properties["score"] = self.score if isinstance(self.score, str) else self.score.external_id
+
         if self.votes is not None:
             properties["votes"] = self.votes if isinstance(self.votes, str) else self.votes.external_id
 

@@ -112,14 +112,18 @@ class EquipmentModuleApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.description is not None:
             properties["description"] = self.description
+
         if self.name is not None:
             properties["name"] = self.name
+
         if self.sensor_value is not None:
             properties["sensor_value"] = (
                 self.sensor_value if isinstance(self.sensor_value, str) else self.sensor_value.external_id
             )
+
         if self.type_ is not None:
             properties["type"] = self.type_
 

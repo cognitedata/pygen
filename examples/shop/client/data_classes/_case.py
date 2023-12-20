@@ -145,27 +145,37 @@ class CaseApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.arguments is not None:
             properties["arguments"] = self.arguments
+
         if self.bid is not None:
             properties["bid"] = self.bid
+
         if self.bid_history is not None:
             properties["bid_history"] = self.bid_history
+
         if self.commands is not None:
             properties["commands"] = {
                 "space": self.space if isinstance(self.commands, str) else self.commands.space,
                 "externalId": self.commands if isinstance(self.commands, str) else self.commands.external_id,
             }
+
         if self.cut_files is not None:
             properties["cut_files"] = self.cut_files
+
         if self.end_time is not None:
             properties["end_time"] = self.end_time.isoformat(timespec="milliseconds")
+
         if self.name is not None:
             properties["name"] = self.name
+
         if self.run_status is not None:
             properties["runStatus"] = self.run_status
+
         if self.scenario is not None:
             properties["scenario"] = self.scenario
+
         if self.start_time is not None:
             properties["start_time"] = self.start_time.isoformat(timespec="milliseconds")
 

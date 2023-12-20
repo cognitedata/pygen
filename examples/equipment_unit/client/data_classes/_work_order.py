@@ -105,10 +105,13 @@ class WorkOrderApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.description is not None:
             properties["description"] = self.description
+
         if self.performed_by is not None:
             properties["performedBy"] = self.performed_by
+
         if self.type_ is not None:
             properties["type"] = self.type_
 

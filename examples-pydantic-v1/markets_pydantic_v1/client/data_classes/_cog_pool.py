@@ -110,14 +110,19 @@ class CogPoolApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.max_price is not None:
             properties["maxPrice"] = self.max_price
+
         if self.min_price is not None:
             properties["minPrice"] = self.min_price
+
         if self.name is not None:
             properties["name"] = self.name
+
         if self.time_unit is not None:
             properties["timeUnit"] = self.time_unit
+
         if self.timezone is not None:
             properties["timezone"] = self.timezone
 

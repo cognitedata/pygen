@@ -98,8 +98,10 @@ class DateTransformationApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.arguments is not None:
             properties["arguments"] = self.arguments
+
         if self.method is not None:
             properties["method"] = self.method
 

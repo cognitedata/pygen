@@ -200,32 +200,46 @@ class VerticalMeasurementsApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.effective_date_time is not None:
             properties["EffectiveDateTime"] = self.effective_date_time
+
         if self.rig_id is not None:
             properties["RigID"] = self.rig_id
+
         if self.termination_date_time is not None:
             properties["TerminationDateTime"] = self.termination_date_time
+
         if self.vertical_crsid is not None:
             properties["VerticalCRSID"] = self.vertical_crsid
+
         if self.vertical_measurement is not None:
             properties["VerticalMeasurement"] = self.vertical_measurement
+
         if self.vertical_measurement_description is not None:
             properties["VerticalMeasurementDescription"] = self.vertical_measurement_description
+
         if self.vertical_measurement_id is not None:
             properties["VerticalMeasurementID"] = self.vertical_measurement_id
+
         if self.vertical_measurement_path_id is not None:
             properties["VerticalMeasurementPathID"] = self.vertical_measurement_path_id
+
         if self.vertical_measurement_source_id is not None:
             properties["VerticalMeasurementSourceID"] = self.vertical_measurement_source_id
+
         if self.vertical_measurement_type_id is not None:
             properties["VerticalMeasurementTypeID"] = self.vertical_measurement_type_id
+
         if self.vertical_measurement_unit_of_measure_id is not None:
             properties["VerticalMeasurementUnitOfMeasureID"] = self.vertical_measurement_unit_of_measure_id
+
         if self.vertical_reference_entity_id is not None:
             properties["VerticalReferenceEntityID"] = self.vertical_reference_entity_id
+
         if self.vertical_reference_id is not None:
             properties["VerticalReferenceID"] = self.vertical_reference_id
+
         if self.wellbore_tvd_trajectory_id is not None:
             properties["WellboreTVDTrajectoryID"] = self.wellbore_tvd_trajectory_id
 

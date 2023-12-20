@@ -98,8 +98,10 @@ class CommandConfigApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.configs is not None:
             properties["configs"] = self.configs
+
         if self.source is not None:
             properties["source"] = self.source
 
