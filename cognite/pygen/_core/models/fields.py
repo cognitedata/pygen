@@ -103,7 +103,11 @@ class Field(ABC):
                 description=prop.description,
                 pydantic_field=pydantic_field,
             )
-        elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.data_types.ListablePropertyType) and prop.type.is_list:
+        elif (
+            isinstance(prop, dm.MappedProperty)
+            and isinstance(prop.type, dm.data_types.ListablePropertyType)
+            and prop.type.is_list
+        ):
             if isinstance(prop.type, dm.CDFExternalIdReference):
                 return CDFExternalListField(
                     name=name,
@@ -350,6 +354,7 @@ class CDFExternalListField(CDFExternalField):
             return f"Optional[list[{type_}]] = None"
         else:  # not self.is_nullable and not self.need_alias
             return f"list[{type_}]"
+
 
 @dataclass(frozen=True)
 class EdgeField(Field, ABC):
