@@ -121,14 +121,19 @@ class NameAliasesApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.alias_name is not None:
             properties["AliasName"] = self.alias_name
+
         if self.alias_name_type_id is not None:
             properties["AliasNameTypeID"] = self.alias_name_type_id
+
         if self.definition_organisation_id is not None:
             properties["DefinitionOrganisationID"] = self.definition_organisation_id
+
         if self.effective_date_time is not None:
             properties["EffectiveDateTime"] = self.effective_date_time
+
         if self.termination_date_time is not None:
             properties["TerminationDateTime"] = self.termination_date_time
 

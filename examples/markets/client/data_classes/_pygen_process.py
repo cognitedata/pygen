@@ -121,11 +121,13 @@ class PygenProcessApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.bid is not None:
             properties["bid"] = {
                 "space": self.space if isinstance(self.bid, str) else self.bid.space,
                 "externalId": self.bid if isinstance(self.bid, str) else self.bid.external_id,
             }
+
         if self.date_transformations is not None:
             properties["dateTransformations"] = {
                 "space": self.space if isinstance(self.date_transformations, str) else self.date_transformations.space,
@@ -133,8 +135,10 @@ class PygenProcessApply(DomainModelApply):
                 if isinstance(self.date_transformations, str)
                 else self.date_transformations.external_id,
             }
+
         if self.name is not None:
             properties["name"] = self.name
+
         if self.transformation is not None:
             properties["transformation"] = {
                 "space": self.space if isinstance(self.transformation, str) else self.transformation.space,

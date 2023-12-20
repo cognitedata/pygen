@@ -91,8 +91,10 @@ class AclApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.owners is not None:
             properties["owners"] = self.owners
+
         if self.viewers is not None:
             properties["viewers"] = self.viewers
 

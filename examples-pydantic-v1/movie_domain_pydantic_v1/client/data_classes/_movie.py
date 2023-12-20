@@ -127,17 +127,22 @@ class MovieApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.meta is not None:
             properties["meta"] = self.meta
+
         if self.rating is not None:
             properties["rating"] = {
                 "space": self.space if isinstance(self.rating, str) else self.rating.space,
                 "externalId": self.rating if isinstance(self.rating, str) else self.rating.external_id,
             }
+
         if self.release_year is not None:
             properties["releaseYear"] = self.release_year
+
         if self.run_time_minutes is not None:
             properties["runTimeMinutes"] = self.run_time_minutes
+
         if self.title is not None:
             properties["title"] = self.title
 

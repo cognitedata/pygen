@@ -98,8 +98,10 @@ class BestLeadingActorApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.name is not None:
             properties["name"] = self.name
+
         if self.year is not None:
             properties["year"] = self.year
 

@@ -105,10 +105,13 @@ class PygenPoolApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.day_of_week is not None:
             properties["dayOfWeek"] = self.day_of_week
+
         if self.name is not None:
             properties["name"] = self.name
+
         if self.timezone is not None:
             properties["timezone"] = self.timezone
 

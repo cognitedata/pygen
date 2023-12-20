@@ -185,8 +185,10 @@ class ProjectedBottomHoleLocationApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.applied_operations is not None:
             properties["AppliedOperations"] = self.applied_operations
+
         if self.as_ingested_coordinates is not None:
             properties["AsIngestedCoordinates"] = {
                 "space": self.space
@@ -196,22 +198,31 @@ class ProjectedBottomHoleLocationApply(DomainModelApply):
                 if isinstance(self.as_ingested_coordinates, str)
                 else self.as_ingested_coordinates.external_id,
             }
+
         if self.coordinate_quality_check_date_time is not None:
             properties["CoordinateQualityCheckDateTime"] = self.coordinate_quality_check_date_time
+
         if self.coordinate_quality_check_performed_by is not None:
             properties["CoordinateQualityCheckPerformedBy"] = self.coordinate_quality_check_performed_by
+
         if self.coordinate_quality_check_remarks is not None:
             properties["CoordinateQualityCheckRemarks"] = self.coordinate_quality_check_remarks
+
         if self.qualitative_spatial_accuracy_type_id is not None:
             properties["QualitativeSpatialAccuracyTypeID"] = self.qualitative_spatial_accuracy_type_id
+
         if self.quantitative_accuracy_band_id is not None:
             properties["QuantitativeAccuracyBandID"] = self.quantitative_accuracy_band_id
+
         if self.spatial_geometry_type_id is not None:
             properties["SpatialGeometryTypeID"] = self.spatial_geometry_type_id
+
         if self.spatial_location_coordinates_date is not None:
             properties["SpatialLocationCoordinatesDate"] = self.spatial_location_coordinates_date
+
         if self.spatial_parameter_type_id is not None:
             properties["SpatialParameterTypeID"] = self.spatial_parameter_type_id
+
         if self.wgs_84_coordinates is not None:
             properties["Wgs84Coordinates"] = {
                 "space": self.space if isinstance(self.wgs_84_coordinates, str) else self.wgs_84_coordinates.space,

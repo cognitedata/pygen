@@ -91,8 +91,10 @@ class MarketApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.name is not None:
             properties["name"] = self.name
+
         if self.timezone is not None:
             properties["timezone"] = self.timezone
 

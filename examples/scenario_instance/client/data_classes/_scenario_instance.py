@@ -140,22 +140,30 @@ class ScenarioInstanceApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.aggregation is not None:
             properties["aggregation"] = self.aggregation
+
         if self.country is not None:
             properties["country"] = self.country
+
         if self.instance is not None:
             properties["instance"] = self.instance.isoformat(timespec="milliseconds")
+
         if self.market is not None:
             properties["market"] = self.market
+
         if self.price_area is not None:
             properties["priceArea"] = self.price_area
+
         if self.price_forecast is not None:
             properties["priceForecast"] = (
                 self.price_forecast if isinstance(self.price_forecast, str) else self.price_forecast.external_id
             )
+
         if self.scenario is not None:
             properties["scenario"] = self.scenario
+
         if self.start is not None:
             properties["start"] = self.start.isoformat(timespec="milliseconds")
 

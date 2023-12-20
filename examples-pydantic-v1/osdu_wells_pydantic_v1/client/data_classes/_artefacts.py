@@ -105,10 +105,13 @@ class ArtefactsApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.resource_id is not None:
             properties["ResourceID"] = self.resource_id
+
         if self.resource_kind is not None:
             properties["ResourceKind"] = self.resource_kind
+
         if self.role_id is not None:
             properties["RoleID"] = self.role_id
 

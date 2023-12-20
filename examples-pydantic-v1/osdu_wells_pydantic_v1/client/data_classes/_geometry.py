@@ -98,10 +98,13 @@ class GeometryApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.bbox is not None:
             properties["bbox"] = self.bbox
+
         if self.coordinates is not None:
             properties["coordinates"] = self.coordinates
+
         if self.type_ is not None:
             properties["type"] = self.type_
 

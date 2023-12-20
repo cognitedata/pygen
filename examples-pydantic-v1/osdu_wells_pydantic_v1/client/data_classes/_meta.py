@@ -110,14 +110,19 @@ class MetaApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.kind is not None:
             properties["kind"] = self.kind
+
         if self.name is not None:
             properties["name"] = self.name
+
         if self.persistable_reference is not None:
             properties["persistableReference"] = self.persistable_reference
+
         if self.property_names is not None:
             properties["propertyNames"] = self.property_names
+
         if self.unit_of_measure_id is not None:
             properties["unitOfMeasureID"] = self.unit_of_measure_id
 

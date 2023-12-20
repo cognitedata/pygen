@@ -162,20 +162,28 @@ class AsIngestedCoordinatesApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.coordinate_reference_system_id is not None:
             properties["CoordinateReferenceSystemID"] = self.coordinate_reference_system_id
+
         if self.vertical_coordinate_reference_system_id is not None:
             properties["VerticalCoordinateReferenceSystemID"] = self.vertical_coordinate_reference_system_id
+
         if self.vertical_unit_id is not None:
             properties["VerticalUnitID"] = self.vertical_unit_id
+
         if self.bbox is not None:
             properties["bbox"] = self.bbox
+
         if self.persistable_reference_crs is not None:
             properties["persistableReferenceCrs"] = self.persistable_reference_crs
+
         if self.persistable_reference_unit_z is not None:
             properties["persistableReferenceUnitZ"] = self.persistable_reference_unit_z
+
         if self.persistable_reference_vertical_crs is not None:
             properties["persistableReferenceVerticalCrs"] = self.persistable_reference_vertical_crs
+
         if self.type_ is not None:
             properties["type"] = self.type_
 

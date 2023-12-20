@@ -111,12 +111,16 @@ class DrillingReasonsApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.effective_date_time is not None:
             properties["EffectiveDateTime"] = self.effective_date_time
+
         if self.lahee_class_id is not None:
             properties["LaheeClassID"] = self.lahee_class_id
+
         if self.remark is not None:
             properties["Remark"] = self.remark
+
         if self.termination_date_time is not None:
             properties["TerminationDateTime"] = self.termination_date_time
 

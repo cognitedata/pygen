@@ -555,72 +555,106 @@ class WellboreTrajectoryDataApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.acquisition_date is not None:
             properties["AcquisitionDate"] = self.acquisition_date
+
         if self.acquisition_remark is not None:
             properties["AcquisitionRemark"] = self.acquisition_remark
+
         if self.active_indicator is not None:
             properties["ActiveIndicator"] = self.active_indicator
+
         if self.applied_operations is not None:
             properties["AppliedOperations"] = self.applied_operations
+
         if self.applied_operations_date_time is not None:
             properties["AppliedOperationsDateTime"] = self.applied_operations_date_time
+
         if self.applied_operations_remarks is not None:
             properties["AppliedOperationsRemarks"] = self.applied_operations_remarks
+
         if self.applied_operations_user is not None:
             properties["AppliedOperationsUser"] = self.applied_operations_user
+
         if self.author_i_ds is not None:
             properties["AuthorIDs"] = self.author_i_ds
+
         if self.azimuth_reference_type is not None:
             properties["AzimuthReferenceType"] = self.azimuth_reference_type
+
         if self.base_depth_measured_depth is not None:
             properties["BaseDepthMeasuredDepth"] = self.base_depth_measured_depth
+
         if self.business_activities is not None:
             properties["BusinessActivities"] = self.business_activities
+
         if self.calculation_method_type is not None:
             properties["CalculationMethodType"] = self.calculation_method_type
+
         if self.company_id is not None:
             properties["CompanyID"] = self.company_id
+
         if self.creation_date_time is not None:
             properties["CreationDateTime"] = self.creation_date_time
+
         if self.ddms_datasets is not None:
             properties["DDMSDatasets"] = self.ddms_datasets
+
         if self.datasets is not None:
             properties["Datasets"] = self.datasets
+
         if self.description is not None:
             properties["Description"] = self.description
+
         if self.end_date_time is not None:
             properties["EndDateTime"] = self.end_date_time
+
         if self.existence_kind is not None:
             properties["ExistenceKind"] = self.existence_kind
+
         if self.extrapolated_measured_depth is not None:
             properties["ExtrapolatedMeasuredDepth"] = self.extrapolated_measured_depth
+
         if self.extrapolated_measured_depth_remark is not None:
             properties["ExtrapolatedMeasuredDepthRemark"] = self.extrapolated_measured_depth_remark
+
         if self.geographic_crsid is not None:
             properties["GeographicCRSID"] = self.geographic_crsid
+
         if self.is_discoverable is not None:
             properties["IsDiscoverable"] = self.is_discoverable
+
         if self.is_extended_load is not None:
             properties["IsExtendedLoad"] = self.is_extended_load
+
         if self.name is not None:
             properties["Name"] = self.name
+
         if self.projected_crsid is not None:
             properties["ProjectedCRSID"] = self.projected_crsid
+
         if self.resource_curation_status is not None:
             properties["ResourceCurationStatus"] = self.resource_curation_status
+
         if self.resource_home_region_id is not None:
             properties["ResourceHomeRegionID"] = self.resource_home_region_id
+
         if self.resource_host_region_i_ds is not None:
             properties["ResourceHostRegionIDs"] = self.resource_host_region_i_ds
+
         if self.resource_lifecycle_status is not None:
             properties["ResourceLifecycleStatus"] = self.resource_lifecycle_status
+
         if self.resource_security_classification is not None:
             properties["ResourceSecurityClassification"] = self.resource_security_classification
+
         if self.service_company_id is not None:
             properties["ServiceCompanyID"] = self.service_company_id
+
         if self.source is not None:
             properties["Source"] = self.source
+
         if self.spatial_area is not None:
             properties["SpatialArea"] = {
                 "space": self.space if isinstance(self.spatial_area, str) else self.spatial_area.space,
@@ -628,6 +662,7 @@ class WellboreTrajectoryDataApply(DomainModelApply):
                 if isinstance(self.spatial_area, str)
                 else self.spatial_area.external_id,
             }
+
         if self.spatial_point is not None:
             properties["SpatialPoint"] = {
                 "space": self.space if isinstance(self.spatial_point, str) else self.spatial_point.space,
@@ -635,32 +670,46 @@ class WellboreTrajectoryDataApply(DomainModelApply):
                 if isinstance(self.spatial_point, str)
                 else self.spatial_point.external_id,
             }
+
         if self.start_date_time is not None:
             properties["StartDateTime"] = self.start_date_time
+
         if self.submitter_name is not None:
             properties["SubmitterName"] = self.submitter_name
+
         if self.surface_grid_convergence is not None:
             properties["SurfaceGridConvergence"] = self.surface_grid_convergence
+
         if self.surface_scale_factor is not None:
             properties["SurfaceScaleFactor"] = self.surface_scale_factor
+
         if self.survey_reference_identifier is not None:
             properties["SurveyReferenceIdentifier"] = self.survey_reference_identifier
+
         if self.survey_tool_type_id is not None:
             properties["SurveyToolTypeID"] = self.survey_tool_type_id
+
         if self.survey_type is not None:
             properties["SurveyType"] = self.survey_type
+
         if self.survey_version is not None:
             properties["SurveyVersion"] = self.survey_version
+
         if self.tags is not None:
             properties["Tags"] = self.tags
+
         if self.tie_measured_depth is not None:
             properties["TieMeasuredDepth"] = self.tie_measured_depth
+
         if self.tie_true_vertical_depth is not None:
             properties["TieTrueVerticalDepth"] = self.tie_true_vertical_depth
+
         if self.top_depth_measured_depth is not None:
             properties["TopDepthMeasuredDepth"] = self.top_depth_measured_depth
+
         if self.tortuosity is not None:
             properties["Tortuosity"] = self.tortuosity
+
         if self.vertical_measurement is not None:
             properties["VerticalMeasurement"] = {
                 "space": self.space if isinstance(self.vertical_measurement, str) else self.vertical_measurement.space,
@@ -668,6 +717,7 @@ class WellboreTrajectoryDataApply(DomainModelApply):
                 if isinstance(self.vertical_measurement, str)
                 else self.vertical_measurement.external_id,
             }
+
         if self.wellbore_id is not None:
             properties["WellboreID"] = self.wellbore_id
 

@@ -94,6 +94,7 @@ class CdfModelApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.name is not None:
             properties["name"] = self.name
 

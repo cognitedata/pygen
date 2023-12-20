@@ -100,13 +100,16 @@ class FeaturesApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.bbox is not None:
             properties["bbox"] = self.bbox
+
         if self.geometry is not None:
             properties["geometry"] = {
                 "space": self.space if isinstance(self.geometry, str) else self.geometry.space,
                 "externalId": self.geometry if isinstance(self.geometry, str) else self.geometry.external_id,
             }
+
         if self.type_ is not None:
             properties["type"] = self.type_
 

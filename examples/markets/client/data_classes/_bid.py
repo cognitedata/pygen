@@ -101,13 +101,16 @@ class BidApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.date is not None:
             properties["date"] = self.date.isoformat()
+
         if self.market is not None:
             properties["market"] = {
                 "space": self.space if isinstance(self.market, str) else self.market.space,
                 "externalId": self.market if isinstance(self.market, str) else self.market.external_id,
             }
+
         if self.name is not None:
             properties["name"] = self.name
 

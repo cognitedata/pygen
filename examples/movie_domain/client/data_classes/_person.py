@@ -100,8 +100,10 @@ class PersonApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.birth_year is not None:
             properties["birthYear"] = self.birth_year
+
         if self.name is not None:
             properties["name"] = self.name
 

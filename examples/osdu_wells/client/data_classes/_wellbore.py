@@ -160,43 +160,55 @@ class WellboreApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.acl is not None:
             properties["acl"] = {
                 "space": self.space if isinstance(self.acl, str) else self.acl.space,
                 "externalId": self.acl if isinstance(self.acl, str) else self.acl.external_id,
             }
+
         if self.ancestry is not None:
             properties["ancestry"] = {
                 "space": self.space if isinstance(self.ancestry, str) else self.ancestry.space,
                 "externalId": self.ancestry if isinstance(self.ancestry, str) else self.ancestry.external_id,
             }
+
         if self.create_time is not None:
             properties["createTime"] = self.create_time
+
         if self.create_user is not None:
             properties["createUser"] = self.create_user
+
         if self.data is not None:
             properties["data"] = {
                 "space": self.space if isinstance(self.data, str) else self.data.space,
                 "externalId": self.data if isinstance(self.data, str) else self.data.external_id,
             }
+
         if self.id_ is not None:
             properties["id"] = self.id_
+
         if self.kind is not None:
             properties["kind"] = self.kind
+
         if self.legal is not None:
             properties["legal"] = {
                 "space": self.space if isinstance(self.legal, str) else self.legal.space,
                 "externalId": self.legal if isinstance(self.legal, str) else self.legal.external_id,
             }
+
         if self.modify_time is not None:
             properties["modifyTime"] = self.modify_time
+
         if self.modify_user is not None:
             properties["modifyUser"] = self.modify_user
+
         if self.tags is not None:
             properties["tags"] = {
                 "space": self.space if isinstance(self.tags, str) else self.tags.space,
                 "externalId": self.tags if isinstance(self.tags, str) else self.tags.external_id,
             }
+
         if self.version_ is not None:
             properties["version"] = self.version_
 

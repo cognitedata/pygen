@@ -439,50 +439,73 @@ class WellDataApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.business_intention_id is not None:
             properties["BusinessIntentionID"] = self.business_intention_id
+
         if self.condition_id is not None:
             properties["ConditionID"] = self.condition_id
+
         if self.current_operator_id is not None:
             properties["CurrentOperatorID"] = self.current_operator_id
+
         if self.data_source_organisation_id is not None:
             properties["DataSourceOrganisationID"] = self.data_source_organisation_id
+
         if self.default_vertical_crsid is not None:
             properties["DefaultVerticalCRSID"] = self.default_vertical_crsid
+
         if self.default_vertical_measurement_id is not None:
             properties["DefaultVerticalMeasurementID"] = self.default_vertical_measurement_id
+
         if self.existence_kind is not None:
             properties["ExistenceKind"] = self.existence_kind
+
         if self.facility_description is not None:
             properties["FacilityDescription"] = self.facility_description
+
         if self.facility_id is not None:
             properties["FacilityID"] = self.facility_id
+
         if self.facility_name is not None:
             properties["FacilityName"] = self.facility_name
+
         if self.facility_type_id is not None:
             properties["FacilityTypeID"] = self.facility_type_id
+
         if self.initial_operator_id is not None:
             properties["InitialOperatorID"] = self.initial_operator_id
+
         if self.interest_type_id is not None:
             properties["InterestTypeID"] = self.interest_type_id
+
         if self.operating_environment_id is not None:
             properties["OperatingEnvironmentID"] = self.operating_environment_id
+
         if self.outcome_id is not None:
             properties["OutcomeID"] = self.outcome_id
+
         if self.resource_curation_status is not None:
             properties["ResourceCurationStatus"] = self.resource_curation_status
+
         if self.resource_home_region_id is not None:
             properties["ResourceHomeRegionID"] = self.resource_home_region_id
+
         if self.resource_host_region_i_ds is not None:
             properties["ResourceHostRegionIDs"] = self.resource_host_region_i_ds
+
         if self.resource_lifecycle_status is not None:
             properties["ResourceLifecycleStatus"] = self.resource_lifecycle_status
+
         if self.resource_security_classification is not None:
             properties["ResourceSecurityClassification"] = self.resource_security_classification
+
         if self.role_id is not None:
             properties["RoleID"] = self.role_id
+
         if self.source is not None:
             properties["Source"] = self.source
+
         if self.spatial_location is not None:
             properties["SpatialLocation"] = {
                 "space": self.space if isinstance(self.spatial_location, str) else self.spatial_location.space,
@@ -490,18 +513,25 @@ class WellDataApply(DomainModelApply):
                 if isinstance(self.spatial_location, str)
                 else self.spatial_location.external_id,
             }
+
         if self.status_summary_id is not None:
             properties["StatusSummaryID"] = self.status_summary_id
+
         if self.technical_assurance_type_id is not None:
             properties["TechnicalAssuranceTypeID"] = self.technical_assurance_type_id
+
         if self.version_creation_reason is not None:
             properties["VersionCreationReason"] = self.version_creation_reason
+
         if self.was_business_interest_financial_non_operated is not None:
             properties["WasBusinessInterestFinancialNonOperated"] = self.was_business_interest_financial_non_operated
+
         if self.was_business_interest_financial_operated is not None:
             properties["WasBusinessInterestFinancialOperated"] = self.was_business_interest_financial_operated
+
         if self.was_business_interest_obligatory is not None:
             properties["WasBusinessInterestObligatory"] = self.was_business_interest_obligatory
+
         if self.was_business_interest_technical is not None:
             properties["WasBusinessInterestTechnical"] = self.was_business_interest_technical
 

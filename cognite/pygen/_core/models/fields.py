@@ -9,7 +9,6 @@ from functools import total_ordering
 from typing import TYPE_CHECKING, Literal, TypeVar, cast
 
 from cognite.client.data_classes import data_modeling as dm
-from cognite.client.data_classes.data_modeling.data_types import ListablePropertyType
 
 from cognite.pygen import config as pygen_config
 from cognite.pygen.config.reserved_words import is_reserved_word
@@ -104,16 +103,27 @@ class Field(ABC):
                 description=prop.description,
                 pydantic_field=pydantic_field,
             )
-        elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, ListablePropertyType) and prop.type.is_list:
-            return PrimitiveListField(
-                name=name,
-                prop_name=prop_name,
-                doc_name=doc_name,
-                type_=prop.type,
-                is_nullable=prop.nullable,
-                pydantic_field=pydantic_field,
-                description=prop.description,
-            )
+        elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.data_types.ListablePropertyType) and prop.type.is_list:
+            if isinstance(prop.type, dm.CDFExternalIdReference):
+                return CDFExternalListField(
+                    name=name,
+                    prop_name=prop_name,
+                    doc_name=doc_name,
+                    type_=prop.type,
+                    is_nullable=prop.nullable,
+                    description=prop.description,
+                    pydantic_field=pydantic_field,
+                )
+            else:
+                return PrimitiveListField(
+                    name=name,
+                    prop_name=prop_name,
+                    doc_name=doc_name,
+                    type_=prop.type,
+                    is_nullable=prop.nullable,
+                    pydantic_field=pydantic_field,
+                    description=prop.description,
+                )
         elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.CDFExternalIdReference):
             # Note: these are only CDF External Fields that are not listable. Listable CDF External Fields
             # are handled above.
@@ -201,6 +211,10 @@ class Field(ABC):
 
     @property
     def is_time_series(self) -> bool:
+        return False
+
+    @property
+    def is_list(self) -> bool:
         return False
 
     @property
@@ -294,6 +308,10 @@ class CDFExternalField(PrimitiveFieldCore):
     def is_time_series(self) -> bool:
         return isinstance(self.type_, dm.TimeSeriesReference)
 
+    @property
+    def is_list(self) -> bool:
+        return isinstance(self.type_, dm.data_types.ListablePropertyType) and self.type_.is_list
+
     def as_read_type_hint(self) -> str:
         return self.as_write_type_hint()
 
@@ -309,6 +327,29 @@ class CDFExternalField(PrimitiveFieldCore):
             out_type = f"Union[{type_}, None] = None"
         return out_type
 
+
+@dataclass(frozen=True)
+class CDFExternalListField(CDFExternalField):
+    """
+    This represents a list of CDF types such as list[TimeSeries], list[Sequence].
+    """
+
+    def as_read_type_hint(self) -> str:
+        if self.need_alias:
+            return f'Optional[list[{self.type_as_string}]] = {self.pydantic_field}(None, alias="{self.prop_name}")'
+        else:
+            return f"Optional[list[{self.type_as_string}]] = None"
+
+    def as_write_type_hint(self) -> str:
+        type_ = self.type_as_string
+        if self.is_nullable and self.need_alias:
+            return f'Optional[list[{type_}]] = {self.pydantic_field}(None, alias="{self.prop_name}")'
+        elif self.need_alias:
+            return f'list[{type_}] = {self.pydantic_field}(alias="{self.prop_name}")'
+        elif self.is_nullable:
+            return f"Optional[list[{type_}]] = None"
+        else:  # not self.is_nullable and not self.need_alias
+            return f"list[{type_}]"
 
 @dataclass(frozen=True)
 class EdgeField(Field, ABC):

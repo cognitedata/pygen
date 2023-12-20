@@ -111,12 +111,16 @@ class FacilityStatesApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.effective_date_time is not None:
             properties["EffectiveDateTime"] = self.effective_date_time
+
         if self.facility_state_type_id is not None:
             properties["FacilityStateTypeID"] = self.facility_state_type_id
+
         if self.remark is not None:
             properties["Remark"] = self.remark
+
         if self.termination_date_time is not None:
             properties["TerminationDateTime"] = self.termination_date_time
 

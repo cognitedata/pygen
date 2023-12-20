@@ -99,8 +99,10 @@ class LineageAssertionsApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.id_ is not None:
             properties["ID"] = self.id_
+
         if self.lineage_relationship_type is not None:
             properties["LineageRelationshipType"] = self.lineage_relationship_type
 

@@ -109,8 +109,10 @@ class WgsCoordinatesApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.bbox is not None:
             properties["bbox"] = self.bbox
+
         if self.type_ is not None:
             properties["type"] = self.type_
 

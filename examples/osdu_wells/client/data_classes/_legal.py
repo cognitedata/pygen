@@ -98,10 +98,13 @@ class LegalApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.legaltags is not None:
             properties["legaltags"] = self.legaltags
+
         if self.other_relevant_data_countries is not None:
             properties["otherRelevantDataCountries"] = self.other_relevant_data_countries
+
         if self.status is not None:
             properties["status"] = self.status
 
