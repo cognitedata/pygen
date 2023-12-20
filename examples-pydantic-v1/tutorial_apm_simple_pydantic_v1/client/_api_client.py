@@ -20,7 +20,7 @@ class ApmSimpleClient:
     Generated with:
         pygen = 0.32.4
         cognite-sdk = 7.5.1
-        pydantic = 1.10.13
+        pydantic = 1.10.7
 
     Data Model:
         space: tutorial_apm_simple
