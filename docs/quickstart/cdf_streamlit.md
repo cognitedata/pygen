@@ -22,7 +22,7 @@ when we want to use `pygen` in the CDF streamlit environment, we need to use `py
 ## Minimal Example
 
 The following is a minimal example of a Streamlit app that uses `pygen` to generate a Python SDK client with the
-`ScenarioInstanceModel` from the (../examples/timeseries.html)[Working with TimeSeries] example.
+`ScenarioInstanceModel` from the [Working with TimeSeries](../examples/timeseries.html) example.
 
 ```python
 import streamlit as st
