@@ -13,8 +13,8 @@
 This is the Cognite Python SDK Generator, `pygen`. The purpose of this package is to help developers to
 work with Cognite Data Fusion's (CDF) Data Models (DM) in Python.
 
-**Alpha Note** This package `pygen` is currently in alpha, which is reflected in the version number 0.x.x. This means that the
-package might have changes that are not backwards compatible between minor versions. It will continued to be developed
+**Alpha Note** This package, `pygen`, is currently in alpha, which is reflected in the version number 0.x.x. This means that the
+package might have changes that are not backwards compatible between minor versions. It will continue to be developed
 towards beta and general availability (GA). You are encouraged to try it out and give feedback, but it should not
 be used in production until it reaches GA.
 
