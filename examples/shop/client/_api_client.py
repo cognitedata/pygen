@@ -16,8 +16,8 @@ class ShopClient:
 
     Generated with:
         pygen = 0.32.5
-        cognite-sdk = 7.5.1
-        pydantic = 1.10.7
+        cognite-sdk = 7.8.2
+        pydantic = 2.5.2
 
     Data Model:
         space: IntegrationTestsImmutable
