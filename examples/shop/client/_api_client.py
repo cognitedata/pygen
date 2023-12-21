@@ -15,9 +15,9 @@ class ShopClient:
     ShopClient
 
     Generated with:
-        pygen = 0.32.4
+        pygen = 0.32.5
         cognite-sdk = 7.5.1
-        pydantic = 2.5.2
+        pydantic = 1.10.7
 
     Data Model:
         space: IntegrationTestsImmutable
@@ -33,7 +33,7 @@ class ShopClient:
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = "CognitePygen:0.32.4"
+        client.config.client_name = "CognitePygen:0.32.5"
 
         view_by_write_class = {
             data_classes.CaseApply: dm.ViewId("IntegrationTestsImmutable", "Case", "366b75cc4e699f"),
