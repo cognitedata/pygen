@@ -23,8 +23,8 @@ class MovieClient:
     MovieClient
 
     Generated with:
-        pygen = 0.32.4
-        cognite-sdk = 7.5.1
+        pygen = 0.32.5
+        cognite-sdk = 7.8.3
         pydantic = 2.5.2
 
     Data Model:
@@ -41,7 +41,7 @@ class MovieClient:
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = "CognitePygen:0.32.4"
+        client.config.client_name = "CognitePygen:0.32.5"
 
         view_by_write_class = {
             data_classes.ActorApply: dm.ViewId("IntegrationTestsImmutable", "Actor", "3"),

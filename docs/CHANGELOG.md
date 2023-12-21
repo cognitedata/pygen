@@ -14,6 +14,11 @@ Changes are grouped as follows
 - `Security` in case of vulnerabilities.
 
 
+## [0.32.5] - 21-12-23
+### Fixed
+* In version `7.6-7.8.1` of the `cognite-sdk` there is a bug that breaks `pygen`. This version
+  requires `cognite-sdk>=7.8.3`.
+
 ## [0.32.4] - 20-12-23
 ### Fixed
 * Correctly recognite `[timeseries]` fields and serialize the values for use in `.apply` methods.
