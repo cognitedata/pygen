@@ -17,7 +17,7 @@ class EquipmentUnitClient:
 
     Generated with:
         pygen = 0.32.5
-        cognite-sdk = 7.8.2
+        cognite-sdk = 7.8.3
         pydantic = 2.5.2
 
     Data Model:
