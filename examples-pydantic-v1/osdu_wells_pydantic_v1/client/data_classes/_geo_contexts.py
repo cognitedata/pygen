@@ -125,16 +125,22 @@ class GeoContextsApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.basin_id is not None:
             properties["BasinID"] = self.basin_id
+
         if self.field_id is not None:
             properties["FieldID"] = self.field_id
+
         if self.geo_political_entity_id is not None:
             properties["GeoPoliticalEntityID"] = self.geo_political_entity_id
+
         if self.geo_type_id is not None:
             properties["GeoTypeID"] = self.geo_type_id
+
         if self.play_id is not None:
             properties["PlayID"] = self.play_id
+
         if self.prospect_id is not None:
             properties["ProspectID"] = self.prospect_id
 

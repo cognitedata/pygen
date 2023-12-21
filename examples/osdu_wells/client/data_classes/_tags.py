@@ -86,6 +86,7 @@ class TagsApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.name_of_key is not None:
             properties["NameOfKey"] = self.name_of_key
 

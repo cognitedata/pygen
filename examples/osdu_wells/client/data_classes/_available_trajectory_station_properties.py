@@ -109,10 +109,13 @@ class AvailableTrajectoryStationPropertiesApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.name is not None:
             properties["Name"] = self.name
+
         if self.station_property_unit_id is not None:
             properties["StationPropertyUnitID"] = self.station_property_unit_id
+
         if self.trajectory_station_property_type_id is not None:
             properties["TrajectoryStationPropertyTypeID"] = self.trajectory_station_property_type_id
 

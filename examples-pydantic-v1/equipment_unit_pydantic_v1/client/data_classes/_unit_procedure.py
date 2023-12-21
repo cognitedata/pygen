@@ -112,8 +112,10 @@ class UnitProcedureApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.name is not None:
             properties["name"] = self.name
+
         if self.type_ is not None:
             properties["type"] = self.type_
 

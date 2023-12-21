@@ -99,8 +99,10 @@ class WellboreCostsApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.activity_type_id is not None:
             properties["ActivityTypeID"] = self.activity_type_id
+
         if self.cost is not None:
             properties["Cost"] = self.cost
 

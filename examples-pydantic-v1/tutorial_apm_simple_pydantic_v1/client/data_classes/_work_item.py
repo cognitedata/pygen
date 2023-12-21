@@ -147,22 +147,31 @@ class WorkItemApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.criticality is not None:
             properties["criticality"] = self.criticality
+
         if self.description is not None:
             properties["description"] = self.description
+
         if self.is_completed is not None:
             properties["isCompleted"] = self.is_completed
+
         if self.item_info is not None:
             properties["itemInfo"] = self.item_info
+
         if self.item_name is not None:
             properties["itemName"] = self.item_name
+
         if self.method is not None:
             properties["method"] = self.method
+
         if self.title is not None:
             properties["title"] = self.title
+
         if self.to_be_done is not None:
             properties["toBeDone"] = self.to_be_done
+
         if self.work_order is not None:
             properties["workOrder"] = {
                 "space": self.space if isinstance(self.work_order, str) else self.work_order.space,

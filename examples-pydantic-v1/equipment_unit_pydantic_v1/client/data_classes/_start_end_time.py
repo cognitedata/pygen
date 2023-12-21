@@ -112,8 +112,10 @@ class StartEndTimeApply(DomainRelationApply):
         )
 
         properties = {}
+
         if self.end_time is not None:
             properties["end_time"] = self.end_time.isoformat(timespec="milliseconds")
+
         if self.start_time is not None:
             properties["start_time"] = self.start_time.isoformat(timespec="milliseconds")
 

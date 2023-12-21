@@ -121,14 +121,19 @@ class ReviewersApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.data_governance_role_type_id is not None:
             properties["DataGovernanceRoleTypeID"] = self.data_governance_role_type_id
+
         if self.name is not None:
             properties["Name"] = self.name
+
         if self.organisation_id is not None:
             properties["OrganisationID"] = self.organisation_id
+
         if self.role_type_id is not None:
             properties["RoleTypeID"] = self.role_type_id
+
         if self.workflow_persona_type_id is not None:
             properties["WorkflowPersonaTypeID"] = self.workflow_persona_type_id
 

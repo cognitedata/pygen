@@ -151,20 +151,28 @@ class FacilitySpecificationsApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.effective_date_time is not None:
             properties["EffectiveDateTime"] = self.effective_date_time
+
         if self.facility_specification_date_time is not None:
             properties["FacilitySpecificationDateTime"] = self.facility_specification_date_time
+
         if self.facility_specification_indicator is not None:
             properties["FacilitySpecificationIndicator"] = self.facility_specification_indicator
+
         if self.facility_specification_quantity is not None:
             properties["FacilitySpecificationQuantity"] = self.facility_specification_quantity
+
         if self.facility_specification_text is not None:
             properties["FacilitySpecificationText"] = self.facility_specification_text
+
         if self.parameter_type_id is not None:
             properties["ParameterTypeID"] = self.parameter_type_id
+
         if self.termination_date_time is not None:
             properties["TerminationDateTime"] = self.termination_date_time
+
         if self.unit_of_measure_id is not None:
             properties["UnitOfMeasureID"] = self.unit_of_measure_id
 

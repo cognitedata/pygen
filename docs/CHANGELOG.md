@@ -14,6 +14,11 @@ Changes are grouped as follows
 - `Security` in case of vulnerabilities.
 
 
+## [0.32.4] - 20-12-23
+### Fixed
+* Correctly recognite `[timeseries]` fields and serialize the values for use in `.apply` methods.
+
+
 ## [0.32.3] - 18-12-23
 ### Fixed
 * `pygen` now handles connections with directions `inwards` instead of assuming `outwards` for all connections.

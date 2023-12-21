@@ -129,14 +129,19 @@ class AcceptableUsageApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.data_quality_id is not None:
             properties["DataQualityID"] = self.data_quality_id
+
         if self.data_quality_rule_set_id is not None:
             properties["DataQualityRuleSetID"] = self.data_quality_rule_set_id
+
         if self.value_chain_status_type_id is not None:
             properties["ValueChainStatusTypeID"] = self.value_chain_status_type_id
+
         if self.workflow_persona_type_id is not None:
             properties["WorkflowPersonaTypeID"] = self.workflow_persona_type_id
+
         if self.workflow_usage_type_id is not None:
             properties["WorkflowUsageTypeID"] = self.workflow_usage_type_id
 

@@ -142,10 +142,13 @@ class TechnicalAssurancesApply(DomainModelApply):
         )
 
         properties = {}
+
         if self.comment is not None:
             properties["Comment"] = self.comment
+
         if self.effective_date is not None:
             properties["EffectiveDate"] = self.effective_date
+
         if self.technical_assurance_type_id is not None:
             properties["TechnicalAssuranceTypeID"] = self.technical_assurance_type_id
 

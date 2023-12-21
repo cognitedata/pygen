@@ -120,8 +120,10 @@ class CdfConnectionPropertiesApply(DomainRelationApply):
         )
 
         properties = {}
+
         if self.revision_id is not None:
             properties["revisionId"] = self.revision_id
+
         if self.revision_node_id is not None:
             properties["revisionNodeId"] = self.revision_node_id
 

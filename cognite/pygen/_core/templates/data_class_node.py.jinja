@@ -92,12 +92,24 @@ class {{ data_class.write_name }}(DomainModelApply):
             "{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}"
         )
 {% if not data_class.is_all_fields_of_type(ft.EdgeOneToMany) %}
-        properties = {}{% for field in data_class.fields_of_type((ft.PrimitiveFieldCore, ft.EdgeOneToOne)) %}
+        properties = {}
+        {% for field in data_class.fields_of_type((ft.PrimitiveFieldCore, ft.EdgeOneToOne)) %}
         if self.{{ field.name }} is not None:
-            properties["{{ field.prop_name }}"] = {% if field.is_edge %}{
+            {% if field.is_edge %}
+            properties["{{ field.prop_name }}"] = {
                 "space":  self.space if isinstance(self.{{ field.name }}, str) else self.{{ field.name }}.space,
                 "externalId": self.{{ field.name }} if isinstance(self.{{ field.name }}, str) else self.{{ field.name }}.external_id,
-            }{% elif field.is_time_series %}self.{{ field.name }} if isinstance(self.{{ field.name }}, str) else self.{{ field.name }}.external_id{% else %}self.{{ field.name }}{% if field.is_time_field %}.isoformat({% if field.is_timestamp %}timespec="milliseconds"{% endif %}){% endif %}{% endif %}{% endfor %}
+            }
+            {% elif field.is_time_series and not field.is_list %}
+            properties["{{ field.prop_name }}"] = self.{{ field.name }} if isinstance(self.{{ field.name }}, str) else self.{{ field.name }}.external_id
+            {% elif field.is_time_series and field.is_list %}
+            properties["{{ field.prop_name }}"] = [
+                value if isinstance(value, str) else value.external_id for value in self.{{ field.name }}
+            ]
+            {% else %}
+            properties["{{ field.prop_name }}"] = self.{{ field.name }}{% if field.is_time_field %}.isoformat({% if field.is_timestamp %}timespec="milliseconds"{% endif %}){% endif %}
+            {% endif %}
+        {% endfor %}
 
         if properties:
             this_node = dm.NodeApply(
