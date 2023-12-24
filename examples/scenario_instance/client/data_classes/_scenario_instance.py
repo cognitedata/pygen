@@ -29,20 +29,20 @@ __all__ = [
 ]
 
 
-ScenarioInstanceTextFields = Literal["aggregation", "country", "market", "price_area", "price_forecast", "scenario"]
+ScenarioInstanceTextFields = Literal["scenario", "price_area", "market", "price_forecast", "country", "aggregation"]
 ScenarioInstanceFields = Literal[
-    "aggregation", "country", "instance", "market", "price_area", "price_forecast", "scenario", "start"
+    "start", "instance", "scenario", "price_area", "market", "price_forecast", "country", "aggregation"
 ]
 
 _SCENARIOINSTANCE_PROPERTIES_BY_FIELD = {
-    "aggregation": "aggregation",
-    "country": "country",
-    "instance": "instance",
-    "market": "market",
-    "price_area": "priceArea",
-    "price_forecast": "priceForecast",
-    "scenario": "scenario",
     "start": "start",
+    "instance": "instance",
+    "scenario": "scenario",
+    "price_area": "priceArea",
+    "market": "market",
+    "price_forecast": "priceForecast",
+    "country": "country",
+    "aggregation": "aggregation",
 }
 
 
@@ -54,14 +54,14 @@ class ScenarioInstance(DomainModel):
     Args:
         space: The space where the node is located.
         external_id: The external id of the scenario instance.
-        aggregation: The aggregation field.
-        country: The country field.
-        instance: The instance field.
-        market: The market field.
-        price_area: The price area field.
-        price_forecast: The price forecast field.
-        scenario: The scenario field.
         start: The start field.
+        instance: The instance field.
+        scenario: The scenario field.
+        price_area: The price area field.
+        market: The market field.
+        price_forecast: The price forecast field.
+        country: The country field.
+        aggregation: The aggregation field.
         created_time: The created time of the scenario instance node.
         last_updated_time: The last updated time of the scenario instance node.
         deleted_time: If present, the deleted time of the scenario instance node.
@@ -69,28 +69,28 @@ class ScenarioInstance(DomainModel):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    aggregation: Optional[str] = None
-    country: Optional[str] = None
-    instance: Optional[datetime.datetime] = None
-    market: Optional[str] = None
-    price_area: Optional[str] = Field(None, alias="priceArea")
-    price_forecast: Union[TimeSeries, str, None] = Field(None, alias="priceForecast")
-    scenario: Optional[str] = None
     start: Optional[datetime.datetime] = None
+    instance: Optional[datetime.datetime] = None
+    scenario: Optional[str] = None
+    price_area: Optional[str] = Field(None, alias="priceArea")
+    market: Optional[str] = None
+    price_forecast: Union[TimeSeries, str, None] = Field(None, alias="priceForecast")
+    country: Optional[str] = None
+    aggregation: Optional[str] = None
 
     def as_apply(self) -> ScenarioInstanceApply:
         """Convert this read version of scenario instance to the writing version."""
         return ScenarioInstanceApply(
             space=self.space,
             external_id=self.external_id,
-            aggregation=self.aggregation,
-            country=self.country,
-            instance=self.instance,
-            market=self.market,
-            price_area=self.price_area,
-            price_forecast=self.price_forecast,
-            scenario=self.scenario,
             start=self.start,
+            instance=self.instance,
+            scenario=self.scenario,
+            price_area=self.price_area,
+            market=self.market,
+            price_forecast=self.price_forecast,
+            country=self.country,
+            aggregation=self.aggregation,
         )
 
 
@@ -102,14 +102,14 @@ class ScenarioInstanceApply(DomainModelApply):
     Args:
         space: The space where the node is located.
         external_id: The external id of the scenario instance.
-        aggregation: The aggregation field.
-        country: The country field.
-        instance: The instance field.
-        market: The market field.
-        price_area: The price area field.
-        price_forecast: The price forecast field.
-        scenario: The scenario field.
         start: The start field.
+        instance: The instance field.
+        scenario: The scenario field.
+        price_area: The price area field.
+        market: The market field.
+        price_forecast: The price forecast field.
+        country: The country field.
+        aggregation: The aggregation field.
         existing_version: Fail the ingestion request if the scenario instance version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
@@ -117,14 +117,14 @@ class ScenarioInstanceApply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    aggregation: Optional[str] = None
-    country: Optional[str] = None
-    instance: Optional[datetime.datetime] = None
-    market: Optional[str] = None
-    price_area: Optional[str] = Field(None, alias="priceArea")
-    price_forecast: Union[TimeSeries, str, None] = Field(None, alias="priceForecast")
-    scenario: Optional[str] = None
     start: Optional[datetime.datetime] = None
+    instance: Optional[datetime.datetime] = None
+    scenario: Optional[str] = None
+    price_area: Optional[str] = Field(None, alias="priceArea")
+    market: Optional[str] = None
+    price_forecast: Union[TimeSeries, str, None] = Field(None, alias="priceForecast")
+    country: Optional[str] = None
+    aggregation: Optional[str] = None
 
     def _to_instances_apply(
         self,
@@ -141,31 +141,31 @@ class ScenarioInstanceApply(DomainModelApply):
 
         properties = {}
 
-        if self.aggregation is not None:
-            properties["aggregation"] = self.aggregation
-
-        if self.country is not None:
-            properties["country"] = self.country
+        if self.start is not None:
+            properties["start"] = self.start.isoformat(timespec="milliseconds")
 
         if self.instance is not None:
             properties["instance"] = self.instance.isoformat(timespec="milliseconds")
 
-        if self.market is not None:
-            properties["market"] = self.market
+        if self.scenario is not None:
+            properties["scenario"] = self.scenario
 
         if self.price_area is not None:
             properties["priceArea"] = self.price_area
+
+        if self.market is not None:
+            properties["market"] = self.market
 
         if self.price_forecast is not None:
             properties["priceForecast"] = (
                 self.price_forecast if isinstance(self.price_forecast, str) else self.price_forecast.external_id
             )
 
-        if self.scenario is not None:
-            properties["scenario"] = self.scenario
+        if self.country is not None:
+            properties["country"] = self.country
 
-        if self.start is not None:
-            properties["start"] = self.start.isoformat(timespec="milliseconds")
+        if self.aggregation is not None:
+            properties["aggregation"] = self.aggregation
 
         if properties:
             this_node = dm.NodeApply(
@@ -206,63 +206,25 @@ class ScenarioInstanceApplyList(DomainModelApplyList[ScenarioInstanceApply]):
 
 def _create_scenario_instance_filter(
     view_id: dm.ViewId,
-    aggregation: str | list[str] | None = None,
-    aggregation_prefix: str | None = None,
-    country: str | list[str] | None = None,
-    country_prefix: str | None = None,
-    min_instance: datetime.datetime | None = None,
-    max_instance: datetime.datetime | None = None,
-    market: str | list[str] | None = None,
-    market_prefix: str | None = None,
-    price_area: str | list[str] | None = None,
-    price_area_prefix: str | None = None,
-    scenario: str | list[str] | None = None,
-    scenario_prefix: str | None = None,
     min_start: datetime.datetime | None = None,
     max_start: datetime.datetime | None = None,
+    min_instance: datetime.datetime | None = None,
+    max_instance: datetime.datetime | None = None,
+    scenario: str | list[str] | None = None,
+    scenario_prefix: str | None = None,
+    price_area: str | list[str] | None = None,
+    price_area_prefix: str | None = None,
+    market: str | list[str] | None = None,
+    market_prefix: str | None = None,
+    country: str | list[str] | None = None,
+    country_prefix: str | None = None,
+    aggregation: str | list[str] | None = None,
+    aggregation_prefix: str | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
-    if aggregation is not None and isinstance(aggregation, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("aggregation"), value=aggregation))
-    if aggregation and isinstance(aggregation, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("aggregation"), values=aggregation))
-    if aggregation_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("aggregation"), value=aggregation_prefix))
-    if country is not None and isinstance(country, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("country"), value=country))
-    if country and isinstance(country, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("country"), values=country))
-    if country_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("country"), value=country_prefix))
-    if min_instance or max_instance:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("instance"),
-                gte=min_instance.isoformat(timespec="milliseconds") if min_instance else None,
-                lte=max_instance.isoformat(timespec="milliseconds") if max_instance else None,
-            )
-        )
-    if market is not None and isinstance(market, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("market"), value=market))
-    if market and isinstance(market, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("market"), values=market))
-    if market_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("market"), value=market_prefix))
-    if price_area is not None and isinstance(price_area, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("priceArea"), value=price_area))
-    if price_area and isinstance(price_area, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("priceArea"), values=price_area))
-    if price_area_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("priceArea"), value=price_area_prefix))
-    if scenario is not None and isinstance(scenario, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("scenario"), value=scenario))
-    if scenario and isinstance(scenario, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("scenario"), values=scenario))
-    if scenario_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("scenario"), value=scenario_prefix))
     if min_start or max_start:
         filters.append(
             dm.filters.Range(
@@ -271,6 +233,44 @@ def _create_scenario_instance_filter(
                 lte=max_start.isoformat(timespec="milliseconds") if max_start else None,
             )
         )
+    if min_instance or max_instance:
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("instance"),
+                gte=min_instance.isoformat(timespec="milliseconds") if min_instance else None,
+                lte=max_instance.isoformat(timespec="milliseconds") if max_instance else None,
+            )
+        )
+    if scenario is not None and isinstance(scenario, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("scenario"), value=scenario))
+    if scenario and isinstance(scenario, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("scenario"), values=scenario))
+    if scenario_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("scenario"), value=scenario_prefix))
+    if price_area is not None and isinstance(price_area, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("priceArea"), value=price_area))
+    if price_area and isinstance(price_area, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("priceArea"), values=price_area))
+    if price_area_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("priceArea"), value=price_area_prefix))
+    if market is not None and isinstance(market, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("market"), value=market))
+    if market and isinstance(market, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("market"), values=market))
+    if market_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("market"), value=market_prefix))
+    if country is not None and isinstance(country, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("country"), value=country))
+    if country and isinstance(country, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("country"), values=country))
+    if country_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("country"), value=country_prefix))
+    if aggregation is not None and isinstance(aggregation, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("aggregation"), value=aggregation))
+    if aggregation and isinstance(aggregation, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("aggregation"), values=aggregation))
+    if aggregation_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("aggregation"), value=aggregation_prefix))
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if space is not None and isinstance(space, str):

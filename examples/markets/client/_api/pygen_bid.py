@@ -51,16 +51,16 @@ class PygenBidAPI(NodeAPI[PygenBid, PygenBidApply, PygenBidList]):
 
     def __call__(
         self,
-        min_date: datetime.date | None = None,
-        max_date: datetime.date | None = None,
-        is_block: bool | None = None,
-        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        min_minimum_price: float | None = None,
-        max_minimum_price: float | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
+        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        min_date: datetime.date | None = None,
+        max_date: datetime.date | None = None,
+        min_minimum_price: float | None = None,
+        max_minimum_price: float | None = None,
         min_price_premium: float | None = None,
         max_price_premium: float | None = None,
+        is_block: bool | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
@@ -69,16 +69,16 @@ class PygenBidAPI(NodeAPI[PygenBid, PygenBidApply, PygenBidList]):
         """Query starting at pygen bids.
 
         Args:
-            min_date: The minimum value of the date to filter on.
-            max_date: The maximum value of the date to filter on.
-            is_block: The is block to filter on.
-            market: The market to filter on.
-            min_minimum_price: The minimum value of the minimum price to filter on.
-            max_minimum_price: The maximum value of the minimum price to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
+            market: The market to filter on.
+            min_date: The minimum value of the date to filter on.
+            max_date: The maximum value of the date to filter on.
+            min_minimum_price: The minimum value of the minimum price to filter on.
+            max_minimum_price: The maximum value of the minimum price to filter on.
             min_price_premium: The minimum value of the price premium to filter on.
             max_price_premium: The maximum value of the price premium to filter on.
+            is_block: The is block to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of pygen bids to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -91,16 +91,16 @@ class PygenBidAPI(NodeAPI[PygenBid, PygenBidApply, PygenBidList]):
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_pygen_bid_filter(
             self._view_id,
-            min_date,
-            max_date,
-            is_block,
-            market,
-            min_minimum_price,
-            max_minimum_price,
             name,
             name_prefix,
+            market,
+            min_date,
+            max_date,
+            min_minimum_price,
+            max_minimum_price,
             min_price_premium,
             max_price_premium,
+            is_block,
             external_id_prefix,
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
@@ -188,16 +188,16 @@ class PygenBidAPI(NodeAPI[PygenBid, PygenBidApply, PygenBidList]):
         self,
         query: str,
         properties: PygenBidTextFields | Sequence[PygenBidTextFields] | None = None,
-        min_date: datetime.date | None = None,
-        max_date: datetime.date | None = None,
-        is_block: bool | None = None,
-        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        min_minimum_price: float | None = None,
-        max_minimum_price: float | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
+        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        min_date: datetime.date | None = None,
+        max_date: datetime.date | None = None,
+        min_minimum_price: float | None = None,
+        max_minimum_price: float | None = None,
         min_price_premium: float | None = None,
         max_price_premium: float | None = None,
+        is_block: bool | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -208,16 +208,16 @@ class PygenBidAPI(NodeAPI[PygenBid, PygenBidApply, PygenBidList]):
         Args:
             query: The search query,
             properties: The property to search, if nothing is passed all text fields will be searched.
-            min_date: The minimum value of the date to filter on.
-            max_date: The maximum value of the date to filter on.
-            is_block: The is block to filter on.
-            market: The market to filter on.
-            min_minimum_price: The minimum value of the minimum price to filter on.
-            max_minimum_price: The maximum value of the minimum price to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
+            market: The market to filter on.
+            min_date: The minimum value of the date to filter on.
+            max_date: The maximum value of the date to filter on.
+            min_minimum_price: The minimum value of the minimum price to filter on.
+            max_minimum_price: The maximum value of the minimum price to filter on.
             min_price_premium: The minimum value of the price premium to filter on.
             max_price_premium: The maximum value of the price premium to filter on.
+            is_block: The is block to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of pygen bids to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -237,16 +237,16 @@ class PygenBidAPI(NodeAPI[PygenBid, PygenBidApply, PygenBidList]):
         """
         filter_ = _create_pygen_bid_filter(
             self._view_id,
-            min_date,
-            max_date,
-            is_block,
-            market,
-            min_minimum_price,
-            max_minimum_price,
             name,
             name_prefix,
+            market,
+            min_date,
+            max_date,
+            min_minimum_price,
+            max_minimum_price,
             min_price_premium,
             max_price_premium,
+            is_block,
             external_id_prefix,
             space,
             filter,
@@ -264,16 +264,16 @@ class PygenBidAPI(NodeAPI[PygenBid, PygenBidApply, PygenBidList]):
         group_by: None = None,
         query: str | None = None,
         search_properties: PygenBidTextFields | Sequence[PygenBidTextFields] | None = None,
-        min_date: datetime.date | None = None,
-        max_date: datetime.date | None = None,
-        is_block: bool | None = None,
-        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        min_minimum_price: float | None = None,
-        max_minimum_price: float | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
+        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        min_date: datetime.date | None = None,
+        max_date: datetime.date | None = None,
+        min_minimum_price: float | None = None,
+        max_minimum_price: float | None = None,
         min_price_premium: float | None = None,
         max_price_premium: float | None = None,
+        is_block: bool | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -292,16 +292,16 @@ class PygenBidAPI(NodeAPI[PygenBid, PygenBidApply, PygenBidList]):
         group_by: PygenBidFields | Sequence[PygenBidFields] = None,
         query: str | None = None,
         search_properties: PygenBidTextFields | Sequence[PygenBidTextFields] | None = None,
-        min_date: datetime.date | None = None,
-        max_date: datetime.date | None = None,
-        is_block: bool | None = None,
-        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        min_minimum_price: float | None = None,
-        max_minimum_price: float | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
+        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        min_date: datetime.date | None = None,
+        max_date: datetime.date | None = None,
+        min_minimum_price: float | None = None,
+        max_minimum_price: float | None = None,
         min_price_premium: float | None = None,
         max_price_premium: float | None = None,
+        is_block: bool | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -319,16 +319,16 @@ class PygenBidAPI(NodeAPI[PygenBid, PygenBidApply, PygenBidList]):
         group_by: PygenBidFields | Sequence[PygenBidFields] | None = None,
         query: str | None = None,
         search_property: PygenBidTextFields | Sequence[PygenBidTextFields] | None = None,
-        min_date: datetime.date | None = None,
-        max_date: datetime.date | None = None,
-        is_block: bool | None = None,
-        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        min_minimum_price: float | None = None,
-        max_minimum_price: float | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
+        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        min_date: datetime.date | None = None,
+        max_date: datetime.date | None = None,
+        min_minimum_price: float | None = None,
+        max_minimum_price: float | None = None,
         min_price_premium: float | None = None,
         max_price_premium: float | None = None,
+        is_block: bool | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -342,16 +342,16 @@ class PygenBidAPI(NodeAPI[PygenBid, PygenBidApply, PygenBidList]):
             group_by: The property to group by when doing the aggregation.
             query: The query to search for in the text field.
             search_property: The text field to search in.
-            min_date: The minimum value of the date to filter on.
-            max_date: The maximum value of the date to filter on.
-            is_block: The is block to filter on.
-            market: The market to filter on.
-            min_minimum_price: The minimum value of the minimum price to filter on.
-            max_minimum_price: The maximum value of the minimum price to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
+            market: The market to filter on.
+            min_date: The minimum value of the date to filter on.
+            max_date: The maximum value of the date to filter on.
+            min_minimum_price: The minimum value of the minimum price to filter on.
+            max_minimum_price: The maximum value of the minimum price to filter on.
             min_price_premium: The minimum value of the price premium to filter on.
             max_price_premium: The maximum value of the price premium to filter on.
+            is_block: The is block to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of pygen bids to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -372,16 +372,16 @@ class PygenBidAPI(NodeAPI[PygenBid, PygenBidApply, PygenBidList]):
 
         filter_ = _create_pygen_bid_filter(
             self._view_id,
-            min_date,
-            max_date,
-            is_block,
-            market,
-            min_minimum_price,
-            max_minimum_price,
             name,
             name_prefix,
+            market,
+            min_date,
+            max_date,
+            min_minimum_price,
+            max_minimum_price,
             min_price_premium,
             max_price_premium,
+            is_block,
             external_id_prefix,
             space,
             filter,
@@ -404,16 +404,16 @@ class PygenBidAPI(NodeAPI[PygenBid, PygenBidApply, PygenBidList]):
         interval: float,
         query: str | None = None,
         search_property: PygenBidTextFields | Sequence[PygenBidTextFields] | None = None,
-        min_date: datetime.date | None = None,
-        max_date: datetime.date | None = None,
-        is_block: bool | None = None,
-        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        min_minimum_price: float | None = None,
-        max_minimum_price: float | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
+        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        min_date: datetime.date | None = None,
+        max_date: datetime.date | None = None,
+        min_minimum_price: float | None = None,
+        max_minimum_price: float | None = None,
         min_price_premium: float | None = None,
         max_price_premium: float | None = None,
+        is_block: bool | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -426,16 +426,16 @@ class PygenBidAPI(NodeAPI[PygenBid, PygenBidApply, PygenBidList]):
             interval: The interval to use for the histogram bins.
             query: The query to search for in the text field.
             search_property: The text field to search in.
-            min_date: The minimum value of the date to filter on.
-            max_date: The maximum value of the date to filter on.
-            is_block: The is block to filter on.
-            market: The market to filter on.
-            min_minimum_price: The minimum value of the minimum price to filter on.
-            max_minimum_price: The maximum value of the minimum price to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
+            market: The market to filter on.
+            min_date: The minimum value of the date to filter on.
+            max_date: The maximum value of the date to filter on.
+            min_minimum_price: The minimum value of the minimum price to filter on.
+            max_minimum_price: The maximum value of the minimum price to filter on.
             min_price_premium: The minimum value of the price premium to filter on.
             max_price_premium: The maximum value of the price premium to filter on.
+            is_block: The is block to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of pygen bids to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -447,16 +447,16 @@ class PygenBidAPI(NodeAPI[PygenBid, PygenBidApply, PygenBidList]):
         """
         filter_ = _create_pygen_bid_filter(
             self._view_id,
-            min_date,
-            max_date,
-            is_block,
-            market,
-            min_minimum_price,
-            max_minimum_price,
             name,
             name_prefix,
+            market,
+            min_date,
+            max_date,
+            min_minimum_price,
+            max_minimum_price,
             min_price_premium,
             max_price_premium,
+            is_block,
             external_id_prefix,
             space,
             filter,
@@ -474,16 +474,16 @@ class PygenBidAPI(NodeAPI[PygenBid, PygenBidApply, PygenBidList]):
 
     def list(
         self,
-        min_date: datetime.date | None = None,
-        max_date: datetime.date | None = None,
-        is_block: bool | None = None,
-        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        min_minimum_price: float | None = None,
-        max_minimum_price: float | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
+        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        min_date: datetime.date | None = None,
+        max_date: datetime.date | None = None,
+        min_minimum_price: float | None = None,
+        max_minimum_price: float | None = None,
         min_price_premium: float | None = None,
         max_price_premium: float | None = None,
+        is_block: bool | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -492,16 +492,16 @@ class PygenBidAPI(NodeAPI[PygenBid, PygenBidApply, PygenBidList]):
         """List/filter pygen bids
 
         Args:
-            min_date: The minimum value of the date to filter on.
-            max_date: The maximum value of the date to filter on.
-            is_block: The is block to filter on.
-            market: The market to filter on.
-            min_minimum_price: The minimum value of the minimum price to filter on.
-            max_minimum_price: The maximum value of the minimum price to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
+            market: The market to filter on.
+            min_date: The minimum value of the date to filter on.
+            max_date: The maximum value of the date to filter on.
+            min_minimum_price: The minimum value of the minimum price to filter on.
+            max_minimum_price: The maximum value of the minimum price to filter on.
             min_price_premium: The minimum value of the price premium to filter on.
             max_price_premium: The maximum value of the price premium to filter on.
+            is_block: The is block to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of pygen bids to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -521,16 +521,16 @@ class PygenBidAPI(NodeAPI[PygenBid, PygenBidApply, PygenBidList]):
         """
         filter_ = _create_pygen_bid_filter(
             self._view_id,
-            min_date,
-            max_date,
-            is_block,
-            market,
-            min_minimum_price,
-            max_minimum_price,
             name,
             name_prefix,
+            market,
+            min_date,
+            max_date,
+            min_minimum_price,
+            max_minimum_price,
             min_price_premium,
             max_price_premium,
+            is_block,
             external_id_prefix,
             space,
             filter,

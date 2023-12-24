@@ -50,16 +50,16 @@ class CogPoolAPI(NodeAPI[CogPool, CogPoolApply, CogPoolList]):
 
     def __call__(
         self,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        timezone: str | list[str] | None = None,
+        timezone_prefix: str | None = None,
         min_max_price: float | None = None,
         max_max_price: float | None = None,
         min_min_price: float | None = None,
         max_min_price: float | None = None,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
         time_unit: str | list[str] | None = None,
         time_unit_prefix: str | None = None,
-        timezone: str | list[str] | None = None,
-        timezone_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
@@ -68,16 +68,16 @@ class CogPoolAPI(NodeAPI[CogPool, CogPoolApply, CogPoolList]):
         """Query starting at cog pools.
 
         Args:
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            timezone: The timezone to filter on.
+            timezone_prefix: The prefix of the timezone to filter on.
             min_max_price: The minimum value of the max price to filter on.
             max_max_price: The maximum value of the max price to filter on.
             min_min_price: The minimum value of the min price to filter on.
             max_min_price: The maximum value of the min price to filter on.
-            name: The name to filter on.
-            name_prefix: The prefix of the name to filter on.
             time_unit: The time unit to filter on.
             time_unit_prefix: The prefix of the time unit to filter on.
-            timezone: The timezone to filter on.
-            timezone_prefix: The prefix of the timezone to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of cog pools to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -90,16 +90,16 @@ class CogPoolAPI(NodeAPI[CogPool, CogPoolApply, CogPoolList]):
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_cog_pool_filter(
             self._view_id,
+            name,
+            name_prefix,
+            timezone,
+            timezone_prefix,
             min_max_price,
             max_max_price,
             min_min_price,
             max_min_price,
-            name,
-            name_prefix,
             time_unit,
             time_unit_prefix,
-            timezone,
-            timezone_prefix,
             external_id_prefix,
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
@@ -187,16 +187,16 @@ class CogPoolAPI(NodeAPI[CogPool, CogPoolApply, CogPoolList]):
         self,
         query: str,
         properties: CogPoolTextFields | Sequence[CogPoolTextFields] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        timezone: str | list[str] | None = None,
+        timezone_prefix: str | None = None,
         min_max_price: float | None = None,
         max_max_price: float | None = None,
         min_min_price: float | None = None,
         max_min_price: float | None = None,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
         time_unit: str | list[str] | None = None,
         time_unit_prefix: str | None = None,
-        timezone: str | list[str] | None = None,
-        timezone_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -207,16 +207,16 @@ class CogPoolAPI(NodeAPI[CogPool, CogPoolApply, CogPoolList]):
         Args:
             query: The search query,
             properties: The property to search, if nothing is passed all text fields will be searched.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            timezone: The timezone to filter on.
+            timezone_prefix: The prefix of the timezone to filter on.
             min_max_price: The minimum value of the max price to filter on.
             max_max_price: The maximum value of the max price to filter on.
             min_min_price: The minimum value of the min price to filter on.
             max_min_price: The maximum value of the min price to filter on.
-            name: The name to filter on.
-            name_prefix: The prefix of the name to filter on.
             time_unit: The time unit to filter on.
             time_unit_prefix: The prefix of the time unit to filter on.
-            timezone: The timezone to filter on.
-            timezone_prefix: The prefix of the timezone to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of cog pools to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -236,16 +236,16 @@ class CogPoolAPI(NodeAPI[CogPool, CogPoolApply, CogPoolList]):
         """
         filter_ = _create_cog_pool_filter(
             self._view_id,
+            name,
+            name_prefix,
+            timezone,
+            timezone_prefix,
             min_max_price,
             max_max_price,
             min_min_price,
             max_min_price,
-            name,
-            name_prefix,
             time_unit,
             time_unit_prefix,
-            timezone,
-            timezone_prefix,
             external_id_prefix,
             space,
             filter,
@@ -263,16 +263,16 @@ class CogPoolAPI(NodeAPI[CogPool, CogPoolApply, CogPoolList]):
         group_by: None = None,
         query: str | None = None,
         search_properties: CogPoolTextFields | Sequence[CogPoolTextFields] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        timezone: str | list[str] | None = None,
+        timezone_prefix: str | None = None,
         min_max_price: float | None = None,
         max_max_price: float | None = None,
         min_min_price: float | None = None,
         max_min_price: float | None = None,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
         time_unit: str | list[str] | None = None,
         time_unit_prefix: str | None = None,
-        timezone: str | list[str] | None = None,
-        timezone_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -291,16 +291,16 @@ class CogPoolAPI(NodeAPI[CogPool, CogPoolApply, CogPoolList]):
         group_by: CogPoolFields | Sequence[CogPoolFields] = None,
         query: str | None = None,
         search_properties: CogPoolTextFields | Sequence[CogPoolTextFields] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        timezone: str | list[str] | None = None,
+        timezone_prefix: str | None = None,
         min_max_price: float | None = None,
         max_max_price: float | None = None,
         min_min_price: float | None = None,
         max_min_price: float | None = None,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
         time_unit: str | list[str] | None = None,
         time_unit_prefix: str | None = None,
-        timezone: str | list[str] | None = None,
-        timezone_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -318,16 +318,16 @@ class CogPoolAPI(NodeAPI[CogPool, CogPoolApply, CogPoolList]):
         group_by: CogPoolFields | Sequence[CogPoolFields] | None = None,
         query: str | None = None,
         search_property: CogPoolTextFields | Sequence[CogPoolTextFields] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        timezone: str | list[str] | None = None,
+        timezone_prefix: str | None = None,
         min_max_price: float | None = None,
         max_max_price: float | None = None,
         min_min_price: float | None = None,
         max_min_price: float | None = None,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
         time_unit: str | list[str] | None = None,
         time_unit_prefix: str | None = None,
-        timezone: str | list[str] | None = None,
-        timezone_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -341,16 +341,16 @@ class CogPoolAPI(NodeAPI[CogPool, CogPoolApply, CogPoolList]):
             group_by: The property to group by when doing the aggregation.
             query: The query to search for in the text field.
             search_property: The text field to search in.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            timezone: The timezone to filter on.
+            timezone_prefix: The prefix of the timezone to filter on.
             min_max_price: The minimum value of the max price to filter on.
             max_max_price: The maximum value of the max price to filter on.
             min_min_price: The minimum value of the min price to filter on.
             max_min_price: The maximum value of the min price to filter on.
-            name: The name to filter on.
-            name_prefix: The prefix of the name to filter on.
             time_unit: The time unit to filter on.
             time_unit_prefix: The prefix of the time unit to filter on.
-            timezone: The timezone to filter on.
-            timezone_prefix: The prefix of the timezone to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of cog pools to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -371,16 +371,16 @@ class CogPoolAPI(NodeAPI[CogPool, CogPoolApply, CogPoolList]):
 
         filter_ = _create_cog_pool_filter(
             self._view_id,
+            name,
+            name_prefix,
+            timezone,
+            timezone_prefix,
             min_max_price,
             max_max_price,
             min_min_price,
             max_min_price,
-            name,
-            name_prefix,
             time_unit,
             time_unit_prefix,
-            timezone,
-            timezone_prefix,
             external_id_prefix,
             space,
             filter,
@@ -403,16 +403,16 @@ class CogPoolAPI(NodeAPI[CogPool, CogPoolApply, CogPoolList]):
         interval: float,
         query: str | None = None,
         search_property: CogPoolTextFields | Sequence[CogPoolTextFields] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        timezone: str | list[str] | None = None,
+        timezone_prefix: str | None = None,
         min_max_price: float | None = None,
         max_max_price: float | None = None,
         min_min_price: float | None = None,
         max_min_price: float | None = None,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
         time_unit: str | list[str] | None = None,
         time_unit_prefix: str | None = None,
-        timezone: str | list[str] | None = None,
-        timezone_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -425,16 +425,16 @@ class CogPoolAPI(NodeAPI[CogPool, CogPoolApply, CogPoolList]):
             interval: The interval to use for the histogram bins.
             query: The query to search for in the text field.
             search_property: The text field to search in.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            timezone: The timezone to filter on.
+            timezone_prefix: The prefix of the timezone to filter on.
             min_max_price: The minimum value of the max price to filter on.
             max_max_price: The maximum value of the max price to filter on.
             min_min_price: The minimum value of the min price to filter on.
             max_min_price: The maximum value of the min price to filter on.
-            name: The name to filter on.
-            name_prefix: The prefix of the name to filter on.
             time_unit: The time unit to filter on.
             time_unit_prefix: The prefix of the time unit to filter on.
-            timezone: The timezone to filter on.
-            timezone_prefix: The prefix of the timezone to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of cog pools to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -446,16 +446,16 @@ class CogPoolAPI(NodeAPI[CogPool, CogPoolApply, CogPoolList]):
         """
         filter_ = _create_cog_pool_filter(
             self._view_id,
+            name,
+            name_prefix,
+            timezone,
+            timezone_prefix,
             min_max_price,
             max_max_price,
             min_min_price,
             max_min_price,
-            name,
-            name_prefix,
             time_unit,
             time_unit_prefix,
-            timezone,
-            timezone_prefix,
             external_id_prefix,
             space,
             filter,
@@ -473,16 +473,16 @@ class CogPoolAPI(NodeAPI[CogPool, CogPoolApply, CogPoolList]):
 
     def list(
         self,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        timezone: str | list[str] | None = None,
+        timezone_prefix: str | None = None,
         min_max_price: float | None = None,
         max_max_price: float | None = None,
         min_min_price: float | None = None,
         max_min_price: float | None = None,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
         time_unit: str | list[str] | None = None,
         time_unit_prefix: str | None = None,
-        timezone: str | list[str] | None = None,
-        timezone_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -491,16 +491,16 @@ class CogPoolAPI(NodeAPI[CogPool, CogPoolApply, CogPoolList]):
         """List/filter cog pools
 
         Args:
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            timezone: The timezone to filter on.
+            timezone_prefix: The prefix of the timezone to filter on.
             min_max_price: The minimum value of the max price to filter on.
             max_max_price: The maximum value of the max price to filter on.
             min_min_price: The minimum value of the min price to filter on.
             max_min_price: The maximum value of the min price to filter on.
-            name: The name to filter on.
-            name_prefix: The prefix of the name to filter on.
             time_unit: The time unit to filter on.
             time_unit_prefix: The prefix of the time unit to filter on.
-            timezone: The timezone to filter on.
-            timezone_prefix: The prefix of the timezone to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of cog pools to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -520,16 +520,16 @@ class CogPoolAPI(NodeAPI[CogPool, CogPoolApply, CogPoolList]):
         """
         filter_ = _create_cog_pool_filter(
             self._view_id,
+            name,
+            name_prefix,
+            timezone,
+            timezone_prefix,
             min_max_price,
             max_max_price,
             min_min_price,
             max_min_price,
-            name,
-            name_prefix,
             time_unit,
             time_unit_prefix,
-            timezone,
-            timezone_prefix,
             external_id_prefix,
             space,
             filter,

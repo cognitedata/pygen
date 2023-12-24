@@ -53,20 +53,20 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
 
     def __call__(
         self,
-        aggregation: str | list[str] | None = None,
-        aggregation_prefix: str | None = None,
-        country: str | list[str] | None = None,
-        country_prefix: str | None = None,
-        min_instance: datetime.datetime | None = None,
-        max_instance: datetime.datetime | None = None,
-        market: str | list[str] | None = None,
-        market_prefix: str | None = None,
-        price_area: str | list[str] | None = None,
-        price_area_prefix: str | None = None,
-        scenario: str | list[str] | None = None,
-        scenario_prefix: str | None = None,
         min_start: datetime.datetime | None = None,
         max_start: datetime.datetime | None = None,
+        min_instance: datetime.datetime | None = None,
+        max_instance: datetime.datetime | None = None,
+        scenario: str | list[str] | None = None,
+        scenario_prefix: str | None = None,
+        price_area: str | list[str] | None = None,
+        price_area_prefix: str | None = None,
+        market: str | list[str] | None = None,
+        market_prefix: str | None = None,
+        country: str | list[str] | None = None,
+        country_prefix: str | None = None,
+        aggregation: str | list[str] | None = None,
+        aggregation_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
@@ -75,20 +75,20 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
         """Query starting at scenario instances.
 
         Args:
-            aggregation: The aggregation to filter on.
-            aggregation_prefix: The prefix of the aggregation to filter on.
-            country: The country to filter on.
-            country_prefix: The prefix of the country to filter on.
-            min_instance: The minimum value of the instance to filter on.
-            max_instance: The maximum value of the instance to filter on.
-            market: The market to filter on.
-            market_prefix: The prefix of the market to filter on.
-            price_area: The price area to filter on.
-            price_area_prefix: The prefix of the price area to filter on.
-            scenario: The scenario to filter on.
-            scenario_prefix: The prefix of the scenario to filter on.
             min_start: The minimum value of the start to filter on.
             max_start: The maximum value of the start to filter on.
+            min_instance: The minimum value of the instance to filter on.
+            max_instance: The maximum value of the instance to filter on.
+            scenario: The scenario to filter on.
+            scenario_prefix: The prefix of the scenario to filter on.
+            price_area: The price area to filter on.
+            price_area_prefix: The prefix of the price area to filter on.
+            market: The market to filter on.
+            market_prefix: The prefix of the market to filter on.
+            country: The country to filter on.
+            country_prefix: The prefix of the country to filter on.
+            aggregation: The aggregation to filter on.
+            aggregation_prefix: The prefix of the aggregation to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of scenario instances to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -101,20 +101,20 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_scenario_instance_filter(
             self._view_id,
-            aggregation,
-            aggregation_prefix,
-            country,
-            country_prefix,
-            min_instance,
-            max_instance,
-            market,
-            market_prefix,
-            price_area,
-            price_area_prefix,
-            scenario,
-            scenario_prefix,
             min_start,
             max_start,
+            min_instance,
+            max_instance,
+            scenario,
+            scenario_prefix,
+            price_area,
+            price_area_prefix,
+            market,
+            market_prefix,
+            country,
+            country_prefix,
+            aggregation,
+            aggregation_prefix,
             external_id_prefix,
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
@@ -204,20 +204,20 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
         self,
         query: str,
         properties: ScenarioInstanceTextFields | Sequence[ScenarioInstanceTextFields] | None = None,
-        aggregation: str | list[str] | None = None,
-        aggregation_prefix: str | None = None,
-        country: str | list[str] | None = None,
-        country_prefix: str | None = None,
-        min_instance: datetime.datetime | None = None,
-        max_instance: datetime.datetime | None = None,
-        market: str | list[str] | None = None,
-        market_prefix: str | None = None,
-        price_area: str | list[str] | None = None,
-        price_area_prefix: str | None = None,
-        scenario: str | list[str] | None = None,
-        scenario_prefix: str | None = None,
         min_start: datetime.datetime | None = None,
         max_start: datetime.datetime | None = None,
+        min_instance: datetime.datetime | None = None,
+        max_instance: datetime.datetime | None = None,
+        scenario: str | list[str] | None = None,
+        scenario_prefix: str | None = None,
+        price_area: str | list[str] | None = None,
+        price_area_prefix: str | None = None,
+        market: str | list[str] | None = None,
+        market_prefix: str | None = None,
+        country: str | list[str] | None = None,
+        country_prefix: str | None = None,
+        aggregation: str | list[str] | None = None,
+        aggregation_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -228,20 +228,20 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
         Args:
             query: The search query,
             properties: The property to search, if nothing is passed all text fields will be searched.
-            aggregation: The aggregation to filter on.
-            aggregation_prefix: The prefix of the aggregation to filter on.
-            country: The country to filter on.
-            country_prefix: The prefix of the country to filter on.
-            min_instance: The minimum value of the instance to filter on.
-            max_instance: The maximum value of the instance to filter on.
-            market: The market to filter on.
-            market_prefix: The prefix of the market to filter on.
-            price_area: The price area to filter on.
-            price_area_prefix: The prefix of the price area to filter on.
-            scenario: The scenario to filter on.
-            scenario_prefix: The prefix of the scenario to filter on.
             min_start: The minimum value of the start to filter on.
             max_start: The maximum value of the start to filter on.
+            min_instance: The minimum value of the instance to filter on.
+            max_instance: The maximum value of the instance to filter on.
+            scenario: The scenario to filter on.
+            scenario_prefix: The prefix of the scenario to filter on.
+            price_area: The price area to filter on.
+            price_area_prefix: The prefix of the price area to filter on.
+            market: The market to filter on.
+            market_prefix: The prefix of the market to filter on.
+            country: The country to filter on.
+            country_prefix: The prefix of the country to filter on.
+            aggregation: The aggregation to filter on.
+            aggregation_prefix: The prefix of the aggregation to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of scenario instances to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -261,20 +261,20 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
         """
         filter_ = _create_scenario_instance_filter(
             self._view_id,
-            aggregation,
-            aggregation_prefix,
-            country,
-            country_prefix,
-            min_instance,
-            max_instance,
-            market,
-            market_prefix,
-            price_area,
-            price_area_prefix,
-            scenario,
-            scenario_prefix,
             min_start,
             max_start,
+            min_instance,
+            max_instance,
+            scenario,
+            scenario_prefix,
+            price_area,
+            price_area_prefix,
+            market,
+            market_prefix,
+            country,
+            country_prefix,
+            aggregation,
+            aggregation_prefix,
             external_id_prefix,
             space,
             filter,
@@ -292,20 +292,20 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
         group_by: None = None,
         query: str | None = None,
         search_properties: ScenarioInstanceTextFields | Sequence[ScenarioInstanceTextFields] | None = None,
-        aggregation: str | list[str] | None = None,
-        aggregation_prefix: str | None = None,
-        country: str | list[str] | None = None,
-        country_prefix: str | None = None,
-        min_instance: datetime.datetime | None = None,
-        max_instance: datetime.datetime | None = None,
-        market: str | list[str] | None = None,
-        market_prefix: str | None = None,
-        price_area: str | list[str] | None = None,
-        price_area_prefix: str | None = None,
-        scenario: str | list[str] | None = None,
-        scenario_prefix: str | None = None,
         min_start: datetime.datetime | None = None,
         max_start: datetime.datetime | None = None,
+        min_instance: datetime.datetime | None = None,
+        max_instance: datetime.datetime | None = None,
+        scenario: str | list[str] | None = None,
+        scenario_prefix: str | None = None,
+        price_area: str | list[str] | None = None,
+        price_area_prefix: str | None = None,
+        market: str | list[str] | None = None,
+        market_prefix: str | None = None,
+        country: str | list[str] | None = None,
+        country_prefix: str | None = None,
+        aggregation: str | list[str] | None = None,
+        aggregation_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -324,20 +324,20 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
         group_by: ScenarioInstanceFields | Sequence[ScenarioInstanceFields] = None,
         query: str | None = None,
         search_properties: ScenarioInstanceTextFields | Sequence[ScenarioInstanceTextFields] | None = None,
-        aggregation: str | list[str] | None = None,
-        aggregation_prefix: str | None = None,
-        country: str | list[str] | None = None,
-        country_prefix: str | None = None,
-        min_instance: datetime.datetime | None = None,
-        max_instance: datetime.datetime | None = None,
-        market: str | list[str] | None = None,
-        market_prefix: str | None = None,
-        price_area: str | list[str] | None = None,
-        price_area_prefix: str | None = None,
-        scenario: str | list[str] | None = None,
-        scenario_prefix: str | None = None,
         min_start: datetime.datetime | None = None,
         max_start: datetime.datetime | None = None,
+        min_instance: datetime.datetime | None = None,
+        max_instance: datetime.datetime | None = None,
+        scenario: str | list[str] | None = None,
+        scenario_prefix: str | None = None,
+        price_area: str | list[str] | None = None,
+        price_area_prefix: str | None = None,
+        market: str | list[str] | None = None,
+        market_prefix: str | None = None,
+        country: str | list[str] | None = None,
+        country_prefix: str | None = None,
+        aggregation: str | list[str] | None = None,
+        aggregation_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -355,20 +355,20 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
         group_by: ScenarioInstanceFields | Sequence[ScenarioInstanceFields] | None = None,
         query: str | None = None,
         search_property: ScenarioInstanceTextFields | Sequence[ScenarioInstanceTextFields] | None = None,
-        aggregation: str | list[str] | None = None,
-        aggregation_prefix: str | None = None,
-        country: str | list[str] | None = None,
-        country_prefix: str | None = None,
-        min_instance: datetime.datetime | None = None,
-        max_instance: datetime.datetime | None = None,
-        market: str | list[str] | None = None,
-        market_prefix: str | None = None,
-        price_area: str | list[str] | None = None,
-        price_area_prefix: str | None = None,
-        scenario: str | list[str] | None = None,
-        scenario_prefix: str | None = None,
         min_start: datetime.datetime | None = None,
         max_start: datetime.datetime | None = None,
+        min_instance: datetime.datetime | None = None,
+        max_instance: datetime.datetime | None = None,
+        scenario: str | list[str] | None = None,
+        scenario_prefix: str | None = None,
+        price_area: str | list[str] | None = None,
+        price_area_prefix: str | None = None,
+        market: str | list[str] | None = None,
+        market_prefix: str | None = None,
+        country: str | list[str] | None = None,
+        country_prefix: str | None = None,
+        aggregation: str | list[str] | None = None,
+        aggregation_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -382,20 +382,20 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
             group_by: The property to group by when doing the aggregation.
             query: The query to search for in the text field.
             search_property: The text field to search in.
-            aggregation: The aggregation to filter on.
-            aggregation_prefix: The prefix of the aggregation to filter on.
-            country: The country to filter on.
-            country_prefix: The prefix of the country to filter on.
-            min_instance: The minimum value of the instance to filter on.
-            max_instance: The maximum value of the instance to filter on.
-            market: The market to filter on.
-            market_prefix: The prefix of the market to filter on.
-            price_area: The price area to filter on.
-            price_area_prefix: The prefix of the price area to filter on.
-            scenario: The scenario to filter on.
-            scenario_prefix: The prefix of the scenario to filter on.
             min_start: The minimum value of the start to filter on.
             max_start: The maximum value of the start to filter on.
+            min_instance: The minimum value of the instance to filter on.
+            max_instance: The maximum value of the instance to filter on.
+            scenario: The scenario to filter on.
+            scenario_prefix: The prefix of the scenario to filter on.
+            price_area: The price area to filter on.
+            price_area_prefix: The prefix of the price area to filter on.
+            market: The market to filter on.
+            market_prefix: The prefix of the market to filter on.
+            country: The country to filter on.
+            country_prefix: The prefix of the country to filter on.
+            aggregation: The aggregation to filter on.
+            aggregation_prefix: The prefix of the aggregation to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of scenario instances to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -416,20 +416,20 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
 
         filter_ = _create_scenario_instance_filter(
             self._view_id,
-            aggregation,
-            aggregation_prefix,
-            country,
-            country_prefix,
-            min_instance,
-            max_instance,
-            market,
-            market_prefix,
-            price_area,
-            price_area_prefix,
-            scenario,
-            scenario_prefix,
             min_start,
             max_start,
+            min_instance,
+            max_instance,
+            scenario,
+            scenario_prefix,
+            price_area,
+            price_area_prefix,
+            market,
+            market_prefix,
+            country,
+            country_prefix,
+            aggregation,
+            aggregation_prefix,
             external_id_prefix,
             space,
             filter,
@@ -452,20 +452,20 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
         interval: float,
         query: str | None = None,
         search_property: ScenarioInstanceTextFields | Sequence[ScenarioInstanceTextFields] | None = None,
-        aggregation: str | list[str] | None = None,
-        aggregation_prefix: str | None = None,
-        country: str | list[str] | None = None,
-        country_prefix: str | None = None,
-        min_instance: datetime.datetime | None = None,
-        max_instance: datetime.datetime | None = None,
-        market: str | list[str] | None = None,
-        market_prefix: str | None = None,
-        price_area: str | list[str] | None = None,
-        price_area_prefix: str | None = None,
-        scenario: str | list[str] | None = None,
-        scenario_prefix: str | None = None,
         min_start: datetime.datetime | None = None,
         max_start: datetime.datetime | None = None,
+        min_instance: datetime.datetime | None = None,
+        max_instance: datetime.datetime | None = None,
+        scenario: str | list[str] | None = None,
+        scenario_prefix: str | None = None,
+        price_area: str | list[str] | None = None,
+        price_area_prefix: str | None = None,
+        market: str | list[str] | None = None,
+        market_prefix: str | None = None,
+        country: str | list[str] | None = None,
+        country_prefix: str | None = None,
+        aggregation: str | list[str] | None = None,
+        aggregation_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -478,20 +478,20 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
             interval: The interval to use for the histogram bins.
             query: The query to search for in the text field.
             search_property: The text field to search in.
-            aggregation: The aggregation to filter on.
-            aggregation_prefix: The prefix of the aggregation to filter on.
-            country: The country to filter on.
-            country_prefix: The prefix of the country to filter on.
-            min_instance: The minimum value of the instance to filter on.
-            max_instance: The maximum value of the instance to filter on.
-            market: The market to filter on.
-            market_prefix: The prefix of the market to filter on.
-            price_area: The price area to filter on.
-            price_area_prefix: The prefix of the price area to filter on.
-            scenario: The scenario to filter on.
-            scenario_prefix: The prefix of the scenario to filter on.
             min_start: The minimum value of the start to filter on.
             max_start: The maximum value of the start to filter on.
+            min_instance: The minimum value of the instance to filter on.
+            max_instance: The maximum value of the instance to filter on.
+            scenario: The scenario to filter on.
+            scenario_prefix: The prefix of the scenario to filter on.
+            price_area: The price area to filter on.
+            price_area_prefix: The prefix of the price area to filter on.
+            market: The market to filter on.
+            market_prefix: The prefix of the market to filter on.
+            country: The country to filter on.
+            country_prefix: The prefix of the country to filter on.
+            aggregation: The aggregation to filter on.
+            aggregation_prefix: The prefix of the aggregation to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of scenario instances to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -503,20 +503,20 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
         """
         filter_ = _create_scenario_instance_filter(
             self._view_id,
-            aggregation,
-            aggregation_prefix,
-            country,
-            country_prefix,
-            min_instance,
-            max_instance,
-            market,
-            market_prefix,
-            price_area,
-            price_area_prefix,
-            scenario,
-            scenario_prefix,
             min_start,
             max_start,
+            min_instance,
+            max_instance,
+            scenario,
+            scenario_prefix,
+            price_area,
+            price_area_prefix,
+            market,
+            market_prefix,
+            country,
+            country_prefix,
+            aggregation,
+            aggregation_prefix,
             external_id_prefix,
             space,
             filter,
@@ -534,20 +534,20 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
 
     def list(
         self,
-        aggregation: str | list[str] | None = None,
-        aggregation_prefix: str | None = None,
-        country: str | list[str] | None = None,
-        country_prefix: str | None = None,
-        min_instance: datetime.datetime | None = None,
-        max_instance: datetime.datetime | None = None,
-        market: str | list[str] | None = None,
-        market_prefix: str | None = None,
-        price_area: str | list[str] | None = None,
-        price_area_prefix: str | None = None,
-        scenario: str | list[str] | None = None,
-        scenario_prefix: str | None = None,
         min_start: datetime.datetime | None = None,
         max_start: datetime.datetime | None = None,
+        min_instance: datetime.datetime | None = None,
+        max_instance: datetime.datetime | None = None,
+        scenario: str | list[str] | None = None,
+        scenario_prefix: str | None = None,
+        price_area: str | list[str] | None = None,
+        price_area_prefix: str | None = None,
+        market: str | list[str] | None = None,
+        market_prefix: str | None = None,
+        country: str | list[str] | None = None,
+        country_prefix: str | None = None,
+        aggregation: str | list[str] | None = None,
+        aggregation_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -556,20 +556,20 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
         """List/filter scenario instances
 
         Args:
-            aggregation: The aggregation to filter on.
-            aggregation_prefix: The prefix of the aggregation to filter on.
-            country: The country to filter on.
-            country_prefix: The prefix of the country to filter on.
-            min_instance: The minimum value of the instance to filter on.
-            max_instance: The maximum value of the instance to filter on.
-            market: The market to filter on.
-            market_prefix: The prefix of the market to filter on.
-            price_area: The price area to filter on.
-            price_area_prefix: The prefix of the price area to filter on.
-            scenario: The scenario to filter on.
-            scenario_prefix: The prefix of the scenario to filter on.
             min_start: The minimum value of the start to filter on.
             max_start: The maximum value of the start to filter on.
+            min_instance: The minimum value of the instance to filter on.
+            max_instance: The maximum value of the instance to filter on.
+            scenario: The scenario to filter on.
+            scenario_prefix: The prefix of the scenario to filter on.
+            price_area: The price area to filter on.
+            price_area_prefix: The prefix of the price area to filter on.
+            market: The market to filter on.
+            market_prefix: The prefix of the market to filter on.
+            country: The country to filter on.
+            country_prefix: The prefix of the country to filter on.
+            aggregation: The aggregation to filter on.
+            aggregation_prefix: The prefix of the aggregation to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of scenario instances to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -589,20 +589,20 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
         """
         filter_ = _create_scenario_instance_filter(
             self._view_id,
-            aggregation,
-            aggregation_prefix,
-            country,
-            country_prefix,
-            min_instance,
-            max_instance,
-            market,
-            market_prefix,
-            price_area,
-            price_area_prefix,
-            scenario,
-            scenario_prefix,
             min_start,
             max_start,
+            min_instance,
+            max_instance,
+            scenario,
+            scenario_prefix,
+            price_area,
+            price_area_prefix,
+            market,
+            market_prefix,
+            country,
+            country_prefix,
+            aggregation,
+            aggregation_prefix,
             external_id_prefix,
             space,
             filter,

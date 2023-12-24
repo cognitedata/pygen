@@ -50,11 +50,11 @@ class CogProcessAPI(NodeAPI[CogProcess, CogProcessApply, CogProcessList]):
 
     def __call__(
         self,
-        bid: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        date_transformations: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
+        bid: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         transformation: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        date_transformations: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
@@ -63,11 +63,11 @@ class CogProcessAPI(NodeAPI[CogProcess, CogProcessApply, CogProcessList]):
         """Query starting at cog process.
 
         Args:
-            bid: The bid to filter on.
-            date_transformations: The date transformation to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
+            bid: The bid to filter on.
             transformation: The transformation to filter on.
+            date_transformations: The date transformation to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of cog process to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -80,11 +80,11 @@ class CogProcessAPI(NodeAPI[CogProcess, CogProcessApply, CogProcessList]):
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_cog_proces_filter(
             self._view_id,
-            bid,
-            date_transformations,
             name,
             name_prefix,
+            bid,
             transformation,
+            date_transformations,
             external_id_prefix,
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
@@ -174,11 +174,11 @@ class CogProcessAPI(NodeAPI[CogProcess, CogProcessApply, CogProcessList]):
         self,
         query: str,
         properties: CogProcessTextFields | Sequence[CogProcessTextFields] | None = None,
-        bid: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        date_transformations: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
+        bid: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         transformation: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        date_transformations: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -189,11 +189,11 @@ class CogProcessAPI(NodeAPI[CogProcess, CogProcessApply, CogProcessList]):
         Args:
             query: The search query,
             properties: The property to search, if nothing is passed all text fields will be searched.
-            bid: The bid to filter on.
-            date_transformations: The date transformation to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
+            bid: The bid to filter on.
             transformation: The transformation to filter on.
+            date_transformations: The date transformation to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of cog process to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -213,11 +213,11 @@ class CogProcessAPI(NodeAPI[CogProcess, CogProcessApply, CogProcessList]):
         """
         filter_ = _create_cog_proces_filter(
             self._view_id,
-            bid,
-            date_transformations,
             name,
             name_prefix,
+            bid,
             transformation,
+            date_transformations,
             external_id_prefix,
             space,
             filter,
@@ -235,11 +235,11 @@ class CogProcessAPI(NodeAPI[CogProcess, CogProcessApply, CogProcessList]):
         group_by: None = None,
         query: str | None = None,
         search_properties: CogProcessTextFields | Sequence[CogProcessTextFields] | None = None,
-        bid: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        date_transformations: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
+        bid: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         transformation: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        date_transformations: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -258,11 +258,11 @@ class CogProcessAPI(NodeAPI[CogProcess, CogProcessApply, CogProcessList]):
         group_by: CogProcessFields | Sequence[CogProcessFields] = None,
         query: str | None = None,
         search_properties: CogProcessTextFields | Sequence[CogProcessTextFields] | None = None,
-        bid: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        date_transformations: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
+        bid: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         transformation: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        date_transformations: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -280,11 +280,11 @@ class CogProcessAPI(NodeAPI[CogProcess, CogProcessApply, CogProcessList]):
         group_by: CogProcessFields | Sequence[CogProcessFields] | None = None,
         query: str | None = None,
         search_property: CogProcessTextFields | Sequence[CogProcessTextFields] | None = None,
-        bid: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        date_transformations: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
+        bid: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         transformation: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        date_transformations: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -298,11 +298,11 @@ class CogProcessAPI(NodeAPI[CogProcess, CogProcessApply, CogProcessList]):
             group_by: The property to group by when doing the aggregation.
             query: The query to search for in the text field.
             search_property: The text field to search in.
-            bid: The bid to filter on.
-            date_transformations: The date transformation to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
+            bid: The bid to filter on.
             transformation: The transformation to filter on.
+            date_transformations: The date transformation to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of cog process to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -323,11 +323,11 @@ class CogProcessAPI(NodeAPI[CogProcess, CogProcessApply, CogProcessList]):
 
         filter_ = _create_cog_proces_filter(
             self._view_id,
-            bid,
-            date_transformations,
             name,
             name_prefix,
+            bid,
             transformation,
+            date_transformations,
             external_id_prefix,
             space,
             filter,
@@ -350,11 +350,11 @@ class CogProcessAPI(NodeAPI[CogProcess, CogProcessApply, CogProcessList]):
         interval: float,
         query: str | None = None,
         search_property: CogProcessTextFields | Sequence[CogProcessTextFields] | None = None,
-        bid: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        date_transformations: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
+        bid: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         transformation: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        date_transformations: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -367,11 +367,11 @@ class CogProcessAPI(NodeAPI[CogProcess, CogProcessApply, CogProcessList]):
             interval: The interval to use for the histogram bins.
             query: The query to search for in the text field.
             search_property: The text field to search in.
-            bid: The bid to filter on.
-            date_transformations: The date transformation to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
+            bid: The bid to filter on.
             transformation: The transformation to filter on.
+            date_transformations: The date transformation to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of cog process to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -383,11 +383,11 @@ class CogProcessAPI(NodeAPI[CogProcess, CogProcessApply, CogProcessList]):
         """
         filter_ = _create_cog_proces_filter(
             self._view_id,
-            bid,
-            date_transformations,
             name,
             name_prefix,
+            bid,
             transformation,
+            date_transformations,
             external_id_prefix,
             space,
             filter,
@@ -405,11 +405,11 @@ class CogProcessAPI(NodeAPI[CogProcess, CogProcessApply, CogProcessList]):
 
     def list(
         self,
-        bid: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        date_transformations: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
+        bid: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         transformation: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        date_transformations: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -418,11 +418,11 @@ class CogProcessAPI(NodeAPI[CogProcess, CogProcessApply, CogProcessList]):
         """List/filter cog process
 
         Args:
-            bid: The bid to filter on.
-            date_transformations: The date transformation to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
+            bid: The bid to filter on.
             transformation: The transformation to filter on.
+            date_transformations: The date transformation to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of cog process to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -442,11 +442,11 @@ class CogProcessAPI(NodeAPI[CogProcess, CogProcessApply, CogProcessList]):
         """
         filter_ = _create_cog_proces_filter(
             self._view_id,
-            bid,
-            date_transformations,
             name,
             name_prefix,
+            bid,
             transformation,
+            date_transformations,
             external_id_prefix,
             space,
             filter,

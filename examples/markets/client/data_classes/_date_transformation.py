@@ -26,11 +26,11 @@ __all__ = [
 
 
 DateTransformationTextFields = Literal["method"]
-DateTransformationFields = Literal["arguments", "method"]
+DateTransformationFields = Literal["method", "arguments"]
 
 _DATETRANSFORMATION_PROPERTIES_BY_FIELD = {
-    "arguments": "arguments",
     "method": "method",
+    "arguments": "arguments",
 }
 
 
@@ -42,8 +42,8 @@ class DateTransformation(DomainModel):
     Args:
         space: The space where the node is located.
         external_id: The external id of the date transformation.
-        arguments: The argument field.
         method: The method field.
+        arguments: The argument field.
         created_time: The created time of the date transformation node.
         last_updated_time: The last updated time of the date transformation node.
         deleted_time: If present, the deleted time of the date transformation node.
@@ -51,16 +51,16 @@ class DateTransformation(DomainModel):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    arguments: Optional[dict] = None
     method: Optional[str] = None
+    arguments: Optional[dict] = None
 
     def as_apply(self) -> DateTransformationApply:
         """Convert this read version of date transformation to the writing version."""
         return DateTransformationApply(
             space=self.space,
             external_id=self.external_id,
-            arguments=self.arguments,
             method=self.method,
+            arguments=self.arguments,
         )
 
 
@@ -72,8 +72,8 @@ class DateTransformationApply(DomainModelApply):
     Args:
         space: The space where the node is located.
         external_id: The external id of the date transformation.
-        arguments: The argument field.
         method: The method field.
+        arguments: The argument field.
         existing_version: Fail the ingestion request if the date transformation version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
@@ -81,8 +81,8 @@ class DateTransformationApply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    arguments: Optional[dict] = None
     method: Optional[str] = None
+    arguments: Optional[dict] = None
 
     def _to_instances_apply(
         self,
@@ -99,11 +99,11 @@ class DateTransformationApply(DomainModelApply):
 
         properties = {}
 
-        if self.arguments is not None:
-            properties["arguments"] = self.arguments
-
         if self.method is not None:
             properties["method"] = self.method
+
+        if self.arguments is not None:
+            properties["arguments"] = self.arguments
 
         if properties:
             this_node = dm.NodeApply(

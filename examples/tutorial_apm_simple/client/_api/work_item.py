@@ -52,20 +52,20 @@ class WorkItemAPI(NodeAPI[WorkItem, WorkItemApply, WorkItemList]):
 
     def __call__(
         self,
-        criticality: str | list[str] | None = None,
-        criticality_prefix: str | None = None,
+        title: str | list[str] | None = None,
+        title_prefix: str | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        is_completed: bool | None = None,
+        method: str | list[str] | None = None,
+        method_prefix: str | None = None,
         item_info: str | list[str] | None = None,
         item_info_prefix: str | None = None,
         item_name: str | list[str] | None = None,
         item_name_prefix: str | None = None,
-        method: str | list[str] | None = None,
-        method_prefix: str | None = None,
-        title: str | list[str] | None = None,
-        title_prefix: str | None = None,
+        is_completed: bool | None = None,
         to_be_done: bool | None = None,
+        criticality: str | list[str] | None = None,
+        criticality_prefix: str | None = None,
         work_order: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -75,20 +75,20 @@ class WorkItemAPI(NodeAPI[WorkItem, WorkItemApply, WorkItemList]):
         """Query starting at work items.
 
         Args:
-            criticality: The criticality to filter on.
-            criticality_prefix: The prefix of the criticality to filter on.
+            title: The title to filter on.
+            title_prefix: The prefix of the title to filter on.
             description: The description to filter on.
             description_prefix: The prefix of the description to filter on.
-            is_completed: The is completed to filter on.
+            method: The method to filter on.
+            method_prefix: The prefix of the method to filter on.
             item_info: The item info to filter on.
             item_info_prefix: The prefix of the item info to filter on.
             item_name: The item name to filter on.
             item_name_prefix: The prefix of the item name to filter on.
-            method: The method to filter on.
-            method_prefix: The prefix of the method to filter on.
-            title: The title to filter on.
-            title_prefix: The prefix of the title to filter on.
+            is_completed: The is completed to filter on.
             to_be_done: The to be done to filter on.
+            criticality: The criticality to filter on.
+            criticality_prefix: The prefix of the criticality to filter on.
             work_order: The work order to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
@@ -102,20 +102,20 @@ class WorkItemAPI(NodeAPI[WorkItem, WorkItemApply, WorkItemList]):
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_work_item_filter(
             self._view_id,
-            criticality,
-            criticality_prefix,
+            title,
+            title_prefix,
             description,
             description_prefix,
-            is_completed,
+            method,
+            method_prefix,
             item_info,
             item_info_prefix,
             item_name,
             item_name_prefix,
-            method,
-            method_prefix,
-            title,
-            title_prefix,
+            is_completed,
             to_be_done,
+            criticality,
+            criticality_prefix,
             work_order,
             external_id_prefix,
             space,
@@ -220,20 +220,20 @@ class WorkItemAPI(NodeAPI[WorkItem, WorkItemApply, WorkItemList]):
         self,
         query: str,
         properties: WorkItemTextFields | Sequence[WorkItemTextFields] | None = None,
-        criticality: str | list[str] | None = None,
-        criticality_prefix: str | None = None,
+        title: str | list[str] | None = None,
+        title_prefix: str | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        is_completed: bool | None = None,
+        method: str | list[str] | None = None,
+        method_prefix: str | None = None,
         item_info: str | list[str] | None = None,
         item_info_prefix: str | None = None,
         item_name: str | list[str] | None = None,
         item_name_prefix: str | None = None,
-        method: str | list[str] | None = None,
-        method_prefix: str | None = None,
-        title: str | list[str] | None = None,
-        title_prefix: str | None = None,
+        is_completed: bool | None = None,
         to_be_done: bool | None = None,
+        criticality: str | list[str] | None = None,
+        criticality_prefix: str | None = None,
         work_order: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -245,20 +245,20 @@ class WorkItemAPI(NodeAPI[WorkItem, WorkItemApply, WorkItemList]):
         Args:
             query: The search query,
             properties: The property to search, if nothing is passed all text fields will be searched.
-            criticality: The criticality to filter on.
-            criticality_prefix: The prefix of the criticality to filter on.
+            title: The title to filter on.
+            title_prefix: The prefix of the title to filter on.
             description: The description to filter on.
             description_prefix: The prefix of the description to filter on.
-            is_completed: The is completed to filter on.
+            method: The method to filter on.
+            method_prefix: The prefix of the method to filter on.
             item_info: The item info to filter on.
             item_info_prefix: The prefix of the item info to filter on.
             item_name: The item name to filter on.
             item_name_prefix: The prefix of the item name to filter on.
-            method: The method to filter on.
-            method_prefix: The prefix of the method to filter on.
-            title: The title to filter on.
-            title_prefix: The prefix of the title to filter on.
+            is_completed: The is completed to filter on.
             to_be_done: The to be done to filter on.
+            criticality: The criticality to filter on.
+            criticality_prefix: The prefix of the criticality to filter on.
             work_order: The work order to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
@@ -279,20 +279,20 @@ class WorkItemAPI(NodeAPI[WorkItem, WorkItemApply, WorkItemList]):
         """
         filter_ = _create_work_item_filter(
             self._view_id,
-            criticality,
-            criticality_prefix,
+            title,
+            title_prefix,
             description,
             description_prefix,
-            is_completed,
+            method,
+            method_prefix,
             item_info,
             item_info_prefix,
             item_name,
             item_name_prefix,
-            method,
-            method_prefix,
-            title,
-            title_prefix,
+            is_completed,
             to_be_done,
+            criticality,
+            criticality_prefix,
             work_order,
             external_id_prefix,
             space,
@@ -311,20 +311,20 @@ class WorkItemAPI(NodeAPI[WorkItem, WorkItemApply, WorkItemList]):
         group_by: None = None,
         query: str | None = None,
         search_properties: WorkItemTextFields | Sequence[WorkItemTextFields] | None = None,
-        criticality: str | list[str] | None = None,
-        criticality_prefix: str | None = None,
+        title: str | list[str] | None = None,
+        title_prefix: str | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        is_completed: bool | None = None,
+        method: str | list[str] | None = None,
+        method_prefix: str | None = None,
         item_info: str | list[str] | None = None,
         item_info_prefix: str | None = None,
         item_name: str | list[str] | None = None,
         item_name_prefix: str | None = None,
-        method: str | list[str] | None = None,
-        method_prefix: str | None = None,
-        title: str | list[str] | None = None,
-        title_prefix: str | None = None,
+        is_completed: bool | None = None,
         to_be_done: bool | None = None,
+        criticality: str | list[str] | None = None,
+        criticality_prefix: str | None = None,
         work_order: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -344,20 +344,20 @@ class WorkItemAPI(NodeAPI[WorkItem, WorkItemApply, WorkItemList]):
         group_by: WorkItemFields | Sequence[WorkItemFields] = None,
         query: str | None = None,
         search_properties: WorkItemTextFields | Sequence[WorkItemTextFields] | None = None,
-        criticality: str | list[str] | None = None,
-        criticality_prefix: str | None = None,
+        title: str | list[str] | None = None,
+        title_prefix: str | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        is_completed: bool | None = None,
+        method: str | list[str] | None = None,
+        method_prefix: str | None = None,
         item_info: str | list[str] | None = None,
         item_info_prefix: str | None = None,
         item_name: str | list[str] | None = None,
         item_name_prefix: str | None = None,
-        method: str | list[str] | None = None,
-        method_prefix: str | None = None,
-        title: str | list[str] | None = None,
-        title_prefix: str | None = None,
+        is_completed: bool | None = None,
         to_be_done: bool | None = None,
+        criticality: str | list[str] | None = None,
+        criticality_prefix: str | None = None,
         work_order: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -376,20 +376,20 @@ class WorkItemAPI(NodeAPI[WorkItem, WorkItemApply, WorkItemList]):
         group_by: WorkItemFields | Sequence[WorkItemFields] | None = None,
         query: str | None = None,
         search_property: WorkItemTextFields | Sequence[WorkItemTextFields] | None = None,
-        criticality: str | list[str] | None = None,
-        criticality_prefix: str | None = None,
+        title: str | list[str] | None = None,
+        title_prefix: str | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        is_completed: bool | None = None,
+        method: str | list[str] | None = None,
+        method_prefix: str | None = None,
         item_info: str | list[str] | None = None,
         item_info_prefix: str | None = None,
         item_name: str | list[str] | None = None,
         item_name_prefix: str | None = None,
-        method: str | list[str] | None = None,
-        method_prefix: str | None = None,
-        title: str | list[str] | None = None,
-        title_prefix: str | None = None,
+        is_completed: bool | None = None,
         to_be_done: bool | None = None,
+        criticality: str | list[str] | None = None,
+        criticality_prefix: str | None = None,
         work_order: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -404,20 +404,20 @@ class WorkItemAPI(NodeAPI[WorkItem, WorkItemApply, WorkItemList]):
             group_by: The property to group by when doing the aggregation.
             query: The query to search for in the text field.
             search_property: The text field to search in.
-            criticality: The criticality to filter on.
-            criticality_prefix: The prefix of the criticality to filter on.
+            title: The title to filter on.
+            title_prefix: The prefix of the title to filter on.
             description: The description to filter on.
             description_prefix: The prefix of the description to filter on.
-            is_completed: The is completed to filter on.
+            method: The method to filter on.
+            method_prefix: The prefix of the method to filter on.
             item_info: The item info to filter on.
             item_info_prefix: The prefix of the item info to filter on.
             item_name: The item name to filter on.
             item_name_prefix: The prefix of the item name to filter on.
-            method: The method to filter on.
-            method_prefix: The prefix of the method to filter on.
-            title: The title to filter on.
-            title_prefix: The prefix of the title to filter on.
+            is_completed: The is completed to filter on.
             to_be_done: The to be done to filter on.
+            criticality: The criticality to filter on.
+            criticality_prefix: The prefix of the criticality to filter on.
             work_order: The work order to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
@@ -439,20 +439,20 @@ class WorkItemAPI(NodeAPI[WorkItem, WorkItemApply, WorkItemList]):
 
         filter_ = _create_work_item_filter(
             self._view_id,
-            criticality,
-            criticality_prefix,
+            title,
+            title_prefix,
             description,
             description_prefix,
-            is_completed,
+            method,
+            method_prefix,
             item_info,
             item_info_prefix,
             item_name,
             item_name_prefix,
-            method,
-            method_prefix,
-            title,
-            title_prefix,
+            is_completed,
             to_be_done,
+            criticality,
+            criticality_prefix,
             work_order,
             external_id_prefix,
             space,
@@ -476,20 +476,20 @@ class WorkItemAPI(NodeAPI[WorkItem, WorkItemApply, WorkItemList]):
         interval: float,
         query: str | None = None,
         search_property: WorkItemTextFields | Sequence[WorkItemTextFields] | None = None,
-        criticality: str | list[str] | None = None,
-        criticality_prefix: str | None = None,
+        title: str | list[str] | None = None,
+        title_prefix: str | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        is_completed: bool | None = None,
+        method: str | list[str] | None = None,
+        method_prefix: str | None = None,
         item_info: str | list[str] | None = None,
         item_info_prefix: str | None = None,
         item_name: str | list[str] | None = None,
         item_name_prefix: str | None = None,
-        method: str | list[str] | None = None,
-        method_prefix: str | None = None,
-        title: str | list[str] | None = None,
-        title_prefix: str | None = None,
+        is_completed: bool | None = None,
         to_be_done: bool | None = None,
+        criticality: str | list[str] | None = None,
+        criticality_prefix: str | None = None,
         work_order: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -503,20 +503,20 @@ class WorkItemAPI(NodeAPI[WorkItem, WorkItemApply, WorkItemList]):
             interval: The interval to use for the histogram bins.
             query: The query to search for in the text field.
             search_property: The text field to search in.
-            criticality: The criticality to filter on.
-            criticality_prefix: The prefix of the criticality to filter on.
+            title: The title to filter on.
+            title_prefix: The prefix of the title to filter on.
             description: The description to filter on.
             description_prefix: The prefix of the description to filter on.
-            is_completed: The is completed to filter on.
+            method: The method to filter on.
+            method_prefix: The prefix of the method to filter on.
             item_info: The item info to filter on.
             item_info_prefix: The prefix of the item info to filter on.
             item_name: The item name to filter on.
             item_name_prefix: The prefix of the item name to filter on.
-            method: The method to filter on.
-            method_prefix: The prefix of the method to filter on.
-            title: The title to filter on.
-            title_prefix: The prefix of the title to filter on.
+            is_completed: The is completed to filter on.
             to_be_done: The to be done to filter on.
+            criticality: The criticality to filter on.
+            criticality_prefix: The prefix of the criticality to filter on.
             work_order: The work order to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
@@ -529,20 +529,20 @@ class WorkItemAPI(NodeAPI[WorkItem, WorkItemApply, WorkItemList]):
         """
         filter_ = _create_work_item_filter(
             self._view_id,
-            criticality,
-            criticality_prefix,
+            title,
+            title_prefix,
             description,
             description_prefix,
-            is_completed,
+            method,
+            method_prefix,
             item_info,
             item_info_prefix,
             item_name,
             item_name_prefix,
-            method,
-            method_prefix,
-            title,
-            title_prefix,
+            is_completed,
             to_be_done,
+            criticality,
+            criticality_prefix,
             work_order,
             external_id_prefix,
             space,
@@ -561,20 +561,20 @@ class WorkItemAPI(NodeAPI[WorkItem, WorkItemApply, WorkItemList]):
 
     def list(
         self,
-        criticality: str | list[str] | None = None,
-        criticality_prefix: str | None = None,
+        title: str | list[str] | None = None,
+        title_prefix: str | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        is_completed: bool | None = None,
+        method: str | list[str] | None = None,
+        method_prefix: str | None = None,
         item_info: str | list[str] | None = None,
         item_info_prefix: str | None = None,
         item_name: str | list[str] | None = None,
         item_name_prefix: str | None = None,
-        method: str | list[str] | None = None,
-        method_prefix: str | None = None,
-        title: str | list[str] | None = None,
-        title_prefix: str | None = None,
+        is_completed: bool | None = None,
         to_be_done: bool | None = None,
+        criticality: str | list[str] | None = None,
+        criticality_prefix: str | None = None,
         work_order: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -585,20 +585,20 @@ class WorkItemAPI(NodeAPI[WorkItem, WorkItemApply, WorkItemList]):
         """List/filter work items
 
         Args:
-            criticality: The criticality to filter on.
-            criticality_prefix: The prefix of the criticality to filter on.
+            title: The title to filter on.
+            title_prefix: The prefix of the title to filter on.
             description: The description to filter on.
             description_prefix: The prefix of the description to filter on.
-            is_completed: The is completed to filter on.
+            method: The method to filter on.
+            method_prefix: The prefix of the method to filter on.
             item_info: The item info to filter on.
             item_info_prefix: The prefix of the item info to filter on.
             item_name: The item name to filter on.
             item_name_prefix: The prefix of the item name to filter on.
-            method: The method to filter on.
-            method_prefix: The prefix of the method to filter on.
-            title: The title to filter on.
-            title_prefix: The prefix of the title to filter on.
+            is_completed: The is completed to filter on.
             to_be_done: The to be done to filter on.
+            criticality: The criticality to filter on.
+            criticality_prefix: The prefix of the criticality to filter on.
             work_order: The work order to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
@@ -620,20 +620,20 @@ class WorkItemAPI(NodeAPI[WorkItem, WorkItemApply, WorkItemList]):
         """
         filter_ = _create_work_item_filter(
             self._view_id,
-            criticality,
-            criticality_prefix,
+            title,
+            title_prefix,
             description,
             description_prefix,
-            is_completed,
+            method,
+            method_prefix,
             item_info,
             item_info_prefix,
             item_name,
             item_name_prefix,
-            method,
-            method_prefix,
-            title,
-            title_prefix,
+            is_completed,
             to_be_done,
+            criticality,
+            criticality_prefix,
             work_order,
             external_id_prefix,
             space,

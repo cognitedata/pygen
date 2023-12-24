@@ -23,20 +23,20 @@ if TYPE_CHECKING:
 __all__ = ["WorkItem", "WorkItemApply", "WorkItemList", "WorkItemApplyList", "WorkItemFields", "WorkItemTextFields"]
 
 
-WorkItemTextFields = Literal["criticality", "description", "item_info", "item_name", "method", "title"]
+WorkItemTextFields = Literal["title", "description", "method", "item_info", "item_name", "criticality"]
 WorkItemFields = Literal[
-    "criticality", "description", "is_completed", "item_info", "item_name", "method", "title", "to_be_done"
+    "title", "description", "method", "item_info", "item_name", "is_completed", "to_be_done", "criticality"
 ]
 
 _WORKITEM_PROPERTIES_BY_FIELD = {
-    "criticality": "criticality",
+    "title": "title",
     "description": "description",
-    "is_completed": "isCompleted",
+    "method": "method",
     "item_info": "itemInfo",
     "item_name": "itemName",
-    "method": "method",
-    "title": "title",
+    "is_completed": "isCompleted",
     "to_be_done": "toBeDone",
+    "criticality": "criticality",
 }
 
 
@@ -48,16 +48,16 @@ class WorkItem(DomainModel):
     Args:
         space: The space where the node is located.
         external_id: The external id of the work item.
-        criticality: The criticality field.
+        title: The title field.
         description: The description field.
-        is_completed: @name completed
+        method: The method field.
         item_info: @name item information
         item_name: @name item name
-        linked_assets: The linked asset field.
-        method: The method field.
-        title: The title field.
+        is_completed: @name completed
         to_be_done: @name to be done
+        criticality: The criticality field.
         work_order: The work order field.
+        linked_assets: The linked asset field.
         created_time: The created time of the work item node.
         last_updated_time: The last updated time of the work item node.
         deleted_time: If present, the deleted time of the work item node.
@@ -65,35 +65,35 @@ class WorkItem(DomainModel):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    criticality: Optional[str] = None
+    title: Optional[str] = None
     description: Optional[str] = None
-    is_completed: Optional[bool] = Field(None, alias="isCompleted")
+    method: Optional[str] = None
     item_info: Optional[str] = Field(None, alias="itemInfo")
     item_name: Optional[str] = Field(None, alias="itemName")
-    linked_assets: Union[list[Asset], list[str], None] = Field(default=None, repr=False, alias="linkedAssets")
-    method: Optional[str] = None
-    title: Optional[str] = None
+    is_completed: Optional[bool] = Field(None, alias="isCompleted")
     to_be_done: Optional[bool] = Field(None, alias="toBeDone")
+    criticality: Optional[str] = None
     work_order: Union[WorkOrder, str, dm.NodeId, None] = Field(None, repr=False, alias="workOrder")
+    linked_assets: Union[list[Asset], list[str], None] = Field(default=None, repr=False, alias="linkedAssets")
 
     def as_apply(self) -> WorkItemApply:
         """Convert this read version of work item to the writing version."""
         return WorkItemApply(
             space=self.space,
             external_id=self.external_id,
-            criticality=self.criticality,
+            title=self.title,
             description=self.description,
-            is_completed=self.is_completed,
+            method=self.method,
             item_info=self.item_info,
             item_name=self.item_name,
+            is_completed=self.is_completed,
+            to_be_done=self.to_be_done,
+            criticality=self.criticality,
+            work_order=self.work_order.as_apply() if isinstance(self.work_order, DomainModel) else self.work_order,
             linked_assets=[
                 linked_asset.as_apply() if isinstance(linked_asset, DomainModel) else linked_asset
                 for linked_asset in self.linked_assets or []
             ],
-            method=self.method,
-            title=self.title,
-            to_be_done=self.to_be_done,
-            work_order=self.work_order.as_apply() if isinstance(self.work_order, DomainModel) else self.work_order,
         )
 
 
@@ -105,16 +105,16 @@ class WorkItemApply(DomainModelApply):
     Args:
         space: The space where the node is located.
         external_id: The external id of the work item.
-        criticality: The criticality field.
+        title: The title field.
         description: The description field.
-        is_completed: @name completed
+        method: The method field.
         item_info: @name item information
         item_name: @name item name
-        linked_assets: The linked asset field.
-        method: The method field.
-        title: The title field.
+        is_completed: @name completed
         to_be_done: @name to be done
+        criticality: The criticality field.
         work_order: The work order field.
+        linked_assets: The linked asset field.
         existing_version: Fail the ingestion request if the work item version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
@@ -122,16 +122,16 @@ class WorkItemApply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    criticality: Optional[str] = None
+    title: Optional[str] = None
     description: Optional[str] = None
-    is_completed: Optional[bool] = Field(None, alias="isCompleted")
+    method: Optional[str] = None
     item_info: Optional[str] = Field(None, alias="itemInfo")
     item_name: Optional[str] = Field(None, alias="itemName")
-    linked_assets: Union[list[AssetApply], list[str], None] = Field(default=None, repr=False, alias="linkedAssets")
-    method: Optional[str] = None
-    title: Optional[str] = None
+    is_completed: Optional[bool] = Field(None, alias="isCompleted")
     to_be_done: Optional[bool] = Field(None, alias="toBeDone")
+    criticality: Optional[str] = None
     work_order: Union[WorkOrderApply, str, dm.NodeId, None] = Field(None, repr=False, alias="workOrder")
+    linked_assets: Union[list[AssetApply], list[str], None] = Field(default=None, repr=False, alias="linkedAssets")
 
     def _to_instances_apply(
         self,
@@ -148,14 +148,14 @@ class WorkItemApply(DomainModelApply):
 
         properties = {}
 
-        if self.criticality is not None:
-            properties["criticality"] = self.criticality
+        if self.title is not None:
+            properties["title"] = self.title
 
         if self.description is not None:
             properties["description"] = self.description
 
-        if self.is_completed is not None:
-            properties["isCompleted"] = self.is_completed
+        if self.method is not None:
+            properties["method"] = self.method
 
         if self.item_info is not None:
             properties["itemInfo"] = self.item_info
@@ -163,14 +163,14 @@ class WorkItemApply(DomainModelApply):
         if self.item_name is not None:
             properties["itemName"] = self.item_name
 
-        if self.method is not None:
-            properties["method"] = self.method
-
-        if self.title is not None:
-            properties["title"] = self.title
+        if self.is_completed is not None:
+            properties["isCompleted"] = self.is_completed
 
         if self.to_be_done is not None:
             properties["toBeDone"] = self.to_be_done
+
+        if self.criticality is not None:
+            properties["criticality"] = self.criticality
 
         if self.work_order is not None:
             properties["workOrder"] = {
@@ -229,40 +229,44 @@ class WorkItemApplyList(DomainModelApplyList[WorkItemApply]):
 
 def _create_work_item_filter(
     view_id: dm.ViewId,
-    criticality: str | list[str] | None = None,
-    criticality_prefix: str | None = None,
+    title: str | list[str] | None = None,
+    title_prefix: str | None = None,
     description: str | list[str] | None = None,
     description_prefix: str | None = None,
-    is_completed: bool | None = None,
+    method: str | list[str] | None = None,
+    method_prefix: str | None = None,
     item_info: str | list[str] | None = None,
     item_info_prefix: str | None = None,
     item_name: str | list[str] | None = None,
     item_name_prefix: str | None = None,
-    method: str | list[str] | None = None,
-    method_prefix: str | None = None,
-    title: str | list[str] | None = None,
-    title_prefix: str | None = None,
+    is_completed: bool | None = None,
     to_be_done: bool | None = None,
+    criticality: str | list[str] | None = None,
+    criticality_prefix: str | None = None,
     work_order: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
-    if criticality is not None and isinstance(criticality, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("criticality"), value=criticality))
-    if criticality and isinstance(criticality, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("criticality"), values=criticality))
-    if criticality_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("criticality"), value=criticality_prefix))
+    if title is not None and isinstance(title, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("title"), value=title))
+    if title and isinstance(title, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("title"), values=title))
+    if title_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("title"), value=title_prefix))
     if description is not None and isinstance(description, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("description"), value=description))
     if description and isinstance(description, list):
         filters.append(dm.filters.In(view_id.as_property_ref("description"), values=description))
     if description_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("description"), value=description_prefix))
-    if is_completed is not None and isinstance(is_completed, bool):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("isCompleted"), value=is_completed))
+    if method is not None and isinstance(method, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("method"), value=method))
+    if method and isinstance(method, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("method"), values=method))
+    if method_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("method"), value=method_prefix))
     if item_info is not None and isinstance(item_info, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("itemInfo"), value=item_info))
     if item_info and isinstance(item_info, list):
@@ -275,20 +279,16 @@ def _create_work_item_filter(
         filters.append(dm.filters.In(view_id.as_property_ref("itemName"), values=item_name))
     if item_name_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("itemName"), value=item_name_prefix))
-    if method is not None and isinstance(method, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("method"), value=method))
-    if method and isinstance(method, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("method"), values=method))
-    if method_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("method"), value=method_prefix))
-    if title is not None and isinstance(title, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("title"), value=title))
-    if title and isinstance(title, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("title"), values=title))
-    if title_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("title"), value=title_prefix))
+    if is_completed is not None and isinstance(is_completed, bool):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("isCompleted"), value=is_completed))
     if to_be_done is not None and isinstance(to_be_done, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("toBeDone"), value=to_be_done))
+    if criticality is not None and isinstance(criticality, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("criticality"), value=criticality))
+    if criticality and isinstance(criticality, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("criticality"), values=criticality))
+    if criticality_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("criticality"), value=criticality_prefix))
     if work_order and isinstance(work_order, str):
         filters.append(
             dm.filters.Equals(

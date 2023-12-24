@@ -35,8 +35,8 @@ from ._core import (
     QueryStep,
     QueryBuilder,
 )
-from .asset_children import AssetChildrenAPI
 from .asset_in_model_3_d import AssetInModelDAPI
+from .asset_children import AssetChildrenAPI
 from .asset_metrics import AssetMetricsAPI
 from .asset_pressure import AssetPressureAPI
 from .asset_query import AssetQueryAPI
@@ -55,7 +55,6 @@ class AssetAPI(NodeAPI[Asset, AssetApply, AssetList]):
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self.children_edge = AssetChildrenAPI(client)
         self.in_model_3_d_edge = AssetInModelDAPI(
             client,
             view_by_write_class,
@@ -63,26 +62,27 @@ class AssetAPI(NodeAPI[Asset, AssetApply, AssetList]):
             CdfConnectionPropertiesApply,
             CdfConnectionPropertiesList,
         )
+        self.children_edge = AssetChildrenAPI(client)
         self.metrics = AssetMetricsAPI(client, view_id)
         self.pressure = AssetPressureAPI(client, view_id)
 
     def __call__(
         self,
+        parent: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        tag: str | list[str] | None = None,
+        tag_prefix: str | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        source_db: str | list[str] | None = None,
+        source_db_prefix: str | None = None,
         min_area_id: int | None = None,
         max_area_id: int | None = None,
         min_category_id: int | None = None,
         max_category_id: int | None = None,
         min_created_date: datetime.datetime | None = None,
         max_created_date: datetime.datetime | None = None,
-        description: str | list[str] | None = None,
-        description_prefix: str | None = None,
-        is_active: bool | None = None,
         is_critical_line: bool | None = None,
-        parent: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        source_db: str | list[str] | None = None,
-        source_db_prefix: str | None = None,
-        tag: str | list[str] | None = None,
-        tag_prefix: str | None = None,
+        is_active: bool | None = None,
         min_updated_date: datetime.datetime | None = None,
         max_updated_date: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
@@ -93,21 +93,21 @@ class AssetAPI(NodeAPI[Asset, AssetApply, AssetList]):
         """Query starting at assets.
 
         Args:
+            parent: The parent to filter on.
+            tag: The tag to filter on.
+            tag_prefix: The prefix of the tag to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            source_db: The source db to filter on.
+            source_db_prefix: The prefix of the source db to filter on.
             min_area_id: The minimum value of the area id to filter on.
             max_area_id: The maximum value of the area id to filter on.
             min_category_id: The minimum value of the category id to filter on.
             max_category_id: The maximum value of the category id to filter on.
             min_created_date: The minimum value of the created date to filter on.
             max_created_date: The maximum value of the created date to filter on.
-            description: The description to filter on.
-            description_prefix: The prefix of the description to filter on.
-            is_active: The is active to filter on.
             is_critical_line: The is critical line to filter on.
-            parent: The parent to filter on.
-            source_db: The source db to filter on.
-            source_db_prefix: The prefix of the source db to filter on.
-            tag: The tag to filter on.
-            tag_prefix: The prefix of the tag to filter on.
+            is_active: The is active to filter on.
             min_updated_date: The minimum value of the updated date to filter on.
             max_updated_date: The maximum value of the updated date to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
@@ -122,21 +122,21 @@ class AssetAPI(NodeAPI[Asset, AssetApply, AssetList]):
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_asset_filter(
             self._view_id,
+            parent,
+            tag,
+            tag_prefix,
+            description,
+            description_prefix,
+            source_db,
+            source_db_prefix,
             min_area_id,
             max_area_id,
             min_category_id,
             max_category_id,
             min_created_date,
             max_created_date,
-            description,
-            description_prefix,
-            is_active,
             is_critical_line,
-            parent,
-            source_db,
-            source_db_prefix,
-            tag,
-            tag_prefix,
+            is_active,
             min_updated_date,
             max_updated_date,
             external_id_prefix,
@@ -150,7 +150,7 @@ class AssetAPI(NodeAPI[Asset, AssetApply, AssetList]):
         """Add or update (upsert) assets.
 
         Note: This method iterates through all nodes and timeseries linked to asset and creates them including the edges
-        between the nodes. For example, if any of `children` or `in_model_3_d` are set, then these
+        between the nodes. For example, if any of `in_model_3_d` or `children` are set, then these
         nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
 
         Args:
@@ -230,15 +230,15 @@ class AssetAPI(NodeAPI[Asset, AssetApply, AssetList]):
             retrieve_edges=True,
             edge_api_name_type_direction_quad=[
                 (
-                    self.children_edge,
-                    "children",
-                    dm.DirectRelationReference("tutorial_apm_simple", "Asset.children"),
-                    "outwards",
-                ),
-                (
                     self.in_model_3_d_edge,
                     "in_model_3_d",
                     dm.DirectRelationReference("cdf_3d_schema", "cdf3dEntityConnection"),
+                    "outwards",
+                ),
+                (
+                    self.children_edge,
+                    "children",
+                    dm.DirectRelationReference("tutorial_apm_simple", "Asset.children"),
                     "outwards",
                 ),
             ],
@@ -248,21 +248,21 @@ class AssetAPI(NodeAPI[Asset, AssetApply, AssetList]):
         self,
         query: str,
         properties: AssetTextFields | Sequence[AssetTextFields] | None = None,
+        parent: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        tag: str | list[str] | None = None,
+        tag_prefix: str | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        source_db: str | list[str] | None = None,
+        source_db_prefix: str | None = None,
         min_area_id: int | None = None,
         max_area_id: int | None = None,
         min_category_id: int | None = None,
         max_category_id: int | None = None,
         min_created_date: datetime.datetime | None = None,
         max_created_date: datetime.datetime | None = None,
-        description: str | list[str] | None = None,
-        description_prefix: str | None = None,
-        is_active: bool | None = None,
         is_critical_line: bool | None = None,
-        parent: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        source_db: str | list[str] | None = None,
-        source_db_prefix: str | None = None,
-        tag: str | list[str] | None = None,
-        tag_prefix: str | None = None,
+        is_active: bool | None = None,
         min_updated_date: datetime.datetime | None = None,
         max_updated_date: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
@@ -275,21 +275,21 @@ class AssetAPI(NodeAPI[Asset, AssetApply, AssetList]):
         Args:
             query: The search query,
             properties: The property to search, if nothing is passed all text fields will be searched.
+            parent: The parent to filter on.
+            tag: The tag to filter on.
+            tag_prefix: The prefix of the tag to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            source_db: The source db to filter on.
+            source_db_prefix: The prefix of the source db to filter on.
             min_area_id: The minimum value of the area id to filter on.
             max_area_id: The maximum value of the area id to filter on.
             min_category_id: The minimum value of the category id to filter on.
             max_category_id: The maximum value of the category id to filter on.
             min_created_date: The minimum value of the created date to filter on.
             max_created_date: The maximum value of the created date to filter on.
-            description: The description to filter on.
-            description_prefix: The prefix of the description to filter on.
-            is_active: The is active to filter on.
             is_critical_line: The is critical line to filter on.
-            parent: The parent to filter on.
-            source_db: The source db to filter on.
-            source_db_prefix: The prefix of the source db to filter on.
-            tag: The tag to filter on.
-            tag_prefix: The prefix of the tag to filter on.
+            is_active: The is active to filter on.
             min_updated_date: The minimum value of the updated date to filter on.
             max_updated_date: The maximum value of the updated date to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
@@ -311,21 +311,21 @@ class AssetAPI(NodeAPI[Asset, AssetApply, AssetList]):
         """
         filter_ = _create_asset_filter(
             self._view_id,
+            parent,
+            tag,
+            tag_prefix,
+            description,
+            description_prefix,
+            source_db,
+            source_db_prefix,
             min_area_id,
             max_area_id,
             min_category_id,
             max_category_id,
             min_created_date,
             max_created_date,
-            description,
-            description_prefix,
-            is_active,
             is_critical_line,
-            parent,
-            source_db,
-            source_db_prefix,
-            tag,
-            tag_prefix,
+            is_active,
             min_updated_date,
             max_updated_date,
             external_id_prefix,
@@ -345,21 +345,21 @@ class AssetAPI(NodeAPI[Asset, AssetApply, AssetList]):
         group_by: None = None,
         query: str | None = None,
         search_properties: AssetTextFields | Sequence[AssetTextFields] | None = None,
+        parent: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        tag: str | list[str] | None = None,
+        tag_prefix: str | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        source_db: str | list[str] | None = None,
+        source_db_prefix: str | None = None,
         min_area_id: int | None = None,
         max_area_id: int | None = None,
         min_category_id: int | None = None,
         max_category_id: int | None = None,
         min_created_date: datetime.datetime | None = None,
         max_created_date: datetime.datetime | None = None,
-        description: str | list[str] | None = None,
-        description_prefix: str | None = None,
-        is_active: bool | None = None,
         is_critical_line: bool | None = None,
-        parent: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        source_db: str | list[str] | None = None,
-        source_db_prefix: str | None = None,
-        tag: str | list[str] | None = None,
-        tag_prefix: str | None = None,
+        is_active: bool | None = None,
         min_updated_date: datetime.datetime | None = None,
         max_updated_date: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
@@ -380,21 +380,21 @@ class AssetAPI(NodeAPI[Asset, AssetApply, AssetList]):
         group_by: AssetFields | Sequence[AssetFields] = None,
         query: str | None = None,
         search_properties: AssetTextFields | Sequence[AssetTextFields] | None = None,
+        parent: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        tag: str | list[str] | None = None,
+        tag_prefix: str | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        source_db: str | list[str] | None = None,
+        source_db_prefix: str | None = None,
         min_area_id: int | None = None,
         max_area_id: int | None = None,
         min_category_id: int | None = None,
         max_category_id: int | None = None,
         min_created_date: datetime.datetime | None = None,
         max_created_date: datetime.datetime | None = None,
-        description: str | list[str] | None = None,
-        description_prefix: str | None = None,
-        is_active: bool | None = None,
         is_critical_line: bool | None = None,
-        parent: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        source_db: str | list[str] | None = None,
-        source_db_prefix: str | None = None,
-        tag: str | list[str] | None = None,
-        tag_prefix: str | None = None,
+        is_active: bool | None = None,
         min_updated_date: datetime.datetime | None = None,
         max_updated_date: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
@@ -414,21 +414,21 @@ class AssetAPI(NodeAPI[Asset, AssetApply, AssetList]):
         group_by: AssetFields | Sequence[AssetFields] | None = None,
         query: str | None = None,
         search_property: AssetTextFields | Sequence[AssetTextFields] | None = None,
+        parent: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        tag: str | list[str] | None = None,
+        tag_prefix: str | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        source_db: str | list[str] | None = None,
+        source_db_prefix: str | None = None,
         min_area_id: int | None = None,
         max_area_id: int | None = None,
         min_category_id: int | None = None,
         max_category_id: int | None = None,
         min_created_date: datetime.datetime | None = None,
         max_created_date: datetime.datetime | None = None,
-        description: str | list[str] | None = None,
-        description_prefix: str | None = None,
-        is_active: bool | None = None,
         is_critical_line: bool | None = None,
-        parent: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        source_db: str | list[str] | None = None,
-        source_db_prefix: str | None = None,
-        tag: str | list[str] | None = None,
-        tag_prefix: str | None = None,
+        is_active: bool | None = None,
         min_updated_date: datetime.datetime | None = None,
         max_updated_date: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
@@ -444,21 +444,21 @@ class AssetAPI(NodeAPI[Asset, AssetApply, AssetList]):
             group_by: The property to group by when doing the aggregation.
             query: The query to search for in the text field.
             search_property: The text field to search in.
+            parent: The parent to filter on.
+            tag: The tag to filter on.
+            tag_prefix: The prefix of the tag to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            source_db: The source db to filter on.
+            source_db_prefix: The prefix of the source db to filter on.
             min_area_id: The minimum value of the area id to filter on.
             max_area_id: The maximum value of the area id to filter on.
             min_category_id: The minimum value of the category id to filter on.
             max_category_id: The maximum value of the category id to filter on.
             min_created_date: The minimum value of the created date to filter on.
             max_created_date: The maximum value of the created date to filter on.
-            description: The description to filter on.
-            description_prefix: The prefix of the description to filter on.
-            is_active: The is active to filter on.
             is_critical_line: The is critical line to filter on.
-            parent: The parent to filter on.
-            source_db: The source db to filter on.
-            source_db_prefix: The prefix of the source db to filter on.
-            tag: The tag to filter on.
-            tag_prefix: The prefix of the tag to filter on.
+            is_active: The is active to filter on.
             min_updated_date: The minimum value of the updated date to filter on.
             max_updated_date: The maximum value of the updated date to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
@@ -481,21 +481,21 @@ class AssetAPI(NodeAPI[Asset, AssetApply, AssetList]):
 
         filter_ = _create_asset_filter(
             self._view_id,
+            parent,
+            tag,
+            tag_prefix,
+            description,
+            description_prefix,
+            source_db,
+            source_db_prefix,
             min_area_id,
             max_area_id,
             min_category_id,
             max_category_id,
             min_created_date,
             max_created_date,
-            description,
-            description_prefix,
-            is_active,
             is_critical_line,
-            parent,
-            source_db,
-            source_db_prefix,
-            tag,
-            tag_prefix,
+            is_active,
             min_updated_date,
             max_updated_date,
             external_id_prefix,
@@ -520,21 +520,21 @@ class AssetAPI(NodeAPI[Asset, AssetApply, AssetList]):
         interval: float,
         query: str | None = None,
         search_property: AssetTextFields | Sequence[AssetTextFields] | None = None,
+        parent: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        tag: str | list[str] | None = None,
+        tag_prefix: str | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        source_db: str | list[str] | None = None,
+        source_db_prefix: str | None = None,
         min_area_id: int | None = None,
         max_area_id: int | None = None,
         min_category_id: int | None = None,
         max_category_id: int | None = None,
         min_created_date: datetime.datetime | None = None,
         max_created_date: datetime.datetime | None = None,
-        description: str | list[str] | None = None,
-        description_prefix: str | None = None,
-        is_active: bool | None = None,
         is_critical_line: bool | None = None,
-        parent: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        source_db: str | list[str] | None = None,
-        source_db_prefix: str | None = None,
-        tag: str | list[str] | None = None,
-        tag_prefix: str | None = None,
+        is_active: bool | None = None,
         min_updated_date: datetime.datetime | None = None,
         max_updated_date: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
@@ -549,21 +549,21 @@ class AssetAPI(NodeAPI[Asset, AssetApply, AssetList]):
             interval: The interval to use for the histogram bins.
             query: The query to search for in the text field.
             search_property: The text field to search in.
+            parent: The parent to filter on.
+            tag: The tag to filter on.
+            tag_prefix: The prefix of the tag to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            source_db: The source db to filter on.
+            source_db_prefix: The prefix of the source db to filter on.
             min_area_id: The minimum value of the area id to filter on.
             max_area_id: The maximum value of the area id to filter on.
             min_category_id: The minimum value of the category id to filter on.
             max_category_id: The maximum value of the category id to filter on.
             min_created_date: The minimum value of the created date to filter on.
             max_created_date: The maximum value of the created date to filter on.
-            description: The description to filter on.
-            description_prefix: The prefix of the description to filter on.
-            is_active: The is active to filter on.
             is_critical_line: The is critical line to filter on.
-            parent: The parent to filter on.
-            source_db: The source db to filter on.
-            source_db_prefix: The prefix of the source db to filter on.
-            tag: The tag to filter on.
-            tag_prefix: The prefix of the tag to filter on.
+            is_active: The is active to filter on.
             min_updated_date: The minimum value of the updated date to filter on.
             max_updated_date: The maximum value of the updated date to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
@@ -577,21 +577,21 @@ class AssetAPI(NodeAPI[Asset, AssetApply, AssetList]):
         """
         filter_ = _create_asset_filter(
             self._view_id,
+            parent,
+            tag,
+            tag_prefix,
+            description,
+            description_prefix,
+            source_db,
+            source_db_prefix,
             min_area_id,
             max_area_id,
             min_category_id,
             max_category_id,
             min_created_date,
             max_created_date,
-            description,
-            description_prefix,
-            is_active,
             is_critical_line,
-            parent,
-            source_db,
-            source_db_prefix,
-            tag,
-            tag_prefix,
+            is_active,
             min_updated_date,
             max_updated_date,
             external_id_prefix,
@@ -611,21 +611,21 @@ class AssetAPI(NodeAPI[Asset, AssetApply, AssetList]):
 
     def list(
         self,
+        parent: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        tag: str | list[str] | None = None,
+        tag_prefix: str | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        source_db: str | list[str] | None = None,
+        source_db_prefix: str | None = None,
         min_area_id: int | None = None,
         max_area_id: int | None = None,
         min_category_id: int | None = None,
         max_category_id: int | None = None,
         min_created_date: datetime.datetime | None = None,
         max_created_date: datetime.datetime | None = None,
-        description: str | list[str] | None = None,
-        description_prefix: str | None = None,
-        is_active: bool | None = None,
         is_critical_line: bool | None = None,
-        parent: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        source_db: str | list[str] | None = None,
-        source_db_prefix: str | None = None,
-        tag: str | list[str] | None = None,
-        tag_prefix: str | None = None,
+        is_active: bool | None = None,
         min_updated_date: datetime.datetime | None = None,
         max_updated_date: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
@@ -637,28 +637,28 @@ class AssetAPI(NodeAPI[Asset, AssetApply, AssetList]):
         """List/filter assets
 
         Args:
+            parent: The parent to filter on.
+            tag: The tag to filter on.
+            tag_prefix: The prefix of the tag to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            source_db: The source db to filter on.
+            source_db_prefix: The prefix of the source db to filter on.
             min_area_id: The minimum value of the area id to filter on.
             max_area_id: The maximum value of the area id to filter on.
             min_category_id: The minimum value of the category id to filter on.
             max_category_id: The maximum value of the category id to filter on.
             min_created_date: The minimum value of the created date to filter on.
             max_created_date: The maximum value of the created date to filter on.
-            description: The description to filter on.
-            description_prefix: The prefix of the description to filter on.
-            is_active: The is active to filter on.
             is_critical_line: The is critical line to filter on.
-            parent: The parent to filter on.
-            source_db: The source db to filter on.
-            source_db_prefix: The prefix of the source db to filter on.
-            tag: The tag to filter on.
-            tag_prefix: The prefix of the tag to filter on.
+            is_active: The is active to filter on.
             min_updated_date: The minimum value of the updated date to filter on.
             max_updated_date: The maximum value of the updated date to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of assets to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            retrieve_edges: Whether to retrieve `children` or `in_model_3_d` external ids for the assets. Defaults to True.
+            retrieve_edges: Whether to retrieve `in_model_3_d` or `children` external ids for the assets. Defaults to True.
 
         Returns:
             List of requested assets
@@ -674,21 +674,21 @@ class AssetAPI(NodeAPI[Asset, AssetApply, AssetList]):
         """
         filter_ = _create_asset_filter(
             self._view_id,
+            parent,
+            tag,
+            tag_prefix,
+            description,
+            description_prefix,
+            source_db,
+            source_db_prefix,
             min_area_id,
             max_area_id,
             min_category_id,
             max_category_id,
             min_created_date,
             max_created_date,
-            description,
-            description_prefix,
-            is_active,
             is_critical_line,
-            parent,
-            source_db,
-            source_db_prefix,
-            tag,
-            tag_prefix,
+            is_active,
             min_updated_date,
             max_updated_date,
             external_id_prefix,
@@ -702,15 +702,15 @@ class AssetAPI(NodeAPI[Asset, AssetApply, AssetList]):
             retrieve_edges=retrieve_edges,
             edge_api_name_type_direction_quad=[
                 (
-                    self.children_edge,
-                    "children",
-                    dm.DirectRelationReference("tutorial_apm_simple", "Asset.children"),
-                    "outwards",
-                ),
-                (
                     self.in_model_3_d_edge,
                     "in_model_3_d",
                     dm.DirectRelationReference("cdf_3d_schema", "cdf3dEntityConnection"),
+                    "outwards",
+                ),
+                (
+                    self.children_edge,
+                    "children",
+                    dm.DirectRelationReference("tutorial_apm_simple", "Asset.children"),
                     "outwards",
                 ),
             ],

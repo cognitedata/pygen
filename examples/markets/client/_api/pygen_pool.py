@@ -50,12 +50,12 @@ class PygenPoolAPI(NodeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
 
     def __call__(
         self,
-        min_day_of_week: int | None = None,
-        max_day_of_week: int | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         timezone: str | list[str] | None = None,
         timezone_prefix: str | None = None,
+        min_day_of_week: int | None = None,
+        max_day_of_week: int | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
@@ -64,12 +64,12 @@ class PygenPoolAPI(NodeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
         """Query starting at pygen pools.
 
         Args:
-            min_day_of_week: The minimum value of the day of week to filter on.
-            max_day_of_week: The maximum value of the day of week to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             timezone: The timezone to filter on.
             timezone_prefix: The prefix of the timezone to filter on.
+            min_day_of_week: The minimum value of the day of week to filter on.
+            max_day_of_week: The maximum value of the day of week to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of pygen pools to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -82,12 +82,12 @@ class PygenPoolAPI(NodeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_pygen_pool_filter(
             self._view_id,
-            min_day_of_week,
-            max_day_of_week,
             name,
             name_prefix,
             timezone,
             timezone_prefix,
+            min_day_of_week,
+            max_day_of_week,
             external_id_prefix,
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
@@ -177,12 +177,12 @@ class PygenPoolAPI(NodeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
         self,
         query: str,
         properties: PygenPoolTextFields | Sequence[PygenPoolTextFields] | None = None,
-        min_day_of_week: int | None = None,
-        max_day_of_week: int | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         timezone: str | list[str] | None = None,
         timezone_prefix: str | None = None,
+        min_day_of_week: int | None = None,
+        max_day_of_week: int | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -193,12 +193,12 @@ class PygenPoolAPI(NodeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
         Args:
             query: The search query,
             properties: The property to search, if nothing is passed all text fields will be searched.
-            min_day_of_week: The minimum value of the day of week to filter on.
-            max_day_of_week: The maximum value of the day of week to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             timezone: The timezone to filter on.
             timezone_prefix: The prefix of the timezone to filter on.
+            min_day_of_week: The minimum value of the day of week to filter on.
+            max_day_of_week: The maximum value of the day of week to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of pygen pools to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -218,12 +218,12 @@ class PygenPoolAPI(NodeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
         """
         filter_ = _create_pygen_pool_filter(
             self._view_id,
-            min_day_of_week,
-            max_day_of_week,
             name,
             name_prefix,
             timezone,
             timezone_prefix,
+            min_day_of_week,
+            max_day_of_week,
             external_id_prefix,
             space,
             filter,
@@ -241,12 +241,12 @@ class PygenPoolAPI(NodeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
         group_by: None = None,
         query: str | None = None,
         search_properties: PygenPoolTextFields | Sequence[PygenPoolTextFields] | None = None,
-        min_day_of_week: int | None = None,
-        max_day_of_week: int | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         timezone: str | list[str] | None = None,
         timezone_prefix: str | None = None,
+        min_day_of_week: int | None = None,
+        max_day_of_week: int | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -265,12 +265,12 @@ class PygenPoolAPI(NodeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
         group_by: PygenPoolFields | Sequence[PygenPoolFields] = None,
         query: str | None = None,
         search_properties: PygenPoolTextFields | Sequence[PygenPoolTextFields] | None = None,
-        min_day_of_week: int | None = None,
-        max_day_of_week: int | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         timezone: str | list[str] | None = None,
         timezone_prefix: str | None = None,
+        min_day_of_week: int | None = None,
+        max_day_of_week: int | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -288,12 +288,12 @@ class PygenPoolAPI(NodeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
         group_by: PygenPoolFields | Sequence[PygenPoolFields] | None = None,
         query: str | None = None,
         search_property: PygenPoolTextFields | Sequence[PygenPoolTextFields] | None = None,
-        min_day_of_week: int | None = None,
-        max_day_of_week: int | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         timezone: str | list[str] | None = None,
         timezone_prefix: str | None = None,
+        min_day_of_week: int | None = None,
+        max_day_of_week: int | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -307,12 +307,12 @@ class PygenPoolAPI(NodeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
             group_by: The property to group by when doing the aggregation.
             query: The query to search for in the text field.
             search_property: The text field to search in.
-            min_day_of_week: The minimum value of the day of week to filter on.
-            max_day_of_week: The maximum value of the day of week to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             timezone: The timezone to filter on.
             timezone_prefix: The prefix of the timezone to filter on.
+            min_day_of_week: The minimum value of the day of week to filter on.
+            max_day_of_week: The maximum value of the day of week to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of pygen pools to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -333,12 +333,12 @@ class PygenPoolAPI(NodeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
 
         filter_ = _create_pygen_pool_filter(
             self._view_id,
-            min_day_of_week,
-            max_day_of_week,
             name,
             name_prefix,
             timezone,
             timezone_prefix,
+            min_day_of_week,
+            max_day_of_week,
             external_id_prefix,
             space,
             filter,
@@ -361,12 +361,12 @@ class PygenPoolAPI(NodeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
         interval: float,
         query: str | None = None,
         search_property: PygenPoolTextFields | Sequence[PygenPoolTextFields] | None = None,
-        min_day_of_week: int | None = None,
-        max_day_of_week: int | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         timezone: str | list[str] | None = None,
         timezone_prefix: str | None = None,
+        min_day_of_week: int | None = None,
+        max_day_of_week: int | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -379,12 +379,12 @@ class PygenPoolAPI(NodeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
             interval: The interval to use for the histogram bins.
             query: The query to search for in the text field.
             search_property: The text field to search in.
-            min_day_of_week: The minimum value of the day of week to filter on.
-            max_day_of_week: The maximum value of the day of week to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             timezone: The timezone to filter on.
             timezone_prefix: The prefix of the timezone to filter on.
+            min_day_of_week: The minimum value of the day of week to filter on.
+            max_day_of_week: The maximum value of the day of week to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of pygen pools to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -396,12 +396,12 @@ class PygenPoolAPI(NodeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
         """
         filter_ = _create_pygen_pool_filter(
             self._view_id,
-            min_day_of_week,
-            max_day_of_week,
             name,
             name_prefix,
             timezone,
             timezone_prefix,
+            min_day_of_week,
+            max_day_of_week,
             external_id_prefix,
             space,
             filter,
@@ -419,12 +419,12 @@ class PygenPoolAPI(NodeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
 
     def list(
         self,
-        min_day_of_week: int | None = None,
-        max_day_of_week: int | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         timezone: str | list[str] | None = None,
         timezone_prefix: str | None = None,
+        min_day_of_week: int | None = None,
+        max_day_of_week: int | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -433,12 +433,12 @@ class PygenPoolAPI(NodeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
         """List/filter pygen pools
 
         Args:
-            min_day_of_week: The minimum value of the day of week to filter on.
-            max_day_of_week: The maximum value of the day of week to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             timezone: The timezone to filter on.
             timezone_prefix: The prefix of the timezone to filter on.
+            min_day_of_week: The minimum value of the day of week to filter on.
+            max_day_of_week: The maximum value of the day of week to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of pygen pools to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -458,12 +458,12 @@ class PygenPoolAPI(NodeAPI[PygenPool, PygenPoolApply, PygenPoolList]):
         """
         filter_ = _create_pygen_pool_filter(
             self._view_id,
-            min_day_of_week,
-            max_day_of_week,
             name,
             name_prefix,
             timezone,
             timezone_prefix,
+            min_day_of_week,
+            max_day_of_week,
             external_id_prefix,
             space,
             filter,

@@ -51,11 +51,11 @@ class BidAPI(NodeAPI[Bid, BidApply, BidList]):
 
     def __call__(
         self,
-        min_date: datetime.date | None = None,
-        max_date: datetime.date | None = None,
-        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
+        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        min_date: datetime.date | None = None,
+        max_date: datetime.date | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
@@ -64,11 +64,11 @@ class BidAPI(NodeAPI[Bid, BidApply, BidList]):
         """Query starting at bids.
 
         Args:
-            min_date: The minimum value of the date to filter on.
-            max_date: The maximum value of the date to filter on.
-            market: The market to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
+            market: The market to filter on.
+            min_date: The minimum value of the date to filter on.
+            max_date: The maximum value of the date to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of bids to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -81,11 +81,11 @@ class BidAPI(NodeAPI[Bid, BidApply, BidList]):
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_bid_filter(
             self._view_id,
-            min_date,
-            max_date,
-            market,
             name,
             name_prefix,
+            market,
+            min_date,
+            max_date,
             external_id_prefix,
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
@@ -173,11 +173,11 @@ class BidAPI(NodeAPI[Bid, BidApply, BidList]):
         self,
         query: str,
         properties: BidTextFields | Sequence[BidTextFields] | None = None,
-        min_date: datetime.date | None = None,
-        max_date: datetime.date | None = None,
-        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
+        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        min_date: datetime.date | None = None,
+        max_date: datetime.date | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -188,11 +188,11 @@ class BidAPI(NodeAPI[Bid, BidApply, BidList]):
         Args:
             query: The search query,
             properties: The property to search, if nothing is passed all text fields will be searched.
-            min_date: The minimum value of the date to filter on.
-            max_date: The maximum value of the date to filter on.
-            market: The market to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
+            market: The market to filter on.
+            min_date: The minimum value of the date to filter on.
+            max_date: The maximum value of the date to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of bids to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -212,11 +212,11 @@ class BidAPI(NodeAPI[Bid, BidApply, BidList]):
         """
         filter_ = _create_bid_filter(
             self._view_id,
-            min_date,
-            max_date,
-            market,
             name,
             name_prefix,
+            market,
+            min_date,
+            max_date,
             external_id_prefix,
             space,
             filter,
@@ -234,11 +234,11 @@ class BidAPI(NodeAPI[Bid, BidApply, BidList]):
         group_by: None = None,
         query: str | None = None,
         search_properties: BidTextFields | Sequence[BidTextFields] | None = None,
-        min_date: datetime.date | None = None,
-        max_date: datetime.date | None = None,
-        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
+        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        min_date: datetime.date | None = None,
+        max_date: datetime.date | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -257,11 +257,11 @@ class BidAPI(NodeAPI[Bid, BidApply, BidList]):
         group_by: BidFields | Sequence[BidFields] = None,
         query: str | None = None,
         search_properties: BidTextFields | Sequence[BidTextFields] | None = None,
-        min_date: datetime.date | None = None,
-        max_date: datetime.date | None = None,
-        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
+        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        min_date: datetime.date | None = None,
+        max_date: datetime.date | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -279,11 +279,11 @@ class BidAPI(NodeAPI[Bid, BidApply, BidList]):
         group_by: BidFields | Sequence[BidFields] | None = None,
         query: str | None = None,
         search_property: BidTextFields | Sequence[BidTextFields] | None = None,
-        min_date: datetime.date | None = None,
-        max_date: datetime.date | None = None,
-        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
+        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        min_date: datetime.date | None = None,
+        max_date: datetime.date | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -297,11 +297,11 @@ class BidAPI(NodeAPI[Bid, BidApply, BidList]):
             group_by: The property to group by when doing the aggregation.
             query: The query to search for in the text field.
             search_property: The text field to search in.
-            min_date: The minimum value of the date to filter on.
-            max_date: The maximum value of the date to filter on.
-            market: The market to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
+            market: The market to filter on.
+            min_date: The minimum value of the date to filter on.
+            max_date: The maximum value of the date to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of bids to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -322,11 +322,11 @@ class BidAPI(NodeAPI[Bid, BidApply, BidList]):
 
         filter_ = _create_bid_filter(
             self._view_id,
-            min_date,
-            max_date,
-            market,
             name,
             name_prefix,
+            market,
+            min_date,
+            max_date,
             external_id_prefix,
             space,
             filter,
@@ -349,11 +349,11 @@ class BidAPI(NodeAPI[Bid, BidApply, BidList]):
         interval: float,
         query: str | None = None,
         search_property: BidTextFields | Sequence[BidTextFields] | None = None,
-        min_date: datetime.date | None = None,
-        max_date: datetime.date | None = None,
-        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
+        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        min_date: datetime.date | None = None,
+        max_date: datetime.date | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -366,11 +366,11 @@ class BidAPI(NodeAPI[Bid, BidApply, BidList]):
             interval: The interval to use for the histogram bins.
             query: The query to search for in the text field.
             search_property: The text field to search in.
-            min_date: The minimum value of the date to filter on.
-            max_date: The maximum value of the date to filter on.
-            market: The market to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
+            market: The market to filter on.
+            min_date: The minimum value of the date to filter on.
+            max_date: The maximum value of the date to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of bids to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -382,11 +382,11 @@ class BidAPI(NodeAPI[Bid, BidApply, BidList]):
         """
         filter_ = _create_bid_filter(
             self._view_id,
-            min_date,
-            max_date,
-            market,
             name,
             name_prefix,
+            market,
+            min_date,
+            max_date,
             external_id_prefix,
             space,
             filter,
@@ -404,11 +404,11 @@ class BidAPI(NodeAPI[Bid, BidApply, BidList]):
 
     def list(
         self,
-        min_date: datetime.date | None = None,
-        max_date: datetime.date | None = None,
-        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
+        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        min_date: datetime.date | None = None,
+        max_date: datetime.date | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -417,11 +417,11 @@ class BidAPI(NodeAPI[Bid, BidApply, BidList]):
         """List/filter bids
 
         Args:
-            min_date: The minimum value of the date to filter on.
-            max_date: The maximum value of the date to filter on.
-            market: The market to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
+            market: The market to filter on.
+            min_date: The minimum value of the date to filter on.
+            max_date: The maximum value of the date to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of bids to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -441,11 +441,11 @@ class BidAPI(NodeAPI[Bid, BidApply, BidList]):
         """
         filter_ = _create_bid_filter(
             self._view_id,
-            min_date,
-            max_date,
-            market,
             name,
             name_prefix,
+            market,
+            min_date,
+            max_date,
             external_id_prefix,
             space,
             filter,

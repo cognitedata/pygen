@@ -51,19 +51,19 @@ class CaseAPI(NodeAPI[Case, CaseApply, CaseList]):
 
     def __call__(
         self,
-        arguments: str | list[str] | None = None,
-        arguments_prefix: str | None = None,
-        commands: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        min_end_time: datetime.datetime | None = None,
-        max_end_time: datetime.datetime | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        run_status: str | list[str] | None = None,
-        run_status_prefix: str | None = None,
         scenario: str | list[str] | None = None,
         scenario_prefix: str | None = None,
         min_start_time: datetime.datetime | None = None,
         max_start_time: datetime.datetime | None = None,
+        min_end_time: datetime.datetime | None = None,
+        max_end_time: datetime.datetime | None = None,
+        commands: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        run_status: str | list[str] | None = None,
+        run_status_prefix: str | None = None,
+        arguments: str | list[str] | None = None,
+        arguments_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
@@ -72,19 +72,19 @@ class CaseAPI(NodeAPI[Case, CaseApply, CaseList]):
         """Query starting at cases.
 
         Args:
-            arguments: The argument to filter on.
-            arguments_prefix: The prefix of the argument to filter on.
-            commands: The command to filter on.
-            min_end_time: The minimum value of the end time to filter on.
-            max_end_time: The maximum value of the end time to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
-            run_status: The run status to filter on.
-            run_status_prefix: The prefix of the run status to filter on.
             scenario: The scenario to filter on.
             scenario_prefix: The prefix of the scenario to filter on.
             min_start_time: The minimum value of the start time to filter on.
             max_start_time: The maximum value of the start time to filter on.
+            min_end_time: The minimum value of the end time to filter on.
+            max_end_time: The maximum value of the end time to filter on.
+            commands: The command to filter on.
+            run_status: The run status to filter on.
+            run_status_prefix: The prefix of the run status to filter on.
+            arguments: The argument to filter on.
+            arguments_prefix: The prefix of the argument to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of cases to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -97,19 +97,19 @@ class CaseAPI(NodeAPI[Case, CaseApply, CaseList]):
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_case_filter(
             self._view_id,
-            arguments,
-            arguments_prefix,
-            commands,
-            min_end_time,
-            max_end_time,
             name,
             name_prefix,
-            run_status,
-            run_status_prefix,
             scenario,
             scenario_prefix,
             min_start_time,
             max_start_time,
+            min_end_time,
+            max_end_time,
+            commands,
+            run_status,
+            run_status_prefix,
+            arguments,
+            arguments_prefix,
             external_id_prefix,
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
@@ -197,19 +197,19 @@ class CaseAPI(NodeAPI[Case, CaseApply, CaseList]):
         self,
         query: str,
         properties: CaseTextFields | Sequence[CaseTextFields] | None = None,
-        arguments: str | list[str] | None = None,
-        arguments_prefix: str | None = None,
-        commands: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        min_end_time: datetime.datetime | None = None,
-        max_end_time: datetime.datetime | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        run_status: str | list[str] | None = None,
-        run_status_prefix: str | None = None,
         scenario: str | list[str] | None = None,
         scenario_prefix: str | None = None,
         min_start_time: datetime.datetime | None = None,
         max_start_time: datetime.datetime | None = None,
+        min_end_time: datetime.datetime | None = None,
+        max_end_time: datetime.datetime | None = None,
+        commands: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        run_status: str | list[str] | None = None,
+        run_status_prefix: str | None = None,
+        arguments: str | list[str] | None = None,
+        arguments_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -220,19 +220,19 @@ class CaseAPI(NodeAPI[Case, CaseApply, CaseList]):
         Args:
             query: The search query,
             properties: The property to search, if nothing is passed all text fields will be searched.
-            arguments: The argument to filter on.
-            arguments_prefix: The prefix of the argument to filter on.
-            commands: The command to filter on.
-            min_end_time: The minimum value of the end time to filter on.
-            max_end_time: The maximum value of the end time to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
-            run_status: The run status to filter on.
-            run_status_prefix: The prefix of the run status to filter on.
             scenario: The scenario to filter on.
             scenario_prefix: The prefix of the scenario to filter on.
             min_start_time: The minimum value of the start time to filter on.
             max_start_time: The maximum value of the start time to filter on.
+            min_end_time: The minimum value of the end time to filter on.
+            max_end_time: The maximum value of the end time to filter on.
+            commands: The command to filter on.
+            run_status: The run status to filter on.
+            run_status_prefix: The prefix of the run status to filter on.
+            arguments: The argument to filter on.
+            arguments_prefix: The prefix of the argument to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of cases to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -252,19 +252,19 @@ class CaseAPI(NodeAPI[Case, CaseApply, CaseList]):
         """
         filter_ = _create_case_filter(
             self._view_id,
-            arguments,
-            arguments_prefix,
-            commands,
-            min_end_time,
-            max_end_time,
             name,
             name_prefix,
-            run_status,
-            run_status_prefix,
             scenario,
             scenario_prefix,
             min_start_time,
             max_start_time,
+            min_end_time,
+            max_end_time,
+            commands,
+            run_status,
+            run_status_prefix,
+            arguments,
+            arguments_prefix,
             external_id_prefix,
             space,
             filter,
@@ -282,19 +282,19 @@ class CaseAPI(NodeAPI[Case, CaseApply, CaseList]):
         group_by: None = None,
         query: str | None = None,
         search_properties: CaseTextFields | Sequence[CaseTextFields] | None = None,
-        arguments: str | list[str] | None = None,
-        arguments_prefix: str | None = None,
-        commands: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        min_end_time: datetime.datetime | None = None,
-        max_end_time: datetime.datetime | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        run_status: str | list[str] | None = None,
-        run_status_prefix: str | None = None,
         scenario: str | list[str] | None = None,
         scenario_prefix: str | None = None,
         min_start_time: datetime.datetime | None = None,
         max_start_time: datetime.datetime | None = None,
+        min_end_time: datetime.datetime | None = None,
+        max_end_time: datetime.datetime | None = None,
+        commands: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        run_status: str | list[str] | None = None,
+        run_status_prefix: str | None = None,
+        arguments: str | list[str] | None = None,
+        arguments_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -313,19 +313,19 @@ class CaseAPI(NodeAPI[Case, CaseApply, CaseList]):
         group_by: CaseFields | Sequence[CaseFields] = None,
         query: str | None = None,
         search_properties: CaseTextFields | Sequence[CaseTextFields] | None = None,
-        arguments: str | list[str] | None = None,
-        arguments_prefix: str | None = None,
-        commands: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        min_end_time: datetime.datetime | None = None,
-        max_end_time: datetime.datetime | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        run_status: str | list[str] | None = None,
-        run_status_prefix: str | None = None,
         scenario: str | list[str] | None = None,
         scenario_prefix: str | None = None,
         min_start_time: datetime.datetime | None = None,
         max_start_time: datetime.datetime | None = None,
+        min_end_time: datetime.datetime | None = None,
+        max_end_time: datetime.datetime | None = None,
+        commands: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        run_status: str | list[str] | None = None,
+        run_status_prefix: str | None = None,
+        arguments: str | list[str] | None = None,
+        arguments_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -343,19 +343,19 @@ class CaseAPI(NodeAPI[Case, CaseApply, CaseList]):
         group_by: CaseFields | Sequence[CaseFields] | None = None,
         query: str | None = None,
         search_property: CaseTextFields | Sequence[CaseTextFields] | None = None,
-        arguments: str | list[str] | None = None,
-        arguments_prefix: str | None = None,
-        commands: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        min_end_time: datetime.datetime | None = None,
-        max_end_time: datetime.datetime | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        run_status: str | list[str] | None = None,
-        run_status_prefix: str | None = None,
         scenario: str | list[str] | None = None,
         scenario_prefix: str | None = None,
         min_start_time: datetime.datetime | None = None,
         max_start_time: datetime.datetime | None = None,
+        min_end_time: datetime.datetime | None = None,
+        max_end_time: datetime.datetime | None = None,
+        commands: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        run_status: str | list[str] | None = None,
+        run_status_prefix: str | None = None,
+        arguments: str | list[str] | None = None,
+        arguments_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -369,19 +369,19 @@ class CaseAPI(NodeAPI[Case, CaseApply, CaseList]):
             group_by: The property to group by when doing the aggregation.
             query: The query to search for in the text field.
             search_property: The text field to search in.
-            arguments: The argument to filter on.
-            arguments_prefix: The prefix of the argument to filter on.
-            commands: The command to filter on.
-            min_end_time: The minimum value of the end time to filter on.
-            max_end_time: The maximum value of the end time to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
-            run_status: The run status to filter on.
-            run_status_prefix: The prefix of the run status to filter on.
             scenario: The scenario to filter on.
             scenario_prefix: The prefix of the scenario to filter on.
             min_start_time: The minimum value of the start time to filter on.
             max_start_time: The maximum value of the start time to filter on.
+            min_end_time: The minimum value of the end time to filter on.
+            max_end_time: The maximum value of the end time to filter on.
+            commands: The command to filter on.
+            run_status: The run status to filter on.
+            run_status_prefix: The prefix of the run status to filter on.
+            arguments: The argument to filter on.
+            arguments_prefix: The prefix of the argument to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of cases to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -402,19 +402,19 @@ class CaseAPI(NodeAPI[Case, CaseApply, CaseList]):
 
         filter_ = _create_case_filter(
             self._view_id,
-            arguments,
-            arguments_prefix,
-            commands,
-            min_end_time,
-            max_end_time,
             name,
             name_prefix,
-            run_status,
-            run_status_prefix,
             scenario,
             scenario_prefix,
             min_start_time,
             max_start_time,
+            min_end_time,
+            max_end_time,
+            commands,
+            run_status,
+            run_status_prefix,
+            arguments,
+            arguments_prefix,
             external_id_prefix,
             space,
             filter,
@@ -437,19 +437,19 @@ class CaseAPI(NodeAPI[Case, CaseApply, CaseList]):
         interval: float,
         query: str | None = None,
         search_property: CaseTextFields | Sequence[CaseTextFields] | None = None,
-        arguments: str | list[str] | None = None,
-        arguments_prefix: str | None = None,
-        commands: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        min_end_time: datetime.datetime | None = None,
-        max_end_time: datetime.datetime | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        run_status: str | list[str] | None = None,
-        run_status_prefix: str | None = None,
         scenario: str | list[str] | None = None,
         scenario_prefix: str | None = None,
         min_start_time: datetime.datetime | None = None,
         max_start_time: datetime.datetime | None = None,
+        min_end_time: datetime.datetime | None = None,
+        max_end_time: datetime.datetime | None = None,
+        commands: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        run_status: str | list[str] | None = None,
+        run_status_prefix: str | None = None,
+        arguments: str | list[str] | None = None,
+        arguments_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -462,19 +462,19 @@ class CaseAPI(NodeAPI[Case, CaseApply, CaseList]):
             interval: The interval to use for the histogram bins.
             query: The query to search for in the text field.
             search_property: The text field to search in.
-            arguments: The argument to filter on.
-            arguments_prefix: The prefix of the argument to filter on.
-            commands: The command to filter on.
-            min_end_time: The minimum value of the end time to filter on.
-            max_end_time: The maximum value of the end time to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
-            run_status: The run status to filter on.
-            run_status_prefix: The prefix of the run status to filter on.
             scenario: The scenario to filter on.
             scenario_prefix: The prefix of the scenario to filter on.
             min_start_time: The minimum value of the start time to filter on.
             max_start_time: The maximum value of the start time to filter on.
+            min_end_time: The minimum value of the end time to filter on.
+            max_end_time: The maximum value of the end time to filter on.
+            commands: The command to filter on.
+            run_status: The run status to filter on.
+            run_status_prefix: The prefix of the run status to filter on.
+            arguments: The argument to filter on.
+            arguments_prefix: The prefix of the argument to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of cases to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -486,19 +486,19 @@ class CaseAPI(NodeAPI[Case, CaseApply, CaseList]):
         """
         filter_ = _create_case_filter(
             self._view_id,
-            arguments,
-            arguments_prefix,
-            commands,
-            min_end_time,
-            max_end_time,
             name,
             name_prefix,
-            run_status,
-            run_status_prefix,
             scenario,
             scenario_prefix,
             min_start_time,
             max_start_time,
+            min_end_time,
+            max_end_time,
+            commands,
+            run_status,
+            run_status_prefix,
+            arguments,
+            arguments_prefix,
             external_id_prefix,
             space,
             filter,
@@ -516,19 +516,19 @@ class CaseAPI(NodeAPI[Case, CaseApply, CaseList]):
 
     def list(
         self,
-        arguments: str | list[str] | None = None,
-        arguments_prefix: str | None = None,
-        commands: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        min_end_time: datetime.datetime | None = None,
-        max_end_time: datetime.datetime | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        run_status: str | list[str] | None = None,
-        run_status_prefix: str | None = None,
         scenario: str | list[str] | None = None,
         scenario_prefix: str | None = None,
         min_start_time: datetime.datetime | None = None,
         max_start_time: datetime.datetime | None = None,
+        min_end_time: datetime.datetime | None = None,
+        max_end_time: datetime.datetime | None = None,
+        commands: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        run_status: str | list[str] | None = None,
+        run_status_prefix: str | None = None,
+        arguments: str | list[str] | None = None,
+        arguments_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -537,19 +537,19 @@ class CaseAPI(NodeAPI[Case, CaseApply, CaseList]):
         """List/filter cases
 
         Args:
-            arguments: The argument to filter on.
-            arguments_prefix: The prefix of the argument to filter on.
-            commands: The command to filter on.
-            min_end_time: The minimum value of the end time to filter on.
-            max_end_time: The maximum value of the end time to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
-            run_status: The run status to filter on.
-            run_status_prefix: The prefix of the run status to filter on.
             scenario: The scenario to filter on.
             scenario_prefix: The prefix of the scenario to filter on.
             min_start_time: The minimum value of the start time to filter on.
             max_start_time: The maximum value of the start time to filter on.
+            min_end_time: The minimum value of the end time to filter on.
+            max_end_time: The maximum value of the end time to filter on.
+            commands: The command to filter on.
+            run_status: The run status to filter on.
+            run_status_prefix: The prefix of the run status to filter on.
+            arguments: The argument to filter on.
+            arguments_prefix: The prefix of the argument to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of cases to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -569,19 +569,19 @@ class CaseAPI(NodeAPI[Case, CaseApply, CaseList]):
         """
         filter_ = _create_case_filter(
             self._view_id,
-            arguments,
-            arguments_prefix,
-            commands,
-            min_end_time,
-            max_end_time,
             name,
             name_prefix,
-            run_status,
-            run_status_prefix,
             scenario,
             scenario_prefix,
             min_start_time,
             max_start_time,
+            min_end_time,
+            max_end_time,
+            commands,
+            run_status,
+            run_status_prefix,
+            arguments,
+            arguments_prefix,
             external_id_prefix,
             space,
             filter,
