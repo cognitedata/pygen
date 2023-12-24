@@ -1,0 +1,40 @@
+space: power-models
+externalId: MainShaft
+name: MainShaft
+usedFor: node
+properties:
+  torque:
+    type:
+      list: false
+      type: timeseries
+    nullable: true
+    autoIncrement: false
+    name: torque
+  calculated_tilt_moment:
+    type:
+      list: false
+      type: timeseries
+    nullable: true
+    autoIncrement: false
+    name: calculated_tilt_moment
+  calculated_yaw_moment:
+    type:
+      list: false
+      type: timeseries
+    nullable: true
+    autoIncrement: false
+    name: calculated_yaw_moment
+  bending_x:
+    type:
+      list: false
+      type: timeseries
+    nullable: true
+    autoIncrement: false
+    name: bending_x
+  bending_y:
+    type:
+      list: false
+      type: timeseries
+    nullable: true
+    autoIncrement: false
+    name: bending_y

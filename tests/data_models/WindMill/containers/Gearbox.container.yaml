@@ -1,0 +1,26 @@
+space: power-models
+externalId: Gearbox
+name: Gearbox
+usedFor: node
+properties:
+  displacement_x:
+    type:
+      list: false
+      type: timeseries
+    nullable: true
+    autoIncrement: false
+    name: displacement_x
+  displacement_y:
+    type:
+      list: false
+      type: timeseries
+    nullable: true
+    autoIncrement: false
+    name: displacement_y
+  displacement_z:
+    type:
+      list: false
+      type: timeseries
+    nullable: true
+    autoIncrement: false
+    name: displacement_z

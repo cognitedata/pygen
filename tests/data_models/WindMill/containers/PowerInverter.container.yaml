@@ -1,0 +1,26 @@
+space: power-models
+externalId: PowerInverter
+name: PowerInverter
+usedFor: node
+properties:
+  active_power_total:
+    type:
+      list: false
+      type: timeseries
+    nullable: true
+    autoIncrement: false
+    name: active_power_total
+  reactive_power_total:
+    type:
+      list: false
+      type: timeseries
+    nullable: true
+    autoIncrement: false
+    name: reactive_power_total
+  apparent_power_total:
+    type:
+      list: false
+      type: timeseries
+    nullable: true
+    autoIncrement: false
+    name: apparent_power_total

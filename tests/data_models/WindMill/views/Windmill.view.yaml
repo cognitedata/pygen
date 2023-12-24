@@ -1,0 +1,74 @@
+space: power-models
+externalId: Windmill
+name: Windmill
+version: 1
+properties:
+  name:
+    container:
+      space: power-models
+      externalId: Windmill
+      type: container
+    containerPropertyIdentifier: name
+    name: name
+  windfarm:
+    container:
+      space: power-models
+      externalId: Windmill
+      type: container
+    containerPropertyIdentifier: windfarm
+    name: windfarm
+  capacity:
+    container:
+      space: power-models
+      externalId: Windmill
+      type: container
+    containerPropertyIdentifier: capacity
+    name: capacity
+  rotor:
+    container:
+      space: power-models
+      externalId: Windmill
+      type: container
+    containerPropertyIdentifier: rotor
+    name: rotor
+    source:
+      space: power-models
+      externalId: Rotor
+      version: 65b5e396df9b84
+      type: view
+  nacelle:
+    container:
+      space: power-models
+      externalId: Windmill
+      type: container
+    containerPropertyIdentifier: nacelle
+    name: nacelle
+    source:
+      space: power-models
+      externalId: Nacelle
+      version: 75fc353d3d8a9b
+      type: view
+  blades:
+    type:
+      space: power-models
+      externalId: Windmill.blades
+    source:
+      space: power-models
+      externalId: Blade
+      version: 1
+      type: view
+    direction: outwards
+    name: blades
+    connectionType: multi_edge_connection
+  metmast:
+    type:
+      space: power-models
+      externalId: Windmill.metmast
+    source:
+      space: power-models
+      externalId: Metmast
+      version: 1
+      type: view
+    direction: outwards
+    name: metmast
+    connectionType: multi_edge_connection

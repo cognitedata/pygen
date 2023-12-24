@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from cognite.client import data_modeling as dm
-from cognite.client.data_classes.data_modeling import DataModelId
+from cognite.client.data_classes.data_modeling import DataModelId, SpaceApply, SpaceApplyList
 
 from cognite.pygen.utils.helper import get_pydantic_version
 
@@ -42,10 +42,18 @@ class ExampleSDK:
     def client_dir(self) -> Path:
         return EXAMPLES_DIR / self.top_level_package.replace(".", "/")
 
+    @staticmethod
+    def model_dir(model_id: DataModelId) -> Path:
+        return DATA_MODELS / model_id.external_id
+
+    @classmethod
+    def read_model_path(cls, model_id: DataModelId) -> Path:
+        return cls.model_dir(model_id) / "model.yaml"
+
     def load_data_models(self) -> dm.DataModelList[dm.View]:
         models = []
         for model_id in self.data_model_ids:
-            data_model_file = DATA_MODELS / model_id.external_id / "model.yaml"
+            data_model_file = self.read_model_path(model_id)
 
             if not data_model_file.is_file():
                 raise FileNotFoundError(f"Data model file {data_model_file} not found")
@@ -64,6 +72,40 @@ class ExampleSDK:
             if isinstance(var, Path) and var.is_file():
                 self.manual_files.append(var)
 
+    def spaces(self) -> SpaceApplyList:
+        spaces = list({model.space for model in self.load_data_models()})
+        return SpaceApplyList([SpaceApply(space) for space in spaces])
+
+    @classmethod
+    def load_views(cls, data_model_id: dm.DataModelId) -> dm.ViewApplyList:
+        view_files = list((cls.model_dir(data_model_id) / "views").glob("*.view.yaml"))
+        return dm.ViewApplyList([dm.ViewApply.load(view_file.read_text()) for view_file in view_files])
+
+    @classmethod
+    def load_containers(cls, data_model_id: dm.DataModelId) -> dm.ContainerApplyList:
+        container_files = list((cls.model_dir(data_model_id) / "containers").glob("*.container.yaml"))
+        return dm.ContainerApplyList(
+            [dm.ContainerApply.load(container_file.read_text()) for container_file in container_files]
+        )
+
+    def load_write_model(self, data_model_id: dm.DataModelId) -> dm.DataModelApply:
+        views = self.load_views(data_model_id).as_ids()
+        return dm.DataModelApply(
+            space=data_model_id.space,
+            external_id=data_model_id.external_id,
+            version=data_model_id.version,
+            description="",
+            name=data_model_id.external_id,
+            views=views,
+        )
+
+
+WINDMILL_SDK = ExampleSDK(
+    data_model_ids=[DataModelId("power-models", "Windmill", "1")],
+    _top_level_package="windmill.client",
+    client_name="WindmillClient",
+    generate_sdk=True,
+)
 
 MARKET_SDK = ExampleSDK(
     data_model_ids=[DataModelId("market", "CogPool", "3"), DataModelId("market", "PygenPool", "3")],

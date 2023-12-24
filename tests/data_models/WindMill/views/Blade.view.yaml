@@ -1,0 +1,31 @@
+space: power-models
+externalId: Blade
+name: Blade
+version: 1
+properties:
+  name:
+    container:
+      space: power-models
+      externalId: Blade
+      type: container
+    containerPropertyIdentifier: name
+    name: name
+  is_damaged:
+    container:
+      space: power-models
+      externalId: Blade
+      type: container
+    containerPropertyIdentifier: is_damaged
+    name: is_damaged
+  sensor_positions:
+    type:
+      space: power-models
+      externalId: Blade.sensor_positions
+    source:
+      space: power-models
+      externalId: SensorPosition
+      version: 1
+      type: view
+    direction: outwards
+    name: sensor_positions
+    connectionType: multi_edge_connection

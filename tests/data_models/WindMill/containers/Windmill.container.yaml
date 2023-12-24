@@ -1,0 +1,40 @@
+space: power-models
+externalId: Windmill
+name: Windmill
+usedFor: node
+properties:
+  name:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: name
+  windfarm:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: windfarm
+  capacity:
+    type:
+      list: false
+      type: float64
+    nullable: true
+    autoIncrement: false
+    name: capacity
+  rotor:
+    type:
+      type: direct
+    nullable: true
+    autoIncrement: false
+    name: rotor
+  nacelle:
+    type:
+      type: direct
+    nullable: true
+    autoIncrement: false
+    name: nacelle

@@ -9,7 +9,7 @@ import typer
 from cognite.client._version import __version__ as cognite_sdk_version
 from cognite.client.data_classes.data_modeling import DataModel, SpaceApply
 from pydantic.version import VERSION as PYDANTIC_VERSION
-from yaml import safe_dump, safe_load
+from yaml import safe_load
 
 from cognite.pygen._generator import SDKGenerator, write_sdk_to_disk
 from cognite.pygen.utils.cdf import _user_options, load_cognite_client_from_toml
@@ -70,12 +70,13 @@ def generate_sdks(
 def download():
     client = load_cognite_client_from_toml("config.toml")
     for example_sdk in EXAMPLE_SDKS:
-        for datamodel_id, dms_file in zip(example_sdk.data_models, example_sdk.dms_files):
-            dms_model = client.data_modeling.data_models.retrieve(datamodel_id, inline_views=True)
-            if not dms_model:
-                raise ValueError(f"Failed to retrieve {datamodel_id}")
-            dms_file.write_text(safe_dump(dms_model.dump(camel_case=True), sort_keys=True))
-            typer.echo(f"Downloaded {dms_file.relative_to(REPO_ROOT)}")
+        for data_model_id in example_sdk.data_model_ids:
+            data_model = client.data_modeling.data_models.retrieve(data_model_id, inline_views=True)
+            if not data_model:
+                raise ValueError(f"Failed to retrieve {data_model_id}")
+            file_path = example_sdk.read_model_path(data_model_id)
+            file_path.write_text(data_model.dump_yaml())
+            typer.echo(f"Downloaded {file_path.relative_to(REPO_ROOT)}")
 
 
 @app.command("deploy", help="Deploy all example SDKs to CDF")
@@ -86,15 +87,18 @@ def deploy():
     data_models = example_sdk.load_data_models()
     spaces = list({model.space for model in data_models})
     client.data_modeling.spaces.apply([SpaceApply(space) for space in spaces])
-    if example_sdk.has_container_file:
-        containers = example_sdk.load_containers()
+    for data_model_id in example_sdk.data_model_ids:
+        containers = example_sdk.load_containers(data_model_id)
         new_containers = client.data_modeling.containers.apply(containers)
         for container in new_containers:
             typer.echo(f"Created container {container.external_id} in space {container.space}")
-
-    new_model = client.data_modeling.data_models.apply(data_models.as_apply())
-    for model in new_model:
-        typer.echo(f"Created data model {model.external_id} in space {model.space}")
+        views = example_sdk.load_views(data_model_id)
+        new_views = client.data_modeling.views.apply(views)
+        for view in new_views:
+            typer.echo(f"Created view {view.external_id} in space {view.space}")
+        data_model = example_sdk.load_write_model(data_model_id)
+        new_model = client.data_modeling.data_models.apply(data_model)
+        typer.echo(f"Created data model {new_model.external_id} in space {new_model.space}")
 
 
 @app.command("list", help="List all example files which are expected to be changed manually")
