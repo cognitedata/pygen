@@ -72,8 +72,8 @@ class ExampleSDK:
             if isinstance(var, Path) and var.is_file():
                 self.manual_files.append(var)
 
-    def spaces(self) -> SpaceApplyList:
-        spaces = list({model.space for model in self.load_data_models()})
+    def load_spaces(self) -> SpaceApplyList:
+        spaces = list({model.space for model in self.data_model_ids})
         return SpaceApplyList([SpaceApply(space) for space in spaces])
 
     @classmethod

@@ -7,7 +7,7 @@ import re
 import toml
 import typer
 from cognite.client._version import __version__ as cognite_sdk_version
-from cognite.client.data_classes.data_modeling import DataModel, SpaceApply
+from cognite.client.data_classes.data_modeling import DataModel
 from pydantic.version import VERSION as PYDANTIC_VERSION
 from yaml import safe_load
 
@@ -84,9 +84,8 @@ def deploy():
     client = load_cognite_client_from_toml("config.toml")
     index = _user_options([", ".join(map(str, example.data_model_ids)) for example in EXAMPLE_SDKS])
     example_sdk = EXAMPLE_SDKS[index]
-    data_models = example_sdk.load_data_models()
-    spaces = list({model.space for model in data_models})
-    client.data_modeling.spaces.apply([SpaceApply(space) for space in spaces])
+    spaces = example_sdk.load_spaces()
+    client.data_modeling.spaces.apply(spaces)
     for data_model_id in example_sdk.data_model_ids:
         containers = example_sdk.load_containers(data_model_id)
         new_containers = client.data_modeling.containers.apply(containers)
