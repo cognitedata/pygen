@@ -7,9 +7,7 @@ import re
 import toml
 import typer
 from cognite.client._version import __version__ as cognite_sdk_version
-from cognite.client.data_classes.data_modeling import DataModel
 from pydantic.version import VERSION as PYDANTIC_VERSION
-from yaml import safe_load
 
 from cognite.pygen._generator import SDKGenerator, write_sdk_to_disk
 from cognite.pygen.utils.cdf import _user_options, load_cognite_client_from_toml
@@ -37,7 +35,7 @@ def generate_sdks(
         if sdk_name is not None and not example_sdk.client_name.casefold().startswith(sdk_name.casefold()):
             continue
         typer.echo(f"Generating {example_sdk.client_name} SDK...")
-        data_models = [DataModel.load(safe_load(dms_file.read_text())[0]) for dms_file in example_sdk.dms_files]
+        data_models = example_sdk.load_data_models()
         if len(data_models) == 1:
             data_models = data_models[0]
         sdk_generator = SDKGenerator(
