@@ -82,7 +82,7 @@ def download():
 @app.command("deploy", help="Deploy all example SDKs to CDF")
 def deploy():
     client = load_cognite_client_from_toml("config.toml")
-    index = _user_options([", ".join(map(str, example.data_models)) for example in EXAMPLE_SDKS])
+    index = _user_options([", ".join(map(str, example.data_model_ids)) for example in EXAMPLE_SDKS])
     example_sdk = EXAMPLE_SDKS[index]
     data_models = example_sdk.load_data_models()
     spaces = list({model.space for model in data_models})
