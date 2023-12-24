@@ -1,0 +1,17 @@
+space: market
+externalId: CogProcess
+name: CogProcess
+usedFor: node
+properties:
+  transformation:
+    type:
+      type: direct
+    nullable: true
+    autoIncrement: false
+    name: transformation
+  dateTransformations:
+    type:
+      type: direct
+    nullable: true
+    autoIncrement: false
+    name: dateTransformations

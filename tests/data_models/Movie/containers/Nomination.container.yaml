@@ -1,0 +1,20 @@
+space: IntegrationTestsImmutable
+externalId: Nomination
+name: Nomination
+usedFor: node
+properties:
+  name:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: false
+    autoIncrement: false
+    name: name
+  year:
+    type:
+      list: false
+      type: int32
+    nullable: false
+    autoIncrement: false
+    name: year

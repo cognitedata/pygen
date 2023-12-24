@@ -1,0 +1,31 @@
+space: market
+externalId: Bid
+name: Bid
+version: 1ad3f030a8399f
+properties:
+  date:
+    container:
+      space: market
+      externalId: Bid
+      type: container
+    containerPropertyIdentifier: date
+    name: date
+  market:
+    container:
+      space: market
+      externalId: Bid
+      type: container
+    containerPropertyIdentifier: market
+    name: market
+    source:
+      space: market
+      externalId: Market
+      version: 5b43e98565d4d5
+      type: view
+  name:
+    container:
+      space: market
+      externalId: Bid
+      type: container
+    containerPropertyIdentifier: name
+    name: name

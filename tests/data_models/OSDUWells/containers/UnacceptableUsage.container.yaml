@@ -1,0 +1,45 @@
+space: IntegrationTestsImmutable
+externalId: UnacceptableUsage
+name: UnacceptableUsage
+usedFor: node
+properties:
+  WorkflowUsageTypeID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: WorkflowUsageTypeID
+  WorkflowPersonaTypeID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: WorkflowPersonaTypeID
+  DataQualityRuleSetID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: DataQualityRuleSetID
+  DataQualityID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: DataQualityID
+  ValueChainStatusTypeID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: ValueChainStatusTypeID

@@ -1,0 +1,26 @@
+space: IntegrationTestsImmutable
+externalId: Legal
+name: Legal
+version: 508188c6379675
+properties:
+  legaltags:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Legal
+      type: container
+    containerPropertyIdentifier: legaltags
+    name: legaltags
+  otherRelevantDataCountries:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Legal
+      type: container
+    containerPropertyIdentifier: otherRelevantDataCountries
+    name: otherRelevantDataCountries
+  status:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Legal
+      type: container
+    containerPropertyIdentifier: status
+    name: status

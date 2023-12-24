@@ -1,0 +1,19 @@
+space: IntegrationTestsImmutable
+externalId: LineageAssertions
+name: LineageAssertions
+version: ef344f6030d778
+properties:
+  ID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: LineageAssertions
+      type: container
+    containerPropertyIdentifier: ID
+    name: ID
+  LineageRelationshipType:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: LineageAssertions
+      type: container
+    containerPropertyIdentifier: LineageRelationshipType
+    name: LineageRelationshipType

@@ -1,0 +1,19 @@
+space: IntegrationTestsImmutable
+externalId: CDF_UserPreferences
+usedFor: node
+properties:
+  language:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    description: The users selected language
+  apmAppConfig:
+    type:
+      list: false
+      type: json
+    nullable: true
+    autoIncrement: false
+    description: User preferences related to APM apps, like selected config

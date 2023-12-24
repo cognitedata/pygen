@@ -1,0 +1,21 @@
+space: IntegrationTestsImmutable
+externalId: UnitProcedure
+name: UnitProcedure
+usedFor: node
+properties:
+  name:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: name
+  type:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: type

@@ -1,0 +1,37 @@
+space: IntegrationTestsImmutable
+externalId: DrillingReasons
+name: DrillingReasons
+usedFor: node
+properties:
+  LaheeClassID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: LaheeClassID
+  EffectiveDateTime:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: EffectiveDateTime
+  TerminationDateTime:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: TerminationDateTime
+  Remark:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: Remark

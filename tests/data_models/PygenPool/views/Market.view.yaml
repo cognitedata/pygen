@@ -1,0 +1,19 @@
+space: market
+externalId: Market
+name: Market
+version: 5b43e98565d4d5
+properties:
+  name:
+    container:
+      space: market
+      externalId: Market
+      type: container
+    containerPropertyIdentifier: name
+    name: name
+  timezone:
+    container:
+      space: market
+      externalId: Market
+      type: container
+    containerPropertyIdentifier: timezone
+    name: timezone

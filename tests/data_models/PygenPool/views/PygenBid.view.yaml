@@ -1,0 +1,57 @@
+space: market
+externalId: PygenBid
+name: PygenBid
+implements:
+- space: market
+  externalId: Bid
+  version: 1ad3f030a8399f
+  type: view
+version: 57f9da2a1acf7e
+properties:
+  date:
+    container:
+      space: market
+      externalId: Bid
+      type: container
+    containerPropertyIdentifier: date
+    name: date
+  isBlock:
+    container:
+      space: market
+      externalId: PygenBid
+      type: container
+    containerPropertyIdentifier: isBlock
+    name: isBlock
+  market:
+    container:
+      space: market
+      externalId: Bid
+      type: container
+    containerPropertyIdentifier: market
+    name: market
+    source:
+      space: market
+      externalId: Market
+      version: 5b43e98565d4d5
+      type: view
+  minimumPrice:
+    container:
+      space: market
+      externalId: PygenBid
+      type: container
+    containerPropertyIdentifier: minimumPrice
+    name: minimumPrice
+  name:
+    container:
+      space: market
+      externalId: Bid
+      type: container
+    containerPropertyIdentifier: name
+    name: name
+  pricePremium:
+    container:
+      space: market
+      externalId: PygenBid
+      type: container
+    containerPropertyIdentifier: pricePremium
+    name: pricePremium

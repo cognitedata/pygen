@@ -1,0 +1,67 @@
+space: IntegrationTestsImmutable
+externalId: FacilitySpecifications
+name: FacilitySpecifications
+usedFor: node
+properties:
+  EffectiveDateTime:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: EffectiveDateTime
+  TerminationDateTime:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: TerminationDateTime
+  FacilitySpecificationQuantity:
+    type:
+      list: false
+      type: float64
+    nullable: true
+    autoIncrement: false
+    name: FacilitySpecificationQuantity
+  FacilitySpecificationDateTime:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: FacilitySpecificationDateTime
+  FacilitySpecificationIndicator:
+    type:
+      list: false
+      type: boolean
+    nullable: true
+    autoIncrement: false
+    name: FacilitySpecificationIndicator
+  FacilitySpecificationText:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: FacilitySpecificationText
+  UnitOfMeasureID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: UnitOfMeasureID
+  ParameterTypeID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: ParameterTypeID

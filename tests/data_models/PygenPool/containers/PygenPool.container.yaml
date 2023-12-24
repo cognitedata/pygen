@@ -1,0 +1,12 @@
+space: market
+externalId: PygenPool
+name: PygenPool
+usedFor: node
+properties:
+  dayOfWeek:
+    type:
+      list: false
+      type: int32
+    nullable: true
+    autoIncrement: false
+    name: dayOfWeek

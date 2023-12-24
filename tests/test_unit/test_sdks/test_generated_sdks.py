@@ -12,7 +12,7 @@ from tests.constants import EXAMPLE_SDKS, ExampleSDK
 
 def example_sdk_generated() -> Iterable[ExampleSDK]:
     for sdk in EXAMPLE_SDKS:
-        if sdk.download_only:
+        if sdk.generate_sdk:
             continue
         yield pytest.param(sdk, id=sdk.top_level_package)
 

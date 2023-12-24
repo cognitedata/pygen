@@ -1,0 +1,24 @@
+space: market
+externalId: Process
+name: Process
+version: 98a2becd0f63ee
+properties:
+  bid:
+    container:
+      space: market
+      externalId: Process
+      type: container
+    containerPropertyIdentifier: bid
+    name: bid
+    source:
+      space: market
+      externalId: Bid
+      version: 1add47c48cf88b
+      type: view
+  name:
+    container:
+      space: market
+      externalId: Process
+      type: container
+    containerPropertyIdentifier: name
+    name: name

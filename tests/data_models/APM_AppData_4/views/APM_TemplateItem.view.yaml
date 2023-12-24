@@ -1,0 +1,57 @@
+space: APM_AppData_4
+externalId: APM_TemplateItem
+name: APM_TemplateItem
+version: '7'
+properties:
+  assetExternalId:
+    container:
+      space: APM_AppData_4
+      externalId: APM_TemplateItem
+      type: container
+    containerPropertyIdentifier: assetExternalId
+    name: assetExternalId
+  createdByExternalId:
+    container:
+      space: APM_AppData_4
+      externalId: APM_TemplateItem
+      type: container
+    containerPropertyIdentifier: createdByExternalId
+    name: createdByExternalId
+    description: System data
+  labels:
+    container:
+      space: APM_AppData_4
+      externalId: APM_TemplateItem
+      type: container
+    containerPropertyIdentifier: labels
+    name: labels
+  order:
+    container:
+      space: APM_AppData_4
+      externalId: APM_TemplateItem
+      type: container
+    containerPropertyIdentifier: order
+    name: order
+  templateExternalId:
+    container:
+      space: APM_AppData_4
+      externalId: APM_TemplateItem
+      type: container
+    containerPropertyIdentifier: templateExternalId
+    name: templateExternalId
+    description: Contextualisation
+  title:
+    container:
+      space: APM_AppData_4
+      externalId: APM_TemplateItem
+      type: container
+    containerPropertyIdentifier: title
+    name: title
+    description: Basic information
+  updatedByExternalId:
+    container:
+      space: APM_AppData_4
+      externalId: APM_TemplateItem
+      type: container
+    containerPropertyIdentifier: updatedByExternalId
+    name: updatedByExternalId

@@ -1,0 +1,19 @@
+space: IntegrationTestsImmutable
+externalId: Rating
+name: Rating
+usedFor: node
+properties:
+  score:
+    type:
+      list: false
+      type: timeseries
+    nullable: true
+    autoIncrement: false
+    name: score
+  votes:
+    type:
+      list: false
+      type: timeseries
+    nullable: true
+    autoIncrement: false
+    name: votes

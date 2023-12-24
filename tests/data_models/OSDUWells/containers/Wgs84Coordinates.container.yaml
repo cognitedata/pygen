@@ -1,0 +1,20 @@
+space: IntegrationTestsImmutable
+externalId: Wgs84Coordinates
+name: Wgs84Coordinates
+usedFor: node
+properties:
+  type:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: type
+  bbox:
+    type:
+      list: true
+      type: float64
+    nullable: true
+    autoIncrement: false
+    name: bbox

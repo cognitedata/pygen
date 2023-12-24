@@ -1,0 +1,20 @@
+space: IntegrationTestsImmutable
+externalId: WellboreCosts
+name: WellboreCosts
+usedFor: node
+properties:
+  ActivityTypeID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: ActivityTypeID
+  Cost:
+    type:
+      list: false
+      type: float64
+    nullable: true
+    autoIncrement: false
+    name: Cost

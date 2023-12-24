@@ -1,0 +1,29 @@
+space: IntegrationTestsImmutable
+externalId: AvailableTrajectoryStationProperties
+name: AvailableTrajectoryStationProperties
+usedFor: node
+properties:
+  TrajectoryStationPropertyTypeID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: TrajectoryStationPropertyTypeID
+  StationPropertyUnitID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: StationPropertyUnitID
+  Name:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: Name

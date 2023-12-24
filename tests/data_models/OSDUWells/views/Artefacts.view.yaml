@@ -1,0 +1,26 @@
+space: IntegrationTestsImmutable
+externalId: Artefacts
+name: Artefacts
+version: 7a44a1f4dac367
+properties:
+  ResourceID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Artefacts
+      type: container
+    containerPropertyIdentifier: ResourceID
+    name: ResourceID
+  ResourceKind:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Artefacts
+      type: container
+    containerPropertyIdentifier: ResourceKind
+    name: ResourceKind
+  RoleID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Artefacts
+      type: container
+    containerPropertyIdentifier: RoleID
+    name: RoleID

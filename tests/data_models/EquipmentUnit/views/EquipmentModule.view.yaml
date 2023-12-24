@@ -1,0 +1,33 @@
+space: IntegrationTestsImmutable
+externalId: EquipmentModule
+name: EquipmentModule
+version: b1cd4bf14a7a33
+properties:
+  description:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: EquipmentModule
+      type: container
+    containerPropertyIdentifier: description
+    name: description
+  name:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: EquipmentModule
+      type: container
+    containerPropertyIdentifier: name
+    name: name
+  sensor_value:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: EquipmentModule
+      type: container
+    containerPropertyIdentifier: sensor_value
+    name: sensor_value
+  type:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: EquipmentModule
+      type: container
+    containerPropertyIdentifier: type
+    name: type

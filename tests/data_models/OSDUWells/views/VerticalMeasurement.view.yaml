@@ -1,0 +1,89 @@
+space: IntegrationTestsImmutable
+externalId: VerticalMeasurement
+name: VerticalMeasurement
+version: fd63ec6e91292f
+properties:
+  EffectiveDateTime:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: VerticalMeasurement
+      type: container
+    containerPropertyIdentifier: EffectiveDateTime
+    name: EffectiveDateTime
+  TerminationDateTime:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: VerticalMeasurement
+      type: container
+    containerPropertyIdentifier: TerminationDateTime
+    name: TerminationDateTime
+  VerticalCRSID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: VerticalMeasurement
+      type: container
+    containerPropertyIdentifier: VerticalCRSID
+    name: VerticalCRSID
+  VerticalMeasurement:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: VerticalMeasurement
+      type: container
+    containerPropertyIdentifier: VerticalMeasurement
+    name: VerticalMeasurement
+  VerticalMeasurementDescription:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: VerticalMeasurement
+      type: container
+    containerPropertyIdentifier: VerticalMeasurementDescription
+    name: VerticalMeasurementDescription
+  VerticalMeasurementPathID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: VerticalMeasurement
+      type: container
+    containerPropertyIdentifier: VerticalMeasurementPathID
+    name: VerticalMeasurementPathID
+  VerticalMeasurementSourceID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: VerticalMeasurement
+      type: container
+    containerPropertyIdentifier: VerticalMeasurementSourceID
+    name: VerticalMeasurementSourceID
+  VerticalMeasurementTypeID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: VerticalMeasurement
+      type: container
+    containerPropertyIdentifier: VerticalMeasurementTypeID
+    name: VerticalMeasurementTypeID
+  VerticalMeasurementUnitOfMeasureID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: VerticalMeasurement
+      type: container
+    containerPropertyIdentifier: VerticalMeasurementUnitOfMeasureID
+    name: VerticalMeasurementUnitOfMeasureID
+  VerticalReferenceEntityID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: VerticalMeasurement
+      type: container
+    containerPropertyIdentifier: VerticalReferenceEntityID
+    name: VerticalReferenceEntityID
+  VerticalReferenceID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: VerticalMeasurement
+      type: container
+    containerPropertyIdentifier: VerticalReferenceID
+    name: VerticalReferenceID
+  WellboreTVDTrajectoryID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: VerticalMeasurement
+      type: container
+    containerPropertyIdentifier: WellboreTVDTrajectoryID
+    name: WellboreTVDTrajectoryID

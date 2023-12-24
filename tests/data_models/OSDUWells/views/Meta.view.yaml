@@ -1,0 +1,40 @@
+space: IntegrationTestsImmutable
+externalId: Meta
+name: Meta
+version: bf181692a967b6
+properties:
+  kind:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Meta
+      type: container
+    containerPropertyIdentifier: kind
+    name: kind
+  name:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Meta
+      type: container
+    containerPropertyIdentifier: name
+    name: name
+  persistableReference:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Meta
+      type: container
+    containerPropertyIdentifier: persistableReference
+    name: persistableReference
+  propertyNames:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Meta
+      type: container
+    containerPropertyIdentifier: propertyNames
+    name: propertyNames
+  unitOfMeasureID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Meta
+      type: container
+    containerPropertyIdentifier: unitOfMeasureID
+    name: unitOfMeasureID

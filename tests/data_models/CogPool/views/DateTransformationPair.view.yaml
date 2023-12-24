@@ -1,0 +1,29 @@
+space: market
+externalId: DateTransformationPair
+name: DateTransformationPair
+version: bde9fd4428c26e
+properties:
+  end:
+    type:
+      space: market
+      externalId: DateTransformationPair.end
+    source:
+      space: market
+      externalId: DateTransformation
+      version: 482866112eb911
+      type: view
+    direction: outwards
+    name: end
+    connectionType: multi_edge_connection
+  start:
+    type:
+      space: market
+      externalId: DateTransformationPair.start
+    source:
+      space: market
+      externalId: DateTransformation
+      version: 482866112eb911
+      type: view
+    direction: outwards
+    name: start
+    connectionType: multi_edge_connection

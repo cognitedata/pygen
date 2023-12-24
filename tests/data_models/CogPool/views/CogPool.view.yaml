@@ -1,0 +1,45 @@
+space: market
+externalId: CogPool
+name: CogPool
+implements:
+- space: market
+  externalId: Market
+  version: a5067899750188
+  type: view
+version: 28af312f1d7093
+properties:
+  maxPrice:
+    container:
+      space: market
+      externalId: CogPool
+      type: container
+    containerPropertyIdentifier: maxPrice
+    name: maxPrice
+  minPrice:
+    container:
+      space: market
+      externalId: CogPool
+      type: container
+    containerPropertyIdentifier: minPrice
+    name: minPrice
+  name:
+    container:
+      space: market
+      externalId: Market
+      type: container
+    containerPropertyIdentifier: name
+    name: name
+  timeUnit:
+    container:
+      space: market
+      externalId: CogPool
+      type: container
+    containerPropertyIdentifier: timeUnit
+    name: timeUnit
+  timezone:
+    container:
+      space: market
+      externalId: Market
+      type: container
+    containerPropertyIdentifier: timezone
+    name: timezone

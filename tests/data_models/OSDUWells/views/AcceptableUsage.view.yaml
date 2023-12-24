@@ -1,0 +1,40 @@
+space: IntegrationTestsImmutable
+externalId: AcceptableUsage
+name: AcceptableUsage
+version: d7e8986cd55d22
+properties:
+  DataQualityID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: AcceptableUsage
+      type: container
+    containerPropertyIdentifier: DataQualityID
+    name: DataQualityID
+  DataQualityRuleSetID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: AcceptableUsage
+      type: container
+    containerPropertyIdentifier: DataQualityRuleSetID
+    name: DataQualityRuleSetID
+  ValueChainStatusTypeID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: AcceptableUsage
+      type: container
+    containerPropertyIdentifier: ValueChainStatusTypeID
+    name: ValueChainStatusTypeID
+  WorkflowPersonaTypeID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: AcceptableUsage
+      type: container
+    containerPropertyIdentifier: WorkflowPersonaTypeID
+    name: WorkflowPersonaTypeID
+  WorkflowUsageTypeID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: AcceptableUsage
+      type: container
+    containerPropertyIdentifier: WorkflowUsageTypeID
+    name: WorkflowUsageTypeID

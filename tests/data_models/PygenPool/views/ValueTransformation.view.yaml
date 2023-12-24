@@ -1,0 +1,19 @@
+space: market
+externalId: ValueTransformation
+name: ValueTransformation
+version: 946587c592b44c
+properties:
+  arguments:
+    container:
+      space: market
+      externalId: ValueTransformation
+      type: container
+    containerPropertyIdentifier: arguments
+    name: arguments
+  method:
+    container:
+      space: market
+      externalId: ValueTransformation
+      type: container
+    containerPropertyIdentifier: method
+    name: method

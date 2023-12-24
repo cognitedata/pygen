@@ -1,0 +1,61 @@
+space: IntegrationTestsImmutable
+externalId: Director
+name: Director
+filter:
+  equals:
+    property:
+    - node
+    - type
+    value:
+      space: IntegrationTestsImmutable
+      externalId: RoleDirector
+implements:
+- space: IntegrationTestsImmutable
+  externalId: Role
+  version: '3'
+  type: view
+version: '3'
+properties:
+  movies:
+    type:
+      space: IntegrationTestsImmutable
+      externalId: Movie.directors
+    source:
+      space: IntegrationTestsImmutable
+      externalId: Movie
+      version: '3'
+      type: view
+    direction: inwards
+    name: movies
+    connectionType: multi_edge_connection
+  nomination:
+    type:
+      space: IntegrationTestsImmutable
+      externalId: Role.nomination
+    source:
+      space: IntegrationTestsImmutable
+      externalId: Nomination
+      version: '3'
+      type: view
+    direction: outwards
+    name: nomination
+    connectionType: multi_edge_connection
+  person:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Role
+      type: container
+    containerPropertyIdentifier: person
+    name: person
+    source:
+      space: IntegrationTestsImmutable
+      externalId: Person
+      version: '3'
+      type: view
+  wonOscar:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Role
+      type: container
+    containerPropertyIdentifier: wonOscar
+    name: wonOscar

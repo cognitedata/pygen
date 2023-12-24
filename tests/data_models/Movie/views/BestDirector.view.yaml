@@ -1,0 +1,24 @@
+space: IntegrationTestsImmutable
+externalId: BestDirector
+name: BestDirector
+implements:
+- space: IntegrationTestsImmutable
+  externalId: Nomination
+  version: '3'
+  type: view
+version: '3'
+properties:
+  name:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Nomination
+      type: container
+    containerPropertyIdentifier: name
+    name: name
+  year:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Nomination
+      type: container
+    containerPropertyIdentifier: year
+    name: year

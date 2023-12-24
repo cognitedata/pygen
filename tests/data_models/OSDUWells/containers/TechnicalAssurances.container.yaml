@@ -1,0 +1,29 @@
+space: IntegrationTestsImmutable
+externalId: TechnicalAssurances
+name: TechnicalAssurances
+usedFor: node
+properties:
+  TechnicalAssuranceTypeID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: TechnicalAssuranceTypeID
+  EffectiveDate:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: EffectiveDate
+  Comment:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: Comment

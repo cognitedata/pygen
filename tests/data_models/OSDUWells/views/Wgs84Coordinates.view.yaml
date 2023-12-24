@@ -1,0 +1,31 @@
+space: IntegrationTestsImmutable
+externalId: Wgs84Coordinates
+name: Wgs84Coordinates
+version: d6030081373896
+properties:
+  bbox:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Wgs84Coordinates
+      type: container
+    containerPropertyIdentifier: bbox
+    name: bbox
+  features:
+    type:
+      space: IntegrationTestsImmutable
+      externalId: Wgs84Coordinates.features
+    source:
+      space: IntegrationTestsImmutable
+      externalId: Features
+      version: df91e0a3bad68c
+      type: view
+    direction: outwards
+    name: features
+    connectionType: multi_edge_connection
+  type:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Wgs84Coordinates
+      type: container
+    containerPropertyIdentifier: type
+    name: type

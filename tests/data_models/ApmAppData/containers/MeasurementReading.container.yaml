@@ -1,0 +1,96 @@
+space: IntegrationTestsImmutable
+externalId: MeasurementReading
+usedFor: node
+properties:
+  visibility:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    description: Visibility of node (PUBLIC, PRIVATE, PROTECTED)
+  createdBy:
+    type:
+      type: direct
+    nullable: true
+    autoIncrement: false
+    description: Who created this node?
+  updatedBy:
+    type:
+      type: direct
+    nullable: true
+    autoIncrement: false
+    description: Who was the last person to update this node?
+  isArchived:
+    type:
+      list: false
+      type: boolean
+    nullable: true
+    autoIncrement: false
+    description: Is this item archived, and therefore hidden from most UIs?
+  type:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    description: Measurement type, eg numerical, label, etc.
+  order:
+    type:
+      list: false
+      type: int32
+    nullable: true
+    autoIncrement: false
+    description: Determines the execution order
+  timeseries:
+    type:
+      list: false
+      type: timeseries
+    nullable: true
+    autoIncrement: false
+    description: Timeseries associated with the measurement
+  min:
+    type:
+      list: false
+      type: float64
+    nullable: true
+    autoIncrement: false
+    description: Min range of the reading, reading lower than `min` is possibly bad
+  max:
+    type:
+      list: false
+      type: float64
+    nullable: true
+    autoIncrement: false
+    description: Max range of the reading, reading higher than `max` is possibly bad
+  options:
+    type:
+      list: true
+      type: json
+    nullable: true
+    autoIncrement: false
+    description: Configuring options for label measurements
+  measuredAt:
+    type:
+      list: false
+      type: timestamp
+    nullable: true
+    autoIncrement: false
+    description: Timestamp of when the last reading was made
+  numericReading:
+    type:
+      list: false
+      type: float64
+    nullable: true
+    autoIncrement: false
+    description: Value of the last reading if it was a numeric reading
+  stringReading:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    description: Value of the last reading if it was a string reading

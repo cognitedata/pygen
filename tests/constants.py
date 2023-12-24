@@ -5,12 +5,11 @@ from pathlib import Path
 
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling import DataModelId
-from yaml import safe_load
 
 from cognite.pygen.utils.helper import get_pydantic_version
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-DMS_DATA_MODELS = REPO_ROOT / "tests" / "dms_data_models"
+DATA_MODELS = REPO_ROOT / "tests" / "data_models"
 
 _pydantic_version = get_pydantic_version()
 IS_PYDANTIC_V1 = _pydantic_version == "v1"
@@ -26,29 +25,11 @@ _EXAMPLES_DIR_V2 = REPO_ROOT / "examples"
 
 @dataclass
 class ExampleSDK:
-    data_models: list[DataModelId]
+    data_model_ids: list[DataModelId]
     client_name: str
     _top_level_package: str
-    download_only: bool = False  # Used to example SDK that only trigger validation error.
-    has_container_file: bool = False  # Used to example SDK that has container file.
+    generate_sdk: bool
     manual_files: list[Path] = field(default_factory=list, init=False)
-
-    @property
-    def dms_files(self) -> list[Path]:
-        return [
-            DMS_DATA_MODELS / f"{model_id.space}-{model_id.external_id}-{model_id.version}.yaml"
-            for model_id in self.data_models
-        ]
-
-    def load_containers(self) -> dm.ContainerApplyList:
-        if self.has_container_file:
-            containers = []
-            for dms_file in self.dms_files:
-                container_file = dms_file.parent / f"{dms_file.stem}-containers.yaml"
-                loaded = dm.ContainerApplyList._load(safe_load(container_file.read_text()))
-                containers.extend(loaded)
-            return dm.ContainerApplyList(containers)
-        raise ValueError(f"Expected {self.client_dir} to have containers.yaml")
 
     @property
     def top_level_package(self) -> str:
@@ -58,22 +39,19 @@ class ExampleSDK:
         return self._top_level_package
 
     @property
-    def data_dir(self) -> Path:
-        first, *_ = self._top_level_package.split(".", maxsplit=1)
-        return _EXAMPLES_DIR_V2 / first / "data"
-
-    @property
     def client_dir(self) -> Path:
         return EXAMPLES_DIR / self.top_level_package.replace(".", "/")
 
-    def load_data_models(self) -> dm.DataModelList[dm.DataModel[dm.View]]:
+    def load_data_models(self) -> dm.DataModelList[dm.View]:
         models = []
-        for dms_file in self.dms_files:
-            raw = safe_load(dms_file.read_text())
-            if isinstance(raw, list):
-                raw = raw[0]
-            models.append(dm.DataModel.load(raw))
-        return dm.DataModelList(models)
+        for model_id in self.data_model_ids:
+            data_model_file = DATA_MODELS / model_id.external_id / "model.yaml"
+
+            if not data_model_file.is_file():
+                raise FileNotFoundError(f"Data model file {data_model_file} not found")
+            data_model = dm.DataModel[dm.View].load(data_model_file.read_text())
+            models.append(data_model)
+        return dm.DataModelList[dm.View](models)
 
     def load_data_model(self) -> dm.DataModel[dm.View]:
         models = self.load_data_models()
@@ -88,68 +66,73 @@ class ExampleSDK:
 
 
 MARKET_SDK = ExampleSDK(
-    data_models=[DataModelId("market", "CogPool", "3"), DataModelId("market", "PygenPool", "3")],
+    data_model_ids=[DataModelId("market", "CogPool", "3"), DataModelId("market", "PygenPool", "3")],
     _top_level_package="markets.client",
     client_name="MarketClient",
+    generate_sdk=True,
 )
 
 SHOP_SDK = ExampleSDK(
-    data_models=[DataModelId("IntegrationTestsImmutable", "SHOP_Model", "2")],
+    data_model_ids=[DataModelId("IntegrationTestsImmutable", "SHOP_Model", "2")],
     _top_level_package="shop.client",
     client_name="ShopClient",
+    generate_sdk=True,
 )
 
 MOVIE_SDK = ExampleSDK(
-    data_models=[DataModelId("IntegrationTestsImmutable", "Movie", "4")],
+    data_model_ids=[DataModelId("IntegrationTestsImmutable", "Movie", "4")],
     _top_level_package="movie_domain.client",
     client_name="MovieClient",
+    generate_sdk=True,
 )
 
 OSDU_SDK = ExampleSDK(
-    data_models=[DataModelId("IntegrationTestsImmutable", "OSDUWells", "1")],
+    data_model_ids=[DataModelId("IntegrationTestsImmutable", "OSDUWells", "1")],
     _top_level_package="osdu_wells.client",
     client_name="OSDUClient",
+    generate_sdk=False,
 )
 
 APM_SDK = ExampleSDK(
-    data_models=[DataModelId("tutorial_apm_simple", "ApmSimple", "6")],
+    data_model_ids=[DataModelId("tutorial_apm_simple", "ApmSimple", "6")],
     _top_level_package="tutorial_apm_simple.client",
     client_name="ApmSimpleClient",
+    generate_sdk=True,
 )
 
 PUMP_SDK = ExampleSDK(
-    data_models=[DataModelId("IntegrationTestsImmutable", "Pumps", "1")],
+    data_model_ids=[DataModelId("IntegrationTestsImmutable", "Pumps", "1")],
     _top_level_package="pump.client",
     client_name="PumpClient",
-    download_only=True,
+    generate_sdk=False,
 )
 
 SCENARIO_INSTANCE_SDK = ExampleSDK(
-    data_models=[DataModelId("IntegrationTestsImmutable", "ScenarioInstance", "1")],
+    data_model_ids=[DataModelId("IntegrationTestsImmutable", "ScenarioInstance", "1")],
     _top_level_package="scenario_instance.client",
     client_name="ScenarioInstanceClient",
+    generate_sdk=True,
 )
 
 APM_APP_DATA_SOURCE = ExampleSDK(
-    data_models=[DataModelId("APM_AppData_4", "APM_AppData_4", "7")],
+    data_model_ids=[DataModelId("APM_AppData_4", "APM_AppData_4", "7")],
     _top_level_package="apm_domain.client",
     client_name="ApmClient",
-    download_only=True,
-    has_container_file=True,
+    generate_sdk=False,
 )
 
 APM_APP_DATA_SINK = ExampleSDK(
-    data_models=[DataModelId("IntegrationTestsImmutable", "ApmAppData", "v3")],
+    data_model_ids=[DataModelId("IntegrationTestsImmutable", "ApmAppData", "v3")],
     _top_level_package="sysdm_domain.client",
     client_name="SysDMClient",
-    download_only=True,
-    has_container_file=True,
+    generate_sdk=False,
 )
 
 EQUIPMENT_UNIT_SDK = ExampleSDK(
-    data_models=[DataModelId("IntegrationTestsImmutable", "EquipmentUnit", "2")],
+    data_model_ids=[DataModelId("IntegrationTestsImmutable", "EquipmentUnit", "2")],
     _top_level_package="equipment_unit.client",
     client_name="EquipmentUnitClient",
+    generate_sdk=True,
 )
 
 

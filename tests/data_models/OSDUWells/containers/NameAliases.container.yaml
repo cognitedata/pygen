@@ -1,0 +1,45 @@
+space: IntegrationTestsImmutable
+externalId: NameAliases
+name: NameAliases
+usedFor: node
+properties:
+  AliasName:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: AliasName
+  AliasNameTypeID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: AliasNameTypeID
+  DefinitionOrganisationID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: DefinitionOrganisationID
+  EffectiveDateTime:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: EffectiveDateTime
+  TerminationDateTime:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: TerminationDateTime

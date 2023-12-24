@@ -1,0 +1,19 @@
+space: market
+externalId: DateTransformation
+name: DateTransformation
+version: 5248f7e87c4c96
+properties:
+  arguments:
+    container:
+      space: market
+      externalId: DateTransformation
+      type: container
+    containerPropertyIdentifier: arguments
+    name: arguments
+  method:
+    container:
+      space: market
+      externalId: DateTransformation
+      type: container
+    containerPropertyIdentifier: method
+    name: method

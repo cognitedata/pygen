@@ -1,0 +1,69 @@
+space: APM_AppData_4
+externalId: APM_Template
+name: APM_Template
+version: '7'
+properties:
+  assignedTo:
+    container:
+      space: APM_AppData_4
+      externalId: APM_Template
+      type: container
+    containerPropertyIdentifier: assignedTo
+    name: assignedTo
+  createdByExternalId:
+    container:
+      space: APM_AppData_4
+      externalId: APM_Template
+      type: container
+    containerPropertyIdentifier: createdByExternalId
+    name: createdByExternalId
+  isArchived:
+    container:
+      space: APM_AppData_4
+      externalId: APM_Template
+      type: container
+    containerPropertyIdentifier: isArchived
+    name: isArchived
+    description: System data
+  rootLocationExternalId:
+    container:
+      space: APM_AppData_4
+      externalId: APM_Template
+      type: container
+    containerPropertyIdentifier: rootLocationExternalId
+    name: rootLocationExternalId
+    description: Contextualisation
+  status:
+    container:
+      space: APM_AppData_4
+      externalId: APM_Template
+      type: container
+    containerPropertyIdentifier: status
+    name: status
+  templateItems:
+    type:
+      space: APM_AppData_4
+      externalId: APM_Template.templateItems
+    source:
+      space: APM_AppData_4
+      externalId: APM_TemplateItem
+      version: '7'
+      type: view
+    direction: outwards
+    name: templateItems
+    connectionType: multi_edge_connection
+  title:
+    container:
+      space: APM_AppData_4
+      externalId: APM_Template
+      type: container
+    containerPropertyIdentifier: title
+    name: title
+    description: Basic information
+  updatedByExternalId:
+    container:
+      space: APM_AppData_4
+      externalId: APM_Template
+      type: container
+    containerPropertyIdentifier: updatedByExternalId
+    name: updatedByExternalId

@@ -1,0 +1,19 @@
+space: IntegrationTestsImmutable
+externalId: Rating
+name: Rating
+version: '3'
+properties:
+  score:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Rating
+      type: container
+    containerPropertyIdentifier: score
+    name: score
+  votes:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Rating
+      type: container
+    containerPropertyIdentifier: votes
+    name: votes

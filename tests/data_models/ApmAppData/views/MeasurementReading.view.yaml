@@ -1,0 +1,100 @@
+space: IntegrationTestsImmutable
+externalId: MeasurementReading
+description: The Measurement reading view facilitates the collection of field data
+  by making readings. It supports various measurement types (e.g., numerical, label)
+  and includes information about execution order, associated time series, value ranges,
+  and the timestamp of the last reading.
+name: Measurement reading
+version: v3
+properties:
+  createdBy:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: MeasurementReading
+      type: container
+    containerPropertyIdentifier: createdBy
+    description: Who created this node?
+  isArchived:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: MeasurementReading
+      type: container
+    containerPropertyIdentifier: isArchived
+    description: Is this item archived, and therefore hidden from most UIs?
+  max:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: MeasurementReading
+      type: container
+    containerPropertyIdentifier: max
+    description: Max range of the reading, reading higher than `max` is possibly bad
+  measuredAt:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: MeasurementReading
+      type: container
+    containerPropertyIdentifier: measuredAt
+    description: Timestamp of when the last reading was made
+  min:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: MeasurementReading
+      type: container
+    containerPropertyIdentifier: min
+    description: Min range of the reading, reading lower than `min` is possibly bad
+  numericReading:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: MeasurementReading
+      type: container
+    containerPropertyIdentifier: numericReading
+    description: Value of the last reading if it was a numeric reading
+  options:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: MeasurementReading
+      type: container
+    containerPropertyIdentifier: options
+    description: Configuring options for label measurements
+  order:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: MeasurementReading
+      type: container
+    containerPropertyIdentifier: order
+    description: Determines the execution order
+  stringReading:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: MeasurementReading
+      type: container
+    containerPropertyIdentifier: stringReading
+    description: Value of the last reading if it was a string reading
+  timeseries:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: MeasurementReading
+      type: container
+    containerPropertyIdentifier: timeseries
+    description: Timeseries associated with the measurement
+  type:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: MeasurementReading
+      type: container
+    containerPropertyIdentifier: type
+    description: Measurement type, eg numerical, label, etc.
+  updatedBy:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: MeasurementReading
+      type: container
+    containerPropertyIdentifier: updatedBy
+    description: Who was the last person to update this node?
+  visibility:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: MeasurementReading
+      type: container
+    containerPropertyIdentifier: visibility
+    description: Visibility of node (PUBLIC, PRIVATE, PROTECTED)

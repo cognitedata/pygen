@@ -1,0 +1,40 @@
+space: IntegrationTestsImmutable
+externalId: NameAliases
+name: NameAliases
+version: b0ef9b17280885
+properties:
+  AliasName:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: NameAliases
+      type: container
+    containerPropertyIdentifier: AliasName
+    name: AliasName
+  AliasNameTypeID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: NameAliases
+      type: container
+    containerPropertyIdentifier: AliasNameTypeID
+    name: AliasNameTypeID
+  DefinitionOrganisationID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: NameAliases
+      type: container
+    containerPropertyIdentifier: DefinitionOrganisationID
+    name: DefinitionOrganisationID
+  EffectiveDateTime:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: NameAliases
+      type: container
+    containerPropertyIdentifier: EffectiveDateTime
+    name: EffectiveDateTime
+  TerminationDateTime:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: NameAliases
+      type: container
+    containerPropertyIdentifier: TerminationDateTime
+    name: TerminationDateTime

@@ -1,0 +1,37 @@
+space: IntegrationTestsImmutable
+externalId: FacilityEvents
+name: FacilityEvents
+usedFor: node
+properties:
+  FacilityEventTypeID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: FacilityEventTypeID
+  EffectiveDateTime:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: EffectiveDateTime
+  TerminationDateTime:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: TerminationDateTime
+  Remark:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: Remark

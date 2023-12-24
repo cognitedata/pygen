@@ -1,0 +1,89 @@
+space: IntegrationTestsImmutable
+externalId: SpatialPoint
+name: SpatialPoint
+usedFor: node
+properties:
+  SpatialLocationCoordinatesDate:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: SpatialLocationCoordinatesDate
+  QuantitativeAccuracyBandID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: QuantitativeAccuracyBandID
+  QualitativeSpatialAccuracyTypeID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: QualitativeSpatialAccuracyTypeID
+  CoordinateQualityCheckPerformedBy:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: CoordinateQualityCheckPerformedBy
+  CoordinateQualityCheckDateTime:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: CoordinateQualityCheckDateTime
+  SpatialParameterTypeID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: SpatialParameterTypeID
+  SpatialGeometryTypeID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: SpatialGeometryTypeID
+  AppliedOperations:
+    type:
+      list: true
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: AppliedOperations
+  Wgs84Coordinates:
+    type:
+      type: direct
+    nullable: true
+    autoIncrement: false
+    name: Wgs84Coordinates
+  AsIngestedCoordinates:
+    type:
+      type: direct
+    nullable: true
+    autoIncrement: false
+    name: AsIngestedCoordinates
+  CoordinateQualityCheckRemarks:
+    type:
+      list: true
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: CoordinateQualityCheckRemarks

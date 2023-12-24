@@ -1,0 +1,29 @@
+space: IntegrationTestsImmutable
+externalId: Legal
+name: Legal
+usedFor: node
+properties:
+  status:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: status
+  otherRelevantDataCountries:
+    type:
+      list: true
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: otherRelevantDataCountries
+  legaltags:
+    type:
+      list: true
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: legaltags

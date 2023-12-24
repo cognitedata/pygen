@@ -1,0 +1,40 @@
+space: IntegrationTestsImmutable
+externalId: FacilityOperators
+name: FacilityOperators
+version: 935498861713d0
+properties:
+  EffectiveDateTime:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: FacilityOperators
+      type: container
+    containerPropertyIdentifier: EffectiveDateTime
+    name: EffectiveDateTime
+  FacilityOperatorID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: FacilityOperators
+      type: container
+    containerPropertyIdentifier: FacilityOperatorID
+    name: FacilityOperatorID
+  FacilityOperatorOrganisationID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: FacilityOperators
+      type: container
+    containerPropertyIdentifier: FacilityOperatorOrganisationID
+    name: FacilityOperatorOrganisationID
+  Remark:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: FacilityOperators
+      type: container
+    containerPropertyIdentifier: Remark
+    name: Remark
+  TerminationDateTime:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: FacilityOperators
+      type: container
+    containerPropertyIdentifier: TerminationDateTime
+    name: TerminationDateTime

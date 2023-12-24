@@ -32,7 +32,7 @@ def generate_sdks(
     sdk: str = typer.Option(None, help="Generate only the specified SDK"),
 ):
     for example_sdk in EXAMPLE_SDKS:
-        if example_sdk.download_only:
+        if not example_sdk.generate_sdk:
             continue
         typer.echo(f"Generating {example_sdk.client_name} SDK...")
         data_models = [DataModel.load(safe_load(dms_file.read_text())[0]) for dms_file in example_sdk.dms_files]
@@ -98,7 +98,7 @@ def deploy():
 @app.command("list", help="List all example files which are expected to be changed manually")
 def list_manual_files():
     for example_sdk in EXAMPLE_SDKS:
-        if example_sdk.download_only:
+        if not example_sdk.generate_sdk:
             continue
         typer.echo(f"{example_sdk.client_name} SDK:")
         for manual_file in example_sdk.manual_files:

@@ -1,0 +1,388 @@
+space: IntegrationTestsImmutable
+externalId: WellboreTrajectoryData
+name: WellboreTrajectoryData
+usedFor: node
+properties:
+  ResourceHomeRegionID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: ResourceHomeRegionID
+  ResourceCurationStatus:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: ResourceCurationStatus
+  ResourceLifecycleStatus:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: ResourceLifecycleStatus
+  ResourceSecurityClassification:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: ResourceSecurityClassification
+  Source:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: Source
+  ExistenceKind:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: ExistenceKind
+  IsExtendedLoad:
+    type:
+      list: false
+      type: boolean
+    nullable: true
+    autoIncrement: false
+    name: IsExtendedLoad
+  IsDiscoverable:
+    type:
+      list: false
+      type: boolean
+    nullable: true
+    autoIncrement: false
+    name: IsDiscoverable
+  Name:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: Name
+  Description:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: Description
+  CreationDateTime:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: CreationDateTime
+  SubmitterName:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: SubmitterName
+  ServiceCompanyID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: ServiceCompanyID
+  WellboreID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: WellboreID
+  TopDepthMeasuredDepth:
+    type:
+      list: false
+      type: int32
+    nullable: true
+    autoIncrement: false
+    name: TopDepthMeasuredDepth
+  AzimuthReferenceType:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: AzimuthReferenceType
+  CalculationMethodType:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: CalculationMethodType
+  ProjectedCRSID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: ProjectedCRSID
+  ActiveIndicator:
+    type:
+      list: false
+      type: boolean
+    nullable: true
+    autoIncrement: false
+    name: ActiveIndicator
+  SurveyType:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: SurveyType
+  AcquisitionDate:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: AcquisitionDate
+  GeographicCRSID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: GeographicCRSID
+  AcquisitionRemark:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: AcquisitionRemark
+  SurveyReferenceIdentifier:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: SurveyReferenceIdentifier
+  SurveyToolTypeID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: SurveyToolTypeID
+  SurveyVersion:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: SurveyVersion
+  ExtrapolatedMeasuredDepth:
+    type:
+      list: false
+      type: int32
+    nullable: true
+    autoIncrement: false
+    name: ExtrapolatedMeasuredDepth
+  ExtrapolatedMeasuredDepthRemark:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: ExtrapolatedMeasuredDepthRemark
+  BaseDepthMeasuredDepth:
+    type:
+      list: false
+      type: int32
+    nullable: true
+    autoIncrement: false
+    name: BaseDepthMeasuredDepth
+  TieMeasuredDepth:
+    type:
+      list: false
+      type: int32
+    nullable: true
+    autoIncrement: false
+    name: TieMeasuredDepth
+  TieTrueVerticalDepth:
+    type:
+      list: false
+      type: int32
+    nullable: true
+    autoIncrement: false
+    name: TieTrueVerticalDepth
+  AppliedOperationsDateTime:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: AppliedOperationsDateTime
+  AppliedOperationsUser:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: AppliedOperationsUser
+  AppliedOperationsRemarks:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: AppliedOperationsRemarks
+  StartDateTime:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: StartDateTime
+  EndDateTime:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: EndDateTime
+  CompanyID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: CompanyID
+  SurfaceGridConvergence:
+    type:
+      list: false
+      type: float64
+    nullable: true
+    autoIncrement: false
+    name: SurfaceGridConvergence
+  SurfaceScaleFactor:
+    type:
+      list: false
+      type: float64
+    nullable: true
+    autoIncrement: false
+    name: SurfaceScaleFactor
+  Tortuosity:
+    type:
+      list: false
+      type: float64
+    nullable: true
+    autoIncrement: false
+    name: Tortuosity
+  AppliedOperations:
+    type:
+      list: true
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: AppliedOperations
+  VerticalMeasurement:
+    type:
+      type: direct
+    nullable: true
+    autoIncrement: false
+    name: VerticalMeasurement
+  AuthorIDs:
+    type:
+      list: true
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: AuthorIDs
+  BusinessActivities:
+    type:
+      list: true
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: BusinessActivities
+  SpatialArea:
+    type:
+      type: direct
+    nullable: true
+    autoIncrement: false
+    name: SpatialArea
+  SpatialPoint:
+    type:
+      type: direct
+    nullable: true
+    autoIncrement: false
+    name: SpatialPoint
+  Tags:
+    type:
+      list: true
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: Tags
+  DDMSDatasets:
+    type:
+      list: true
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: DDMSDatasets
+  Datasets:
+    type:
+      list: true
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: Datasets
+  ResourceHostRegionIDs:
+    type:
+      list: true
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: ResourceHostRegionIDs

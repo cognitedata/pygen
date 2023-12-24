@@ -1,0 +1,19 @@
+space: market
+externalId: Process
+name: Process
+usedFor: node
+properties:
+  name:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: name
+  bid:
+    type:
+      type: direct
+    nullable: true
+    autoIncrement: false
+    name: bid

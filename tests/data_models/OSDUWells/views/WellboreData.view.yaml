@@ -1,0 +1,460 @@
+space: IntegrationTestsImmutable
+externalId: WellboreData
+name: WellboreData
+version: 6349cf734b294e
+properties:
+  BusinessIntentionID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: BusinessIntentionID
+    name: BusinessIntentionID
+  ConditionID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: ConditionID
+    name: ConditionID
+  CurrentOperatorID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: CurrentOperatorID
+    name: CurrentOperatorID
+  DataSourceOrganisationID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: DataSourceOrganisationID
+    name: DataSourceOrganisationID
+  DefaultVerticalMeasurementID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: DefaultVerticalMeasurementID
+    name: DefaultVerticalMeasurementID
+  DefinitiveTrajectoryID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: DefinitiveTrajectoryID
+    name: DefinitiveTrajectoryID
+  DrillingReasons:
+    type:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData.DrillingReasons
+    source:
+      space: IntegrationTestsImmutable
+      externalId: DrillingReasons
+      version: 220055a8165644
+      type: view
+    direction: outwards
+    name: DrillingReasons
+    connectionType: multi_edge_connection
+  ExistenceKind:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: ExistenceKind
+    name: ExistenceKind
+  FacilityDescription:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: FacilityDescription
+    name: FacilityDescription
+  FacilityEvents:
+    type:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData.FacilityEvents
+    source:
+      space: IntegrationTestsImmutable
+      externalId: FacilityEvents
+      version: 1b7526673ad990
+      type: view
+    direction: outwards
+    name: FacilityEvents
+    connectionType: multi_edge_connection
+  FacilityID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: FacilityID
+    name: FacilityID
+  FacilityName:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: FacilityName
+    name: FacilityName
+  FacilityOperators:
+    type:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData.FacilityOperators
+    source:
+      space: IntegrationTestsImmutable
+      externalId: FacilityOperators
+      version: 935498861713d0
+      type: view
+    direction: outwards
+    name: FacilityOperators
+    connectionType: multi_edge_connection
+  FacilitySpecifications:
+    type:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData.FacilitySpecifications
+    source:
+      space: IntegrationTestsImmutable
+      externalId: FacilitySpecifications
+      version: 1b7ddbd5d36655
+      type: view
+    direction: outwards
+    name: FacilitySpecifications
+    connectionType: multi_edge_connection
+  FacilityStates:
+    type:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData.FacilityStates
+    source:
+      space: IntegrationTestsImmutable
+      externalId: FacilityStates
+      version: a12316ff3d8033
+      type: view
+    direction: outwards
+    name: FacilityStates
+    connectionType: multi_edge_connection
+  FacilityTypeID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: FacilityTypeID
+    name: FacilityTypeID
+  FluidDirectionID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: FluidDirectionID
+    name: FluidDirectionID
+  FormationNameAtTotalDepth:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: FormationNameAtTotalDepth
+    name: FormationNameAtTotalDepth
+  GeoContexts:
+    type:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData.GeoContexts
+    source:
+      space: IntegrationTestsImmutable
+      externalId: GeoContexts
+      version: cec36d5139aade
+      type: view
+    direction: outwards
+    name: GeoContexts
+    connectionType: multi_edge_connection
+  GeographicBottomHoleLocation:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: GeographicBottomHoleLocation
+    name: GeographicBottomHoleLocation
+    source:
+      space: IntegrationTestsImmutable
+      externalId: GeographicBottomHoleLocation
+      version: a82995ae29bc5c
+      type: view
+  HistoricalInterests:
+    type:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData.HistoricalInterests
+    source:
+      space: IntegrationTestsImmutable
+      externalId: HistoricalInterests
+      version: 7399eff7364ba6
+      type: view
+    direction: outwards
+    name: HistoricalInterests
+    connectionType: multi_edge_connection
+  InitialOperatorID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: InitialOperatorID
+    name: InitialOperatorID
+  InterestTypeID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: InterestTypeID
+    name: InterestTypeID
+  KickOffWellbore:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: KickOffWellbore
+    name: KickOffWellbore
+  NameAliases:
+    type:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData.NameAliases
+    source:
+      space: IntegrationTestsImmutable
+      externalId: NameAliases
+      version: b0ef9b17280885
+      type: view
+    direction: outwards
+    name: NameAliases
+    connectionType: multi_edge_connection
+  OperatingEnvironmentID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: OperatingEnvironmentID
+    name: OperatingEnvironmentID
+  OutcomeID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: OutcomeID
+    name: OutcomeID
+  PrimaryProductTypeID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: PrimaryProductTypeID
+    name: PrimaryProductTypeID
+  ProjectedBottomHoleLocation:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: ProjectedBottomHoleLocation
+    name: ProjectedBottomHoleLocation
+    source:
+      space: IntegrationTestsImmutable
+      externalId: ProjectedBottomHoleLocation
+      version: 447a307957e5b7
+      type: view
+  ResourceCurationStatus:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: ResourceCurationStatus
+    name: ResourceCurationStatus
+  ResourceHomeRegionID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: ResourceHomeRegionID
+    name: ResourceHomeRegionID
+  ResourceHostRegionIDs:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: ResourceHostRegionIDs
+    name: ResourceHostRegionIDs
+  ResourceLifecycleStatus:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: ResourceLifecycleStatus
+    name: ResourceLifecycleStatus
+  ResourceSecurityClassification:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: ResourceSecurityClassification
+    name: ResourceSecurityClassification
+  RoleID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: RoleID
+    name: RoleID
+  SecondaryProductTypeID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: SecondaryProductTypeID
+    name: SecondaryProductTypeID
+  SequenceNumber:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: SequenceNumber
+    name: SequenceNumber
+  ShowProductTypeID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: ShowProductTypeID
+    name: ShowProductTypeID
+  Source:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: Source
+    name: Source
+  SpatialLocation:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: SpatialLocation
+    name: SpatialLocation
+    source:
+      space: IntegrationTestsImmutable
+      externalId: SpatialLocation
+      version: 697432f011ef60
+      type: view
+  StatusSummaryID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: StatusSummaryID
+    name: StatusSummaryID
+  TargetFormation:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: TargetFormation
+    name: TargetFormation
+  TechnicalAssuranceTypeID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: TechnicalAssuranceTypeID
+    name: TechnicalAssuranceTypeID
+  TechnicalAssurances:
+    type:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData.TechnicalAssurances
+    source:
+      space: IntegrationTestsImmutable
+      externalId: TechnicalAssurances
+      version: 20cfc9c180f3df
+      type: view
+    direction: outwards
+    name: TechnicalAssurances
+    connectionType: multi_edge_connection
+  TertiaryProductTypeID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: TertiaryProductTypeID
+    name: TertiaryProductTypeID
+  TrajectoryTypeID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: TrajectoryTypeID
+    name: TrajectoryTypeID
+  VersionCreationReason:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: VersionCreationReason
+    name: VersionCreationReason
+  VerticalMeasurements:
+    type:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData.VerticalMeasurements
+    source:
+      space: IntegrationTestsImmutable
+      externalId: VerticalMeasurements
+      version: d8c3b28a0d0dfb
+      type: view
+    direction: outwards
+    name: VerticalMeasurements
+    connectionType: multi_edge_connection
+  WasBusinessInterestFinancialNonOperated:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: WasBusinessInterestFinancialNonOperated
+    name: WasBusinessInterestFinancialNonOperated
+  WasBusinessInterestFinancialOperated:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: WasBusinessInterestFinancialOperated
+    name: WasBusinessInterestFinancialOperated
+  WasBusinessInterestObligatory:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: WasBusinessInterestObligatory
+    name: WasBusinessInterestObligatory
+  WasBusinessInterestTechnical:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: WasBusinessInterestTechnical
+    name: WasBusinessInterestTechnical
+  WellID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: WellID
+    name: WellID
+  WellboreCosts:
+    type:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData.WellboreCosts
+    source:
+      space: IntegrationTestsImmutable
+      externalId: WellboreCosts
+      version: b4f71248f398a2
+      type: view
+    direction: outwards
+    name: WellboreCosts
+    connectionType: multi_edge_connection
+  WellboreReasonID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WellboreData
+      type: container
+    containerPropertyIdentifier: WellboreReasonID
+    name: WellboreReasonID

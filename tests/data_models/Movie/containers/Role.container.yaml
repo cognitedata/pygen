@@ -1,0 +1,18 @@
+space: IntegrationTestsImmutable
+externalId: Role
+name: Role
+usedFor: node
+properties:
+  wonOscar:
+    type:
+      list: false
+      type: boolean
+    nullable: true
+    autoIncrement: false
+    name: wonOscar
+  person:
+    type:
+      type: direct
+    nullable: true
+    autoIncrement: false
+    name: person

@@ -1,0 +1,47 @@
+space: IntegrationTestsImmutable
+externalId: GeoContexts
+name: GeoContexts
+version: cec36d5139aade
+properties:
+  BasinID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: GeoContexts
+      type: container
+    containerPropertyIdentifier: BasinID
+    name: BasinID
+  FieldID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: GeoContexts
+      type: container
+    containerPropertyIdentifier: FieldID
+    name: FieldID
+  GeoPoliticalEntityID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: GeoContexts
+      type: container
+    containerPropertyIdentifier: GeoPoliticalEntityID
+    name: GeoPoliticalEntityID
+  GeoTypeID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: GeoContexts
+      type: container
+    containerPropertyIdentifier: GeoTypeID
+    name: GeoTypeID
+  PlayID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: GeoContexts
+      type: container
+    containerPropertyIdentifier: PlayID
+    name: PlayID
+  ProspectID:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: GeoContexts
+      type: container
+    containerPropertyIdentifier: ProspectID
+    name: ProspectID

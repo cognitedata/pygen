@@ -1,0 +1,31 @@
+space: IntegrationTestsImmutable
+externalId: Features
+name: Features
+version: df91e0a3bad68c
+properties:
+  bbox:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Features
+      type: container
+    containerPropertyIdentifier: bbox
+    name: bbox
+  geometry:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Features
+      type: container
+    containerPropertyIdentifier: geometry
+    name: geometry
+    source:
+      space: IntegrationTestsImmutable
+      externalId: Geometry
+      version: fc702ec6877c79
+      type: view
+  type:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Features
+      type: container
+    containerPropertyIdentifier: type
+    name: type

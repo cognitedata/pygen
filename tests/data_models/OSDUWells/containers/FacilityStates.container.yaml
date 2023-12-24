@@ -1,0 +1,37 @@
+space: IntegrationTestsImmutable
+externalId: FacilityStates
+name: FacilityStates
+usedFor: node
+properties:
+  EffectiveDateTime:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: EffectiveDateTime
+  TerminationDateTime:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: TerminationDateTime
+  FacilityStateTypeID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: FacilityStateTypeID
+  Remark:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: Remark

@@ -1,0 +1,53 @@
+space: market
+externalId: PygenProcess
+name: PygenProcess
+implements:
+- space: market
+  externalId: Process
+  version: b3e0207c0bb510
+  type: view
+version: 477b68a858c7a8
+properties:
+  bid:
+    container:
+      space: market
+      externalId: Process
+      type: container
+    containerPropertyIdentifier: bid
+    name: bid
+    source:
+      space: market
+      externalId: Bid
+      version: 1ad3f030a8399f
+      type: view
+  dateTransformations:
+    container:
+      space: market
+      externalId: PygenProcess
+      type: container
+    containerPropertyIdentifier: dateTransformations
+    name: dateTransformations
+    source:
+      space: market
+      externalId: DateTransformationPair
+      version: 310f933a9aca9b
+      type: view
+  name:
+    container:
+      space: market
+      externalId: Process
+      type: container
+    containerPropertyIdentifier: name
+    name: name
+  transformation:
+    container:
+      space: market
+      externalId: PygenProcess
+      type: container
+    containerPropertyIdentifier: transformation
+    name: transformation
+    source:
+      space: market
+      externalId: ValueTransformation
+      version: 946587c592b44c
+      type: view

@@ -1,0 +1,57 @@
+space: market
+externalId: CogBid
+name: CogBid
+implements:
+- space: market
+  externalId: Bid
+  version: 1add47c48cf88b
+  type: view
+version: 3c04fa081c45d5
+properties:
+  date:
+    container:
+      space: market
+      externalId: Bid
+      type: container
+    containerPropertyIdentifier: date
+    name: date
+  market:
+    container:
+      space: market
+      externalId: Bid
+      type: container
+    containerPropertyIdentifier: market
+    name: market
+    source:
+      space: market
+      externalId: Market
+      version: a5067899750188
+      type: view
+  name:
+    container:
+      space: market
+      externalId: Bid
+      type: container
+    containerPropertyIdentifier: name
+    name: name
+  price:
+    container:
+      space: market
+      externalId: CogBid
+      type: container
+    containerPropertyIdentifier: price
+    name: price
+  priceArea:
+    container:
+      space: market
+      externalId: CogBid
+      type: container
+    containerPropertyIdentifier: priceArea
+    name: priceArea
+  quantity:
+    container:
+      space: market
+      externalId: CogBid
+      type: container
+    containerPropertyIdentifier: quantity
+    name: quantity

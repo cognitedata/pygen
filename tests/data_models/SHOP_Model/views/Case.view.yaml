@@ -1,0 +1,80 @@
+space: IntegrationTestsImmutable
+externalId: Case
+name: Case
+version: 366b75cc4e699f
+properties:
+  arguments:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Case
+      type: container
+    containerPropertyIdentifier: arguments
+    name: arguments
+  bid:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Case
+      type: container
+    containerPropertyIdentifier: bid
+    name: bid
+  bid_history:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Case
+      type: container
+    containerPropertyIdentifier: bid_history
+    name: bid_history
+  commands:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Case
+      type: container
+    containerPropertyIdentifier: commands
+    name: commands
+    source:
+      space: IntegrationTestsImmutable
+      externalId: Command_Config
+      version: 4727b5ad34b608
+      type: view
+  cut_files:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Case
+      type: container
+    containerPropertyIdentifier: cut_files
+    name: cut_files
+  end_time:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Case
+      type: container
+    containerPropertyIdentifier: end_time
+    name: end_time
+  name:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Case
+      type: container
+    containerPropertyIdentifier: name
+    name: name
+  runStatus:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Case
+      type: container
+    containerPropertyIdentifier: runStatus
+    name: runStatus
+  scenario:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Case
+      type: container
+    containerPropertyIdentifier: scenario
+    name: scenario
+  start_time:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Case
+      type: container
+    containerPropertyIdentifier: start_time
+    name: start_time

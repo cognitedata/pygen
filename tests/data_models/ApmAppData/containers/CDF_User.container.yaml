@@ -1,0 +1,26 @@
+space: IntegrationTestsImmutable
+externalId: CDF_User
+usedFor: node
+properties:
+  email:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    description: Email of user
+  preferences:
+    type:
+      type: direct
+    nullable: true
+    autoIncrement: false
+    description: Holds user preferences across and within applications
+  name:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    description: Name of user

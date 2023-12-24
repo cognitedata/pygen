@@ -1,0 +1,100 @@
+space: IntegrationTestsImmutable
+externalId: VerticalMeasurement
+name: VerticalMeasurement
+usedFor: node
+properties:
+  EffectiveDateTime:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: EffectiveDateTime
+  VerticalMeasurement:
+    type:
+      list: false
+      type: float64
+    nullable: true
+    autoIncrement: false
+    name: VerticalMeasurement
+  TerminationDateTime:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: TerminationDateTime
+  VerticalMeasurementTypeID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: VerticalMeasurementTypeID
+  VerticalMeasurementPathID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: VerticalMeasurementPathID
+  VerticalMeasurementSourceID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: VerticalMeasurementSourceID
+  WellboreTVDTrajectoryID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: WellboreTVDTrajectoryID
+  VerticalMeasurementUnitOfMeasureID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: VerticalMeasurementUnitOfMeasureID
+  VerticalCRSID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: VerticalCRSID
+  VerticalReferenceID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: VerticalReferenceID
+  VerticalReferenceEntityID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: VerticalReferenceEntityID
+  VerticalMeasurementDescription:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: VerticalMeasurementDescription

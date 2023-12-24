@@ -1,0 +1,45 @@
+space: IntegrationTestsImmutable
+externalId: Reviewers
+name: Reviewers
+usedFor: node
+properties:
+  RoleTypeID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: RoleTypeID
+  DataGovernanceRoleTypeID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: DataGovernanceRoleTypeID
+  WorkflowPersonaTypeID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: WorkflowPersonaTypeID
+  OrganisationID:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: OrganisationID
+  Name:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: Name
