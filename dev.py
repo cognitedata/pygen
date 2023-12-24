@@ -90,10 +90,14 @@ def deploy():
         for container in new_containers:
             typer.echo(f"Created container {container.external_id} in space {container.space}")
         views = example_sdk.load_views(data_model_id)
+        # Delete previous views
+        client.data_modeling.views.delete(views.as_ids())
         new_views = client.data_modeling.views.apply(views)
         for view in new_views:
             typer.echo(f"Created view {view.external_id} in space {view.space}")
         data_model = example_sdk.load_write_model(data_model_id)
+
+        client.data_modeling.data_models.delete(data_model_id)
         new_model = client.data_modeling.data_models.apply(data_model)
         typer.echo(f"Created data model {new_model.external_id} in space {new_model.space}")
 

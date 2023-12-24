@@ -34,7 +34,7 @@ properties:
     source:
       space: power-models
       externalId: Rotor
-      version: 65b5e396df9b84
+      version: 1
       type: view
   nacelle:
     container:
@@ -46,7 +46,7 @@ properties:
     source:
       space: power-models
       externalId: Nacelle
-      version: 75fc353d3d8a9b
+      version: 1
       type: view
   blades:
     type:
