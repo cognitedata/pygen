@@ -5,6 +5,75 @@ name: EquipmentUnit
 version: '2'
 views:
 - space: IntegrationTestsImmutable
+  externalId: EquipmentModule
+  name: EquipmentModule
+  version: b1cd4bf14a7a33
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    description:
+      container:
+        space: IntegrationTestsImmutable
+        externalId: EquipmentModule
+      containerPropertyIdentifier: description
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: description
+      description: null
+    name:
+      container:
+        space: IntegrationTestsImmutable
+        externalId: EquipmentModule
+      containerPropertyIdentifier: name
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: name
+      description: null
+    sensor_value:
+      container:
+        space: IntegrationTestsImmutable
+        externalId: EquipmentModule
+      containerPropertyIdentifier: sensor_value
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: sensor_value
+      description: null
+    type:
+      container:
+        space: IntegrationTestsImmutable
+        externalId: EquipmentModule
+      containerPropertyIdentifier: type
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: type
+      description: null
+  lastUpdatedTime: 1703424931271
+  createdTime: 1703424931271
+- space: IntegrationTestsImmutable
   externalId: StartEndTime
   name: StartEndTime
   version: d416e0ed98186b
@@ -12,20 +81,6 @@ views:
   usedFor: edge
   isGlobal: false
   properties:
-    start_time:
-      container:
-        space: IntegrationTestsImmutable
-        externalId: StartEndTime
-      containerPropertyIdentifier: start_time
-      type:
-        list: false
-        type: timestamp
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: start_time
-      description: null
     end_time:
       container:
         space: IntegrationTestsImmutable
@@ -40,8 +95,22 @@ views:
       defaultValue: null
       name: end_time
       description: null
-  lastUpdatedTime: 1699895900210
-  createdTime: 1699895900210
+    start_time:
+      container:
+        space: IntegrationTestsImmutable
+        externalId: StartEndTime
+      containerPropertyIdentifier: start_time
+      type:
+        list: false
+        type: timestamp
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: start_time
+      description: null
+  lastUpdatedTime: 1703424931271
+  createdTime: 1703424931271
 - space: IntegrationTestsImmutable
   externalId: UnitProcedure
   name: UnitProcedure
@@ -116,77 +185,8 @@ views:
         type: view
       direction: outwards
       connectionType: multi_edge_connection
-  lastUpdatedTime: 1701512519646
-  createdTime: 1701512519646
-- space: IntegrationTestsImmutable
-  externalId: EquipmentModule
-  name: EquipmentModule
-  version: b1cd4bf14a7a33
-  writable: true
-  usedFor: node
-  isGlobal: false
-  properties:
-    name:
-      container:
-        space: IntegrationTestsImmutable
-        externalId: EquipmentModule
-      containerPropertyIdentifier: name
-      type:
-        list: false
-        collation: ucs_basic
-        type: text
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: name
-      description: null
-    description:
-      container:
-        space: IntegrationTestsImmutable
-        externalId: EquipmentModule
-      containerPropertyIdentifier: description
-      type:
-        list: false
-        collation: ucs_basic
-        type: text
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: description
-      description: null
-    sensor_value:
-      container:
-        space: IntegrationTestsImmutable
-        externalId: EquipmentModule
-      containerPropertyIdentifier: sensor_value
-      type:
-        list: false
-        type: timeseries
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: sensor_value
-      description: null
-    type:
-      container:
-        space: IntegrationTestsImmutable
-        externalId: EquipmentModule
-      containerPropertyIdentifier: type
-      type:
-        list: false
-        collation: ucs_basic
-        type: text
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: type
-      description: null
-  lastUpdatedTime: 1699895900210
-  createdTime: 1699895900210
+  lastUpdatedTime: 1703424931271
+  createdTime: 1703424931271
 - space: IntegrationTestsImmutable
   externalId: WorkOrder
   name: WorkOrder
@@ -195,21 +195,6 @@ views:
   usedFor: node
   isGlobal: false
   properties:
-    type:
-      container:
-        space: IntegrationTestsImmutable
-        externalId: WorkOrder
-      containerPropertyIdentifier: type
-      type:
-        list: false
-        collation: ucs_basic
-        type: text
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: type
-      description: null
     description:
       container:
         space: IntegrationTestsImmutable
@@ -240,8 +225,23 @@ views:
       defaultValue: null
       name: performedBy
       description: null
-  lastUpdatedTime: 1701512519646
-  createdTime: 1701512519646
+    type:
+      container:
+        space: IntegrationTestsImmutable
+        externalId: WorkOrder
+      containerPropertyIdentifier: type
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: type
+      description: null
+  lastUpdatedTime: 1703424931271
+  createdTime: 1703424931271
 isGlobal: false
-lastUpdatedTime: 1703420196989
-createdTime: 1701512520803
+lastUpdatedTime: 1703424932659
+createdTime: 1703424932659
