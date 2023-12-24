@@ -136,7 +136,8 @@ EQUIPMENT_UNIT_SDK = ExampleSDK(
 )
 
 
-# The following files are manually controlled and should not be overwritten by the generator by default.
+# The following files are manually maintained (they are used to implement new functionality,
+# and are thus nod overwritten by the `python dev.py generate` command)
 
 
 class MarketSDKFiles:
@@ -215,16 +216,6 @@ class ScenarioInstanceFiles:
 
     api = client_dir / "_api"
     scenario_instance_api = api / "scenario_instance.py"
-
-
-class OSDUWellsFiles:
-    client_dir = OSDU_SDK.client_dir
-
-    class Data:
-        data_dir = OSDU_SDK.data_dir
-        well = data_dir / "osdu-master-well_1.3.0.patched.json"
-        wellbore = data_dir / "osdu-master-wellbore_1.5.0.patched.json"
-        wellbore_trajectory = data_dir / "osdu-work-product-component-wellboretrajectory_1.3.0.patched.json"
 
 
 EXAMPLE_SDKS = [var for var in locals().values() if isinstance(var, ExampleSDK)]

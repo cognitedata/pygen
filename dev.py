@@ -29,10 +29,12 @@ def generate_sdks(
     overwrite: bool = typer.Option(
         False, help="Whether to overwrite the files expected to be manually maintained in the examples"
     ),
-    sdk: str = typer.Option(None, help="Generate only the specified SDK"),
+    sdk_name: str = typer.Option(None, "--sdk", help="Generate only the specified SDK"),
 ):
     for example_sdk in EXAMPLE_SDKS:
         if not example_sdk.generate_sdk:
+            continue
+        if sdk_name is not None and not example_sdk.client_name.casefold().startswith(sdk_name.casefold()):
             continue
         typer.echo(f"Generating {example_sdk.client_name} SDK...")
         data_models = [DataModel.load(safe_load(dms_file.read_text())[0]) for dms_file in example_sdk.dms_files]
