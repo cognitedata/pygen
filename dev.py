@@ -73,7 +73,7 @@ def download():
             if not data_model:
                 raise ValueError(f"Failed to retrieve {data_model_id}")
             file_path = example_sdk.read_model_path(data_model_id)
-            file_path.write_text(data_model.dump_yaml())
+            file_path.write_text(data_model.latest_version().dump_yaml())
             typer.echo(f"Downloaded {file_path.relative_to(REPO_ROOT)}")
 
 
