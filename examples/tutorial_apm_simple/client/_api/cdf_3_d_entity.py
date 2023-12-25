@@ -10,13 +10,13 @@ from tutorial_apm_simple.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from tutorial_apm_simple.client.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
-    CdfEntity,
-    CdfEntityApply,
-    CdfEntityList,
-    CdfEntityApplyList,
-    CdfConnectionProperties,
-    CdfConnectionPropertiesApply,
-    CdfConnectionPropertiesList,
+    Cdf3dEntity,
+    Cdf3dEntityApply,
+    Cdf3dEntityList,
+    Cdf3dEntityApplyList,
+    Cdf3dConnectionProperties,
+    Cdf3dConnectionPropertiesApply,
+    Cdf3dConnectionPropertiesList,
 )
 from tutorial_apm_simple.client.data_classes._cdf_3_d_entity import (
     _create_cdf_3_d_entity_filter,
@@ -30,29 +30,29 @@ from ._core import (
     QueryStep,
     QueryBuilder,
 )
-from .cdf_3_d_entity_in_model_3_d import CdfEntityInModelDAPI
-from .cdf_3_d_entity_query import CdfEntityQueryAPI
+from .cdf_3_d_entity_in_model_3_d import Cdf3dEntityInModelDAPI
+from .cdf_3_d_entity_query import Cdf3dEntityQueryAPI
 
 
-class CdfEntityAPI(NodeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
+class Cdf3dEntityAPI(NodeAPI[Cdf3dEntity, Cdf3dEntityApply, Cdf3dEntityList]):
     def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
-        view_id = view_by_write_class[CdfEntityApply]
+        view_id = view_by_write_class[Cdf3dEntityApply]
         super().__init__(
             client=client,
             sources=view_id,
-            class_type=CdfEntity,
-            class_apply_type=CdfEntityApply,
-            class_list=CdfEntityList,
-            class_apply_list=CdfEntityApplyList,
+            class_type=Cdf3dEntity,
+            class_apply_type=Cdf3dEntityApply,
+            class_list=Cdf3dEntityList,
+            class_apply_list=Cdf3dEntityApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self.in_model_3_d_edge = CdfEntityInModelDAPI(
+        self.in_model_3_d_edge = Cdf3dEntityInModelDAPI(
             client,
             view_by_write_class,
-            CdfConnectionProperties,
-            CdfConnectionPropertiesApply,
-            CdfConnectionPropertiesList,
+            Cdf3dConnectionProperties,
+            Cdf3dConnectionPropertiesApply,
+            Cdf3dConnectionPropertiesList,
         )
 
     def __call__(
@@ -61,7 +61,7 @@ class CdfEntityAPI(NodeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
-    ) -> CdfEntityQueryAPI[CdfEntityList]:
+    ) -> Cdf3dEntityQueryAPI[Cdf3dEntityList]:
         """Query starting at cdf 3 d entities.
 
         Args:
@@ -81,11 +81,11 @@ class CdfEntityAPI(NodeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(CdfEntityList)
-        return CdfEntityQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
+        builder = QueryBuilder(Cdf3dEntityList)
+        return Cdf3dEntityQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(
-        self, cdf_3_d_entity: CdfEntityApply | Sequence[CdfEntityApply], replace: bool = False
+        self, cdf_3_d_entity: Cdf3dEntityApply | Sequence[Cdf3dEntityApply], replace: bool = False
     ) -> ResourcesApplyResult:
         """Add or update (upsert) cdf 3 d entities.
 
@@ -105,9 +105,9 @@ class CdfEntityAPI(NodeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
             Create a new cdf_3_d_entity:
 
                 >>> from tutorial_apm_simple.client import ApmSimpleClient
-                >>> from tutorial_apm_simple.client.data_classes import CdfEntityApply
+                >>> from tutorial_apm_simple.client.data_classes import Cdf3dEntityApply
                 >>> client = ApmSimpleClient()
-                >>> cdf_3_d_entity = CdfEntityApply(external_id="my_cdf_3_d_entity", ...)
+                >>> cdf_3_d_entity = Cdf3dEntityApply(external_id="my_cdf_3_d_entity", ...)
                 >>> result = client.cdf_3_d_entity.apply(cdf_3_d_entity)
 
         """
@@ -136,16 +136,16 @@ class CdfEntityAPI(NodeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> CdfEntity | None:
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> Cdf3dEntity | None:
         ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> CdfEntityList:
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> Cdf3dEntityList:
         ...
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> CdfEntity | CdfEntityList | None:
+    ) -> Cdf3dEntity | Cdf3dEntityList | None:
         """Retrieve one or more cdf 3 d entities by id(s).
 
         Args:
@@ -185,7 +185,7 @@ class CdfEntityAPI(NodeAPI[CdfEntity, CdfEntityApply, CdfEntityList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
-    ) -> CdfEntityList:
+    ) -> Cdf3dEntityList:
         """List/filter cdf 3 d entities
 
         Args:

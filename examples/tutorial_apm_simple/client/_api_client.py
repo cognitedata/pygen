@@ -6,8 +6,8 @@ from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
 from cognite.client.credentials import OAuthClientCredentials
 
 from ._api.asset import AssetAPI
-from ._api.cdf_3_d_entity import CdfEntityAPI
-from ._api.cdf_3_d_model import CdfModelAPI
+from ._api.cdf_3_d_entity import Cdf3dEntityAPI
+from ._api.cdf_3_d_model import Cdf3dModelAPI
 from ._api.work_item import WorkItemAPI
 from ._api.work_order import WorkOrderAPI
 from . import data_classes
@@ -40,16 +40,16 @@ class ApmSimpleClient:
 
         view_by_write_class = {
             data_classes.AssetApply: dm.ViewId("tutorial_apm_simple", "Asset", "beb2bebdcbb4ad"),
-            data_classes.CdfConnectionPropertiesApply: dm.ViewId("cdf_3d_schema", "Cdf3dConnectionProperties", "1"),
-            data_classes.CdfEntityApply: dm.ViewId("cdf_3d_schema", "Cdf3dEntity", "1"),
-            data_classes.CdfModelApply: dm.ViewId("cdf_3d_schema", "Cdf3dModel", "1"),
+            data_classes.Cdf3dConnectionPropertiesApply: dm.ViewId("cdf_3d_schema", "Cdf3dConnectionProperties", "1"),
+            data_classes.Cdf3dEntityApply: dm.ViewId("cdf_3d_schema", "Cdf3dEntity", "1"),
+            data_classes.Cdf3dModelApply: dm.ViewId("cdf_3d_schema", "Cdf3dModel", "1"),
             data_classes.WorkItemApply: dm.ViewId("tutorial_apm_simple", "WorkItem", "18ac48abbe96aa"),
             data_classes.WorkOrderApply: dm.ViewId("tutorial_apm_simple", "WorkOrder", "6f36e59c3c4896"),
         }
 
         self.asset = AssetAPI(client, view_by_write_class)
-        self.cdf_3_d_entity = CdfEntityAPI(client, view_by_write_class)
-        self.cdf_3_d_model = CdfModelAPI(client, view_by_write_class)
+        self.cdf_3_d_entity = Cdf3dEntityAPI(client, view_by_write_class)
+        self.cdf_3_d_model = Cdf3dModelAPI(client, view_by_write_class)
         self.work_item = WorkItemAPI(client, view_by_write_class)
         self.work_order = WorkOrderAPI(client, view_by_write_class)
 

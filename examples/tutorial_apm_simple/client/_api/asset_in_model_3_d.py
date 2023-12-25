@@ -4,7 +4,7 @@ from __future__ import annotations
 from cognite.client import data_modeling as dm
 
 from tutorial_apm_simple.client.data_classes import (
-    CdfConnectionPropertiesList,
+    Cdf3dConnectionPropertiesList,
 )
 from tutorial_apm_simple.client.data_classes._cdf_3_d_connection_properties import (
     _create_cdf_3_d_connection_property_filter,
@@ -28,7 +28,7 @@ class AssetInModelDAPI(EdgePropertyAPI):
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit=DEFAULT_LIMIT_READ,
-    ) -> CdfConnectionPropertiesList:
+    ) -> Cdf3dConnectionPropertiesList:
         """List in model 3 d edges of a asset.
 
         Args:

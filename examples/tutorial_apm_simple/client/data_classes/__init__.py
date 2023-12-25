@@ -8,14 +8,21 @@ from ._core import (
 )
 from ._asset import Asset, AssetApply, AssetApplyList, AssetFields, AssetList, AssetTextFields
 from ._cdf_3_d_connection_properties import (
-    CdfConnectionProperties,
-    CdfConnectionPropertiesApply,
-    CdfConnectionPropertiesApplyList,
-    CdfConnectionPropertiesFields,
-    CdfConnectionPropertiesList,
+    Cdf3dConnectionProperties,
+    Cdf3dConnectionPropertiesApply,
+    Cdf3dConnectionPropertiesApplyList,
+    Cdf3dConnectionPropertiesFields,
+    Cdf3dConnectionPropertiesList,
 )
-from ._cdf_3_d_entity import CdfEntity, CdfEntityApply, CdfEntityApplyList, CdfEntityList
-from ._cdf_3_d_model import CdfModel, CdfModelApply, CdfModelApplyList, CdfModelFields, CdfModelList, CdfModelTextFields
+from ._cdf_3_d_entity import Cdf3dEntity, Cdf3dEntityApply, Cdf3dEntityApplyList, Cdf3dEntityList
+from ._cdf_3_d_model import (
+    Cdf3dModel,
+    Cdf3dModelApply,
+    Cdf3dModelApplyList,
+    Cdf3dModelFields,
+    Cdf3dModelList,
+    Cdf3dModelTextFields,
+)
 from ._work_item import WorkItem, WorkItemApply, WorkItemApplyList, WorkItemFields, WorkItemList, WorkItemTextFields
 from ._work_order import (
     WorkOrder,
@@ -28,12 +35,12 @@ from ._work_order import (
 
 Asset.model_rebuild()
 AssetApply.model_rebuild()
-CdfConnectionProperties.model_rebuild()
-CdfConnectionPropertiesApply.model_rebuild()
-CdfEntity.model_rebuild()
-CdfEntityApply.model_rebuild()
-CdfModel.model_rebuild()
-CdfModelApply.model_rebuild()
+Cdf3dConnectionProperties.model_rebuild()
+Cdf3dConnectionPropertiesApply.model_rebuild()
+Cdf3dEntity.model_rebuild()
+Cdf3dEntityApply.model_rebuild()
+Cdf3dModel.model_rebuild()
+Cdf3dModelApply.model_rebuild()
 WorkItem.model_rebuild()
 WorkItemApply.model_rebuild()
 WorkOrder.model_rebuild()
@@ -52,21 +59,21 @@ __all__ = [
     "AssetApplyList",
     "AssetFields",
     "AssetTextFields",
-    "CdfConnectionProperties",
-    "CdfConnectionPropertiesApply",
-    "CdfConnectionPropertiesList",
-    "CdfConnectionPropertiesApplyList",
-    "CdfConnectionPropertiesFields",
-    "CdfEntity",
-    "CdfEntityApply",
-    "CdfEntityList",
-    "CdfEntityApplyList",
-    "CdfModel",
-    "CdfModelApply",
-    "CdfModelList",
-    "CdfModelApplyList",
-    "CdfModelFields",
-    "CdfModelTextFields",
+    "Cdf3dConnectionProperties",
+    "Cdf3dConnectionPropertiesApply",
+    "Cdf3dConnectionPropertiesList",
+    "Cdf3dConnectionPropertiesApplyList",
+    "Cdf3dConnectionPropertiesFields",
+    "Cdf3dEntity",
+    "Cdf3dEntityApply",
+    "Cdf3dEntityList",
+    "Cdf3dEntityApplyList",
+    "Cdf3dModel",
+    "Cdf3dModelApply",
+    "Cdf3dModelList",
+    "Cdf3dModelApplyList",
+    "Cdf3dModelFields",
+    "Cdf3dModelTextFields",
     "WorkItem",
     "WorkItemApply",
     "WorkItemList",

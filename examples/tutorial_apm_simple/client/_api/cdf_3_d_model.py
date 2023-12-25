@@ -11,18 +11,18 @@ from tutorial_apm_simple.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from tutorial_apm_simple.client.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
-    CdfModel,
-    CdfModelApply,
-    CdfModelFields,
-    CdfModelList,
-    CdfModelApplyList,
-    CdfModelTextFields,
-    CdfConnectionProperties,
-    CdfConnectionPropertiesApply,
-    CdfConnectionPropertiesList,
+    Cdf3dModel,
+    Cdf3dModelApply,
+    Cdf3dModelFields,
+    Cdf3dModelList,
+    Cdf3dModelApplyList,
+    Cdf3dModelTextFields,
+    Cdf3dConnectionProperties,
+    Cdf3dConnectionPropertiesApply,
+    Cdf3dConnectionPropertiesList,
 )
 from tutorial_apm_simple.client.data_classes._cdf_3_d_model import (
-    _CDFMODEL_PROPERTIES_BY_FIELD,
+    _CDF3DMODEL_PROPERTIES_BY_FIELD,
     _create_cdf_3_d_model_filter,
 )
 from ._core import (
@@ -34,29 +34,29 @@ from ._core import (
     QueryStep,
     QueryBuilder,
 )
-from .cdf_3_d_model_entities import CdfModelEntitiesAPI
-from .cdf_3_d_model_query import CdfModelQueryAPI
+from .cdf_3_d_model_entities import Cdf3dModelEntitiesAPI
+from .cdf_3_d_model_query import Cdf3dModelQueryAPI
 
 
-class CdfModelAPI(NodeAPI[CdfModel, CdfModelApply, CdfModelList]):
+class Cdf3dModelAPI(NodeAPI[Cdf3dModel, Cdf3dModelApply, Cdf3dModelList]):
     def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
-        view_id = view_by_write_class[CdfModelApply]
+        view_id = view_by_write_class[Cdf3dModelApply]
         super().__init__(
             client=client,
             sources=view_id,
-            class_type=CdfModel,
-            class_apply_type=CdfModelApply,
-            class_list=CdfModelList,
-            class_apply_list=CdfModelApplyList,
+            class_type=Cdf3dModel,
+            class_apply_type=Cdf3dModelApply,
+            class_list=Cdf3dModelList,
+            class_apply_list=Cdf3dModelApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self.entities_edge = CdfModelEntitiesAPI(
+        self.entities_edge = Cdf3dModelEntitiesAPI(
             client,
             view_by_write_class,
-            CdfConnectionProperties,
-            CdfConnectionPropertiesApply,
-            CdfConnectionPropertiesList,
+            Cdf3dConnectionProperties,
+            Cdf3dConnectionPropertiesApply,
+            Cdf3dConnectionPropertiesList,
         )
 
     def __call__(
@@ -67,7 +67,7 @@ class CdfModelAPI(NodeAPI[CdfModel, CdfModelApply, CdfModelList]):
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
-    ) -> CdfModelQueryAPI[CdfModelList]:
+    ) -> Cdf3dModelQueryAPI[Cdf3dModelList]:
         """Query starting at cdf 3 d models.
 
         Args:
@@ -91,11 +91,11 @@ class CdfModelAPI(NodeAPI[CdfModel, CdfModelApply, CdfModelList]):
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(CdfModelList)
-        return CdfModelQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
+        builder = QueryBuilder(Cdf3dModelList)
+        return Cdf3dModelQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(
-        self, cdf_3_d_model: CdfModelApply | Sequence[CdfModelApply], replace: bool = False
+        self, cdf_3_d_model: Cdf3dModelApply | Sequence[Cdf3dModelApply], replace: bool = False
     ) -> ResourcesApplyResult:
         """Add or update (upsert) cdf 3 d models.
 
@@ -115,9 +115,9 @@ class CdfModelAPI(NodeAPI[CdfModel, CdfModelApply, CdfModelList]):
             Create a new cdf_3_d_model:
 
                 >>> from tutorial_apm_simple.client import ApmSimpleClient
-                >>> from tutorial_apm_simple.client.data_classes import CdfModelApply
+                >>> from tutorial_apm_simple.client.data_classes import Cdf3dModelApply
                 >>> client = ApmSimpleClient()
-                >>> cdf_3_d_model = CdfModelApply(external_id="my_cdf_3_d_model", ...)
+                >>> cdf_3_d_model = Cdf3dModelApply(external_id="my_cdf_3_d_model", ...)
                 >>> result = client.cdf_3_d_model.apply(cdf_3_d_model)
 
         """
@@ -146,16 +146,16 @@ class CdfModelAPI(NodeAPI[CdfModel, CdfModelApply, CdfModelList]):
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> CdfModel | None:
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> Cdf3dModel | None:
         ...
 
     @overload
-    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> CdfModelList:
+    def retrieve(self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> Cdf3dModelList:
         ...
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> CdfModel | CdfModelList | None:
+    ) -> Cdf3dModel | Cdf3dModelList | None:
         """Retrieve one or more cdf 3 d models by id(s).
 
         Args:
@@ -191,14 +191,14 @@ class CdfModelAPI(NodeAPI[CdfModel, CdfModelApply, CdfModelList]):
     def search(
         self,
         query: str,
-        properties: CdfModelTextFields | Sequence[CdfModelTextFields] | None = None,
+        properties: Cdf3dModelTextFields | Sequence[Cdf3dModelTextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> CdfModelList:
+    ) -> Cdf3dModelList:
         """Search cdf 3 d models
 
         Args:
@@ -231,7 +231,7 @@ class CdfModelAPI(NodeAPI[CdfModel, CdfModelApply, CdfModelList]):
             space,
             filter,
         )
-        return self._search(self._view_id, query, _CDFMODEL_PROPERTIES_BY_FIELD, properties, filter_, limit)
+        return self._search(self._view_id, query, _CDF3DMODEL_PROPERTIES_BY_FIELD, properties, filter_, limit)
 
     @overload
     def aggregate(
@@ -240,10 +240,10 @@ class CdfModelAPI(NodeAPI[CdfModel, CdfModelApply, CdfModelList]):
         | dm.aggregations.MetricAggregation
         | Sequence[Aggregations]
         | Sequence[dm.aggregations.MetricAggregation],
-        property: CdfModelFields | Sequence[CdfModelFields] | None = None,
+        property: Cdf3dModelFields | Sequence[Cdf3dModelFields] | None = None,
         group_by: None = None,
         query: str | None = None,
-        search_properties: CdfModelTextFields | Sequence[CdfModelTextFields] | None = None,
+        search_properties: Cdf3dModelTextFields | Sequence[Cdf3dModelTextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -260,10 +260,10 @@ class CdfModelAPI(NodeAPI[CdfModel, CdfModelApply, CdfModelList]):
         | dm.aggregations.MetricAggregation
         | Sequence[Aggregations]
         | Sequence[dm.aggregations.MetricAggregation],
-        property: CdfModelFields | Sequence[CdfModelFields] | None = None,
-        group_by: CdfModelFields | Sequence[CdfModelFields] = None,
+        property: Cdf3dModelFields | Sequence[Cdf3dModelFields] | None = None,
+        group_by: Cdf3dModelFields | Sequence[Cdf3dModelFields] = None,
         query: str | None = None,
-        search_properties: CdfModelTextFields | Sequence[CdfModelTextFields] | None = None,
+        search_properties: Cdf3dModelTextFields | Sequence[Cdf3dModelTextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -279,10 +279,10 @@ class CdfModelAPI(NodeAPI[CdfModel, CdfModelApply, CdfModelList]):
         | dm.aggregations.MetricAggregation
         | Sequence[Aggregations]
         | Sequence[dm.aggregations.MetricAggregation],
-        property: CdfModelFields | Sequence[CdfModelFields] | None = None,
-        group_by: CdfModelFields | Sequence[CdfModelFields] | None = None,
+        property: Cdf3dModelFields | Sequence[Cdf3dModelFields] | None = None,
+        group_by: Cdf3dModelFields | Sequence[Cdf3dModelFields] | None = None,
         query: str | None = None,
-        search_property: CdfModelTextFields | Sequence[CdfModelTextFields] | None = None,
+        search_property: Cdf3dModelTextFields | Sequence[Cdf3dModelTextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -329,7 +329,7 @@ class CdfModelAPI(NodeAPI[CdfModel, CdfModelApply, CdfModelList]):
         return self._aggregate(
             self._view_id,
             aggregate,
-            _CDFMODEL_PROPERTIES_BY_FIELD,
+            _CDF3DMODEL_PROPERTIES_BY_FIELD,
             property,
             group_by,
             query,
@@ -340,10 +340,10 @@ class CdfModelAPI(NodeAPI[CdfModel, CdfModelApply, CdfModelList]):
 
     def histogram(
         self,
-        property: CdfModelFields,
+        property: Cdf3dModelFields,
         interval: float,
         query: str | None = None,
-        search_property: CdfModelTextFields | Sequence[CdfModelTextFields] | None = None,
+        search_property: Cdf3dModelTextFields | Sequence[Cdf3dModelTextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -381,7 +381,7 @@ class CdfModelAPI(NodeAPI[CdfModel, CdfModelApply, CdfModelList]):
             self._view_id,
             property,
             interval,
-            _CDFMODEL_PROPERTIES_BY_FIELD,
+            _CDF3DMODEL_PROPERTIES_BY_FIELD,
             query,
             search_property,
             limit,
@@ -397,7 +397,7 @@ class CdfModelAPI(NodeAPI[CdfModel, CdfModelApply, CdfModelList]):
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
         retrieve_edges: bool = True,
-    ) -> CdfModelList:
+    ) -> Cdf3dModelList:
         """List/filter cdf 3 d models
 
         Args:

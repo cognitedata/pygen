@@ -7,10 +7,10 @@ from cognite.client import data_modeling as dm, CogniteClient
 
 from tutorial_apm_simple.client.data_classes import (
     DomainModelApply,
-    CdfEntity,
-    CdfEntityApply,
-    CdfConnectionProperties,
-    CdfConnectionPropertiesApply,
+    Cdf3dEntity,
+    Cdf3dEntityApply,
+    Cdf3dConnectionProperties,
+    Cdf3dConnectionPropertiesApply,
 )
 from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
 
@@ -19,10 +19,10 @@ from tutorial_apm_simple.client.data_classes._cdf_3_d_connection_properties impo
 )
 
 if TYPE_CHECKING:
-    from .cdf_3_d_model_query import CdfModelQueryAPI
+    from .cdf_3_d_model_query import Cdf3dModelQueryAPI
 
 
-class CdfEntityQueryAPI(QueryAPI[T_DomainModelList]):
+class Cdf3dEntityQueryAPI(QueryAPI[T_DomainModelList]):
     def __init__(
         self,
         client: CogniteClient,
@@ -40,8 +40,8 @@ class CdfEntityQueryAPI(QueryAPI[T_DomainModelList]):
                     from_=self._builder[-1].name if self._builder else None,
                     filter=filter_,
                 ),
-                select=dm.query.Select([dm.query.SourceSelector(self._view_by_write_class[CdfEntityApply], ["*"])]),
-                result_cls=CdfEntity,
+                select=dm.query.Select([dm.query.SourceSelector(self._view_by_write_class[Cdf3dEntityApply], ["*"])]),
+                result_cls=Cdf3dEntity,
                 max_retrieve_limit=limit,
             )
         )
@@ -55,7 +55,7 @@ class CdfEntityQueryAPI(QueryAPI[T_DomainModelList]):
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_QUERY_LIMIT,
-    ) -> CdfModelQueryAPI[T_DomainModelList]:
+    ) -> Cdf3dModelQueryAPI[T_DomainModelList]:
         """Query along the in model 3 d edges of the cdf 3 d entity.
 
         Args:
@@ -69,13 +69,13 @@ class CdfEntityQueryAPI(QueryAPI[T_DomainModelList]):
                 to return all items.
 
         Returns:
-            CdfModelQueryAPI: The query API for the cdf 3 d model.
+            Cdf3dModelQueryAPI: The query API for the cdf 3 d model.
         """
-        from .cdf_3_d_model_query import CdfModelQueryAPI
+        from .cdf_3_d_model_query import Cdf3dModelQueryAPI
 
         from_ = self._builder[-1].name
 
-        edge_view = self._view_by_write_class[CdfConnectionPropertiesApply]
+        edge_view = self._view_by_write_class[Cdf3dConnectionPropertiesApply]
         edge_filter = _create_cdf_3_d_connection_property_filter(
             dm.DirectRelationReference("cdf_3d_schema", "cdf3dEntityConnection"),
             edge_view,
@@ -97,11 +97,11 @@ class CdfEntityQueryAPI(QueryAPI[T_DomainModelList]):
                 select=dm.query.Select(
                     [dm.query.SourceSelector(edge_view, ["*"])],
                 ),
-                result_cls=CdfConnectionProperties,
+                result_cls=Cdf3dConnectionProperties,
                 max_retrieve_limit=limit,
             )
         )
-        return CdfModelQueryAPI(self._client, self._builder, self._view_by_write_class, None, limit)
+        return Cdf3dModelQueryAPI(self._client, self._builder, self._view_by_write_class, None, limit)
 
     def query(
         self,

@@ -18,9 +18,9 @@ from tutorial_apm_simple.client.data_classes import (
     AssetList,
     AssetApplyList,
     AssetTextFields,
-    CdfConnectionProperties,
-    CdfConnectionPropertiesApply,
-    CdfConnectionPropertiesList,
+    Cdf3dConnectionProperties,
+    Cdf3dConnectionPropertiesApply,
+    Cdf3dConnectionPropertiesList,
 )
 from tutorial_apm_simple.client.data_classes._asset import (
     _ASSET_PROPERTIES_BY_FIELD,
@@ -59,9 +59,9 @@ class AssetAPI(NodeAPI[Asset, AssetApply, AssetList]):
         self.in_model_3_d_edge = AssetInModelDAPI(
             client,
             view_by_write_class,
-            CdfConnectionProperties,
-            CdfConnectionPropertiesApply,
-            CdfConnectionPropertiesList,
+            Cdf3dConnectionProperties,
+            Cdf3dConnectionPropertiesApply,
+            Cdf3dConnectionPropertiesList,
         )
         self.metrics = AssetMetricsAPI(client, view_id)
         self.pressure = AssetPressureAPI(client, view_id)
