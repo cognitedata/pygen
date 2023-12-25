@@ -15,7 +15,7 @@ properties:
     containerPropertyIdentifier: subValue
     name: SubValue
 filter:
-  In:
+  in:
     property:
       - node
       - type
