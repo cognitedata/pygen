@@ -13,6 +13,7 @@ from cognite.client.data_classes.data_modeling.data_types import ListablePropert
 
 NOT_SUPPORTED = {
     # Todo Add Omnium Connection to have support for direct nullable type.
+    # type, listable, nullable
     ("direct", False, True),
     ("direct", True, True),
     ("direct", True, False),
