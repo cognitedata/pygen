@@ -37,7 +37,7 @@ TimeSeries = Annotated[
 ]
 
 
-DEFAULT_INSTANCE_SPACE = "power-models"
+DEFAULT_INSTANCE_SPACE = "windmill-instances"
 
 
 @dataclass
