@@ -249,7 +249,7 @@ def as_plural(noun: str) -> str:
         ...
     elif noun.lower() in _PLURAL_BY_SINGULAR:
         noun = _PLURAL_BY_SINGULAR[noun.lower()]
-    elif _Inflect.engine().singular_noun(noun) is False:
+    elif noun and _Inflect.engine().singular_noun(noun) is False:
         noun = _Inflect.engine().plural_noun(noun)
 
     if numbers:
@@ -276,14 +276,13 @@ def as_singular(noun: str) -> str:
     """
     numbers = re.findall(r"\d+$", noun)
     noun = noun[: -len(numbers[0])] if numbers else noun
-
     if noun.lower() in _S_EXCEPTIONS:
         noun = noun[:-1] if noun[-1] == "s" else noun
     elif noun.lower() in _PLURAL_BY_SINGULAR:
         ...
     elif noun.lower() in _SINGULAR_BY_PLURAL:
         noun = _SINGULAR_BY_PLURAL[noun.lower()]
-    elif isinstance(singular := _Inflect.engine().singular_noun(noun), str):
+    elif noun and isinstance(singular := _Inflect.engine().singular_noun(noun), str):
         noun = singular
 
     if numbers:

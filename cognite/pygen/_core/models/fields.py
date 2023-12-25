@@ -287,22 +287,36 @@ class PrimitiveField(PrimitiveFieldCore):
 
     default: str | int | dict | None = None
 
+    @property
+    def default_code(self) -> str:
+        if self.default is None:
+            return "None"
+        elif isinstance(self.default, str):
+            return f'"{self.default}"'
+        elif isinstance(self.default, dict):
+            return f"{self.default}"
+        else:
+            return f"{self.default}"
+
     def as_read_type_hint(self) -> str:
         if self.need_alias:
-            return f'Optional[{self.type_as_string}] = {self.pydantic_field}({self.default}, alias="{self.prop_name}")'
+            return (
+                f"Optional[{self.type_as_string}] = {self.pydantic_field}"
+                f'({self.default_code}, alias="{self.prop_name}")'
+            )
         else:
-            return f"Optional[{self.type_as_string}] = {self.default}"
+            return f"Optional[{self.type_as_string}] = {self.default_code}"
 
     def as_write_type_hint(self) -> str:
         out_type = self.type_as_string
         if self.is_nullable and self.need_alias:
-            out_type = f'Optional[{out_type}] = {self.pydantic_field}({self.default}, alias="{self.prop_name}")'
+            out_type = f'Optional[{out_type}] = {self.pydantic_field}({self.default_code}, alias="{self.prop_name}")'
         elif self.need_alias:
             out_type = f'{out_type} = {self.pydantic_field}(alias="{self.prop_name}")'
         elif self.is_nullable:
             out_type = f"Optional[{out_type}] = None"
         elif self.default is not None or self.is_nullable:
-            out_type = f"{out_type} = {self.default}"
+            out_type = f"{out_type} = {self.default_code}"
         return out_type
 
 
