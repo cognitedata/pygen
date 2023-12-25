@@ -40,8 +40,11 @@ class ExampleSDK:
     @property
     def top_level_package(self) -> str:
         if IS_PYDANTIC_V1:
-            first, *rest = self._top_level_package.split(".")
-            return f"{first}_pydantic_v1." + ".".join(rest)
+            if "." in self._top_level_package:
+                first, *rest = self._top_level_package.split(".")
+                return f"{first}_pydantic_v1." + ".".join(rest)
+            else:
+                return f"{self._top_level_package}_pydantic_v1"
         return self._top_level_package
 
     @property

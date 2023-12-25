@@ -19,7 +19,7 @@ from ._core import (
 
 if TYPE_CHECKING:
     from ._asset import Asset, AssetApply
-    from ._cdf_3_d_connection_properties import CdfConnectionProperties, CdfConnectionPropertiesApply
+    from ._cdf_3_d_connection_properties import Cdf3dConnectionProperties, Cdf3dConnectionPropertiesApply
 
 
 __all__ = ["Asset", "AssetApply", "AssetList", "AssetApplyList", "AssetFields", "AssetTextFields"]
@@ -104,7 +104,7 @@ class Asset(DomainModel):
     created_date: Optional[datetime.datetime] = Field(None, alias="createdDate")
     description: Optional[str] = None
     documents: Optional[list[str]] = None
-    in_model_3_d: Optional[list[CdfConnectionProperties]] = Field(default=None, repr=False, alias="inModel3d")
+    in_model_3_d: Optional[list[Cdf3dConnectionProperties]] = Field(default=None, repr=False, alias="inModel3d")
     is_active: Optional[bool] = Field(None, alias="isActive")
     is_critical_line: Optional[bool] = Field(None, alias="isCriticalLine")
     measurements: Optional[list[str]] = None
@@ -182,7 +182,7 @@ class AssetApply(DomainModelApply):
     created_date: Optional[datetime.datetime] = Field(None, alias="createdDate")
     description: Optional[str] = None
     documents: Optional[list[str]] = None
-    in_model_3_d: Optional[list[CdfConnectionPropertiesApply]] = Field(default=None, repr=False, alias="inModel3d")
+    in_model_3_d: Optional[list[Cdf3dConnectionPropertiesApply]] = Field(default=None, repr=False, alias="inModel3d")
     is_active: Optional[bool] = Field(None, alias="isActive")
     is_critical_line: Optional[bool] = Field(None, alias="isCriticalLine")
     measurements: Optional[list[str]] = None

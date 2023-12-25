@@ -16,21 +16,28 @@ from ._core import (
 )
 
 if TYPE_CHECKING:
-    from ._cdf_3_d_connection_properties import CdfConnectionProperties, CdfConnectionPropertiesApply
+    from ._cdf_3_d_connection_properties import Cdf3dConnectionProperties, Cdf3dConnectionPropertiesApply
 
 
-__all__ = ["CdfModel", "CdfModelApply", "CdfModelList", "CdfModelApplyList", "CdfModelFields", "CdfModelTextFields"]
+__all__ = [
+    "Cdf3dModel",
+    "Cdf3dModelApply",
+    "Cdf3dModelList",
+    "Cdf3dModelApplyList",
+    "Cdf3dModelFields",
+    "Cdf3dModelTextFields",
+]
 
 
-CdfModelTextFields = Literal["name"]
-CdfModelFields = Literal["name"]
+Cdf3dModelTextFields = Literal["name"]
+Cdf3dModelFields = Literal["name"]
 
-_CDFMODEL_PROPERTIES_BY_FIELD = {
+_CDF3DMODEL_PROPERTIES_BY_FIELD = {
     "name": "name",
 }
 
 
-class CdfModel(DomainModel):
+class Cdf3dModel(DomainModel):
     """This represents the reading version of cdf 3 d model.
 
     It is used to when data is retrieved from CDF.
@@ -47,12 +54,12 @@ class CdfModel(DomainModel):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    entities: Optional[list[CdfConnectionProperties]] = Field(default=None, repr=False)
+    entities: Optional[list[Cdf3dConnectionProperties]] = Field(default=None, repr=False)
     name: Optional[str] = None
 
-    def as_apply(self) -> CdfModelApply:
+    def as_apply(self) -> Cdf3dModelApply:
         """Convert this read version of cdf 3 d model to the writing version."""
-        return CdfModelApply(
+        return Cdf3dModelApply(
             space=self.space,
             external_id=self.external_id,
             entities=[entity.as_apply() for entity in self.entities or []],
@@ -60,7 +67,7 @@ class CdfModel(DomainModel):
         )
 
 
-class CdfModelApply(DomainModelApply):
+class Cdf3dModelApply(DomainModelApply):
     """This represents the writing version of cdf 3 d model.
 
     It is used to when data is sent to CDF.
@@ -77,7 +84,7 @@ class CdfModelApply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    entities: Optional[list[CdfConnectionPropertiesApply]] = Field(default=None, repr=False)
+    entities: Optional[list[Cdf3dConnectionPropertiesApply]] = Field(default=None, repr=False)
     name: str
 
     def _to_instances_apply(
@@ -126,20 +133,20 @@ class CdfModelApply(DomainModelApply):
         return resources
 
 
-class CdfModelList(DomainModelList[CdfModel]):
+class Cdf3dModelList(DomainModelList[Cdf3dModel]):
     """List of cdf 3 d models in the read version."""
 
-    _INSTANCE = CdfModel
+    _INSTANCE = Cdf3dModel
 
-    def as_apply(self) -> CdfModelApplyList:
+    def as_apply(self) -> Cdf3dModelApplyList:
         """Convert these read versions of cdf 3 d model to the writing versions."""
-        return CdfModelApplyList([node.as_apply() for node in self.data])
+        return Cdf3dModelApplyList([node.as_apply() for node in self.data])
 
 
-class CdfModelApplyList(DomainModelApplyList[CdfModelApply]):
+class Cdf3dModelApplyList(DomainModelApplyList[Cdf3dModelApply]):
     """List of cdf 3 d models in the writing version."""
 
-    _INSTANCE = CdfModelApply
+    _INSTANCE = Cdf3dModelApply
 
 
 def _create_cdf_3_d_model_filter(

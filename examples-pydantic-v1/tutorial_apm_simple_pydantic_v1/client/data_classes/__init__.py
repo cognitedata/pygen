@@ -8,14 +8,21 @@ from ._core import (
 )
 from ._asset import Asset, AssetApply, AssetApplyList, AssetFields, AssetList, AssetTextFields
 from ._cdf_3_d_connection_properties import (
-    CdfConnectionProperties,
-    CdfConnectionPropertiesApply,
-    CdfConnectionPropertiesApplyList,
-    CdfConnectionPropertiesFields,
-    CdfConnectionPropertiesList,
+    Cdf3dConnectionProperties,
+    Cdf3dConnectionPropertiesApply,
+    Cdf3dConnectionPropertiesApplyList,
+    Cdf3dConnectionPropertiesFields,
+    Cdf3dConnectionPropertiesList,
 )
-from ._cdf_3_d_entity import CdfEntity, CdfEntityApply, CdfEntityApplyList, CdfEntityList
-from ._cdf_3_d_model import CdfModel, CdfModelApply, CdfModelApplyList, CdfModelFields, CdfModelList, CdfModelTextFields
+from ._cdf_3_d_entity import Cdf3dEntity, Cdf3dEntityApply, Cdf3dEntityApplyList, Cdf3dEntityList
+from ._cdf_3_d_model import (
+    Cdf3dModel,
+    Cdf3dModelApply,
+    Cdf3dModelApplyList,
+    Cdf3dModelFields,
+    Cdf3dModelList,
+    Cdf3dModelTextFields,
+)
 from ._work_item import WorkItem, WorkItemApply, WorkItemApplyList, WorkItemFields, WorkItemList, WorkItemTextFields
 from ._work_order import (
     WorkOrder,
@@ -29,34 +36,34 @@ from ._work_order import (
 
 Asset.update_forward_refs(
     Asset=Asset,
-    CdfConnectionProperties=CdfConnectionProperties,
+    Cdf3dConnectionProperties=Cdf3dConnectionProperties,
 )
 AssetApply.update_forward_refs(
     AssetApply=AssetApply,
-    CdfConnectionPropertiesApply=CdfConnectionPropertiesApply,
+    Cdf3dConnectionPropertiesApply=Cdf3dConnectionPropertiesApply,
 )
 
-CdfConnectionProperties.update_forward_refs(
-    CdfEntity=CdfEntity,
-    CdfModel=CdfModel,
+Cdf3dConnectionProperties.update_forward_refs(
+    Cdf3dEntity=Cdf3dEntity,
+    Cdf3dModel=Cdf3dModel,
 )
-CdfConnectionPropertiesApply.update_forward_refs(
-    CdfEntityApply=CdfEntityApply,
-    CdfModelApply=CdfModelApply,
-)
-
-CdfEntity.update_forward_refs(
-    CdfConnectionProperties=CdfConnectionProperties,
-)
-CdfEntityApply.update_forward_refs(
-    CdfConnectionPropertiesApply=CdfConnectionPropertiesApply,
+Cdf3dConnectionPropertiesApply.update_forward_refs(
+    Cdf3dEntityApply=Cdf3dEntityApply,
+    Cdf3dModelApply=Cdf3dModelApply,
 )
 
-CdfModel.update_forward_refs(
-    CdfConnectionProperties=CdfConnectionProperties,
+Cdf3dEntity.update_forward_refs(
+    Cdf3dConnectionProperties=Cdf3dConnectionProperties,
 )
-CdfModelApply.update_forward_refs(
-    CdfConnectionPropertiesApply=CdfConnectionPropertiesApply,
+Cdf3dEntityApply.update_forward_refs(
+    Cdf3dConnectionPropertiesApply=Cdf3dConnectionPropertiesApply,
+)
+
+Cdf3dModel.update_forward_refs(
+    Cdf3dConnectionProperties=Cdf3dConnectionProperties,
+)
+Cdf3dModelApply.update_forward_refs(
+    Cdf3dConnectionPropertiesApply=Cdf3dConnectionPropertiesApply,
 )
 
 WorkItem.update_forward_refs(
@@ -90,21 +97,21 @@ __all__ = [
     "AssetApplyList",
     "AssetFields",
     "AssetTextFields",
-    "CdfConnectionProperties",
-    "CdfConnectionPropertiesApply",
-    "CdfConnectionPropertiesList",
-    "CdfConnectionPropertiesApplyList",
-    "CdfConnectionPropertiesFields",
-    "CdfEntity",
-    "CdfEntityApply",
-    "CdfEntityList",
-    "CdfEntityApplyList",
-    "CdfModel",
-    "CdfModelApply",
-    "CdfModelList",
-    "CdfModelApplyList",
-    "CdfModelFields",
-    "CdfModelTextFields",
+    "Cdf3dConnectionProperties",
+    "Cdf3dConnectionPropertiesApply",
+    "Cdf3dConnectionPropertiesList",
+    "Cdf3dConnectionPropertiesApplyList",
+    "Cdf3dConnectionPropertiesFields",
+    "Cdf3dEntity",
+    "Cdf3dEntityApply",
+    "Cdf3dEntityList",
+    "Cdf3dEntityApplyList",
+    "Cdf3dModel",
+    "Cdf3dModelApply",
+    "Cdf3dModelList",
+    "Cdf3dModelApplyList",
+    "Cdf3dModelFields",
+    "Cdf3dModelTextFields",
     "WorkItem",
     "WorkItemApply",
     "WorkItemList",

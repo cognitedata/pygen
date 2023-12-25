@@ -9,8 +9,8 @@ from tutorial_apm_simple_pydantic_v1.client.data_classes import (
     DomainModelApply,
     Asset,
     AssetApply,
-    CdfConnectionProperties,
-    CdfConnectionPropertiesApply,
+    Cdf3dConnectionProperties,
+    Cdf3dConnectionPropertiesApply,
     Asset,
     AssetApply,
 )
@@ -22,7 +22,7 @@ from tutorial_apm_simple_pydantic_v1.client.data_classes._cdf_3_d_connection_pro
 
 if TYPE_CHECKING:
     from .asset_query import AssetQueryAPI
-    from .cdf_3_d_entity_query import CdfEntityQueryAPI
+    from .cdf_3_d_model_query import Cdf3dModelQueryAPI
 
 
 class AssetQueryAPI(QueryAPI[T_DomainModelList]):
@@ -103,7 +103,7 @@ class AssetQueryAPI(QueryAPI[T_DomainModelList]):
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_QUERY_LIMIT,
         retrieve_parent: bool = False,
-    ) -> CdfEntityQueryAPI[T_DomainModelList]:
+    ) -> Cdf3dModelQueryAPI[T_DomainModelList]:
         """Query along the in model 3 d edges of the asset.
 
         Args:
@@ -118,13 +118,13 @@ class AssetQueryAPI(QueryAPI[T_DomainModelList]):
             retrieve_parent: Whether to retrieve the parent for each asset or not.
 
         Returns:
-            CdfEntityQueryAPI: The query API for the cdf 3 d entity.
+            Cdf3dModelQueryAPI: The query API for the cdf 3 d model.
         """
-        from .cdf_3_d_entity_query import CdfEntityQueryAPI
+        from .cdf_3_d_model_query import Cdf3dModelQueryAPI
 
         from_ = self._builder[-1].name
 
-        edge_view = self._view_by_write_class[CdfConnectionPropertiesApply]
+        edge_view = self._view_by_write_class[Cdf3dConnectionPropertiesApply]
         edge_filter = _create_cdf_3_d_connection_property_filter(
             dm.DirectRelationReference("cdf_3d_schema", "cdf3dEntityConnection"),
             edge_view,
@@ -146,13 +146,13 @@ class AssetQueryAPI(QueryAPI[T_DomainModelList]):
                 select=dm.query.Select(
                     [dm.query.SourceSelector(edge_view, ["*"])],
                 ),
-                result_cls=CdfConnectionProperties,
+                result_cls=Cdf3dConnectionProperties,
                 max_retrieve_limit=limit,
             )
         )
         if retrieve_parent:
             self._query_append_parent(from_)
-        return CdfEntityQueryAPI(self._client, self._builder, self._view_by_write_class, None, limit)
+        return Cdf3dModelQueryAPI(self._client, self._builder, self._view_by_write_class, None, limit)
 
     def query(
         self,

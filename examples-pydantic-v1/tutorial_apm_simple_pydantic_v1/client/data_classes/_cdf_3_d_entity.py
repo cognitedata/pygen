@@ -16,13 +16,13 @@ from ._core import (
 )
 
 if TYPE_CHECKING:
-    from ._cdf_3_d_connection_properties import CdfConnectionProperties, CdfConnectionPropertiesApply
+    from ._cdf_3_d_connection_properties import Cdf3dConnectionProperties, Cdf3dConnectionPropertiesApply
 
 
-__all__ = ["CdfEntity", "CdfEntityApply", "CdfEntityList", "CdfEntityApplyList"]
+__all__ = ["Cdf3dEntity", "Cdf3dEntityApply", "Cdf3dEntityList", "Cdf3dEntityApplyList"]
 
 
-class CdfEntity(DomainModel):
+class Cdf3dEntity(DomainModel):
     """This represents the reading version of cdf 3 d entity.
 
     It is used to when data is retrieved from CDF.
@@ -38,18 +38,18 @@ class CdfEntity(DomainModel):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    in_model_3_d: Optional[list[CdfConnectionProperties]] = Field(default=None, repr=False, alias="inModel3d")
+    in_model_3_d: Optional[list[Cdf3dConnectionProperties]] = Field(default=None, repr=False, alias="inModel3d")
 
-    def as_apply(self) -> CdfEntityApply:
+    def as_apply(self) -> Cdf3dEntityApply:
         """Convert this read version of cdf 3 d entity to the writing version."""
-        return CdfEntityApply(
+        return Cdf3dEntityApply(
             space=self.space,
             external_id=self.external_id,
             in_model_3_d=[in_model_3_d.as_apply() for in_model_3_d in self.in_model_3_d or []],
         )
 
 
-class CdfEntityApply(DomainModelApply):
+class Cdf3dEntityApply(DomainModelApply):
     """This represents the writing version of cdf 3 d entity.
 
     It is used to when data is sent to CDF.
@@ -65,7 +65,7 @@ class CdfEntityApply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    in_model_3_d: Optional[list[CdfConnectionPropertiesApply]] = Field(default=None, repr=False, alias="inModel3d")
+    in_model_3_d: Optional[list[Cdf3dConnectionPropertiesApply]] = Field(default=None, repr=False, alias="inModel3d")
 
     def _to_instances_apply(
         self,
@@ -94,20 +94,20 @@ class CdfEntityApply(DomainModelApply):
         return resources
 
 
-class CdfEntityList(DomainModelList[CdfEntity]):
+class Cdf3dEntityList(DomainModelList[Cdf3dEntity]):
     """List of cdf 3 d entities in the read version."""
 
-    _INSTANCE = CdfEntity
+    _INSTANCE = Cdf3dEntity
 
-    def as_apply(self) -> CdfEntityApplyList:
+    def as_apply(self) -> Cdf3dEntityApplyList:
         """Convert these read versions of cdf 3 d entity to the writing versions."""
-        return CdfEntityApplyList([node.as_apply() for node in self.data])
+        return Cdf3dEntityApplyList([node.as_apply() for node in self.data])
 
 
-class CdfEntityApplyList(DomainModelApplyList[CdfEntityApply]):
+class Cdf3dEntityApplyList(DomainModelApplyList[Cdf3dEntityApply]):
     """List of cdf 3 d entities in the writing version."""
 
-    _INSTANCE = CdfEntityApply
+    _INSTANCE = Cdf3dEntityApply
 
 
 def _create_cdf_3_d_entity_filter(

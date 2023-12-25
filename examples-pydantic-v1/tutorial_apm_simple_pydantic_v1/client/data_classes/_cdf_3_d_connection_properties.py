@@ -15,28 +15,28 @@ from ._core import (
     ResourcesApply,
 )
 from ._asset import AssetApply
-from ._cdf_3_d_entity import CdfEntityApply
-from ._cdf_3_d_model import CdfModelApply
-from ._cdf_3_d_entity import CdfEntity, CdfEntityApply
-from ._cdf_3_d_model import CdfModel, CdfModelApply
+from ._cdf_3_d_entity import Cdf3dEntityApply
+from ._cdf_3_d_model import Cdf3dModelApply
+from ._cdf_3_d_entity import Cdf3dEntity, Cdf3dEntityApply
+from ._cdf_3_d_model import Cdf3dModel, Cdf3dModelApply
 
 __all__ = [
-    "CdfConnectionProperties",
-    "CdfConnectionPropertiesApply",
-    "CdfConnectionPropertiesList",
-    "CdfConnectionPropertiesApplyList",
-    "CdfConnectionPropertiesFields",
+    "Cdf3dConnectionProperties",
+    "Cdf3dConnectionPropertiesApply",
+    "Cdf3dConnectionPropertiesList",
+    "Cdf3dConnectionPropertiesApplyList",
+    "Cdf3dConnectionPropertiesFields",
 ]
 
 
-CdfConnectionPropertiesFields = Literal["revision_id", "revision_node_id"]
-_CDFCONNECTIONPROPERTIES_PROPERTIES_BY_FIELD = {
+Cdf3dConnectionPropertiesFields = Literal["revision_id", "revision_node_id"]
+_CDF3DCONNECTIONPROPERTIES_PROPERTIES_BY_FIELD = {
     "revision_id": "revisionId",
     "revision_node_id": "revisionNodeId",
 }
 
 
-class CdfConnectionProperties(DomainRelation):
+class Cdf3dConnectionProperties(DomainRelation):
     """This represents the reading version of cdf 3 d connection property.
 
     It is used to when data is retrieved from CDF.
@@ -54,13 +54,13 @@ class CdfConnectionProperties(DomainRelation):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    end_node: Union[CdfEntity, CdfModel, str, dm.NodeId]
+    end_node: Union[Cdf3dEntity, Cdf3dModel, str, dm.NodeId]
     revision_id: Optional[int] = Field(None, alias="revisionId")
     revision_node_id: Optional[int] = Field(None, alias="revisionNodeId")
 
-    def as_apply(self) -> CdfConnectionPropertiesApply:
+    def as_apply(self) -> Cdf3dConnectionPropertiesApply:
         """Convert this read version of cdf 3 d connection property to the writing version."""
-        return CdfConnectionPropertiesApply(
+        return Cdf3dConnectionPropertiesApply(
             space=self.space,
             external_id=self.external_id,
             end_node=self.end_node.as_apply() if isinstance(self.end_node, DomainModel) else self.end_node,
@@ -69,7 +69,7 @@ class CdfConnectionProperties(DomainRelation):
         )
 
 
-class CdfConnectionPropertiesApply(DomainRelationApply):
+class Cdf3dConnectionPropertiesApply(DomainRelationApply):
     """This represents the writing version of cdf 3 d connection property.
 
     It is used to when data is sent to CDF.
@@ -87,7 +87,7 @@ class CdfConnectionPropertiesApply(DomainRelationApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    end_node: Union[CdfEntityApply, CdfModelApply, str, dm.NodeId]
+    end_node: Union[Cdf3dEntityApply, Cdf3dModelApply, str, dm.NodeId]
     revision_id: int = Field(alias="revisionId")
     revision_node_id: int = Field(alias="revisionNodeId")
 
@@ -152,16 +152,16 @@ class CdfConnectionPropertiesApply(DomainRelationApply):
         return resources
 
 
-class CdfConnectionPropertiesList(DomainRelationList[CdfConnectionProperties]):
+class Cdf3dConnectionPropertiesList(DomainRelationList[Cdf3dConnectionProperties]):
     """List of cdf 3 d connection properties in the reading version."""
 
-    _INSTANCE = CdfConnectionProperties
+    _INSTANCE = Cdf3dConnectionProperties
 
 
-class CdfConnectionPropertiesApplyList(DomainRelationList[CdfConnectionPropertiesApply]):
+class Cdf3dConnectionPropertiesApplyList(DomainRelationList[Cdf3dConnectionPropertiesApply]):
     """List of cdf 3 d connection properties in the writing version."""
 
-    _INSTANCE = CdfConnectionPropertiesApply
+    _INSTANCE = Cdf3dConnectionPropertiesApply
 
 
 def _create_cdf_3_d_connection_property_filter(
@@ -247,13 +247,13 @@ def _create_cdf_3_d_connection_property_filter(
 
 
 _EXPECTED_START_NODES_BY_END_NODE = {
-    CdfEntityApply: {CdfModelApply},
-    CdfModelApply: {CdfEntityApply, AssetApply},
+    Cdf3dEntityApply: {Cdf3dModelApply},
+    Cdf3dModelApply: {AssetApply, Cdf3dEntityApply},
 }
 
 
 def _validate_end_node(
-    start_node: DomainModelApply, end_node: Union[CdfEntityApply, CdfModelApply, str, dm.NodeId]
+    start_node: DomainModelApply, end_node: Union[Cdf3dEntityApply, Cdf3dModelApply, str, dm.NodeId]
 ) -> None:
     if isinstance(end_node, (str, dm.NodeId)):
         # Nothing to validate
