@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from cognite.client import data_modeling as dm
+from cognite.client.data_classes import TimeSeriesList
 from cognite.client.data_classes.data_modeling import DataModelId, SpaceApply, SpaceApplyList
 
 from cognite.pygen.utils.helper import get_pydantic_version
@@ -105,6 +106,10 @@ class ExampleSDK:
             name=data_model_id.external_id,
             views=views,
         )
+
+    def load_timeseries(self, data_model_id: dm.DataModelId) -> TimeSeriesList:
+        timeseries_files = list(self.model_dir(data_model_id).glob("**/*timeseries.yaml"))
+        return TimeSeriesList([ts for filepath in timeseries_files for ts in TimeSeriesList.load(filepath.read_text())])
 
 
 WINDMILL_SDK = ExampleSDK(

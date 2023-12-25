@@ -11,7 +11,7 @@
   isStep: false
   description: 'Flapwise Bend. Mom. Blade C R1.4m  '
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MyB1
   name: MyB1
   isString: false
@@ -25,7 +25,7 @@
   isStep: false
   description: 'Edgewise Bend. Mom. Blade B R1.4m '
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MxSdw
   name: MxSdw
   isString: false
@@ -39,7 +39,7 @@
   isStep: false
   description: Main shaft calculated tilt moment
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MxA5
   name: MxA5
   isString: false
@@ -53,7 +53,7 @@
   isStep: false
   description: 'Flapwise Bend. Mom. Blade A R13.1m '
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MxA2_O
   name: MxA2_O
   isString: false
@@ -67,7 +67,7 @@
   isStep: false
   description: Flapwise Bend. Mom. Blade A R1.5m (spare) Offset
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MxA2
   name: MxA2
   isString: false
@@ -81,7 +81,7 @@
   isStep: false
   description: 'Flapwise Bend. Mom. Blade A R1.5m (spare) '
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.Gear_D_Z
   name: Gear_D_Z
   isString: false
@@ -95,7 +95,7 @@
   isStep: false
   description: Gearbox Displacement Z (laser sensor) (not calibrated)
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MyC4cr
   name: MyC4cr
   isString: false
@@ -109,7 +109,7 @@
   isStep: false
   description: Edgewise Bend. Mom. Blade C R6.7m (spare) - crosstalk corrected
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MyA3_O
   name: MyA3_O
   isString: false
@@ -123,7 +123,7 @@
   isStep: false
   description: Edgewise Bend. Mom. Blade A R6.6m Offset
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MxB3
   name: MxB3
   isString: false
@@ -137,7 +137,7 @@
   isStep: false
   description: 'Flapwise Bend. Mom. Blade B R6.6m '
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MyA2_O
   name: MyA2_O
   isString: false
@@ -151,7 +151,7 @@
   isStep: false
   description: Edgewise Bend. Mom. Blade A R1.5m (spare) Offset
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.Gear_D_X
   name: Gear_D_X
   isString: false
@@ -165,7 +165,7 @@
   isStep: false
   description: Gearbox Displacement X (laser sensor) (not calibrated)
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MxC3cr
   name: MxC3cr
   isString: false
@@ -179,7 +179,7 @@
   isStep: false
   description: Flapwise Bend. Mom. Blade C R6.6m - crosstalk corrected
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MxC4cr
   name: MxC4cr
   isString: false
@@ -193,7 +193,7 @@
   isStep: false
   description: Flapwise Bend. Mom. Blade C R6.7m (spare) - crosstalk corrected
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MxA4_Ocr
   name: MxA4_Ocr
   isString: false
@@ -207,7 +207,7 @@
   isStep: false
   description: Flapwise Bend. Mom. Blade A R6.6m Offset - crosstalk corrected
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.Pt
   name: Pt
   isString: false
@@ -221,7 +221,7 @@
   isStep: false
   description: Active Power Total (Pt)
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MyC4
   name: MyC4
   isString: false
@@ -235,7 +235,7 @@
   isStep: false
   description: Edgewise Bend. Mom. Blade C R6.7m (spare)
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MxA4cr
   name: MxA4cr
   isString: false
@@ -249,7 +249,7 @@
   isStep: false
   description: Flapwise Bend. Mom. Blade A R6.7m (spare) - crosstalk corrected
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MxB3cr
   name: MxB3cr
   isString: false
@@ -263,7 +263,7 @@
   isStep: false
   description: Flapwise Bend. Mom. Blade B R6.6m - crosstalk corrected
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MxA4
   name: MxA4
   isString: false
@@ -277,7 +277,7 @@
   isStep: false
   description: 'Flapwise Bend. Mom. Blade A R6.7m (spare) '
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MyA2_Ocr
   name: MyA2_Ocr
   isString: false
@@ -291,7 +291,7 @@
   isStep: false
   description: Edgewise Bend. Mom. Blade A R1.5m (spare) Offset - crosstalk corrected
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MyC1cr
   name: MyC1cr
   isString: false
@@ -305,7 +305,7 @@
   isStep: false
   description: Edgewise Bend. Mom. Blade C R1.4m - crosstalk corrected
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MyC3cr
   name: MyC3cr
   isString: false
@@ -319,7 +319,7 @@
   isStep: false
   description: Edgewise Bend. Mom. Blade C R6.6m - crosstalk corrected
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MxA3_O
   name: MxA3_O
   isString: false
@@ -333,7 +333,7 @@
   isStep: false
   description: Flapwise Bend. Mom. Blade A R6.6m Offset
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.ROT
   name: ROT
   isString: false
@@ -347,7 +347,7 @@
   isStep: false
   description: WTG Controller Rotor speed
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.yaw
   name: yaw
   isString: false
@@ -361,7 +361,7 @@
   isStep: false
   description: Yaw direction (from Modbus)
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MxA1
   name: MxA1
   isString: false
@@ -375,7 +375,7 @@
   isStep: false
   description: 'Flapwise Bend. Mom. Blade A R1.4m  '
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MyA4
   name: MyA4
   isString: false
@@ -389,7 +389,7 @@
   isStep: false
   description: 'Edgewise Bend. Mom. Blade A R6.7m (spare) '
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MyC2cr
   name: MyC2cr
   isString: false
@@ -403,7 +403,7 @@
   isStep: false
   description: Edgewise Bend. Mom. Blade C R1.5m (spare) - crosstalk corrected
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MxB4
   name: MxB4
   isString: false
@@ -417,7 +417,7 @@
   isStep: false
   description: 'Flapwise Bend. Mom. Blade B R6.7m (spare) '
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MxA1_O
   name: MxA1_O
   isString: false
@@ -431,7 +431,7 @@
   isStep: false
   description: Flapwise Bend. Mom. Blade A R1.4m Offset
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MxB1
   name: MxB1
   isString: false
@@ -445,7 +445,7 @@
   isStep: false
   description: 'Flapwise Bend. Mom. Blade B R1.4m '
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MxA3
   name: MxA3
   isString: false
@@ -459,7 +459,7 @@
   isStep: false
   description: 'Flapwise Bend. Mom. Blade A R6.6m '
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MyA4cr
   name: MyA4cr
   isString: false
@@ -473,7 +473,7 @@
   isStep: false
   description: Edgewise Bend. Mom. Blade A R6.7m (spare) - crosstalk corrected
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MxC4
   name: MxC4
   isString: false
@@ -487,7 +487,7 @@
   isStep: false
   description: Flapwise Bend. Mom. Blade C R6.7m (spare)
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MxC2cr
   name: MxC2cr
   isString: false
@@ -501,7 +501,7 @@
   isStep: false
   description: Flapwise Bend. Mom. Blade C R1.5m (spare) - crosstalk corrected
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MxA4_O
   name: MxA4_O
   isString: false
@@ -515,7 +515,7 @@
   isStep: false
   description: Flapwise Bend. Mom. Blade A R6.6m Offset
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MySlat
   name: MySlat
   isString: false
@@ -529,7 +529,7 @@
   isStep: false
   description: Main shaft calculated yaw moment
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MyB1cr
   name: MyB1cr
   isString: false
@@ -543,7 +543,7 @@
   isStep: false
   description: Edgewise Bend. Mom. Blade B R1.4m - crosstalk corrected
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MxA1cr
   name: MxA1cr
   isString: false
@@ -557,7 +557,7 @@
   isStep: false
   description: Flapwise Bend. Mom. Blade A R1.4m - crosstalk corrected
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.Acc2N
   name: Acc2N
   isString: false
@@ -571,7 +571,7 @@
   isStep: false
   description: Accelration from the back side of the nacelle, in Y-Direction
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MyB2
   name: MyB2
   isString: false
@@ -585,7 +585,7 @@
   isStep: false
   description: 'Edgewise Bend. Mom. Blade B R1.5m (spare) '
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MyA2
   name: MyA2
   isString: false
@@ -599,7 +599,7 @@
   isStep: false
   description: Edgewise Bend. Mom. Blade A R1.5m (spare)
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.Acc1N
   name: Acc1N
   isString: false
@@ -613,7 +613,7 @@
   isStep: false
   description: Accelration from the back side of the nacelle, in X-Direction
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MyB4
   name: MyB4
   isString: false
@@ -627,7 +627,7 @@
   isStep: false
   description: 'Edgewise Bend. Mom. Blade B R6.7m (spare) '
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MyC3
   name: MyC3
   isString: false
@@ -641,7 +641,7 @@
   isStep: false
   description: 'Edgewise Bend. Mom. Blade C R6.6m '
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MxA2_Ocr
   name: MxA2_Ocr
   isString: false
@@ -655,7 +655,7 @@
   isStep: false
   description: Flapwise Bend. Mom. Blade A R1.5m (spare) Offset - crosstalk corrected
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MyB3cr
   name: MyB3cr
   isString: false
@@ -669,7 +669,7 @@
   isStep: false
   description: Edgewise Bend. Mom. Blade B R6.6m - crosstalk corrected
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MxC2
   name: MxC2
   isString: false
@@ -683,7 +683,7 @@
   isStep: false
   description: Flapwise Bend. Mom. Blade C R1.5m (spare)
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MyB3
   name: MyB3
   isString: false
@@ -697,7 +697,7 @@
   isStep: false
   description: 'Edgewise Bend. Mom. Blade B R6.6m '
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MyB2cr
   name: MyB2cr
   isString: false
@@ -711,7 +711,7 @@
   isStep: false
   description: Edgewise Bend. Mom. Blade B R1.5m (spare) - crosstalk corrected
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MyC1
   name: MyC1
   isString: false
@@ -725,7 +725,7 @@
   isStep: false
   description: 'Edgewise Bend. Mom. Blade C R1.4m '
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MxC1cr
   name: MxC1cr
   isString: false
@@ -739,7 +739,7 @@
   isStep: false
   description: Flapwise Bend. Mom. Blade C R1.4m - crosstalk corrected
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MyA2cr
   name: MyA2cr
   isString: false
@@ -753,7 +753,7 @@
   isStep: false
   description: Edgewise Bend. Mom. Blade A R1.5m (spare) - crosstalk corrected
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MyA1cr
   name: MyA1cr
   isString: false
@@ -767,7 +767,7 @@
   isStep: false
   description: Edgewise Bend. Mom. Blade A R1.4m - crosstalk corrected
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.HSS_Y
   name: HSS_Y
   isString: false
@@ -781,7 +781,7 @@
   isStep: false
   description: High Speed Shaft Bending Moment (not calibrated)
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MxA1_Ocr
   name: MxA1_Ocr
   isString: false
@@ -795,7 +795,7 @@
   isStep: false
   description: Flapwise Bend. Mom. Blade A R1.4m Offset - crosstalk corrected
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MzR
   name: MzR
   isString: false
@@ -809,7 +809,7 @@
   isStep: false
   description: Main shaft torque
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MxA6
   name: MxA6
   isString: false
@@ -823,7 +823,7 @@
   isStep: false
   description: 'Flapwise Bend. Mom. Blade A R19.6m '
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.Acc3N
   name: Acc3N
   isString: false
@@ -837,7 +837,7 @@
   isStep: false
   description: Accelration from the back side of the nacelle, in Z-Direction
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MyA1_O
   name: MyA1_O
   isString: false
@@ -851,7 +851,7 @@
   isStep: false
   description: Edgewise Bend. Mom. Blade A R1.4m Offset
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.cnt0
   name: cnt0
   isString: false
@@ -865,7 +865,7 @@
   isStep: false
   description: Revolution per minutes of the low speed shaft, used for rotor position
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.Qt
   name: Qt
   isString: false
@@ -879,7 +879,7 @@
   isStep: false
   description: Reactive Power Total (Qt)
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.HSSTrq
   name: HSSTrq
   isString: false
@@ -893,7 +893,7 @@
   isStep: false
   description: High Speed Shaft Torque (not calibrated)
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MxB2
   name: MxB2
   isString: false
@@ -907,7 +907,7 @@
   isStep: false
   description: 'Flapwise Bend. Mom. Blade B R1.5m (spare) '
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.St
   name: St
   isString: false
@@ -921,7 +921,7 @@
   isStep: false
   description: Apparent Power Total (St)
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MyC2
   name: MyC2
   isString: false
@@ -935,7 +935,7 @@
   isStep: false
   description: Edgewise Bend. Mom. Blade C R1.5m (spare)
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.HSS_X
   name: HSS_X
   isString: false
@@ -949,7 +949,7 @@
   isStep: false
   description: High Speed Shaft Bending Moment (not calibrated)
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MxC3
   name: MxC3
   isString: false
@@ -963,7 +963,7 @@
   isStep: false
   description: 'Flapwise Bend. Mom. Blade C R6.6m '
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MyR
   name: MyR
   isString: false
@@ -977,7 +977,7 @@
   isStep: false
   description: Main shaft bending y-dir
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MxR
   name: MxR
   isString: false
@@ -991,7 +991,7 @@
   isStep: false
   description: Main shaft bending x-dir
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MxA2cr
   name: MxA2cr
   isString: false
@@ -1005,7 +1005,7 @@
   isStep: false
   description: Flapwise Bend. Mom. Blade A R1.5m (spare) - crosstalk corrected
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MxB2cr
   name: MxB2cr
   isString: false
@@ -1019,7 +1019,7 @@
   isStep: false
   description: Flapwise Bend. Mom. Blade B R1.5m (spare) - crosstalk corrected
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MyA4_Ocr
   name: MyA4_Ocr
   isString: false
@@ -1033,7 +1033,7 @@
   isStep: false
   description: Edgewise Bend. Mom. Blade A R6.6m Offset - crosstalk corrected
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MxB1cr
   name: MxB1cr
   isString: false
@@ -1047,7 +1047,7 @@
   isStep: false
   description: Flapwise Bend. Mom. Blade B R1.4m - crosstalk corrected
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.Gear_D_Y
   name: Gear_D_Y
   isString: false
@@ -1061,7 +1061,7 @@
   isStep: false
   description: Gearbox Displacement Y (laser sensor) (not calibrated)
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MyA3
   name: MyA3
   isString: false
@@ -1075,7 +1075,7 @@
   isStep: false
   description: 'Edgewise Bend. Mom. Blade A R6.6m '
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.YawErr
   name: YawErr
   isString: false
@@ -1089,7 +1089,7 @@
   isStep: false
   description: Yaw error (yaw-Wdir_41m)
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MyA4_O
   name: MyA4_O
   isString: false
@@ -1103,7 +1103,7 @@
   isStep: false
   description: Edgewise Bend. Mom. Blade A R6.6m Offset
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MyA1
   name: MyA1
   isString: false
@@ -1117,7 +1117,7 @@
   isStep: false
   description: 'Edgewise Bend. Mom. Blade A R1.4m '
   securityCategories: []
-  dataSetId: 3387046938944729
+
 - externalId: V52-WindTurbine.MyA1_Ocr
   name: MyA1_Ocr
   isString: false
@@ -1131,4 +1131,3 @@
   isStep: false
   description: Edgewise Bend. Mom. Blade A R1.4m Offset - crosstalk corrected
   securityCategories: []
-  dataSetId: 3387046938944729

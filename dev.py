@@ -110,6 +110,11 @@ def deploy():
         new_model = client.data_modeling.data_models.apply(data_model)
         typer.echo(f"Created data model {new_model.external_id} in space {new_model.space}")
 
+        timeseries = example_sdk.load_timeseries(data_model_id)
+        new_timeseries = client.time_series.upsert(timeseries, mode="replace")
+        for ts in new_timeseries:
+            typer.echo(f"Created timeseries {ts.external_id}")
+
 
 @app.command("list", help="List all example files which are expected to be changed manually")
 def list_manual_files():
