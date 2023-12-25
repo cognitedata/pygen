@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timezone
 
 import pytest
 from cognite.client import data_modeling as dm
@@ -7,11 +7,15 @@ from cognite.client.data_classes.data_modeling.instances import Properties
 from tests.constants import IS_PYDANTIC_V2
 
 if IS_PYDANTIC_V2:
+    from markets.client.data_classes import ValueTransformation
     from movie_domain.client import data_classes as movie
     from movie_domain.client.data_classes._core import unpack_properties
+    from shop.client.data_classes import CaseApply, CommandConfigApply
 else:
+    from markets_pydantic_v1.client.data_classes import ValueTransformation
     from movie_domain_pydantic_v1.client import data_classes as movie
     from movie_domain_pydantic_v1.client.data_classes._core import unpack_properties
+    from shop_pydantic_v1.client.data_classes import CaseApply, CommandConfigApply
 
 
 def test_person_from_instance():
@@ -361,8 +365,8 @@ def person_and_person_apply() -> tuple[movie.Person, movie.PersonApply]:
         name="Christoph Waltz",
         roles=["actor:christoph_waltz"],
         version=1,
-        created_time=datetime.datetime(2023, 6, 7),
-        last_updated_time=datetime.datetime(2023, 8, 8),
+        created_time=datetime(2023, 6, 7),
+        last_updated_time=datetime(2023, 8, 8),
     )
 
     person_apply = movie.PersonApply(
@@ -429,3 +433,56 @@ def test_person_apply_setting_space():
     assert not (
         edges := [e for e in instances.edges if e.space != space]
     ), f"Found edges with unexpected space: {edges}"
+
+
+def test_to_instances_apply_case():
+    # Arrange
+    date_format = "%Y-%m-%dT%H:%M:%SZ"
+    case = CaseApply(
+        external_id="shop:case:integration_test",
+        name="Integration test",
+        scenario="Integration test",
+        start_time=datetime.strptime("2021-01-01T00:00:00Z", date_format),
+        end_time=datetime.strptime("2021-01-01T00:00:00Z", date_format),
+        commands=CommandConfigApply(external_id="shop:command_config:integration_test", configs=["BlueViolet", "Red"]),
+        cut_files=["shop:cut_file:1"],
+        bid="shop:bid_matrix:8",
+        bid_history=["shop:bid_matrix:9"],
+        run_status="Running",
+        arguments="Integration test",
+    )
+
+    # Act
+    instances = case.to_instances_apply()
+
+    # Assert
+    assert len(instances.nodes) == 2
+    assert len(instances.edges) == 0
+
+
+def test_from_node_with_json() -> None:
+    # Arrange
+    node = dm.Node(
+        space="market",
+        external_id="myExternalId",
+        version=1,
+        last_updated_time=0,
+        created_time=0,
+        properties=Properties({dm.ViewId("market", "myView", "1"): {"arguments": {"a": 1}, "method": "myMethod"}}),
+        deleted_time=None,
+        type=None,
+    )
+    expected = ValueTransformation(
+        external_id="myExternalId",
+        version=1,
+        last_updated_time=datetime.fromtimestamp(0, tz=timezone.utc),
+        created_time=datetime.fromtimestamp(0, tz=timezone.utc),
+        arguments={"a": 1},
+        method="myMethod",
+    )
+
+    # Act
+    actual = ValueTransformation.from_instance(node)
+
+    # Assert
+    assert actual == expected

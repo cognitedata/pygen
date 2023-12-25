@@ -1,5 +1,5 @@
 import json
-from typing import Callable, TypeVar
+from typing import Callable
 
 import pytest
 
@@ -19,26 +19,6 @@ else:
     from pydantic import parse_obj_as
 
     raise NotImplementedError
-
-T_TypeNode = TypeVar("T_TypeNode", bound=DomainModelApply)
-
-
-def clear_nested_dependencies(loaded: T_TypeNode, loaded_json: dict):
-    # Clean nested dependencies for easy comparison
-
-    if IS_PYDANTIC_V2:
-        fields = loaded.model_fields.items()
-    else:
-        fields = loaded.__fields__.items()
-
-    for name, field in fields:
-        if not (
-            isinstance(value := getattr(loaded, name), DomainModelApply)
-            or (isinstance(value, list) and value and isinstance(value[0], DomainModelApply))
-        ):
-            continue
-        setattr(loaded, name, None)
-        loaded_json.pop(field.alias or name)
 
 
 def recursive_exclude(d: dict, exclude: set[str]) -> None:
