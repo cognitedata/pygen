@@ -1,6 +1,6 @@
 space: pygen-models
-externalId: PrimitiveRequired
-name: PrimitiveRequired
+externalId: PrimitiveRequiredList
+name: PrimitiveRequiredList
 usedFor: node
 properties:
   text:

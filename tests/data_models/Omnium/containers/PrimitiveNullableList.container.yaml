@@ -1,6 +1,6 @@
 space: pygen-models
-externalId: PrimitiveNullable
-name: PrimitiveNullable
+externalId: PrimitiveNullableList
+name: PrimitiveNullableList
 usedFor: node
 properties:
   text:

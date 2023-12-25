@@ -32,7 +32,7 @@ properties:
     type:
       list: false
       type: int32
-    nullable: true
+    nullable: false
     autoIncrement: true
     name: autoIncrementInt32
   defaultObject:
@@ -40,6 +40,7 @@ properties:
       list: false
       type: json
     nullable: true
-    defaultValue: '{"foo": "bar"}'
+    defaultValue:
+      foo: bar
     autoIncrement: false
     name: defaultObject
