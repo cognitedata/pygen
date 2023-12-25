@@ -5,18 +5,47 @@ name: APM_AppData_4
 version: '7'
 views:
 - space: APM_AppData_4
-  externalId: APM_User
-  name: APM_User
+  externalId: APM_Checklist
+  name: APM_Checklist
   version: '7'
   writable: true
   usedFor: node
   isGlobal: false
   properties:
-    email:
+    assignedTo:
       container:
         space: APM_AppData_4
-        externalId: APM_User
-      containerPropertyIdentifier: email
+        externalId: APM_Checklist
+      containerPropertyIdentifier: assignedTo
+      type:
+        list: true
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: assignedTo
+      description: null
+    checklistItems:
+      type:
+        space: APM_AppData_4
+        externalId: APM_Checklist.checklistItems
+      source:
+        space: APM_AppData_4
+        externalId: APM_ChecklistItem
+        version: '7'
+        type: view
+      name: checklistItems
+      description: Contextualisation
+      edgeSource: null
+      direction: outwards
+      connectionType: multi_edge_connection
+    createdByExternalId:
+      container:
+        space: APM_AppData_4
+        externalId: APM_Checklist
+      containerPropertyIdentifier: createdByExternalId
       type:
         list: false
         collation: ucs_basic
@@ -25,13 +54,28 @@ views:
       autoIncrement: false
       source: null
       defaultValue: null
-      name: email
+      name: createdByExternalId
       description: null
-    lastSeen:
+    description:
       container:
         space: APM_AppData_4
-        externalId: APM_User
-      containerPropertyIdentifier: lastSeen
+        externalId: APM_Checklist
+      containerPropertyIdentifier: description
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: description
+      description: null
+    endTime:
+      container:
+        space: APM_AppData_4
+        externalId: APM_Checklist
+      containerPropertyIdentifier: endTime
       type:
         list: false
         type: timestamp
@@ -39,13 +83,27 @@ views:
       autoIncrement: false
       source: null
       defaultValue: null
-      name: lastSeen
+      name: endTime
       description: null
-    name:
+    isArchived:
       container:
         space: APM_AppData_4
-        externalId: APM_User
-      containerPropertyIdentifier: name
+        externalId: APM_Checklist
+      containerPropertyIdentifier: isArchived
+      type:
+        list: false
+        type: boolean
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: isArchived
+      description: System data
+    rootLocationExternalId:
+      container:
+        space: APM_AppData_4
+        externalId: APM_Checklist
+      containerPropertyIdentifier: rootLocationExternalId
       type:
         list: false
         collation: ucs_basic
@@ -54,21 +112,327 @@ views:
       autoIncrement: false
       source: null
       defaultValue: null
-      name: name
+      name: rootLocationExternalId
       description: null
-    preferences:
+    sourceId:
       container:
         space: APM_AppData_4
-        externalId: APM_User
-      containerPropertyIdentifier: preferences
+        externalId: APM_Checklist
+      containerPropertyIdentifier: sourceId
       type:
         list: false
-        type: json
+        collation: ucs_basic
+        type: text
       nullable: true
       autoIncrement: false
       source: null
       defaultValue: null
-      name: preferences
+      name: sourceId
+      description: Basic information
+    startTime:
+      container:
+        space: APM_AppData_4
+        externalId: APM_Checklist
+      containerPropertyIdentifier: startTime
+      type:
+        list: false
+        type: timestamp
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: startTime
+      description: Scheduling information
+    status:
+      container:
+        space: APM_AppData_4
+        externalId: APM_Checklist
+      containerPropertyIdentifier: status
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: status
+      description: null
+    title:
+      container:
+        space: APM_AppData_4
+        externalId: APM_Checklist
+      containerPropertyIdentifier: title
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: title
+      description: null
+    type:
+      container:
+        space: APM_AppData_4
+        externalId: APM_Checklist
+      containerPropertyIdentifier: type
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: type
+      description: null
+    updatedByExternalId:
+      container:
+        space: APM_AppData_4
+        externalId: APM_Checklist
+      containerPropertyIdentifier: updatedByExternalId
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: updatedByExternalId
+      description: null
+  lastUpdatedTime: 1699136187224
+  createdTime: 1699136187224
+- space: APM_AppData_4
+  externalId: APM_ChecklistItem
+  name: APM_ChecklistItem
+  version: '7'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    assetExternalId:
+      container:
+        space: APM_AppData_4
+        externalId: APM_ChecklistItem
+      containerPropertyIdentifier: assetExternalId
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: assetExternalId
+      description: null
+    checklistExternalId:
+      container:
+        space: APM_AppData_4
+        externalId: APM_ChecklistItem
+      containerPropertyIdentifier: checklistExternalId
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: checklistExternalId
+      description: Contextualisation
+    createdByExternalId:
+      container:
+        space: APM_AppData_4
+        externalId: APM_ChecklistItem
+      containerPropertyIdentifier: createdByExternalId
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: createdByExternalId
+      description: System data
+    description:
+      container:
+        space: APM_AppData_4
+        externalId: APM_ChecklistItem
+      containerPropertyIdentifier: description
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: description
+      description: null
+    endTime:
+      container:
+        space: APM_AppData_4
+        externalId: APM_ChecklistItem
+      containerPropertyIdentifier: endTime
+      type:
+        list: false
+        type: timestamp
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: endTime
+      description: null
+    fileExternalIds:
+      container:
+        space: APM_AppData_4
+        externalId: APM_ChecklistItem
+      containerPropertyIdentifier: fileExternalIds
+      type:
+        list: true
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: fileExternalIds
+      description: null
+    labels:
+      container:
+        space: APM_AppData_4
+        externalId: APM_ChecklistItem
+      containerPropertyIdentifier: labels
+      type:
+        list: true
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: labels
+      description: null
+    note:
+      container:
+        space: APM_AppData_4
+        externalId: APM_ChecklistItem
+      containerPropertyIdentifier: note
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: note
+      description: null
+    observations:
+      type:
+        space: APM_AppData_4
+        externalId: APM_ChecklistItem.observations
+      source:
+        space: APM_AppData_4
+        externalId: APM_Observation
+        version: '7'
+        type: view
+      name: observations
+      description: null
+      edgeSource: null
+      direction: outwards
+      connectionType: multi_edge_connection
+    order:
+      container:
+        space: APM_AppData_4
+        externalId: APM_ChecklistItem
+      containerPropertyIdentifier: order
+      type:
+        list: false
+        type: int32
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: order
+      description: null
+    sourceId:
+      container:
+        space: APM_AppData_4
+        externalId: APM_ChecklistItem
+      containerPropertyIdentifier: sourceId
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: sourceId
+      description: Basic information
+    startTime:
+      container:
+        space: APM_AppData_4
+        externalId: APM_ChecklistItem
+      containerPropertyIdentifier: startTime
+      type:
+        list: false
+        type: timestamp
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: startTime
+      description: Scheduling information
+    status:
+      container:
+        space: APM_AppData_4
+        externalId: APM_ChecklistItem
+      containerPropertyIdentifier: status
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: status
+      description: null
+    title:
+      container:
+        space: APM_AppData_4
+        externalId: APM_ChecklistItem
+      containerPropertyIdentifier: title
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: title
+      description: null
+    updatedByExternalId:
+      container:
+        space: APM_AppData_4
+        externalId: APM_ChecklistItem
+      containerPropertyIdentifier: updatedByExternalId
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: updatedByExternalId
       description: null
   lastUpdatedTime: 1699136187224
   createdTime: 1699136187224
@@ -271,6 +635,221 @@ views:
   lastUpdatedTime: 1699136187224
   createdTime: 1699136187224
 - space: APM_AppData_4
+  externalId: APM_Observation
+  name: APM_Observation
+  version: '7'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    assetExternalId:
+      container:
+        space: APM_AppData_4
+        externalId: APM_Observation
+      containerPropertyIdentifier: assetExternalId
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: assetExternalId
+      description: Contextualization
+    createdByExternalId:
+      container:
+        space: APM_AppData_4
+        externalId: APM_Observation
+      containerPropertyIdentifier: createdByExternalId
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: createdByExternalId
+      description: null
+    description:
+      container:
+        space: APM_AppData_4
+        externalId: APM_Observation
+      containerPropertyIdentifier: description
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: description
+      description: Observation data
+    fileExternalIds:
+      container:
+        space: APM_AppData_4
+        externalId: APM_Observation
+      containerPropertyIdentifier: fileExternalIds
+      type:
+        list: true
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: fileExternalIds
+      description: null
+    files:
+      container:
+        space: APM_AppData_4
+        externalId: APM_Observation
+      containerPropertyIdentifier: files
+      type:
+        list: true
+        type: file
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: files
+      description: null
+    isArchived:
+      container:
+        space: APM_AppData_4
+        externalId: APM_Observation
+      containerPropertyIdentifier: isArchived
+      type:
+        list: false
+        type: boolean
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: isArchived
+      description: System data
+    measurements:
+      type:
+        space: APM_AppData_4
+        externalId: APM_Observation.measurements
+      source:
+        space: APM_AppData_4
+        externalId: APM_Measurement
+        version: '7'
+        type: view
+      name: measurements
+      description: null
+      edgeSource: null
+      direction: outwards
+      connectionType: multi_edge_connection
+    position:
+      container:
+        space: APM_AppData_4
+        externalId: APM_Observation
+      containerPropertyIdentifier: position
+      type:
+        type: direct
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: position
+      description: null
+    priority:
+      container:
+        space: APM_AppData_4
+        externalId: APM_Observation
+      containerPropertyIdentifier: priority
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: priority
+      description: null
+    sourceId:
+      container:
+        space: APM_AppData_4
+        externalId: APM_Observation
+      containerPropertyIdentifier: sourceId
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: sourceId
+      description: Basic information
+    status:
+      container:
+        space: APM_AppData_4
+        externalId: APM_Observation
+      containerPropertyIdentifier: status
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: status
+      description: null
+    troubleshooting:
+      container:
+        space: APM_AppData_4
+        externalId: APM_Observation
+      containerPropertyIdentifier: troubleshooting
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: troubleshooting
+      description: null
+    type:
+      container:
+        space: APM_AppData_4
+        externalId: APM_Observation
+      containerPropertyIdentifier: type
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: type
+      description: null
+    updatedByExternalId:
+      container:
+        space: APM_AppData_4
+        externalId: APM_Observation
+      containerPropertyIdentifier: updatedByExternalId
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: updatedByExternalId
+      description: null
+  lastUpdatedTime: 1699136187224
+  createdTime: 1699136187224
+- space: APM_AppData_4
   externalId: APM_Schedule
   name: APM_Schedule
   version: '7'
@@ -441,653 +1020,6 @@ views:
   lastUpdatedTime: 1699136187224
   createdTime: 1699136187224
 - space: APM_AppData_4
-  externalId: APM_Checklist
-  name: APM_Checklist
-  version: '7'
-  writable: true
-  usedFor: node
-  isGlobal: false
-  properties:
-    assignedTo:
-      container:
-        space: APM_AppData_4
-        externalId: APM_Checklist
-      containerPropertyIdentifier: assignedTo
-      type:
-        list: true
-        collation: ucs_basic
-        type: text
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: assignedTo
-      description: null
-    createdByExternalId:
-      container:
-        space: APM_AppData_4
-        externalId: APM_Checklist
-      containerPropertyIdentifier: createdByExternalId
-      type:
-        list: false
-        collation: ucs_basic
-        type: text
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: createdByExternalId
-      description: null
-    description:
-      container:
-        space: APM_AppData_4
-        externalId: APM_Checklist
-      containerPropertyIdentifier: description
-      type:
-        list: false
-        collation: ucs_basic
-        type: text
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: description
-      description: null
-    endTime:
-      container:
-        space: APM_AppData_4
-        externalId: APM_Checklist
-      containerPropertyIdentifier: endTime
-      type:
-        list: false
-        type: timestamp
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: endTime
-      description: null
-    isArchived:
-      container:
-        space: APM_AppData_4
-        externalId: APM_Checklist
-      containerPropertyIdentifier: isArchived
-      type:
-        list: false
-        type: boolean
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: isArchived
-      description: System data
-    rootLocationExternalId:
-      container:
-        space: APM_AppData_4
-        externalId: APM_Checklist
-      containerPropertyIdentifier: rootLocationExternalId
-      type:
-        list: false
-        collation: ucs_basic
-        type: text
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: rootLocationExternalId
-      description: null
-    sourceId:
-      container:
-        space: APM_AppData_4
-        externalId: APM_Checklist
-      containerPropertyIdentifier: sourceId
-      type:
-        list: false
-        collation: ucs_basic
-        type: text
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: sourceId
-      description: Basic information
-    startTime:
-      container:
-        space: APM_AppData_4
-        externalId: APM_Checklist
-      containerPropertyIdentifier: startTime
-      type:
-        list: false
-        type: timestamp
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: startTime
-      description: Scheduling information
-    status:
-      container:
-        space: APM_AppData_4
-        externalId: APM_Checklist
-      containerPropertyIdentifier: status
-      type:
-        list: false
-        collation: ucs_basic
-        type: text
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: status
-      description: null
-    title:
-      container:
-        space: APM_AppData_4
-        externalId: APM_Checklist
-      containerPropertyIdentifier: title
-      type:
-        list: false
-        collation: ucs_basic
-        type: text
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: title
-      description: null
-    type:
-      container:
-        space: APM_AppData_4
-        externalId: APM_Checklist
-      containerPropertyIdentifier: type
-      type:
-        list: false
-        collation: ucs_basic
-        type: text
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: type
-      description: null
-    updatedByExternalId:
-      container:
-        space: APM_AppData_4
-        externalId: APM_Checklist
-      containerPropertyIdentifier: updatedByExternalId
-      type:
-        list: false
-        collation: ucs_basic
-        type: text
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: updatedByExternalId
-      description: null
-    checklistItems:
-      type:
-        space: APM_AppData_4
-        externalId: APM_Checklist.checklistItems
-      source:
-        space: APM_AppData_4
-        externalId: APM_ChecklistItem
-        version: '7'
-        type: view
-      name: checklistItems
-      description: Contextualisation
-      edgeSource: null
-      direction: outwards
-      connectionType: multi_edge_connection
-  lastUpdatedTime: 1699136187224
-  createdTime: 1699136187224
-- space: APM_AppData_4
-  externalId: APM_ChecklistItem
-  name: APM_ChecklistItem
-  version: '7'
-  writable: true
-  usedFor: node
-  isGlobal: false
-  properties:
-    assetExternalId:
-      container:
-        space: APM_AppData_4
-        externalId: APM_ChecklistItem
-      containerPropertyIdentifier: assetExternalId
-      type:
-        list: false
-        collation: ucs_basic
-        type: text
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: assetExternalId
-      description: null
-    checklistExternalId:
-      container:
-        space: APM_AppData_4
-        externalId: APM_ChecklistItem
-      containerPropertyIdentifier: checklistExternalId
-      type:
-        list: false
-        collation: ucs_basic
-        type: text
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: checklistExternalId
-      description: Contextualisation
-    createdByExternalId:
-      container:
-        space: APM_AppData_4
-        externalId: APM_ChecklistItem
-      containerPropertyIdentifier: createdByExternalId
-      type:
-        list: false
-        collation: ucs_basic
-        type: text
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: createdByExternalId
-      description: System data
-    description:
-      container:
-        space: APM_AppData_4
-        externalId: APM_ChecklistItem
-      containerPropertyIdentifier: description
-      type:
-        list: false
-        collation: ucs_basic
-        type: text
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: description
-      description: null
-    endTime:
-      container:
-        space: APM_AppData_4
-        externalId: APM_ChecklistItem
-      containerPropertyIdentifier: endTime
-      type:
-        list: false
-        type: timestamp
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: endTime
-      description: null
-    fileExternalIds:
-      container:
-        space: APM_AppData_4
-        externalId: APM_ChecklistItem
-      containerPropertyIdentifier: fileExternalIds
-      type:
-        list: true
-        collation: ucs_basic
-        type: text
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: fileExternalIds
-      description: null
-    labels:
-      container:
-        space: APM_AppData_4
-        externalId: APM_ChecklistItem
-      containerPropertyIdentifier: labels
-      type:
-        list: true
-        collation: ucs_basic
-        type: text
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: labels
-      description: null
-    note:
-      container:
-        space: APM_AppData_4
-        externalId: APM_ChecklistItem
-      containerPropertyIdentifier: note
-      type:
-        list: false
-        collation: ucs_basic
-        type: text
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: note
-      description: null
-    order:
-      container:
-        space: APM_AppData_4
-        externalId: APM_ChecklistItem
-      containerPropertyIdentifier: order
-      type:
-        list: false
-        type: int32
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: order
-      description: null
-    sourceId:
-      container:
-        space: APM_AppData_4
-        externalId: APM_ChecklistItem
-      containerPropertyIdentifier: sourceId
-      type:
-        list: false
-        collation: ucs_basic
-        type: text
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: sourceId
-      description: Basic information
-    startTime:
-      container:
-        space: APM_AppData_4
-        externalId: APM_ChecklistItem
-      containerPropertyIdentifier: startTime
-      type:
-        list: false
-        type: timestamp
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: startTime
-      description: Scheduling information
-    status:
-      container:
-        space: APM_AppData_4
-        externalId: APM_ChecklistItem
-      containerPropertyIdentifier: status
-      type:
-        list: false
-        collation: ucs_basic
-        type: text
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: status
-      description: null
-    title:
-      container:
-        space: APM_AppData_4
-        externalId: APM_ChecklistItem
-      containerPropertyIdentifier: title
-      type:
-        list: false
-        collation: ucs_basic
-        type: text
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: title
-      description: null
-    updatedByExternalId:
-      container:
-        space: APM_AppData_4
-        externalId: APM_ChecklistItem
-      containerPropertyIdentifier: updatedByExternalId
-      type:
-        list: false
-        collation: ucs_basic
-        type: text
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: updatedByExternalId
-      description: null
-    observations:
-      type:
-        space: APM_AppData_4
-        externalId: APM_ChecklistItem.observations
-      source:
-        space: APM_AppData_4
-        externalId: APM_Observation
-        version: '7'
-        type: view
-      name: observations
-      description: null
-      edgeSource: null
-      direction: outwards
-      connectionType: multi_edge_connection
-  lastUpdatedTime: 1699136187224
-  createdTime: 1699136187224
-- space: APM_AppData_4
-  externalId: APM_Observation
-  name: APM_Observation
-  version: '7'
-  writable: true
-  usedFor: node
-  isGlobal: false
-  properties:
-    assetExternalId:
-      container:
-        space: APM_AppData_4
-        externalId: APM_Observation
-      containerPropertyIdentifier: assetExternalId
-      type:
-        list: false
-        collation: ucs_basic
-        type: text
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: assetExternalId
-      description: Contextualization
-    createdByExternalId:
-      container:
-        space: APM_AppData_4
-        externalId: APM_Observation
-      containerPropertyIdentifier: createdByExternalId
-      type:
-        list: false
-        collation: ucs_basic
-        type: text
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: createdByExternalId
-      description: null
-    description:
-      container:
-        space: APM_AppData_4
-        externalId: APM_Observation
-      containerPropertyIdentifier: description
-      type:
-        list: false
-        collation: ucs_basic
-        type: text
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: description
-      description: Observation data
-    fileExternalIds:
-      container:
-        space: APM_AppData_4
-        externalId: APM_Observation
-      containerPropertyIdentifier: fileExternalIds
-      type:
-        list: true
-        collation: ucs_basic
-        type: text
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: fileExternalIds
-      description: null
-    files:
-      container:
-        space: APM_AppData_4
-        externalId: APM_Observation
-      containerPropertyIdentifier: files
-      type:
-        list: true
-        type: file
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: files
-      description: null
-    isArchived:
-      container:
-        space: APM_AppData_4
-        externalId: APM_Observation
-      containerPropertyIdentifier: isArchived
-      type:
-        list: false
-        type: boolean
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: isArchived
-      description: System data
-    position:
-      container:
-        space: APM_AppData_4
-        externalId: APM_Observation
-      containerPropertyIdentifier: position
-      type:
-        type: direct
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: position
-      description: null
-    priority:
-      container:
-        space: APM_AppData_4
-        externalId: APM_Observation
-      containerPropertyIdentifier: priority
-      type:
-        list: false
-        collation: ucs_basic
-        type: text
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: priority
-      description: null
-    sourceId:
-      container:
-        space: APM_AppData_4
-        externalId: APM_Observation
-      containerPropertyIdentifier: sourceId
-      type:
-        list: false
-        collation: ucs_basic
-        type: text
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: sourceId
-      description: Basic information
-    status:
-      container:
-        space: APM_AppData_4
-        externalId: APM_Observation
-      containerPropertyIdentifier: status
-      type:
-        list: false
-        collation: ucs_basic
-        type: text
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: status
-      description: null
-    troubleshooting:
-      container:
-        space: APM_AppData_4
-        externalId: APM_Observation
-      containerPropertyIdentifier: troubleshooting
-      type:
-        list: false
-        collation: ucs_basic
-        type: text
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: troubleshooting
-      description: null
-    type:
-      container:
-        space: APM_AppData_4
-        externalId: APM_Observation
-      containerPropertyIdentifier: type
-      type:
-        list: false
-        collation: ucs_basic
-        type: text
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: type
-      description: null
-    updatedByExternalId:
-      container:
-        space: APM_AppData_4
-        externalId: APM_Observation
-      containerPropertyIdentifier: updatedByExternalId
-      type:
-        list: false
-        collation: ucs_basic
-        type: text
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: updatedByExternalId
-      description: null
-    measurements:
-      type:
-        space: APM_AppData_4
-        externalId: APM_Observation.measurements
-      source:
-        space: APM_AppData_4
-        externalId: APM_Measurement
-        version: '7'
-        type: view
-      name: measurements
-      description: null
-      edgeSource: null
-      direction: outwards
-      connectionType: multi_edge_connection
-  lastUpdatedTime: 1699136187224
-  createdTime: 1699136187224
-- space: APM_AppData_4
   externalId: APM_Template
   name: APM_Template
   version: '7'
@@ -1169,6 +1101,20 @@ views:
       defaultValue: null
       name: status
       description: null
+    templateItems:
+      type:
+        space: APM_AppData_4
+        externalId: APM_Template.templateItems
+      source:
+        space: APM_AppData_4
+        externalId: APM_TemplateItem
+        version: '7'
+        type: view
+      name: templateItems
+      description: null
+      edgeSource: null
+      direction: outwards
+      connectionType: multi_edge_connection
     title:
       container:
         space: APM_AppData_4
@@ -1199,20 +1145,6 @@ views:
       defaultValue: null
       name: updatedByExternalId
       description: null
-    templateItems:
-      type:
-        space: APM_AppData_4
-        externalId: APM_Template.templateItems
-      source:
-        space: APM_AppData_4
-        externalId: APM_TemplateItem
-        version: '7'
-        type: view
-      name: templateItems
-      description: null
-      edgeSource: null
-      direction: outwards
-      connectionType: multi_edge_connection
   lastUpdatedTime: 1699136187224
   createdTime: 1699136187224
 - space: APM_AppData_4
@@ -1326,6 +1258,74 @@ views:
       source: null
       defaultValue: null
       name: updatedByExternalId
+      description: null
+  lastUpdatedTime: 1699136187224
+  createdTime: 1699136187224
+- space: APM_AppData_4
+  externalId: APM_User
+  name: APM_User
+  version: '7'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    email:
+      container:
+        space: APM_AppData_4
+        externalId: APM_User
+      containerPropertyIdentifier: email
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: email
+      description: null
+    lastSeen:
+      container:
+        space: APM_AppData_4
+        externalId: APM_User
+      containerPropertyIdentifier: lastSeen
+      type:
+        list: false
+        type: timestamp
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: lastSeen
+      description: null
+    name:
+      container:
+        space: APM_AppData_4
+        externalId: APM_User
+      containerPropertyIdentifier: name
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: name
+      description: null
+    preferences:
+      container:
+        space: APM_AppData_4
+        externalId: APM_User
+      containerPropertyIdentifier: preferences
+      type:
+        list: false
+        type: json
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: preferences
       description: null
   lastUpdatedTime: 1699136187224
   createdTime: 1699136187224

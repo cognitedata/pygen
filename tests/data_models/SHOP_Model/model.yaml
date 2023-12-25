@@ -12,26 +12,11 @@ views:
   usedFor: node
   isGlobal: false
   properties:
-    name:
+    arguments:
       container:
         space: IntegrationTestsImmutable
         externalId: Case
-      containerPropertyIdentifier: name
-      type:
-        list: false
-        collation: ucs_basic
-        type: text
-      nullable: false
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: name
-      description: null
-    scenario:
-      container:
-        space: IntegrationTestsImmutable
-        externalId: Case
-      containerPropertyIdentifier: scenario
+      containerPropertyIdentifier: arguments
       type:
         list: false
         collation: ucs_basic
@@ -40,35 +25,35 @@ views:
       autoIncrement: false
       source: null
       defaultValue: null
-      name: scenario
+      name: arguments
       description: null
-    start_time:
+    bid:
       container:
         space: IntegrationTestsImmutable
         externalId: Case
-      containerPropertyIdentifier: start_time
+      containerPropertyIdentifier: bid
       type:
         list: false
-        type: timestamp
-      nullable: false
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: start_time
-      description: null
-    end_time:
-      container:
-        space: IntegrationTestsImmutable
-        externalId: Case
-      containerPropertyIdentifier: end_time
-      type:
-        list: false
-        type: timestamp
+        type: sequence
       nullable: true
       autoIncrement: false
       source: null
       defaultValue: null
-      name: end_time
+      name: bid
+      description: null
+    bid_history:
+      container:
+        space: IntegrationTestsImmutable
+        externalId: Case
+      containerPropertyIdentifier: bid_history
+      type:
+        list: true
+        type: sequence
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: bid_history
       description: null
     commands:
       container:
@@ -100,33 +85,34 @@ views:
       defaultValue: null
       name: cut_files
       description: null
-    bid:
+    end_time:
       container:
         space: IntegrationTestsImmutable
         externalId: Case
-      containerPropertyIdentifier: bid
+      containerPropertyIdentifier: end_time
       type:
         list: false
-        type: sequence
+        type: timestamp
       nullable: true
       autoIncrement: false
       source: null
       defaultValue: null
-      name: bid
+      name: end_time
       description: null
-    bid_history:
+    name:
       container:
         space: IntegrationTestsImmutable
         externalId: Case
-      containerPropertyIdentifier: bid_history
+      containerPropertyIdentifier: name
       type:
-        list: true
-        type: sequence
-      nullable: true
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: false
       autoIncrement: false
       source: null
       defaultValue: null
-      name: bid_history
+      name: name
       description: null
     runStatus:
       container:
@@ -143,11 +129,11 @@ views:
       defaultValue: null
       name: runStatus
       description: null
-    arguments:
+    scenario:
       container:
         space: IntegrationTestsImmutable
         externalId: Case
-      containerPropertyIdentifier: arguments
+      containerPropertyIdentifier: scenario
       type:
         list: false
         collation: ucs_basic
@@ -156,7 +142,21 @@ views:
       autoIncrement: false
       source: null
       defaultValue: null
-      name: arguments
+      name: scenario
+      description: null
+    start_time:
+      container:
+        space: IntegrationTestsImmutable
+        externalId: Case
+      containerPropertyIdentifier: start_time
+      type:
+        list: false
+        type: timestamp
+      nullable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: start_time
       description: null
   lastUpdatedTime: 1687962393258
   createdTime: 1687962393258

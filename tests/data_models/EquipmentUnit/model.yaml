@@ -149,24 +149,6 @@ views:
       defaultValue: null
       name: type
       description: null
-    work_units:
-      type:
-        space: IntegrationTestsImmutable
-        externalId: UnitProcedure.equipment_module
-      source:
-        space: IntegrationTestsImmutable
-        externalId: EquipmentModule
-        version: b1cd4bf14a7a33
-        type: view
-      name: work_units
-      description: null
-      edgeSource:
-        space: IntegrationTestsImmutable
-        externalId: StartEndTime
-        version: d416e0ed98186b
-        type: view
-      direction: outwards
-      connectionType: multi_edge_connection
     work_orders:
       type:
         space: IntegrationTestsImmutable
@@ -177,6 +159,24 @@ views:
         version: c5543fb2b1bc81
         type: view
       name: work_orders
+      description: null
+      edgeSource:
+        space: IntegrationTestsImmutable
+        externalId: StartEndTime
+        version: d416e0ed98186b
+        type: view
+      direction: outwards
+      connectionType: multi_edge_connection
+    work_units:
+      type:
+        space: IntegrationTestsImmutable
+        externalId: UnitProcedure.equipment_module
+      source:
+        space: IntegrationTestsImmutable
+        externalId: EquipmentModule
+        version: b1cd4bf14a7a33
+        type: view
+      name: work_units
       description: null
       edgeSource:
         space: IntegrationTestsImmutable
@@ -243,5 +243,5 @@ views:
   lastUpdatedTime: 1703424931271
   createdTime: 1703424931271
 isGlobal: false
-lastUpdatedTime: 1703424932659
+lastUpdatedTime: 1703485511412
 createdTime: 1703424932659

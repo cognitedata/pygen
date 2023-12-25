@@ -12,39 +12,11 @@ views:
   usedFor: node
   isGlobal: false
   properties:
-    start:
+    aggregation:
       container:
         space: IntegrationTestsImmutable
         externalId: ScenarioInstance
-      containerPropertyIdentifier: start
-      type:
-        list: false
-        type: timestamp
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: start
-      description: null
-    instance:
-      container:
-        space: IntegrationTestsImmutable
-        externalId: ScenarioInstance
-      containerPropertyIdentifier: instance
-      type:
-        list: false
-        type: timestamp
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: instance
-      description: null
-    scenario:
-      container:
-        space: IntegrationTestsImmutable
-        externalId: ScenarioInstance
-      containerPropertyIdentifier: scenario
+      containerPropertyIdentifier: aggregation
       type:
         list: false
         collation: ucs_basic
@@ -53,51 +25,7 @@ views:
       autoIncrement: false
       source: null
       defaultValue: null
-      name: scenario
-      description: null
-    priceArea:
-      container:
-        space: IntegrationTestsImmutable
-        externalId: ScenarioInstance
-      containerPropertyIdentifier: priceArea
-      type:
-        list: false
-        collation: ucs_basic
-        type: text
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: priceArea
-      description: null
-    market:
-      container:
-        space: IntegrationTestsImmutable
-        externalId: ScenarioInstance
-      containerPropertyIdentifier: market
-      type:
-        list: false
-        collation: ucs_basic
-        type: text
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: market
-      description: null
-    priceForecast:
-      container:
-        space: IntegrationTestsImmutable
-        externalId: ScenarioInstance
-      containerPropertyIdentifier: priceForecast
-      type:
-        list: false
-        type: timeseries
-      nullable: true
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: priceForecast
+      name: aggregation
       description: null
     country:
       container:
@@ -114,11 +42,25 @@ views:
       defaultValue: null
       name: country
       description: null
-    aggregation:
+    instance:
       container:
         space: IntegrationTestsImmutable
         externalId: ScenarioInstance
-      containerPropertyIdentifier: aggregation
+      containerPropertyIdentifier: instance
+      type:
+        list: false
+        type: timestamp
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: instance
+      description: null
+    market:
+      container:
+        space: IntegrationTestsImmutable
+        externalId: ScenarioInstance
+      containerPropertyIdentifier: market
       type:
         list: false
         collation: ucs_basic
@@ -127,7 +69,65 @@ views:
       autoIncrement: false
       source: null
       defaultValue: null
-      name: aggregation
+      name: market
+      description: null
+    priceArea:
+      container:
+        space: IntegrationTestsImmutable
+        externalId: ScenarioInstance
+      containerPropertyIdentifier: priceArea
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: priceArea
+      description: null
+    priceForecast:
+      container:
+        space: IntegrationTestsImmutable
+        externalId: ScenarioInstance
+      containerPropertyIdentifier: priceForecast
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: priceForecast
+      description: null
+    scenario:
+      container:
+        space: IntegrationTestsImmutable
+        externalId: ScenarioInstance
+      containerPropertyIdentifier: scenario
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: scenario
+      description: null
+    start:
+      container:
+        space: IntegrationTestsImmutable
+        externalId: ScenarioInstance
+      containerPropertyIdentifier: start
+      type:
+        list: false
+        type: timestamp
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: start
       description: null
   lastUpdatedTime: 1695443620025
   createdTime: 1695443620025
