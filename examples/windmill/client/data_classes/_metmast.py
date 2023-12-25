@@ -20,14 +20,14 @@ from ._core import (
 __all__ = ["Metmast", "MetmastApply", "MetmastList", "MetmastApplyList", "MetmastFields", "MetmastTextFields"]
 
 
-MetmastTextFields = Literal["wind_speed", "tilt_angle", "temperature"]
-MetmastFields = Literal["position", "wind_speed", "tilt_angle", "temperature"]
+MetmastTextFields = Literal["temperature", "tilt_angle", "wind_speed"]
+MetmastFields = Literal["position", "temperature", "tilt_angle", "wind_speed"]
 
 _METMAST_PROPERTIES_BY_FIELD = {
     "position": "position",
-    "wind_speed": "wind_speed",
-    "tilt_angle": "tilt_angle",
     "temperature": "temperature",
+    "tilt_angle": "tilt_angle",
+    "wind_speed": "wind_speed",
 }
 
 
@@ -40,9 +40,9 @@ class Metmast(DomainModel):
         space: The space where the node is located.
         external_id: The external id of the metmast.
         position: The position field.
-        wind_speed: The wind speed field.
-        tilt_angle: The tilt angle field.
         temperature: The temperature field.
+        tilt_angle: The tilt angle field.
+        wind_speed: The wind speed field.
         created_time: The created time of the metmast node.
         last_updated_time: The last updated time of the metmast node.
         deleted_time: If present, the deleted time of the metmast node.
@@ -51,9 +51,9 @@ class Metmast(DomainModel):
 
     space: str = DEFAULT_INSTANCE_SPACE
     position: Optional[float] = None
-    wind_speed: Union[TimeSeries, str, None] = None
-    tilt_angle: Union[TimeSeries, str, None] = None
     temperature: Union[TimeSeries, str, None] = None
+    tilt_angle: Union[TimeSeries, str, None] = None
+    wind_speed: Union[TimeSeries, str, None] = None
 
     def as_apply(self) -> MetmastApply:
         """Convert this read version of metmast to the writing version."""
@@ -61,9 +61,9 @@ class Metmast(DomainModel):
             space=self.space,
             external_id=self.external_id,
             position=self.position,
-            wind_speed=self.wind_speed,
-            tilt_angle=self.tilt_angle,
             temperature=self.temperature,
+            tilt_angle=self.tilt_angle,
+            wind_speed=self.wind_speed,
         )
 
 
@@ -76,9 +76,9 @@ class MetmastApply(DomainModelApply):
         space: The space where the node is located.
         external_id: The external id of the metmast.
         position: The position field.
-        wind_speed: The wind speed field.
-        tilt_angle: The tilt angle field.
         temperature: The temperature field.
+        tilt_angle: The tilt angle field.
+        wind_speed: The wind speed field.
         existing_version: Fail the ingestion request if the metmast version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
@@ -87,9 +87,9 @@ class MetmastApply(DomainModelApply):
 
     space: str = DEFAULT_INSTANCE_SPACE
     position: Optional[float] = None
-    wind_speed: Union[TimeSeries, str, None] = None
-    tilt_angle: Union[TimeSeries, str, None] = None
     temperature: Union[TimeSeries, str, None] = None
+    tilt_angle: Union[TimeSeries, str, None] = None
+    wind_speed: Union[TimeSeries, str, None] = None
 
     def _to_instances_apply(
         self,
@@ -109,9 +109,9 @@ class MetmastApply(DomainModelApply):
         if self.position is not None:
             properties["position"] = self.position
 
-        if self.wind_speed is not None:
-            properties["wind_speed"] = (
-                self.wind_speed if isinstance(self.wind_speed, str) else self.wind_speed.external_id
+        if self.temperature is not None:
+            properties["temperature"] = (
+                self.temperature if isinstance(self.temperature, str) else self.temperature.external_id
             )
 
         if self.tilt_angle is not None:
@@ -119,9 +119,9 @@ class MetmastApply(DomainModelApply):
                 self.tilt_angle if isinstance(self.tilt_angle, str) else self.tilt_angle.external_id
             )
 
-        if self.temperature is not None:
-            properties["temperature"] = (
-                self.temperature if isinstance(self.temperature, str) else self.temperature.external_id
+        if self.wind_speed is not None:
+            properties["wind_speed"] = (
+                self.wind_speed if isinstance(self.wind_speed, str) else self.wind_speed.external_id
             )
 
         if properties:
@@ -139,14 +139,14 @@ class MetmastApply(DomainModelApply):
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
 
-        if isinstance(self.wind_speed, CogniteTimeSeries):
-            resources.time_series.append(self.wind_speed)
+        if isinstance(self.temperature, CogniteTimeSeries):
+            resources.time_series.append(self.temperature)
 
         if isinstance(self.tilt_angle, CogniteTimeSeries):
             resources.time_series.append(self.tilt_angle)
 
-        if isinstance(self.temperature, CogniteTimeSeries):
-            resources.time_series.append(self.temperature)
+        if isinstance(self.wind_speed, CogniteTimeSeries):
+            resources.time_series.append(self.wind_speed)
 
         return resources
 

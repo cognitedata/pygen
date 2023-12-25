@@ -38,8 +38,8 @@ class CdfModel(DomainModel):
     Args:
         space: The space where the node is located.
         external_id: The external id of the cdf 3 d model.
-        name: The name field.
         entities: Collection of Cdf3dEntity that are part of this Cdf3dModel
+        name: The name field.
         created_time: The created time of the cdf 3 d model node.
         last_updated_time: The last updated time of the cdf 3 d model node.
         deleted_time: If present, the deleted time of the cdf 3 d model node.
@@ -47,16 +47,16 @@ class CdfModel(DomainModel):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    name: Optional[str] = None
     entities: Optional[list[CdfConnectionProperties]] = Field(default=None, repr=False)
+    name: Optional[str] = None
 
     def as_apply(self) -> CdfModelApply:
         """Convert this read version of cdf 3 d model to the writing version."""
         return CdfModelApply(
             space=self.space,
             external_id=self.external_id,
-            name=self.name,
             entities=[entity.as_apply() for entity in self.entities or []],
+            name=self.name,
         )
 
 
@@ -68,8 +68,8 @@ class CdfModelApply(DomainModelApply):
     Args:
         space: The space where the node is located.
         external_id: The external id of the cdf 3 d model.
-        name: The name field.
         entities: Collection of Cdf3dEntity that are part of this Cdf3dModel
+        name: The name field.
         existing_version: Fail the ingestion request if the cdf 3 d model version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
@@ -77,8 +77,8 @@ class CdfModelApply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    name: str
     entities: Optional[list[CdfConnectionPropertiesApply]] = Field(default=None, repr=False)
+    name: str
 
     def _to_instances_apply(
         self,

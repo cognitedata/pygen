@@ -26,12 +26,12 @@ __all__ = ["Windmill", "WindmillApply", "WindmillList", "WindmillApplyList", "Wi
 
 
 WindmillTextFields = Literal["name", "windfarm"]
-WindmillFields = Literal["name", "windfarm", "capacity"]
+WindmillFields = Literal["capacity", "name", "windfarm"]
 
 _WINDMILL_PROPERTIES_BY_FIELD = {
+    "capacity": "capacity",
     "name": "name",
     "windfarm": "windfarm",
-    "capacity": "capacity",
 }
 
 
@@ -43,13 +43,13 @@ class Windmill(DomainModel):
     Args:
         space: The space where the node is located.
         external_id: The external id of the windmill.
-        name: The name field.
-        windfarm: The windfarm field.
-        capacity: The capacity field.
-        rotor: The rotor field.
-        nacelle: The nacelle field.
         blades: The blade field.
+        capacity: The capacity field.
         metmast: The metmast field.
+        nacelle: The nacelle field.
+        name: The name field.
+        rotor: The rotor field.
+        windfarm: The windfarm field.
         created_time: The created time of the windmill node.
         last_updated_time: The last updated time of the windmill node.
         deleted_time: If present, the deleted time of the windmill node.
@@ -57,28 +57,28 @@ class Windmill(DomainModel):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    name: Optional[str] = None
-    windfarm: Optional[str] = None
-    capacity: Optional[float] = None
-    rotor: Union[Rotor, str, dm.NodeId, None] = Field(None, repr=False)
-    nacelle: Union[Nacelle, str, dm.NodeId, None] = Field(None, repr=False)
     blades: Union[list[Blade], list[str], None] = Field(default=None, repr=False)
+    capacity: Optional[float] = None
     metmast: Union[list[Metmast], list[str], None] = Field(default=None, repr=False)
+    nacelle: Union[Nacelle, str, dm.NodeId, None] = Field(None, repr=False)
+    name: Optional[str] = None
+    rotor: Union[Rotor, str, dm.NodeId, None] = Field(None, repr=False)
+    windfarm: Optional[str] = None
 
     def as_apply(self) -> WindmillApply:
         """Convert this read version of windmill to the writing version."""
         return WindmillApply(
             space=self.space,
             external_id=self.external_id,
-            name=self.name,
-            windfarm=self.windfarm,
-            capacity=self.capacity,
-            rotor=self.rotor.as_apply() if isinstance(self.rotor, DomainModel) else self.rotor,
-            nacelle=self.nacelle.as_apply() if isinstance(self.nacelle, DomainModel) else self.nacelle,
             blades=[blade.as_apply() if isinstance(blade, DomainModel) else blade for blade in self.blades or []],
+            capacity=self.capacity,
             metmast=[
                 metmast.as_apply() if isinstance(metmast, DomainModel) else metmast for metmast in self.metmast or []
             ],
+            nacelle=self.nacelle.as_apply() if isinstance(self.nacelle, DomainModel) else self.nacelle,
+            name=self.name,
+            rotor=self.rotor.as_apply() if isinstance(self.rotor, DomainModel) else self.rotor,
+            windfarm=self.windfarm,
         )
 
 
@@ -90,13 +90,13 @@ class WindmillApply(DomainModelApply):
     Args:
         space: The space where the node is located.
         external_id: The external id of the windmill.
-        name: The name field.
-        windfarm: The windfarm field.
-        capacity: The capacity field.
-        rotor: The rotor field.
-        nacelle: The nacelle field.
         blades: The blade field.
+        capacity: The capacity field.
         metmast: The metmast field.
+        nacelle: The nacelle field.
+        name: The name field.
+        rotor: The rotor field.
+        windfarm: The windfarm field.
         existing_version: Fail the ingestion request if the windmill version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
@@ -104,13 +104,13 @@ class WindmillApply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    name: Optional[str] = None
-    windfarm: Optional[str] = None
-    capacity: Optional[float] = None
-    rotor: Union[RotorApply, str, dm.NodeId, None] = Field(None, repr=False)
-    nacelle: Union[NacelleApply, str, dm.NodeId, None] = Field(None, repr=False)
     blades: Union[list[BladeApply], list[str], None] = Field(default=None, repr=False)
+    capacity: Optional[float] = None
     metmast: Union[list[MetmastApply], list[str], None] = Field(default=None, repr=False)
+    nacelle: Union[NacelleApply, str, dm.NodeId, None] = Field(None, repr=False)
+    name: Optional[str] = None
+    rotor: Union[RotorApply, str, dm.NodeId, None] = Field(None, repr=False)
+    windfarm: Optional[str] = None
 
     def _to_instances_apply(
         self,
@@ -127,14 +127,17 @@ class WindmillApply(DomainModelApply):
 
         properties = {}
 
-        if self.name is not None:
-            properties["name"] = self.name
-
-        if self.windfarm is not None:
-            properties["windfarm"] = self.windfarm
-
         if self.capacity is not None:
             properties["capacity"] = self.capacity
+
+        if self.nacelle is not None:
+            properties["nacelle"] = {
+                "space": self.space if isinstance(self.nacelle, str) else self.nacelle.space,
+                "externalId": self.nacelle if isinstance(self.nacelle, str) else self.nacelle.external_id,
+            }
+
+        if self.name is not None:
+            properties["name"] = self.name
 
         if self.rotor is not None:
             properties["rotor"] = {
@@ -142,11 +145,8 @@ class WindmillApply(DomainModelApply):
                 "externalId": self.rotor if isinstance(self.rotor, str) else self.rotor.external_id,
             }
 
-        if self.nacelle is not None:
-            properties["nacelle"] = {
-                "space": self.space if isinstance(self.nacelle, str) else self.nacelle.space,
-                "externalId": self.nacelle if isinstance(self.nacelle, str) else self.nacelle.external_id,
-            }
+        if self.windfarm is not None:
+            properties["windfarm"] = self.windfarm
 
         if properties:
             this_node = dm.NodeApply(
@@ -177,12 +177,12 @@ class WindmillApply(DomainModelApply):
             )
             resources.extend(other_resources)
 
-        if isinstance(self.rotor, DomainModelApply):
-            other_resources = self.rotor._to_instances_apply(cache, view_by_write_class)
-            resources.extend(other_resources)
-
         if isinstance(self.nacelle, DomainModelApply):
             other_resources = self.nacelle._to_instances_apply(cache, view_by_write_class)
+            resources.extend(other_resources)
+
+        if isinstance(self.rotor, DomainModelApply):
+            other_resources = self.rotor._to_instances_apply(cache, view_by_write_class)
             resources.extend(other_resources)
 
         return resources
@@ -206,54 +206,21 @@ class WindmillApplyList(DomainModelApplyList[WindmillApply]):
 
 def _create_windmill_filter(
     view_id: dm.ViewId,
-    name: str | list[str] | None = None,
-    name_prefix: str | None = None,
-    windfarm: str | list[str] | None = None,
-    windfarm_prefix: str | None = None,
     min_capacity: float | None = None,
     max_capacity: float | None = None,
-    rotor: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
     nacelle: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+    name: str | list[str] | None = None,
+    name_prefix: str | None = None,
+    rotor: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+    windfarm: str | list[str] | None = None,
+    windfarm_prefix: str | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
-    if name is not None and isinstance(name, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
-    if name and isinstance(name, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("name"), values=name))
-    if name_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
-    if windfarm is not None and isinstance(windfarm, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("windfarm"), value=windfarm))
-    if windfarm and isinstance(windfarm, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("windfarm"), values=windfarm))
-    if windfarm_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("windfarm"), value=windfarm_prefix))
     if min_capacity or max_capacity:
         filters.append(dm.filters.Range(view_id.as_property_ref("capacity"), gte=min_capacity, lte=max_capacity))
-    if rotor and isinstance(rotor, str):
-        filters.append(
-            dm.filters.Equals(view_id.as_property_ref("rotor"), value={"space": "power-models", "externalId": rotor})
-        )
-    if rotor and isinstance(rotor, tuple):
-        filters.append(
-            dm.filters.Equals(view_id.as_property_ref("rotor"), value={"space": rotor[0], "externalId": rotor[1]})
-        )
-    if rotor and isinstance(rotor, list) and isinstance(rotor[0], str):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("rotor"),
-                values=[{"space": "power-models", "externalId": item} for item in rotor],
-            )
-        )
-    if rotor and isinstance(rotor, list) and isinstance(rotor[0], tuple):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("rotor"), values=[{"space": item[0], "externalId": item[1]} for item in rotor]
-            )
-        )
     if nacelle and isinstance(nacelle, str):
         filters.append(
             dm.filters.Equals(
@@ -278,6 +245,39 @@ def _create_windmill_filter(
                 values=[{"space": item[0], "externalId": item[1]} for item in nacelle],
             )
         )
+    if name is not None and isinstance(name, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
+    if name and isinstance(name, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("name"), values=name))
+    if name_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
+    if rotor and isinstance(rotor, str):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("rotor"), value={"space": "power-models", "externalId": rotor})
+        )
+    if rotor and isinstance(rotor, tuple):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("rotor"), value={"space": rotor[0], "externalId": rotor[1]})
+        )
+    if rotor and isinstance(rotor, list) and isinstance(rotor[0], str):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("rotor"),
+                values=[{"space": "power-models", "externalId": item} for item in rotor],
+            )
+        )
+    if rotor and isinstance(rotor, list) and isinstance(rotor[0], tuple):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("rotor"), values=[{"space": item[0], "externalId": item[1]} for item in rotor]
+            )
+        )
+    if windfarm is not None and isinstance(windfarm, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("windfarm"), value=windfarm))
+    if windfarm and isinstance(windfarm, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("windfarm"), values=windfarm))
+    if windfarm_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("windfarm"), value=windfarm_prefix))
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if space is not None and isinstance(space, str):

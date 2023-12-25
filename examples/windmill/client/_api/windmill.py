@@ -54,14 +54,14 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
 
     def __call__(
         self,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
-        windfarm: str | list[str] | None = None,
-        windfarm_prefix: str | None = None,
         min_capacity: float | None = None,
         max_capacity: float | None = None,
-        rotor: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         nacelle: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        rotor: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        windfarm: str | list[str] | None = None,
+        windfarm_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
@@ -70,14 +70,14 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
         """Query starting at windmills.
 
         Args:
-            name: The name to filter on.
-            name_prefix: The prefix of the name to filter on.
-            windfarm: The windfarm to filter on.
-            windfarm_prefix: The prefix of the windfarm to filter on.
             min_capacity: The minimum value of the capacity to filter on.
             max_capacity: The maximum value of the capacity to filter on.
-            rotor: The rotor to filter on.
             nacelle: The nacelle to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            rotor: The rotor to filter on.
+            windfarm: The windfarm to filter on.
+            windfarm_prefix: The prefix of the windfarm to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of windmills to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -90,14 +90,14 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_windmill_filter(
             self._view_id,
-            name,
-            name_prefix,
-            windfarm,
-            windfarm_prefix,
             min_capacity,
             max_capacity,
-            rotor,
             nacelle,
+            name,
+            name_prefix,
+            rotor,
+            windfarm,
+            windfarm_prefix,
             external_id_prefix,
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
@@ -207,14 +207,14 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
         self,
         query: str,
         properties: WindmillTextFields | Sequence[WindmillTextFields] | None = None,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
-        windfarm: str | list[str] | None = None,
-        windfarm_prefix: str | None = None,
         min_capacity: float | None = None,
         max_capacity: float | None = None,
-        rotor: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         nacelle: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        rotor: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        windfarm: str | list[str] | None = None,
+        windfarm_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -225,14 +225,14 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
         Args:
             query: The search query,
             properties: The property to search, if nothing is passed all text fields will be searched.
-            name: The name to filter on.
-            name_prefix: The prefix of the name to filter on.
-            windfarm: The windfarm to filter on.
-            windfarm_prefix: The prefix of the windfarm to filter on.
             min_capacity: The minimum value of the capacity to filter on.
             max_capacity: The maximum value of the capacity to filter on.
-            rotor: The rotor to filter on.
             nacelle: The nacelle to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            rotor: The rotor to filter on.
+            windfarm: The windfarm to filter on.
+            windfarm_prefix: The prefix of the windfarm to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of windmills to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -252,14 +252,14 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
         """
         filter_ = _create_windmill_filter(
             self._view_id,
-            name,
-            name_prefix,
-            windfarm,
-            windfarm_prefix,
             min_capacity,
             max_capacity,
-            rotor,
             nacelle,
+            name,
+            name_prefix,
+            rotor,
+            windfarm,
+            windfarm_prefix,
             external_id_prefix,
             space,
             filter,
@@ -277,14 +277,14 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
         group_by: None = None,
         query: str | None = None,
         search_properties: WindmillTextFields | Sequence[WindmillTextFields] | None = None,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
-        windfarm: str | list[str] | None = None,
-        windfarm_prefix: str | None = None,
         min_capacity: float | None = None,
         max_capacity: float | None = None,
-        rotor: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         nacelle: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        rotor: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        windfarm: str | list[str] | None = None,
+        windfarm_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -303,14 +303,14 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
         group_by: WindmillFields | Sequence[WindmillFields] = None,
         query: str | None = None,
         search_properties: WindmillTextFields | Sequence[WindmillTextFields] | None = None,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
-        windfarm: str | list[str] | None = None,
-        windfarm_prefix: str | None = None,
         min_capacity: float | None = None,
         max_capacity: float | None = None,
-        rotor: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         nacelle: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        rotor: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        windfarm: str | list[str] | None = None,
+        windfarm_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -328,14 +328,14 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
         group_by: WindmillFields | Sequence[WindmillFields] | None = None,
         query: str | None = None,
         search_property: WindmillTextFields | Sequence[WindmillTextFields] | None = None,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
-        windfarm: str | list[str] | None = None,
-        windfarm_prefix: str | None = None,
         min_capacity: float | None = None,
         max_capacity: float | None = None,
-        rotor: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         nacelle: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        rotor: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        windfarm: str | list[str] | None = None,
+        windfarm_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -349,14 +349,14 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
             group_by: The property to group by when doing the aggregation.
             query: The query to search for in the text field.
             search_property: The text field to search in.
-            name: The name to filter on.
-            name_prefix: The prefix of the name to filter on.
-            windfarm: The windfarm to filter on.
-            windfarm_prefix: The prefix of the windfarm to filter on.
             min_capacity: The minimum value of the capacity to filter on.
             max_capacity: The maximum value of the capacity to filter on.
-            rotor: The rotor to filter on.
             nacelle: The nacelle to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            rotor: The rotor to filter on.
+            windfarm: The windfarm to filter on.
+            windfarm_prefix: The prefix of the windfarm to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of windmills to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -377,14 +377,14 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
 
         filter_ = _create_windmill_filter(
             self._view_id,
-            name,
-            name_prefix,
-            windfarm,
-            windfarm_prefix,
             min_capacity,
             max_capacity,
-            rotor,
             nacelle,
+            name,
+            name_prefix,
+            rotor,
+            windfarm,
+            windfarm_prefix,
             external_id_prefix,
             space,
             filter,
@@ -407,14 +407,14 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
         interval: float,
         query: str | None = None,
         search_property: WindmillTextFields | Sequence[WindmillTextFields] | None = None,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
-        windfarm: str | list[str] | None = None,
-        windfarm_prefix: str | None = None,
         min_capacity: float | None = None,
         max_capacity: float | None = None,
-        rotor: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         nacelle: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        rotor: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        windfarm: str | list[str] | None = None,
+        windfarm_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -427,14 +427,14 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
             interval: The interval to use for the histogram bins.
             query: The query to search for in the text field.
             search_property: The text field to search in.
-            name: The name to filter on.
-            name_prefix: The prefix of the name to filter on.
-            windfarm: The windfarm to filter on.
-            windfarm_prefix: The prefix of the windfarm to filter on.
             min_capacity: The minimum value of the capacity to filter on.
             max_capacity: The maximum value of the capacity to filter on.
-            rotor: The rotor to filter on.
             nacelle: The nacelle to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            rotor: The rotor to filter on.
+            windfarm: The windfarm to filter on.
+            windfarm_prefix: The prefix of the windfarm to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of windmills to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -446,14 +446,14 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
         """
         filter_ = _create_windmill_filter(
             self._view_id,
-            name,
-            name_prefix,
-            windfarm,
-            windfarm_prefix,
             min_capacity,
             max_capacity,
-            rotor,
             nacelle,
+            name,
+            name_prefix,
+            rotor,
+            windfarm,
+            windfarm_prefix,
             external_id_prefix,
             space,
             filter,
@@ -471,14 +471,14 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
 
     def list(
         self,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
-        windfarm: str | list[str] | None = None,
-        windfarm_prefix: str | None = None,
         min_capacity: float | None = None,
         max_capacity: float | None = None,
-        rotor: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         nacelle: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        rotor: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        windfarm: str | list[str] | None = None,
+        windfarm_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -488,14 +488,14 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
         """List/filter windmills
 
         Args:
-            name: The name to filter on.
-            name_prefix: The prefix of the name to filter on.
-            windfarm: The windfarm to filter on.
-            windfarm_prefix: The prefix of the windfarm to filter on.
             min_capacity: The minimum value of the capacity to filter on.
             max_capacity: The maximum value of the capacity to filter on.
-            rotor: The rotor to filter on.
             nacelle: The nacelle to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            rotor: The rotor to filter on.
+            windfarm: The windfarm to filter on.
+            windfarm_prefix: The prefix of the windfarm to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of windmills to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -516,14 +516,14 @@ class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
         """
         filter_ = _create_windmill_filter(
             self._view_id,
-            name,
-            name_prefix,
-            windfarm,
-            windfarm_prefix,
             min_capacity,
             max_capacity,
-            rotor,
             nacelle,
+            name,
+            name_prefix,
+            rotor,
+            windfarm,
+            windfarm_prefix,
             external_id_prefix,
             space,
             filter,

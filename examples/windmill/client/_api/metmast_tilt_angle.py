@@ -12,7 +12,7 @@ from cognite.client.data_classes.datapoints import Aggregate
 from windmill.client.data_classes._metmast import _create_metmast_filter
 from ._core import DEFAULT_LIMIT_READ, INSTANCE_QUERY_LIMIT
 
-ColumnNames = Literal["position", "wind_speed", "tilt_angle", "temperature"]
+ColumnNames = Literal["position", "temperature", "tilt_angle", "wind_speed"]
 
 
 class MetmastTiltAngleQuery:

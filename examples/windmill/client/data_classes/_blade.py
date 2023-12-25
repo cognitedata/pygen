@@ -23,11 +23,11 @@ __all__ = ["Blade", "BladeApply", "BladeList", "BladeApplyList", "BladeFields", 
 
 
 BladeTextFields = Literal["name"]
-BladeFields = Literal["name", "is_damaged"]
+BladeFields = Literal["is_damaged", "name"]
 
 _BLADE_PROPERTIES_BY_FIELD = {
-    "name": "name",
     "is_damaged": "is_damaged",
+    "name": "name",
 }
 
 
@@ -39,8 +39,8 @@ class Blade(DomainModel):
     Args:
         space: The space where the node is located.
         external_id: The external id of the blade.
-        name: The name field.
         is_damaged: The is damaged field.
+        name: The name field.
         sensor_positions: The sensor position field.
         created_time: The created time of the blade node.
         last_updated_time: The last updated time of the blade node.
@@ -49,8 +49,8 @@ class Blade(DomainModel):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    name: Optional[str] = None
     is_damaged: Optional[bool] = None
+    name: Optional[str] = None
     sensor_positions: Union[list[SensorPosition], list[str], None] = Field(default=None, repr=False)
 
     def as_apply(self) -> BladeApply:
@@ -58,8 +58,8 @@ class Blade(DomainModel):
         return BladeApply(
             space=self.space,
             external_id=self.external_id,
-            name=self.name,
             is_damaged=self.is_damaged,
+            name=self.name,
             sensor_positions=[
                 sensor_position.as_apply() if isinstance(sensor_position, DomainModel) else sensor_position
                 for sensor_position in self.sensor_positions or []
@@ -75,8 +75,8 @@ class BladeApply(DomainModelApply):
     Args:
         space: The space where the node is located.
         external_id: The external id of the blade.
-        name: The name field.
         is_damaged: The is damaged field.
+        name: The name field.
         sensor_positions: The sensor position field.
         existing_version: Fail the ingestion request if the blade version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
@@ -85,8 +85,8 @@ class BladeApply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    name: Optional[str] = None
     is_damaged: Optional[bool] = None
+    name: Optional[str] = None
     sensor_positions: Union[list[SensorPositionApply], list[str], None] = Field(default=None, repr=False)
 
     def _to_instances_apply(
@@ -104,11 +104,11 @@ class BladeApply(DomainModelApply):
 
         properties = {}
 
-        if self.name is not None:
-            properties["name"] = self.name
-
         if self.is_damaged is not None:
             properties["is_damaged"] = self.is_damaged
+
+        if self.name is not None:
+            properties["name"] = self.name
 
         if properties:
             this_node = dm.NodeApply(
@@ -157,22 +157,22 @@ class BladeApplyList(DomainModelApplyList[BladeApply]):
 
 def _create_blade_filter(
     view_id: dm.ViewId,
+    is_damaged: bool | None = None,
     name: str | list[str] | None = None,
     name_prefix: str | None = None,
-    is_damaged: bool | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
+    if is_damaged is not None and isinstance(is_damaged, bool):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("is_damaged"), value=is_damaged))
     if name is not None and isinstance(name, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
     if name and isinstance(name, list):
         filters.append(dm.filters.In(view_id.as_property_ref("name"), values=name))
     if name_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
-    if is_damaged is not None and isinstance(is_damaged, bool):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("is_damaged"), value=is_damaged))
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if space is not None and isinstance(space, str):

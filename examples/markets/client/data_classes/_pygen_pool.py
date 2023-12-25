@@ -27,12 +27,12 @@ __all__ = [
 
 
 PygenPoolTextFields = Literal["name", "timezone"]
-PygenPoolFields = Literal["name", "timezone", "day_of_week"]
+PygenPoolFields = Literal["day_of_week", "name", "timezone"]
 
 _PYGENPOOL_PROPERTIES_BY_FIELD = {
+    "day_of_week": "dayOfWeek",
     "name": "name",
     "timezone": "timezone",
-    "day_of_week": "dayOfWeek",
 }
 
 
@@ -44,9 +44,9 @@ class PygenPool(DomainModel):
     Args:
         space: The space where the node is located.
         external_id: The external id of the pygen pool.
+        day_of_week: The day of week field.
         name: The name field.
         timezone: The timezone field.
-        day_of_week: The day of week field.
         created_time: The created time of the pygen pool node.
         last_updated_time: The last updated time of the pygen pool node.
         deleted_time: If present, the deleted time of the pygen pool node.
@@ -54,18 +54,18 @@ class PygenPool(DomainModel):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    day_of_week: Optional[int] = Field(None, alias="dayOfWeek")
     name: Optional[str] = None
     timezone: Optional[str] = None
-    day_of_week: Optional[int] = Field(None, alias="dayOfWeek")
 
     def as_apply(self) -> PygenPoolApply:
         """Convert this read version of pygen pool to the writing version."""
         return PygenPoolApply(
             space=self.space,
             external_id=self.external_id,
+            day_of_week=self.day_of_week,
             name=self.name,
             timezone=self.timezone,
-            day_of_week=self.day_of_week,
         )
 
 
@@ -77,9 +77,9 @@ class PygenPoolApply(DomainModelApply):
     Args:
         space: The space where the node is located.
         external_id: The external id of the pygen pool.
+        day_of_week: The day of week field.
         name: The name field.
         timezone: The timezone field.
-        day_of_week: The day of week field.
         existing_version: Fail the ingestion request if the pygen pool version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
@@ -87,9 +87,9 @@ class PygenPoolApply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    day_of_week: Optional[int] = Field(None, alias="dayOfWeek")
     name: Optional[str] = None
     timezone: Optional[str] = None
-    day_of_week: Optional[int] = Field(None, alias="dayOfWeek")
 
     def _to_instances_apply(
         self,
@@ -106,14 +106,14 @@ class PygenPoolApply(DomainModelApply):
 
         properties = {}
 
+        if self.day_of_week is not None:
+            properties["dayOfWeek"] = self.day_of_week
+
         if self.name is not None:
             properties["name"] = self.name
 
         if self.timezone is not None:
             properties["timezone"] = self.timezone
-
-        if self.day_of_week is not None:
-            properties["dayOfWeek"] = self.day_of_week
 
         if properties:
             this_node = dm.NodeApply(
@@ -151,17 +151,19 @@ class PygenPoolApplyList(DomainModelApplyList[PygenPoolApply]):
 
 def _create_pygen_pool_filter(
     view_id: dm.ViewId,
+    min_day_of_week: int | None = None,
+    max_day_of_week: int | None = None,
     name: str | list[str] | None = None,
     name_prefix: str | None = None,
     timezone: str | list[str] | None = None,
     timezone_prefix: str | None = None,
-    min_day_of_week: int | None = None,
-    max_day_of_week: int | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
+    if min_day_of_week or max_day_of_week:
+        filters.append(dm.filters.Range(view_id.as_property_ref("dayOfWeek"), gte=min_day_of_week, lte=max_day_of_week))
     if name is not None and isinstance(name, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
     if name and isinstance(name, list):
@@ -174,8 +176,6 @@ def _create_pygen_pool_filter(
         filters.append(dm.filters.In(view_id.as_property_ref("timezone"), values=timezone))
     if timezone_prefix:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("timezone"), value=timezone_prefix))
-    if min_day_of_week or max_day_of_week:
-        filters.append(dm.filters.Range(view_id.as_property_ref("dayOfWeek"), gte=min_day_of_week, lte=max_day_of_week))
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if space is not None and isinstance(space, str):

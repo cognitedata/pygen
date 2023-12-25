@@ -13,15 +13,15 @@ from windmill.client.data_classes._sensor_position import _create_sensor_positio
 from ._core import DEFAULT_LIMIT_READ, INSTANCE_QUERY_LIMIT
 
 ColumnNames = Literal[
-    "position",
-    "flapwise_bend_mom",
-    "flapwise_bend_mom_offset",
-    "flapwise_bend_mom_crosstalk_corrected",
-    "flapwise_bend_mom_offset_crosstalk_corrected",
-    "edgewisewise_bend_mom",
-    "edgewise_bend_mom_offset",
     "edgewise_bend_mom_crosstalk_corrected",
+    "edgewise_bend_mom_offset",
     "edgewise_bend_mom_offset_crosstalk_corrected",
+    "edgewisewise_bend_mom",
+    "flapwise_bend_mom",
+    "flapwise_bend_mom_crosstalk_corrected",
+    "flapwise_bend_mom_offset",
+    "flapwise_bend_mom_offset_crosstalk_corrected",
+    "position",
 ]
 
 

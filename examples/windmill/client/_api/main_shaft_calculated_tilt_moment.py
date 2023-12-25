@@ -12,7 +12,7 @@ from cognite.client.data_classes.datapoints import Aggregate
 from windmill.client.data_classes._main_shaft import _create_main_shaft_filter
 from ._core import DEFAULT_LIMIT_READ, INSTANCE_QUERY_LIMIT
 
-ColumnNames = Literal["torque", "calculated_tilt_moment", "calculated_yaw_moment", "bending_x", "bending_y"]
+ColumnNames = Literal["bending_x", "bending_y", "calculated_tilt_moment", "calculated_yaw_moment", "torque"]
 
 
 class MainShaftCalculatedTiltMomentQuery:

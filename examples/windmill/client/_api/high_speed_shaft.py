@@ -30,9 +30,9 @@ from ._core import (
     QueryStep,
     QueryBuilder,
 )
-from .high_speed_shaft_torque import HighSpeedShaftTorqueAPI
-from .high_speed_shaft_bending_monent_x import HighSpeedShaftBendingMonentXAPI
 from .high_speed_shaft_bending_moment_y import HighSpeedShaftBendingMomentYAPI
+from .high_speed_shaft_bending_monent_x import HighSpeedShaftBendingMonentXAPI
+from .high_speed_shaft_torque import HighSpeedShaftTorqueAPI
 from .high_speed_shaft_query import HighSpeedShaftQueryAPI
 
 
@@ -49,9 +49,9 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftApply, HighSpeedSh
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self.torque = HighSpeedShaftTorqueAPI(client, view_id)
-        self.bending_monent_x = HighSpeedShaftBendingMonentXAPI(client, view_id)
         self.bending_moment_y = HighSpeedShaftBendingMomentYAPI(client, view_id)
+        self.bending_monent_x = HighSpeedShaftBendingMonentXAPI(client, view_id)
+        self.torque = HighSpeedShaftTorqueAPI(client, view_id)
 
     def __call__(
         self,

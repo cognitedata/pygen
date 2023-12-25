@@ -52,9 +52,9 @@ class BladeAPI(NodeAPI[Blade, BladeApply, BladeList]):
 
     def __call__(
         self,
+        is_damaged: bool | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        is_damaged: bool | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
@@ -63,9 +63,9 @@ class BladeAPI(NodeAPI[Blade, BladeApply, BladeList]):
         """Query starting at blades.
 
         Args:
+            is_damaged: The is damaged to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
-            is_damaged: The is damaged to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of blades to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -78,9 +78,9 @@ class BladeAPI(NodeAPI[Blade, BladeApply, BladeList]):
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_blade_filter(
             self._view_id,
+            is_damaged,
             name,
             name_prefix,
-            is_damaged,
             external_id_prefix,
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
@@ -184,9 +184,9 @@ class BladeAPI(NodeAPI[Blade, BladeApply, BladeList]):
         self,
         query: str,
         properties: BladeTextFields | Sequence[BladeTextFields] | None = None,
+        is_damaged: bool | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        is_damaged: bool | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -197,9 +197,9 @@ class BladeAPI(NodeAPI[Blade, BladeApply, BladeList]):
         Args:
             query: The search query,
             properties: The property to search, if nothing is passed all text fields will be searched.
+            is_damaged: The is damaged to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
-            is_damaged: The is damaged to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of blades to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -219,9 +219,9 @@ class BladeAPI(NodeAPI[Blade, BladeApply, BladeList]):
         """
         filter_ = _create_blade_filter(
             self._view_id,
+            is_damaged,
             name,
             name_prefix,
-            is_damaged,
             external_id_prefix,
             space,
             filter,
@@ -239,9 +239,9 @@ class BladeAPI(NodeAPI[Blade, BladeApply, BladeList]):
         group_by: None = None,
         query: str | None = None,
         search_properties: BladeTextFields | Sequence[BladeTextFields] | None = None,
+        is_damaged: bool | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        is_damaged: bool | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -260,9 +260,9 @@ class BladeAPI(NodeAPI[Blade, BladeApply, BladeList]):
         group_by: BladeFields | Sequence[BladeFields] = None,
         query: str | None = None,
         search_properties: BladeTextFields | Sequence[BladeTextFields] | None = None,
+        is_damaged: bool | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        is_damaged: bool | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -280,9 +280,9 @@ class BladeAPI(NodeAPI[Blade, BladeApply, BladeList]):
         group_by: BladeFields | Sequence[BladeFields] | None = None,
         query: str | None = None,
         search_property: BladeTextFields | Sequence[BladeTextFields] | None = None,
+        is_damaged: bool | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        is_damaged: bool | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -296,9 +296,9 @@ class BladeAPI(NodeAPI[Blade, BladeApply, BladeList]):
             group_by: The property to group by when doing the aggregation.
             query: The query to search for in the text field.
             search_property: The text field to search in.
+            is_damaged: The is damaged to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
-            is_damaged: The is damaged to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of blades to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -319,9 +319,9 @@ class BladeAPI(NodeAPI[Blade, BladeApply, BladeList]):
 
         filter_ = _create_blade_filter(
             self._view_id,
+            is_damaged,
             name,
             name_prefix,
-            is_damaged,
             external_id_prefix,
             space,
             filter,
@@ -344,9 +344,9 @@ class BladeAPI(NodeAPI[Blade, BladeApply, BladeList]):
         interval: float,
         query: str | None = None,
         search_property: BladeTextFields | Sequence[BladeTextFields] | None = None,
+        is_damaged: bool | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        is_damaged: bool | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -359,9 +359,9 @@ class BladeAPI(NodeAPI[Blade, BladeApply, BladeList]):
             interval: The interval to use for the histogram bins.
             query: The query to search for in the text field.
             search_property: The text field to search in.
+            is_damaged: The is damaged to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
-            is_damaged: The is damaged to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of blades to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -373,9 +373,9 @@ class BladeAPI(NodeAPI[Blade, BladeApply, BladeList]):
         """
         filter_ = _create_blade_filter(
             self._view_id,
+            is_damaged,
             name,
             name_prefix,
-            is_damaged,
             external_id_prefix,
             space,
             filter,
@@ -393,9 +393,9 @@ class BladeAPI(NodeAPI[Blade, BladeApply, BladeList]):
 
     def list(
         self,
+        is_damaged: bool | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        is_damaged: bool | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -405,9 +405,9 @@ class BladeAPI(NodeAPI[Blade, BladeApply, BladeList]):
         """List/filter blades
 
         Args:
+            is_damaged: The is damaged to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
-            is_damaged: The is damaged to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of blades to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -428,9 +428,9 @@ class BladeAPI(NodeAPI[Blade, BladeApply, BladeList]):
         """
         filter_ = _create_blade_filter(
             self._view_id,
+            is_damaged,
             name,
             name_prefix,
-            is_damaged,
             external_id_prefix,
             space,
             filter,

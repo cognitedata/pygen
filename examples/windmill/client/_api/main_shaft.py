@@ -30,11 +30,11 @@ from ._core import (
     QueryStep,
     QueryBuilder,
 )
-from .main_shaft_torque import MainShaftTorqueAPI
-from .main_shaft_calculated_tilt_moment import MainShaftCalculatedTiltMomentAPI
-from .main_shaft_calculated_yaw_moment import MainShaftCalculatedYawMomentAPI
 from .main_shaft_bending_x import MainShaftBendingXAPI
 from .main_shaft_bending_y import MainShaftBendingYAPI
+from .main_shaft_calculated_tilt_moment import MainShaftCalculatedTiltMomentAPI
+from .main_shaft_calculated_yaw_moment import MainShaftCalculatedYawMomentAPI
+from .main_shaft_torque import MainShaftTorqueAPI
 from .main_shaft_query import MainShaftQueryAPI
 
 
@@ -51,11 +51,11 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftApply, MainShaftList]):
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self.torque = MainShaftTorqueAPI(client, view_id)
-        self.calculated_tilt_moment = MainShaftCalculatedTiltMomentAPI(client, view_id)
-        self.calculated_yaw_moment = MainShaftCalculatedYawMomentAPI(client, view_id)
         self.bending_x = MainShaftBendingXAPI(client, view_id)
         self.bending_y = MainShaftBendingYAPI(client, view_id)
+        self.calculated_tilt_moment = MainShaftCalculatedTiltMomentAPI(client, view_id)
+        self.calculated_yaw_moment = MainShaftCalculatedYawMomentAPI(client, view_id)
+        self.torque = MainShaftTorqueAPI(client, view_id)
 
     def __call__(
         self,

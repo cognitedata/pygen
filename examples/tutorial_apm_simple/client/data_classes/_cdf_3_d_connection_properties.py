@@ -248,7 +248,7 @@ def _create_cdf_3_d_connection_property_filter(
 
 _EXPECTED_START_NODES_BY_END_NODE = {
     CdfEntityApply: {CdfModelApply},
-    CdfModelApply: {CdfEntityApply, AssetApply},
+    CdfModelApply: {AssetApply, CdfEntityApply},
 }
 
 

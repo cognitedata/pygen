@@ -30,9 +30,9 @@ from ._core import (
     QueryStep,
     QueryBuilder,
 )
-from .metmast_wind_speed import MetmastWindSpeedAPI
-from .metmast_tilt_angle import MetmastTiltAngleAPI
 from .metmast_temperature import MetmastTemperatureAPI
+from .metmast_tilt_angle import MetmastTiltAngleAPI
+from .metmast_wind_speed import MetmastWindSpeedAPI
 from .metmast_query import MetmastQueryAPI
 
 
@@ -49,9 +49,9 @@ class MetmastAPI(NodeAPI[Metmast, MetmastApply, MetmastList]):
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self.wind_speed = MetmastWindSpeedAPI(client, view_id)
-        self.tilt_angle = MetmastTiltAngleAPI(client, view_id)
         self.temperature = MetmastTemperatureAPI(client, view_id)
+        self.tilt_angle = MetmastTiltAngleAPI(client, view_id)
+        self.wind_speed = MetmastWindSpeedAPI(client, view_id)
 
     def __call__(
         self,

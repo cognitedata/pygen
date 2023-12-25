@@ -43,13 +43,13 @@ class Movie(DomainModel):
     Args:
         space: The space where the node is located.
         external_id: The external id of the movie.
+        actors: The actor field.
+        directors: The director field.
         meta: The meta field.
         rating: The rating field.
         release_year: The release year field.
         run_time_minutes: The run time minute field.
         title: The title field.
-        actors: The actor field.
-        directors: The director field.
         created_time: The created time of the movie node.
         last_updated_time: The last updated time of the movie node.
         deleted_time: If present, the deleted time of the movie node.
@@ -57,29 +57,29 @@ class Movie(DomainModel):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    actors: Union[list[Actor], list[str], None] = Field(default=None, repr=False)
+    directors: Union[list[Director], list[str], None] = Field(default=None, repr=False)
     meta: Optional[dict] = None
     rating: Union[Rating, str, dm.NodeId, None] = Field(None, repr=False)
     release_year: Optional[int] = Field(None, alias="releaseYear")
     run_time_minutes: Optional[float] = Field(None, alias="runTimeMinutes")
     title: Optional[str] = None
-    actors: Union[list[Actor], list[str], None] = Field(default=None, repr=False)
-    directors: Union[list[Director], list[str], None] = Field(default=None, repr=False)
 
     def as_apply(self) -> MovieApply:
         """Convert this read version of movie to the writing version."""
         return MovieApply(
             space=self.space,
             external_id=self.external_id,
-            meta=self.meta,
-            rating=self.rating.as_apply() if isinstance(self.rating, DomainModel) else self.rating,
-            release_year=self.release_year,
-            run_time_minutes=self.run_time_minutes,
-            title=self.title,
             actors=[actor.as_apply() if isinstance(actor, DomainModel) else actor for actor in self.actors or []],
             directors=[
                 director.as_apply() if isinstance(director, DomainModel) else director
                 for director in self.directors or []
             ],
+            meta=self.meta,
+            rating=self.rating.as_apply() if isinstance(self.rating, DomainModel) else self.rating,
+            release_year=self.release_year,
+            run_time_minutes=self.run_time_minutes,
+            title=self.title,
         )
 
 
@@ -91,13 +91,13 @@ class MovieApply(DomainModelApply):
     Args:
         space: The space where the node is located.
         external_id: The external id of the movie.
+        actors: The actor field.
+        directors: The director field.
         meta: The meta field.
         rating: The rating field.
         release_year: The release year field.
         run_time_minutes: The run time minute field.
         title: The title field.
-        actors: The actor field.
-        directors: The director field.
         existing_version: Fail the ingestion request if the movie version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
@@ -105,13 +105,13 @@ class MovieApply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    actors: Union[list[ActorApply], list[str], None] = Field(default=None, repr=False)
+    directors: Union[list[DirectorApply], list[str], None] = Field(default=None, repr=False)
     meta: Optional[dict] = None
     rating: Union[RatingApply, str, dm.NodeId, None] = Field(None, repr=False)
     release_year: Optional[int] = Field(None, alias="releaseYear")
     run_time_minutes: Optional[float] = Field(None, alias="runTimeMinutes")
     title: str
-    actors: Union[list[ActorApply], list[str], None] = Field(default=None, repr=False)
-    directors: Union[list[DirectorApply], list[str], None] = Field(default=None, repr=False)
 
     def _to_instances_apply(
         self,

@@ -19,7 +19,7 @@ from tutorial_apm_simple.client.data_classes._cdf_3_d_connection_properties impo
 )
 
 if TYPE_CHECKING:
-    from .cdf_3_d_entity_query import CdfEntityQueryAPI
+    from .cdf_3_d_model_query import CdfModelQueryAPI
 
 
 class CdfEntityQueryAPI(QueryAPI[T_DomainModelList]):
@@ -55,7 +55,7 @@ class CdfEntityQueryAPI(QueryAPI[T_DomainModelList]):
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_QUERY_LIMIT,
-    ) -> CdfEntityQueryAPI[T_DomainModelList]:
+    ) -> CdfModelQueryAPI[T_DomainModelList]:
         """Query along the in model 3 d edges of the cdf 3 d entity.
 
         Args:
@@ -69,9 +69,9 @@ class CdfEntityQueryAPI(QueryAPI[T_DomainModelList]):
                 to return all items.
 
         Returns:
-            CdfEntityQueryAPI: The query API for the cdf 3 d entity.
+            CdfModelQueryAPI: The query API for the cdf 3 d model.
         """
-        from .cdf_3_d_entity_query import CdfEntityQueryAPI
+        from .cdf_3_d_model_query import CdfModelQueryAPI
 
         from_ = self._builder[-1].name
 
@@ -101,7 +101,7 @@ class CdfEntityQueryAPI(QueryAPI[T_DomainModelList]):
                 max_retrieve_limit=limit,
             )
         )
-        return CdfEntityQueryAPI(self._client, self._builder, self._view_by_write_class, None, limit)
+        return CdfModelQueryAPI(self._client, self._builder, self._view_by_write_class, None, limit)
 
     def query(
         self,

@@ -52,14 +52,14 @@ class Nacelle(DomainModel):
     Args:
         space: The space where the node is located.
         external_id: The external id of the nacelle.
+        acc_from_back_side_x: The acc from back side x field.
+        acc_from_back_side_y: The acc from back side y field.
+        acc_from_back_side_z: The acc from back side z field.
         gearbox: The gearbox field.
         generator: The generator field.
         high_speed_shaft: The high speed shaft field.
         main_shaft: The main shaft field.
         power_inverter: The power inverter field.
-        acc_from_back_side_x: The acc from back side x field.
-        acc_from_back_side_y: The acc from back side y field.
-        acc_from_back_side_z: The acc from back side z field.
         yaw_direction: The yaw direction field.
         yaw_error: The yaw error field.
         created_time: The created time of the nacelle node.
@@ -69,14 +69,14 @@ class Nacelle(DomainModel):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    acc_from_back_side_x: Union[TimeSeries, str, None] = None
+    acc_from_back_side_y: Union[TimeSeries, str, None] = None
+    acc_from_back_side_z: Union[TimeSeries, str, None] = None
     gearbox: Union[Gearbox, str, dm.NodeId, None] = Field(None, repr=False)
     generator: Union[Generator, str, dm.NodeId, None] = Field(None, repr=False)
     high_speed_shaft: Union[HighSpeedShaft, str, dm.NodeId, None] = Field(None, repr=False)
     main_shaft: Union[MainShaft, str, dm.NodeId, None] = Field(None, repr=False)
     power_inverter: Union[PowerInverter, str, dm.NodeId, None] = Field(None, repr=False)
-    acc_from_back_side_x: Union[TimeSeries, str, None] = None
-    acc_from_back_side_y: Union[TimeSeries, str, None] = None
-    acc_from_back_side_z: Union[TimeSeries, str, None] = None
     yaw_direction: Union[TimeSeries, str, None] = None
     yaw_error: Union[TimeSeries, str, None] = None
 
@@ -85,6 +85,9 @@ class Nacelle(DomainModel):
         return NacelleApply(
             space=self.space,
             external_id=self.external_id,
+            acc_from_back_side_x=self.acc_from_back_side_x,
+            acc_from_back_side_y=self.acc_from_back_side_y,
+            acc_from_back_side_z=self.acc_from_back_side_z,
             gearbox=self.gearbox.as_apply() if isinstance(self.gearbox, DomainModel) else self.gearbox,
             generator=self.generator.as_apply() if isinstance(self.generator, DomainModel) else self.generator,
             high_speed_shaft=self.high_speed_shaft.as_apply()
@@ -94,9 +97,6 @@ class Nacelle(DomainModel):
             power_inverter=self.power_inverter.as_apply()
             if isinstance(self.power_inverter, DomainModel)
             else self.power_inverter,
-            acc_from_back_side_x=self.acc_from_back_side_x,
-            acc_from_back_side_y=self.acc_from_back_side_y,
-            acc_from_back_side_z=self.acc_from_back_side_z,
             yaw_direction=self.yaw_direction,
             yaw_error=self.yaw_error,
         )
@@ -110,14 +110,14 @@ class NacelleApply(DomainModelApply):
     Args:
         space: The space where the node is located.
         external_id: The external id of the nacelle.
+        acc_from_back_side_x: The acc from back side x field.
+        acc_from_back_side_y: The acc from back side y field.
+        acc_from_back_side_z: The acc from back side z field.
         gearbox: The gearbox field.
         generator: The generator field.
         high_speed_shaft: The high speed shaft field.
         main_shaft: The main shaft field.
         power_inverter: The power inverter field.
-        acc_from_back_side_x: The acc from back side x field.
-        acc_from_back_side_y: The acc from back side y field.
-        acc_from_back_side_z: The acc from back side z field.
         yaw_direction: The yaw direction field.
         yaw_error: The yaw error field.
         existing_version: Fail the ingestion request if the nacelle version is greater than or equal to this value.
@@ -127,14 +127,14 @@ class NacelleApply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    acc_from_back_side_x: Union[TimeSeries, str, None] = None
+    acc_from_back_side_y: Union[TimeSeries, str, None] = None
+    acc_from_back_side_z: Union[TimeSeries, str, None] = None
     gearbox: Union[GearboxApply, str, dm.NodeId, None] = Field(None, repr=False)
     generator: Union[GeneratorApply, str, dm.NodeId, None] = Field(None, repr=False)
     high_speed_shaft: Union[HighSpeedShaftApply, str, dm.NodeId, None] = Field(None, repr=False)
     main_shaft: Union[MainShaftApply, str, dm.NodeId, None] = Field(None, repr=False)
     power_inverter: Union[PowerInverterApply, str, dm.NodeId, None] = Field(None, repr=False)
-    acc_from_back_side_x: Union[TimeSeries, str, None] = None
-    acc_from_back_side_y: Union[TimeSeries, str, None] = None
-    acc_from_back_side_z: Union[TimeSeries, str, None] = None
     yaw_direction: Union[TimeSeries, str, None] = None
     yaw_error: Union[TimeSeries, str, None] = None
 
@@ -152,6 +152,27 @@ class NacelleApply(DomainModelApply):
         )
 
         properties = {}
+
+        if self.acc_from_back_side_x is not None:
+            properties["acc_from_back_side_x"] = (
+                self.acc_from_back_side_x
+                if isinstance(self.acc_from_back_side_x, str)
+                else self.acc_from_back_side_x.external_id
+            )
+
+        if self.acc_from_back_side_y is not None:
+            properties["acc_from_back_side_y"] = (
+                self.acc_from_back_side_y
+                if isinstance(self.acc_from_back_side_y, str)
+                else self.acc_from_back_side_y.external_id
+            )
+
+        if self.acc_from_back_side_z is not None:
+            properties["acc_from_back_side_z"] = (
+                self.acc_from_back_side_z
+                if isinstance(self.acc_from_back_side_z, str)
+                else self.acc_from_back_side_z.external_id
+            )
 
         if self.gearbox is not None:
             properties["gearbox"] = {
@@ -186,27 +207,6 @@ class NacelleApply(DomainModelApply):
                 if isinstance(self.power_inverter, str)
                 else self.power_inverter.external_id,
             }
-
-        if self.acc_from_back_side_x is not None:
-            properties["acc_from_back_side_x"] = (
-                self.acc_from_back_side_x
-                if isinstance(self.acc_from_back_side_x, str)
-                else self.acc_from_back_side_x.external_id
-            )
-
-        if self.acc_from_back_side_y is not None:
-            properties["acc_from_back_side_y"] = (
-                self.acc_from_back_side_y
-                if isinstance(self.acc_from_back_side_y, str)
-                else self.acc_from_back_side_y.external_id
-            )
-
-        if self.acc_from_back_side_z is not None:
-            properties["acc_from_back_side_z"] = (
-                self.acc_from_back_side_z
-                if isinstance(self.acc_from_back_side_z, str)
-                else self.acc_from_back_side_z.external_id
-            )
 
         if self.yaw_direction is not None:
             properties["yaw_direction"] = (

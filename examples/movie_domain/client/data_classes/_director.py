@@ -38,10 +38,10 @@ class Director(DomainModel):
     Args:
         space: The space where the node is located.
         external_id: The external id of the director.
+        movies: The movie field.
+        nomination: The nomination field.
         person: The person field.
         won_oscar: The won oscar field.
-        nomination: The nomination field.
-        movies: The movie field.
         created_time: The created time of the director node.
         last_updated_time: The last updated time of the director node.
         deleted_time: If present, the deleted time of the director node.
@@ -49,23 +49,23 @@ class Director(DomainModel):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    movies: Union[list[Movie], list[str], None] = Field(default=None, repr=False)
+    nomination: Union[list[Nomination], list[str], None] = Field(default=None, repr=False)
     person: Union[Person, str, dm.NodeId, None] = Field(None, repr=False)
     won_oscar: Optional[bool] = Field(None, alias="wonOscar")
-    nomination: Union[list[Nomination], list[str], None] = Field(default=None, repr=False)
-    movies: Union[list[Movie], list[str], None] = Field(default=None, repr=False)
 
     def as_apply(self) -> DirectorApply:
         """Convert this read version of director to the writing version."""
         return DirectorApply(
             space=self.space,
             external_id=self.external_id,
-            person=self.person.as_apply() if isinstance(self.person, DomainModel) else self.person,
-            won_oscar=self.won_oscar,
+            movies=[movie.as_apply() if isinstance(movie, DomainModel) else movie for movie in self.movies or []],
             nomination=[
                 nomination.as_apply() if isinstance(nomination, DomainModel) else nomination
                 for nomination in self.nomination or []
             ],
-            movies=[movie.as_apply() if isinstance(movie, DomainModel) else movie for movie in self.movies or []],
+            person=self.person.as_apply() if isinstance(self.person, DomainModel) else self.person,
+            won_oscar=self.won_oscar,
         )
 
 
@@ -77,10 +77,10 @@ class DirectorApply(DomainModelApply):
     Args:
         space: The space where the node is located.
         external_id: The external id of the director.
+        movies: The movie field.
+        nomination: The nomination field.
         person: The person field.
         won_oscar: The won oscar field.
-        nomination: The nomination field.
-        movies: The movie field.
         existing_version: Fail the ingestion request if the director version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
@@ -88,10 +88,10 @@ class DirectorApply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    movies: Union[list[MovieApply], list[str], None] = Field(default=None, repr=False)
+    nomination: Union[list[NominationApply], list[str], None] = Field(default=None, repr=False)
     person: Union[PersonApply, str, dm.NodeId, None] = Field(None, repr=False)
     won_oscar: Optional[bool] = Field(None, alias="wonOscar")
-    nomination: Union[list[NominationApply], list[str], None] = Field(default=None, repr=False)
-    movies: Union[list[MovieApply], list[str], None] = Field(default=None, repr=False)
 
     def _to_instances_apply(
         self,
@@ -133,6 +133,13 @@ class DirectorApply(DomainModelApply):
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
 
+        edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "Movie.directors")
+        for movie in self.movies or []:
+            other_resources = DomainRelationApply.from_edge_to_resources(
+                cache, start_node=movie, end_node=self, edge_type=edge_type, view_by_write_class=view_by_write_class
+            )
+            resources.extend(other_resources)
+
         edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "Role.nomination")
         for nomination in self.nomination or []:
             other_resources = DomainRelationApply.from_edge_to_resources(
@@ -141,13 +148,6 @@ class DirectorApply(DomainModelApply):
                 end_node=nomination,
                 edge_type=edge_type,
                 view_by_write_class=view_by_write_class,
-            )
-            resources.extend(other_resources)
-
-        edge_type = dm.DirectRelationReference("IntegrationTestsImmutable", "Movie.directors")
-        for movie in self.movies or []:
-            other_resources = DomainRelationApply.from_edge_to_resources(
-                cache, start_node=movie, end_node=self, edge_type=edge_type, view_by_write_class=view_by_write_class
             )
             resources.extend(other_resources)
 

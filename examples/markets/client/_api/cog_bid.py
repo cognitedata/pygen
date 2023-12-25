@@ -51,17 +51,17 @@ class CogBidAPI(NodeAPI[CogBid, CogBidApply, CogBidList]):
 
     def __call__(
         self,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
-        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         min_date: datetime.date | None = None,
         max_date: datetime.date | None = None,
+        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
         min_price: float | None = None,
         max_price: float | None = None,
-        min_quantity: int | None = None,
-        max_quantity: int | None = None,
         price_area: str | list[str] | None = None,
         price_area_prefix: str | None = None,
+        min_quantity: int | None = None,
+        max_quantity: int | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
@@ -70,17 +70,17 @@ class CogBidAPI(NodeAPI[CogBid, CogBidApply, CogBidList]):
         """Query starting at cog bids.
 
         Args:
-            name: The name to filter on.
-            name_prefix: The prefix of the name to filter on.
-            market: The market to filter on.
             min_date: The minimum value of the date to filter on.
             max_date: The maximum value of the date to filter on.
+            market: The market to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
             min_price: The minimum value of the price to filter on.
             max_price: The maximum value of the price to filter on.
-            min_quantity: The minimum value of the quantity to filter on.
-            max_quantity: The maximum value of the quantity to filter on.
             price_area: The price area to filter on.
             price_area_prefix: The prefix of the price area to filter on.
+            min_quantity: The minimum value of the quantity to filter on.
+            max_quantity: The maximum value of the quantity to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of cog bids to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -93,17 +93,17 @@ class CogBidAPI(NodeAPI[CogBid, CogBidApply, CogBidList]):
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_cog_bid_filter(
             self._view_id,
-            name,
-            name_prefix,
-            market,
             min_date,
             max_date,
+            market,
+            name,
+            name_prefix,
             min_price,
             max_price,
-            min_quantity,
-            max_quantity,
             price_area,
             price_area_prefix,
+            min_quantity,
+            max_quantity,
             external_id_prefix,
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
@@ -191,17 +191,17 @@ class CogBidAPI(NodeAPI[CogBid, CogBidApply, CogBidList]):
         self,
         query: str,
         properties: CogBidTextFields | Sequence[CogBidTextFields] | None = None,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
-        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         min_date: datetime.date | None = None,
         max_date: datetime.date | None = None,
+        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
         min_price: float | None = None,
         max_price: float | None = None,
-        min_quantity: int | None = None,
-        max_quantity: int | None = None,
         price_area: str | list[str] | None = None,
         price_area_prefix: str | None = None,
+        min_quantity: int | None = None,
+        max_quantity: int | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -212,17 +212,17 @@ class CogBidAPI(NodeAPI[CogBid, CogBidApply, CogBidList]):
         Args:
             query: The search query,
             properties: The property to search, if nothing is passed all text fields will be searched.
-            name: The name to filter on.
-            name_prefix: The prefix of the name to filter on.
-            market: The market to filter on.
             min_date: The minimum value of the date to filter on.
             max_date: The maximum value of the date to filter on.
+            market: The market to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
             min_price: The minimum value of the price to filter on.
             max_price: The maximum value of the price to filter on.
-            min_quantity: The minimum value of the quantity to filter on.
-            max_quantity: The maximum value of the quantity to filter on.
             price_area: The price area to filter on.
             price_area_prefix: The prefix of the price area to filter on.
+            min_quantity: The minimum value of the quantity to filter on.
+            max_quantity: The maximum value of the quantity to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of cog bids to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -242,17 +242,17 @@ class CogBidAPI(NodeAPI[CogBid, CogBidApply, CogBidList]):
         """
         filter_ = _create_cog_bid_filter(
             self._view_id,
-            name,
-            name_prefix,
-            market,
             min_date,
             max_date,
+            market,
+            name,
+            name_prefix,
             min_price,
             max_price,
-            min_quantity,
-            max_quantity,
             price_area,
             price_area_prefix,
+            min_quantity,
+            max_quantity,
             external_id_prefix,
             space,
             filter,
@@ -270,17 +270,17 @@ class CogBidAPI(NodeAPI[CogBid, CogBidApply, CogBidList]):
         group_by: None = None,
         query: str | None = None,
         search_properties: CogBidTextFields | Sequence[CogBidTextFields] | None = None,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
-        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         min_date: datetime.date | None = None,
         max_date: datetime.date | None = None,
+        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
         min_price: float | None = None,
         max_price: float | None = None,
-        min_quantity: int | None = None,
-        max_quantity: int | None = None,
         price_area: str | list[str] | None = None,
         price_area_prefix: str | None = None,
+        min_quantity: int | None = None,
+        max_quantity: int | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -299,17 +299,17 @@ class CogBidAPI(NodeAPI[CogBid, CogBidApply, CogBidList]):
         group_by: CogBidFields | Sequence[CogBidFields] = None,
         query: str | None = None,
         search_properties: CogBidTextFields | Sequence[CogBidTextFields] | None = None,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
-        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         min_date: datetime.date | None = None,
         max_date: datetime.date | None = None,
+        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
         min_price: float | None = None,
         max_price: float | None = None,
-        min_quantity: int | None = None,
-        max_quantity: int | None = None,
         price_area: str | list[str] | None = None,
         price_area_prefix: str | None = None,
+        min_quantity: int | None = None,
+        max_quantity: int | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -327,17 +327,17 @@ class CogBidAPI(NodeAPI[CogBid, CogBidApply, CogBidList]):
         group_by: CogBidFields | Sequence[CogBidFields] | None = None,
         query: str | None = None,
         search_property: CogBidTextFields | Sequence[CogBidTextFields] | None = None,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
-        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         min_date: datetime.date | None = None,
         max_date: datetime.date | None = None,
+        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
         min_price: float | None = None,
         max_price: float | None = None,
-        min_quantity: int | None = None,
-        max_quantity: int | None = None,
         price_area: str | list[str] | None = None,
         price_area_prefix: str | None = None,
+        min_quantity: int | None = None,
+        max_quantity: int | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -351,17 +351,17 @@ class CogBidAPI(NodeAPI[CogBid, CogBidApply, CogBidList]):
             group_by: The property to group by when doing the aggregation.
             query: The query to search for in the text field.
             search_property: The text field to search in.
-            name: The name to filter on.
-            name_prefix: The prefix of the name to filter on.
-            market: The market to filter on.
             min_date: The minimum value of the date to filter on.
             max_date: The maximum value of the date to filter on.
+            market: The market to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
             min_price: The minimum value of the price to filter on.
             max_price: The maximum value of the price to filter on.
-            min_quantity: The minimum value of the quantity to filter on.
-            max_quantity: The maximum value of the quantity to filter on.
             price_area: The price area to filter on.
             price_area_prefix: The prefix of the price area to filter on.
+            min_quantity: The minimum value of the quantity to filter on.
+            max_quantity: The maximum value of the quantity to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of cog bids to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -382,17 +382,17 @@ class CogBidAPI(NodeAPI[CogBid, CogBidApply, CogBidList]):
 
         filter_ = _create_cog_bid_filter(
             self._view_id,
-            name,
-            name_prefix,
-            market,
             min_date,
             max_date,
+            market,
+            name,
+            name_prefix,
             min_price,
             max_price,
-            min_quantity,
-            max_quantity,
             price_area,
             price_area_prefix,
+            min_quantity,
+            max_quantity,
             external_id_prefix,
             space,
             filter,
@@ -415,17 +415,17 @@ class CogBidAPI(NodeAPI[CogBid, CogBidApply, CogBidList]):
         interval: float,
         query: str | None = None,
         search_property: CogBidTextFields | Sequence[CogBidTextFields] | None = None,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
-        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         min_date: datetime.date | None = None,
         max_date: datetime.date | None = None,
+        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
         min_price: float | None = None,
         max_price: float | None = None,
-        min_quantity: int | None = None,
-        max_quantity: int | None = None,
         price_area: str | list[str] | None = None,
         price_area_prefix: str | None = None,
+        min_quantity: int | None = None,
+        max_quantity: int | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -438,17 +438,17 @@ class CogBidAPI(NodeAPI[CogBid, CogBidApply, CogBidList]):
             interval: The interval to use for the histogram bins.
             query: The query to search for in the text field.
             search_property: The text field to search in.
-            name: The name to filter on.
-            name_prefix: The prefix of the name to filter on.
-            market: The market to filter on.
             min_date: The minimum value of the date to filter on.
             max_date: The maximum value of the date to filter on.
+            market: The market to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
             min_price: The minimum value of the price to filter on.
             max_price: The maximum value of the price to filter on.
-            min_quantity: The minimum value of the quantity to filter on.
-            max_quantity: The maximum value of the quantity to filter on.
             price_area: The price area to filter on.
             price_area_prefix: The prefix of the price area to filter on.
+            min_quantity: The minimum value of the quantity to filter on.
+            max_quantity: The maximum value of the quantity to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of cog bids to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -460,17 +460,17 @@ class CogBidAPI(NodeAPI[CogBid, CogBidApply, CogBidList]):
         """
         filter_ = _create_cog_bid_filter(
             self._view_id,
-            name,
-            name_prefix,
-            market,
             min_date,
             max_date,
+            market,
+            name,
+            name_prefix,
             min_price,
             max_price,
-            min_quantity,
-            max_quantity,
             price_area,
             price_area_prefix,
+            min_quantity,
+            max_quantity,
             external_id_prefix,
             space,
             filter,
@@ -488,17 +488,17 @@ class CogBidAPI(NodeAPI[CogBid, CogBidApply, CogBidList]):
 
     def list(
         self,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
-        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         min_date: datetime.date | None = None,
         max_date: datetime.date | None = None,
+        market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
         min_price: float | None = None,
         max_price: float | None = None,
-        min_quantity: int | None = None,
-        max_quantity: int | None = None,
         price_area: str | list[str] | None = None,
         price_area_prefix: str | None = None,
+        min_quantity: int | None = None,
+        max_quantity: int | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -507,17 +507,17 @@ class CogBidAPI(NodeAPI[CogBid, CogBidApply, CogBidList]):
         """List/filter cog bids
 
         Args:
-            name: The name to filter on.
-            name_prefix: The prefix of the name to filter on.
-            market: The market to filter on.
             min_date: The minimum value of the date to filter on.
             max_date: The maximum value of the date to filter on.
+            market: The market to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
             min_price: The minimum value of the price to filter on.
             max_price: The maximum value of the price to filter on.
-            min_quantity: The minimum value of the quantity to filter on.
-            max_quantity: The maximum value of the quantity to filter on.
             price_area: The price area to filter on.
             price_area_prefix: The prefix of the price area to filter on.
+            min_quantity: The minimum value of the quantity to filter on.
+            max_quantity: The maximum value of the quantity to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of cog bids to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -537,17 +537,17 @@ class CogBidAPI(NodeAPI[CogBid, CogBidApply, CogBidList]):
         """
         filter_ = _create_cog_bid_filter(
             self._view_id,
-            name,
-            name_prefix,
-            market,
             min_date,
             max_date,
+            market,
+            name,
+            name_prefix,
             min_price,
             max_price,
-            min_quantity,
-            max_quantity,
             price_area,
             price_area_prefix,
+            min_quantity,
+            max_quantity,
             external_id_prefix,
             space,
             filter,

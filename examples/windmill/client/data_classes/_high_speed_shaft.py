@@ -27,13 +27,13 @@ __all__ = [
 ]
 
 
-HighSpeedShaftTextFields = Literal["torque", "bending_monent_x", "bending_moment_y"]
-HighSpeedShaftFields = Literal["torque", "bending_monent_x", "bending_moment_y"]
+HighSpeedShaftTextFields = Literal["bending_moment_y", "bending_monent_x", "torque"]
+HighSpeedShaftFields = Literal["bending_moment_y", "bending_monent_x", "torque"]
 
 _HIGHSPEEDSHAFT_PROPERTIES_BY_FIELD = {
-    "torque": "torque",
-    "bending_monent_x": "bending_monent_x",
     "bending_moment_y": "bending_moment_y",
+    "bending_monent_x": "bending_monent_x",
+    "torque": "torque",
 }
 
 
@@ -45,9 +45,9 @@ class HighSpeedShaft(DomainModel):
     Args:
         space: The space where the node is located.
         external_id: The external id of the high speed shaft.
-        torque: The torque field.
-        bending_monent_x: The bending monent x field.
         bending_moment_y: The bending moment y field.
+        bending_monent_x: The bending monent x field.
+        torque: The torque field.
         created_time: The created time of the high speed shaft node.
         last_updated_time: The last updated time of the high speed shaft node.
         deleted_time: If present, the deleted time of the high speed shaft node.
@@ -55,18 +55,18 @@ class HighSpeedShaft(DomainModel):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    torque: Union[TimeSeries, str, None] = None
-    bending_monent_x: Union[TimeSeries, str, None] = None
     bending_moment_y: Union[TimeSeries, str, None] = None
+    bending_monent_x: Union[TimeSeries, str, None] = None
+    torque: Union[TimeSeries, str, None] = None
 
     def as_apply(self) -> HighSpeedShaftApply:
         """Convert this read version of high speed shaft to the writing version."""
         return HighSpeedShaftApply(
             space=self.space,
             external_id=self.external_id,
-            torque=self.torque,
-            bending_monent_x=self.bending_monent_x,
             bending_moment_y=self.bending_moment_y,
+            bending_monent_x=self.bending_monent_x,
+            torque=self.torque,
         )
 
 
@@ -78,9 +78,9 @@ class HighSpeedShaftApply(DomainModelApply):
     Args:
         space: The space where the node is located.
         external_id: The external id of the high speed shaft.
-        torque: The torque field.
-        bending_monent_x: The bending monent x field.
         bending_moment_y: The bending moment y field.
+        bending_monent_x: The bending monent x field.
+        torque: The torque field.
         existing_version: Fail the ingestion request if the high speed shaft version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
@@ -88,9 +88,9 @@ class HighSpeedShaftApply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    torque: Union[TimeSeries, str, None] = None
-    bending_monent_x: Union[TimeSeries, str, None] = None
     bending_moment_y: Union[TimeSeries, str, None] = None
+    bending_monent_x: Union[TimeSeries, str, None] = None
+    torque: Union[TimeSeries, str, None] = None
 
     def _to_instances_apply(
         self,
@@ -107,18 +107,18 @@ class HighSpeedShaftApply(DomainModelApply):
 
         properties = {}
 
-        if self.torque is not None:
-            properties["torque"] = self.torque if isinstance(self.torque, str) else self.torque.external_id
+        if self.bending_moment_y is not None:
+            properties["bending_moment_y"] = (
+                self.bending_moment_y if isinstance(self.bending_moment_y, str) else self.bending_moment_y.external_id
+            )
 
         if self.bending_monent_x is not None:
             properties["bending_monent_x"] = (
                 self.bending_monent_x if isinstance(self.bending_monent_x, str) else self.bending_monent_x.external_id
             )
 
-        if self.bending_moment_y is not None:
-            properties["bending_moment_y"] = (
-                self.bending_moment_y if isinstance(self.bending_moment_y, str) else self.bending_moment_y.external_id
-            )
+        if self.torque is not None:
+            properties["torque"] = self.torque if isinstance(self.torque, str) else self.torque.external_id
 
         if properties:
             this_node = dm.NodeApply(
@@ -135,14 +135,14 @@ class HighSpeedShaftApply(DomainModelApply):
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
 
-        if isinstance(self.torque, CogniteTimeSeries):
-            resources.time_series.append(self.torque)
+        if isinstance(self.bending_moment_y, CogniteTimeSeries):
+            resources.time_series.append(self.bending_moment_y)
 
         if isinstance(self.bending_monent_x, CogniteTimeSeries):
             resources.time_series.append(self.bending_monent_x)
 
-        if isinstance(self.bending_moment_y, CogniteTimeSeries):
-            resources.time_series.append(self.bending_moment_y)
+        if isinstance(self.torque, CogniteTimeSeries):
+            resources.time_series.append(self.torque)
 
         return resources
 

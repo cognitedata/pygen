@@ -37,9 +37,9 @@ class Role(DomainModel):
     Args:
         space: The space where the node is located.
         external_id: The external id of the role.
+        nomination: The nomination field.
         person: The person field.
         won_oscar: The won oscar field.
-        nomination: The nomination field.
         created_time: The created time of the role node.
         last_updated_time: The last updated time of the role node.
         deleted_time: If present, the deleted time of the role node.
@@ -47,21 +47,21 @@ class Role(DomainModel):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    nomination: Union[list[Nomination], list[str], None] = Field(default=None, repr=False)
     person: Union[Person, str, dm.NodeId, None] = Field(None, repr=False)
     won_oscar: Optional[bool] = Field(None, alias="wonOscar")
-    nomination: Union[list[Nomination], list[str], None] = Field(default=None, repr=False)
 
     def as_apply(self) -> RoleApply:
         """Convert this read version of role to the writing version."""
         return RoleApply(
             space=self.space,
             external_id=self.external_id,
-            person=self.person.as_apply() if isinstance(self.person, DomainModel) else self.person,
-            won_oscar=self.won_oscar,
             nomination=[
                 nomination.as_apply() if isinstance(nomination, DomainModel) else nomination
                 for nomination in self.nomination or []
             ],
+            person=self.person.as_apply() if isinstance(self.person, DomainModel) else self.person,
+            won_oscar=self.won_oscar,
         )
 
 
@@ -73,9 +73,9 @@ class RoleApply(DomainModelApply):
     Args:
         space: The space where the node is located.
         external_id: The external id of the role.
+        nomination: The nomination field.
         person: The person field.
         won_oscar: The won oscar field.
-        nomination: The nomination field.
         existing_version: Fail the ingestion request if the role version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
@@ -83,9 +83,9 @@ class RoleApply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    nomination: Union[list[NominationApply], list[str], None] = Field(default=None, repr=False)
     person: Union[PersonApply, str, dm.NodeId, None] = Field(None, repr=False)
     won_oscar: Optional[bool] = Field(None, alias="wonOscar")
-    nomination: Union[list[NominationApply], list[str], None] = Field(default=None, repr=False)
 
     def _to_instances_apply(
         self,

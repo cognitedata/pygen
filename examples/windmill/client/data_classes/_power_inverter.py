@@ -27,13 +27,13 @@ __all__ = [
 ]
 
 
-PowerInverterTextFields = Literal["active_power_total", "reactive_power_total", "apparent_power_total"]
-PowerInverterFields = Literal["active_power_total", "reactive_power_total", "apparent_power_total"]
+PowerInverterTextFields = Literal["active_power_total", "apparent_power_total", "reactive_power_total"]
+PowerInverterFields = Literal["active_power_total", "apparent_power_total", "reactive_power_total"]
 
 _POWERINVERTER_PROPERTIES_BY_FIELD = {
     "active_power_total": "active_power_total",
-    "reactive_power_total": "reactive_power_total",
     "apparent_power_total": "apparent_power_total",
+    "reactive_power_total": "reactive_power_total",
 }
 
 
@@ -46,8 +46,8 @@ class PowerInverter(DomainModel):
         space: The space where the node is located.
         external_id: The external id of the power inverter.
         active_power_total: The active power total field.
-        reactive_power_total: The reactive power total field.
         apparent_power_total: The apparent power total field.
+        reactive_power_total: The reactive power total field.
         created_time: The created time of the power inverter node.
         last_updated_time: The last updated time of the power inverter node.
         deleted_time: If present, the deleted time of the power inverter node.
@@ -56,8 +56,8 @@ class PowerInverter(DomainModel):
 
     space: str = DEFAULT_INSTANCE_SPACE
     active_power_total: Union[TimeSeries, str, None] = None
-    reactive_power_total: Union[TimeSeries, str, None] = None
     apparent_power_total: Union[TimeSeries, str, None] = None
+    reactive_power_total: Union[TimeSeries, str, None] = None
 
     def as_apply(self) -> PowerInverterApply:
         """Convert this read version of power inverter to the writing version."""
@@ -65,8 +65,8 @@ class PowerInverter(DomainModel):
             space=self.space,
             external_id=self.external_id,
             active_power_total=self.active_power_total,
-            reactive_power_total=self.reactive_power_total,
             apparent_power_total=self.apparent_power_total,
+            reactive_power_total=self.reactive_power_total,
         )
 
 
@@ -79,8 +79,8 @@ class PowerInverterApply(DomainModelApply):
         space: The space where the node is located.
         external_id: The external id of the power inverter.
         active_power_total: The active power total field.
-        reactive_power_total: The reactive power total field.
         apparent_power_total: The apparent power total field.
+        reactive_power_total: The reactive power total field.
         existing_version: Fail the ingestion request if the power inverter version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
@@ -89,8 +89,8 @@ class PowerInverterApply(DomainModelApply):
 
     space: str = DEFAULT_INSTANCE_SPACE
     active_power_total: Union[TimeSeries, str, None] = None
-    reactive_power_total: Union[TimeSeries, str, None] = None
     apparent_power_total: Union[TimeSeries, str, None] = None
+    reactive_power_total: Union[TimeSeries, str, None] = None
 
     def _to_instances_apply(
         self,
@@ -114,18 +114,18 @@ class PowerInverterApply(DomainModelApply):
                 else self.active_power_total.external_id
             )
 
-        if self.reactive_power_total is not None:
-            properties["reactive_power_total"] = (
-                self.reactive_power_total
-                if isinstance(self.reactive_power_total, str)
-                else self.reactive_power_total.external_id
-            )
-
         if self.apparent_power_total is not None:
             properties["apparent_power_total"] = (
                 self.apparent_power_total
                 if isinstance(self.apparent_power_total, str)
                 else self.apparent_power_total.external_id
+            )
+
+        if self.reactive_power_total is not None:
+            properties["reactive_power_total"] = (
+                self.reactive_power_total
+                if isinstance(self.reactive_power_total, str)
+                else self.reactive_power_total.external_id
             )
 
         if properties:
@@ -146,11 +146,11 @@ class PowerInverterApply(DomainModelApply):
         if isinstance(self.active_power_total, CogniteTimeSeries):
             resources.time_series.append(self.active_power_total)
 
-        if isinstance(self.reactive_power_total, CogniteTimeSeries):
-            resources.time_series.append(self.reactive_power_total)
-
         if isinstance(self.apparent_power_total, CogniteTimeSeries):
             resources.time_series.append(self.apparent_power_total)
+
+        if isinstance(self.reactive_power_total, CogniteTimeSeries):
+            resources.time_series.append(self.reactive_power_total)
 
         return resources
 

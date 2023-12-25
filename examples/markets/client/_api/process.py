@@ -50,9 +50,9 @@ class ProcessAPI(NodeAPI[Process, ProcessApply, ProcessList]):
 
     def __call__(
         self,
+        bid: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        bid: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
@@ -61,9 +61,9 @@ class ProcessAPI(NodeAPI[Process, ProcessApply, ProcessList]):
         """Query starting at process.
 
         Args:
+            bid: The bid to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
-            bid: The bid to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of process to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -76,9 +76,9 @@ class ProcessAPI(NodeAPI[Process, ProcessApply, ProcessList]):
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_proces_filter(
             self._view_id,
+            bid,
             name,
             name_prefix,
-            bid,
             external_id_prefix,
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
@@ -166,9 +166,9 @@ class ProcessAPI(NodeAPI[Process, ProcessApply, ProcessList]):
         self,
         query: str,
         properties: ProcessTextFields | Sequence[ProcessTextFields] | None = None,
+        bid: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        bid: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -179,9 +179,9 @@ class ProcessAPI(NodeAPI[Process, ProcessApply, ProcessList]):
         Args:
             query: The search query,
             properties: The property to search, if nothing is passed all text fields will be searched.
+            bid: The bid to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
-            bid: The bid to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of process to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -201,9 +201,9 @@ class ProcessAPI(NodeAPI[Process, ProcessApply, ProcessList]):
         """
         filter_ = _create_proces_filter(
             self._view_id,
+            bid,
             name,
             name_prefix,
-            bid,
             external_id_prefix,
             space,
             filter,
@@ -221,9 +221,9 @@ class ProcessAPI(NodeAPI[Process, ProcessApply, ProcessList]):
         group_by: None = None,
         query: str | None = None,
         search_properties: ProcessTextFields | Sequence[ProcessTextFields] | None = None,
+        bid: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        bid: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -242,9 +242,9 @@ class ProcessAPI(NodeAPI[Process, ProcessApply, ProcessList]):
         group_by: ProcessFields | Sequence[ProcessFields] = None,
         query: str | None = None,
         search_properties: ProcessTextFields | Sequence[ProcessTextFields] | None = None,
+        bid: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        bid: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -262,9 +262,9 @@ class ProcessAPI(NodeAPI[Process, ProcessApply, ProcessList]):
         group_by: ProcessFields | Sequence[ProcessFields] | None = None,
         query: str | None = None,
         search_property: ProcessTextFields | Sequence[ProcessTextFields] | None = None,
+        bid: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        bid: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -278,9 +278,9 @@ class ProcessAPI(NodeAPI[Process, ProcessApply, ProcessList]):
             group_by: The property to group by when doing the aggregation.
             query: The query to search for in the text field.
             search_property: The text field to search in.
+            bid: The bid to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
-            bid: The bid to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of process to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -301,9 +301,9 @@ class ProcessAPI(NodeAPI[Process, ProcessApply, ProcessList]):
 
         filter_ = _create_proces_filter(
             self._view_id,
+            bid,
             name,
             name_prefix,
-            bid,
             external_id_prefix,
             space,
             filter,
@@ -326,9 +326,9 @@ class ProcessAPI(NodeAPI[Process, ProcessApply, ProcessList]):
         interval: float,
         query: str | None = None,
         search_property: ProcessTextFields | Sequence[ProcessTextFields] | None = None,
+        bid: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        bid: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -341,9 +341,9 @@ class ProcessAPI(NodeAPI[Process, ProcessApply, ProcessList]):
             interval: The interval to use for the histogram bins.
             query: The query to search for in the text field.
             search_property: The text field to search in.
+            bid: The bid to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
-            bid: The bid to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of process to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -355,9 +355,9 @@ class ProcessAPI(NodeAPI[Process, ProcessApply, ProcessList]):
         """
         filter_ = _create_proces_filter(
             self._view_id,
+            bid,
             name,
             name_prefix,
-            bid,
             external_id_prefix,
             space,
             filter,
@@ -375,9 +375,9 @@ class ProcessAPI(NodeAPI[Process, ProcessApply, ProcessList]):
 
     def list(
         self,
+        bid: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        bid: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -386,9 +386,9 @@ class ProcessAPI(NodeAPI[Process, ProcessApply, ProcessList]):
         """List/filter process
 
         Args:
+            bid: The bid to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
-            bid: The bid to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of process to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -408,9 +408,9 @@ class ProcessAPI(NodeAPI[Process, ProcessApply, ProcessList]):
         """
         filter_ = _create_proces_filter(
             self._view_id,
+            bid,
             name,
             name_prefix,
-            bid,
             external_id_prefix,
             space,
             filter,

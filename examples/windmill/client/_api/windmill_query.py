@@ -9,10 +9,10 @@ from windmill.client.data_classes import (
     DomainModelApply,
     Windmill,
     WindmillApply,
-    Rotor,
-    RotorApply,
     Nacelle,
     NacelleApply,
+    Rotor,
+    RotorApply,
 )
 from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
 
@@ -50,8 +50,8 @@ class WindmillQueryAPI(QueryAPI[T_DomainModelList]):
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_QUERY_LIMIT,
-        retrieve_rotor: bool = False,
         retrieve_nacelle: bool = False,
+        retrieve_rotor: bool = False,
     ) -> BladeQueryAPI[T_DomainModelList]:
         """Query along the blade edges of the windmill.
 
@@ -60,8 +60,8 @@ class WindmillQueryAPI(QueryAPI[T_DomainModelList]):
             space: The space to filter on.
             limit: Maximum number of blade edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
-            retrieve_rotor: Whether to retrieve the rotor for each windmill or not.
             retrieve_nacelle: Whether to retrieve the nacelle for each windmill or not.
+            retrieve_rotor: Whether to retrieve the rotor for each windmill or not.
 
         Returns:
             BladeQueryAPI: The query API for the blade.
@@ -87,10 +87,10 @@ class WindmillQueryAPI(QueryAPI[T_DomainModelList]):
                 max_retrieve_limit=limit,
             )
         )
-        if retrieve_rotor:
-            self._query_append_rotor(from_)
         if retrieve_nacelle:
             self._query_append_nacelle(from_)
+        if retrieve_rotor:
+            self._query_append_rotor(from_)
         return BladeQueryAPI(self._client, self._builder, self._view_by_write_class, None, limit)
 
     def metmast(
@@ -98,8 +98,8 @@ class WindmillQueryAPI(QueryAPI[T_DomainModelList]):
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int | None = DEFAULT_QUERY_LIMIT,
-        retrieve_rotor: bool = False,
         retrieve_nacelle: bool = False,
+        retrieve_rotor: bool = False,
     ) -> MetmastQueryAPI[T_DomainModelList]:
         """Query along the metmast edges of the windmill.
 
@@ -108,8 +108,8 @@ class WindmillQueryAPI(QueryAPI[T_DomainModelList]):
             space: The space to filter on.
             limit: Maximum number of metmast edges to return. Defaults to 25. Set to -1, float("inf") or None
                 to return all items.
-            retrieve_rotor: Whether to retrieve the rotor for each windmill or not.
             retrieve_nacelle: Whether to retrieve the nacelle for each windmill or not.
+            retrieve_rotor: Whether to retrieve the rotor for each windmill or not.
 
         Returns:
             MetmastQueryAPI: The query API for the metmast.
@@ -135,50 +135,33 @@ class WindmillQueryAPI(QueryAPI[T_DomainModelList]):
                 max_retrieve_limit=limit,
             )
         )
-        if retrieve_rotor:
-            self._query_append_rotor(from_)
         if retrieve_nacelle:
             self._query_append_nacelle(from_)
+        if retrieve_rotor:
+            self._query_append_rotor(from_)
         return MetmastQueryAPI(self._client, self._builder, self._view_by_write_class, None, limit)
 
     def query(
         self,
-        retrieve_rotor: bool = False,
         retrieve_nacelle: bool = False,
+        retrieve_rotor: bool = False,
     ) -> T_DomainModelList:
         """Execute query and return the result.
 
         Args:
-            retrieve_rotor: Whether to retrieve the rotor for each windmill or not.
             retrieve_nacelle: Whether to retrieve the nacelle for each windmill or not.
+            retrieve_rotor: Whether to retrieve the rotor for each windmill or not.
 
         Returns:
             The list of the source nodes of the query.
 
         """
         from_ = self._builder[-1].name
-        if retrieve_rotor:
-            self._query_append_rotor(from_)
         if retrieve_nacelle:
             self._query_append_nacelle(from_)
+        if retrieve_rotor:
+            self._query_append_rotor(from_)
         return self._query()
-
-    def _query_append_rotor(self, from_: str) -> None:
-        view_id = self._view_by_write_class[RotorApply]
-        self._builder.append(
-            QueryStep(
-                name=self._builder.next_name("rotor"),
-                expression=dm.query.NodeResultSetExpression(
-                    filter=dm.filters.HasData(views=[view_id]),
-                    from_=from_,
-                    through=self._view_by_write_class[WindmillApply].as_property_ref("rotor"),
-                    direction="outwards",
-                ),
-                select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
-                max_retrieve_limit=-1,
-                result_cls=Rotor,
-            ),
-        )
 
     def _query_append_nacelle(self, from_: str) -> None:
         view_id = self._view_by_write_class[NacelleApply]
@@ -194,5 +177,22 @@ class WindmillQueryAPI(QueryAPI[T_DomainModelList]):
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
                 max_retrieve_limit=-1,
                 result_cls=Nacelle,
+            ),
+        )
+
+    def _query_append_rotor(self, from_: str) -> None:
+        view_id = self._view_by_write_class[RotorApply]
+        self._builder.append(
+            QueryStep(
+                name=self._builder.next_name("rotor"),
+                expression=dm.query.NodeResultSetExpression(
+                    filter=dm.filters.HasData(views=[view_id]),
+                    from_=from_,
+                    through=self._view_by_write_class[WindmillApply].as_property_ref("rotor"),
+                    direction="outwards",
+                ),
+                select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
+                max_retrieve_limit=-1,
+                result_cls=Rotor,
             ),
         )

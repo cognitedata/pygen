@@ -12,7 +12,7 @@ from cognite.client.data_classes.datapoints import Aggregate
 from windmill.client.data_classes._power_inverter import _create_power_inverter_filter
 from ._core import DEFAULT_LIMIT_READ, INSTANCE_QUERY_LIMIT
 
-ColumnNames = Literal["active_power_total", "reactive_power_total", "apparent_power_total"]
+ColumnNames = Literal["active_power_total", "apparent_power_total", "reactive_power_total"]
 
 
 class PowerInverterReactivePowerTotalQuery:

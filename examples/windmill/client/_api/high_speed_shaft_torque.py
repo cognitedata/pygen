@@ -12,7 +12,7 @@ from cognite.client.data_classes.datapoints import Aggregate
 from windmill.client.data_classes._high_speed_shaft import _create_high_speed_shaft_filter
 from ._core import DEFAULT_LIMIT_READ, INSTANCE_QUERY_LIMIT
 
-ColumnNames = Literal["torque", "bending_monent_x", "bending_moment_y"]
+ColumnNames = Literal["bending_moment_y", "bending_monent_x", "torque"]
 
 
 class HighSpeedShaftTorqueQuery:

@@ -13,21 +13,21 @@ from tutorial_apm_simple.client.data_classes._asset import _create_asset_filter
 from ._core import DEFAULT_LIMIT_READ, INSTANCE_QUERY_LIMIT
 
 ColumnNames = Literal[
-    "tag",
-    "description",
-    "sourceDb",
     "areaId",
     "categoryId",
     "createdDate",
-    "isCriticalLine",
-    "isActive",
-    "updatedDate",
-    "metrics",
+    "description",
     "documents",
-    "pressure",
-    "specification",
+    "isActive",
+    "isCriticalLine",
     "measurements",
+    "metrics",
+    "pressure",
+    "sourceDb",
+    "specification",
+    "tag",
     "trajectory",
+    "updatedDate",
 ]
 
 
@@ -375,21 +375,21 @@ class AssetPressureAPI:
 
     def __call__(
         self,
-        parent: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        tag: str | list[str] | None = None,
-        tag_prefix: str | None = None,
-        description: str | list[str] | None = None,
-        description_prefix: str | None = None,
-        source_db: str | list[str] | None = None,
-        source_db_prefix: str | None = None,
         min_area_id: int | None = None,
         max_area_id: int | None = None,
         min_category_id: int | None = None,
         max_category_id: int | None = None,
         min_created_date: datetime.datetime | None = None,
         max_created_date: datetime.datetime | None = None,
-        is_critical_line: bool | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
         is_active: bool | None = None,
+        is_critical_line: bool | None = None,
+        parent: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        source_db: str | list[str] | None = None,
+        source_db_prefix: str | None = None,
+        tag: str | list[str] | None = None,
+        tag_prefix: str | None = None,
         min_updated_date: datetime.datetime | None = None,
         max_updated_date: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
@@ -400,21 +400,21 @@ class AssetPressureAPI:
         """Query timeseries `asset.pressure`
 
         Args:
-            parent: The parent to filter on.
-            tag: The tag to filter on.
-            tag_prefix: The prefix of the tag to filter on.
-            description: The description to filter on.
-            description_prefix: The prefix of the description to filter on.
-            source_db: The source db to filter on.
-            source_db_prefix: The prefix of the source db to filter on.
             min_area_id: The minimum value of the area id to filter on.
             max_area_id: The maximum value of the area id to filter on.
             min_category_id: The minimum value of the category id to filter on.
             max_category_id: The maximum value of the category id to filter on.
             min_created_date: The minimum value of the created date to filter on.
             max_created_date: The maximum value of the created date to filter on.
-            is_critical_line: The is critical line to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
             is_active: The is active to filter on.
+            is_critical_line: The is critical line to filter on.
+            parent: The parent to filter on.
+            source_db: The source db to filter on.
+            source_db_prefix: The prefix of the source db to filter on.
+            tag: The tag to filter on.
+            tag_prefix: The prefix of the tag to filter on.
             min_updated_date: The minimum value of the updated date to filter on.
             max_updated_date: The maximum value of the updated date to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
@@ -437,21 +437,21 @@ class AssetPressureAPI:
         """
         filter_ = _create_asset_filter(
             self._view_id,
-            parent,
-            tag,
-            tag_prefix,
-            description,
-            description_prefix,
-            source_db,
-            source_db_prefix,
             min_area_id,
             max_area_id,
             min_category_id,
             max_category_id,
             min_created_date,
             max_created_date,
-            is_critical_line,
+            description,
+            description_prefix,
             is_active,
+            is_critical_line,
+            parent,
+            source_db,
+            source_db_prefix,
+            tag,
+            tag_prefix,
             min_updated_date,
             max_updated_date,
             external_id_prefix,
@@ -468,21 +468,21 @@ class AssetPressureAPI:
 
     def list(
         self,
-        parent: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
-        tag: str | list[str] | None = None,
-        tag_prefix: str | None = None,
-        description: str | list[str] | None = None,
-        description_prefix: str | None = None,
-        source_db: str | list[str] | None = None,
-        source_db_prefix: str | None = None,
         min_area_id: int | None = None,
         max_area_id: int | None = None,
         min_category_id: int | None = None,
         max_category_id: int | None = None,
         min_created_date: datetime.datetime | None = None,
         max_created_date: datetime.datetime | None = None,
-        is_critical_line: bool | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
         is_active: bool | None = None,
+        is_critical_line: bool | None = None,
+        parent: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
+        source_db: str | list[str] | None = None,
+        source_db_prefix: str | None = None,
+        tag: str | list[str] | None = None,
+        tag_prefix: str | None = None,
         min_updated_date: datetime.datetime | None = None,
         max_updated_date: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
@@ -493,21 +493,21 @@ class AssetPressureAPI:
         """List timeseries `asset.pressure`
 
         Args:
-            parent: The parent to filter on.
-            tag: The tag to filter on.
-            tag_prefix: The prefix of the tag to filter on.
-            description: The description to filter on.
-            description_prefix: The prefix of the description to filter on.
-            source_db: The source db to filter on.
-            source_db_prefix: The prefix of the source db to filter on.
             min_area_id: The minimum value of the area id to filter on.
             max_area_id: The maximum value of the area id to filter on.
             min_category_id: The minimum value of the category id to filter on.
             max_category_id: The maximum value of the category id to filter on.
             min_created_date: The minimum value of the created date to filter on.
             max_created_date: The maximum value of the created date to filter on.
-            is_critical_line: The is critical line to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
             is_active: The is active to filter on.
+            is_critical_line: The is critical line to filter on.
+            parent: The parent to filter on.
+            source_db: The source db to filter on.
+            source_db_prefix: The prefix of the source db to filter on.
+            tag: The tag to filter on.
+            tag_prefix: The prefix of the tag to filter on.
             min_updated_date: The minimum value of the updated date to filter on.
             max_updated_date: The maximum value of the updated date to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
@@ -529,21 +529,21 @@ class AssetPressureAPI:
         """
         filter_ = _create_asset_filter(
             self._view_id,
-            parent,
-            tag,
-            tag_prefix,
-            description,
-            description_prefix,
-            source_db,
-            source_db_prefix,
             min_area_id,
             max_area_id,
             min_category_id,
             max_category_id,
             min_created_date,
             max_created_date,
-            is_critical_line,
+            description,
+            description_prefix,
             is_active,
+            is_critical_line,
+            parent,
+            source_db,
+            source_db_prefix,
+            tag,
+            tag_prefix,
             min_updated_date,
             max_updated_date,
             external_id_prefix,

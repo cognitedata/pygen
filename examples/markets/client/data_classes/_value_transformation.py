@@ -26,11 +26,11 @@ __all__ = [
 
 
 ValueTransformationTextFields = Literal["method"]
-ValueTransformationFields = Literal["method", "arguments"]
+ValueTransformationFields = Literal["arguments", "method"]
 
 _VALUETRANSFORMATION_PROPERTIES_BY_FIELD = {
-    "method": "method",
     "arguments": "arguments",
+    "method": "method",
 }
 
 
@@ -42,8 +42,8 @@ class ValueTransformation(DomainModel):
     Args:
         space: The space where the node is located.
         external_id: The external id of the value transformation.
-        method: The method field.
         arguments: The argument field.
+        method: The method field.
         created_time: The created time of the value transformation node.
         last_updated_time: The last updated time of the value transformation node.
         deleted_time: If present, the deleted time of the value transformation node.
@@ -51,16 +51,16 @@ class ValueTransformation(DomainModel):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    method: Optional[str] = None
     arguments: Optional[dict] = None
+    method: Optional[str] = None
 
     def as_apply(self) -> ValueTransformationApply:
         """Convert this read version of value transformation to the writing version."""
         return ValueTransformationApply(
             space=self.space,
             external_id=self.external_id,
-            method=self.method,
             arguments=self.arguments,
+            method=self.method,
         )
 
 
@@ -72,8 +72,8 @@ class ValueTransformationApply(DomainModelApply):
     Args:
         space: The space where the node is located.
         external_id: The external id of the value transformation.
-        method: The method field.
         arguments: The argument field.
+        method: The method field.
         existing_version: Fail the ingestion request if the value transformation version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
@@ -81,8 +81,8 @@ class ValueTransformationApply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    method: Optional[str] = None
     arguments: Optional[dict] = None
+    method: Optional[str] = None
 
     def _to_instances_apply(
         self,
@@ -99,11 +99,11 @@ class ValueTransformationApply(DomainModelApply):
 
         properties = {}
 
-        if self.method is not None:
-            properties["method"] = self.method
-
         if self.arguments is not None:
             properties["arguments"] = self.arguments
+
+        if self.method is not None:
+            properties["method"] = self.method
 
         if properties:
             this_node = dm.NodeApply(

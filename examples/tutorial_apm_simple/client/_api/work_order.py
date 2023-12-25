@@ -32,8 +32,8 @@ from ._core import (
     QueryStep,
     QueryBuilder,
 )
-from .work_order_work_items import WorkOrderWorkItemsAPI
 from .work_order_linked_assets import WorkOrderLinkedAssetsAPI
+from .work_order_work_items import WorkOrderWorkItemsAPI
 from .work_order_query import WorkOrderQueryAPI
 
 
@@ -50,45 +50,45 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self.work_items_edge = WorkOrderWorkItemsAPI(client)
         self.linked_assets_edge = WorkOrderLinkedAssetsAPI(client)
+        self.work_items_edge = WorkOrderWorkItemsAPI(client)
 
     def __call__(
         self,
-        title: str | list[str] | None = None,
-        title_prefix: str | None = None,
-        description: str | list[str] | None = None,
-        description_prefix: str | None = None,
-        min_start_time: datetime.datetime | None = None,
-        max_start_time: datetime.datetime | None = None,
-        min_end_time: datetime.datetime | None = None,
-        max_end_time: datetime.datetime | None = None,
-        program_number: str | list[str] | None = None,
-        program_number_prefix: str | None = None,
-        work_order_number: str | list[str] | None = None,
-        work_order_number_prefix: str | None = None,
-        status: str | list[str] | None = None,
-        status_prefix: str | None = None,
-        min_due_date: datetime.datetime | None = None,
-        max_due_date: datetime.datetime | None = None,
-        is_active: bool | None = None,
-        work_package_number: str | list[str] | None = None,
-        work_package_number_prefix: str | None = None,
+        min_actual_hours: int | None = None,
+        max_actual_hours: int | None = None,
         min_created_date: datetime.datetime | None = None,
         max_created_date: datetime.datetime | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        min_due_date: datetime.datetime | None = None,
+        max_due_date: datetime.datetime | None = None,
+        min_duration_hours: int | None = None,
+        max_duration_hours: int | None = None,
+        min_end_time: datetime.datetime | None = None,
+        max_end_time: datetime.datetime | None = None,
+        is_active: bool | None = None,
+        is_cancelled: bool | None = None,
+        is_completed: bool | None = None,
+        is_safety_critical: bool | None = None,
+        min_percentage_progress: int | None = None,
+        max_percentage_progress: int | None = None,
         min_planned_start: datetime.datetime | None = None,
         max_planned_start: datetime.datetime | None = None,
         priority_description: str | list[str] | None = None,
         priority_description_prefix: str | None = None,
-        min_duration_hours: int | None = None,
-        max_duration_hours: int | None = None,
-        min_actual_hours: int | None = None,
-        max_actual_hours: int | None = None,
-        is_cancelled: bool | None = None,
-        is_completed: bool | None = None,
-        min_percentage_progress: int | None = None,
-        max_percentage_progress: int | None = None,
-        is_safety_critical: bool | None = None,
+        program_number: str | list[str] | None = None,
+        program_number_prefix: str | None = None,
+        min_start_time: datetime.datetime | None = None,
+        max_start_time: datetime.datetime | None = None,
+        status: str | list[str] | None = None,
+        status_prefix: str | None = None,
+        title: str | list[str] | None = None,
+        title_prefix: str | None = None,
+        work_order_number: str | list[str] | None = None,
+        work_order_number_prefix: str | None = None,
+        work_package_number: str | list[str] | None = None,
+        work_package_number_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
@@ -97,40 +97,40 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         """Query starting at work orders.
 
         Args:
-            title: The title to filter on.
-            title_prefix: The prefix of the title to filter on.
-            description: The description to filter on.
-            description_prefix: The prefix of the description to filter on.
-            min_start_time: The minimum value of the start time to filter on.
-            max_start_time: The maximum value of the start time to filter on.
-            min_end_time: The minimum value of the end time to filter on.
-            max_end_time: The maximum value of the end time to filter on.
-            program_number: The program number to filter on.
-            program_number_prefix: The prefix of the program number to filter on.
-            work_order_number: The work order number to filter on.
-            work_order_number_prefix: The prefix of the work order number to filter on.
-            status: The status to filter on.
-            status_prefix: The prefix of the status to filter on.
-            min_due_date: The minimum value of the due date to filter on.
-            max_due_date: The maximum value of the due date to filter on.
-            is_active: The is active to filter on.
-            work_package_number: The work package number to filter on.
-            work_package_number_prefix: The prefix of the work package number to filter on.
+            min_actual_hours: The minimum value of the actual hour to filter on.
+            max_actual_hours: The maximum value of the actual hour to filter on.
             min_created_date: The minimum value of the created date to filter on.
             max_created_date: The maximum value of the created date to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            min_due_date: The minimum value of the due date to filter on.
+            max_due_date: The maximum value of the due date to filter on.
+            min_duration_hours: The minimum value of the duration hour to filter on.
+            max_duration_hours: The maximum value of the duration hour to filter on.
+            min_end_time: The minimum value of the end time to filter on.
+            max_end_time: The maximum value of the end time to filter on.
+            is_active: The is active to filter on.
+            is_cancelled: The is cancelled to filter on.
+            is_completed: The is completed to filter on.
+            is_safety_critical: The is safety critical to filter on.
+            min_percentage_progress: The minimum value of the percentage progres to filter on.
+            max_percentage_progress: The maximum value of the percentage progres to filter on.
             min_planned_start: The minimum value of the planned start to filter on.
             max_planned_start: The maximum value of the planned start to filter on.
             priority_description: The priority description to filter on.
             priority_description_prefix: The prefix of the priority description to filter on.
-            min_duration_hours: The minimum value of the duration hour to filter on.
-            max_duration_hours: The maximum value of the duration hour to filter on.
-            min_actual_hours: The minimum value of the actual hour to filter on.
-            max_actual_hours: The maximum value of the actual hour to filter on.
-            is_cancelled: The is cancelled to filter on.
-            is_completed: The is completed to filter on.
-            min_percentage_progress: The minimum value of the percentage progres to filter on.
-            max_percentage_progress: The maximum value of the percentage progres to filter on.
-            is_safety_critical: The is safety critical to filter on.
+            program_number: The program number to filter on.
+            program_number_prefix: The prefix of the program number to filter on.
+            min_start_time: The minimum value of the start time to filter on.
+            max_start_time: The maximum value of the start time to filter on.
+            status: The status to filter on.
+            status_prefix: The prefix of the status to filter on.
+            title: The title to filter on.
+            title_prefix: The prefix of the title to filter on.
+            work_order_number: The work order number to filter on.
+            work_order_number_prefix: The prefix of the work order number to filter on.
+            work_package_number: The work package number to filter on.
+            work_package_number_prefix: The prefix of the work package number to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of work orders to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -143,40 +143,40 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_work_order_filter(
             self._view_id,
-            title,
-            title_prefix,
-            description,
-            description_prefix,
-            min_start_time,
-            max_start_time,
-            min_end_time,
-            max_end_time,
-            program_number,
-            program_number_prefix,
-            work_order_number,
-            work_order_number_prefix,
-            status,
-            status_prefix,
-            min_due_date,
-            max_due_date,
-            is_active,
-            work_package_number,
-            work_package_number_prefix,
+            min_actual_hours,
+            max_actual_hours,
             min_created_date,
             max_created_date,
+            description,
+            description_prefix,
+            min_due_date,
+            max_due_date,
+            min_duration_hours,
+            max_duration_hours,
+            min_end_time,
+            max_end_time,
+            is_active,
+            is_cancelled,
+            is_completed,
+            is_safety_critical,
+            min_percentage_progress,
+            max_percentage_progress,
             min_planned_start,
             max_planned_start,
             priority_description,
             priority_description_prefix,
-            min_duration_hours,
-            max_duration_hours,
-            min_actual_hours,
-            max_actual_hours,
-            is_cancelled,
-            is_completed,
-            min_percentage_progress,
-            max_percentage_progress,
-            is_safety_critical,
+            program_number,
+            program_number_prefix,
+            min_start_time,
+            max_start_time,
+            status,
+            status_prefix,
+            title,
+            title_prefix,
+            work_order_number,
+            work_order_number_prefix,
+            work_package_number,
+            work_package_number_prefix,
             external_id_prefix,
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
@@ -190,7 +190,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         """Add or update (upsert) work orders.
 
         Note: This method iterates through all nodes and timeseries linked to work_order and creates them including the edges
-        between the nodes. For example, if any of `work_items` or `linked_assets` are set, then these
+        between the nodes. For example, if any of `linked_assets` or `work_items` are set, then these
         nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
 
         Args:
@@ -270,15 +270,15 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
             retrieve_edges=True,
             edge_api_name_type_direction_quad=[
                 (
-                    self.work_items_edge,
-                    "work_items",
-                    dm.DirectRelationReference("tutorial_apm_simple", "WorkOrder.workItems"),
-                    "outwards",
-                ),
-                (
                     self.linked_assets_edge,
                     "linked_assets",
                     dm.DirectRelationReference("tutorial_apm_simple", "WorkOrder.linkedAssets"),
+                    "outwards",
+                ),
+                (
+                    self.work_items_edge,
+                    "work_items",
+                    dm.DirectRelationReference("tutorial_apm_simple", "WorkOrder.workItems"),
                     "outwards",
                 ),
             ],
@@ -288,40 +288,40 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         self,
         query: str,
         properties: WorkOrderTextFields | Sequence[WorkOrderTextFields] | None = None,
-        title: str | list[str] | None = None,
-        title_prefix: str | None = None,
-        description: str | list[str] | None = None,
-        description_prefix: str | None = None,
-        min_start_time: datetime.datetime | None = None,
-        max_start_time: datetime.datetime | None = None,
-        min_end_time: datetime.datetime | None = None,
-        max_end_time: datetime.datetime | None = None,
-        program_number: str | list[str] | None = None,
-        program_number_prefix: str | None = None,
-        work_order_number: str | list[str] | None = None,
-        work_order_number_prefix: str | None = None,
-        status: str | list[str] | None = None,
-        status_prefix: str | None = None,
-        min_due_date: datetime.datetime | None = None,
-        max_due_date: datetime.datetime | None = None,
-        is_active: bool | None = None,
-        work_package_number: str | list[str] | None = None,
-        work_package_number_prefix: str | None = None,
+        min_actual_hours: int | None = None,
+        max_actual_hours: int | None = None,
         min_created_date: datetime.datetime | None = None,
         max_created_date: datetime.datetime | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        min_due_date: datetime.datetime | None = None,
+        max_due_date: datetime.datetime | None = None,
+        min_duration_hours: int | None = None,
+        max_duration_hours: int | None = None,
+        min_end_time: datetime.datetime | None = None,
+        max_end_time: datetime.datetime | None = None,
+        is_active: bool | None = None,
+        is_cancelled: bool | None = None,
+        is_completed: bool | None = None,
+        is_safety_critical: bool | None = None,
+        min_percentage_progress: int | None = None,
+        max_percentage_progress: int | None = None,
         min_planned_start: datetime.datetime | None = None,
         max_planned_start: datetime.datetime | None = None,
         priority_description: str | list[str] | None = None,
         priority_description_prefix: str | None = None,
-        min_duration_hours: int | None = None,
-        max_duration_hours: int | None = None,
-        min_actual_hours: int | None = None,
-        max_actual_hours: int | None = None,
-        is_cancelled: bool | None = None,
-        is_completed: bool | None = None,
-        min_percentage_progress: int | None = None,
-        max_percentage_progress: int | None = None,
-        is_safety_critical: bool | None = None,
+        program_number: str | list[str] | None = None,
+        program_number_prefix: str | None = None,
+        min_start_time: datetime.datetime | None = None,
+        max_start_time: datetime.datetime | None = None,
+        status: str | list[str] | None = None,
+        status_prefix: str | None = None,
+        title: str | list[str] | None = None,
+        title_prefix: str | None = None,
+        work_order_number: str | list[str] | None = None,
+        work_order_number_prefix: str | None = None,
+        work_package_number: str | list[str] | None = None,
+        work_package_number_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -332,40 +332,40 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         Args:
             query: The search query,
             properties: The property to search, if nothing is passed all text fields will be searched.
-            title: The title to filter on.
-            title_prefix: The prefix of the title to filter on.
-            description: The description to filter on.
-            description_prefix: The prefix of the description to filter on.
-            min_start_time: The minimum value of the start time to filter on.
-            max_start_time: The maximum value of the start time to filter on.
-            min_end_time: The minimum value of the end time to filter on.
-            max_end_time: The maximum value of the end time to filter on.
-            program_number: The program number to filter on.
-            program_number_prefix: The prefix of the program number to filter on.
-            work_order_number: The work order number to filter on.
-            work_order_number_prefix: The prefix of the work order number to filter on.
-            status: The status to filter on.
-            status_prefix: The prefix of the status to filter on.
-            min_due_date: The minimum value of the due date to filter on.
-            max_due_date: The maximum value of the due date to filter on.
-            is_active: The is active to filter on.
-            work_package_number: The work package number to filter on.
-            work_package_number_prefix: The prefix of the work package number to filter on.
+            min_actual_hours: The minimum value of the actual hour to filter on.
+            max_actual_hours: The maximum value of the actual hour to filter on.
             min_created_date: The minimum value of the created date to filter on.
             max_created_date: The maximum value of the created date to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            min_due_date: The minimum value of the due date to filter on.
+            max_due_date: The maximum value of the due date to filter on.
+            min_duration_hours: The minimum value of the duration hour to filter on.
+            max_duration_hours: The maximum value of the duration hour to filter on.
+            min_end_time: The minimum value of the end time to filter on.
+            max_end_time: The maximum value of the end time to filter on.
+            is_active: The is active to filter on.
+            is_cancelled: The is cancelled to filter on.
+            is_completed: The is completed to filter on.
+            is_safety_critical: The is safety critical to filter on.
+            min_percentage_progress: The minimum value of the percentage progres to filter on.
+            max_percentage_progress: The maximum value of the percentage progres to filter on.
             min_planned_start: The minimum value of the planned start to filter on.
             max_planned_start: The maximum value of the planned start to filter on.
             priority_description: The priority description to filter on.
             priority_description_prefix: The prefix of the priority description to filter on.
-            min_duration_hours: The minimum value of the duration hour to filter on.
-            max_duration_hours: The maximum value of the duration hour to filter on.
-            min_actual_hours: The minimum value of the actual hour to filter on.
-            max_actual_hours: The maximum value of the actual hour to filter on.
-            is_cancelled: The is cancelled to filter on.
-            is_completed: The is completed to filter on.
-            min_percentage_progress: The minimum value of the percentage progres to filter on.
-            max_percentage_progress: The maximum value of the percentage progres to filter on.
-            is_safety_critical: The is safety critical to filter on.
+            program_number: The program number to filter on.
+            program_number_prefix: The prefix of the program number to filter on.
+            min_start_time: The minimum value of the start time to filter on.
+            max_start_time: The maximum value of the start time to filter on.
+            status: The status to filter on.
+            status_prefix: The prefix of the status to filter on.
+            title: The title to filter on.
+            title_prefix: The prefix of the title to filter on.
+            work_order_number: The work order number to filter on.
+            work_order_number_prefix: The prefix of the work order number to filter on.
+            work_package_number: The work package number to filter on.
+            work_package_number_prefix: The prefix of the work package number to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of work orders to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -385,40 +385,40 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         """
         filter_ = _create_work_order_filter(
             self._view_id,
-            title,
-            title_prefix,
-            description,
-            description_prefix,
-            min_start_time,
-            max_start_time,
-            min_end_time,
-            max_end_time,
-            program_number,
-            program_number_prefix,
-            work_order_number,
-            work_order_number_prefix,
-            status,
-            status_prefix,
-            min_due_date,
-            max_due_date,
-            is_active,
-            work_package_number,
-            work_package_number_prefix,
+            min_actual_hours,
+            max_actual_hours,
             min_created_date,
             max_created_date,
+            description,
+            description_prefix,
+            min_due_date,
+            max_due_date,
+            min_duration_hours,
+            max_duration_hours,
+            min_end_time,
+            max_end_time,
+            is_active,
+            is_cancelled,
+            is_completed,
+            is_safety_critical,
+            min_percentage_progress,
+            max_percentage_progress,
             min_planned_start,
             max_planned_start,
             priority_description,
             priority_description_prefix,
-            min_duration_hours,
-            max_duration_hours,
-            min_actual_hours,
-            max_actual_hours,
-            is_cancelled,
-            is_completed,
-            min_percentage_progress,
-            max_percentage_progress,
-            is_safety_critical,
+            program_number,
+            program_number_prefix,
+            min_start_time,
+            max_start_time,
+            status,
+            status_prefix,
+            title,
+            title_prefix,
+            work_order_number,
+            work_order_number_prefix,
+            work_package_number,
+            work_package_number_prefix,
             external_id_prefix,
             space,
             filter,
@@ -436,40 +436,40 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         group_by: None = None,
         query: str | None = None,
         search_properties: WorkOrderTextFields | Sequence[WorkOrderTextFields] | None = None,
-        title: str | list[str] | None = None,
-        title_prefix: str | None = None,
-        description: str | list[str] | None = None,
-        description_prefix: str | None = None,
-        min_start_time: datetime.datetime | None = None,
-        max_start_time: datetime.datetime | None = None,
-        min_end_time: datetime.datetime | None = None,
-        max_end_time: datetime.datetime | None = None,
-        program_number: str | list[str] | None = None,
-        program_number_prefix: str | None = None,
-        work_order_number: str | list[str] | None = None,
-        work_order_number_prefix: str | None = None,
-        status: str | list[str] | None = None,
-        status_prefix: str | None = None,
-        min_due_date: datetime.datetime | None = None,
-        max_due_date: datetime.datetime | None = None,
-        is_active: bool | None = None,
-        work_package_number: str | list[str] | None = None,
-        work_package_number_prefix: str | None = None,
+        min_actual_hours: int | None = None,
+        max_actual_hours: int | None = None,
         min_created_date: datetime.datetime | None = None,
         max_created_date: datetime.datetime | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        min_due_date: datetime.datetime | None = None,
+        max_due_date: datetime.datetime | None = None,
+        min_duration_hours: int | None = None,
+        max_duration_hours: int | None = None,
+        min_end_time: datetime.datetime | None = None,
+        max_end_time: datetime.datetime | None = None,
+        is_active: bool | None = None,
+        is_cancelled: bool | None = None,
+        is_completed: bool | None = None,
+        is_safety_critical: bool | None = None,
+        min_percentage_progress: int | None = None,
+        max_percentage_progress: int | None = None,
         min_planned_start: datetime.datetime | None = None,
         max_planned_start: datetime.datetime | None = None,
         priority_description: str | list[str] | None = None,
         priority_description_prefix: str | None = None,
-        min_duration_hours: int | None = None,
-        max_duration_hours: int | None = None,
-        min_actual_hours: int | None = None,
-        max_actual_hours: int | None = None,
-        is_cancelled: bool | None = None,
-        is_completed: bool | None = None,
-        min_percentage_progress: int | None = None,
-        max_percentage_progress: int | None = None,
-        is_safety_critical: bool | None = None,
+        program_number: str | list[str] | None = None,
+        program_number_prefix: str | None = None,
+        min_start_time: datetime.datetime | None = None,
+        max_start_time: datetime.datetime | None = None,
+        status: str | list[str] | None = None,
+        status_prefix: str | None = None,
+        title: str | list[str] | None = None,
+        title_prefix: str | None = None,
+        work_order_number: str | list[str] | None = None,
+        work_order_number_prefix: str | None = None,
+        work_package_number: str | list[str] | None = None,
+        work_package_number_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -488,40 +488,40 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         group_by: WorkOrderFields | Sequence[WorkOrderFields] = None,
         query: str | None = None,
         search_properties: WorkOrderTextFields | Sequence[WorkOrderTextFields] | None = None,
-        title: str | list[str] | None = None,
-        title_prefix: str | None = None,
-        description: str | list[str] | None = None,
-        description_prefix: str | None = None,
-        min_start_time: datetime.datetime | None = None,
-        max_start_time: datetime.datetime | None = None,
-        min_end_time: datetime.datetime | None = None,
-        max_end_time: datetime.datetime | None = None,
-        program_number: str | list[str] | None = None,
-        program_number_prefix: str | None = None,
-        work_order_number: str | list[str] | None = None,
-        work_order_number_prefix: str | None = None,
-        status: str | list[str] | None = None,
-        status_prefix: str | None = None,
-        min_due_date: datetime.datetime | None = None,
-        max_due_date: datetime.datetime | None = None,
-        is_active: bool | None = None,
-        work_package_number: str | list[str] | None = None,
-        work_package_number_prefix: str | None = None,
+        min_actual_hours: int | None = None,
+        max_actual_hours: int | None = None,
         min_created_date: datetime.datetime | None = None,
         max_created_date: datetime.datetime | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        min_due_date: datetime.datetime | None = None,
+        max_due_date: datetime.datetime | None = None,
+        min_duration_hours: int | None = None,
+        max_duration_hours: int | None = None,
+        min_end_time: datetime.datetime | None = None,
+        max_end_time: datetime.datetime | None = None,
+        is_active: bool | None = None,
+        is_cancelled: bool | None = None,
+        is_completed: bool | None = None,
+        is_safety_critical: bool | None = None,
+        min_percentage_progress: int | None = None,
+        max_percentage_progress: int | None = None,
         min_planned_start: datetime.datetime | None = None,
         max_planned_start: datetime.datetime | None = None,
         priority_description: str | list[str] | None = None,
         priority_description_prefix: str | None = None,
-        min_duration_hours: int | None = None,
-        max_duration_hours: int | None = None,
-        min_actual_hours: int | None = None,
-        max_actual_hours: int | None = None,
-        is_cancelled: bool | None = None,
-        is_completed: bool | None = None,
-        min_percentage_progress: int | None = None,
-        max_percentage_progress: int | None = None,
-        is_safety_critical: bool | None = None,
+        program_number: str | list[str] | None = None,
+        program_number_prefix: str | None = None,
+        min_start_time: datetime.datetime | None = None,
+        max_start_time: datetime.datetime | None = None,
+        status: str | list[str] | None = None,
+        status_prefix: str | None = None,
+        title: str | list[str] | None = None,
+        title_prefix: str | None = None,
+        work_order_number: str | list[str] | None = None,
+        work_order_number_prefix: str | None = None,
+        work_package_number: str | list[str] | None = None,
+        work_package_number_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -539,40 +539,40 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         group_by: WorkOrderFields | Sequence[WorkOrderFields] | None = None,
         query: str | None = None,
         search_property: WorkOrderTextFields | Sequence[WorkOrderTextFields] | None = None,
-        title: str | list[str] | None = None,
-        title_prefix: str | None = None,
-        description: str | list[str] | None = None,
-        description_prefix: str | None = None,
-        min_start_time: datetime.datetime | None = None,
-        max_start_time: datetime.datetime | None = None,
-        min_end_time: datetime.datetime | None = None,
-        max_end_time: datetime.datetime | None = None,
-        program_number: str | list[str] | None = None,
-        program_number_prefix: str | None = None,
-        work_order_number: str | list[str] | None = None,
-        work_order_number_prefix: str | None = None,
-        status: str | list[str] | None = None,
-        status_prefix: str | None = None,
-        min_due_date: datetime.datetime | None = None,
-        max_due_date: datetime.datetime | None = None,
-        is_active: bool | None = None,
-        work_package_number: str | list[str] | None = None,
-        work_package_number_prefix: str | None = None,
+        min_actual_hours: int | None = None,
+        max_actual_hours: int | None = None,
         min_created_date: datetime.datetime | None = None,
         max_created_date: datetime.datetime | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        min_due_date: datetime.datetime | None = None,
+        max_due_date: datetime.datetime | None = None,
+        min_duration_hours: int | None = None,
+        max_duration_hours: int | None = None,
+        min_end_time: datetime.datetime | None = None,
+        max_end_time: datetime.datetime | None = None,
+        is_active: bool | None = None,
+        is_cancelled: bool | None = None,
+        is_completed: bool | None = None,
+        is_safety_critical: bool | None = None,
+        min_percentage_progress: int | None = None,
+        max_percentage_progress: int | None = None,
         min_planned_start: datetime.datetime | None = None,
         max_planned_start: datetime.datetime | None = None,
         priority_description: str | list[str] | None = None,
         priority_description_prefix: str | None = None,
-        min_duration_hours: int | None = None,
-        max_duration_hours: int | None = None,
-        min_actual_hours: int | None = None,
-        max_actual_hours: int | None = None,
-        is_cancelled: bool | None = None,
-        is_completed: bool | None = None,
-        min_percentage_progress: int | None = None,
-        max_percentage_progress: int | None = None,
-        is_safety_critical: bool | None = None,
+        program_number: str | list[str] | None = None,
+        program_number_prefix: str | None = None,
+        min_start_time: datetime.datetime | None = None,
+        max_start_time: datetime.datetime | None = None,
+        status: str | list[str] | None = None,
+        status_prefix: str | None = None,
+        title: str | list[str] | None = None,
+        title_prefix: str | None = None,
+        work_order_number: str | list[str] | None = None,
+        work_order_number_prefix: str | None = None,
+        work_package_number: str | list[str] | None = None,
+        work_package_number_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -586,40 +586,40 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
             group_by: The property to group by when doing the aggregation.
             query: The query to search for in the text field.
             search_property: The text field to search in.
-            title: The title to filter on.
-            title_prefix: The prefix of the title to filter on.
-            description: The description to filter on.
-            description_prefix: The prefix of the description to filter on.
-            min_start_time: The minimum value of the start time to filter on.
-            max_start_time: The maximum value of the start time to filter on.
-            min_end_time: The minimum value of the end time to filter on.
-            max_end_time: The maximum value of the end time to filter on.
-            program_number: The program number to filter on.
-            program_number_prefix: The prefix of the program number to filter on.
-            work_order_number: The work order number to filter on.
-            work_order_number_prefix: The prefix of the work order number to filter on.
-            status: The status to filter on.
-            status_prefix: The prefix of the status to filter on.
-            min_due_date: The minimum value of the due date to filter on.
-            max_due_date: The maximum value of the due date to filter on.
-            is_active: The is active to filter on.
-            work_package_number: The work package number to filter on.
-            work_package_number_prefix: The prefix of the work package number to filter on.
+            min_actual_hours: The minimum value of the actual hour to filter on.
+            max_actual_hours: The maximum value of the actual hour to filter on.
             min_created_date: The minimum value of the created date to filter on.
             max_created_date: The maximum value of the created date to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            min_due_date: The minimum value of the due date to filter on.
+            max_due_date: The maximum value of the due date to filter on.
+            min_duration_hours: The minimum value of the duration hour to filter on.
+            max_duration_hours: The maximum value of the duration hour to filter on.
+            min_end_time: The minimum value of the end time to filter on.
+            max_end_time: The maximum value of the end time to filter on.
+            is_active: The is active to filter on.
+            is_cancelled: The is cancelled to filter on.
+            is_completed: The is completed to filter on.
+            is_safety_critical: The is safety critical to filter on.
+            min_percentage_progress: The minimum value of the percentage progres to filter on.
+            max_percentage_progress: The maximum value of the percentage progres to filter on.
             min_planned_start: The minimum value of the planned start to filter on.
             max_planned_start: The maximum value of the planned start to filter on.
             priority_description: The priority description to filter on.
             priority_description_prefix: The prefix of the priority description to filter on.
-            min_duration_hours: The minimum value of the duration hour to filter on.
-            max_duration_hours: The maximum value of the duration hour to filter on.
-            min_actual_hours: The minimum value of the actual hour to filter on.
-            max_actual_hours: The maximum value of the actual hour to filter on.
-            is_cancelled: The is cancelled to filter on.
-            is_completed: The is completed to filter on.
-            min_percentage_progress: The minimum value of the percentage progres to filter on.
-            max_percentage_progress: The maximum value of the percentage progres to filter on.
-            is_safety_critical: The is safety critical to filter on.
+            program_number: The program number to filter on.
+            program_number_prefix: The prefix of the program number to filter on.
+            min_start_time: The minimum value of the start time to filter on.
+            max_start_time: The maximum value of the start time to filter on.
+            status: The status to filter on.
+            status_prefix: The prefix of the status to filter on.
+            title: The title to filter on.
+            title_prefix: The prefix of the title to filter on.
+            work_order_number: The work order number to filter on.
+            work_order_number_prefix: The prefix of the work order number to filter on.
+            work_package_number: The work package number to filter on.
+            work_package_number_prefix: The prefix of the work package number to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of work orders to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -640,40 +640,40 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
 
         filter_ = _create_work_order_filter(
             self._view_id,
-            title,
-            title_prefix,
-            description,
-            description_prefix,
-            min_start_time,
-            max_start_time,
-            min_end_time,
-            max_end_time,
-            program_number,
-            program_number_prefix,
-            work_order_number,
-            work_order_number_prefix,
-            status,
-            status_prefix,
-            min_due_date,
-            max_due_date,
-            is_active,
-            work_package_number,
-            work_package_number_prefix,
+            min_actual_hours,
+            max_actual_hours,
             min_created_date,
             max_created_date,
+            description,
+            description_prefix,
+            min_due_date,
+            max_due_date,
+            min_duration_hours,
+            max_duration_hours,
+            min_end_time,
+            max_end_time,
+            is_active,
+            is_cancelled,
+            is_completed,
+            is_safety_critical,
+            min_percentage_progress,
+            max_percentage_progress,
             min_planned_start,
             max_planned_start,
             priority_description,
             priority_description_prefix,
-            min_duration_hours,
-            max_duration_hours,
-            min_actual_hours,
-            max_actual_hours,
-            is_cancelled,
-            is_completed,
-            min_percentage_progress,
-            max_percentage_progress,
-            is_safety_critical,
+            program_number,
+            program_number_prefix,
+            min_start_time,
+            max_start_time,
+            status,
+            status_prefix,
+            title,
+            title_prefix,
+            work_order_number,
+            work_order_number_prefix,
+            work_package_number,
+            work_package_number_prefix,
             external_id_prefix,
             space,
             filter,
@@ -696,40 +696,40 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         interval: float,
         query: str | None = None,
         search_property: WorkOrderTextFields | Sequence[WorkOrderTextFields] | None = None,
-        title: str | list[str] | None = None,
-        title_prefix: str | None = None,
-        description: str | list[str] | None = None,
-        description_prefix: str | None = None,
-        min_start_time: datetime.datetime | None = None,
-        max_start_time: datetime.datetime | None = None,
-        min_end_time: datetime.datetime | None = None,
-        max_end_time: datetime.datetime | None = None,
-        program_number: str | list[str] | None = None,
-        program_number_prefix: str | None = None,
-        work_order_number: str | list[str] | None = None,
-        work_order_number_prefix: str | None = None,
-        status: str | list[str] | None = None,
-        status_prefix: str | None = None,
-        min_due_date: datetime.datetime | None = None,
-        max_due_date: datetime.datetime | None = None,
-        is_active: bool | None = None,
-        work_package_number: str | list[str] | None = None,
-        work_package_number_prefix: str | None = None,
+        min_actual_hours: int | None = None,
+        max_actual_hours: int | None = None,
         min_created_date: datetime.datetime | None = None,
         max_created_date: datetime.datetime | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        min_due_date: datetime.datetime | None = None,
+        max_due_date: datetime.datetime | None = None,
+        min_duration_hours: int | None = None,
+        max_duration_hours: int | None = None,
+        min_end_time: datetime.datetime | None = None,
+        max_end_time: datetime.datetime | None = None,
+        is_active: bool | None = None,
+        is_cancelled: bool | None = None,
+        is_completed: bool | None = None,
+        is_safety_critical: bool | None = None,
+        min_percentage_progress: int | None = None,
+        max_percentage_progress: int | None = None,
         min_planned_start: datetime.datetime | None = None,
         max_planned_start: datetime.datetime | None = None,
         priority_description: str | list[str] | None = None,
         priority_description_prefix: str | None = None,
-        min_duration_hours: int | None = None,
-        max_duration_hours: int | None = None,
-        min_actual_hours: int | None = None,
-        max_actual_hours: int | None = None,
-        is_cancelled: bool | None = None,
-        is_completed: bool | None = None,
-        min_percentage_progress: int | None = None,
-        max_percentage_progress: int | None = None,
-        is_safety_critical: bool | None = None,
+        program_number: str | list[str] | None = None,
+        program_number_prefix: str | None = None,
+        min_start_time: datetime.datetime | None = None,
+        max_start_time: datetime.datetime | None = None,
+        status: str | list[str] | None = None,
+        status_prefix: str | None = None,
+        title: str | list[str] | None = None,
+        title_prefix: str | None = None,
+        work_order_number: str | list[str] | None = None,
+        work_order_number_prefix: str | None = None,
+        work_package_number: str | list[str] | None = None,
+        work_package_number_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -742,40 +742,40 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
             interval: The interval to use for the histogram bins.
             query: The query to search for in the text field.
             search_property: The text field to search in.
-            title: The title to filter on.
-            title_prefix: The prefix of the title to filter on.
-            description: The description to filter on.
-            description_prefix: The prefix of the description to filter on.
-            min_start_time: The minimum value of the start time to filter on.
-            max_start_time: The maximum value of the start time to filter on.
-            min_end_time: The minimum value of the end time to filter on.
-            max_end_time: The maximum value of the end time to filter on.
-            program_number: The program number to filter on.
-            program_number_prefix: The prefix of the program number to filter on.
-            work_order_number: The work order number to filter on.
-            work_order_number_prefix: The prefix of the work order number to filter on.
-            status: The status to filter on.
-            status_prefix: The prefix of the status to filter on.
-            min_due_date: The minimum value of the due date to filter on.
-            max_due_date: The maximum value of the due date to filter on.
-            is_active: The is active to filter on.
-            work_package_number: The work package number to filter on.
-            work_package_number_prefix: The prefix of the work package number to filter on.
+            min_actual_hours: The minimum value of the actual hour to filter on.
+            max_actual_hours: The maximum value of the actual hour to filter on.
             min_created_date: The minimum value of the created date to filter on.
             max_created_date: The maximum value of the created date to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            min_due_date: The minimum value of the due date to filter on.
+            max_due_date: The maximum value of the due date to filter on.
+            min_duration_hours: The minimum value of the duration hour to filter on.
+            max_duration_hours: The maximum value of the duration hour to filter on.
+            min_end_time: The minimum value of the end time to filter on.
+            max_end_time: The maximum value of the end time to filter on.
+            is_active: The is active to filter on.
+            is_cancelled: The is cancelled to filter on.
+            is_completed: The is completed to filter on.
+            is_safety_critical: The is safety critical to filter on.
+            min_percentage_progress: The minimum value of the percentage progres to filter on.
+            max_percentage_progress: The maximum value of the percentage progres to filter on.
             min_planned_start: The minimum value of the planned start to filter on.
             max_planned_start: The maximum value of the planned start to filter on.
             priority_description: The priority description to filter on.
             priority_description_prefix: The prefix of the priority description to filter on.
-            min_duration_hours: The minimum value of the duration hour to filter on.
-            max_duration_hours: The maximum value of the duration hour to filter on.
-            min_actual_hours: The minimum value of the actual hour to filter on.
-            max_actual_hours: The maximum value of the actual hour to filter on.
-            is_cancelled: The is cancelled to filter on.
-            is_completed: The is completed to filter on.
-            min_percentage_progress: The minimum value of the percentage progres to filter on.
-            max_percentage_progress: The maximum value of the percentage progres to filter on.
-            is_safety_critical: The is safety critical to filter on.
+            program_number: The program number to filter on.
+            program_number_prefix: The prefix of the program number to filter on.
+            min_start_time: The minimum value of the start time to filter on.
+            max_start_time: The maximum value of the start time to filter on.
+            status: The status to filter on.
+            status_prefix: The prefix of the status to filter on.
+            title: The title to filter on.
+            title_prefix: The prefix of the title to filter on.
+            work_order_number: The work order number to filter on.
+            work_order_number_prefix: The prefix of the work order number to filter on.
+            work_package_number: The work package number to filter on.
+            work_package_number_prefix: The prefix of the work package number to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of work orders to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -787,40 +787,40 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         """
         filter_ = _create_work_order_filter(
             self._view_id,
-            title,
-            title_prefix,
-            description,
-            description_prefix,
-            min_start_time,
-            max_start_time,
-            min_end_time,
-            max_end_time,
-            program_number,
-            program_number_prefix,
-            work_order_number,
-            work_order_number_prefix,
-            status,
-            status_prefix,
-            min_due_date,
-            max_due_date,
-            is_active,
-            work_package_number,
-            work_package_number_prefix,
+            min_actual_hours,
+            max_actual_hours,
             min_created_date,
             max_created_date,
+            description,
+            description_prefix,
+            min_due_date,
+            max_due_date,
+            min_duration_hours,
+            max_duration_hours,
+            min_end_time,
+            max_end_time,
+            is_active,
+            is_cancelled,
+            is_completed,
+            is_safety_critical,
+            min_percentage_progress,
+            max_percentage_progress,
             min_planned_start,
             max_planned_start,
             priority_description,
             priority_description_prefix,
-            min_duration_hours,
-            max_duration_hours,
-            min_actual_hours,
-            max_actual_hours,
-            is_cancelled,
-            is_completed,
-            min_percentage_progress,
-            max_percentage_progress,
-            is_safety_critical,
+            program_number,
+            program_number_prefix,
+            min_start_time,
+            max_start_time,
+            status,
+            status_prefix,
+            title,
+            title_prefix,
+            work_order_number,
+            work_order_number_prefix,
+            work_package_number,
+            work_package_number_prefix,
             external_id_prefix,
             space,
             filter,
@@ -838,40 +838,40 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
 
     def list(
         self,
-        title: str | list[str] | None = None,
-        title_prefix: str | None = None,
-        description: str | list[str] | None = None,
-        description_prefix: str | None = None,
-        min_start_time: datetime.datetime | None = None,
-        max_start_time: datetime.datetime | None = None,
-        min_end_time: datetime.datetime | None = None,
-        max_end_time: datetime.datetime | None = None,
-        program_number: str | list[str] | None = None,
-        program_number_prefix: str | None = None,
-        work_order_number: str | list[str] | None = None,
-        work_order_number_prefix: str | None = None,
-        status: str | list[str] | None = None,
-        status_prefix: str | None = None,
-        min_due_date: datetime.datetime | None = None,
-        max_due_date: datetime.datetime | None = None,
-        is_active: bool | None = None,
-        work_package_number: str | list[str] | None = None,
-        work_package_number_prefix: str | None = None,
+        min_actual_hours: int | None = None,
+        max_actual_hours: int | None = None,
         min_created_date: datetime.datetime | None = None,
         max_created_date: datetime.datetime | None = None,
+        description: str | list[str] | None = None,
+        description_prefix: str | None = None,
+        min_due_date: datetime.datetime | None = None,
+        max_due_date: datetime.datetime | None = None,
+        min_duration_hours: int | None = None,
+        max_duration_hours: int | None = None,
+        min_end_time: datetime.datetime | None = None,
+        max_end_time: datetime.datetime | None = None,
+        is_active: bool | None = None,
+        is_cancelled: bool | None = None,
+        is_completed: bool | None = None,
+        is_safety_critical: bool | None = None,
+        min_percentage_progress: int | None = None,
+        max_percentage_progress: int | None = None,
         min_planned_start: datetime.datetime | None = None,
         max_planned_start: datetime.datetime | None = None,
         priority_description: str | list[str] | None = None,
         priority_description_prefix: str | None = None,
-        min_duration_hours: int | None = None,
-        max_duration_hours: int | None = None,
-        min_actual_hours: int | None = None,
-        max_actual_hours: int | None = None,
-        is_cancelled: bool | None = None,
-        is_completed: bool | None = None,
-        min_percentage_progress: int | None = None,
-        max_percentage_progress: int | None = None,
-        is_safety_critical: bool | None = None,
+        program_number: str | list[str] | None = None,
+        program_number_prefix: str | None = None,
+        min_start_time: datetime.datetime | None = None,
+        max_start_time: datetime.datetime | None = None,
+        status: str | list[str] | None = None,
+        status_prefix: str | None = None,
+        title: str | list[str] | None = None,
+        title_prefix: str | None = None,
+        work_order_number: str | list[str] | None = None,
+        work_order_number_prefix: str | None = None,
+        work_package_number: str | list[str] | None = None,
+        work_package_number_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -881,45 +881,45 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         """List/filter work orders
 
         Args:
-            title: The title to filter on.
-            title_prefix: The prefix of the title to filter on.
-            description: The description to filter on.
-            description_prefix: The prefix of the description to filter on.
-            min_start_time: The minimum value of the start time to filter on.
-            max_start_time: The maximum value of the start time to filter on.
-            min_end_time: The minimum value of the end time to filter on.
-            max_end_time: The maximum value of the end time to filter on.
-            program_number: The program number to filter on.
-            program_number_prefix: The prefix of the program number to filter on.
-            work_order_number: The work order number to filter on.
-            work_order_number_prefix: The prefix of the work order number to filter on.
-            status: The status to filter on.
-            status_prefix: The prefix of the status to filter on.
-            min_due_date: The minimum value of the due date to filter on.
-            max_due_date: The maximum value of the due date to filter on.
-            is_active: The is active to filter on.
-            work_package_number: The work package number to filter on.
-            work_package_number_prefix: The prefix of the work package number to filter on.
+            min_actual_hours: The minimum value of the actual hour to filter on.
+            max_actual_hours: The maximum value of the actual hour to filter on.
             min_created_date: The minimum value of the created date to filter on.
             max_created_date: The maximum value of the created date to filter on.
+            description: The description to filter on.
+            description_prefix: The prefix of the description to filter on.
+            min_due_date: The minimum value of the due date to filter on.
+            max_due_date: The maximum value of the due date to filter on.
+            min_duration_hours: The minimum value of the duration hour to filter on.
+            max_duration_hours: The maximum value of the duration hour to filter on.
+            min_end_time: The minimum value of the end time to filter on.
+            max_end_time: The maximum value of the end time to filter on.
+            is_active: The is active to filter on.
+            is_cancelled: The is cancelled to filter on.
+            is_completed: The is completed to filter on.
+            is_safety_critical: The is safety critical to filter on.
+            min_percentage_progress: The minimum value of the percentage progres to filter on.
+            max_percentage_progress: The maximum value of the percentage progres to filter on.
             min_planned_start: The minimum value of the planned start to filter on.
             max_planned_start: The maximum value of the planned start to filter on.
             priority_description: The priority description to filter on.
             priority_description_prefix: The prefix of the priority description to filter on.
-            min_duration_hours: The minimum value of the duration hour to filter on.
-            max_duration_hours: The maximum value of the duration hour to filter on.
-            min_actual_hours: The minimum value of the actual hour to filter on.
-            max_actual_hours: The maximum value of the actual hour to filter on.
-            is_cancelled: The is cancelled to filter on.
-            is_completed: The is completed to filter on.
-            min_percentage_progress: The minimum value of the percentage progres to filter on.
-            max_percentage_progress: The maximum value of the percentage progres to filter on.
-            is_safety_critical: The is safety critical to filter on.
+            program_number: The program number to filter on.
+            program_number_prefix: The prefix of the program number to filter on.
+            min_start_time: The minimum value of the start time to filter on.
+            max_start_time: The maximum value of the start time to filter on.
+            status: The status to filter on.
+            status_prefix: The prefix of the status to filter on.
+            title: The title to filter on.
+            title_prefix: The prefix of the title to filter on.
+            work_order_number: The work order number to filter on.
+            work_order_number_prefix: The prefix of the work order number to filter on.
+            work_package_number: The work package number to filter on.
+            work_package_number_prefix: The prefix of the work package number to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of work orders to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
-            retrieve_edges: Whether to retrieve `work_items` or `linked_assets` external ids for the work orders. Defaults to True.
+            retrieve_edges: Whether to retrieve `linked_assets` or `work_items` external ids for the work orders. Defaults to True.
 
         Returns:
             List of requested work orders
@@ -935,40 +935,40 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
         """
         filter_ = _create_work_order_filter(
             self._view_id,
-            title,
-            title_prefix,
-            description,
-            description_prefix,
-            min_start_time,
-            max_start_time,
-            min_end_time,
-            max_end_time,
-            program_number,
-            program_number_prefix,
-            work_order_number,
-            work_order_number_prefix,
-            status,
-            status_prefix,
-            min_due_date,
-            max_due_date,
-            is_active,
-            work_package_number,
-            work_package_number_prefix,
+            min_actual_hours,
+            max_actual_hours,
             min_created_date,
             max_created_date,
+            description,
+            description_prefix,
+            min_due_date,
+            max_due_date,
+            min_duration_hours,
+            max_duration_hours,
+            min_end_time,
+            max_end_time,
+            is_active,
+            is_cancelled,
+            is_completed,
+            is_safety_critical,
+            min_percentage_progress,
+            max_percentage_progress,
             min_planned_start,
             max_planned_start,
             priority_description,
             priority_description_prefix,
-            min_duration_hours,
-            max_duration_hours,
-            min_actual_hours,
-            max_actual_hours,
-            is_cancelled,
-            is_completed,
-            min_percentage_progress,
-            max_percentage_progress,
-            is_safety_critical,
+            program_number,
+            program_number_prefix,
+            min_start_time,
+            max_start_time,
+            status,
+            status_prefix,
+            title,
+            title_prefix,
+            work_order_number,
+            work_order_number_prefix,
+            work_package_number,
+            work_package_number_prefix,
             external_id_prefix,
             space,
             filter,
@@ -980,15 +980,15 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
             retrieve_edges=retrieve_edges,
             edge_api_name_type_direction_quad=[
                 (
-                    self.work_items_edge,
-                    "work_items",
-                    dm.DirectRelationReference("tutorial_apm_simple", "WorkOrder.workItems"),
-                    "outwards",
-                ),
-                (
                     self.linked_assets_edge,
                     "linked_assets",
                     dm.DirectRelationReference("tutorial_apm_simple", "WorkOrder.linkedAssets"),
+                    "outwards",
+                ),
+                (
+                    self.work_items_edge,
+                    "work_items",
+                    dm.DirectRelationReference("tutorial_apm_simple", "WorkOrder.workItems"),
                     "outwards",
                 ),
             ],

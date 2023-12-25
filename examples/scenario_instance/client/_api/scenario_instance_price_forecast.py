@@ -12,7 +12,7 @@ from cognite.client.data_classes.datapoints import Aggregate
 from scenario_instance.client.data_classes._scenario_instance import _create_scenario_instance_filter
 from ._core import DEFAULT_LIMIT_READ, INSTANCE_QUERY_LIMIT
 
-ColumnNames = Literal["start", "instance", "scenario", "priceArea", "market", "priceForecast", "country", "aggregation"]
+ColumnNames = Literal["aggregation", "country", "instance", "market", "priceArea", "priceForecast", "scenario", "start"]
 
 
 class ScenarioInstancePriceForecastQuery:
@@ -359,20 +359,20 @@ class ScenarioInstancePriceForecastAPI:
 
     def __call__(
         self,
-        min_start: datetime.datetime | None = None,
-        max_start: datetime.datetime | None = None,
-        min_instance: datetime.datetime | None = None,
-        max_instance: datetime.datetime | None = None,
-        scenario: str | list[str] | None = None,
-        scenario_prefix: str | None = None,
-        price_area: str | list[str] | None = None,
-        price_area_prefix: str | None = None,
-        market: str | list[str] | None = None,
-        market_prefix: str | None = None,
-        country: str | list[str] | None = None,
-        country_prefix: str | None = None,
         aggregation: str | list[str] | None = None,
         aggregation_prefix: str | None = None,
+        country: str | list[str] | None = None,
+        country_prefix: str | None = None,
+        min_instance: datetime.datetime | None = None,
+        max_instance: datetime.datetime | None = None,
+        market: str | list[str] | None = None,
+        market_prefix: str | None = None,
+        price_area: str | list[str] | None = None,
+        price_area_prefix: str | None = None,
+        scenario: str | list[str] | None = None,
+        scenario_prefix: str | None = None,
+        min_start: datetime.datetime | None = None,
+        max_start: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -381,20 +381,20 @@ class ScenarioInstancePriceForecastAPI:
         """Query timeseries `scenario_instance.price_forecast`
 
         Args:
-            min_start: The minimum value of the start to filter on.
-            max_start: The maximum value of the start to filter on.
-            min_instance: The minimum value of the instance to filter on.
-            max_instance: The maximum value of the instance to filter on.
-            scenario: The scenario to filter on.
-            scenario_prefix: The prefix of the scenario to filter on.
-            price_area: The price area to filter on.
-            price_area_prefix: The prefix of the price area to filter on.
-            market: The market to filter on.
-            market_prefix: The prefix of the market to filter on.
-            country: The country to filter on.
-            country_prefix: The prefix of the country to filter on.
             aggregation: The aggregation to filter on.
             aggregation_prefix: The prefix of the aggregation to filter on.
+            country: The country to filter on.
+            country_prefix: The prefix of the country to filter on.
+            min_instance: The minimum value of the instance to filter on.
+            max_instance: The maximum value of the instance to filter on.
+            market: The market to filter on.
+            market_prefix: The prefix of the market to filter on.
+            price_area: The price area to filter on.
+            price_area_prefix: The prefix of the price area to filter on.
+            scenario: The scenario to filter on.
+            scenario_prefix: The prefix of the scenario to filter on.
+            min_start: The minimum value of the start to filter on.
+            max_start: The maximum value of the start to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of scenario instances to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -415,20 +415,20 @@ class ScenarioInstancePriceForecastAPI:
         """
         filter_ = _create_scenario_instance_filter(
             self._view_id,
-            min_start,
-            max_start,
-            min_instance,
-            max_instance,
-            scenario,
-            scenario_prefix,
-            price_area,
-            price_area_prefix,
-            market,
-            market_prefix,
-            country,
-            country_prefix,
             aggregation,
             aggregation_prefix,
+            country,
+            country_prefix,
+            min_instance,
+            max_instance,
+            market,
+            market_prefix,
+            price_area,
+            price_area_prefix,
+            scenario,
+            scenario_prefix,
+            min_start,
+            max_start,
             external_id_prefix,
             space,
             filter,
@@ -443,20 +443,20 @@ class ScenarioInstancePriceForecastAPI:
 
     def list(
         self,
-        min_start: datetime.datetime | None = None,
-        max_start: datetime.datetime | None = None,
-        min_instance: datetime.datetime | None = None,
-        max_instance: datetime.datetime | None = None,
-        scenario: str | list[str] | None = None,
-        scenario_prefix: str | None = None,
-        price_area: str | list[str] | None = None,
-        price_area_prefix: str | None = None,
-        market: str | list[str] | None = None,
-        market_prefix: str | None = None,
-        country: str | list[str] | None = None,
-        country_prefix: str | None = None,
         aggregation: str | list[str] | None = None,
         aggregation_prefix: str | None = None,
+        country: str | list[str] | None = None,
+        country_prefix: str | None = None,
+        min_instance: datetime.datetime | None = None,
+        max_instance: datetime.datetime | None = None,
+        market: str | list[str] | None = None,
+        market_prefix: str | None = None,
+        price_area: str | list[str] | None = None,
+        price_area_prefix: str | None = None,
+        scenario: str | list[str] | None = None,
+        scenario_prefix: str | None = None,
+        min_start: datetime.datetime | None = None,
+        max_start: datetime.datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -465,20 +465,20 @@ class ScenarioInstancePriceForecastAPI:
         """List timeseries `scenario_instance.price_forecast`
 
         Args:
-            min_start: The minimum value of the start to filter on.
-            max_start: The maximum value of the start to filter on.
-            min_instance: The minimum value of the instance to filter on.
-            max_instance: The maximum value of the instance to filter on.
-            scenario: The scenario to filter on.
-            scenario_prefix: The prefix of the scenario to filter on.
-            price_area: The price area to filter on.
-            price_area_prefix: The prefix of the price area to filter on.
-            market: The market to filter on.
-            market_prefix: The prefix of the market to filter on.
-            country: The country to filter on.
-            country_prefix: The prefix of the country to filter on.
             aggregation: The aggregation to filter on.
             aggregation_prefix: The prefix of the aggregation to filter on.
+            country: The country to filter on.
+            country_prefix: The prefix of the country to filter on.
+            min_instance: The minimum value of the instance to filter on.
+            max_instance: The maximum value of the instance to filter on.
+            market: The market to filter on.
+            market_prefix: The prefix of the market to filter on.
+            price_area: The price area to filter on.
+            price_area_prefix: The prefix of the price area to filter on.
+            scenario: The scenario to filter on.
+            scenario_prefix: The prefix of the scenario to filter on.
+            min_start: The minimum value of the start to filter on.
+            max_start: The maximum value of the start to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of scenario instances to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
@@ -498,20 +498,20 @@ class ScenarioInstancePriceForecastAPI:
         """
         filter_ = _create_scenario_instance_filter(
             self._view_id,
-            min_start,
-            max_start,
-            min_instance,
-            max_instance,
-            scenario,
-            scenario_prefix,
-            price_area,
-            price_area_prefix,
-            market,
-            market_prefix,
-            country,
-            country_prefix,
             aggregation,
             aggregation_prefix,
+            country,
+            country_prefix,
+            min_instance,
+            max_instance,
+            market,
+            market_prefix,
+            price_area,
+            price_area_prefix,
+            scenario,
+            scenario_prefix,
+            min_start,
+            max_start,
             external_id_prefix,
             space,
             filter,

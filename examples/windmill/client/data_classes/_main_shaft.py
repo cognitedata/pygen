@@ -27,15 +27,15 @@ __all__ = [
 ]
 
 
-MainShaftTextFields = Literal["torque", "calculated_tilt_moment", "calculated_yaw_moment", "bending_x", "bending_y"]
-MainShaftFields = Literal["torque", "calculated_tilt_moment", "calculated_yaw_moment", "bending_x", "bending_y"]
+MainShaftTextFields = Literal["bending_x", "bending_y", "calculated_tilt_moment", "calculated_yaw_moment", "torque"]
+MainShaftFields = Literal["bending_x", "bending_y", "calculated_tilt_moment", "calculated_yaw_moment", "torque"]
 
 _MAINSHAFT_PROPERTIES_BY_FIELD = {
-    "torque": "torque",
-    "calculated_tilt_moment": "calculated_tilt_moment",
-    "calculated_yaw_moment": "calculated_yaw_moment",
     "bending_x": "bending_x",
     "bending_y": "bending_y",
+    "calculated_tilt_moment": "calculated_tilt_moment",
+    "calculated_yaw_moment": "calculated_yaw_moment",
+    "torque": "torque",
 }
 
 
@@ -47,11 +47,11 @@ class MainShaft(DomainModel):
     Args:
         space: The space where the node is located.
         external_id: The external id of the main shaft.
-        torque: The torque field.
-        calculated_tilt_moment: The calculated tilt moment field.
-        calculated_yaw_moment: The calculated yaw moment field.
         bending_x: The bending x field.
         bending_y: The bending y field.
+        calculated_tilt_moment: The calculated tilt moment field.
+        calculated_yaw_moment: The calculated yaw moment field.
+        torque: The torque field.
         created_time: The created time of the main shaft node.
         last_updated_time: The last updated time of the main shaft node.
         deleted_time: If present, the deleted time of the main shaft node.
@@ -59,22 +59,22 @@ class MainShaft(DomainModel):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    torque: Union[TimeSeries, str, None] = None
-    calculated_tilt_moment: Union[TimeSeries, str, None] = None
-    calculated_yaw_moment: Union[TimeSeries, str, None] = None
     bending_x: Union[TimeSeries, str, None] = None
     bending_y: Union[TimeSeries, str, None] = None
+    calculated_tilt_moment: Union[TimeSeries, str, None] = None
+    calculated_yaw_moment: Union[TimeSeries, str, None] = None
+    torque: Union[TimeSeries, str, None] = None
 
     def as_apply(self) -> MainShaftApply:
         """Convert this read version of main shaft to the writing version."""
         return MainShaftApply(
             space=self.space,
             external_id=self.external_id,
-            torque=self.torque,
-            calculated_tilt_moment=self.calculated_tilt_moment,
-            calculated_yaw_moment=self.calculated_yaw_moment,
             bending_x=self.bending_x,
             bending_y=self.bending_y,
+            calculated_tilt_moment=self.calculated_tilt_moment,
+            calculated_yaw_moment=self.calculated_yaw_moment,
+            torque=self.torque,
         )
 
 
@@ -86,11 +86,11 @@ class MainShaftApply(DomainModelApply):
     Args:
         space: The space where the node is located.
         external_id: The external id of the main shaft.
-        torque: The torque field.
-        calculated_tilt_moment: The calculated tilt moment field.
-        calculated_yaw_moment: The calculated yaw moment field.
         bending_x: The bending x field.
         bending_y: The bending y field.
+        calculated_tilt_moment: The calculated tilt moment field.
+        calculated_yaw_moment: The calculated yaw moment field.
+        torque: The torque field.
         existing_version: Fail the ingestion request if the main shaft version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
@@ -98,11 +98,11 @@ class MainShaftApply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    torque: Union[TimeSeries, str, None] = None
-    calculated_tilt_moment: Union[TimeSeries, str, None] = None
-    calculated_yaw_moment: Union[TimeSeries, str, None] = None
     bending_x: Union[TimeSeries, str, None] = None
     bending_y: Union[TimeSeries, str, None] = None
+    calculated_tilt_moment: Union[TimeSeries, str, None] = None
+    calculated_yaw_moment: Union[TimeSeries, str, None] = None
+    torque: Union[TimeSeries, str, None] = None
 
     def _to_instances_apply(
         self,
@@ -119,8 +119,11 @@ class MainShaftApply(DomainModelApply):
 
         properties = {}
 
-        if self.torque is not None:
-            properties["torque"] = self.torque if isinstance(self.torque, str) else self.torque.external_id
+        if self.bending_x is not None:
+            properties["bending_x"] = self.bending_x if isinstance(self.bending_x, str) else self.bending_x.external_id
+
+        if self.bending_y is not None:
+            properties["bending_y"] = self.bending_y if isinstance(self.bending_y, str) else self.bending_y.external_id
 
         if self.calculated_tilt_moment is not None:
             properties["calculated_tilt_moment"] = (
@@ -136,11 +139,8 @@ class MainShaftApply(DomainModelApply):
                 else self.calculated_yaw_moment.external_id
             )
 
-        if self.bending_x is not None:
-            properties["bending_x"] = self.bending_x if isinstance(self.bending_x, str) else self.bending_x.external_id
-
-        if self.bending_y is not None:
-            properties["bending_y"] = self.bending_y if isinstance(self.bending_y, str) else self.bending_y.external_id
+        if self.torque is not None:
+            properties["torque"] = self.torque if isinstance(self.torque, str) else self.torque.external_id
 
         if properties:
             this_node = dm.NodeApply(
@@ -157,8 +157,11 @@ class MainShaftApply(DomainModelApply):
             resources.nodes.append(this_node)
             cache.add(self.as_tuple_id())
 
-        if isinstance(self.torque, CogniteTimeSeries):
-            resources.time_series.append(self.torque)
+        if isinstance(self.bending_x, CogniteTimeSeries):
+            resources.time_series.append(self.bending_x)
+
+        if isinstance(self.bending_y, CogniteTimeSeries):
+            resources.time_series.append(self.bending_y)
 
         if isinstance(self.calculated_tilt_moment, CogniteTimeSeries):
             resources.time_series.append(self.calculated_tilt_moment)
@@ -166,11 +169,8 @@ class MainShaftApply(DomainModelApply):
         if isinstance(self.calculated_yaw_moment, CogniteTimeSeries):
             resources.time_series.append(self.calculated_yaw_moment)
 
-        if isinstance(self.bending_x, CogniteTimeSeries):
-            resources.time_series.append(self.bending_x)
-
-        if isinstance(self.bending_y, CogniteTimeSeries):
-            resources.time_series.append(self.bending_y)
+        if isinstance(self.torque, CogniteTimeSeries):
+            resources.time_series.append(self.torque)
 
         return resources
 

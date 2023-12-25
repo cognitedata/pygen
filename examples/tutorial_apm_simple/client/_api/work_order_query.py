@@ -13,8 +13,8 @@ from tutorial_apm_simple.client.data_classes import (
 from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
 
 if TYPE_CHECKING:
-    from .work_item_query import WorkItemQueryAPI
     from .asset_query import AssetQueryAPI
+    from .work_item_query import WorkItemQueryAPI
 
 
 class WorkOrderQueryAPI(QueryAPI[T_DomainModelList]):
@@ -40,46 +40,6 @@ class WorkOrderQueryAPI(QueryAPI[T_DomainModelList]):
                 max_retrieve_limit=limit,
             )
         )
-
-    def work_items(
-        self,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit: int | None = DEFAULT_QUERY_LIMIT,
-    ) -> WorkItemQueryAPI[T_DomainModelList]:
-        """Query along the work item edges of the work order.
-
-        Args:
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            limit: Maximum number of work item edges to return. Defaults to 25. Set to -1, float("inf") or None
-                to return all items.
-
-        Returns:
-            WorkItemQueryAPI: The query API for the work item.
-        """
-        from .work_item_query import WorkItemQueryAPI
-
-        from_ = self._builder[-1].name
-
-        edge_filter = _create_edge_filter(
-            dm.DirectRelationReference("tutorial_apm_simple", "WorkOrder.workItems"),
-            external_id_prefix=external_id_prefix,
-            space=space,
-        )
-        self._builder.append(
-            QueryStep(
-                name=self._builder.next_name("work_items"),
-                expression=dm.query.EdgeResultSetExpression(
-                    filter=edge_filter,
-                    from_=from_,
-                    direction="outwards",
-                ),
-                select=dm.query.Select(),
-                max_retrieve_limit=limit,
-            )
-        )
-        return WorkItemQueryAPI(self._client, self._builder, self._view_by_write_class, None, limit)
 
     def linked_assets(
         self,
@@ -120,6 +80,46 @@ class WorkOrderQueryAPI(QueryAPI[T_DomainModelList]):
             )
         )
         return AssetQueryAPI(self._client, self._builder, self._view_by_write_class, None, limit)
+
+    def work_items(
+        self,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int | None = DEFAULT_QUERY_LIMIT,
+    ) -> WorkItemQueryAPI[T_DomainModelList]:
+        """Query along the work item edges of the work order.
+
+        Args:
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of work item edges to return. Defaults to 25. Set to -1, float("inf") or None
+                to return all items.
+
+        Returns:
+            WorkItemQueryAPI: The query API for the work item.
+        """
+        from .work_item_query import WorkItemQueryAPI
+
+        from_ = self._builder[-1].name
+
+        edge_filter = _create_edge_filter(
+            dm.DirectRelationReference("tutorial_apm_simple", "WorkOrder.workItems"),
+            external_id_prefix=external_id_prefix,
+            space=space,
+        )
+        self._builder.append(
+            QueryStep(
+                name=self._builder.next_name("work_items"),
+                expression=dm.query.EdgeResultSetExpression(
+                    filter=edge_filter,
+                    from_=from_,
+                    direction="outwards",
+                ),
+                select=dm.query.Select(),
+                max_retrieve_limit=limit,
+            )
+        )
+        return WorkItemQueryAPI(self._client, self._builder, self._view_by_write_class, None, limit)
 
     def query(
         self,

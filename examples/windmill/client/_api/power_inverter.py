@@ -31,8 +31,8 @@ from ._core import (
     QueryBuilder,
 )
 from .power_inverter_active_power_total import PowerInverterActivePowerTotalAPI
-from .power_inverter_reactive_power_total import PowerInverterReactivePowerTotalAPI
 from .power_inverter_apparent_power_total import PowerInverterApparentPowerTotalAPI
+from .power_inverter_reactive_power_total import PowerInverterReactivePowerTotalAPI
 from .power_inverter_query import PowerInverterQueryAPI
 
 
@@ -50,8 +50,8 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterApply, PowerInverterL
         )
         self._view_id = view_id
         self.active_power_total = PowerInverterActivePowerTotalAPI(client, view_id)
-        self.reactive_power_total = PowerInverterReactivePowerTotalAPI(client, view_id)
         self.apparent_power_total = PowerInverterApparentPowerTotalAPI(client, view_id)
+        self.reactive_power_total = PowerInverterReactivePowerTotalAPI(client, view_id)
 
     def __call__(
         self,

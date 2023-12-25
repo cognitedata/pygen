@@ -30,17 +30,17 @@ from ._core import (
     QueryStep,
     QueryBuilder,
 )
-from .sensor_position_flapwise_bend_mom import SensorPositionFlapwiseBendMomAPI
-from .sensor_position_flapwise_bend_mom_offset import SensorPositionFlapwiseBendMomOffsetAPI
-from .sensor_position_flapwise_bend_mom_crosstalk_corrected import SensorPositionFlapwiseBendMomCrosstalkCorrectedAPI
-from .sensor_position_flapwise_bend_mom_offset_crosstalk_corrected import (
-    SensorPositionFlapwiseBendMomOffsetCrosstalkCorrectedAPI,
-)
-from .sensor_position_edgewisewise_bend_mom import SensorPositionEdgewisewiseBendMomAPI
-from .sensor_position_edgewise_bend_mom_offset import SensorPositionEdgewiseBendMomOffsetAPI
 from .sensor_position_edgewise_bend_mom_crosstalk_corrected import SensorPositionEdgewiseBendMomCrosstalkCorrectedAPI
+from .sensor_position_edgewise_bend_mom_offset import SensorPositionEdgewiseBendMomOffsetAPI
 from .sensor_position_edgewise_bend_mom_offset_crosstalk_corrected import (
     SensorPositionEdgewiseBendMomOffsetCrosstalkCorrectedAPI,
+)
+from .sensor_position_edgewisewise_bend_mom import SensorPositionEdgewisewiseBendMomAPI
+from .sensor_position_flapwise_bend_mom import SensorPositionFlapwiseBendMomAPI
+from .sensor_position_flapwise_bend_mom_crosstalk_corrected import SensorPositionFlapwiseBendMomCrosstalkCorrectedAPI
+from .sensor_position_flapwise_bend_mom_offset import SensorPositionFlapwiseBendMomOffsetAPI
+from .sensor_position_flapwise_bend_mom_offset_crosstalk_corrected import (
+    SensorPositionFlapwiseBendMomOffsetCrosstalkCorrectedAPI,
 )
 from .sensor_position_query import SensorPositionQueryAPI
 
@@ -58,16 +58,16 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionApply, SensorPosit
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
-        self.flapwise_bend_mom = SensorPositionFlapwiseBendMomAPI(client, view_id)
-        self.flapwise_bend_mom_offset = SensorPositionFlapwiseBendMomOffsetAPI(client, view_id)
-        self.flapwise_bend_mom_crosstalk_corrected = SensorPositionFlapwiseBendMomCrosstalkCorrectedAPI(client, view_id)
-        self.flapwise_bend_mom_offset_crosstalk_corrected = SensorPositionFlapwiseBendMomOffsetCrosstalkCorrectedAPI(
+        self.edgewise_bend_mom_crosstalk_corrected = SensorPositionEdgewiseBendMomCrosstalkCorrectedAPI(client, view_id)
+        self.edgewise_bend_mom_offset = SensorPositionEdgewiseBendMomOffsetAPI(client, view_id)
+        self.edgewise_bend_mom_offset_crosstalk_corrected = SensorPositionEdgewiseBendMomOffsetCrosstalkCorrectedAPI(
             client, view_id
         )
         self.edgewisewise_bend_mom = SensorPositionEdgewisewiseBendMomAPI(client, view_id)
-        self.edgewise_bend_mom_offset = SensorPositionEdgewiseBendMomOffsetAPI(client, view_id)
-        self.edgewise_bend_mom_crosstalk_corrected = SensorPositionEdgewiseBendMomCrosstalkCorrectedAPI(client, view_id)
-        self.edgewise_bend_mom_offset_crosstalk_corrected = SensorPositionEdgewiseBendMomOffsetCrosstalkCorrectedAPI(
+        self.flapwise_bend_mom = SensorPositionFlapwiseBendMomAPI(client, view_id)
+        self.flapwise_bend_mom_crosstalk_corrected = SensorPositionFlapwiseBendMomCrosstalkCorrectedAPI(client, view_id)
+        self.flapwise_bend_mom_offset = SensorPositionFlapwiseBendMomOffsetAPI(client, view_id)
+        self.flapwise_bend_mom_offset_crosstalk_corrected = SensorPositionFlapwiseBendMomOffsetCrosstalkCorrectedAPI(
             client, view_id
         )
 

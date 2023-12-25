@@ -24,14 +24,14 @@ __all__ = ["PygenBid", "PygenBidApply", "PygenBidList", "PygenBidApplyList", "Py
 
 
 PygenBidTextFields = Literal["name"]
-PygenBidFields = Literal["name", "date", "minimum_price", "price_premium", "is_block"]
+PygenBidFields = Literal["date", "is_block", "minimum_price", "name", "price_premium"]
 
 _PYGENBID_PROPERTIES_BY_FIELD = {
-    "name": "name",
     "date": "date",
-    "minimum_price": "minimumPrice",
-    "price_premium": "pricePremium",
     "is_block": "isBlock",
+    "minimum_price": "minimumPrice",
+    "name": "name",
+    "price_premium": "pricePremium",
 }
 
 
@@ -43,12 +43,12 @@ class PygenBid(DomainModel):
     Args:
         space: The space where the node is located.
         external_id: The external id of the pygen bid.
-        name: The name field.
-        market: The market field.
         date: The date field.
-        minimum_price: The minimum price field.
-        price_premium: The price premium field.
         is_block: The is block field.
+        market: The market field.
+        minimum_price: The minimum price field.
+        name: The name field.
+        price_premium: The price premium field.
         created_time: The created time of the pygen bid node.
         last_updated_time: The last updated time of the pygen bid node.
         deleted_time: If present, the deleted time of the pygen bid node.
@@ -56,24 +56,24 @@ class PygenBid(DomainModel):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    name: Optional[str] = None
-    market: Union[Market, str, dm.NodeId, None] = Field(None, repr=False)
     date: Optional[datetime.date] = None
-    minimum_price: Optional[float] = Field(None, alias="minimumPrice")
-    price_premium: Optional[float] = Field(None, alias="pricePremium")
     is_block: Optional[bool] = Field(None, alias="isBlock")
+    market: Union[Market, str, dm.NodeId, None] = Field(None, repr=False)
+    minimum_price: Optional[float] = Field(None, alias="minimumPrice")
+    name: Optional[str] = None
+    price_premium: Optional[float] = Field(None, alias="pricePremium")
 
     def as_apply(self) -> PygenBidApply:
         """Convert this read version of pygen bid to the writing version."""
         return PygenBidApply(
             space=self.space,
             external_id=self.external_id,
-            name=self.name,
-            market=self.market.as_apply() if isinstance(self.market, DomainModel) else self.market,
             date=self.date,
-            minimum_price=self.minimum_price,
-            price_premium=self.price_premium,
             is_block=self.is_block,
+            market=self.market.as_apply() if isinstance(self.market, DomainModel) else self.market,
+            minimum_price=self.minimum_price,
+            name=self.name,
+            price_premium=self.price_premium,
         )
 
 
@@ -85,12 +85,12 @@ class PygenBidApply(DomainModelApply):
     Args:
         space: The space where the node is located.
         external_id: The external id of the pygen bid.
-        name: The name field.
-        market: The market field.
         date: The date field.
-        minimum_price: The minimum price field.
-        price_premium: The price premium field.
         is_block: The is block field.
+        market: The market field.
+        minimum_price: The minimum price field.
+        name: The name field.
+        price_premium: The price premium field.
         existing_version: Fail the ingestion request if the pygen bid version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
@@ -98,12 +98,12 @@ class PygenBidApply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    name: Optional[str] = None
-    market: Union[MarketApply, str, dm.NodeId, None] = Field(None, repr=False)
     date: Optional[datetime.date] = None
-    minimum_price: Optional[float] = Field(None, alias="minimumPrice")
-    price_premium: Optional[float] = Field(None, alias="pricePremium")
     is_block: Optional[bool] = Field(None, alias="isBlock")
+    market: Union[MarketApply, str, dm.NodeId, None] = Field(None, repr=False)
+    minimum_price: Optional[float] = Field(None, alias="minimumPrice")
+    name: Optional[str] = None
+    price_premium: Optional[float] = Field(None, alias="pricePremium")
 
     def _to_instances_apply(
         self,
@@ -120,8 +120,11 @@ class PygenBidApply(DomainModelApply):
 
         properties = {}
 
-        if self.name is not None:
-            properties["name"] = self.name
+        if self.date is not None:
+            properties["date"] = self.date.isoformat()
+
+        if self.is_block is not None:
+            properties["isBlock"] = self.is_block
 
         if self.market is not None:
             properties["market"] = {
@@ -129,17 +132,14 @@ class PygenBidApply(DomainModelApply):
                 "externalId": self.market if isinstance(self.market, str) else self.market.external_id,
             }
 
-        if self.date is not None:
-            properties["date"] = self.date.isoformat()
-
         if self.minimum_price is not None:
             properties["minimumPrice"] = self.minimum_price
 
+        if self.name is not None:
+            properties["name"] = self.name
+
         if self.price_premium is not None:
             properties["pricePremium"] = self.price_premium
-
-        if self.is_block is not None:
-            properties["isBlock"] = self.is_block
 
         if properties:
             this_node = dm.NodeApply(
@@ -181,27 +181,31 @@ class PygenBidApplyList(DomainModelApplyList[PygenBidApply]):
 
 def _create_pygen_bid_filter(
     view_id: dm.ViewId,
-    name: str | list[str] | None = None,
-    name_prefix: str | None = None,
-    market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
     min_date: datetime.date | None = None,
     max_date: datetime.date | None = None,
+    is_block: bool | None = None,
+    market: str | tuple[str, str] | list[str] | list[tuple[str, str]] | None = None,
     min_minimum_price: float | None = None,
     max_minimum_price: float | None = None,
+    name: str | list[str] | None = None,
+    name_prefix: str | None = None,
     min_price_premium: float | None = None,
     max_price_premium: float | None = None,
-    is_block: bool | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters = []
-    if name is not None and isinstance(name, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
-    if name and isinstance(name, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("name"), values=name))
-    if name_prefix:
-        filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
+    if min_date or max_date:
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("date"),
+                gte=min_date.isoformat() if min_date else None,
+                lte=max_date.isoformat() if max_date else None,
+            )
+        )
+    if is_block is not None and isinstance(is_block, bool):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("isBlock"), value=is_block))
     if market and isinstance(market, str):
         filters.append(
             dm.filters.Equals(view_id.as_property_ref("market"), value={"space": "market", "externalId": market})
@@ -222,24 +226,20 @@ def _create_pygen_bid_filter(
                 view_id.as_property_ref("market"), values=[{"space": item[0], "externalId": item[1]} for item in market]
             )
         )
-    if min_date or max_date:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("date"),
-                gte=min_date.isoformat() if min_date else None,
-                lte=max_date.isoformat() if max_date else None,
-            )
-        )
     if min_minimum_price or max_minimum_price:
         filters.append(
             dm.filters.Range(view_id.as_property_ref("minimumPrice"), gte=min_minimum_price, lte=max_minimum_price)
         )
+    if name is not None and isinstance(name, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
+    if name and isinstance(name, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("name"), values=name))
+    if name_prefix:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
     if min_price_premium or max_price_premium:
         filters.append(
             dm.filters.Range(view_id.as_property_ref("pricePremium"), gte=min_price_premium, lte=max_price_premium)
         )
-    if is_block is not None and isinstance(is_block, bool):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("isBlock"), value=is_block))
     if external_id_prefix:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if space is not None and isinstance(space, str):
