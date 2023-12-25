@@ -117,9 +117,19 @@ WINDMILL_SDK = ExampleSDK(
 
 OMNIUM_SDK = ExampleSDK(
     data_model_ids=[DataModelId("pygen-models", "Omnium", "1")],
-    _top_level_package="omnium.client",
+    _top_level_package="omnium",
     client_name="OmniumClient",
     generate_sdk=True,
+    _instance_space="omnium-instances",
+)
+
+
+# This uses connections that are not supported by the UI, so it will not be shown there.
+OMNIUM_CONNECTION_SDK = ExampleSDK(
+    data_model_ids=[DataModelId("pygen-models", "OmniumConnection", "1")],
+    _top_level_package="omnium_connection",
+    client_name="OmniumConnectionClient",
+    generate_sdk=False,
     _instance_space="omnium-instances",
 )
 
