@@ -55,8 +55,8 @@ views:
       edgeSource: null
       direction: outwards
       connectionType: multi_edge_connection
-  lastUpdatedTime: 1703490461051
-  createdTime: 1703490461051
+  lastUpdatedTime: 1703508218266
+  createdTime: 1703508218266
 - space: power-models
   externalId: Gearbox
   name: Gearbox
@@ -107,8 +107,8 @@ views:
       defaultValue: null
       name: displacement_z
       description: null
-  lastUpdatedTime: 1703490461051
-  createdTime: 1703490461051
+  lastUpdatedTime: 1703508218266
+  createdTime: 1703508218266
 - space: power-models
   externalId: Generator
   name: Generator
@@ -145,8 +145,8 @@ views:
       defaultValue: null
       name: generator_speed_controller_reference
       description: null
-  lastUpdatedTime: 1703490461051
-  createdTime: 1703490461051
+  lastUpdatedTime: 1703508218266
+  createdTime: 1703508218266
 - space: power-models
   externalId: HighSpeedShaft
   name: HighSpeedShaft
@@ -197,8 +197,8 @@ views:
       defaultValue: null
       name: torque
       description: null
-  lastUpdatedTime: 1703490461051
-  createdTime: 1703490461051
+  lastUpdatedTime: 1703508218266
+  createdTime: 1703508218266
 - space: power-models
   externalId: MainShaft
   name: MainShaft
@@ -277,8 +277,8 @@ views:
       defaultValue: null
       name: torque
       description: null
-  lastUpdatedTime: 1703490461051
-  createdTime: 1703490461051
+  lastUpdatedTime: 1703508218266
+  createdTime: 1703508218266
 - space: power-models
   externalId: Metmast
   name: Metmast
@@ -343,8 +343,8 @@ views:
       defaultValue: null
       name: wind_speed
       description: null
-  lastUpdatedTime: 1703490461051
-  createdTime: 1703490461051
+  lastUpdatedTime: 1703508218266
+  createdTime: 1703508218266
 - space: power-models
   externalId: Nacelle
   name: Nacelle
@@ -503,8 +503,8 @@ views:
       defaultValue: null
       name: yaw_error
       description: null
-  lastUpdatedTime: 1703490461051
-  createdTime: 1703490461051
+  lastUpdatedTime: 1703508218266
+  createdTime: 1703508218266
 - space: power-models
   externalId: PowerInverter
   name: PowerInverter
@@ -555,8 +555,8 @@ views:
       defaultValue: null
       name: reactive_power_total
       description: null
-  lastUpdatedTime: 1703490461051
-  createdTime: 1703490461051
+  lastUpdatedTime: 1703508218266
+  createdTime: 1703508218266
 - space: power-models
   externalId: Rotor
   name: Rotor
@@ -593,8 +593,8 @@ views:
       defaultValue: null
       name: rpm_low_speed_shaft
       description: null
-  lastUpdatedTime: 1703490461051
-  createdTime: 1703490461051
+  lastUpdatedTime: 1703508218266
+  createdTime: 1703508218266
 - space: power-models
   externalId: SensorPosition
   name: SensorPosition
@@ -729,8 +729,8 @@ views:
       defaultValue: null
       name: position
       description: null
-  lastUpdatedTime: 1703490461051
-  createdTime: 1703490461051
+  lastUpdatedTime: 1703508218266
+  createdTime: 1703508218266
 - space: power-models
   externalId: Windmill
   name: Windmill
@@ -843,8 +843,8 @@ views:
       defaultValue: null
       name: windfarm
       description: null
-  lastUpdatedTime: 1703490461051
-  createdTime: 1703490461051
+  lastUpdatedTime: 1703508218266
+  createdTime: 1703508218266
 isGlobal: false
-lastUpdatedTime: 1703490885359
-createdTime: 1703490462246
+lastUpdatedTime: 1703508242349
+createdTime: 1703508219198
