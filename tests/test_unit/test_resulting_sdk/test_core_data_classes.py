@@ -3,14 +3,17 @@ from __future__ import annotations
 import datetime
 from typing import Optional
 
+import pytest
+from cognite.client.data_classes.data_modeling.instances import Properties
+from movie_domain.client.data_classes._core import unpack_properties
 from pydantic import Field
 
 from tests.constants import IS_PYDANTIC_V1
 
 if IS_PYDANTIC_V1:
-    from movie_domain_pydantic_v1.client.data_classes._core import DomainModel
+    from omni.data_classes._core import DomainModel
 else:
-    from movie_domain.client.data_classes._core import DomainModel
+    from omni_pydantic_v1.data_classes._core import DomainModel
 
 
 class TestDomainModel:
@@ -65,3 +68,42 @@ class TestDomainModel:
             "version=1, last_updated_time=datetime.datetime(2024, 1, 1, 0, 0), "
             "created_time=datetime.datetime(2023, 1, 1, 0, 0), deleted_time=None)"
         )
+
+
+def unpack_properties_test_cases():
+    properties = {
+        "IntegrationTestsImmutable": {
+            "Person/2": {
+                "name": "Christoph Waltz",
+                "birthYear": 1956,
+            }
+        }
+    }
+    expected = {
+        "name": "Christoph Waltz",
+        "birthYear": 1956,
+    }
+    yield pytest.param(properties, expected, id="Person")
+
+    properties = {
+        "IntegrationTestsImmutable": {
+            "Actor/2": {
+                "person": {"space": "IntegrationTestsImmutable", "externalId": "person:ethan_coen"},
+                "wonOscar": True,
+            }
+        }
+    }
+    expected = {"person": "person:ethan_coen", "wonOscar": True}
+    yield pytest.param(properties, expected, id="Actor")
+
+
+@pytest.mark.parametrize("raw_properties, expected", list(unpack_properties_test_cases()))
+def test_unpack_properties(raw_properties: dict, expected: dict):
+    # Arrange
+    properties = Properties.load(raw_properties)
+
+    # Act
+    actual = unpack_properties(properties)
+
+    # Assert
+    assert actual == expected
