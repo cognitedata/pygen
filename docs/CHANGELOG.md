@@ -14,6 +14,11 @@ Changes are grouped as follows
 - `Security` in case of vulnerabilities.
 
 
+## [0.TBD] - TBD-12-23
+### Fixed
+* Bug in `pygen` with views ending in numbers. The number was removed from the name of the resulting data class.
+  This is now fixed.
+
 ## [0.32.5] - 21-12-23
 ### Fixed
 * In version `7.6-7.8.1` of the `cognite-sdk` there is a bug that breaks `pygen`. This version
