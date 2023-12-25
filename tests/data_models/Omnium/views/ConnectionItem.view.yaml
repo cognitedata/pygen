@@ -1,0 +1,68 @@
+space: pygen-models
+externalId: Item
+name: Item
+version: '1'
+properties:
+  name:
+    container:
+      space: pygen-models
+      externalId: ConnectionItem
+      type: container
+    containerPropertyIdentifier: name
+    name: Name
+  parent:
+    container:
+      space: pygen-models
+      externalId: ConnectionItem
+      type: container
+    containerPropertyIdentifier: parent
+    name: Parent
+    source:
+      type: view
+      space: pygen-models
+      externalId: Item
+      version: '1'
+  root:
+    connectionType: single_edge_connection
+    name: Root
+    type:
+      space: pygen-models
+      externalId: ConnectionItem
+    source:
+      type: view
+      space: pygen-models
+      externalId: Root
+      version: '1'
+    direction: inwards
+  mainComponent:
+    container:
+      space: pygen-models
+      externalId: ConnectionItem
+      type: container
+    containerPropertyIdentifier: componentA
+    name: MainComponent
+    source:
+      type: view
+      space: pygen-models
+      externalId: MainComponent
+      version: '1'
+  secondaryComponent:
+    connectionType: single_edge_connection
+    name: SecondaryComponent
+    type:
+      space: pygen-models
+      externalId: ConnectionItem
+    source:
+      type: view
+      space: pygen-models
+      externalId: SecondaryComponent
+      version: '1'
+    direction: outwards
+filter:
+  equals:
+    property:
+     - node
+     - type
+    value:
+      space: pygen-models
+      externalId: Item

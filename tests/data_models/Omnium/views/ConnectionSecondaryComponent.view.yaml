@@ -1,0 +1,32 @@
+space: pygen-models
+externalId: SecondaryComponent
+name: SecondaryComponent
+version: '1'
+properties:
+  name:
+    container:
+      space: pygen-models
+      externalId: ConnectionItem
+      type: container
+    containerPropertyIdentifier: name
+    name: Name
+  item:
+    connectionType: single_edge_connection
+    name: Item
+    type:
+      space: pygen-models
+      externalId: ConnectionItem
+    source:
+      type: view
+      space: pygen-models
+      externalId: Item
+      version: '1'
+    direction: inwards
+filter:
+  equals:
+    property:
+     - node
+     - type
+    value:
+      space: pygen-models
+      externalId: SecondaryComponent

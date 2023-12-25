@@ -1,0 +1,26 @@
+space: pygen-models
+externalId: SubInterface
+name: SubInterface
+version: '1'
+implements:
+  - space: pygen-models
+    externalId: MainInterface
+    version: '1'
+properties:
+  subValue:
+    container:
+      space: pygen-models
+      externalId: SubInterface
+      type: container
+    containerPropertyIdentifier: subValue
+    name: SubValue
+filter:
+  In:
+    property:
+      - node
+      - type
+    values:
+      - space: pygen-models
+        externalId: Implementation1
+      - space: pygen-models
+        externalId: Implementation2

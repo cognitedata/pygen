@@ -1,6 +1,6 @@
 space: pygen-models
-externalId: ConnectionSubject
-name: ConnectionSubject
+externalId: ConnectionItem
+name: ConnectionItem
 usedFor: node
 properties:
   name:
@@ -11,9 +11,15 @@ properties:
     nullable: true
     autoIncrement: false
     name: name
-  directRelation:
+  parent:
     type:
       type: direct
     nullable: true
     autoIncrement: false
-    name: directRelation
+    name: parent
+  componentA:
+    type:
+      type: direct
+    nullable: true
+    autoIncrement: false
+    name: componentA
