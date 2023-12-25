@@ -115,6 +115,15 @@ WINDMILL_SDK = ExampleSDK(
     _instance_space="windmill-instances",
 )
 
+OMNIUM_SDK = ExampleSDK(
+    data_model_ids=[DataModelId("pygen-models", "Omnium", "1")],
+    _top_level_package="omnium.client",
+    client_name="OmniumClient",
+    generate_sdk=True,
+    _instance_space="omnium-instances",
+)
+
+
 MARKET_SDK = ExampleSDK(
     data_model_ids=[DataModelId("market", "CogPool", "3"), DataModelId("market", "PygenPool", "3")],
     _top_level_package="markets.client",

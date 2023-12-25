@@ -1,0 +1,19 @@
+space: pygen-models
+externalId: ConnectionSubject
+name: ConnectionSubject
+usedFor: node
+properties:
+  name:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: name
+  directRelation:
+    type:
+      type: direct
+    nullable: true
+    autoIncrement: false
+    name: directRelation

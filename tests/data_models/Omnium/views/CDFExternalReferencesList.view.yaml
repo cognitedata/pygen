@@ -1,0 +1,26 @@
+space: pygen-models
+externalId: CDFExternalReferencesList
+name: CDFExternalReferencesList
+version: '1'
+properties:
+  timeseries:
+    container:
+      space: pygen-models
+      externalId: CDFExternalReferencesList
+      type: container
+    containerPropertyIdentifier: timeseries
+    name: timeseries
+  files:
+    container:
+      space: pygen-models
+      externalId: CDFExternalReferencesList
+      type: container
+    containerPropertyIdentifier: files
+    name: files
+  sequences:
+    container:
+      space: pygen-models
+      externalId: CDFExternalReferencesList
+      type: container
+    containerPropertyIdentifier: sequences
+    name: sequences
