@@ -55,12 +55,12 @@
                 "is_damaged": false,
                 "sensor_positions": [
                     {
-                        "external_id": "hornsea_1_mill_3_blade_A_19.6",
+
                         "position": 19.6,
                         "flapwise_bend_mom": "V52-WindTurbine.MxA6"
                     },
                     {
-                        "external_id": "hornsea_1_mill_3_blade_A_6.6",
+
                         "position": 6.6,
                         "flapwise_bend_mom": "V52-WindTurbine.MxA3",
                         "flapwise_bend_mom_offset": "V52-WindTurbine.MxA3_O",
@@ -68,7 +68,7 @@
                         "edgewise_bend_mom_offset": "V52-WindTurbine.MyA3_O"
                     },
                     {
-                        "external_id": "hornsea_1_mill_3_blade_A_6.7",
+
                         "position": 6.7,
                         "flapwise_bend_mom": "V52-WindTurbine.MxA4",
                         "flapwise_bend_mom_offset": "V52-WindTurbine.MxA4_O",
@@ -80,12 +80,12 @@
                         "edgewise_bend_mom_offset_crosstalk_corrected": "V52-WindTurbine.MyA4_Ocr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_3_blade_A_13.1",
+
                         "position": 13.1,
                         "flapwise_bend_mom": "V52-WindTurbine.MxA5"
                     },
                     {
-                        "external_id": "hornsea_1_mill_3_blade_A_1.4",
+
                         "position": 1.4,
                         "flapwise_bend_mom": "V52-WindTurbine.MxA1",
                         "flapwise_bend_mom_offset": "V52-WindTurbine.MxA1_O",
@@ -97,7 +97,7 @@
                         "edgewise_bend_mom_offset_crosstalk_corrected": "V52-WindTurbine.MyA1_Ocr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_3_blade_A_1.5",
+
                         "position": 1.5,
                         "flapwise_bend_mom": "V52-WindTurbine.MxA2",
                         "flapwise_bend_mom_offset": "V52-WindTurbine.MxA2_O",
@@ -116,7 +116,7 @@
                 "is_damaged": false,
                 "sensor_positions": [
                     {
-                        "external_id": "hornsea_1_mill_3_blade_B_1.5",
+
                         "position": 1.5,
                         "flapwise_bend_mom": "V52-WindTurbine.MxB2",
                         "flapwise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MxB2cr",
@@ -124,11 +124,11 @@
                         "edgewise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MyB2cr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_3_blade_B_19.6",
+
                         "position": 19.6
                     },
                     {
-                        "external_id": "hornsea_1_mill_3_blade_B_1.4",
+
                         "position": 1.4,
                         "flapwise_bend_mom": "V52-WindTurbine.MxB1",
                         "flapwise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MxB1cr",
@@ -136,17 +136,17 @@
                         "edgewise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MyB1cr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_3_blade_B_13.1",
+
                         "position": 13.1
                     },
                     {
-                        "external_id": "hornsea_1_mill_3_blade_B_6.7",
+
                         "position": 6.7,
                         "flapwise_bend_mom": "V52-WindTurbine.MxB4",
                         "edgewisewise_bend_mom": "V52-WindTurbine.MyB4"
                     },
                     {
-                        "external_id": "hornsea_1_mill_3_blade_B_6.6",
+
                         "position": 6.6,
                         "flapwise_bend_mom": "V52-WindTurbine.MxB3",
                         "flapwise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MxB3cr",
@@ -161,15 +161,15 @@
                 "is_damaged": false,
                 "sensor_positions": [
                     {
-                        "external_id": "hornsea_1_mill_3_blade_C_13.1",
+
                         "position": 13.1
                     },
                     {
-                        "external_id": "hornsea_1_mill_3_blade_C_19.6",
+
                         "position": 19.6
                     },
                     {
-                        "external_id": "hornsea_1_mill_3_blade_C_6.7",
+
                         "position": 6.7,
                         "flapwise_bend_mom": "V52-WindTurbine.MxC4",
                         "flapwise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MxC4cr",
@@ -177,7 +177,7 @@
                         "edgewise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MyC4cr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_3_blade_C_6.6",
+
                         "position": 6.6,
                         "flapwise_bend_mom": "V52-WindTurbine.MxC3",
                         "flapwise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MxC3cr",
@@ -185,7 +185,7 @@
                         "edgewise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MyC3cr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_3_blade_C_1.4",
+
                         "position": 1.4,
                         "flapwise_bend_mom": "V52-WindTurbine.MxC1",
                         "flapwise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MxC1cr",
@@ -193,7 +193,7 @@
                         "edgewise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MyC1cr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_3_blade_C_1.5",
+
                         "position": 1.5,
                         "flapwise_bend_mom": "V52-WindTurbine.MxC2",
                         "flapwise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MxC2cr",
@@ -261,11 +261,11 @@
                 "is_damaged": true,
                 "sensor_positions": [
                     {
-                        "external_id": "hornsea_1_mill_2_blade_B_13.1",
+
                         "position": 13.1
                     },
                     {
-                        "external_id": "hornsea_1_mill_2_blade_B_1.5",
+
                         "position": 1.5,
                         "flapwise_bend_mom": "V52-WindTurbine.MxB2",
                         "flapwise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MxB2cr",
@@ -273,11 +273,11 @@
                         "edgewise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MyB2cr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_2_blade_B_19.6",
+
                         "position": 19.6
                     },
                     {
-                        "external_id": "hornsea_1_mill_2_blade_B_6.6",
+
                         "position": 6.6,
                         "flapwise_bend_mom": "V52-WindTurbine.MxB3",
                         "flapwise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MxB3cr",
@@ -285,13 +285,13 @@
                         "edgewise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MyB3cr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_2_blade_B_6.7",
+
                         "position": 6.7,
                         "flapwise_bend_mom": "V52-WindTurbine.MxB4",
                         "edgewisewise_bend_mom": "V52-WindTurbine.MyB4"
                     },
                     {
-                        "external_id": "hornsea_1_mill_2_blade_B_1.4",
+
                         "position": 1.4,
                         "flapwise_bend_mom": "V52-WindTurbine.MxB1",
                         "flapwise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MxB1cr",
@@ -306,11 +306,11 @@
                 "is_damaged": false,
                 "sensor_positions": [
                     {
-                        "external_id": "hornsea_1_mill_2_blade_C_19.6",
+
                         "position": 19.6
                     },
                     {
-                        "external_id": "hornsea_1_mill_2_blade_C_1.5",
+
                         "position": 1.5,
                         "flapwise_bend_mom": "V52-WindTurbine.MxC2",
                         "flapwise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MxC2cr",
@@ -318,11 +318,11 @@
                         "edgewise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MyC2cr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_2_blade_C_13.1",
+
                         "position": 13.1
                     },
                     {
-                        "external_id": "hornsea_1_mill_2_blade_C_6.7",
+
                         "position": 6.7,
                         "flapwise_bend_mom": "V52-WindTurbine.MxC4",
                         "flapwise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MxC4cr",
@@ -330,7 +330,7 @@
                         "edgewise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MyC4cr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_2_blade_C_1.4",
+
                         "position": 1.4,
                         "flapwise_bend_mom": "V52-WindTurbine.MxC1",
                         "flapwise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MxC1cr",
@@ -338,7 +338,7 @@
                         "edgewise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MyC1cr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_2_blade_C_6.6",
+
                         "position": 6.6,
                         "flapwise_bend_mom": "V52-WindTurbine.MxC3",
                         "flapwise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MxC3cr",
@@ -353,7 +353,7 @@
                 "is_damaged": false,
                 "sensor_positions": [
                     {
-                        "external_id": "hornsea_1_mill_2_blade_A_1.4",
+
                         "position": 1.4,
                         "flapwise_bend_mom": "V52-WindTurbine.MxA1",
                         "flapwise_bend_mom_offset": "V52-WindTurbine.MxA1_O",
@@ -365,12 +365,12 @@
                         "edgewise_bend_mom_offset_crosstalk_corrected": "V52-WindTurbine.MyA1_Ocr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_2_blade_A_19.6",
+
                         "position": 19.6,
                         "flapwise_bend_mom": "V52-WindTurbine.MxA6"
                     },
                     {
-                        "external_id": "hornsea_1_mill_2_blade_A_6.6",
+
                         "position": 6.6,
                         "flapwise_bend_mom": "V52-WindTurbine.MxA3",
                         "flapwise_bend_mom_offset": "V52-WindTurbine.MxA3_O",
@@ -378,7 +378,7 @@
                         "edgewise_bend_mom_offset": "V52-WindTurbine.MyA3_O"
                     },
                     {
-                        "external_id": "hornsea_1_mill_2_blade_A_1.5",
+
                         "position": 1.5,
                         "flapwise_bend_mom": "V52-WindTurbine.MxA2",
                         "flapwise_bend_mom_offset": "V52-WindTurbine.MxA2_O",
@@ -390,7 +390,7 @@
                         "edgewise_bend_mom_offset_crosstalk_corrected": "V52-WindTurbine.MyA2_Ocr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_2_blade_A_6.7",
+
                         "position": 6.7,
                         "flapwise_bend_mom": "V52-WindTurbine.MxA4",
                         "flapwise_bend_mom_offset": "V52-WindTurbine.MxA4_O",
@@ -402,7 +402,7 @@
                         "edgewise_bend_mom_offset_crosstalk_corrected": "V52-WindTurbine.MyA4_Ocr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_2_blade_A_13.1",
+
                         "position": 13.1,
                         "flapwise_bend_mom": "V52-WindTurbine.MxA5"
                     }
@@ -467,7 +467,7 @@
                 "is_damaged": true,
                 "sensor_positions": [
                     {
-                        "external_id": "hornsea_1_mill_1_blade_A_1.5",
+
                         "position": 1.5,
                         "flapwise_bend_mom": "V52-WindTurbine.MxA2",
                         "flapwise_bend_mom_offset": "V52-WindTurbine.MxA2_O",
@@ -479,7 +479,7 @@
                         "edgewise_bend_mom_offset_crosstalk_corrected": "V52-WindTurbine.MyA2_Ocr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_1_blade_A_6.7",
+
                         "position": 6.7,
                         "flapwise_bend_mom": "V52-WindTurbine.MxA4",
                         "flapwise_bend_mom_offset": "V52-WindTurbine.MxA4_O",
@@ -491,12 +491,12 @@
                         "edgewise_bend_mom_offset_crosstalk_corrected": "V52-WindTurbine.MyA4_Ocr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_1_blade_A_19.6",
+
                         "position": 19.6,
                         "flapwise_bend_mom": "V52-WindTurbine.MxA6"
                     },
                     {
-                        "external_id": "hornsea_1_mill_1_blade_A_6.6",
+
                         "position": 6.6,
                         "flapwise_bend_mom": "V52-WindTurbine.MxA3",
                         "flapwise_bend_mom_offset": "V52-WindTurbine.MxA3_O",
@@ -504,12 +504,12 @@
                         "edgewise_bend_mom_offset": "V52-WindTurbine.MyA3_O"
                     },
                     {
-                        "external_id": "hornsea_1_mill_1_blade_A_13.1",
+
                         "position": 13.1,
                         "flapwise_bend_mom": "V52-WindTurbine.MxA5"
                     },
                     {
-                        "external_id": "hornsea_1_mill_1_blade_A_1.4",
+
                         "position": 1.4,
                         "flapwise_bend_mom": "V52-WindTurbine.MxA1",
                         "flapwise_bend_mom_offset": "V52-WindTurbine.MxA1_O",
@@ -528,7 +528,7 @@
                 "is_damaged": false,
                 "sensor_positions": [
                     {
-                        "external_id": "hornsea_1_mill_1_blade_B_1.4",
+
                         "position": 1.4,
                         "flapwise_bend_mom": "V52-WindTurbine.MxB1",
                         "flapwise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MxB1cr",
@@ -536,21 +536,21 @@
                         "edgewise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MyB1cr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_1_blade_B_13.1",
+
                         "position": 13.1
                     },
                     {
-                        "external_id": "hornsea_1_mill_1_blade_B_19.6",
+
                         "position": 19.6
                     },
                     {
-                        "external_id": "hornsea_1_mill_1_blade_B_6.7",
+
                         "position": 6.7,
                         "flapwise_bend_mom": "V52-WindTurbine.MxB4",
                         "edgewisewise_bend_mom": "V52-WindTurbine.MyB4"
                     },
                     {
-                        "external_id": "hornsea_1_mill_1_blade_B_1.5",
+
                         "position": 1.5,
                         "flapwise_bend_mom": "V52-WindTurbine.MxB2",
                         "flapwise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MxB2cr",
@@ -558,7 +558,7 @@
                         "edgewise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MyB2cr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_1_blade_B_6.6",
+
                         "position": 6.6,
                         "flapwise_bend_mom": "V52-WindTurbine.MxB3",
                         "flapwise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MxB3cr",
@@ -573,15 +573,15 @@
                 "is_damaged": false,
                 "sensor_positions": [
                     {
-                        "external_id": "hornsea_1_mill_1_blade_C_13.1",
+
                         "position": 13.1
                     },
                     {
-                        "external_id": "hornsea_1_mill_1_blade_C_19.6",
+
                         "position": 19.6
                     },
                     {
-                        "external_id": "hornsea_1_mill_1_blade_C_6.6",
+
                         "position": 6.6,
                         "flapwise_bend_mom": "V52-WindTurbine.MxC3",
                         "flapwise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MxC3cr",
@@ -589,7 +589,7 @@
                         "edgewise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MyC3cr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_1_blade_C_1.4",
+
                         "position": 1.4,
                         "flapwise_bend_mom": "V52-WindTurbine.MxC1",
                         "flapwise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MxC1cr",
@@ -597,7 +597,7 @@
                         "edgewise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MyC1cr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_1_blade_C_1.5",
+
                         "position": 1.5,
                         "flapwise_bend_mom": "V52-WindTurbine.MxC2",
                         "flapwise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MxC2cr",
@@ -605,7 +605,7 @@
                         "edgewise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MyC2cr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_1_blade_C_6.7",
+
                         "position": 6.7,
                         "flapwise_bend_mom": "V52-WindTurbine.MxC4",
                         "flapwise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MxC4cr",
@@ -673,7 +673,7 @@
                 "is_damaged": true,
                 "sensor_positions": [
                     {
-                        "external_id": "hornsea_1_mill_4_blade_C_6.6",
+
                         "position": 6.6,
                         "flapwise_bend_mom": "V52-WindTurbine.MxC3",
                         "flapwise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MxC3cr",
@@ -681,11 +681,11 @@
                         "edgewise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MyC3cr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_4_blade_C_19.6",
+
                         "position": 19.6
                     },
                     {
-                        "external_id": "hornsea_1_mill_4_blade_C_1.5",
+
                         "position": 1.5,
                         "flapwise_bend_mom": "V52-WindTurbine.MxC2",
                         "flapwise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MxC2cr",
@@ -693,11 +693,11 @@
                         "edgewise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MyC2cr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_4_blade_C_13.1",
+
                         "position": 13.1
                     },
                     {
-                        "external_id": "hornsea_1_mill_4_blade_C_6.7",
+
                         "position": 6.7,
                         "flapwise_bend_mom": "V52-WindTurbine.MxC4",
                         "flapwise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MxC4cr",
@@ -705,7 +705,7 @@
                         "edgewise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MyC4cr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_4_blade_C_1.4",
+
                         "position": 1.4,
                         "flapwise_bend_mom": "V52-WindTurbine.MxC1",
                         "flapwise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MxC1cr",
@@ -720,7 +720,7 @@
                 "is_damaged": false,
                 "sensor_positions": [
                     {
-                        "external_id": "hornsea_1_mill_4_blade_A_1.4",
+
                         "position": 1.4,
                         "flapwise_bend_mom": "V52-WindTurbine.MxA1",
                         "flapwise_bend_mom_offset": "V52-WindTurbine.MxA1_O",
@@ -732,12 +732,12 @@
                         "edgewise_bend_mom_offset_crosstalk_corrected": "V52-WindTurbine.MyA1_Ocr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_4_blade_A_13.1",
+
                         "position": 13.1,
                         "flapwise_bend_mom": "V52-WindTurbine.MxA5"
                     },
                     {
-                        "external_id": "hornsea_1_mill_4_blade_A_6.7",
+
                         "position": 6.7,
                         "flapwise_bend_mom": "V52-WindTurbine.MxA4",
                         "flapwise_bend_mom_offset": "V52-WindTurbine.MxA4_O",
@@ -749,12 +749,12 @@
                         "edgewise_bend_mom_offset_crosstalk_corrected": "V52-WindTurbine.MyA4_Ocr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_4_blade_A_19.6",
+
                         "position": 19.6,
                         "flapwise_bend_mom": "V52-WindTurbine.MxA6"
                     },
                     {
-                        "external_id": "hornsea_1_mill_4_blade_A_6.6",
+
                         "position": 6.6,
                         "flapwise_bend_mom": "V52-WindTurbine.MxA3",
                         "flapwise_bend_mom_offset": "V52-WindTurbine.MxA3_O",
@@ -762,7 +762,7 @@
                         "edgewise_bend_mom_offset": "V52-WindTurbine.MyA3_O"
                     },
                     {
-                        "external_id": "hornsea_1_mill_4_blade_A_1.5",
+
                         "position": 1.5,
                         "flapwise_bend_mom": "V52-WindTurbine.MxA2",
                         "flapwise_bend_mom_offset": "V52-WindTurbine.MxA2_O",
@@ -781,7 +781,7 @@
                 "is_damaged": false,
                 "sensor_positions": [
                     {
-                        "external_id": "hornsea_1_mill_4_blade_B_1.4",
+
                         "position": 1.4,
                         "flapwise_bend_mom": "V52-WindTurbine.MxB1",
                         "flapwise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MxB1cr",
@@ -789,7 +789,7 @@
                         "edgewise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MyB1cr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_4_blade_B_1.5",
+
                         "position": 1.5,
                         "flapwise_bend_mom": "V52-WindTurbine.MxB2",
                         "flapwise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MxB2cr",
@@ -797,7 +797,7 @@
                         "edgewise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MyB2cr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_4_blade_B_6.6",
+
                         "position": 6.6,
                         "flapwise_bend_mom": "V52-WindTurbine.MxB3",
                         "flapwise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MxB3cr",
@@ -805,17 +805,17 @@
                         "edgewise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MyB3cr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_4_blade_B_19.6",
+
                         "position": 19.6
                     },
                     {
-                        "external_id": "hornsea_1_mill_4_blade_B_6.7",
+
                         "position": 6.7,
                         "flapwise_bend_mom": "V52-WindTurbine.MxB4",
                         "edgewisewise_bend_mom": "V52-WindTurbine.MyB4"
                     },
                     {
-                        "external_id": "hornsea_1_mill_4_blade_B_13.1",
+
                         "position": 13.1
                     }
                 ]
@@ -879,7 +879,7 @@
                 "is_damaged": false,
                 "sensor_positions": [
                     {
-                        "external_id": "hornsea_1_mill_5_blade_B_6.6",
+
                         "position": 6.6,
                         "flapwise_bend_mom": "V52-WindTurbine.MxB3",
                         "flapwise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MxB3cr",
@@ -887,7 +887,7 @@
                         "edgewise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MyB3cr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_5_blade_B_1.4",
+
                         "position": 1.4,
                         "flapwise_bend_mom": "V52-WindTurbine.MxB1",
                         "flapwise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MxB1cr",
@@ -895,7 +895,7 @@
                         "edgewise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MyB1cr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_5_blade_B_1.5",
+
                         "position": 1.5,
                         "flapwise_bend_mom": "V52-WindTurbine.MxB2",
                         "flapwise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MxB2cr",
@@ -903,17 +903,17 @@
                         "edgewise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MyB2cr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_5_blade_B_19.6",
+
                         "position": 19.6
                     },
                     {
-                        "external_id": "hornsea_1_mill_5_blade_B_6.7",
+
                         "position": 6.7,
                         "flapwise_bend_mom": "V52-WindTurbine.MxB4",
                         "edgewisewise_bend_mom": "V52-WindTurbine.MyB4"
                     },
                     {
-                        "external_id": "hornsea_1_mill_5_blade_B_13.1",
+
                         "position": 13.1
                     }
                 ]
@@ -924,7 +924,7 @@
                 "is_damaged": false,
                 "sensor_positions": [
                     {
-                        "external_id": "hornsea_1_mill_5_blade_A_6.6",
+
                         "position": 6.6,
                         "flapwise_bend_mom": "V52-WindTurbine.MxA3",
                         "flapwise_bend_mom_offset": "V52-WindTurbine.MxA3_O",
@@ -932,7 +932,7 @@
                         "edgewise_bend_mom_offset": "V52-WindTurbine.MyA3_O"
                     },
                     {
-                        "external_id": "hornsea_1_mill_5_blade_A_1.5",
+
                         "position": 1.5,
                         "flapwise_bend_mom": "V52-WindTurbine.MxA2",
                         "flapwise_bend_mom_offset": "V52-WindTurbine.MxA2_O",
@@ -944,17 +944,17 @@
                         "edgewise_bend_mom_offset_crosstalk_corrected": "V52-WindTurbine.MyA2_Ocr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_5_blade_A_13.1",
+
                         "position": 13.1,
                         "flapwise_bend_mom": "V52-WindTurbine.MxA5"
                     },
                     {
-                        "external_id": "hornsea_1_mill_5_blade_A_19.6",
+
                         "position": 19.6,
                         "flapwise_bend_mom": "V52-WindTurbine.MxA6"
                     },
                     {
-                        "external_id": "hornsea_1_mill_5_blade_A_6.7",
+
                         "position": 6.7,
                         "flapwise_bend_mom": "V52-WindTurbine.MxA4",
                         "flapwise_bend_mom_offset": "V52-WindTurbine.MxA4_O",
@@ -966,7 +966,7 @@
                         "edgewise_bend_mom_offset_crosstalk_corrected": "V52-WindTurbine.MyA4_Ocr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_5_blade_A_1.4",
+
                         "position": 1.4,
                         "flapwise_bend_mom": "V52-WindTurbine.MxA1",
                         "flapwise_bend_mom_offset": "V52-WindTurbine.MxA1_O",
@@ -985,11 +985,11 @@
                 "is_damaged": false,
                 "sensor_positions": [
                     {
-                        "external_id": "hornsea_1_mill_5_blade_C_13.1",
+
                         "position": 13.1
                     },
                     {
-                        "external_id": "hornsea_1_mill_5_blade_C_1.5",
+
                         "position": 1.5,
                         "flapwise_bend_mom": "V52-WindTurbine.MxC2",
                         "flapwise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MxC2cr",
@@ -997,11 +997,11 @@
                         "edgewise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MyC2cr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_5_blade_C_19.6",
+
                         "position": 19.6
                     },
                     {
-                        "external_id": "hornsea_1_mill_5_blade_C_6.6",
+
                         "position": 6.6,
                         "flapwise_bend_mom": "V52-WindTurbine.MxC3",
                         "flapwise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MxC3cr",
@@ -1009,7 +1009,7 @@
                         "edgewise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MyC3cr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_5_blade_C_1.4",
+
                         "position": 1.4,
                         "flapwise_bend_mom": "V52-WindTurbine.MxC1",
                         "flapwise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MxC1cr",
@@ -1017,7 +1017,7 @@
                         "edgewise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MyC1cr"
                     },
                     {
-                        "external_id": "hornsea_1_mill_5_blade_C_6.7",
+
                         "position": 6.7,
                         "flapwise_bend_mom": "V52-WindTurbine.MxC4",
                         "flapwise_bend_mom_crosstalk_corrected": "V52-WindTurbine.MxC4cr",

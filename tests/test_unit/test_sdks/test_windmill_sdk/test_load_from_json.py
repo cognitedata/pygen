@@ -3,7 +3,13 @@ from typing import Callable, TypeVar
 
 import pytest
 
-from cognite.pygen.utils.external_id_factories import create_incremental_factory, sha256_factory, uuid_factory
+from cognite.pygen.utils.external_id_factories import (
+    create_incremental_factory,
+    create_sha256_factory,
+    create_uuid_factory,
+    sha256_factory,
+    uuid_factory,
+)
 from tests.constants import IS_PYDANTIC_V2, WindMillFiles
 
 if IS_PYDANTIC_V2:
@@ -35,20 +41,37 @@ def clear_nested_dependencies(loaded: T_TypeNode, loaded_json: dict):
         loaded_json.pop(field.alias or name)
 
 
+def recursive_exclude(d: dict, exclude: set[str]) -> None:
+    for key in list(d.keys()):
+        value = d[key]
+        if isinstance(value, dict):
+            recursive_exclude(value, exclude)
+        elif isinstance(value, list):
+            for item in value:
+                if isinstance(item, dict):
+                    recursive_exclude(item, exclude)
+        elif key in exclude:
+            d.pop(key)
+
+
 @pytest.mark.parametrize(
-    "factory",
+    "factory, expected_node_count, expected_edge_count",
     [
-        sha256_factory,
-        create_incremental_factory(),
-        uuid_factory,
+        # There are none unique sensor positions in the windmill data
+        # so hashing it will lead to fewer nodes
+        (sha256_factory, 135, 105),
+        (create_incremental_factory(), 145, 105),
+        (uuid_factory, 145, 105),
+        (create_sha256_factory(True), 135, 105),
+        (create_uuid_factory(True), 145, 105),
     ],
 )
 def test_load_wells_from_json(
     factory: Callable[[type, dict], str],
+    expected_node_count: int,
+    expected_edge_count: int,
 ) -> None:
     # Arrange
-    expected_node_count = 145
-    expected_edge_count = 105
     raw_json = WindMillFiles.Data.wind_mill_json.read_text()
     try:
         DomainModelApply.external_id_factory = factory
@@ -65,18 +88,19 @@ def test_load_wells_from_json(
             created.extend(item.to_instances_apply())
 
         # Assert
-        exclude = {"external_id", "space", "last_updated_time", "created_time", "deleted_time"}
+        exclude = {"external_id", "space"}
         for windmill, json_item in zip(windmills, loaded_json):
-            clear_nested_dependencies(windmill, json_item)
             if IS_PYDANTIC_V2:
                 dumped_windmill = json.loads(
                     windmill.model_dump_json(by_alias=True, exclude=exclude, exclude_none=True)
                 )
             else:
                 dumped_windmill = json.loads(windmill.json(by_alias=True, exclude=exclude, exclude_none=True))
+            # The exclude=True is not recursive in pydantic, so we need to do it manually
+            recursive_exclude(dumped_windmill, exclude)
             assert dumped_windmill == json_item
 
-        assert expected_node_count == len(created.nodes)
-        assert expected_edge_count == len(created.edges)
+        assert len(created.nodes) == expected_node_count
+        assert len(created.edges) == expected_edge_count
     finally:
         DomainModelApply.external_id_factory = None
