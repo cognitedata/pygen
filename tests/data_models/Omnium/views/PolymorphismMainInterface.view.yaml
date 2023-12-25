@@ -6,7 +6,7 @@ properties:
   mainValue:
     container:
       space: pygen-models
-      externalId: ConnectionItem
+      externalId: MainInterface
       type: container
     containerPropertyIdentifier: mainValue
     name: MainValue

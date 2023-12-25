@@ -1,6 +1,6 @@
 space: pygen-models
-externalId: Implementation1
-name: Implementation1
+externalId: Implementation2
+name: Implementation2
 version: '1'
 implements:
   - space: pygen-models
