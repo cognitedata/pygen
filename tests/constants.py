@@ -268,4 +268,12 @@ class ScenarioInstanceFiles:
     scenario_instance_api = api / "scenario_instance.py"
 
 
+SCENARIO_INSTANCE_SDK.append_manual_files(ScenarioInstanceFiles)
+
+
+class WindMillFiles:
+    class Data:
+        wind_mill_json = DATA_MODELS / "WindMill" / "data" / "data.json"
+
+
 EXAMPLE_SDKS = [var for var in locals().values() if isinstance(var, ExampleSDK)]

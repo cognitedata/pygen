@@ -52,7 +52,7 @@ def uuid_factory(domain_cls: type, data: dict) -> str:
     Returns:
 
     """
-    return f"{domain_cls.__name__.casefold()}:{uuid.uuid4()}"
+    return f"{domain_cls.__name__.casefold().removesuffix('apply')}:{uuid.uuid4()}"
 
 
 def sha256_factory(domain_cls: type, data: dict) -> str:
@@ -67,7 +67,7 @@ def sha256_factory(domain_cls: type, data: dict) -> str:
         A sha256 hash of the data
 
     """
-    return f"{domain_cls.__name__.casefold()}:{sha256(str(data).encode()).hexdigest()}"
+    return f"{domain_cls.__name__.casefold().removesuffix('apply')}:{sha256(str(data).encode()).hexdigest()}"
 
 
 def create_incremental_factory() -> Callable[[type, dict], str]:
@@ -81,6 +81,6 @@ def create_incremental_factory() -> Callable[[type, dict], str]:
 
     def incremental_factory(domain_cls: type, data: dict[str, Any]) -> str:
         registry[domain_cls.__name__] += 1
-        return f"{domain_cls.__name__.casefold()}:{registry[domain_cls.__name__]}"
+        return f"{domain_cls.__name__.casefold().removesuffix('apply')}:{registry[domain_cls.__name__]}"
 
     return incremental_factory
