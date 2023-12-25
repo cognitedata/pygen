@@ -5,7 +5,7 @@ from cognite.client.testing import monkeypatch_cognite_client
 
 from cognite.pygen._generator import CodeFormatter
 from cognite.pygen.config import PygenConfig
-from tests.constants import OMNIUM_SDK
+from tests.constants import OMNI_SDK
 
 
 @pytest.fixture(scope="session")
@@ -26,4 +26,4 @@ def mock_cognite_client() -> CogniteClient:
 
 @pytest.fixture(scope="session")
 def omnium_data_model() -> dm.DataModel[dm.View]:
-    return OMNIUM_SDK.load_data_model()
+    return OMNI_SDK.load_data_model()

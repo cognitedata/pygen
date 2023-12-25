@@ -1,7 +1,7 @@
 space: pygen-models
-externalId: Omnium
+externalId: Omni
 description: ''
-name: Omnium
+name: Omni
 version: '1'
 views:
 - space: pygen-models
