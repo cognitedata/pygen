@@ -29,7 +29,12 @@ class ExampleSDK:
     client_name: str
     _top_level_package: str
     generate_sdk: bool
+    _instance_space: str | None = None
     manual_files: list[Path] = field(default_factory=list, init=False)
+
+    @property
+    def instance_space(self) -> str:
+        return self._instance_space or self.data_model_ids[0].space
 
     @property
     def top_level_package(self) -> str:
@@ -74,6 +79,8 @@ class ExampleSDK:
 
     def load_spaces(self) -> SpaceApplyList:
         spaces = list({model.space for model in self.data_model_ids})
+        if self.instance_space not in spaces:
+            spaces.append(self.instance_space)
         return SpaceApplyList([SpaceApply(space) for space in spaces])
 
     @classmethod
@@ -105,6 +112,7 @@ WINDMILL_SDK = ExampleSDK(
     _top_level_package="windmill.client",
     client_name="WindmillClient",
     generate_sdk=True,
+    _instance_space="windmill-instances",
 )
 
 MARKET_SDK = ExampleSDK(

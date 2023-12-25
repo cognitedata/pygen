@@ -39,7 +39,11 @@ def generate_sdks(
         if len(data_models) == 1:
             data_models = data_models[0]
         sdk_generator = SDKGenerator(
-            example_sdk.top_level_package, example_sdk.client_name, data_models, logger=typer.echo
+            example_sdk.top_level_package,
+            example_sdk.client_name,
+            data_models,
+            logger=typer.echo,
+            default_instance_space=example_sdk.instance_space,
         )
 
         sdk = sdk_generator.generate_sdk()
