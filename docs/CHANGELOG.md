@@ -27,6 +27,8 @@ Changes are grouped as follows
 * Bug in `pygen` when default values are set, the read class should have `None` and not the default values.
   This is now fixed.
 * Bug in `DomainModelApply.from_instance()` raised `AttributeError` when called. This is now fixed.
+* Bug when getting passing in a sequence and getting empty response on `.retrieve` in the generated SDK you got an
+  `None` instead of an empty list. This is now fixed.
 
 ## [0.32.5] - 21-12-23
 ### Fixed
