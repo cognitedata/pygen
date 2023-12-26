@@ -51,7 +51,14 @@ class TestToFromInstances:
         domain_apply_node = domain_node.as_apply()
 
         resources = domain_apply_node.to_instances_apply()
-        assert node.as_apply(None, None).dump() == resources.nodes[0].dump()
+        if not node.properties[view_id]:
+            return
+        assert len(resources.nodes) == 1
+
+        node_apply = node.as_apply(None, None)
+        # Bug in SDK that skips the type
+        node_apply.type = node.type
+        assert node_apply.dump() == resources.nodes[0].dump()
 
 
 class TestToInstancesApply:

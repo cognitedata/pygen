@@ -57,7 +57,7 @@ class CDFExternalReferencesList(DomainModel):
     space: str = DEFAULT_INSTANCE_SPACE
     files: Optional[list[str]] = None
     sequences: Optional[list[str]] = None
-    timeseries: Optional[list[TimeSeries]] = None
+    timeseries: Union[list[TimeSeries], list[str], None] = None
 
     def as_apply(self) -> CDFExternalReferencesListApply:
         """Convert this read version of cdf external references list to the writing version."""
@@ -90,7 +90,7 @@ class CDFExternalReferencesListApply(DomainModelApply):
     space: str = DEFAULT_INSTANCE_SPACE
     files: Optional[list[str]] = None
     sequences: Optional[list[str]] = None
-    timeseries: Optional[list[TimeSeries]] = None
+    timeseries: Union[list[TimeSeries], list[str], None] = None
 
     def _to_instances_apply(
         self,
