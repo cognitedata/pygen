@@ -15,6 +15,9 @@ Changes are grouped as follows
 
 
 ## [0.TBD] - TBD-12-23
+### Added
+* Setting `type` on nodes.
+
 ### Fixed
 * Bug in `pygen` with views ending in numbers. The number was removed from the name of the resulting data class.
   This is now fixed.
