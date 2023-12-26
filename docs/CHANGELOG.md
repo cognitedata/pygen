@@ -18,6 +18,9 @@ Changes are grouped as follows
 ### Fixed
 * Bug in `pygen` with views ending in numbers. The number was removed from the name of the resulting data class.
   This is now fixed.
+* Bug in `pygen` when having a list of `TimeSeries` caused `pydantic` to raise a `ValidationError` when retrieving
+  data from CDF. This is now fixed.
+* Bug in `pygen` when having a list of `timestamps` or `dates`. This is now fixed.
 
 ## [0.32.5] - 21-12-23
 ### Fixed
