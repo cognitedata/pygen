@@ -1,0 +1,95 @@
+- instanceType: node
+  space: omni-instances
+  externalId: PrimitiveNullable:Monique
+  sources:
+  - properties:
+      boolean: null
+      date: 2023-10-25
+      float32: null
+      float64: null
+      int32: 98
+      int64: null
+      json: null
+      text: Campaign little near enter.
+      timestamp: null
+    source:
+      space: pygen-models
+      externalId: PrimitiveNullable
+      version: '1'
+      type: view
+- instanceType: node
+  space: omni-instances
+  externalId: PrimitiveNullable:Emily
+  sources:
+  - properties:
+      boolean: null
+      date: null
+      float32: null
+      float64: null
+      int32: 16
+      int64: null
+      json: null
+      text: Who up sense ready require human.
+      timestamp: null
+    source:
+      space: pygen-models
+      externalId: PrimitiveNullable
+      version: '1'
+      type: view
+- instanceType: node
+  space: omni-instances
+  externalId: PrimitiveNullable:Jeffrey
+  sources:
+  - properties:
+      boolean: null
+      date: 2023-05-26
+      float32: null
+      float64: null
+      int32: 34
+      int64: 70
+      json: null
+      text: Tonight later easy ask again network.
+      timestamp: 2023-08-17 12:39:33
+    source:
+      space: pygen-models
+      externalId: PrimitiveNullable
+      version: '1'
+      type: view
+- instanceType: node
+  space: omni-instances
+  externalId: PrimitiveNullable:Jennifer
+  sources:
+  - properties:
+      boolean: true
+      date: 2023-01-28
+      float32: null
+      float64: 62.74710692832005
+      int32: null
+      int64: 23
+      json: null
+      text: Arrive attack all form method everything magazine much.
+      timestamp: null
+    source:
+      space: pygen-models
+      externalId: PrimitiveNullable
+      version: '1'
+      type: view
+- instanceType: node
+  space: omni-instances
+  externalId: PrimitiveNullable:Robert
+  sources:
+  - properties:
+      boolean: true
+      date: 2023-12-09
+      float32: null
+      float64: null
+      int32: 68
+      int64: null
+      json: null
+      text: Office drug list imagine behind probably great.
+      timestamp: null
+    source:
+      space: pygen-models
+      externalId: PrimitiveNullable
+      version: '1'
+      type: view

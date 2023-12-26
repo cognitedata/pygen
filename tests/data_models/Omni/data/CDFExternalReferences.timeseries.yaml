@@ -1,6 +1,8 @@
-- externalId: timeseries_danielle
-  name: timeseries_danielle
-- externalId: timeseries_erica
-  name: timeseries_erica
-- externalId: timeseries_jeffery
-  name: timeseries_jeffery
+- externalId: timeseries_jill
+  name: timeseries_jill
+- externalId: timeseries_robert
+  name: timeseries_robert
+- externalId: timeseries_william
+  name: timeseries_william
+- externalId: timeseries_amy
+  name: timeseries_amy

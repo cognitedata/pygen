@@ -4,20 +4,7 @@
   sources:
   - properties:
       file: null
-      sequence: null
-      timeseries: timeseries_danielle
-    source:
-      space: pygen-models
-      externalId: CDFExternalReferences
-      version: '1'
-      type: view
-- instanceType: node
-  space: omni-instances
-  externalId: CDFExternalReferences:Joshua
-  sources:
-  - properties:
-      file: null
-      sequence: null
+      sequence: sequence_danielle
       timeseries: null
     source:
       space: pygen-models
@@ -26,12 +13,12 @@
       type: view
 - instanceType: node
   space: omni-instances
-  externalId: CDFExternalReferences:Patricia
+  externalId: CDFExternalReferences:Erica
   sources:
   - properties:
-      file: file_jeffrey
-      sequence: sequence_jill
-      timeseries: timeseries_erica
+      file: file_joshua
+      sequence: sequence_jeffrey
+      timeseries: timeseries_jill
     source:
       space: pygen-models
       externalId: CDFExternalReferences
@@ -39,12 +26,25 @@
       type: view
 - instanceType: node
   space: omni-instances
-  externalId: CDFExternalReferences:Robert
+  externalId: CDFExternalReferences:Anthony
   sources:
   - properties:
-      file: file_christopher
+      file: file_patricia
+      sequence: sequence_christopher
+      timeseries: timeseries_robert
+    source:
+      space: pygen-models
+      externalId: CDFExternalReferences
+      version: '1'
+      type: view
+- instanceType: node
+  space: omni-instances
+  externalId: CDFExternalReferences:James
+  sources:
+  - properties:
+      file: file_jeffery
       sequence: null
-      timeseries: null
+      timeseries: timeseries_william
     source:
       space: pygen-models
       externalId: CDFExternalReferences
@@ -52,12 +52,12 @@
       type: view
 - instanceType: node
   space: omni-instances
-  externalId: CDFExternalReferences:William
+  externalId: CDFExternalReferences:Jeffrey
   sources:
   - properties:
-      file: null
-      sequence: sequence_anthony
-      timeseries: timeseries_jeffery
+      file: file_debra
+      sequence: null
+      timeseries: timeseries_amy
     source:
       space: pygen-models
       externalId: CDFExternalReferences

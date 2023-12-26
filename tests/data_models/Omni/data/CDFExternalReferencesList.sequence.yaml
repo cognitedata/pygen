@@ -1,0 +1,40 @@
+- name: sequence_bridget
+  externalId: sequence_bridget
+  columns:
+  - externalId: value
+    valueType: Double
+- name: sequence_lisa
+  externalId: sequence_lisa
+  columns:
+  - externalId: value
+    valueType: Double
+- name: sequence_linda
+  externalId: sequence_linda
+  columns:
+  - externalId: value
+    valueType: Double
+- name: sequence_helen
+  externalId: sequence_helen
+  columns:
+  - externalId: value
+    valueType: Double
+- name: sequence_eric
+  externalId: sequence_eric
+  columns:
+  - externalId: value
+    valueType: Double
+- name: sequence_susan
+  externalId: sequence_susan
+  columns:
+  - externalId: value
+    valueType: Double
+- name: sequence_colin
+  externalId: sequence_colin
+  columns:
+  - externalId: value
+    valueType: Double
+- name: sequence_melanie
+  externalId: sequence_melanie
+  columns:
+  - externalId: value
+    valueType: Double

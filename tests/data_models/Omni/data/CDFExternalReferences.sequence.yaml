@@ -1,0 +1,15 @@
+- name: sequence_danielle
+  externalId: sequence_danielle
+  columns:
+  - externalId: value
+    valueType: Double
+- name: sequence_jeffrey
+  externalId: sequence_jeffrey
+  columns:
+  - externalId: value
+    valueType: Double
+- name: sequence_christopher
+  externalId: sequence_christopher
+  columns:
+  - externalId: value
+    valueType: Double

@@ -1,0 +1,158 @@
+- instanceType: node
+  space: omni-instances
+  externalId: PrimitiveNullableList:Michelle
+  sources:
+  - properties:
+      boolean:
+      - false
+      - false
+      - true
+      date: null
+      float32: null
+      float64: null
+      int32: null
+      int64:
+      - 57
+      - 91
+      json: null
+      text:
+      - Pull worker better.
+      - Rock song body court movie cell.
+      - Everything economic type kitchen.
+      timestamp: null
+    source:
+      space: pygen-models
+      externalId: PrimitiveNullableList
+      version: '1'
+      type: view
+- instanceType: node
+  space: omni-instances
+  externalId: PrimitiveNullableList:Yvette
+  sources:
+  - properties:
+      boolean: null
+      date: null
+      float32: null
+      float64:
+      - 22.536066555491708
+      - 85.79468083326182
+      - 14.816738354033877
+      - 4.1928090911085185
+      - 32.01679416433048
+      int32:
+      - 18
+      int64: null
+      json: null
+      text: null
+      timestamp:
+      - 2023-08-02 17:24:13
+      - 2023-02-08 00:34:31
+      - 2023-01-20 15:31:02
+      - 2023-09-11 06:25:51
+    source:
+      space: pygen-models
+      externalId: PrimitiveNullableList
+      version: '1'
+      type: view
+- instanceType: node
+  space: omni-instances
+  externalId: PrimitiveNullableList:Mary
+  sources:
+  - properties:
+      boolean: null
+      date: null
+      float32:
+      - 27.644931920189574
+      - 93.95510792984444
+      - 22.319868936567
+      - 5.063020607593193
+      float64:
+      - 6.486286349918702
+      - 73.83170031019792
+      int32:
+      - 38
+      - 44
+      - 65
+      int64:
+      - 20
+      json: null
+      text: null
+      timestamp: null
+    source:
+      space: pygen-models
+      externalId: PrimitiveNullableList
+      version: '1'
+      type: view
+- instanceType: node
+  space: omni-instances
+  externalId: PrimitiveNullableList:Justin
+  sources:
+  - properties:
+      boolean:
+      - true
+      - true
+      - false
+      date:
+      - 2023-02-06
+      - 2023-10-20
+      - 2023-11-26
+      - 2023-04-02
+      float32:
+      - 18.735539253049193
+      float64:
+      - 82.63447051873443
+      - 83.65705426911832
+      - 41.8604683879905
+      int32:
+      - 38
+      - 9
+      - 9
+      int64: null
+      json:
+      - {}
+      - Image loss ten total.: Her world enter six.
+        Expect recent room situation product main couple.: Why often my security arm.
+        Live try most arm meet surface attention attack.: Identify walk now often
+          always.
+        Information on mission various.: Prove fire enter capital population.
+      - First sell authority leader your you available.: Media car give attention
+          each.
+      text: null
+      timestamp: null
+    source:
+      space: pygen-models
+      externalId: PrimitiveNullableList
+      version: '1'
+      type: view
+- instanceType: node
+  space: omni-instances
+  externalId: PrimitiveNullableList:Joseph
+  sources:
+  - properties:
+      boolean:
+      - false
+      - true
+      - true
+      date: null
+      float32: null
+      float64: null
+      int32:
+      - 47
+      - 97
+      - 50
+      int64:
+      - 94
+      - 88
+      - 62
+      - 40
+      - 61
+      json: null
+      text:
+      - Street region particularly would pressure account.
+      - Federal professional voice care break blood network.
+      timestamp: null
+    source:
+      space: pygen-models
+      externalId: PrimitiveNullableList
+      version: '1'
+      type: view

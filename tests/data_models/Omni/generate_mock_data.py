@@ -41,16 +41,16 @@ def main():
             if not resources:
                 continue
             (DATA_DIR / f"{view.external_id}.{field_.name}.yaml").write_text(resources.dump_yaml())
-        print(f"Generated {len(mock_data.nodes)} nodes for {view.external_id}")
+        print(f"Generated {len(mock_data.node)} nodes for {view.external_id}")
 
 
 @dataclass
 class Data:
-    nodes: dm.NodeApplyList = field(default_factory=lambda: dm.NodeApplyList([]))
-    edges: dm.EdgeApplyList = field(default_factory=lambda: dm.EdgeApplyList([]))
+    node: dm.NodeApplyList = field(default_factory=lambda: dm.NodeApplyList([]))
+    edge: dm.EdgeApplyList = field(default_factory=lambda: dm.EdgeApplyList([]))
     timeseries: TimeSeriesList = field(default_factory=lambda: TimeSeriesList([]))
-    sequences: SequenceList = field(default_factory=lambda: SequenceList([]))
-    files: FileMetadataList = field(default_factory=lambda: FileMetadataList([]))
+    sequence: SequenceList = field(default_factory=lambda: SequenceList([]))
+    file: FileMetadataList = field(default_factory=lambda: FileMetadataList([]))
 
 
 def generate_mock_data(view: dm.View, node_count: int) -> Data:
@@ -62,9 +62,9 @@ def generate_mock_data(view: dm.View, node_count: int) -> Data:
     for _ in range(node_count):
         mapped_properties = {k: v for k, v in view.properties.items() if isinstance(v, dm.MappedProperty)}
         properties, external = generate_mock_values(mapped_properties, faker)
-        output.files.extend(external.files)
+        output.file.extend(external.file)
         output.timeseries.extend(external.timeseries)
-        output.sequences.extend(external.sequences)
+        output.sequence.extend(external.sequence)
 
         node = dm.NodeApply(
             space=OMNI_SDK.instance_space,
@@ -77,7 +77,7 @@ def generate_mock_data(view: dm.View, node_count: int) -> Data:
             ],
             type=node_type,
         )
-        output.nodes.append(node)
+        output.node.append(node)
 
     return output
 
@@ -108,7 +108,7 @@ def generate_mock_values(
                         )
                     )
                 elif isinstance(mapped.type, dm.SequenceReference):
-                    external.sequences.append(
+                    external.sequence.append(
                         Sequence(
                             external_id=ref,
                             name=ref,
@@ -116,7 +116,7 @@ def generate_mock_values(
                         )
                     )
                 elif isinstance(mapped.type, dm.FileReference):
-                    external.files.append(
+                    external.file.append(
                         FileMetadata(
                             external_id=ref,
                             name=ref,

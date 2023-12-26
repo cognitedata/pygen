@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from cognite.client import data_modeling as dm
-from cognite.client.data_classes import TimeSeriesList
+from cognite.client.data_classes import FileMetadataList, SequenceList, TimeSeriesList
 from cognite.client.data_classes.data_modeling import DataModelId, SpaceApply, SpaceApplyList
 
 from cognite.pygen.utils.helper import get_pydantic_version
@@ -113,6 +113,22 @@ class ExampleSDK:
     def load_timeseries(self, data_model_id: dm.DataModelId) -> TimeSeriesList:
         timeseries_files = list(self.model_dir(data_model_id).glob("**/*timeseries.yaml"))
         return TimeSeriesList([ts for filepath in timeseries_files for ts in TimeSeriesList.load(filepath.read_text())])
+
+    def load_sequences(self, data_model_id: dm.DataModelId) -> SequenceList:
+        sequence_files = list(self.model_dir(data_model_id).glob("**/*sequence.yaml"))
+        return SequenceList([SequenceList.load(filepath.read_text()) for filepath in sequence_files])
+
+    def load_filemetadata(self, data_model_id: dm.DataModelId) -> FileMetadataList:
+        filemetadata_files = list(self.model_dir(data_model_id).glob("**/*filemetadata.yaml"))
+        return FileMetadataList([FileMetadataList.load(filepath.read_text()) for filepath in filemetadata_files])
+
+    def load_nodes(self, data_model_id: dm.DataModelId) -> dm.NodeApplyList:
+        node_files = list(self.model_dir(data_model_id).glob("**/*node.yaml"))
+        return dm.NodeApplyList([dm.NodeApply.load(filepath.read_text()) for filepath in node_files])
+
+    def load_edges(self, data_model_id: dm.DataModelId) -> dm.EdgeApplyList:
+        edge_files = list(self.model_dir(data_model_id).glob("**/*edge.yaml"))
+        return dm.EdgeApplyList([dm.EdgeApply.load(filepath.read_text()) for filepath in edge_files])
 
 
 WINDMILL_SDK = ExampleSDK(
