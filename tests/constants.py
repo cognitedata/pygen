@@ -155,7 +155,7 @@ class ExampleSDK:
         return dm.EdgeApplyList([e for filepath in edge_files for e in dm.EdgeApplyList.load(filepath.read_text())])
 
     def load_read_nodes(self, data_model_id: dm.DataModelId) -> dm.NodeList:
-        return dm.NodeList(self.read_node_path(data_model_id).read_text())
+        return dm.NodeList.load(self.read_node_path(data_model_id).read_text())
 
 
 WINDMILL_SDK = ExampleSDK(
