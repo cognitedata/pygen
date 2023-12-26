@@ -177,17 +177,15 @@ def deploy():
         existing = client.files.retrieve_multiple(external_ids=files.as_external_ids(), ignore_unknown_ids=True)
         new, changed, unchanged = _difference(existing, files)
         if new:
-            created = client.files.create(new)
-            for file in created:
-                typer.echo(f"Created file {file.external_id}")
+            for n in new:
+                created, _ = client.files.create(n)
+                typer.echo(f"Created file {created.external_id}")
         if changed:
             client.files.update(changed)
             for file in changed:
                 typer.echo(f"Updated file {file.external_id}")
         if unchanged:
             typer.echo(f"{len(unchanged)} files are unchanged")
-
-        # # Nodes
 
 
 @app.command("list", help="List all example files which are expected to be changed manually")
@@ -345,6 +343,7 @@ def _clean_cdf_resources(cdf_resources: dict, resource_cls_list: type) -> None:
             file.id = None
             file.created_time = None
             file.last_updated_time = None
+            file.uploaded = None
             if not file.metadata:
                 file.metadata = None
 
