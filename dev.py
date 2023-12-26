@@ -4,6 +4,7 @@ This is a small CLI used for development of Pygen.
 """
 import re
 from collections import defaultdict
+from datetime import datetime
 from typing import TypeVar
 
 import toml
@@ -106,6 +107,7 @@ def download():
                 nodes.extend(client.data_modeling.instances.list("node", filter=is_space, limit=100, sources=[view]))
             nodes = dm.NodeList(sorted(nodes, key=lambda n: n.external_id))
             nodes = _remove_duplicate_nodes(nodes)
+            _isoformat_timestamps(nodes)
             file_path = example_sdk.read_node_path(data_model_id)
             file_path.write_text(nodes.dump_yaml())
             typer.echo(f"Downloaded {len(nodes)} nodes to {file_path.relative_to(REPO_ROOT)}")
@@ -392,10 +394,46 @@ def _remove_duplicate_nodes(nodes: dm.NodeList) -> dm.NodeList:
         if len(nodes) == 1:
             output.append(nodes[0])
             continue
-        # The node with the most properties is the child node that has implemented all interfaces.
+        # The node with the most properties is the child node that has implemented all interfaces
+        # (and thus have all values of their parent interfaces).
         keep: dm.Node = max(nodes, key=lambda n: sum(len(props) for props in n.properties.values()))
         output.append(keep)
     return output
+
+
+def _isoformat_timestamps(nodes: dm.NodeList):
+    """Convert all timestamps to isoformat.
+
+    Args:
+        nodes:
+
+    Returns:
+
+    """
+    for node in nodes:
+        node: dm.Node
+        for properties in node.properties.values():
+            for key in list(properties):
+                value = properties[key]
+                if isinstance(value, list):
+                    for i, item in enumerate(value):
+                        if isinstance(item, datetime):
+                            properties[key][i] = item.isoformat(timespec="milliseconds")
+                        elif isinstance(item, str):
+                            try:
+                                parsed = datetime.strptime(item, "%Y-%m-%dT%H:%M:%S%z")
+                            except ValueError:
+                                continue
+                            properties[key][i] = parsed.isoformat(timespec="milliseconds")
+                elif isinstance(value, datetime):
+                    properties[key] = value.isoformat(timespec="milliseconds")
+                elif isinstance(value, str):
+                    try:
+                        # 2023-04-16T18:28:09.000+00:00
+                        parsed = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S%z")
+                    except ValueError:
+                        continue
+                    properties[key] = parsed.isoformat(timespec="milliseconds")
 
 
 if __name__ == "__main__":
