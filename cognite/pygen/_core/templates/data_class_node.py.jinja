@@ -106,8 +106,14 @@ class {{ data_class.write_name }}(DomainModelApply):
             properties["{{ field.prop_name }}"] = [
                 value if isinstance(value, str) else value.external_id for value in self.{{ field.name }}
             ]
+            {% elif field.is_time_field and field.is_list %}
+            properties["{{ field.prop_name }}"] = [
+                {{ field.variable }}.isoformat({% if field.is_timestamp %}timespec="milliseconds"{% endif %}) for {{ field.variable }} in self.{{ field.name }}
+            ]
+            {% elif field.is_time_field %}
+            properties["{{ field.prop_name }}"] = self.{{ field.name }}.isoformat({% if field.is_timestamp %}timespec="milliseconds"{% endif %})
             {% else %}
-            properties["{{ field.prop_name }}"] = self.{{ field.name }}{% if field.is_time_field %}.isoformat({% if field.is_timestamp %}timespec="milliseconds"{% endif %}){% endif %}
+            properties["{{ field.prop_name }}"] = self.{{ field.name }}
             {% endif %}
         {% endfor %}
 

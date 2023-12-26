@@ -117,6 +117,7 @@ class Field(ABC):
                     is_nullable=prop.nullable,
                     description=prop.description,
                     pydantic_field=pydantic_field,
+                    variable=variable,
                 )
             else:
                 return PrimitiveListField(
@@ -127,6 +128,7 @@ class Field(ABC):
                     is_nullable=prop.nullable,
                     pydantic_field=pydantic_field,
                     description=prop.description,
+                    variable=variable,
                 )
         elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.CDFExternalIdReference):
             # Note: these are only CDF External Fields that are not listable. Listable CDF External Fields
@@ -261,6 +263,8 @@ class ListFieldCore(PrimitiveFieldCore):
     list[datetime.datetime], list[datetime.date].
     """
 
+    variable: str
+
     def as_read_type_hint(self) -> str:
         if self.need_alias:
             return f'Optional[list[{self.type_as_string}]] = {self.pydantic_field}(None, alias="{self.prop_name}")'
@@ -326,6 +330,10 @@ class PrimitiveListField(ListFieldCore):
     This represents a list of basic types such as list[str], list[int], list[float], list[bool],
     list[datetime.datetime], list[datetime.date].
     """
+
+    @property
+    def is_list(self) -> bool:
+        return True
 
 
 @dataclass(frozen=True)

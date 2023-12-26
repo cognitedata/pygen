@@ -149,7 +149,7 @@ class PrimitiveNullableListApply(DomainModelApply):
             properties["boolean"] = self.boolean
 
         if self.date is not None:
-            properties["date"] = [d.isoformat() for d in self.date]
+            properties["date"] = [date.isoformat() for date in self.date]
 
         if self.float_32 is not None:
             properties["float32"] = self.float_32
@@ -170,7 +170,7 @@ class PrimitiveNullableListApply(DomainModelApply):
             properties["text"] = self.text
 
         if self.timestamp is not None:
-            properties["timestamp"] = [t.isoformat(timespec="milliseconds") for t in self.timestamp]
+            properties["timestamp"] = [timestamp.isoformat(timespec="milliseconds") for timestamp in self.timestamp]
 
         if properties:
             this_node = dm.NodeApply(
