@@ -1,6 +1,6 @@
 space: pygen-models
-externalId: PrimitiveRequiredList
-name: PrimitiveRequiredList
+externalId: PrimitiveRequiredListable
+name: PrimitiveRequiredListable
 version: '1'
 properties:
   text:

@@ -4,6 +4,7 @@ from collections.abc import Sequence
 from typing import Protocol
 
 import pytest
+from _pytest.mark import ParameterSet
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from faker import Faker
@@ -22,15 +23,19 @@ else:
     from omni_pydantic_v1.data_classes import DomainModelApply, ResourcesApplyResult
 
 
-def omni_view_ids() -> list[dm.ViewId]:
-    return dm.ViewList(OMNI_SDK.load_data_model().views).as_ids()
+def omni_view_ids() -> list[ParameterSet]:
+    return [
+        pytest.param(view.as_id(), id=view.external_id)
+        for view in dm.ViewList(OMNI_SDK.load_data_model().views)
+        if view.writable
+    ]
 
 
 class DomainAPI(Protocol):
-    def retrieve(self, external_id: str | SequenceNotStr[str], space: str):
+    def retrieve(self, external_id: str | SequenceNotStr[str], space: str = "") -> Sequence:
         ...
 
-    def delete(self, external_id: str | SequenceNotStr[str], space: str):
+    def delete(self, external_id: str | SequenceNotStr[str], space: str = ""):
         ...
 
     def apply(
@@ -49,28 +54,30 @@ class TestCRUDOperations:
         cognite_client: CogniteClient,
     ) -> None:
         # Arrange
+        Faker.seed(42)
         faker = Faker()
         api_name = omni_data_classes[view_id].api_name
         write_class = omni_data_classes[view_id].write
         view = omni_data_classes[view_id].view
         mock_nodes = generate_mock_data(view, 2, faker).node
-        domain_nodes = write_class.from_instance(mock_nodes[0])
+        domain_nodes = [write_class.from_instance(node) for node in mock_nodes]
+        external_ids = [node.external_id for node in domain_nodes]
         api: DomainAPI = getattr(omni_client, api_name)
 
         # Act
         try:
             created = api.apply(domain_nodes)
 
-            assert len(created) == 2
+            assert len(created.nodes) == 2
 
-            retrieved = api.retrieve(domain_nodes.as_external_ids())
+            retrieved = api.retrieve(external_ids)
 
             assert len(retrieved) == 2
-            assert sorted(retrieved.as_external_ids()) == sorted(domain_nodes.as_external_ids())
+            assert sorted([n.external_id for n in retrieved]) == sorted(external_ids)
 
-            api.delete(domain_nodes.as_external_ids())
+            api.delete(external_ids)
 
-            retrieved_after_delete = api.retrieve(domain_nodes.as_external_ids())
+            retrieved_after_delete = api.retrieve(external_ids)
             assert len(retrieved_after_delete) == 0
 
         finally:

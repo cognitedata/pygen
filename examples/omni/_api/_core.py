@@ -167,15 +167,16 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
             node_ids = [(space, ext_id) for ext_id in external_id]
 
         instances = self._client.data_modeling.instances.retrieve(nodes=node_ids, sources=self._sources)
-        nodes = self._class_list([self._class_type.from_instance(node) for node in instances.nodes])
+        list_ = [self._class_type.from_instance(node) for node in instances.nodes]
+        nodes = self._class_list(list_)
 
         if retrieve_edges and nodes:
             self._retrieve_and_set_edge_types(nodes, edge_api_name_type_direction_quad)
 
-        if not nodes:
-            return None
-        elif is_multiple:
+        if is_multiple:
             return nodes
+        elif not nodes:
+            return None
         else:
             return nodes[0]
 

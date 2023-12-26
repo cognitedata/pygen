@@ -1,6 +1,6 @@
 space: pygen-models
-externalId: PrimitiveNullableList
-name: PrimitiveNullableList
+externalId: PrimitiveNullableListable
+name: PrimitiveNullableListable
 version: '1'
 properties:
   text:

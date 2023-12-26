@@ -1,6 +1,6 @@
 space: pygen-models
-externalId: CDFExternalReferencesList
-name: CDFExternalReferencesList
+externalId: CDFExternalReferencesListable
+name: CDFExternalReferencesListable
 version: '1'
 properties:
   timeseries:
