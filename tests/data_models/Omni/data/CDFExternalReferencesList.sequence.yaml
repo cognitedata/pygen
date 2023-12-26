@@ -1,3 +1,8 @@
+- name: sequence_jeffrey
+  externalId: sequence_jeffrey
+  columns:
+  - externalId: value
+    valueType: Double
 - name: sequence_bridget
   externalId: sequence_bridget
   columns:
@@ -8,33 +13,58 @@
   columns:
   - externalId: value
     valueType: Double
-- name: sequence_linda
-  externalId: sequence_linda
-  columns:
-  - externalId: value
-    valueType: Double
-- name: sequence_helen
-  externalId: sequence_helen
-  columns:
-  - externalId: value
-    valueType: Double
-- name: sequence_eric
-  externalId: sequence_eric
-  columns:
-  - externalId: value
-    valueType: Double
-- name: sequence_susan
-  externalId: sequence_susan
-  columns:
-  - externalId: value
-    valueType: Double
-- name: sequence_colin
-  externalId: sequence_colin
+- name: sequence_adam
+  externalId: sequence_adam
   columns:
   - externalId: value
     valueType: Double
 - name: sequence_melanie
   externalId: sequence_melanie
+  columns:
+  - externalId: value
+    valueType: Double
+- name: sequence_cassandra
+  externalId: sequence_cassandra
+  columns:
+  - externalId: value
+    valueType: Double
+- name: sequence_lindsay
+  externalId: sequence_lindsay
+  columns:
+  - externalId: value
+    valueType: Double
+- name: sequence_jessica
+  externalId: sequence_jessica
+  columns:
+  - externalId: value
+    valueType: Double
+- name: sequence_amanda
+  externalId: sequence_amanda
+  columns:
+  - externalId: value
+    valueType: Double
+- name: sequence_nicholas
+  externalId: sequence_nicholas
+  columns:
+  - externalId: value
+    valueType: Double
+- name: sequence_andrea
+  externalId: sequence_andrea
+  columns:
+  - externalId: value
+    valueType: Double
+- name: sequence_maria
+  externalId: sequence_maria
+  columns:
+  - externalId: value
+    valueType: Double
+- name: sequence_christine
+  externalId: sequence_christine
+  columns:
+  - externalId: value
+    valueType: Double
+- name: sequence_michelle
+  externalId: sequence_michelle
   columns:
   - externalId: value
     valueType: Double

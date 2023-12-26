@@ -8,8 +8,8 @@
   columns:
   - externalId: value
     valueType: Double
-- name: sequence_christopher
-  externalId: sequence_christopher
+- name: sequence_erica
+  externalId: sequence_erica
   columns:
   - externalId: value
     valueType: Double

@@ -1,16 +1,8 @@
-- externalId: file_joshua
-  name: file_joshua
+- externalId: file_christopher
+  name: file_christopher
   source: omni-instances
   mimeType: text/plain
-- externalId: file_patricia
-  name: file_patricia
-  source: omni-instances
-  mimeType: text/plain
-- externalId: file_jeffery
-  name: file_jeffery
-  source: omni-instances
-  mimeType: text/plain
-- externalId: file_debra
-  name: file_debra
+- externalId: file_anthony
+  name: file_anthony
   source: omni-instances
   mimeType: text/plain

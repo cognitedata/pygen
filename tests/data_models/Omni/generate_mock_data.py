@@ -146,7 +146,7 @@ def create_value(prop: dm.PropertyType, faker) -> PropertyValue:
     elif isinstance(prop, dm.Date):
         return faker.date_this_year()
     elif isinstance(prop, dm.CDFExternalIdReference):
-        return f"{prop._type}_{faker.first_name().casefold()}"
+        return f"{prop._type}_{faker.unique.first_name().casefold()}"
     else:
         raise NotImplementedError(prop)
 
