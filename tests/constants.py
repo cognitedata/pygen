@@ -197,7 +197,7 @@ SHOP_SDK = ExampleSDK(
     data_model_ids=[DataModelId("IntegrationTestsImmutable", "SHOP_Model", "2")],
     _top_level_package="shop.client",
     client_name="ShopClient",
-    generate_sdk=True,
+    generate_sdk=False,
 )
 
 MOVIE_SDK = ExampleSDK(
