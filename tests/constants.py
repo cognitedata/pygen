@@ -342,6 +342,27 @@ class ScenarioInstanceFiles:
 SCENARIO_INSTANCE_SDK.append_manual_files(ScenarioInstanceFiles)
 
 
+class OmniFiles:
+    client_dir = OMNI_SDK.client_dir
+    client = client_dir / "_api_client.py"
+    data_classes = client_dir / "data_classes"
+    core_data = data_classes / "_core.py"
+    core_init = data_classes / "__init__.py"
+    api = client_dir / "_api"
+    core_api = api / "_core.py"
+    client_init = client_dir / "__init__.py"
+    cdf_external_data = data_classes / "_cdf_external_references.py"
+    cdf_external_list_data = data_classes / "_cdf_external_references_list.py"
+    primitive_nullable_data = data_classes / "_primitive_nullable.py"
+    primitive_nullable_list_data = data_classes / "_primitive_nullable_list.py"
+    primitive_with_defaults_data = data_classes / "_primitive_with_defaults.py"
+    primitive_required_data = data_classes / "_primitive_required.py"
+    primitive_required_list_data = data_classes / "_primitive_required_list.py"
+
+
+OMNI_SDK.append_manual_files(OmniFiles)
+
+
 class WindMillFiles:
     class Data:
         wind_mill_json = DATA_MODELS / "WindMill" / "data" / "data.json"

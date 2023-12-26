@@ -10,9 +10,9 @@ from tests.constants import IS_PYDANTIC_V2, OMNI_SDK
 from tests.omni_constants import OmniClassPair
 
 if IS_PYDANTIC_V2:
-    from omni import data_classes
+    from omni import data_classes as omni_classes
 else:
-    from omni_pydantic_v1 import data_classes
+    from omni_pydantic_v1 import data_classes as omni_classes
 
 
 @pytest.fixture(scope="session")
@@ -39,7 +39,7 @@ def omni_data_model() -> dm.DataModel[dm.View]:
 @pytest.fixture(scope="session")
 def omni_data_classes(omni_data_model: dm.DataModel[dm.View]) -> dict[dm.ViewId, OmniClassPair]:
     output = {}
-    available_data_classes = vars(data_classes)
+    available_data_classes = vars(omni_classes)
     for view in omni_data_model.views:
         read_name = to_pascal(view.external_id)
         write_name = read_name + "Apply"
