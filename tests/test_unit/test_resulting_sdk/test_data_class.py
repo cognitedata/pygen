@@ -1,6 +1,6 @@
 import json
 from datetime import datetime, timezone
-from typing import Callable
+from typing import Callable, cast
 
 import pytest
 from cognite.client import data_modeling as dm
@@ -13,99 +13,50 @@ from cognite.pygen.utils.external_id_factories import (
     sha256_factory,
     uuid_factory,
 )
-from tests.constants import IS_PYDANTIC_V2, WindMillFiles
+from tests.constants import IS_PYDANTIC_V2, OMNI_SDK, WindMillFiles
+from tests.omni_constants import OmniClassPair
 
 if IS_PYDANTIC_V2:
     from markets.client.data_classes import ValueTransformation
     from movie_domain.client import data_classes as movie
     from pydantic import TypeAdapter
     from shop.client.data_classes import CaseApply, CommandConfigApply
-    from windmill.client.data_classes import DomainModelApply, ResourcesApply, WindmillApply
+    from windmill.client.data_classes import DomainModelApply as WindmillDomainModelApply
+    from windmill.client.data_classes import ResourcesApply, WindmillApply
 else:
     from pydantic import parse_obj_as
-    from windmill_pydantic_v1.client.data_classes import DomainModelApply, ResourcesApply, WindmillApply
+    from windmill_pydantic_v1.client.data_classes import (
+        DomainModelApply as WindmillDomainModelApply,
+    )
+    from windmill_pydantic_v1.client.data_classes import (
+        ResourcesApply,
+        WindmillApply,
+    )
 
     from markets_pydantic_v1.client.data_classes import ValueTransformation
     from movie_domain_pydantic_v1.client import data_classes as movie
     from shop_pydantic_v1.client.data_classes import CaseApply, CommandConfigApply
 
 
-class TestFromInstance:
-    def test_person_from_instance(self) -> None:
-        # Arrange
-        node = dm.Node.load(
-            {
-                "instanceType": "node",
-                "space": "IntegrationTestsImmutable",
-                "externalId": "person:christoph_waltz",
-                "version": 1,
-                "lastUpdatedTime": 1684170308732,
-                "createdTime": 1684170308732,
-                "properties": {
-                    "IntegrationTestsImmutable": {"Person/2": {"name": "Christoph Waltz", "birthYear": 1956}}
-                },
-            }
-        )
-
-        # Act
-        person = movie.Person.from_instance(node)
-
-        # Assert
-        assert person.name == "Christoph Waltz"
-
-    def test_from_node_with_json(self) -> None:
-        # Arrange
-        node = dm.Node(
-            space="market",
-            external_id="myExternalId",
-            version=1,
-            last_updated_time=0,
-            created_time=0,
-            properties=Properties({dm.ViewId("market", "myView", "1"): {"arguments": {"a": 1}, "method": "myMethod"}}),
-            deleted_time=None,
-            type=None,
-        )
-        expected = ValueTransformation(
-            external_id="myExternalId",
-            version=1,
-            last_updated_time=datetime.fromtimestamp(0, tz=timezone.utc),
-            created_time=datetime.fromtimestamp(0, tz=timezone.utc),
-            arguments={"a": 1},
-            method="myMethod",
-        )
-
-        # Act
-        actual = ValueTransformation.from_instance(node)
-
-        # Assert
-        assert actual == expected
+def omni_nodes_with_view():
+    nodes = OMNI_SDK.load_nodes(OMNI_SDK.data_model_ids[0])
+    for node in nodes:
+        view_id = cast(dm.ViewId, node.sources[0].source)
+        yield pytest.param(node, view_id, id=node.external_id)
 
 
-class TestToPandas:
-    def test_person_to_pandas(self):
-        # Arrange
-        node = dm.Node.load(
-            {
-                "instanceType": "node",
-                "space": "IntegrationTestsImmutable",
-                "externalId": "person:christoph_waltz",
-                "version": 1,
-                "lastUpdatedTime": 1684170308732,
-                "createdTime": 1684170308732,
-                "properties": {
-                    "IntegrationTestsImmutable": {"Person/2": {"name": "Christoph Waltz", "birthYear": 1956}}
-                },
-            }
-        )
-        person = movie.Person.from_instance(node)
-        persons = movie.PersonList([person])
+class TestToFromInstances:
+    @pytest.mark.parametrize("node, view_id", list(omni_nodes_with_view()))
+    def test_from_to_instances(
+        self, node: dm.Node, view_id: dm.ViewId, omni_data_classes: dict[dm.ViewId, OmniClassPair]
+    ):
+        read_cls = omni_data_classes[view_id].read
 
-        # Act
-        df = persons.to_pandas()
+        domain_node = read_cls.from_instance(node)
+        domain_apply_node = domain_node.as_apply()
 
-        # Assert
-        assert not df.empty
-        assert len(df) == 1
+        resources = domain_apply_node.to_instances_apply()
+        assert node.as_apply(None, None).dump() == resources.nodes[0].dump()
 
 
 def person_apply_to_instances_test_cases():
@@ -342,6 +293,57 @@ def person_apply_to_instances_test_cases():
     )
 
 
+class TestFromInstance:
+    def test_person_from_instance(self) -> None:
+        # Arrange
+        node = dm.Node.load(
+            {
+                "instanceType": "node",
+                "space": "IntegrationTestsImmutable",
+                "externalId": "person:christoph_waltz",
+                "version": 1,
+                "lastUpdatedTime": 1684170308732,
+                "createdTime": 1684170308732,
+                "properties": {
+                    "IntegrationTestsImmutable": {"Person/2": {"name": "Christoph Waltz", "birthYear": 1956}}
+                },
+            }
+        )
+
+        # Act
+        person = movie.Person.from_instance(node)
+
+        # Assert
+        assert person.name == "Christoph Waltz"
+
+    def test_from_node_with_json(self) -> None:
+        # Arrange
+        node = dm.Node(
+            space="market",
+            external_id="myExternalId",
+            version=1,
+            last_updated_time=0,
+            created_time=0,
+            properties=Properties({dm.ViewId("market", "myView", "1"): {"arguments": {"a": 1}, "method": "myMethod"}}),
+            deleted_time=None,
+            type=None,
+        )
+        expected = ValueTransformation(
+            external_id="myExternalId",
+            version=1,
+            last_updated_time=datetime.fromtimestamp(0, tz=timezone.utc),
+            created_time=datetime.fromtimestamp(0, tz=timezone.utc),
+            arguments={"a": 1},
+            method="myMethod",
+        )
+
+        # Act
+        actual = ValueTransformation.from_instance(node)
+
+        # Assert
+        assert actual == expected
+
+
 class TestToInstancesApply:
     @pytest.mark.parametrize("person, expected", list(person_apply_to_instances_test_cases()))
     def test_person_to_apply_instances(self, person: movie.PersonApply, expected: dm.InstancesApply):
@@ -429,6 +431,33 @@ class TestToInstancesApply:
         assert len(instances.edges) == 0
 
 
+class TestToPandas:
+    def test_person_to_pandas(self):
+        # Arrange
+        node = dm.Node.load(
+            {
+                "instanceType": "node",
+                "space": "IntegrationTestsImmutable",
+                "externalId": "person:christoph_waltz",
+                "version": 1,
+                "lastUpdatedTime": 1684170308732,
+                "createdTime": 1684170308732,
+                "properties": {
+                    "IntegrationTestsImmutable": {"Person/2": {"name": "Christoph Waltz", "birthYear": 1956}}
+                },
+            }
+        )
+        person = movie.Person.from_instance(node)
+        persons = movie.PersonList([person])
+
+        # Act
+        df = persons.to_pandas()
+
+        # Assert
+        assert not df.empty
+        assert len(df) == 1
+
+
 @pytest.fixture(scope="module")
 def person_and_person_apply() -> tuple[movie.Person, movie.PersonApply]:
     person = movie.Person(
@@ -492,7 +521,7 @@ def test_load_windmills_from_json(
     # Arrange
     raw_json = WindMillFiles.Data.wind_mill_json.read_text()
     try:
-        DomainModelApply.external_id_factory = factory
+        WindmillDomainModelApply.external_id_factory = factory
 
         loaded_json = json.loads(raw_json)
 
@@ -521,7 +550,7 @@ def test_load_windmills_from_json(
         assert len(created.nodes) == expected_node_count
         assert len(created.edges) == expected_edge_count
     finally:
-        DomainModelApply.external_id_factory = None
+        WindmillDomainModelApply.external_id_factory = None
 
 
 def _recursive_exclude(d: dict, exclude: set[str]) -> None:

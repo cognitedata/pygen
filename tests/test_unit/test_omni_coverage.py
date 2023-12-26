@@ -27,9 +27,9 @@ NOT_SUPPORTED = {
 }
 
 
-def test_mapped_properties_coverage(omnium_data_model: dm.DataModel[dm.View]) -> None:
+def test_mapped_properties_coverage(omni_data_model) -> None:
     existing_properties = existing_mapped_properties()
-    covered_properties = properties_from_views(omnium_data_model.views)
+    covered_properties = properties_from_views(omni_data_model.views)
 
     missing = existing_properties - covered_properties
     assert not missing, f"Missing {len(missing)}:  {missing}"
