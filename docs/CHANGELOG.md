@@ -21,6 +21,8 @@ Changes are grouped as follows
 * Bug in `pygen` when having a list of `TimeSeries` caused `pydantic` to raise a `ValidationError` when retrieving
   data from CDF. This is now fixed.
 * Bug in `pygen` when having a list of `timestamps` or `dates`. This is now fixed.
+* Bug in `pygen` when default values are set, the read class should have `None` and not the default values.
+  This is now fixed.
 
 ## [0.32.5] - 21-12-23
 ### Fixed
