@@ -106,6 +106,7 @@ matplotlib = "*"
 tabulate = "*"
 pytest-icdiff = "^0.8"
 Faker = "*"
+hypothesis = "*"
 
 [tool.pytest.ini_options]
 filterwarnings = [
