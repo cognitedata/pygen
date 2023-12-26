@@ -361,21 +361,41 @@ class CDFExternalListField(ListFieldCore, CDFExternalField):
     """
 
     def as_read_type_hint(self) -> str:
-        if self.need_alias:
-            return f'Optional[list[{self.type_as_string}]] = {self.pydantic_field}(None, alias="{self.prop_name}")'
+        type = self.type_as_string
+        if type != "str":
+            if self.need_alias:
+                return (
+                    f"Union[list[{self.type_as_string}], list[str], None] = "
+                    f'{self.pydantic_field}(None, alias="{self.prop_name}")'
+                )
+            else:
+                return f"Union[list[{self.type_as_string}], list[str], None] = None"
         else:
-            return f"Optional[list[{self.type_as_string}]] = None"
+            if self.need_alias:
+                return f'Optional[list[str]] = {self.pydantic_field}(None, alias="{self.prop_name}")'
+            else:
+                return "Optional[list[str]] = None"
 
     def as_write_type_hint(self) -> str:
         type_ = self.type_as_string
-        if self.is_nullable and self.need_alias:
-            return f'Optional[list[{type_}]] = {self.pydantic_field}(None, alias="{self.prop_name}")'
-        elif self.need_alias:
-            return f'list[{type_}] = {self.pydantic_field}(alias="{self.prop_name}")'
-        elif self.is_nullable:
-            return f"Optional[list[{type_}]] = None"
-        else:  # not self.is_nullable and not self.need_alias
-            return f"list[{type_}]"
+        if type_ != "str":
+            if self.is_nullable and self.need_alias:
+                return f'Union[list[{type_}], list[str], None] = {self.pydantic_field}(None, alias="{self.prop_name}")'
+            elif self.need_alias:
+                return f'Union[list[{type_}], list[str]] = {self.pydantic_field}(alias="{self.prop_name}")'
+            elif self.is_nullable:
+                return f"Union[list[{type_}], list[str], None] = None"
+            else:  # not self.is_nullable and not self.need_alias
+                return f"Union[list[{type_}], list[str]]"
+        else:
+            if self.is_nullable and self.need_alias:
+                return f'Optional[list[str]] = {self.pydantic_field}(None, alias="{self.prop_name}")'
+            elif self.need_alias:
+                return f'list[str] = {self.pydantic_field}(alias="{self.prop_name}")'
+            elif self.is_nullable:
+                return "Optional[list[str]] = None"
+            else:
+                return "list[str]"
 
 
 @dataclass(frozen=True)

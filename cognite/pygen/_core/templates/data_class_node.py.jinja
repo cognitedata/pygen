@@ -1,7 +1,7 @@
 from __future__ import annotations
 {% if data_class.has_primitive_field_of_type((dm.Timestamp, dm.Date)) %}
 import datetime{% endif %}
-{% if data_class.has_field_of_type(ft.EdgeField) %}from typing import TYPE_CHECKING, Literal, Optional, Union{% else %}from typing import Literal, Optional{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}, Union{% endif %}{% endif %}{% if not data_class.use_optional_type %}  # noqa: F401{% endif %}
+{% if data_class.has_field_of_type(ft.EdgeField) %}from typing import TYPE_CHECKING, Literal, Optional, Union{% else %}from typing import Literal, Optional{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}, Union{% endif %}{% endif %}{% if not data_class.use_optional_type %}{% endif %}
 
 from cognite.client import data_modeling as dm{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}
 from cognite.client.data_classes import TimeSeries{% if is_pydantic_v2 %} as CogniteTimeSeries{% endif %}{% endif %}{% if data_class.use_pydantic_field %}
