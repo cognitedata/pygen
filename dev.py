@@ -3,10 +3,12 @@ This is a small CLI used for development of Pygen.
 
 """
 import re
+from typing import TypeVar
 
 import toml
 import typer
 from cognite.client._version import __version__ as cognite_sdk_version
+from cognite.client.data_classes.data_modeling import ViewApplyList
 from pydantic.version import VERSION as PYDANTIC_VERSION
 
 from cognite.pygen._generator import SDKGenerator, write_sdk_to_disk
@@ -94,24 +96,43 @@ def deploy():
     spaces = example_sdk.load_spaces()
     client.data_modeling.spaces.apply(spaces)
     for data_model_id in example_sdk.data_model_ids:
+        # Containers
         containers = example_sdk.load_containers(data_model_id)
-        client.data_modeling.containers.retrieve(containers.as_ids())
-
-        new_containers = client.data_modeling.containers.apply(containers)
+        existing_containers = client.data_modeling.containers.retrieve(containers.as_ids())
+        new, changed, unchanged = _difference(existing_containers.as_apply(), containers)
+        if changed:
+            raise ValueError(f"Containers {changed.as_ids()} require data migration")
+        new_containers = client.data_modeling.containers.apply(new)
         for container in new_containers:
             typer.echo(f"Created container {container.external_id} in space {container.space}")
+        if unchanged:
+            typer.echo(f"{len(unchanged)} containers are unchanged")
+
+        # Views
         views = example_sdk.load_views(data_model_id)
-        # Delete previous views
-        client.data_modeling.views.delete(views.as_ids())
-        new_views = client.data_modeling.views.apply(views)
+        existing_views = client.data_modeling.views.retrieve(views.as_ids())
+        new, changed, unchanged = _difference(existing_views.as_apply(), views)
+        is_views_changed = bool(changed or new)
+        if changed:
+            client.data_modeling.views.delete(changed.as_ids())
+        new_views = client.data_modeling.views.apply(new + changed)
         for view in new_views:
             typer.echo(f"Created view {view.external_id} in space {view.space}")
+        if unchanged:
+            typer.echo(f"{len(unchanged)} views are unchanged")
+
+        # Data Model
         data_model = example_sdk.load_write_model(data_model_id)
+        existing_data_model = client.data_modeling.data_models.retrieve(data_model_id).latest_version()
+        is_changed = existing_data_model.as_apply() != data_model
+        if is_changed or is_views_changed:
+            client.data_modeling.data_models.delete(data_model_id)
+            new_model = client.data_modeling.data_models.apply(data_model)
+            typer.echo(f"Created data model {new_model.external_id} in space {new_model.space}")
+        else:
+            typer.echo(f"Data model {data_model_id} is unchanged")
 
-        client.data_modeling.data_models.delete(data_model_id)
-        new_model = client.data_modeling.data_models.apply(data_model)
-        typer.echo(f"Created data model {new_model.external_id} in space {new_model.space}")
-
+        # TimeSeries
         timeseries = example_sdk.load_timeseries(data_model_id)
         new_timeseries = client.time_series.upsert(timeseries, mode="replace")
         for ts in new_timeseries:
@@ -191,6 +212,43 @@ def overwrite_index():
 
 def _remove_top_lines(text: str, lines: int) -> str:
     return "\n".join(text.split("\n")[lines:])
+
+
+T_DataModeling = TypeVar("T_DataModeling")
+
+
+def _difference(
+    cdf_resources: T_DataModeling, local_resources: T_DataModeling
+) -> tuple[T_DataModeling, T_DataModeling, T_DataModeling]:
+    """Return new, changed, unchanged"""
+    resource_cls_list = type(cdf_resources)
+    cdf_resources = {r.as_id(): r for r in cdf_resources}
+    local_resources = {r.as_id(): r for r in local_resources}
+    if resource_cls_list is ViewApplyList:
+        # The read version of views includes all properties from the interfaces, but the write version does not.
+        # This removes all properties from the write version which are inherited from an interface, so
+        # that the comparison is correct.
+        interfaces = {parent for view in local_resources.values() for parent in view.implements or []}
+        property_by_interface = {}
+        for view in cdf_resources.values():
+            if view.as_id() in interfaces:
+                property_by_interface[view.as_id()] = set(view.properties)
+        for view in cdf_resources.values():
+            for parent in view.implements or []:
+                for property_ in property_by_interface[parent]:
+                    view.properties.pop(property_, None)
+
+    new = resource_cls_list([])
+    changed = resource_cls_list([])
+    unchanged = resource_cls_list([])
+    for id_, resource in local_resources.items():
+        if id_ not in cdf_resources:
+            new.append(resource)
+        elif resource != cdf_resources[id_]:
+            changed.append(resource)
+        else:
+            unchanged.append(resource)
+    return new, changed, unchanged
 
 
 if __name__ == "__main__":
