@@ -358,6 +358,7 @@ class OmniFiles:
     primitive_with_defaults_data = data_classes / "_primitive_with_defaults.py"
     primitive_required_data = data_classes / "_primitive_required.py"
     primitive_required_list_data = data_classes / "_primitive_required_list.py"
+    implementation_1_data = data_classes / "_implementation_1.py"
 
 
 OMNI_SDK.append_manual_files(OmniFiles)
