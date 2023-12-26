@@ -304,12 +304,9 @@ class PrimitiveField(PrimitiveFieldCore):
 
     def as_read_type_hint(self) -> str:
         if self.need_alias:
-            return (
-                f"Optional[{self.type_as_string}] = {self.pydantic_field}"
-                f'({self.default_code}, alias="{self.prop_name}")'
-            )
+            return f"Optional[{self.type_as_string}] = {self.pydantic_field}" f'(None, alias="{self.prop_name}")'
         else:
-            return f"Optional[{self.type_as_string}] = {self.default_code}"
+            return f"Optional[{self.type_as_string}] = None"
 
     def as_write_type_hint(self) -> str:
         out_type = self.type_as_string

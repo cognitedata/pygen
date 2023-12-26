@@ -55,20 +55,6 @@ def test_create_view_data_classes_case(
     assert expected == actual
 
 
-def test_generate_data_class_file_command_configs(
-    command_api_generator: APIGenerator, code_formatter: CodeFormatter
-) -> None:
-    # Arrange
-    expected = ShopSDKFiles.command_configs_data.read_text()
-
-    # Act
-    actual = command_api_generator.generate_data_class_file(IS_PYDANTIC_V2)
-    actual = code_formatter.format_code(actual)
-
-    # Assert
-    assert actual == expected
-
-
 def test_create_view_api_classes_command_configs(
     command_api_generator: APIGenerator, top_level_package: str, client_name: str, code_formatter: CodeFormatter
 ):

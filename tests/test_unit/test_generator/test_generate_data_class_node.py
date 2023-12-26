@@ -5,9 +5,7 @@ from cognite.pygen._generator import CodeFormatter
 from tests.constants import IS_PYDANTIC_V2, OmniFiles
 
 
-def test_generate_data_class_node_primitive_nullable(
-    omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter
-):
+def test_generate_primitive_nullable(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
     # Arrange
     api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "PrimitiveNullable", "1")]
     expected = OmniFiles.primitive_nullable_data.read_text()
@@ -20,9 +18,7 @@ def test_generate_data_class_node_primitive_nullable(
     assert actual == expected
 
 
-def test_generate_data_class_node_primitive_required(
-    omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter
-):
+def test_generate_primitive_required(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
     # Arrange
     api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "PrimitiveRequired", "1")]
     expected = OmniFiles.primitive_required_data.read_text()
@@ -35,9 +31,7 @@ def test_generate_data_class_node_primitive_required(
     assert actual == expected
 
 
-def test_generate_data_class_node_primitive_nullable_list(
-    omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter
-):
+def test_generate_primitive_nullable_list(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
     # Arrange
     api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "PrimitiveNullableList", "1")]
     expected = OmniFiles.primitive_nullable_list_data.read_text()
@@ -50,9 +44,7 @@ def test_generate_data_class_node_primitive_nullable_list(
     assert actual == expected
 
 
-def test_generate_data_class_node_primitive_required_list(
-    omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter
-):
+def test_generate_primitive_required_list(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
     # Arrange
     api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "PrimitiveRequiredList", "1")]
     expected = OmniFiles.primitive_required_list_data.read_text()
@@ -65,9 +57,7 @@ def test_generate_data_class_node_primitive_required_list(
     assert actual == expected
 
 
-def test_generate_data_class_node_primitive_with_defaults(
-    omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter
-):
+def test_generate_primitive_with_defaults(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
     # Arrange
     api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "PrimitiveWithDefaults", "1")]
     expected = OmniFiles.primitive_with_defaults_data.read_text()
