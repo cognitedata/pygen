@@ -24,10 +24,10 @@ from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
 from cognite.client.data_classes import TimeSeriesList
 from cognite.client.data_classes.data_modeling.instances import (
     Instance,
-    Properties,
-    PropertyValue,
     InstanceApply,
     InstanceCore,
+    Properties,
+    PropertyValue,
 )
 from pydantic import BaseModel, BeforeValidator, Extra, Field, model_validator
 from pydantic.functional_serializers import PlainSerializer
