@@ -8,6 +8,14 @@ from typing import TypeVar
 import toml
 import typer
 from cognite.client._version import __version__ as cognite_sdk_version
+from cognite.client.data_classes import (
+    FileMetadata,
+    FileMetadataList,
+    Sequence,
+    SequenceList,
+    TimeSeries,
+    TimeSeriesList,
+)
 from cognite.client.data_classes.data_modeling import ViewApplyList
 from pydantic.version import VERSION as PYDANTIC_VERSION
 
@@ -134,9 +142,52 @@ def deploy():
 
         # TimeSeries
         timeseries = example_sdk.load_timeseries(data_model_id)
-        new_timeseries = client.time_series.upsert(timeseries, mode="replace")
-        for ts in new_timeseries:
-            typer.echo(f"Created timeseries {ts.external_id}")
+        existing = client.time_series.retrieve_multiple(
+            external_ids=timeseries.as_external_ids(), ignore_unknown_ids=True
+        )
+        new, changed, unchanged = _difference(existing, timeseries)
+        if new:
+            created = client.time_series.create(new)
+            for ts in created:
+                typer.echo(f"Created timeseries {ts.external_id}")
+        if changed:
+            client.time_series.update(changed)
+            for ts in changed:
+                typer.echo(f"Updated timeseries {ts.external_id}")
+        if unchanged:
+            typer.echo(f"{len(unchanged)} timeseries are unchanged")
+
+        # Sequences
+        sequences = example_sdk.load_sequences(data_model_id)
+        existing = client.sequences.retrieve_multiple(external_ids=sequences.as_external_ids(), ignore_unknown_ids=True)
+        new, changed, unchanged = _difference(existing, sequences)
+        if new:
+            created = client.sequences.create(new)
+            for seq in created:
+                typer.echo(f"Created sequence {seq.external_id}")
+        if changed:
+            client.sequences.update(changed)
+            for seq in changed:
+                typer.echo(f"Updated sequence {seq.external_id}")
+        if unchanged:
+            typer.echo(f"{len(unchanged)} sequences are unchanged")
+
+        # Files
+        files = example_sdk.load_files(data_model_id)
+        existing = client.files.retrieve_multiple(external_ids=files.as_external_ids(), ignore_unknown_ids=True)
+        new, changed, unchanged = _difference(existing, files)
+        if new:
+            created = client.files.create(new)
+            for file in created:
+                typer.echo(f"Created file {file.external_id}")
+        if changed:
+            client.files.update(changed)
+            for file in changed:
+                typer.echo(f"Updated file {file.external_id}")
+        if unchanged:
+            typer.echo(f"{len(unchanged)} files are unchanged")
+
+        # # Nodes
 
 
 @app.command("list", help="List all example files which are expected to be changed manually")
@@ -222,21 +273,10 @@ def _difference(
 ) -> tuple[T_DataModeling, T_DataModeling, T_DataModeling]:
     """Return new, changed, unchanged"""
     resource_cls_list = type(cdf_resources)
-    cdf_resources = {r.as_id(): r for r in cdf_resources}
-    local_resources = {r.as_id(): r for r in local_resources}
-    if resource_cls_list is ViewApplyList:
-        # The read version of views includes all properties from the interfaces, but the write version does not.
-        # This removes all properties from the write version which are inherited from an interface, so
-        # that the comparison is correct.
-        interfaces = {parent for view in local_resources.values() for parent in view.implements or []}
-        property_by_interface = {}
-        for view in cdf_resources.values():
-            if view.as_id() in interfaces:
-                property_by_interface[view.as_id()] = set(view.properties)
-        for view in cdf_resources.values():
-            for parent in view.implements or []:
-                for property_ in property_by_interface[parent]:
-                    view.properties.pop(property_, None)
+    cdf_resources = {r.as_id() if hasattr(r, "as_id") else r.external_id: r for r in cdf_resources}
+    local_resources = {r.as_id() if hasattr(r, "as_id") else r.external_id: r for r in local_resources}
+
+    _clean_cdf_resources(cdf_resources, resource_cls_list)
 
     new = resource_cls_list([])
     changed = resource_cls_list([])
@@ -249,6 +289,50 @@ def _difference(
         else:
             unchanged.append(resource)
     return new, changed, unchanged
+
+
+def _clean_cdf_resources(cdf_resources: dict, resource_cls_list: type) -> None:
+    """Custom cleaning of CDF resources to make them comparable to local resources.
+
+    Args:
+        cdf_resources:
+        resource_cls_list:
+
+    Returns:
+
+    """
+    if resource_cls_list is ViewApplyList:
+        # The read version of views includes all properties from the interfaces, but the write version does not.
+        # This removes all properties from the write version which are inherited from an interface, so
+        # that the comparison is correct.
+        interfaces = {parent for view in cdf_resources.values() for parent in view.implements or []}
+        property_by_interface = {}
+        for view in cdf_resources.values():
+            if view.as_id() in interfaces:
+                property_by_interface[view.as_id()] = set(view.properties)
+        for view in cdf_resources.values():
+            for parent in view.implements or []:
+                for property_ in property_by_interface[parent]:
+                    view.properties.pop(property_, None)
+
+    if resource_cls_list is TimeSeriesList:
+        for ts in cdf_resources.values():
+            ts: TimeSeries
+            ts.created_time = None
+            ts.last_updated_time = None
+            ts.id = None
+    if resource_cls_list is SequenceList:
+        for seq in cdf_resources.values():
+            seq: Sequence
+            seq.id = None
+            seq.created_time = None
+            seq.last_updated_time = None
+    if resource_cls_list is FileMetadataList:
+        for file in cdf_resources.values():
+            file: FileMetadata
+            file.id = None
+            file.created_time = None
+            file.last_updated_time = None
 
 
 if __name__ == "__main__":

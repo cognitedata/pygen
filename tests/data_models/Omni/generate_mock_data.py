@@ -105,6 +105,12 @@ def generate_mock_values(
                         TimeSeries(
                             external_id=ref,
                             name=ref,
+                            # These must be set to ensure comparison work in the
+                            # deploy command.
+                            is_step=False,
+                            is_string=False,
+                            metadata={},
+                            security_categories=[],
                         )
                     )
                 elif isinstance(mapped.type, dm.SequenceReference):

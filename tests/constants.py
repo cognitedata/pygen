@@ -116,19 +116,21 @@ class ExampleSDK:
 
     def load_sequences(self, data_model_id: dm.DataModelId) -> SequenceList:
         sequence_files = list(self.model_dir(data_model_id).glob("**/*sequence.yaml"))
-        return SequenceList([SequenceList.load(filepath.read_text()) for filepath in sequence_files])
+        return SequenceList([seq for filepath in sequence_files for seq in SequenceList.load(filepath.read_text())])
 
     def load_filemetadata(self, data_model_id: dm.DataModelId) -> FileMetadataList:
         filemetadata_files = list(self.model_dir(data_model_id).glob("**/*filemetadata.yaml"))
-        return FileMetadataList([FileMetadataList.load(filepath.read_text()) for filepath in filemetadata_files])
+        return FileMetadataList(
+            [f for filepath in filemetadata_files for f in FileMetadataList.load(filepath.read_text())]
+        )
 
     def load_nodes(self, data_model_id: dm.DataModelId) -> dm.NodeApplyList:
         node_files = list(self.model_dir(data_model_id).glob("**/*node.yaml"))
-        return dm.NodeApplyList([dm.NodeApply.load(filepath.read_text()) for filepath in node_files])
+        return dm.NodeApplyList([n for filepath in node_files for n in dm.NodeApplyList.load(filepath.read_text())])
 
     def load_edges(self, data_model_id: dm.DataModelId) -> dm.EdgeApplyList:
         edge_files = list(self.model_dir(data_model_id).glob("**/*edge.yaml"))
-        return dm.EdgeApplyList([dm.EdgeApply.load(filepath.read_text()) for filepath in edge_files])
+        return dm.EdgeApplyList([e for filepath in edge_files for e in dm.EdgeApplyList.load(filepath.read_text())])
 
 
 WINDMILL_SDK = ExampleSDK(

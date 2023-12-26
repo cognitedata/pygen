@@ -1,2 +1,6 @@
 - externalId: timeseries_angel
   name: timeseries_angel
+  isString: false
+  isStep: false
+  metadata: { }
+  securityCategories: [ ]
