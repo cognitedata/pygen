@@ -57,8 +57,8 @@ views:
   lastUpdatedTime: 1703513428481
   createdTime: 1703513428481
 - space: pygen-models
-  externalId: CDFExternalReferencesList
-  name: CDFExternalReferencesList
+  externalId: CDFExternalReferencesListable
+  name: CDFExternalReferencesListable
   version: '1'
   writable: true
   usedFor: node
@@ -106,8 +106,8 @@ views:
       defaultValue: null
       name: timeseries
       description: null
-  lastUpdatedTime: 1703513428481
-  createdTime: 1703513428481
+  lastUpdatedTime: 1703628843397
+  createdTime: 1703628843397
 - space: pygen-models
   externalId: Implementation1
   name: Implementation1
@@ -475,8 +475,8 @@ views:
   lastUpdatedTime: 1703513428481
   createdTime: 1703513428481
 - space: pygen-models
-  externalId: PrimitiveNullableList
-  name: PrimitiveNullableList
+  externalId: PrimitiveNullableListable
+  name: PrimitiveNullableListable
   version: '1'
   writable: true
   usedFor: node
@@ -609,8 +609,8 @@ views:
       defaultValue: null
       name: timestamp
       description: null
-  lastUpdatedTime: 1703513428481
-  createdTime: 1703513428481
+  lastUpdatedTime: 1703628843397
+  createdTime: 1703628843397
 - space: pygen-models
   externalId: PrimitiveRequired
   name: PrimitiveRequired
@@ -749,8 +749,8 @@ views:
   lastUpdatedTime: 1703513428481
   createdTime: 1703513428481
 - space: pygen-models
-  externalId: PrimitiveRequiredList
-  name: PrimitiveRequiredList
+  externalId: PrimitiveRequiredListable
+  name: PrimitiveRequiredListable
   version: '1'
   writable: true
   usedFor: node
@@ -883,8 +883,8 @@ views:
       defaultValue: null
       name: timestamp
       description: null
-  lastUpdatedTime: 1703513428481
-  createdTime: 1703513428481
+  lastUpdatedTime: 1703628843397
+  createdTime: 1703628843397
 - space: pygen-models
   externalId: PrimitiveWithDefaults
   name: PrimitiveWithDefaults
@@ -1023,5 +1023,5 @@ views:
   lastUpdatedTime: 1703513428481
   createdTime: 1703513428481
 isGlobal: false
-lastUpdatedTime: 1703578668786
-createdTime: 1703578668786
+lastUpdatedTime: 1703628844688
+createdTime: 1703628844688
