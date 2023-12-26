@@ -27,6 +27,7 @@ DATA_DIR = MODEL_DIR / "data"
 
 def main():
     Faker.seed(42)
+    faker = Faker()
     data_model = dm.DataModel[dm.View].load(MODEL_FILE.read_text())
     interfaces = {parent for view in data_model.views for parent in view.implements or []}
 
@@ -35,7 +36,7 @@ def main():
         if not view.writable or view.as_id() in interfaces:
             continue
 
-        mock_data = generate_mock_data(view, node_count=5)
+        mock_data = generate_mock_data(view, node_count=5, faker=faker)
         for field_ in fields(mock_data):
             resources = getattr(mock_data, field_.name)
             if not resources:
@@ -53,8 +54,7 @@ class Data:
     file: FileMetadataList = field(default_factory=lambda: FileMetadataList([]))
 
 
-def generate_mock_data(view: dm.View, node_count: int) -> Data:
-    faker = Faker()
+def generate_mock_data(view: dm.View, node_count: int, faker: Faker) -> Data:
     output = Data()
     node_type: Union[dm.DirectRelationReference, None] = None
     if isinstance(view.filter, dm.filters.Equals):
@@ -106,7 +106,7 @@ def generate_mock_values(
                             external_id=ref,
                             name=ref,
                             # These must be set to ensure comparison work in the
-                            # deploy command.
+                            # 'deploy' command.
                             is_step=False,
                             is_string=False,
                             metadata={},

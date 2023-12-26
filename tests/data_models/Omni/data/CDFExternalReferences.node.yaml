@@ -1,50 +1,37 @@
 - instanceType: node
   space: omni-instances
-  externalId: CDFExternalReferences:Joshua
+  externalId: CDFExternalReferences:Angel
   sources:
   - properties:
       file: null
-      sequence: sequence_danielle
-      timeseries: timeseries_angel
-    source:
-      space: pygen-models
-      externalId: CDFExternalReferences
-      version: '1'
-      type: view
-- instanceType: node
-  space: omni-instances
-  externalId: CDFExternalReferences:Jill
-  sources:
-  - properties:
-      file: null
-      sequence: sequence_jeffrey
-      timeseries: null
-    source:
-      space: pygen-models
-      externalId: CDFExternalReferences
-      version: '1'
-      type: view
-- instanceType: node
-  space: omni-instances
-  externalId: CDFExternalReferences:Patricia
-  sources:
-  - properties:
-      file: null
-      sequence: sequence_erica
-      timeseries: null
-    source:
-      space: pygen-models
-      externalId: CDFExternalReferences
-      version: '1'
-      type: view
-- instanceType: node
-  space: omni-instances
-  externalId: CDFExternalReferences:Robert
-  sources:
-  - properties:
-      file: file_christopher
       sequence: null
-      timeseries: null
+      timeseries: timeseries_danielle
+    source:
+      space: pygen-models
+      externalId: CDFExternalReferences
+      version: '1'
+      type: view
+- instanceType: node
+  space: omni-instances
+  externalId: CDFExternalReferences:Erica
+  sources:
+  - properties:
+      file: file_joshua
+      sequence: sequence_jeffrey
+      timeseries: timeseries_jill
+    source:
+      space: pygen-models
+      externalId: CDFExternalReferences
+      version: '1'
+      type: view
+- instanceType: node
+  space: omni-instances
+  externalId: CDFExternalReferences:Christopher
+  sources:
+  - properties:
+      file: null
+      sequence: null
+      timeseries: timeseries_patricia
     source:
       space: pygen-models
       externalId: CDFExternalReferences
@@ -55,9 +42,22 @@
   externalId: CDFExternalReferences:Jeffery
   sources:
   - properties:
-      file: file_anthony
-      sequence: null
+      file: file_robert
+      sequence: sequence_anthony
       timeseries: null
+    source:
+      space: pygen-models
+      externalId: CDFExternalReferences
+      version: '1'
+      type: view
+- instanceType: node
+  space: omni-instances
+  externalId: CDFExternalReferences:Amy
+  sources:
+  - properties:
+      file: file_william
+      sequence: sequence_james
+      timeseries: timeseries_debra
     source:
       space: pygen-models
       externalId: CDFExternalReferences

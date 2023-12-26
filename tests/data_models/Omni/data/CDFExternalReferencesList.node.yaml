@@ -1,29 +1,11 @@
 - instanceType: node
   space: omni-instances
-  externalId: CDFExternalReferencesList:Amy
-  sources:
-  - properties:
-      files:
-      - file_william
-      - file_anthony
-      - file_james
-      - file_debra
-      sequences: []
-      timeseries: null
-    source:
-      space: pygen-models
-      externalId: CDFExternalReferencesList
-      version: '1'
-      type: view
-- instanceType: node
-  space: omni-instances
   externalId: CDFExternalReferencesList:Helen
   sources:
   - properties:
-      files: []
+      files:
+      - file_bridget
       sequences:
-      - sequence_jeffrey
-      - sequence_bridget
       - sequence_lisa
       - sequence_adam
       timeseries:
@@ -35,21 +17,11 @@
       type: view
 - instanceType: node
   space: omni-instances
-  externalId: CDFExternalReferencesList:Teresa
+  externalId: CDFExternalReferencesList:Matthew
   sources:
   - properties:
-      files:
-      - file_matthew
-      - file_eric
-      - file_susan
-      - file_christopher
-      - file_colin
-      sequences:
-      - sequence_melanie
-      - sequence_cassandra
-      - sequence_lindsay
-      - sequence_jessica
-      - sequence_amanda
+      files: null
+      sequences: null
       timeseries: null
     source:
       space: pygen-models
@@ -58,22 +30,12 @@
       type: view
 - instanceType: node
   space: omni-instances
-  externalId: CDFExternalReferencesList:Jesse
+  externalId: CDFExternalReferencesList:Eric
   sources:
   - properties:
       files: null
-      sequences:
-      - sequence_nicholas
-      - sequence_andrea
-      - sequence_maria
-      - sequence_christine
-      - sequence_michelle
-      timeseries:
-      - timeseries_barbara
-      - timeseries_janet
-      - timeseries_brandon
-      - timeseries_jeremy
-      - timeseries_keith
+      sequences: null
+      timeseries: null
     source:
       space: pygen-models
       externalId: CDFExternalReferencesList
@@ -81,16 +43,43 @@
       type: view
 - instanceType: node
   space: omni-instances
-  externalId: CDFExternalReferencesList:Mitchell
+  externalId: CDFExternalReferencesList:Andrea
   sources:
   - properties:
       files:
-      - file_craig
-      - file_joshua
+      - file_susan
+      - file_colin
+      - file_melanie
+      - file_cassandra
+      - file_lindsay
       sequences: null
       timeseries:
-      - timeseries_cynthia
-      - timeseries_michael
+      - timeseries_jessica
+      - timeseries_amanda
+      - timeseries_teresa
+      - timeseries_nicholas
+    source:
+      space: pygen-models
+      externalId: CDFExternalReferencesList
+      version: '1'
+      type: view
+- instanceType: node
+  space: omni-instances
+  externalId: CDFExternalReferencesList:Craig
+  sources:
+  - properties:
+      files: null
+      sequences:
+      - sequence_maria
+      - sequence_christine
+      - sequence_michelle
+      - sequence_barbara
+      - sequence_janet
+      timeseries:
+      - timeseries_brandon
+      - timeseries_jeremy
+      - timeseries_keith
+      - timeseries_jesse
     source:
       space: pygen-models
       externalId: CDFExternalReferencesList
