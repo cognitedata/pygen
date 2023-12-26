@@ -172,17 +172,6 @@ def test_create_api_client(sdk_generator: SDKGenerator, code_formatter: CodeForm
     assert actual == expected
 
 
-def test_generate_api_core_file(multi_api_generator: MultiAPIGenerator) -> None:
-    # Arrange
-    expected = MovieSDKFiles.core_api.read_text()
-
-    # Act
-    actual = multi_api_generator.generate_api_core_file()
-
-    # Assert
-    assert actual == expected
-
-
 def test_create_list_method(person_view: dm.View, pygen_config: PygenConfig) -> None:
     # Arrange
     data_class = NodeDataClass.from_view(

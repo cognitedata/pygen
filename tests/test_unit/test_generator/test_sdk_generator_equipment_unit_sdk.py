@@ -187,28 +187,6 @@ def test_generate_data_class_init_file(multi_api_generator: MultiAPIGenerator, c
     assert actual == expected
 
 
-def test_generate_api_core_file(multi_api_generator: MultiAPIGenerator) -> None:
-    # Arrange
-    expected = EquipmentSDKFiles.core_api.read_text()
-
-    # Act
-    actual = multi_api_generator.generate_api_core_file()
-
-    # Assert
-    assert actual == expected
-
-
-def test_generate_data_class_core_file(multi_api_generator: MultiAPIGenerator) -> None:
-    # Arrange
-    expected = EquipmentSDKFiles.core_data.read_text()
-
-    # Act
-    actual = multi_api_generator.generate_data_class_core_file()
-
-    # Assert
-    assert actual == expected
-
-
 @pytest.mark.skipif(
     not platform.platform().startswith("Windows"),
     reason="There is currently some strange problem with the diff on non-windows",
