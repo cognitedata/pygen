@@ -149,7 +149,7 @@ class PrimitiveRequiredListApply(DomainModelApply):
             properties["boolean"] = self.boolean
 
         if self.date is not None:
-            properties["date"] = self.date.isoformat()
+            properties["date"] = [d.isoformat() for d in self.date]
 
         if self.float_32 is not None:
             properties["float32"] = self.float_32
@@ -170,7 +170,7 @@ class PrimitiveRequiredListApply(DomainModelApply):
             properties["text"] = self.text
 
         if self.timestamp is not None:
-            properties["timestamp"] = self.timestamp.isoformat(timespec="milliseconds")
+            properties["timestamp"] = [t.isoformat(timespec="milliseconds") for t in self.timestamp]
 
         if properties:
             this_node = dm.NodeApply(
