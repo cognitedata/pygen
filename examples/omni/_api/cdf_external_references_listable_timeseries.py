@@ -9,13 +9,13 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import Datapoints, DatapointsArrayList, DatapointsList, TimeSeriesList
 from cognite.client.data_classes.datapoints import Aggregate
-from omni.data_classes._cdf_external_references_list import _create_cdf_external_references_list_filter
+from omni.data_classes._cdf_external_references_listable import _create_cdf_external_references_listable_filter
 from ._core import DEFAULT_LIMIT_READ, INSTANCE_QUERY_LIMIT
 
 ColumnNames = Literal["files", "sequences", "timeseries"]
 
 
-class CDFExternalReferencesListTimeseriesQuery:
+class CDFExternalReferencesListableTimeseriesQuery:
     def __init__(
         self,
         client: CogniteClient,
@@ -40,7 +40,7 @@ class CDFExternalReferencesListTimeseriesQuery:
         limit: int | None = None,
         include_outside_points: bool = False,
     ) -> DatapointsList:
-        """`Retrieve datapoints for the `cdf_external_references_list.timeseries` timeseries.
+        """`Retrieve datapoints for the `cdf_external_references_listable.timeseries` timeseries.
 
         **Performance guide**:
             In order to retrieve millions of datapoints as efficiently as possible, here are a few guidelines:
@@ -69,7 +69,7 @@ class CDFExternalReferencesListTimeseriesQuery:
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> cdf_external_references_list_datapoints = client.cdf_external_references_list.timeseries(external_id="my_timeseries").retrieve(start="2w-ago")
+                >>> cdf_external_references_listable_datapoints = client.cdf_external_references_listable.timeseries(external_id="my_timeseries").retrieve(start="2w-ago")
         """
         external_ids = self._retrieve_timeseries_external_ids_with_extra()
         if external_ids:
@@ -99,7 +99,7 @@ class CDFExternalReferencesListTimeseriesQuery:
         limit: int | None = None,
         include_outside_points: bool = False,
     ) -> DatapointsArrayList:
-        """`Retrieve numpy arrays for the `cdf_external_references_list.timeseries` timeseries.
+        """`Retrieve numpy arrays for the `cdf_external_references_listable.timeseries` timeseries.
 
         **Performance guide**:
             In order to retrieve millions of datapoints as efficiently as possible, here are a few guidelines:
@@ -128,7 +128,7 @@ class CDFExternalReferencesListTimeseriesQuery:
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> cdf_external_references_list_datapoints = client.cdf_external_references_list.timeseries(external_id="my_timeseries").retrieve_array(start="2w-ago")
+                >>> cdf_external_references_listable_datapoints = client.cdf_external_references_listable.timeseries(external_id="my_timeseries").retrieve_array(start="2w-ago")
         """
         external_ids = self._retrieve_timeseries_external_ids_with_extra()
         if external_ids:
@@ -162,7 +162,7 @@ class CDFExternalReferencesListTimeseriesQuery:
         include_granularity_name: bool = False,
         column_names: ColumnNames | list[ColumnNames] = "timeseries",
     ) -> pd.DataFrame:
-        """`Retrieve DataFrames for the `cdf_external_references_list.timeseries` timeseries.
+        """`Retrieve DataFrames for the `cdf_external_references_listable.timeseries` timeseries.
 
         **Performance guide**:
             In order to retrieve millions of datapoints as efficiently as possible, here are a few guidelines:
@@ -196,7 +196,7 @@ class CDFExternalReferencesListTimeseriesQuery:
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> cdf_external_references_list_datapoints = client.cdf_external_references_list.timeseries(external_id="my_timeseries").retrieve_dataframe(start="2w-ago")
+                >>> cdf_external_references_listable_datapoints = client.cdf_external_references_listable.timeseries(external_id="my_timeseries").retrieve_dataframe(start="2w-ago")
         """
         external_ids = self._retrieve_timeseries_external_ids_with_extra(column_names)
         if external_ids:
@@ -239,7 +239,7 @@ class CDFExternalReferencesListTimeseriesQuery:
         include_granularity_name: bool = False,
         column_names: ColumnNames | list[ColumnNames] = "timeseries",
     ) -> pd.DataFrame:
-        """Retrieve DataFrames for the `cdf_external_references_list.timeseries` timeseries in Timezone.
+        """Retrieve DataFrames for the `cdf_external_references_listable.timeseries` timeseries in Timezone.
 
         **Performance guide**:
             In order to retrieve millions of datapoints as efficiently as possible, here are a few guidelines:
@@ -274,7 +274,7 @@ class CDFExternalReferencesListTimeseriesQuery:
                 >>> from omni import OmniClient
                 >>> from datetime import datetime, timezone
                 >>> client = OmniClient()
-                >>> cdf_external_references_list_datapoints = client.cdf_external_references_list.timeseries(
+                >>> cdf_external_references_listable_datapoints = client.cdf_external_references_listable.timeseries(
                 ...     external_id="my_timeseries").retrieve_dataframe_in_timezone(
                 ...         datetime(2023, 1, 1, tzinfo=ZoneInfo("Europe/Oslo")),
                 ...         datetime(2023, 1, 2, tzinfo=ZoneInfo("Europe/Oslo")),
@@ -352,7 +352,7 @@ class CDFExternalReferencesListTimeseriesQuery:
         return df
 
 
-class CDFExternalReferencesListTimeseriesAPI:
+class CDFExternalReferencesListableTimeseriesAPI:
     def __init__(self, client: CogniteClient, view_id: dm.ViewId):
         self._client = client
         self._view_id = view_id
@@ -363,36 +363,36 @@ class CDFExternalReferencesListTimeseriesAPI:
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> CDFExternalReferencesListTimeseriesQuery:
-        """Query timeseries `cdf_external_references_list.timeseries`
+    ) -> CDFExternalReferencesListableTimeseriesQuery:
+        """Query timeseries `cdf_external_references_listable.timeseries`
 
         Args:
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of cdf external references lists to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            limit: Maximum number of cdf external references listables to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
-            A query object that can be used to retrieve datapoins for the cdf_external_references_list.timeseries timeseries
+            A query object that can be used to retrieve datapoins for the cdf_external_references_listable.timeseries timeseries
             selected in this method.
 
         Examples:
 
-            Retrieve all data for 5 cdf_external_references_list.timeseries timeseries:
+            Retrieve all data for 5 cdf_external_references_listable.timeseries timeseries:
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> cdf_external_references_lists = client.cdf_external_references_list.timeseries(limit=5).retrieve()
+                >>> cdf_external_references_listables = client.cdf_external_references_listable.timeseries(limit=5).retrieve()
 
         """
-        filter_ = _create_cdf_external_references_list_filter(
+        filter_ = _create_cdf_external_references_listable_filter(
             self._view_id,
             external_id_prefix,
             space,
             filter,
         )
 
-        return CDFExternalReferencesListTimeseriesQuery(
+        return CDFExternalReferencesListableTimeseriesQuery(
             client=self._client,
             view_id=self._view_id,
             timeseries_limit=limit,
@@ -406,27 +406,27 @@ class CDFExternalReferencesListTimeseriesAPI:
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> TimeSeriesList:
-        """List timeseries `cdf_external_references_list.timeseries`
+        """List timeseries `cdf_external_references_listable.timeseries`
 
         Args:
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of cdf external references lists to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            limit: Maximum number of cdf external references listables to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
-            List of Timeseries cdf_external_references_list.timeseries.
+            List of Timeseries cdf_external_references_listable.timeseries.
 
         Examples:
 
-            List cdf_external_references_list.timeseries and limit to 5:
+            List cdf_external_references_listable.timeseries and limit to 5:
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> cdf_external_references_lists = client.cdf_external_references_list.timeseries.list(limit=5)
+                >>> cdf_external_references_listables = client.cdf_external_references_listable.timeseries.list(limit=5)
 
         """
-        filter_ = _create_cdf_external_references_list_filter(
+        filter_ = _create_cdf_external_references_listable_filter(
             self._view_id,
             external_id_prefix,
             space,

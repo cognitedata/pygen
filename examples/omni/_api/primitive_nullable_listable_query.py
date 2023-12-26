@@ -7,13 +7,13 @@ from cognite.client import data_modeling as dm, CogniteClient
 
 from omni.data_classes import (
     DomainModelApply,
-    PrimitiveRequiredList,
-    PrimitiveRequiredListApply,
+    PrimitiveNullableListable,
+    PrimitiveNullableListableApply,
 )
 from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
 
 
-class PrimitiveRequiredListQueryAPI(QueryAPI[T_DomainModelList]):
+class PrimitiveNullableListableQueryAPI(QueryAPI[T_DomainModelList]):
     def __init__(
         self,
         client: CogniteClient,
@@ -26,15 +26,15 @@ class PrimitiveRequiredListQueryAPI(QueryAPI[T_DomainModelList]):
 
         self._builder.append(
             QueryStep(
-                name=self._builder.next_name("primitive_required_list"),
+                name=self._builder.next_name("primitive_nullable_listable"),
                 expression=dm.query.NodeResultSetExpression(
                     from_=self._builder[-1].name if self._builder else None,
                     filter=filter_,
                 ),
                 select=dm.query.Select(
-                    [dm.query.SourceSelector(self._view_by_write_class[PrimitiveRequiredListApply], ["*"])]
+                    [dm.query.SourceSelector(self._view_by_write_class[PrimitiveNullableListableApply], ["*"])]
                 ),
-                result_cls=PrimitiveRequiredList,
+                result_cls=PrimitiveNullableListable,
                 max_retrieve_limit=limit,
             )
         )

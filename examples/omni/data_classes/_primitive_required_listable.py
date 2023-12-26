@@ -18,21 +18,21 @@ from ._core import (
 
 
 __all__ = [
-    "PrimitiveRequiredList",
-    "PrimitiveRequiredListApply",
-    "PrimitiveRequiredListList",
-    "PrimitiveRequiredListApplyList",
-    "PrimitiveRequiredListFields",
-    "PrimitiveRequiredListTextFields",
+    "PrimitiveRequiredListable",
+    "PrimitiveRequiredListableApply",
+    "PrimitiveRequiredListableList",
+    "PrimitiveRequiredListableApplyList",
+    "PrimitiveRequiredListableFields",
+    "PrimitiveRequiredListableTextFields",
 ]
 
 
-PrimitiveRequiredListTextFields = Literal["text"]
-PrimitiveRequiredListFields = Literal[
+PrimitiveRequiredListableTextFields = Literal["text"]
+PrimitiveRequiredListableFields = Literal[
     "boolean", "date", "float_32", "float_64", "int_32", "int_64", "json_", "text", "timestamp"
 ]
 
-_PRIMITIVEREQUIREDLIST_PROPERTIES_BY_FIELD = {
+_PRIMITIVEREQUIREDLISTABLE_PROPERTIES_BY_FIELD = {
     "boolean": "boolean",
     "date": "date",
     "float_32": "float32",
@@ -45,14 +45,14 @@ _PRIMITIVEREQUIREDLIST_PROPERTIES_BY_FIELD = {
 }
 
 
-class PrimitiveRequiredList(DomainModel):
-    """This represents the reading version of primitive required list.
+class PrimitiveRequiredListable(DomainModel):
+    """This represents the reading version of primitive required listable.
 
     It is used to when data is retrieved from CDF.
 
     Args:
         space: The space where the node is located.
-        external_id: The external id of the primitive required list.
+        external_id: The external id of the primitive required listable.
         boolean: The boolean field.
         date: The date field.
         float_32: The float 32 field.
@@ -62,10 +62,10 @@ class PrimitiveRequiredList(DomainModel):
         json_: The json field.
         text: The text field.
         timestamp: The timestamp field.
-        created_time: The created time of the primitive required list node.
-        last_updated_time: The last updated time of the primitive required list node.
-        deleted_time: If present, the deleted time of the primitive required list node.
-        version: The version of the primitive required list node.
+        created_time: The created time of the primitive required listable node.
+        last_updated_time: The last updated time of the primitive required listable node.
+        deleted_time: If present, the deleted time of the primitive required listable node.
+        version: The version of the primitive required listable node.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -79,9 +79,9 @@ class PrimitiveRequiredList(DomainModel):
     text: Optional[list[str]] = None
     timestamp: Optional[list[datetime.datetime]] = None
 
-    def as_apply(self) -> PrimitiveRequiredListApply:
-        """Convert this read version of primitive required list to the writing version."""
-        return PrimitiveRequiredListApply(
+    def as_apply(self) -> PrimitiveRequiredListableApply:
+        """Convert this read version of primitive required listable to the writing version."""
+        return PrimitiveRequiredListableApply(
             space=self.space,
             external_id=self.external_id,
             boolean=self.boolean,
@@ -96,14 +96,14 @@ class PrimitiveRequiredList(DomainModel):
         )
 
 
-class PrimitiveRequiredListApply(DomainModelApply):
-    """This represents the writing version of primitive required list.
+class PrimitiveRequiredListableApply(DomainModelApply):
+    """This represents the writing version of primitive required listable.
 
     It is used to when data is sent to CDF.
 
     Args:
         space: The space where the node is located.
-        external_id: The external id of the primitive required list.
+        external_id: The external id of the primitive required listable.
         boolean: The boolean field.
         date: The date field.
         float_32: The float 32 field.
@@ -113,7 +113,7 @@ class PrimitiveRequiredListApply(DomainModelApply):
         json_: The json field.
         text: The text field.
         timestamp: The timestamp field.
-        existing_version: Fail the ingestion request if the primitive required list version is greater than or equal to this value.
+        existing_version: Fail the ingestion request if the primitive required listable version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
@@ -140,7 +140,7 @@ class PrimitiveRequiredListApply(DomainModelApply):
             return resources
 
         write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
-            "pygen-models", "PrimitiveRequiredList", "1"
+            "pygen-models", "PrimitiveRequiredListable", "1"
         )
 
         properties = {}
@@ -190,23 +190,23 @@ class PrimitiveRequiredListApply(DomainModelApply):
         return resources
 
 
-class PrimitiveRequiredListList(DomainModelList[PrimitiveRequiredList]):
-    """List of primitive required lists in the read version."""
+class PrimitiveRequiredListableList(DomainModelList[PrimitiveRequiredListable]):
+    """List of primitive required listables in the read version."""
 
-    _INSTANCE = PrimitiveRequiredList
+    _INSTANCE = PrimitiveRequiredListable
 
-    def as_apply(self) -> PrimitiveRequiredListApplyList:
-        """Convert these read versions of primitive required list to the writing versions."""
-        return PrimitiveRequiredListApplyList([node.as_apply() for node in self.data])
-
-
-class PrimitiveRequiredListApplyList(DomainModelApplyList[PrimitiveRequiredListApply]):
-    """List of primitive required lists in the writing version."""
-
-    _INSTANCE = PrimitiveRequiredListApply
+    def as_apply(self) -> PrimitiveRequiredListableApplyList:
+        """Convert these read versions of primitive required listable to the writing versions."""
+        return PrimitiveRequiredListableApplyList([node.as_apply() for node in self.data])
 
 
-def _create_primitive_required_list_filter(
+class PrimitiveRequiredListableApplyList(DomainModelApplyList[PrimitiveRequiredListableApply]):
+    """List of primitive required listables in the writing version."""
+
+    _INSTANCE = PrimitiveRequiredListableApply
+
+
+def _create_primitive_required_listable_filter(
     view_id: dm.ViewId,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,

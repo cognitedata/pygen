@@ -6,15 +6,15 @@ from cognite.client import ClientConfig, CogniteClient, data_modeling as dm
 from cognite.client.credentials import OAuthClientCredentials
 
 from ._api.cdf_external_references import CDFExternalReferencesAPI
-from ._api.cdf_external_references_list import CDFExternalReferencesListAPI
+from ._api.cdf_external_references_listable import CDFExternalReferencesListableAPI
 from ._api.implementation_1 import Implementation1API
 from ._api.implementation_1_non_writeable import Implementation1NonWriteableAPI
 from ._api.implementation_2 import Implementation2API
 from ._api.main_interface import MainInterfaceAPI
 from ._api.primitive_nullable import PrimitiveNullableAPI
-from ._api.primitive_nullable_list import PrimitiveNullableListAPI
+from ._api.primitive_nullable_listable import PrimitiveNullableListableAPI
 from ._api.primitive_required import PrimitiveRequiredAPI
-from ._api.primitive_required_list import PrimitiveRequiredListAPI
+from ._api.primitive_required_listable import PrimitiveRequiredListableAPI
 from ._api.primitive_with_defaults import PrimitiveWithDefaultsAPI
 from ._api.sub_interface import SubInterfaceAPI
 from . import data_classes
@@ -47,7 +47,9 @@ class OmniClient:
 
         view_by_write_class = {
             data_classes.CDFExternalReferencesApply: dm.ViewId("pygen-models", "CDFExternalReferences", "1"),
-            data_classes.CDFExternalReferencesListApply: dm.ViewId("pygen-models", "CDFExternalReferencesList", "1"),
+            data_classes.CDFExternalReferencesListableApply: dm.ViewId(
+                "pygen-models", "CDFExternalReferencesListable", "1"
+            ),
             data_classes.Implementation1Apply: dm.ViewId("pygen-models", "Implementation1", "1"),
             data_classes.Implementation1NonWriteableApply: dm.ViewId(
                 "pygen-models", "Implementation1NonWriteable", "1"
@@ -55,23 +57,23 @@ class OmniClient:
             data_classes.Implementation2Apply: dm.ViewId("pygen-models", "Implementation2", "1"),
             data_classes.MainInterfaceApply: dm.ViewId("pygen-models", "MainInterface", "1"),
             data_classes.PrimitiveNullableApply: dm.ViewId("pygen-models", "PrimitiveNullable", "1"),
-            data_classes.PrimitiveNullableListApply: dm.ViewId("pygen-models", "PrimitiveNullableList", "1"),
+            data_classes.PrimitiveNullableListableApply: dm.ViewId("pygen-models", "PrimitiveNullableListable", "1"),
             data_classes.PrimitiveRequiredApply: dm.ViewId("pygen-models", "PrimitiveRequired", "1"),
-            data_classes.PrimitiveRequiredListApply: dm.ViewId("pygen-models", "PrimitiveRequiredList", "1"),
+            data_classes.PrimitiveRequiredListableApply: dm.ViewId("pygen-models", "PrimitiveRequiredListable", "1"),
             data_classes.PrimitiveWithDefaultsApply: dm.ViewId("pygen-models", "PrimitiveWithDefaults", "1"),
             data_classes.SubInterfaceApply: dm.ViewId("pygen-models", "SubInterface", "1"),
         }
 
         self.cdf_external_references = CDFExternalReferencesAPI(client, view_by_write_class)
-        self.cdf_external_references_list = CDFExternalReferencesListAPI(client, view_by_write_class)
+        self.cdf_external_references_listable = CDFExternalReferencesListableAPI(client, view_by_write_class)
         self.implementation_1 = Implementation1API(client, view_by_write_class)
         self.implementation_1_non_writeable = Implementation1NonWriteableAPI(client, view_by_write_class)
         self.implementation_2 = Implementation2API(client, view_by_write_class)
         self.main_interface = MainInterfaceAPI(client, view_by_write_class)
         self.primitive_nullable = PrimitiveNullableAPI(client, view_by_write_class)
-        self.primitive_nullable_list = PrimitiveNullableListAPI(client, view_by_write_class)
+        self.primitive_nullable_listable = PrimitiveNullableListableAPI(client, view_by_write_class)
         self.primitive_required = PrimitiveRequiredAPI(client, view_by_write_class)
-        self.primitive_required_list = PrimitiveRequiredListAPI(client, view_by_write_class)
+        self.primitive_required_listable = PrimitiveRequiredListableAPI(client, view_by_write_class)
         self.primitive_with_defaults = PrimitiveWithDefaultsAPI(client, view_by_write_class)
         self.sub_interface = SubInterfaceAPI(client, view_by_write_class)
 

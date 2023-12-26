@@ -12,16 +12,16 @@ from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
-    PrimitiveRequiredList,
-    PrimitiveRequiredListApply,
-    PrimitiveRequiredListFields,
-    PrimitiveRequiredListList,
-    PrimitiveRequiredListApplyList,
-    PrimitiveRequiredListTextFields,
+    PrimitiveRequiredListable,
+    PrimitiveRequiredListableApply,
+    PrimitiveRequiredListableFields,
+    PrimitiveRequiredListableList,
+    PrimitiveRequiredListableApplyList,
+    PrimitiveRequiredListableTextFields,
 )
-from omni.data_classes._primitive_required_list import (
-    _PRIMITIVEREQUIREDLIST_PROPERTIES_BY_FIELD,
-    _create_primitive_required_list_filter,
+from omni.data_classes._primitive_required_listable import (
+    _PRIMITIVEREQUIREDLISTABLE_PROPERTIES_BY_FIELD,
+    _create_primitive_required_listable_filter,
 )
 from ._core import (
     DEFAULT_LIMIT_READ,
@@ -32,19 +32,21 @@ from ._core import (
     QueryStep,
     QueryBuilder,
 )
-from .primitive_required_list_query import PrimitiveRequiredListQueryAPI
+from .primitive_required_listable_query import PrimitiveRequiredListableQueryAPI
 
 
-class PrimitiveRequiredListAPI(NodeAPI[PrimitiveRequiredList, PrimitiveRequiredListApply, PrimitiveRequiredListList]):
+class PrimitiveRequiredListableAPI(
+    NodeAPI[PrimitiveRequiredListable, PrimitiveRequiredListableApply, PrimitiveRequiredListableList]
+):
     def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
-        view_id = view_by_write_class[PrimitiveRequiredListApply]
+        view_id = view_by_write_class[PrimitiveRequiredListableApply]
         super().__init__(
             client=client,
             sources=view_id,
-            class_type=PrimitiveRequiredList,
-            class_apply_type=PrimitiveRequiredListApply,
-            class_list=PrimitiveRequiredListList,
-            class_apply_list=PrimitiveRequiredListApplyList,
+            class_type=PrimitiveRequiredListable,
+            class_apply_type=PrimitiveRequiredListableApply,
+            class_list=PrimitiveRequiredListableList,
+            class_apply_list=PrimitiveRequiredListableApplyList,
             view_by_write_class=view_by_write_class,
         )
         self._view_id = view_id
@@ -55,38 +57,38 @@ class PrimitiveRequiredListAPI(NodeAPI[PrimitiveRequiredList, PrimitiveRequiredL
         space: str | list[str] | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
         filter: dm.Filter | None = None,
-    ) -> PrimitiveRequiredListQueryAPI[PrimitiveRequiredListList]:
-        """Query starting at primitive required lists.
+    ) -> PrimitiveRequiredListableQueryAPI[PrimitiveRequiredListableList]:
+        """Query starting at primitive required listables.
 
         Args:
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of primitive required lists to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            limit: Maximum number of primitive required listables to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
-            A query API for primitive required lists.
+            A query API for primitive required listables.
 
         """
         has_data = dm.filters.HasData(views=[self._view_id])
-        filter_ = _create_primitive_required_list_filter(
+        filter_ = _create_primitive_required_listable_filter(
             self._view_id,
             external_id_prefix,
             space,
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
-        builder = QueryBuilder(PrimitiveRequiredListList)
-        return PrimitiveRequiredListQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
+        builder = QueryBuilder(PrimitiveRequiredListableList)
+        return PrimitiveRequiredListableQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
 
     def apply(
         self,
-        primitive_required_list: PrimitiveRequiredListApply | Sequence[PrimitiveRequiredListApply],
+        primitive_required_listable: PrimitiveRequiredListableApply | Sequence[PrimitiveRequiredListableApply],
         replace: bool = False,
     ) -> ResourcesApplyResult:
-        """Add or update (upsert) primitive required lists.
+        """Add or update (upsert) primitive required listables.
 
         Args:
-            primitive_required_list: Primitive required list or sequence of primitive required lists to upsert.
+            primitive_required_listable: Primitive required listable or sequence of primitive required listables to upsert.
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
         Returns:
@@ -94,68 +96,68 @@ class PrimitiveRequiredListAPI(NodeAPI[PrimitiveRequiredList, PrimitiveRequiredL
 
         Examples:
 
-            Create a new primitive_required_list:
+            Create a new primitive_required_listable:
 
                 >>> from omni import OmniClient
-                >>> from omni.data_classes import PrimitiveRequiredListApply
+                >>> from omni.data_classes import PrimitiveRequiredListableApply
                 >>> client = OmniClient()
-                >>> primitive_required_list = PrimitiveRequiredListApply(external_id="my_primitive_required_list", ...)
-                >>> result = client.primitive_required_list.apply(primitive_required_list)
+                >>> primitive_required_listable = PrimitiveRequiredListableApply(external_id="my_primitive_required_listable", ...)
+                >>> result = client.primitive_required_listable.apply(primitive_required_listable)
 
         """
-        return self._apply(primitive_required_list, replace)
+        return self._apply(primitive_required_listable, replace)
 
     def delete(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
     ) -> dm.InstancesDeleteResult:
-        """Delete one or more primitive required list.
+        """Delete one or more primitive required listable.
 
         Args:
-            external_id: External id of the primitive required list to delete.
-            space: The space where all the primitive required list are located.
+            external_id: External id of the primitive required listable to delete.
+            space: The space where all the primitive required listable are located.
 
         Returns:
             The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
 
         Examples:
 
-            Delete primitive_required_list by id:
+            Delete primitive_required_listable by id:
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> client.primitive_required_list.delete("my_primitive_required_list")
+                >>> client.primitive_required_listable.delete("my_primitive_required_listable")
         """
         return self._delete(external_id, space)
 
     @overload
-    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> PrimitiveRequiredList | None:
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> PrimitiveRequiredListable | None:
         ...
 
     @overload
     def retrieve(
         self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> PrimitiveRequiredListList:
+    ) -> PrimitiveRequiredListableList:
         ...
 
     def retrieve(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> PrimitiveRequiredList | PrimitiveRequiredListList | None:
-        """Retrieve one or more primitive required lists by id(s).
+    ) -> PrimitiveRequiredListable | PrimitiveRequiredListableList | None:
+        """Retrieve one or more primitive required listables by id(s).
 
         Args:
-            external_id: External id or list of external ids of the primitive required lists.
-            space: The space where all the primitive required lists are located.
+            external_id: External id or list of external ids of the primitive required listables.
+            space: The space where all the primitive required listables are located.
 
         Returns:
-            The requested primitive required lists.
+            The requested primitive required listables.
 
         Examples:
 
-            Retrieve primitive_required_list by id:
+            Retrieve primitive_required_listable by id:
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> primitive_required_list = client.primitive_required_list.retrieve("my_primitive_required_list")
+                >>> primitive_required_listable = client.primitive_required_listable.retrieve("my_primitive_required_listable")
 
         """
         return self._retrieve(external_id, space)
@@ -163,42 +165,42 @@ class PrimitiveRequiredListAPI(NodeAPI[PrimitiveRequiredList, PrimitiveRequiredL
     def search(
         self,
         query: str,
-        properties: PrimitiveRequiredListTextFields | Sequence[PrimitiveRequiredListTextFields] | None = None,
+        properties: PrimitiveRequiredListableTextFields | Sequence[PrimitiveRequiredListableTextFields] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> PrimitiveRequiredListList:
-        """Search primitive required lists
+    ) -> PrimitiveRequiredListableList:
+        """Search primitive required listables
 
         Args:
             query: The search query,
             properties: The property to search, if nothing is passed all text fields will be searched.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of primitive required lists to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            limit: Maximum number of primitive required listables to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
-            Search results primitive required lists matching the query.
+            Search results primitive required listables matching the query.
 
         Examples:
 
-           Search for 'my_primitive_required_list' in all text properties:
+           Search for 'my_primitive_required_listable' in all text properties:
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> primitive_required_lists = client.primitive_required_list.search('my_primitive_required_list')
+                >>> primitive_required_listables = client.primitive_required_listable.search('my_primitive_required_listable')
 
         """
-        filter_ = _create_primitive_required_list_filter(
+        filter_ = _create_primitive_required_listable_filter(
             self._view_id,
             external_id_prefix,
             space,
             filter,
         )
         return self._search(
-            self._view_id, query, _PRIMITIVEREQUIREDLIST_PROPERTIES_BY_FIELD, properties, filter_, limit
+            self._view_id, query, _PRIMITIVEREQUIREDLISTABLE_PROPERTIES_BY_FIELD, properties, filter_, limit
         )
 
     @overload
@@ -208,10 +210,12 @@ class PrimitiveRequiredListAPI(NodeAPI[PrimitiveRequiredList, PrimitiveRequiredL
         | dm.aggregations.MetricAggregation
         | Sequence[Aggregations]
         | Sequence[dm.aggregations.MetricAggregation],
-        property: PrimitiveRequiredListFields | Sequence[PrimitiveRequiredListFields] | None = None,
+        property: PrimitiveRequiredListableFields | Sequence[PrimitiveRequiredListableFields] | None = None,
         group_by: None = None,
         query: str | None = None,
-        search_properties: PrimitiveRequiredListTextFields | Sequence[PrimitiveRequiredListTextFields] | None = None,
+        search_properties: PrimitiveRequiredListableTextFields
+        | Sequence[PrimitiveRequiredListableTextFields]
+        | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -226,10 +230,12 @@ class PrimitiveRequiredListAPI(NodeAPI[PrimitiveRequiredList, PrimitiveRequiredL
         | dm.aggregations.MetricAggregation
         | Sequence[Aggregations]
         | Sequence[dm.aggregations.MetricAggregation],
-        property: PrimitiveRequiredListFields | Sequence[PrimitiveRequiredListFields] | None = None,
-        group_by: PrimitiveRequiredListFields | Sequence[PrimitiveRequiredListFields] = None,
+        property: PrimitiveRequiredListableFields | Sequence[PrimitiveRequiredListableFields] | None = None,
+        group_by: PrimitiveRequiredListableFields | Sequence[PrimitiveRequiredListableFields] = None,
         query: str | None = None,
-        search_properties: PrimitiveRequiredListTextFields | Sequence[PrimitiveRequiredListTextFields] | None = None,
+        search_properties: PrimitiveRequiredListableTextFields
+        | Sequence[PrimitiveRequiredListableTextFields]
+        | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -243,16 +249,18 @@ class PrimitiveRequiredListAPI(NodeAPI[PrimitiveRequiredList, PrimitiveRequiredL
         | dm.aggregations.MetricAggregation
         | Sequence[Aggregations]
         | Sequence[dm.aggregations.MetricAggregation],
-        property: PrimitiveRequiredListFields | Sequence[PrimitiveRequiredListFields] | None = None,
-        group_by: PrimitiveRequiredListFields | Sequence[PrimitiveRequiredListFields] | None = None,
+        property: PrimitiveRequiredListableFields | Sequence[PrimitiveRequiredListableFields] | None = None,
+        group_by: PrimitiveRequiredListableFields | Sequence[PrimitiveRequiredListableFields] | None = None,
         query: str | None = None,
-        search_property: PrimitiveRequiredListTextFields | Sequence[PrimitiveRequiredListTextFields] | None = None,
+        search_property: PrimitiveRequiredListableTextFields
+        | Sequence[PrimitiveRequiredListableTextFields]
+        | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
-        """Aggregate data across primitive required lists
+        """Aggregate data across primitive required listables
 
         Args:
             aggregate: The aggregation to perform.
@@ -262,7 +270,7 @@ class PrimitiveRequiredListAPI(NodeAPI[PrimitiveRequiredList, PrimitiveRequiredL
             search_property: The text field to search in.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of primitive required lists to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            limit: Maximum number of primitive required listables to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
@@ -270,15 +278,15 @@ class PrimitiveRequiredListAPI(NodeAPI[PrimitiveRequiredList, PrimitiveRequiredL
 
         Examples:
 
-            Count primitive required lists in space `my_space`:
+            Count primitive required listables in space `my_space`:
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> result = client.primitive_required_list.aggregate("count", space="my_space")
+                >>> result = client.primitive_required_listable.aggregate("count", space="my_space")
 
         """
 
-        filter_ = _create_primitive_required_list_filter(
+        filter_ = _create_primitive_required_listable_filter(
             self._view_id,
             external_id_prefix,
             space,
@@ -287,7 +295,7 @@ class PrimitiveRequiredListAPI(NodeAPI[PrimitiveRequiredList, PrimitiveRequiredL
         return self._aggregate(
             self._view_id,
             aggregate,
-            _PRIMITIVEREQUIREDLIST_PROPERTIES_BY_FIELD,
+            _PRIMITIVEREQUIREDLISTABLE_PROPERTIES_BY_FIELD,
             property,
             group_by,
             query,
@@ -298,16 +306,18 @@ class PrimitiveRequiredListAPI(NodeAPI[PrimitiveRequiredList, PrimitiveRequiredL
 
     def histogram(
         self,
-        property: PrimitiveRequiredListFields,
+        property: PrimitiveRequiredListableFields,
         interval: float,
         query: str | None = None,
-        search_property: PrimitiveRequiredListTextFields | Sequence[PrimitiveRequiredListTextFields] | None = None,
+        search_property: PrimitiveRequiredListableTextFields
+        | Sequence[PrimitiveRequiredListableTextFields]
+        | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
-        """Produces histograms for primitive required lists
+        """Produces histograms for primitive required listables
 
         Args:
             property: The property to use as the value in the histogram.
@@ -316,14 +326,14 @@ class PrimitiveRequiredListAPI(NodeAPI[PrimitiveRequiredList, PrimitiveRequiredL
             search_property: The text field to search in.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of primitive required lists to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            limit: Maximum number of primitive required listables to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
             Bucketed histogram results.
 
         """
-        filter_ = _create_primitive_required_list_filter(
+        filter_ = _create_primitive_required_listable_filter(
             self._view_id,
             external_id_prefix,
             space,
@@ -333,7 +343,7 @@ class PrimitiveRequiredListAPI(NodeAPI[PrimitiveRequiredList, PrimitiveRequiredL
             self._view_id,
             property,
             interval,
-            _PRIMITIVEREQUIREDLIST_PROPERTIES_BY_FIELD,
+            _PRIMITIVEREQUIREDLISTABLE_PROPERTIES_BY_FIELD,
             query,
             search_property,
             limit,
@@ -346,28 +356,28 @@ class PrimitiveRequiredListAPI(NodeAPI[PrimitiveRequiredList, PrimitiveRequiredL
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-    ) -> PrimitiveRequiredListList:
-        """List/filter primitive required lists
+    ) -> PrimitiveRequiredListableList:
+        """List/filter primitive required listables
 
         Args:
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of primitive required lists to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            limit: Maximum number of primitive required listables to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
 
         Returns:
-            List of requested primitive required lists
+            List of requested primitive required listables
 
         Examples:
 
-            List primitive required lists and limit to 5:
+            List primitive required listables and limit to 5:
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> primitive_required_lists = client.primitive_required_list.list(limit=5)
+                >>> primitive_required_listables = client.primitive_required_listable.list(limit=5)
 
         """
-        filter_ = _create_primitive_required_list_filter(
+        filter_ = _create_primitive_required_listable_filter(
             self._view_id,
             external_id_prefix,
             space,

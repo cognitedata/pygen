@@ -18,21 +18,21 @@ from ._core import (
 
 
 __all__ = [
-    "PrimitiveNullableList",
-    "PrimitiveNullableListApply",
-    "PrimitiveNullableListList",
-    "PrimitiveNullableListApplyList",
-    "PrimitiveNullableListFields",
-    "PrimitiveNullableListTextFields",
+    "PrimitiveNullableListable",
+    "PrimitiveNullableListableApply",
+    "PrimitiveNullableListableList",
+    "PrimitiveNullableListableApplyList",
+    "PrimitiveNullableListableFields",
+    "PrimitiveNullableListableTextFields",
 ]
 
 
-PrimitiveNullableListTextFields = Literal["text"]
-PrimitiveNullableListFields = Literal[
+PrimitiveNullableListableTextFields = Literal["text"]
+PrimitiveNullableListableFields = Literal[
     "boolean", "date", "float_32", "float_64", "int_32", "int_64", "json_", "text", "timestamp"
 ]
 
-_PRIMITIVENULLABLELIST_PROPERTIES_BY_FIELD = {
+_PRIMITIVENULLABLELISTABLE_PROPERTIES_BY_FIELD = {
     "boolean": "boolean",
     "date": "date",
     "float_32": "float32",
@@ -45,14 +45,14 @@ _PRIMITIVENULLABLELIST_PROPERTIES_BY_FIELD = {
 }
 
 
-class PrimitiveNullableList(DomainModel):
-    """This represents the reading version of primitive nullable list.
+class PrimitiveNullableListable(DomainModel):
+    """This represents the reading version of primitive nullable listable.
 
     It is used to when data is retrieved from CDF.
 
     Args:
         space: The space where the node is located.
-        external_id: The external id of the primitive nullable list.
+        external_id: The external id of the primitive nullable listable.
         boolean: The boolean field.
         date: The date field.
         float_32: The float 32 field.
@@ -62,10 +62,10 @@ class PrimitiveNullableList(DomainModel):
         json_: The json field.
         text: The text field.
         timestamp: The timestamp field.
-        created_time: The created time of the primitive nullable list node.
-        last_updated_time: The last updated time of the primitive nullable list node.
-        deleted_time: If present, the deleted time of the primitive nullable list node.
-        version: The version of the primitive nullable list node.
+        created_time: The created time of the primitive nullable listable node.
+        last_updated_time: The last updated time of the primitive nullable listable node.
+        deleted_time: If present, the deleted time of the primitive nullable listable node.
+        version: The version of the primitive nullable listable node.
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
@@ -79,9 +79,9 @@ class PrimitiveNullableList(DomainModel):
     text: Optional[list[str]] = None
     timestamp: Optional[list[datetime.datetime]] = None
 
-    def as_apply(self) -> PrimitiveNullableListApply:
-        """Convert this read version of primitive nullable list to the writing version."""
-        return PrimitiveNullableListApply(
+    def as_apply(self) -> PrimitiveNullableListableApply:
+        """Convert this read version of primitive nullable listable to the writing version."""
+        return PrimitiveNullableListableApply(
             space=self.space,
             external_id=self.external_id,
             boolean=self.boolean,
@@ -96,14 +96,14 @@ class PrimitiveNullableList(DomainModel):
         )
 
 
-class PrimitiveNullableListApply(DomainModelApply):
-    """This represents the writing version of primitive nullable list.
+class PrimitiveNullableListableApply(DomainModelApply):
+    """This represents the writing version of primitive nullable listable.
 
     It is used to when data is sent to CDF.
 
     Args:
         space: The space where the node is located.
-        external_id: The external id of the primitive nullable list.
+        external_id: The external id of the primitive nullable listable.
         boolean: The boolean field.
         date: The date field.
         float_32: The float 32 field.
@@ -113,7 +113,7 @@ class PrimitiveNullableListApply(DomainModelApply):
         json_: The json field.
         text: The text field.
         timestamp: The timestamp field.
-        existing_version: Fail the ingestion request if the primitive nullable list version is greater than or equal to this value.
+        existing_version: Fail the ingestion request if the primitive nullable listable version is greater than or equal to this value.
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
@@ -140,7 +140,7 @@ class PrimitiveNullableListApply(DomainModelApply):
             return resources
 
         write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
-            "pygen-models", "PrimitiveNullableList", "1"
+            "pygen-models", "PrimitiveNullableListable", "1"
         )
 
         properties = {}
@@ -190,23 +190,23 @@ class PrimitiveNullableListApply(DomainModelApply):
         return resources
 
 
-class PrimitiveNullableListList(DomainModelList[PrimitiveNullableList]):
-    """List of primitive nullable lists in the read version."""
+class PrimitiveNullableListableList(DomainModelList[PrimitiveNullableListable]):
+    """List of primitive nullable listables in the read version."""
 
-    _INSTANCE = PrimitiveNullableList
+    _INSTANCE = PrimitiveNullableListable
 
-    def as_apply(self) -> PrimitiveNullableListApplyList:
-        """Convert these read versions of primitive nullable list to the writing versions."""
-        return PrimitiveNullableListApplyList([node.as_apply() for node in self.data])
-
-
-class PrimitiveNullableListApplyList(DomainModelApplyList[PrimitiveNullableListApply]):
-    """List of primitive nullable lists in the writing version."""
-
-    _INSTANCE = PrimitiveNullableListApply
+    def as_apply(self) -> PrimitiveNullableListableApplyList:
+        """Convert these read versions of primitive nullable listable to the writing versions."""
+        return PrimitiveNullableListableApplyList([node.as_apply() for node in self.data])
 
 
-def _create_primitive_nullable_list_filter(
+class PrimitiveNullableListableApplyList(DomainModelApplyList[PrimitiveNullableListableApply]):
+    """List of primitive nullable listables in the writing version."""
+
+    _INSTANCE = PrimitiveNullableListableApply
+
+
+def _create_primitive_nullable_listable_filter(
     view_id: dm.ViewId,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,

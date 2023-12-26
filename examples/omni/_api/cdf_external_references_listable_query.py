@@ -7,13 +7,13 @@ from cognite.client import data_modeling as dm, CogniteClient
 
 from omni.data_classes import (
     DomainModelApply,
-    PrimitiveNullableList,
-    PrimitiveNullableListApply,
+    CDFExternalReferencesListable,
+    CDFExternalReferencesListableApply,
 )
 from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
 
 
-class PrimitiveNullableListQueryAPI(QueryAPI[T_DomainModelList]):
+class CDFExternalReferencesListableQueryAPI(QueryAPI[T_DomainModelList]):
     def __init__(
         self,
         client: CogniteClient,
@@ -26,15 +26,15 @@ class PrimitiveNullableListQueryAPI(QueryAPI[T_DomainModelList]):
 
         self._builder.append(
             QueryStep(
-                name=self._builder.next_name("primitive_nullable_list"),
+                name=self._builder.next_name("cdf_external_references_listable"),
                 expression=dm.query.NodeResultSetExpression(
                     from_=self._builder[-1].name if self._builder else None,
                     filter=filter_,
                 ),
                 select=dm.query.Select(
-                    [dm.query.SourceSelector(self._view_by_write_class[PrimitiveNullableListApply], ["*"])]
+                    [dm.query.SourceSelector(self._view_by_write_class[CDFExternalReferencesListableApply], ["*"])]
                 ),
-                result_cls=PrimitiveNullableList,
+                result_cls=CDFExternalReferencesListable,
                 max_retrieve_limit=limit,
             )
         )
