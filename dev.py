@@ -3,6 +3,7 @@ This is a small CLI used for development of Pygen.
 
 """
 import re
+from collections import defaultdict
 from typing import TypeVar
 
 import toml
@@ -104,6 +105,7 @@ def download():
             for view in latest.views:
                 nodes.extend(client.data_modeling.instances.list("node", filter=is_space, limit=100, sources=[view]))
             nodes = dm.NodeList(sorted(nodes, key=lambda n: n.external_id))
+            nodes = _remove_duplicate_nodes(nodes)
             file_path = example_sdk.read_node_path(data_model_id)
             file_path.write_text(nodes.dump_yaml())
             typer.echo(f"Downloaded {len(nodes)} nodes to {file_path.relative_to(REPO_ROOT)}")
@@ -369,6 +371,31 @@ def _clean_cdf_resources(cdf_resources: dict, resource_cls_list: type) -> None:
             file.uploaded = None
             if not file.metadata:
                 file.metadata = None
+
+
+def _remove_duplicate_nodes(nodes: dm.NodeList) -> dm.NodeList:
+    """Remove duplicate nodes from the list.
+
+    Args:
+        nodes:
+
+    Returns:
+
+    """
+    nodes_by_id = defaultdict(list)
+    for node in nodes:
+        nodes_by_id[node.as_id()].append(node)
+
+    output = dm.NodeList([])
+
+    for nodes in nodes_by_id.values():
+        if len(nodes) == 1:
+            output.append(nodes[0])
+            continue
+        # The node with the most properties is the child node that has implemented all interfaces.
+        keep: dm.Node = max(nodes, key=lambda n: sum(len(props) for props in n.properties.values()))
+        output.append(keep)
+    return output
 
 
 if __name__ == "__main__":
