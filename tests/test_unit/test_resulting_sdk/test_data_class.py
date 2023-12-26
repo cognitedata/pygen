@@ -60,6 +60,29 @@ class TestToFromInstances:
         node_apply.type = node.type
         assert node_apply.dump() == resources.nodes[0].dump()
 
+    @pytest.mark.parametrize("node, view_id", list(omni_nodes_with_view()))
+    def test_writeable_to_instances(
+        self, node: dm.Node, view_id: dm.ViewId, omni_data_classes: dict[dm.ViewId, OmniClasses]
+    ):
+        view = omni_data_classes[view_id].view
+        if any(prop for prop in view.properties.values() if isinstance(prop, dm.MappedProperty) and prop.default_value):
+            # Mapped properties with default values will not return the same node
+            # This is intentional, as write note should give hints to the user
+            return
+
+        read_cls = omni_data_classes[view_id].write
+        node_apply = node.as_apply(None, None)
+        # Bug in SDK that skips the type
+        node_apply.type = node.type
+        domain_apply_node = read_cls.from_instance(node_apply)
+
+        resources = domain_apply_node.to_instances_apply()
+        if not node.properties[view_id]:
+            return
+        assert len(resources.nodes) == 1
+
+        assert node_apply.dump() == resources.nodes[0].dump()
+
 
 class TestToInstancesApply:
     def test_to_instances_with_recursive(self) -> None:

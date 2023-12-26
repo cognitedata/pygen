@@ -54,6 +54,7 @@ class Implementation1NonWriteable(DomainModel):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    type: dm.DirectRelationReference = dm.DirectRelationReference("pygen-models", "Implementation1NonWriteable")
     main_value: Optional[str] = Field(None, alias="mainValue")
     sub_value: Optional[str] = Field(None, alias="subValue")
     value_1: Optional[str] = Field(None, alias="value1")
@@ -87,6 +88,7 @@ class Implementation1NonWriteableApply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    type: dm.DirectRelationReference = dm.DirectRelationReference("pygen-models", "Implementation1NonWriteable")
     main_value: Optional[str] = Field(None, alias="mainValue")
     sub_value: Optional[str] = Field(None, alias="subValue")
     value_1: Optional[str] = Field(None, alias="value1")
@@ -120,7 +122,7 @@ class Implementation1NonWriteableApply(DomainModelApply):
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                type=dm.DirectRelationReference("pygen-models", "Implementation1"),
+                type=self.type,
                 sources=[
                     dm.NodeOrEdgeData(
                         source=write_view,
