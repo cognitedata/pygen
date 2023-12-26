@@ -1,8 +1,8 @@
-import random
 from dataclasses import dataclass, field, fields
 from pathlib import Path
 from typing import Union
 
+import numpy as np
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import (
     FileMetadata,
@@ -88,12 +88,12 @@ def generate_mock_values(
     output = {}
     external = Data()
     for name, mapped in properties.items():
-        if mapped.nullable and random.random() < 0.5:
+        if mapped.nullable and faker.random.random() < 0.5:
             output[name] = None
             continue
 
         if isinstance(mapped.type, ListablePropertyType) and mapped.type.is_list:
-            output[name] = [create_value(mapped.type, faker) for _ in range(random.randint(0, 5))]
+            output[name] = [create_value(mapped.type, faker) for _ in range(faker.random.randint(0, 5))]
         else:
             output[name] = create_value(mapped.type, faker)
 
@@ -137,14 +137,24 @@ def generate_mock_values(
 def create_value(prop: dm.PropertyType, faker) -> PropertyValue:
     if isinstance(prop, dm.Text):
         return faker.sentence()
-    elif isinstance(prop, (dm.Int32, dm.Int64)):
-        return random.randint(0, 100)
-    elif isinstance(prop, (dm.Float32, dm.Float64)):
-        return random.random() * 100
+    elif isinstance(prop, dm.Int64):
+        info = np.iinfo(np.int64)
+        return faker.random.randint(int(info.min) + 1, int(info.max) - 1)
+    elif isinstance(prop, dm.Int32):
+        info = np.iinfo(np.int32)
+        return faker.random.randint(int(info.min) + 1, int(info.max) - 1)
+    elif isinstance(prop, dm.Float64):
+        info = np.finfo(np.float64)
+        return round(faker.random.uniform(float(info.min) / 2, float(info.max) / 2), info.precision)
+    elif isinstance(prop, dm.Float32):
+        info = np.finfo(np.float32)
+        return round(faker.random.uniform(float(info.min) + 1, float(info.max) - 1), info.precision)
     elif isinstance(prop, dm.Boolean):
-        return random.random() < 0.5
+        return faker.pybool()
     elif isinstance(prop, dm.Json):
-        return {create_value(dm.Text(), faker): create_value(dm.Text(), faker) for _ in range(random.randint(0, 5))}
+        return {
+            create_value(dm.Text(), faker): create_value(dm.Text(), faker) for _ in range(faker.random.randint(0, 5))
+        }
     elif isinstance(prop, dm.Timestamp):
         return faker.date_time_this_year()
     elif isinstance(prop, dm.Date):

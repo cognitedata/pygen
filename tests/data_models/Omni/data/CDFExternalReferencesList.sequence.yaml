@@ -1,35 +1,20 @@
-- name: sequence_lisa
-  externalId: sequence_lisa
+- name: sequence_david
+  externalId: sequence_david
   columns:
   - externalId: value
     valueType: DOUBLE
-- name: sequence_adam
-  externalId: sequence_adam
+- name: sequence_sandra
+  externalId: sequence_sandra
   columns:
   - externalId: value
     valueType: DOUBLE
-- name: sequence_maria
-  externalId: sequence_maria
+- name: sequence_christian
+  externalId: sequence_christian
   columns:
   - externalId: value
     valueType: DOUBLE
-- name: sequence_christine
-  externalId: sequence_christine
-  columns:
-  - externalId: value
-    valueType: DOUBLE
-- name: sequence_michelle
-  externalId: sequence_michelle
-  columns:
-  - externalId: value
-    valueType: DOUBLE
-- name: sequence_barbara
-  externalId: sequence_barbara
-  columns:
-  - externalId: value
-    valueType: DOUBLE
-- name: sequence_janet
-  externalId: sequence_janet
+- name: sequence_kelly
+  externalId: sequence_kelly
   columns:
   - externalId: value
     valueType: DOUBLE

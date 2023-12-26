@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import date, datetime
 from pathlib import Path
 
 from cognite.client import data_modeling as dm
@@ -124,9 +125,25 @@ class ExampleSDK:
             [f for filepath in filemetadata_files for f in FileMetadataList.load(filepath.read_text())]
         )
 
-    def load_nodes(self, data_model_id: dm.DataModelId) -> dm.NodeApplyList:
+    def load_nodes(self, data_model_id: dm.DataModelId, isoformat_dates: bool = False) -> dm.NodeApplyList:
         node_files = list(self.model_dir(data_model_id).glob("**/*node.yaml"))
-        return dm.NodeApplyList([n for filepath in node_files for n in dm.NodeApplyList.load(filepath.read_text())])
+        nodes = dm.NodeApplyList([n for filepath in node_files for n in dm.NodeApplyList.load(filepath.read_text())])
+        if not isoformat_dates:
+            return nodes
+        for node in nodes:
+            for source in node.sources:
+                for name in list(source.properties):
+                    if isinstance(source.properties[name], date):
+                        source.properties[name] = source.properties[name].isoformat()
+                    elif isinstance(source.properties[name], datetime):
+                        source.properties[name] = source.properties[name].isoformat(timespec="milliseconds")
+                    if isinstance(source.properties[name], list):
+                        for i, value in enumerate(source.properties[name]):
+                            if isinstance(value, date):
+                                source.properties[name][i] = value.isoformat()
+                            elif isinstance(value, datetime):
+                                source.properties[name][i] = value.isoformat(timespec="milliseconds")
+        return nodes
 
     def load_edges(self, data_model_id: dm.DataModelId) -> dm.EdgeApplyList:
         edge_files = list(self.model_dir(data_model_id).glob("**/*edge.yaml"))

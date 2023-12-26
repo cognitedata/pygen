@@ -1,15 +1,10 @@
-- name: sequence_jeffrey
-  externalId: sequence_jeffrey
-  columns:
-  - externalId: value
-    valueType: DOUBLE
-- name: sequence_anthony
-  externalId: sequence_anthony
-  columns:
-  - externalId: value
-    valueType: DOUBLE
 - name: sequence_james
   externalId: sequence_james
+  columns:
+  - externalId: value
+    valueType: DOUBLE
+- name: sequence_christopher
+  externalId: sequence_christopher
   columns:
   - externalId: value
     valueType: DOUBLE

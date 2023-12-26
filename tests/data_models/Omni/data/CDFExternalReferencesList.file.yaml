@@ -1,24 +1,20 @@
-- externalId: file_bridget
-  name: file_bridget
+- externalId: file_deborah
+  name: file_deborah
   source: omni-instances
   mimeType: text/plain
-- externalId: file_susan
-  name: file_susan
+- externalId: file_chelsea
+  name: file_chelsea
   source: omni-instances
   mimeType: text/plain
-- externalId: file_colin
-  name: file_colin
+- externalId: file_george
+  name: file_george
   source: omni-instances
   mimeType: text/plain
-- externalId: file_melanie
-  name: file_melanie
+- externalId: file_jessica
+  name: file_jessica
   source: omni-instances
   mimeType: text/plain
-- externalId: file_cassandra
-  name: file_cassandra
-  source: omni-instances
-  mimeType: text/plain
-- externalId: file_lindsay
-  name: file_lindsay
+- externalId: file_frank
+  name: file_frank
   source: omni-instances
   mimeType: text/plain
