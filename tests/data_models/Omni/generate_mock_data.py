@@ -147,9 +147,8 @@ def create_value(prop: dm.PropertyType, faker) -> PropertyValue:
         info = np.finfo(np.float64)
         return round(faker.random.uniform(float(info.min) / 2, float(info.max) / 2), info.precision)
     elif isinstance(prop, dm.Float32):
-        info = np.finfo(np.float32)
         number = np.float32(faker.random.uniform(-1000, 1000))
-        return round(float(number), info.precision)
+        return round(float(number), 2)
     elif isinstance(prop, dm.Boolean):
         return faker.pybool()
     elif isinstance(prop, dm.Json):
