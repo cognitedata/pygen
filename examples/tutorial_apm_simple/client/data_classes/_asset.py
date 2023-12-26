@@ -109,7 +109,7 @@ class Asset(DomainModel):
     is_active: Optional[bool] = Field(None, alias="isActive")
     is_critical_line: Optional[bool] = Field(None, alias="isCriticalLine")
     measurements: Optional[list[str]] = None
-    metrics: Optional[list[TimeSeries]] = None
+    metrics: Union[list[TimeSeries], list[str], None] = None
     parent: Union[Asset, str, dm.NodeId, None] = Field(None, repr=False)
     pressure: Union[TimeSeries, str, None] = None
     source_db: Optional[str] = Field(None, alias="sourceDb")
@@ -187,7 +187,7 @@ class AssetApply(DomainModelApply):
     is_active: Optional[bool] = Field(None, alias="isActive")
     is_critical_line: Optional[bool] = Field(None, alias="isCriticalLine")
     measurements: Optional[list[str]] = None
-    metrics: Optional[list[TimeSeries]] = None
+    metrics: Union[list[TimeSeries], list[str], None] = None
     parent: Union[AssetApply, str, dm.NodeId, None] = Field(None, repr=False)
     pressure: Union[TimeSeries, str, None] = None
     source_db: Optional[str] = Field(None, alias="sourceDb")
