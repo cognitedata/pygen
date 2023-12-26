@@ -31,6 +31,7 @@ class ExampleSDK:
     client_name: str
     _top_level_package: str
     generate_sdk: bool
+    download_nodes: bool = False
     _instance_space: str | None = None
     manual_files: list[Path] = field(default_factory=list, init=False)
 
@@ -59,6 +60,10 @@ class ExampleSDK:
     @classmethod
     def read_model_path(cls, model_id: DataModelId) -> Path:
         return cls.model_dir(model_id) / "model.yaml"
+
+    @classmethod
+    def read_node_path(cls, model_id: DataModelId) -> Path:
+        return cls.model_dir(model_id) / "nodes.yaml"
 
     def load_data_models(self) -> dm.DataModelList[dm.View]:
         models = []
@@ -149,6 +154,9 @@ class ExampleSDK:
         edge_files = list(self.model_dir(data_model_id).glob("**/*edge.yaml"))
         return dm.EdgeApplyList([e for filepath in edge_files for e in dm.EdgeApplyList.load(filepath.read_text())])
 
+    def load_read_nodes(self, data_model_id: dm.DataModelId) -> dm.NodeList:
+        return dm.NodeList(self.read_node_path(data_model_id).read_text())
+
 
 WINDMILL_SDK = ExampleSDK(
     data_model_ids=[DataModelId("power-models", "Windmill", "1")],
@@ -164,6 +172,7 @@ OMNI_SDK = ExampleSDK(
     client_name="OmniClient",
     generate_sdk=True,
     _instance_space="omni-instances",
+    download_nodes=True,
 )
 
 

@@ -7,6 +7,7 @@ from typing import TypeVar
 
 import toml
 import typer
+from cognite.client import data_modeling as dm
 from cognite.client._version import __version__ as cognite_sdk_version
 from cognite.client.data_classes import (
     FileMetadata,
@@ -94,6 +95,18 @@ def download():
                 view.properties = dict(sorted(view.properties.items()))
             file_path.write_text(latest.dump_yaml())
             typer.echo(f"Downloaded {file_path.relative_to(REPO_ROOT)}")
+
+            if not example_sdk.download_nodes:
+                continue
+
+            is_space = dm.filters.Equals(["node", "space"], example_sdk.instance_space)
+            nodes = dm.NodeList([])
+            for view in latest.views:
+                nodes.extend(client.data_modeling.instances.list("node", filter=is_space, limit=100, sources=[view]))
+            nodes = dm.NodeList(sorted(nodes, key=lambda n: n.external_id))
+            file_path = example_sdk.read_node_path(data_model_id)
+            file_path.write_text(nodes.dump_yaml())
+            typer.echo(f"Downloaded {len(nodes)} nodes to {file_path.relative_to(REPO_ROOT)}")
 
 
 @app.command("deploy", help="Deploy all example SDKs to CDF")
