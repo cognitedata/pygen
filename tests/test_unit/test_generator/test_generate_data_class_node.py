@@ -33,7 +33,7 @@ def test_generate_primitive_required(omni_multi_api_generator: MultiAPIGenerator
 
 def test_generate_primitive_nullable_list(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
     # Arrange
-    api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "PrimitiveNullableList", "1")]
+    api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "PrimitiveNullableListable", "1")]
     expected = OmniFiles.primitive_nullable_list_data.read_text()
 
     # Act
@@ -46,7 +46,7 @@ def test_generate_primitive_nullable_list(omni_multi_api_generator: MultiAPIGene
 
 def test_generate_primitive_required_list(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
     # Arrange
-    api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "PrimitiveRequiredList", "1")]
+    api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "PrimitiveRequiredListable", "1")]
     expected = OmniFiles.primitive_required_list_data.read_text()
 
     # Act
@@ -87,7 +87,9 @@ def test_generate_cdf_external_references_list(
     omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter
 ):
     # Arrange
-    api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "CDFExternalReferencesList", "1")]
+    api_generator = omni_multi_api_generator.api_by_view_id[
+        dm.ViewId("pygen-models", "CDFExternalReferencesListable", "1")
+    ]
     expected = OmniFiles.cdf_external_list_data.read_text()
 
     # Act
