@@ -12,7 +12,7 @@ from cognite.pygen.utils.external_id_factories import (
     uuid_factory,
 )
 from tests.constants import IS_PYDANTIC_V2, OMNI_SDK, WindMillFiles
-from tests.omni_constants import OmniClassPair
+from tests.omni_constants import OmniClasses
 
 if IS_PYDANTIC_V2:
     from movie_domain.client import data_classes as movie
@@ -43,7 +43,7 @@ def omni_nodes_with_view():
 class TestToFromInstances:
     @pytest.mark.parametrize("node, view_id", list(omni_nodes_with_view()))
     def test_from_to_instances(
-        self, node: dm.Node, view_id: dm.ViewId, omni_data_classes: dict[dm.ViewId, OmniClassPair]
+        self, node: dm.Node, view_id: dm.ViewId, omni_data_classes: dict[dm.ViewId, OmniClasses]
     ):
         read_cls = omni_data_classes[view_id].read
 

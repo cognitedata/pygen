@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 
 from cognite.client import data_modeling as dm
@@ -11,7 +13,8 @@ else:
 
 
 @dataclass
-class OmniClassPair:
+class OmniClasses:
     read: type[DomainModel]
     write: type[DomainModelApply]
+    api_name: str
     view: dm.View

@@ -8,6 +8,13 @@ import toml
 from cognite.client import ClientConfig, CogniteClient
 from cognite.client.credentials import OAuthClientCredentials
 
+from tests.constants import IS_PYDANTIC_V2
+
+if IS_PYDANTIC_V2:
+    from omni import OmniClient
+else:
+    from omni_pydantic_v1 import OmniClient
+
 
 @pytest.fixture(scope="session")
 def client_config() -> dict[str, str]:
@@ -35,3 +42,8 @@ def create_cognite_client_config(
 @pytest.fixture()
 def cognite_client(client_config) -> CogniteClient:
     return CogniteClient(create_cognite_client_config(**client_config))
+
+
+@pytest.fixture()
+def omni_client(cognite_client: CogniteClient) -> OmniClient:
+    return OmniClient(cognite_client)
