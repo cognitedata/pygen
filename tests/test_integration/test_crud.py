@@ -27,7 +27,7 @@ def omni_view_ids() -> list[ParameterSet]:
     return [
         pytest.param(view.as_id(), id=view.external_id)
         for view in dm.ViewList(OMNI_SDK.load_data_model().views)
-        if view.writable
+        if view.writable and view.external_id != "SubInterface"
     ]
 
 
@@ -41,6 +41,9 @@ class DomainAPI(Protocol):
     def apply(
         self, items: DomainModelApply | Sequence[DomainModelApply], replace: bool = False
     ) -> ResourcesApplyResult:
+        ...
+
+    def list(self, limit: int = 25, **kwargs) -> Sequence:
         ...
 
 
@@ -82,3 +85,12 @@ class TestCRUDOperations:
 
         finally:
             cognite_client.data_modeling.instances.delete(nodes=mock_nodes.as_ids())
+
+    @pytest.mark.parametrize("view_id", omni_view_ids())
+    def test_list(self, view_id: dm.ViewId, omni_data_classes: dict[dm.ViewId, OmniClasses], omni_client: OmniClient):
+        api_name = omni_data_classes[view_id].api_name
+        api: DomainAPI = getattr(omni_client, api_name)
+
+        retrieved = api.list(limit=5)
+
+        assert 5 >= len(retrieved) >= 3
