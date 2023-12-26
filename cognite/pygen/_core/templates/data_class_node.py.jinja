@@ -47,7 +47,8 @@ class {{ data_class.read_name }}(DomainModel):
         deleted_time: If present, the deleted time of the {{ data_class.doc_name }} node.
         version: The version of the {{ data_class.doc_name }} node.
     """
-    space: str = DEFAULT_INSTANCE_SPACE{% for field in data_class %}
+    space: str = DEFAULT_INSTANCE_SPACE{% if data_class.node_type %}
+    type: dm.DirectRelationReference = dm.DirectRelationReference("{{ data_class.node_type.space }}", "{{ data_class.node_type.external_id }}"){% endif %}{% for field in data_class %}
     {{ field.name }}: {{ field.as_read_type_hint() }}{% endfor %}
 
     def as_apply(self) -> {{ data_class.write_name }}:
@@ -73,7 +74,8 @@ class {{ data_class.write_name }}(DomainModelApply):
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
-    space: str = DEFAULT_INSTANCE_SPACE{% for field in data_class %}
+    space: str = DEFAULT_INSTANCE_SPACE{% if data_class.node_type %}
+    type: dm.DirectRelationReference = dm.DirectRelationReference("{{ data_class.node_type.space }}", "{{ data_class.node_type.external_id }}"){% endif %}{% for field in data_class %}
     {{ field.name }}: {{ field.as_write_type_hint() }}{% endfor %}
 
     def _to_instances_apply(
@@ -122,7 +124,7 @@ class {{ data_class.write_name }}(DomainModelApply):
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,{% if data_class.node_type %}
-                type=dm.DirectRelationReference("{{ data_class.node_type.space }}", "{{ data_class.node_type.external_id }}"),{% endif %}
+                type=self.type,{% endif %}
                 sources=[
                     dm.NodeOrEdgeData(
                         source=write_view,
