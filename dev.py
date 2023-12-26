@@ -173,7 +173,7 @@ def deploy():
             typer.echo(f"{len(unchanged)} sequences are unchanged")
 
         # Files
-        files = example_sdk.load_files(data_model_id)
+        files = example_sdk.load_filemetadata(data_model_id)
         existing = client.files.retrieve_multiple(external_ids=files.as_external_ids(), ignore_unknown_ids=True)
         new, changed, unchanged = _difference(existing, files)
         if new:
@@ -321,18 +321,32 @@ def _clean_cdf_resources(cdf_resources: dict, resource_cls_list: type) -> None:
             ts.created_time = None
             ts.last_updated_time = None
             ts.id = None
+            if not ts.metadata:
+                ts.metadata = None
+            if not ts.security_categories:
+                ts.security_categories = None
     if resource_cls_list is SequenceList:
         for seq in cdf_resources.values():
             seq: Sequence
             seq.id = None
             seq.created_time = None
             seq.last_updated_time = None
+            if not seq.metadata:
+                seq.metadata = None
+            for column in seq.columns:
+                column.id = None
+                column.created_time = None
+                column.last_updated_time = None
+                if not column.metadata:
+                    column.metadata = None
     if resource_cls_list is FileMetadataList:
         for file in cdf_resources.values():
             file: FileMetadata
             file.id = None
             file.created_time = None
             file.last_updated_time = None
+            if not file.metadata:
+                file.metadata = None
 
 
 if __name__ == "__main__":

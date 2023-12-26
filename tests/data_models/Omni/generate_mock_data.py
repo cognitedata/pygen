@@ -109,8 +109,6 @@ def generate_mock_values(
                             # 'deploy' command.
                             is_step=False,
                             is_string=False,
-                            metadata={},
-                            security_categories=[],
                         )
                     )
                 elif isinstance(mapped.type, dm.SequenceReference):
@@ -118,7 +116,7 @@ def generate_mock_values(
                         Sequence(
                             external_id=ref,
                             name=ref,
-                            columns=[SequenceColumn(external_id="value")],
+                            columns=[SequenceColumn(external_id="value", value_type="DOUBLE")],
                         )
                     )
                 elif isinstance(mapped.type, dm.FileReference):

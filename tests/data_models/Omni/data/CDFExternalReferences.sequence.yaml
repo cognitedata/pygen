@@ -2,14 +2,14 @@
   externalId: sequence_jeffrey
   columns:
   - externalId: value
-    valueType: Double
+    valueType: DOUBLE
 - name: sequence_anthony
   externalId: sequence_anthony
   columns:
   - externalId: value
-    valueType: Double
+    valueType: DOUBLE
 - name: sequence_james
   externalId: sequence_james
   columns:
   - externalId: value
-    valueType: Double
+    valueType: DOUBLE

@@ -119,7 +119,7 @@ class ExampleSDK:
         return SequenceList([seq for filepath in sequence_files for seq in SequenceList.load(filepath.read_text())])
 
     def load_filemetadata(self, data_model_id: dm.DataModelId) -> FileMetadataList:
-        filemetadata_files = list(self.model_dir(data_model_id).glob("**/*filemetadata.yaml"))
+        filemetadata_files = list(self.model_dir(data_model_id).glob("**/*file.yaml"))
         return FileMetadataList(
             [f for filepath in filemetadata_files for f in FileMetadataList.load(filepath.read_text())]
         )

@@ -1,24 +1,16 @@
 - externalId: timeseries_danielle
   name: timeseries_danielle
   isString: false
-  metadata: {}
   isStep: false
-  securityCategories: []
 - externalId: timeseries_jill
   name: timeseries_jill
   isString: false
-  metadata: {}
   isStep: false
-  securityCategories: []
 - externalId: timeseries_patricia
   name: timeseries_patricia
   isString: false
-  metadata: {}
   isStep: false
-  securityCategories: []
 - externalId: timeseries_debra
   name: timeseries_debra
   isString: false
-  metadata: {}
   isStep: false
-  securityCategories: []

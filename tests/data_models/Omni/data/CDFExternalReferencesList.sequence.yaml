@@ -2,34 +2,34 @@
   externalId: sequence_lisa
   columns:
   - externalId: value
-    valueType: Double
+    valueType: DOUBLE
 - name: sequence_adam
   externalId: sequence_adam
   columns:
   - externalId: value
-    valueType: Double
+    valueType: DOUBLE
 - name: sequence_maria
   externalId: sequence_maria
   columns:
   - externalId: value
-    valueType: Double
+    valueType: DOUBLE
 - name: sequence_christine
   externalId: sequence_christine
   columns:
   - externalId: value
-    valueType: Double
+    valueType: DOUBLE
 - name: sequence_michelle
   externalId: sequence_michelle
   columns:
   - externalId: value
-    valueType: Double
+    valueType: DOUBLE
 - name: sequence_barbara
   externalId: sequence_barbara
   columns:
   - externalId: value
-    valueType: Double
+    valueType: DOUBLE
 - name: sequence_janet
   externalId: sequence_janet
   columns:
   - externalId: value
-    valueType: Double
+    valueType: DOUBLE

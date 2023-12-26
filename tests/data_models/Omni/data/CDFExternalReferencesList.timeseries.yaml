@@ -1,54 +1,36 @@
 - externalId: timeseries_linda
   name: timeseries_linda
   isString: false
-  metadata: {}
   isStep: false
-  securityCategories: []
 - externalId: timeseries_jessica
   name: timeseries_jessica
   isString: false
-  metadata: {}
   isStep: false
-  securityCategories: []
 - externalId: timeseries_amanda
   name: timeseries_amanda
   isString: false
-  metadata: {}
   isStep: false
-  securityCategories: []
 - externalId: timeseries_teresa
   name: timeseries_teresa
   isString: false
-  metadata: {}
   isStep: false
-  securityCategories: []
 - externalId: timeseries_nicholas
   name: timeseries_nicholas
   isString: false
-  metadata: {}
   isStep: false
-  securityCategories: []
 - externalId: timeseries_brandon
   name: timeseries_brandon
   isString: false
-  metadata: {}
   isStep: false
-  securityCategories: []
 - externalId: timeseries_jeremy
   name: timeseries_jeremy
   isString: false
-  metadata: {}
   isStep: false
-  securityCategories: []
 - externalId: timeseries_keith
   name: timeseries_keith
   isString: false
-  metadata: {}
   isStep: false
-  securityCategories: []
 - externalId: timeseries_jesse
   name: timeseries_jesse
   isString: false
-  metadata: {}
   isStep: false
-  securityCategories: []
