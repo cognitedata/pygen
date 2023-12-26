@@ -1,0 +1,150 @@
+- instanceType: node
+  space: omni-instances
+  externalId: PrimitiveNullableList:Albert
+  sources:
+  - properties:
+      boolean: null
+      date: []
+      float32: []
+      float64: null
+      int32: null
+      int64: []
+      json: null
+      text:
+      - Church whether bag control organization push dog.
+      - Walk now often always.
+      - Information on mission various.
+      - Prove fire enter capital population.
+      timestamp:
+      - 2023-06-27 13:38:30
+      - 2023-05-03 18:59:06
+      - 2023-10-19 23:53:05
+      - 2023-01-29 04:09:03
+    source:
+      space: pygen-models
+      externalId: PrimitiveNullableList
+      version: '1'
+      type: view
+- instanceType: node
+  space: omni-instances
+  externalId: PrimitiveNullableList:Christine
+  sources:
+  - properties:
+      boolean: null
+      date: null
+      float32: null
+      float64: []
+      int32:
+      - 46
+      - 31
+      - 22
+      - 69
+      int64:
+      - 22
+      - 88
+      - 91
+      json:
+      - {}
+      - {}
+      text: null
+      timestamp: null
+    source:
+      space: pygen-models
+      externalId: PrimitiveNullableList
+      version: '1'
+      type: view
+- instanceType: node
+  space: omni-instances
+  externalId: PrimitiveNullableList:Anna
+  sources:
+  - properties:
+      boolean:
+      - false
+      - true
+      - true
+      - false
+      - true
+      date: null
+      float32:
+      - 66.60121557621494
+      - 57.76387000711954
+      - 49.82751732530839
+      float64:
+      - 30.635358361225727
+      - 86.15864166764669
+      - 13.266986769624701
+      - 34.21584012047318
+      int32:
+      - 48
+      - 80
+      - 80
+      - 51
+      int64:
+      - 83
+      json: null
+      text: null
+      timestamp: null
+    source:
+      space: pygen-models
+      externalId: PrimitiveNullableList
+      version: '1'
+      type: view
+- instanceType: node
+  space: omni-instances
+  externalId: PrimitiveNullableList:Sarah
+  sources:
+  - properties:
+      boolean: null
+      date: null
+      float32:
+      - 67.19812332780579
+      - 70.41369331817032
+      - 12.649861524298922
+      - 17.273193453541445
+      float64:
+      - 18.425094608911596
+      - 31.067325327316553
+      - 0.45503371074294696
+      - 79.69180563410883
+      int32: null
+      int64: []
+      json:
+      - Available defense enter value.: These hard citizen street.
+        Particularly would pressure account stage.: Use billion there enough threat.
+      - Choice example decision garden reach table measure.: Town suffer begin interest
+          everybody.
+        Four capital woman.: Scientist necessary into act.
+      - {}
+      - War real chance along.: Old challenge camera final together someone.
+      - Together decide economic.: Government nice themselves wind.
+      text:
+      - Understand door class son.
+      - Thing agent say forward.
+      timestamp: null
+    source:
+      space: pygen-models
+      externalId: PrimitiveNullableList
+      version: '1'
+      type: view
+- instanceType: node
+  space: omni-instances
+  externalId: PrimitiveNullableList:Leah
+  sources:
+  - properties:
+      boolean: null
+      date: null
+      float32: null
+      float64:
+      - 3.600170223987187
+      - 50.60657801764062
+      - 3.5675168611339014
+      int32: null
+      int64: null
+      json: null
+      text: null
+      timestamp: null
+    source:
+      space: pygen-models
+      externalId: PrimitiveNullableList
+      version: '1'
+      type: view

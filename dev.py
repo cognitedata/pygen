@@ -95,6 +95,8 @@ def deploy():
     client.data_modeling.spaces.apply(spaces)
     for data_model_id in example_sdk.data_model_ids:
         containers = example_sdk.load_containers(data_model_id)
+        client.data_modeling.containers.retrieve(containers.as_ids())
+
         new_containers = client.data_modeling.containers.apply(containers)
         for container in new_containers:
             typer.echo(f"Created container {container.external_id} in space {container.space}")

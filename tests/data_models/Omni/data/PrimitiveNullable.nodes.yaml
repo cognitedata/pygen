@@ -1,0 +1,95 @@
+- instanceType: node
+  space: omni-instances
+  externalId: PrimitiveNullable:Denise
+  sources:
+  - properties:
+      boolean: null
+      date: null
+      float32: 17.48327863620712
+      float64: 76.71037019810686
+      int32: 1
+      int64: null
+      json: {}
+      text: Themselves away space task better.
+      timestamp: null
+    source:
+      space: pygen-models
+      externalId: PrimitiveNullable
+      version: '1'
+      type: view
+- instanceType: node
+  space: omni-instances
+  externalId: PrimitiveNullable:Rachel
+  sources:
+  - properties:
+      boolean: true
+      date: null
+      float32: null
+      float64: 89.06466693424233
+      int32: null
+      int64: 44
+      json: null
+      text: Structure why unit support coach magazine degree.
+      timestamp: 2023-06-05 17:57:59
+    source:
+      space: pygen-models
+      externalId: PrimitiveNullable
+      version: '1'
+      type: view
+- instanceType: node
+  space: omni-instances
+  externalId: PrimitiveNullable:Nicholas
+  sources:
+  - properties:
+      boolean: false
+      date: null
+      float32: 87.0451379141685
+      float64: null
+      int32: null
+      int64: 21
+      json: {}
+      text: null
+      timestamp: 2023-03-05 22:31:45
+    source:
+      space: pygen-models
+      externalId: PrimitiveNullable
+      version: '1'
+      type: view
+- instanceType: node
+  space: omni-instances
+  externalId: PrimitiveNullable:Angela
+  sources:
+  - properties:
+      boolean: null
+      date: null
+      float32: 82.65957546737302
+      float64: null
+      int32: 63
+      int64: null
+      json: null
+      text: Enter six lawyer institution whatever yet.
+      timestamp: null
+    source:
+      space: pygen-models
+      externalId: PrimitiveNullable
+      version: '1'
+      type: view
+- instanceType: node
+  space: omni-instances
+  externalId: PrimitiveNullable:Thomas
+  sources:
+  - properties:
+      boolean: false
+      date: null
+      float32: 98.98365553612992
+      float64: 81.10882429558623
+      int32: null
+      int64: null
+      json: {}
+      text: Choice father why often my security arm.
+      timestamp: 2023-08-15 20:55:47
+    source:
+      space: pygen-models
+      externalId: PrimitiveNullable
+      version: '1'
+      type: view

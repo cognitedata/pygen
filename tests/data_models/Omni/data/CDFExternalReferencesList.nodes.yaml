@@ -1,0 +1,92 @@
+- instanceType: node
+  space: omni-instances
+  externalId: CDFExternalReferencesList:Adam
+  sources:
+  - properties:
+      files: null
+      sequences:
+      - sequence_anthony
+      - sequence_james
+      - sequence_debra
+      timeseries:
+      - timeseries_amy
+      - timeseries_jeffrey
+      - timeseries_bridget
+      - timeseries_lisa
+    source:
+      space: pygen-models
+      externalId: CDFExternalReferencesList
+      version: '1'
+      type: view
+- instanceType: node
+  space: omni-instances
+  externalId: CDFExternalReferencesList:Matthew
+  sources:
+  - properties:
+      files: null
+      sequences: null
+      timeseries:
+      - timeseries_linda
+      - timeseries_helen
+    source:
+      space: pygen-models
+      externalId: CDFExternalReferencesList
+      version: '1'
+      type: view
+- instanceType: node
+  space: omni-instances
+  externalId: CDFExternalReferencesList:Jessica
+  sources:
+  - properties:
+      files:
+      - file_eric
+      - file_susan
+      - file_matthew
+      - file_christopher
+      sequences:
+      - sequence_colin
+      - sequence_melanie
+      timeseries:
+      - timeseries_cassandra
+      - timeseries_lindsay
+    source:
+      space: pygen-models
+      externalId: CDFExternalReferencesList
+      version: '1'
+      type: view
+- instanceType: node
+  space: omni-instances
+  externalId: CDFExternalReferencesList:Jeremy
+  sources:
+  - properties:
+      files:
+      - file_amanda
+      - file_teresa
+      - file_nicholas
+      sequences:
+      - sequence_andrea
+      - sequence_maria
+      timeseries:
+      - timeseries_christine
+      - timeseries_michelle
+      - timeseries_barbara
+      - timeseries_janet
+      - timeseries_brandon
+    source:
+      space: pygen-models
+      externalId: CDFExternalReferencesList
+      version: '1'
+      type: view
+- instanceType: node
+  space: omni-instances
+  externalId: CDFExternalReferencesList:Keith
+  sources:
+  - properties:
+      files: null
+      sequences: null
+      timeseries: null
+    source:
+      space: pygen-models
+      externalId: CDFExternalReferencesList
+      version: '1'
+      type: view

@@ -1,0 +1,10 @@
+- name: sequence_jill
+  externalId: sequence_jill
+  columns:
+  - externalId: value
+    valueType: Double
+- name: sequence_anthony
+  externalId: sequence_anthony
+  columns:
+  - externalId: value
+    valueType: Double
