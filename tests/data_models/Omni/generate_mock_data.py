@@ -32,6 +32,9 @@ def main():
     interfaces = {parent for view in data_model.views for parent in view.implements or []}
 
     for view in data_model.views:
+        if view.external_id == "Empty":
+            # The empty view is used for testing and should not have mock data.
+            continue
         view: dm.View
         if not view.writable or view.as_id() in interfaces:
             continue
