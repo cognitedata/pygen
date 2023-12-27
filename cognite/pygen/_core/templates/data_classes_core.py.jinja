@@ -260,6 +260,11 @@ class DomainRelation(DomainModelCore):
     created_time: datetime.datetime
     deleted_time: Optional[datetime.datetime] = None
 
+    @classmethod
+    def from_instance(cls: type[T_DomainRelation], instance: Instance) -> T_DomainRelation:
+        data = instance.dump(camel_case=False)
+        return cls(**{**data, **unpack_properties(instance.properties)})
+
 
 T_DomainRelation = TypeVar("T_DomainRelation", bound=DomainRelation)
 

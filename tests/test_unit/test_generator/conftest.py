@@ -1,13 +1,11 @@
 import pytest
 from cognite.client import data_modeling as dm
 
-from cognite.pygen._core.generators import MultiAPIGenerator, SDKGenerator
 from tests.constants import (
     APM_SDK,
     EQUIPMENT_UNIT_SDK,
     MARKET_SDK,
     MOVIE_SDK,
-    OMNI_SDK,
     PUMP_SDK,
     SCENARIO_INSTANCE_SDK,
     SHOP_SDK,
@@ -117,23 +115,3 @@ def equipment_module_view(equipment_unit_model: dm.DataModel) -> dm.View:
 @pytest.fixture(scope="session")
 def start_end_time_view(equipment_unit_model: dm.DataModel) -> dm.View:
     return next(v for v in equipment_unit_model.views if v.name == "StartEndTime")
-
-
-@pytest.fixture(scope="session")
-def omni_sdk_generator(omni_data_model: dm.DataModel[dm.View]) -> SDKGenerator:
-    return SDKGenerator(
-        OMNI_SDK.top_level_package,
-        OMNI_SDK.client_name,
-        omni_data_model,
-        OMNI_SDK.instance_space,
-    )
-
-
-@pytest.fixture(scope="session")
-def omni_multi_api_generator(omni_data_model: dm.DataModel[dm.View]) -> MultiAPIGenerator:
-    return MultiAPIGenerator(
-        OMNI_SDK.top_level_package,
-        OMNI_SDK.client_name,
-        omni_data_model.views,
-        OMNI_SDK.instance_space,
-    )

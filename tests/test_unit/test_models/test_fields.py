@@ -1,24 +1,11 @@
 from cognite.client import data_modeling as dm
 
-from cognite.pygen._core.generators import APIGenerator
-from cognite.pygen._core.models import NodeDataClass
-from cognite.pygen.config import PygenConfig
+from cognite.pygen._core.generators import MultiAPIGenerator
 
 
-def test_is_date_field(bid_view: dm.View, market_view: dm.View, pygen_config: PygenConfig) -> None:
+def test_has_date_field(omni_multi_api_generator: MultiAPIGenerator) -> None:
     # Arrange
-    market_data_class = NodeDataClass.from_view(
-        market_view, NodeDataClass.to_base_name(market_view), pygen_config.naming.data_class
-    )
-
-    # Act
-    gen = APIGenerator(bid_view, bid_view.space, pygen_config)
-    gen.data_class.update_fields(
-        bid_view.properties,
-        {market_view.as_id(): market_data_class},
-        [market_view],
-        pygen_config,
-    )
+    api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "PrimitiveRequired", "1")]
 
     # Assert
-    assert gen.data_class.has_primitive_field_of_type(dm.Date)
+    assert api_generator.data_class.has_primitive_field_of_type(dm.Date)
