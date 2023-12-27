@@ -49,6 +49,7 @@ class Director(DomainModel):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    type: dm.DirectRelationReference = dm.DirectRelationReference("IntegrationTestsImmutable", "RoleDirector")
     movies: Union[list[Movie], list[str], None] = Field(default=None, repr=False)
     nomination: Union[list[Nomination], list[str], None] = Field(default=None, repr=False)
     person: Union[Person, str, dm.NodeId, None] = Field(None, repr=False)
@@ -88,6 +89,7 @@ class DirectorApply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    type: dm.DirectRelationReference = dm.DirectRelationReference("IntegrationTestsImmutable", "RoleDirector")
     movies: Union[list[MovieApply], list[str], None] = Field(default=None, repr=False)
     nomination: Union[list[NominationApply], list[str], None] = Field(default=None, repr=False)
     person: Union[PersonApply, str, dm.NodeId, None] = Field(None, repr=False)
@@ -122,7 +124,7 @@ class DirectorApply(DomainModelApply):
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                type=dm.DirectRelationReference("IntegrationTestsImmutable", "RoleDirector"),
+                type=self.type,
                 sources=[
                     dm.NodeOrEdgeData(
                         source=write_view,

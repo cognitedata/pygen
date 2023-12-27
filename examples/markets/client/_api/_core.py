@@ -172,10 +172,10 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
         if retrieve_edges and nodes:
             self._retrieve_and_set_edge_types(nodes, edge_api_name_type_direction_quad)
 
-        if not nodes:
-            return None
-        elif is_multiple:
+        if is_multiple:
             return nodes
+        elif not nodes:
+            return None
         else:
             return nodes[0]
 
