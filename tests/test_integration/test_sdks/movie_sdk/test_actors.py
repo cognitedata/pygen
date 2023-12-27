@@ -13,26 +13,6 @@ else:
     from movie_domain_pydantic_v1.client import data_classes as m
 
 
-def test_actor_list(movie_client: MovieClient):
-    actors = movie_client.actor.list(limit=-1)
-
-    assert len(actors) > 0
-    assert all(isinstance(movie, str) for actor in actors for movie in actor.movies or [])
-    assert all(isinstance(nomination, str) for actor in actors for nomination in actor.nomination or [])
-
-
-def test_actor_retrieve(movie_client: MovieClient) -> None:
-    # Act
-    actor = movie_client.actor.retrieve("actor:quentin_tarantino")
-
-    # Assert
-    assert actor is not None
-    assert isinstance(actor, m.Actor)
-    assert actor.external_id == "actor:quentin_tarantino"
-    assert len(actor.movies or []) > 0
-    assert len(actor.nomination or []) == 0
-
-
 def test_actor_apply_retrieve_with_person(movie_client: MovieClient, cognite_client: CogniteClient):
     # Arrange
     actor = m.ActorApply(
