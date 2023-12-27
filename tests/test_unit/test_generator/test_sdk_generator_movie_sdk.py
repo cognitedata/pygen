@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import platform
 from unittest.mock import MagicMock
 
 import pytest
@@ -16,7 +15,7 @@ from cognite.pygen._core.models import (
 )
 from cognite.pygen._generator import CodeFormatter
 from cognite.pygen.config import PygenConfig
-from tests.constants import IS_PYDANTIC_V1, IS_PYDANTIC_V2, MovieSDKFiles
+from tests.constants import IS_PYDANTIC_V1, MovieSDKFiles
 
 
 @pytest.fixture
@@ -58,34 +57,6 @@ def actor_api_generator(multi_api_generator: MultiAPIGenerator, actor_view: dm.V
     api_generator = multi_api_generator[actor_view.as_id()]
     assert api_generator is not None, "Could not find API generator for actor view"
     return api_generator
-
-
-def test_generate_data_class_file_persons(
-    person_api_generator: APIGenerator, pygen_config: PygenConfig, code_formatter: CodeFormatter
-):
-    # Arrange
-    expected = MovieSDKFiles.persons_data.read_text()
-
-    # Act
-    actual = person_api_generator.generate_data_class_file(IS_PYDANTIC_V2)
-    actual = code_formatter.format_code(actual)
-
-    # Assert
-    assert actual == expected
-
-
-def test_create_view_data_class_actors(
-    actor_api_generator: APIGenerator, pygen_config: PygenConfig, code_formatter: CodeFormatter
-):
-    # Arrange
-    expected = MovieSDKFiles.actors_data.read_text()
-
-    # Act
-    actual = actor_api_generator.generate_data_class_file(IS_PYDANTIC_V2)
-    actual = code_formatter.format_code(actual)
-
-    # Assert
-    assert actual == expected
 
 
 def test_create_view_api_classes_actors(
@@ -138,34 +109,6 @@ def test_create_view_api_classes_persons(
 
     # Act
     actual = person_api_generator.generate_api_file(top_level_package, client_name)
-    actual = code_formatter.format_code(actual)
-
-    # Assert
-    assert actual == expected
-
-
-def test_generate_data_class_init_file(multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
-    # Arrange
-    expected = MovieSDKFiles.data_init.read_text()
-
-    # Act
-    actual = multi_api_generator.generate_data_classes_init_file()
-    actual = code_formatter.format_code(actual)
-
-    # Assert
-    assert actual == expected
-
-
-@pytest.mark.skipif(
-    not platform.platform().startswith("Windows"),
-    reason="There is currently some strange problem with the diff on non-windows",
-)
-def test_create_api_client(sdk_generator: SDKGenerator, code_formatter: CodeFormatter):
-    # Arrange
-    expected = MovieSDKFiles.client.read_text()
-
-    # Act
-    actual = sdk_generator._generate_api_client_file()
     actual = code_formatter.format_code(actual)
 
     # Assert

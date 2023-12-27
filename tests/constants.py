@@ -347,7 +347,7 @@ class OmniFiles:
     client = client_dir / "_api_client.py"
     data_classes = client_dir / "data_classes"
     core_data = data_classes / "_core.py"
-    core_init = data_classes / "__init__.py"
+    data_init = data_classes / "__init__.py"
     api = client_dir / "_api"
     core_api = api / "_core.py"
     client_init = client_dir / "__init__.py"
