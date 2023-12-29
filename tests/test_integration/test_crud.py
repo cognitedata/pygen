@@ -10,7 +10,7 @@ from cognite.client import data_modeling as dm
 from faker import Faker
 
 from tests.constants import IS_PYDANTIC_V2, OMNI_SDK
-from tests.data_models.Omni.generate_mock_data import generate_mock_data
+from tests.data_models.Omni.generate_mock_data import connected_views, generate_mock_data
 from tests.omni_constants import OmniClasses
 
 if IS_PYDANTIC_V2:
@@ -23,12 +23,13 @@ else:
     from omni_pydantic_v1.data_classes import DomainModelApply, ResourcesApplyResult
 
 
-def omni_view_ids() -> list[ParameterSet]:
-    return [
-        pytest.param(view.as_id(), id=view.external_id)
-        for view in dm.ViewList(OMNI_SDK.load_data_model().views)
-        if view.writable and view.external_id != "SubInterface"
-    ]
+def omni_independent_view_ids() -> list[ParameterSet]:
+    for connected in connected_views(OMNI_SDK.load_data_model().views):
+        if len(connected) != 1:
+            continue
+        view = connected[0]
+        if view.writable and view.external_id not in {"SubInterface", "Empty"}:
+            yield pytest.param(view.as_id(), id=view.external_id)
 
 
 class DomainAPI(Protocol):
@@ -48,7 +49,7 @@ class DomainAPI(Protocol):
 
 
 class TestCRUDOperations:
-    @pytest.mark.parametrize("view_id", omni_view_ids())
+    @pytest.mark.parametrize("view_id", omni_independent_view_ids())
     def test_create_retrieve_delete(
         self,
         view_id: dm.ViewId,
@@ -62,7 +63,7 @@ class TestCRUDOperations:
         api_name = omni_data_classes[view_id].api_name
         write_class = omni_data_classes[view_id].write
         view = omni_data_classes[view_id].view
-        mock_nodes = generate_mock_data(view, 2, 0, faker).node
+        mock_nodes = generate_mock_data([view], 2, 0, faker)[0].node
         domain_nodes = [write_class.from_instance(node) for node in mock_nodes]
         external_ids = [node.external_id for node in domain_nodes]
         api: DomainAPI = getattr(omni_client, api_name)
@@ -86,7 +87,7 @@ class TestCRUDOperations:
         finally:
             cognite_client.data_modeling.instances.delete(nodes=mock_nodes.as_ids())
 
-    @pytest.mark.parametrize("view_id", omni_view_ids())
+    @pytest.mark.parametrize("view_id", omni_independent_view_ids())
     def test_list(self, view_id: dm.ViewId, omni_data_classes: dict[dm.ViewId, OmniClasses], omni_client: OmniClient):
         api_name = omni_data_classes[view_id].api_name
         api: DomainAPI = getattr(omni_client, api_name)
