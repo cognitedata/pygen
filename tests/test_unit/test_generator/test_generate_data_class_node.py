@@ -111,3 +111,16 @@ def test_generate_implementation1(omni_multi_api_generator: MultiAPIGenerator, c
 
     # Assert
     assert actual == expected
+
+
+def test_generate_connection_item_c(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
+    # Arrange
+    api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "ConnectionItemC", "1")]
+    expected = OmniFiles.connection_item_c_data.read_text()
+
+    # Act
+    actual = api_generator.generate_data_class_file(IS_PYDANTIC_V2)
+    actual = code_formatter.format_code(actual)
+
+    # Assert
+    assert actual == expected
