@@ -1,6 +1,6 @@
 - instanceType: node
   space: omni-instances
-  externalId: CDFExternalReferencesList:Brandon
+  externalId: CDFExternalReferencesListed:Brandon
   sources:
   - properties:
       files: []
@@ -14,12 +14,12 @@
       - timeseries_janet
     source:
       space: pygen-models
-      externalId: CDFExternalReferencesList
+      externalId: CDFExternalReferencesListed
       version: '1'
       type: view
 - instanceType: node
   space: omni-instances
-  externalId: CDFExternalReferencesList:Jesse
+  externalId: CDFExternalReferencesListed:Jesse
   sources:
   - properties:
       files: null
@@ -27,12 +27,12 @@
       timeseries: null
     source:
       space: pygen-models
-      externalId: CDFExternalReferencesList
+      externalId: CDFExternalReferencesListed
       version: '1'
       type: view
 - instanceType: node
   space: omni-instances
-  externalId: CDFExternalReferencesList:Elizabeth
+  externalId: CDFExternalReferencesListed:Elizabeth
   sources:
   - properties:
       files: null
@@ -42,12 +42,12 @@
       - timeseries_michael
     source:
       space: pygen-models
-      externalId: CDFExternalReferencesList
+      externalId: CDFExternalReferencesListed
       version: '1'
       type: view
 - instanceType: node
   space: omni-instances
-  externalId: CDFExternalReferencesList:Linda
+  externalId: CDFExternalReferencesListed:Linda
   sources:
   - properties:
       files:
@@ -65,12 +65,12 @@
       - timeseries_lydia
     source:
       space: pygen-models
-      externalId: CDFExternalReferencesList
+      externalId: CDFExternalReferencesListed
       version: '1'
       type: view
 - instanceType: node
   space: omni-instances
-  externalId: CDFExternalReferencesList:Robin
+  externalId: CDFExternalReferencesListed:Robin
   sources:
   - properties:
       files: null
@@ -82,6 +82,6 @@
       - timeseries_randall
     source:
       space: pygen-models
-      externalId: CDFExternalReferencesList
+      externalId: CDFExternalReferencesListed
       version: '1'
       type: view

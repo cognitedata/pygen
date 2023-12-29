@@ -54,11 +54,11 @@ views:
       defaultValue: null
       name: timeseries
       description: null
-  lastUpdatedTime: 1703513428481
-  createdTime: 1703513428481
+  lastUpdatedTime: 1703845437017
+  createdTime: 1703845437017
 - space: pygen-models
-  externalId: CDFExternalReferencesListable
-  name: CDFExternalReferencesListable
+  externalId: CDFExternalReferencesListed
+  name: CDFExternalReferencesListed
   version: '1'
   writable: true
   usedFor: node
@@ -67,7 +67,7 @@ views:
     files:
       container:
         space: pygen-models
-        externalId: CDFExternalReferencesList
+        externalId: CDFExternalReferencesListed
       containerPropertyIdentifier: files
       type:
         list: true
@@ -81,7 +81,7 @@ views:
     sequences:
       container:
         space: pygen-models
-        externalId: CDFExternalReferencesList
+        externalId: CDFExternalReferencesListed
       containerPropertyIdentifier: sequences
       type:
         list: true
@@ -95,7 +95,7 @@ views:
     timeseries:
       container:
         space: pygen-models
-        externalId: CDFExternalReferencesList
+        externalId: CDFExternalReferencesListed
       containerPropertyIdentifier: timeseries
       type:
         list: true
@@ -106,8 +106,8 @@ views:
       defaultValue: null
       name: timeseries
       description: null
-  lastUpdatedTime: 1703628843397
-  createdTime: 1703628843397
+  lastUpdatedTime: 1703845437017
+  createdTime: 1703845437017
 - space: pygen-models
   externalId: ConnectionItemA
   name: ConnectionItemA
@@ -185,8 +185,8 @@ views:
       defaultValue: null
       name: selfDirect
       description: null
-  lastUpdatedTime: 1703659844068
-  createdTime: 1703659844068
+  lastUpdatedTime: 1703845437017
+  createdTime: 1703845437017
 - space: pygen-models
   externalId: ConnectionItemB
   name: ConnectionItemB
@@ -246,8 +246,8 @@ views:
       edgeSource: null
       direction: outwards
       connectionType: multi_edge_connection
-  lastUpdatedTime: 1703659844068
-  createdTime: 1703659844068
+  lastUpdatedTime: 1703845437017
+  createdTime: 1703845437017
 - space: pygen-models
   externalId: ConnectionItemC
   name: ConnectionItemC
@@ -292,8 +292,8 @@ views:
       edgeSource: null
       direction: outwards
       connectionType: multi_edge_connection
-  lastUpdatedTime: 1703659844068
-  createdTime: 1703659844068
+  lastUpdatedTime: 1703845437017
+  createdTime: 1703845437017
 - space: pygen-models
   externalId: Empty
   name: Empty
@@ -429,8 +429,8 @@ views:
       defaultValue: null
       name: timestamp
       description: null
-  lastUpdatedTime: 1703659844068
-  createdTime: 1703659844068
+  lastUpdatedTime: 1703845437017
+  createdTime: 1703845437017
 - space: pygen-models
   externalId: Implementation1
   name: Implementation1
@@ -512,8 +512,8 @@ views:
       defaultValue: null
       name: Value2
       description: null
-  lastUpdatedTime: 1703513428481
-  createdTime: 1703513428481
+  lastUpdatedTime: 1703845437017
+  createdTime: 1703845437017
 - space: pygen-models
   externalId: Implementation1NonWriteable
   name: Implementation1NonWriteable
@@ -580,8 +580,8 @@ views:
       defaultValue: null
       name: Value1
       description: null
-  lastUpdatedTime: 1703513428481
-  createdTime: 1703513428481
+  lastUpdatedTime: 1703845437017
+  createdTime: 1703845437017
 - space: pygen-models
   externalId: Implementation2
   name: Implementation2
@@ -633,8 +633,8 @@ views:
       defaultValue: null
       name: SubValue
       description: null
-  lastUpdatedTime: 1703513428481
-  createdTime: 1703513428481
+  lastUpdatedTime: 1703845437017
+  createdTime: 1703845437017
 - space: pygen-models
   externalId: MainInterface
   name: MainInterface
@@ -658,8 +658,8 @@ views:
       defaultValue: null
       name: MainValue
       description: null
-  lastUpdatedTime: 1703513428481
-  createdTime: 1703513428481
+  lastUpdatedTime: 1703845437017
+  createdTime: 1703845437017
 - space: pygen-models
   externalId: PrimitiveNullable
   name: PrimitiveNullable
@@ -795,11 +795,11 @@ views:
       defaultValue: null
       name: timestamp
       description: null
-  lastUpdatedTime: 1703513428481
-  createdTime: 1703513428481
+  lastUpdatedTime: 1703845437017
+  createdTime: 1703845437017
 - space: pygen-models
-  externalId: PrimitiveNullableListable
-  name: PrimitiveNullableListable
+  externalId: PrimitiveNullableListed
+  name: PrimitiveNullableListed
   version: '1'
   writable: true
   usedFor: node
@@ -808,7 +808,7 @@ views:
     boolean:
       container:
         space: pygen-models
-        externalId: PrimitiveNullableList
+        externalId: PrimitiveNullableListed
       containerPropertyIdentifier: boolean
       type:
         list: true
@@ -822,7 +822,7 @@ views:
     date:
       container:
         space: pygen-models
-        externalId: PrimitiveNullableList
+        externalId: PrimitiveNullableListed
       containerPropertyIdentifier: date
       type:
         list: true
@@ -836,7 +836,7 @@ views:
     float32:
       container:
         space: pygen-models
-        externalId: PrimitiveNullableList
+        externalId: PrimitiveNullableListed
       containerPropertyIdentifier: float32
       type:
         list: true
@@ -850,7 +850,7 @@ views:
     float64:
       container:
         space: pygen-models
-        externalId: PrimitiveNullableList
+        externalId: PrimitiveNullableListed
       containerPropertyIdentifier: float64
       type:
         list: true
@@ -864,7 +864,7 @@ views:
     int32:
       container:
         space: pygen-models
-        externalId: PrimitiveNullableList
+        externalId: PrimitiveNullableListed
       containerPropertyIdentifier: int32
       type:
         list: true
@@ -878,7 +878,7 @@ views:
     int64:
       container:
         space: pygen-models
-        externalId: PrimitiveNullableList
+        externalId: PrimitiveNullableListed
       containerPropertyIdentifier: int64
       type:
         list: true
@@ -892,7 +892,7 @@ views:
     json:
       container:
         space: pygen-models
-        externalId: PrimitiveNullableList
+        externalId: PrimitiveNullableListed
       containerPropertyIdentifier: json
       type:
         list: true
@@ -906,7 +906,7 @@ views:
     text:
       container:
         space: pygen-models
-        externalId: PrimitiveNullableList
+        externalId: PrimitiveNullableListed
       containerPropertyIdentifier: text
       type:
         list: true
@@ -921,7 +921,7 @@ views:
     timestamp:
       container:
         space: pygen-models
-        externalId: PrimitiveNullableList
+        externalId: PrimitiveNullableListed
       containerPropertyIdentifier: timestamp
       type:
         list: true
@@ -932,8 +932,8 @@ views:
       defaultValue: null
       name: timestamp
       description: null
-  lastUpdatedTime: 1703628843397
-  createdTime: 1703628843397
+  lastUpdatedTime: 1703845437017
+  createdTime: 1703845437017
 - space: pygen-models
   externalId: PrimitiveRequired
   name: PrimitiveRequired
@@ -1069,11 +1069,11 @@ views:
       defaultValue: null
       name: timestamp
       description: null
-  lastUpdatedTime: 1703513428481
-  createdTime: 1703513428481
+  lastUpdatedTime: 1703845437017
+  createdTime: 1703845437017
 - space: pygen-models
-  externalId: PrimitiveRequiredListable
-  name: PrimitiveRequiredListable
+  externalId: PrimitiveRequiredListed
+  name: PrimitiveRequiredListed
   version: '1'
   writable: true
   usedFor: node
@@ -1082,7 +1082,7 @@ views:
     boolean:
       container:
         space: pygen-models
-        externalId: PrimitiveRequiredList
+        externalId: PrimitiveRequiredListed
       containerPropertyIdentifier: boolean
       type:
         list: true
@@ -1096,7 +1096,7 @@ views:
     date:
       container:
         space: pygen-models
-        externalId: PrimitiveRequiredList
+        externalId: PrimitiveRequiredListed
       containerPropertyIdentifier: date
       type:
         list: true
@@ -1110,7 +1110,7 @@ views:
     float32:
       container:
         space: pygen-models
-        externalId: PrimitiveRequiredList
+        externalId: PrimitiveRequiredListed
       containerPropertyIdentifier: float32
       type:
         list: true
@@ -1124,7 +1124,7 @@ views:
     float64:
       container:
         space: pygen-models
-        externalId: PrimitiveRequiredList
+        externalId: PrimitiveRequiredListed
       containerPropertyIdentifier: float64
       type:
         list: true
@@ -1138,7 +1138,7 @@ views:
     int32:
       container:
         space: pygen-models
-        externalId: PrimitiveRequiredList
+        externalId: PrimitiveRequiredListed
       containerPropertyIdentifier: int32
       type:
         list: true
@@ -1152,7 +1152,7 @@ views:
     int64:
       container:
         space: pygen-models
-        externalId: PrimitiveRequiredList
+        externalId: PrimitiveRequiredListed
       containerPropertyIdentifier: int64
       type:
         list: true
@@ -1166,7 +1166,7 @@ views:
     json:
       container:
         space: pygen-models
-        externalId: PrimitiveRequiredList
+        externalId: PrimitiveRequiredListed
       containerPropertyIdentifier: json
       type:
         list: true
@@ -1180,7 +1180,7 @@ views:
     text:
       container:
         space: pygen-models
-        externalId: PrimitiveRequiredList
+        externalId: PrimitiveRequiredListed
       containerPropertyIdentifier: text
       type:
         list: true
@@ -1195,7 +1195,7 @@ views:
     timestamp:
       container:
         space: pygen-models
-        externalId: PrimitiveRequiredList
+        externalId: PrimitiveRequiredListed
       containerPropertyIdentifier: timestamp
       type:
         list: true
@@ -1206,8 +1206,8 @@ views:
       defaultValue: null
       name: timestamp
       description: null
-  lastUpdatedTime: 1703628843397
-  createdTime: 1703628843397
+  lastUpdatedTime: 1703845437017
+  createdTime: 1703845437017
 - space: pygen-models
   externalId: PrimitiveWithDefaults
   name: PrimitiveWithDefaults
@@ -1288,8 +1288,8 @@ views:
       defaultValue: my default text
       name: defaultString
       description: null
-  lastUpdatedTime: 1703513428481
-  createdTime: 1703513428481
+  lastUpdatedTime: 1703845437017
+  createdTime: 1703845437017
 - space: pygen-models
   externalId: SubInterface
   name: SubInterface
@@ -1343,8 +1343,8 @@ views:
       defaultValue: null
       name: SubValue
       description: null
-  lastUpdatedTime: 1703513428481
-  createdTime: 1703513428481
+  lastUpdatedTime: 1703845437017
+  createdTime: 1703845437017
 isGlobal: false
-lastUpdatedTime: 1703659845336
-createdTime: 1703659845336
+lastUpdatedTime: 1703845453427
+createdTime: 1703845438338

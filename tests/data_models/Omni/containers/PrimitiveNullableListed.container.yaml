@@ -1,6 +1,6 @@
 space: pygen-models
-externalId: PrimitiveRequiredList
-name: PrimitiveRequiredList
+externalId: PrimitiveNullableListed
+name: PrimitiveNullableListed
 usedFor: node
 properties:
   text:
@@ -8,62 +8,62 @@ properties:
       list: true
       collation: ucs_basic
       type: text
-    nullable: false
+    nullable: true
     autoIncrement: false
     name: text
   boolean:
     type:
       list: true
       type: boolean
-    nullable: false
+    nullable: true
     autoIncrement: false
     name: text
   float32:
     type:
       list: true
       type: float32
-    nullable: false
+    nullable: true
     autoIncrement: false
     name: float32
   float64:
     type:
       list: true
       type: float64
-    nullable: false
+    nullable: true
     autoIncrement: false
     name: float64
   int32:
     type:
       list: true
       type: int32
-    nullable: false
+    nullable: true
     autoIncrement: false
     name: int32
   int64:
     type:
       list: true
       type: int64
-    nullable: false
+    nullable: true
     autoIncrement: false
     name: int64
   timestamp:
     type:
       list: true
       type: timestamp
-    nullable: false
+    nullable: true
     autoIncrement: false
     name: timestamp
   date:
     type:
       list: true
       type: date
-    nullable: false
+    nullable: true
     autoIncrement: false
     name: date
   json:
     type:
       list: true
       type: json
-    nullable: false
+    nullable: true
     autoIncrement: false
     name: json

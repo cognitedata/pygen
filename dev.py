@@ -148,8 +148,11 @@ def deploy():
 
         # Data Model
         data_model = example_sdk.load_write_model(data_model_id)
-        existing_data_model = client.data_modeling.data_models.retrieve(data_model_id).latest_version()
-        is_changed = existing_data_model.as_apply() != data_model
+        existing_data_models = client.data_modeling.data_models.retrieve(data_model_id)
+        if not existing_data_models:
+            is_changed = True
+        else:
+            is_changed = existing_data_models.latest_version().as_apply() != data_model
         if is_changed or is_views_changed:
             client.data_modeling.data_models.delete(data_model_id)
             new_model = client.data_modeling.data_models.apply(data_model)
