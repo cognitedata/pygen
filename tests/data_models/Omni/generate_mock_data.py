@@ -45,7 +45,9 @@ def main():
 
         for data in mock_data:
             for field_ in fields(data):
-                resources = getattr(mock_data, field_.name)
+                if field_.name == "view_id":
+                    continue
+                resources = getattr(data, field_.name)
                 if not resources:
                     continue
                 (DATA_DIR / f"{data.view_id.external_id}.{field_.name}.yaml").write_text(resources.dump_yaml())
