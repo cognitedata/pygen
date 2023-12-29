@@ -1,6 +1,8 @@
+from collections import defaultdict
+from collections.abc import Iterable
 from dataclasses import dataclass, field, fields
 from pathlib import Path
-from typing import Union
+from typing import TypeVar, Union
 
 import numpy as np
 from cognite.client import data_modeling as dm
@@ -15,6 +17,7 @@ from cognite.client.data_classes import (
 )
 from cognite.client.data_classes.data_modeling.data_types import ListablePropertyType
 from cognite.client.data_classes.data_modeling.instances import PropertyValue
+from cognite.client.data_classes.data_modeling.views import MultiEdgeConnection
 from faker import Faker
 
 from tests.constants import OMNI_SDK
@@ -30,26 +33,74 @@ def main():
     faker = Faker()
     data_model = dm.DataModel[dm.View].load(MODEL_FILE.read_text())
     interfaces = {parent for view in data_model.views for parent in view.implements or []}
+    views = [
+        view
+        for view in data_model.views
+        # The empty view is used for testing and should not have mock data, neither interfaces and non-writable views
+        if view.external_id != "Empty" or not view.writable or view.as_id() in interfaces
+    ]
 
-    for view in data_model.views:
-        if view.external_id == "Empty":
-            # The empty view is used for testing and should not have mock data.
-            continue
-        view: dm.View
-        if not view.writable or view.as_id() in interfaces:
-            continue
+    for component in connected_views(views):
+        mock_data = generate_mock_data(component, node_count=5, faker=faker)
 
-        mock_data = generate_mock_data(view, node_count=5, faker=faker)
-        for field_ in fields(mock_data):
-            resources = getattr(mock_data, field_.name)
-            if not resources:
-                continue
-            (DATA_DIR / f"{view.external_id}.{field_.name}.yaml").write_text(resources.dump_yaml())
-        print(f"Generated {len(mock_data.node)} nodes for {view.external_id}")
+        for data in mock_data:
+            for field_ in fields(data):
+                resources = getattr(mock_data, field_.name)
+                if not resources:
+                    continue
+                (DATA_DIR / f"{data.view_id.external_id}.{field_.name}.yaml").write_text(resources.dump_yaml())
+            print(f"Generated {len(data.node)} nodes and {len(data.edge)} edges for {data.view_id.external_id}")
+
+
+def connected_views(views: list[dm.View]) -> Iterable[list[dm.View]]:
+    """
+    Find the connected views in the data model.
+    """
+    graph: dict[dm.ViewId, set[dm.ViewId]] = defaultdict(set)
+    for view in views:
+        dependencies = set()
+        for prop in view.properties.values():
+            if isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation) and prop.source:
+                dependencies.add(prop.source)
+            elif isinstance(prop, MultiEdgeConnection):
+                dependencies.add(prop.source)
+        graph[view.as_id()] |= dependencies
+        for dep in dependencies:
+            graph[dep] |= {view.as_id()}
+
+    view_by_id = {view.as_id(): view for view in views}
+    for components in connected_components(graph):
+        yield [view_by_id[view_id] for view_id in components]
+
+
+T_Component = TypeVar("T_Component")
+
+
+def connected_components(graph: dict[T_Component, set[T_Component]]) -> list[list[T_Component]]:
+    """
+    Find the connected components in a graph.
+    """
+    seen = set()
+
+    def component(search_node: T_Component) -> Iterable[T_Component]:
+        neighbors = {search_node}
+        while neighbors:
+            search_node = neighbors.pop()
+            seen.add(search_node)
+            neighbors |= graph[search_node] - seen
+            yield search_node
+
+    components = []
+    for node in graph:
+        if node not in seen:
+            components.append(list(component(node)))
+
+    return components
 
 
 @dataclass
 class Data:
+    view_id: dm.ViewId
     node: dm.NodeApplyList = field(default_factory=lambda: dm.NodeApplyList([]))
     edge: dm.EdgeApplyList = field(default_factory=lambda: dm.EdgeApplyList([]))
     timeseries: TimeSeriesList = field(default_factory=lambda: TimeSeriesList([]))
@@ -57,39 +108,62 @@ class Data:
     file: FileMetadataList = field(default_factory=lambda: FileMetadataList([]))
 
 
-def generate_mock_data(view: dm.View, node_count: int, faker: Faker) -> Data:
-    output = Data()
-    node_type: Union[dm.DirectRelationReference, None] = None
-    if isinstance(view.filter, dm.filters.Equals):
-        node_type = dm.DirectRelationReference.load(view.filter.dump()["equals"]["value"])
-    for _ in range(node_count):
-        mapped_properties = {k: v for k, v in view.properties.items() if isinstance(v, dm.MappedProperty)}
-        properties, external = generate_mock_values(mapped_properties, faker)
-        output.file.extend(external.file)
-        output.timeseries.extend(external.timeseries)
-        output.sequence.extend(external.sequence)
+def generate_mock_data(views: list[dm.View], node_count: int, faker: Faker) -> list[Data]:
+    outputs: dict[dm.ViewId, Data] = {}
+    for view in views:
+        view_id = view.as_id()
+        outputs[view_id] = output = Data(view_id=view.as_id())
+        mapped_properties = {
+            k: v
+            for k, v in view.properties.items()
+            if isinstance(v, dm.MappedProperty) and not isinstance(v.type, dm.DirectRelation)
+        }
 
-        node = dm.NodeApply(
-            space=OMNI_SDK.instance_space,
-            external_id=f"{view.external_id}:{faker.unique.first_name()}",
-            sources=[
-                dm.NodeOrEdgeData(
-                    source=view.as_id(),
-                    properties=properties,
-                )
-            ],
-            type=node_type,
-        )
-        output.node.append(node)
+        if not mapped_properties:
+            continue
+        node_type: Union[dm.DirectRelationReference, None] = None
+        if isinstance(view.filter, dm.filters.Equals):
+            node_type = dm.DirectRelationReference.load(view.filter.dump()["equals"]["value"])
+        for _ in range(node_count):
+            properties, external = generate_mock_values(mapped_properties, faker, view_id)
+            output.file.extend(external.file)
+            output.timeseries.extend(external.timeseries)
+            output.sequence.extend(external.sequence)
 
-    return output
+            node = dm.NodeApply(
+                space=OMNI_SDK.instance_space,
+                external_id=f"{view.external_id}:{faker.unique.first_name()}",
+                sources=[
+                    dm.NodeOrEdgeData(
+                        source=view.as_id(),
+                        properties=properties,
+                    )
+                ],
+                type=node_type,
+            )
+
+            output.node.append(node)
+    for view in views:
+        view_id = view.as_id()
+        connection_properties = {
+            k: v
+            for k, v in view.properties.items()
+            if (isinstance(v, dm.MappedProperty) and isinstance(v.type, dm.DirectRelation))
+            or isinstance(v, dm.ConnectionDefinition)
+        }
+        if not connection_properties:
+            continue
+        for _ in range(faker.random.randint(0, node_count)):
+            raise NotImplementedError()
+
+    return list(outputs.values())
 
 
 def generate_mock_values(
-    properties: dict[str, dm.MappedProperty], faker: Faker
+    properties: dict[str, dm.MappedProperty], faker: Faker, view_id: dm.ViewId
 ) -> tuple[dict[str, PropertyValue], Data]:
     output = {}
-    external = Data()
+    external = Data(view_id)
     for name, mapped in properties.items():
         if mapped.nullable and faker.random.random() < 0.5:
             output[name] = None
