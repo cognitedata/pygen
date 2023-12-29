@@ -203,7 +203,7 @@ MARKET_SDK = ExampleSDK(
     data_model_ids=[DataModelId("market", "CogPool", "3"), DataModelId("market", "PygenPool", "3")],
     _top_level_package="markets.client",
     client_name="MarketClient",
-    generate_sdk=True,
+    generate_sdk=False,
 )
 
 SHOP_SDK = ExampleSDK(
