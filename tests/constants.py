@@ -175,7 +175,9 @@ OMNI_SDK = ExampleSDK(
     download_nodes=True,
 )
 
-
+# This is used for testing the multi model functionality,
+# when calling python dev.py generate, the full SDK will not be generated, however,
+# the '_api_client.py` file will be generated.
 MULTI_MODEL_SDK = ExampleSDK(
     data_model_ids=[
         DataModelId("pygen-models", "Omni", "1"),
@@ -397,6 +399,10 @@ class OmniFiles:
 
 
 OMNI_SDK.append_manual_files(OmniFiles)
+
+
+class MultiModelFiles:
+    api_client = EXAMPLES_DIR / "multi_model_api_client.py"
 
 
 class WindMillFiles:
