@@ -59,20 +59,6 @@ def actor_api_generator(multi_api_generator: MultiAPIGenerator, actor_view: dm.V
     return api_generator
 
 
-def test_create_view_api_classes_actors(
-    actor_api_generator: APIGenerator, top_level_package: str, client_name: str, code_formatter: CodeFormatter
-):
-    # Arrange
-    expected = MovieSDKFiles.actors_api.read_text()
-
-    # Act
-    actual = actor_api_generator.generate_api_file(top_level_package, client_name)
-    actual = code_formatter.format_code(actual)
-
-    # Assert
-    assert actual == expected
-
-
 def test_create_query_api_actors(
     actor_api_generator: APIGenerator, top_level_package: str, client_name: str, code_formatter: CodeFormatter
 ):
@@ -95,20 +81,6 @@ def test_generate_actor_movie_edge_api(
 
     # Act
     _, actual = next(actor_api_generator.generate_edge_api_files(top_level_package, client_name))
-    actual = code_formatter.format_code(actual)
-
-    # Assert
-    assert actual == expected
-
-
-def test_create_view_api_classes_persons(
-    person_api_generator: APIGenerator, top_level_package: str, client_name: str, code_formatter: CodeFormatter
-):
-    # Arrange
-    expected = MovieSDKFiles.persons_api.read_text()
-
-    # Act
-    actual = person_api_generator.generate_api_file(top_level_package, client_name)
     actual = code_formatter.format_code(actual)
 
     # Assert

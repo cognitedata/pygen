@@ -360,6 +360,26 @@ class OmniFiles:
     primitive_required_list_data = data_classes / "_primitive_required_listed.py"
     implementation_1_data = data_classes / "_implementation_1.py"
 
+    cdf_external_api = api / "cdf_external_references.py"
+    cdf_external_list_api = api / "cdf_external_references_listed.py"
+    primitive_nullable_api = api / "primitive_nullable.py"
+    primitive_nullable_list_api = api / "primitive_nullable_listed.py"
+    primitive_with_defaults_api = api / "primitive_with_defaults.py"
+    primitive_required_api = api / "primitive_required.py"
+    primitive_required_list_api = api / "primitive_required_listed.py"
+    implementation_1_api = api / "implementation_1.py"
+
+    connection_item_a_api = api / "connection_item_a.py"
+    connection_item_b_api = api / "connection_item_b.py"
+    connection_item_c_api = api / "connection_item_c.py"
+
+    connection_item_a_edge_apis = (api / "connection_item_a_outwards.py",)
+    connection_item_b_edge_apis = (api / "connection_item_b_inwards.py", api / "connection_item_b_self_edge.py")
+    connection_item_c_edge_apis = (
+        api / "connection_item_c_connection_item_a.py",
+        api / "connection_item_c_connection_item_b.py",
+    )
+
 
 OMNI_SDK.append_manual_files(OmniFiles)
 
