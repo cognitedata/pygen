@@ -2,6 +2,14 @@ space: pygen-models
 externalId: Empty
 name: Empty
 version: '1'
+filter:
+  equals:
+    property:
+      - node
+      - type
+    value:
+      space: pygen-models
+      externalId: Empty
 properties:
   text:
     container:

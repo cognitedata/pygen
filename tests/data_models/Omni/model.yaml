@@ -297,6 +297,14 @@ views:
 - space: pygen-models
   externalId: Empty
   name: Empty
+  filter:
+    equals:
+      property:
+      - node
+      - type
+      value:
+        space: pygen-models
+        externalId: Empty
   version: '1'
   writable: true
   usedFor: node
@@ -429,8 +437,8 @@ views:
       defaultValue: null
       name: timestamp
       description: null
-  lastUpdatedTime: 1703845437017
-  createdTime: 1703845437017
+  lastUpdatedTime: 1703861235837
+  createdTime: 1703861235837
 - space: pygen-models
   externalId: Implementation1
   name: Implementation1
@@ -1346,5 +1354,5 @@ views:
   lastUpdatedTime: 1703845437017
   createdTime: 1703845437017
 isGlobal: false
-lastUpdatedTime: 1703845453427
-createdTime: 1703845438338
+lastUpdatedTime: 1703861237240
+createdTime: 1703861237240
