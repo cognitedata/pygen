@@ -2,10 +2,8 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock
 
-import pytest
 from cognite.client import data_modeling as dm
 
-from cognite.pygen._core.generators import APIGenerator, MultiAPIGenerator, SDKGenerator
 from cognite.pygen._core.models import (
     FilterCondition,
     FilterConditionOnetoOneEdge,
@@ -14,48 +12,6 @@ from cognite.pygen._core.models import (
     NodeDataClass,
 )
 from cognite.pygen.config import PygenConfig
-from tests.constants import IS_PYDANTIC_V1
-
-
-@pytest.fixture
-def top_level_package() -> str:
-    if IS_PYDANTIC_V1:
-        return "movie_domain_pydantic_v1.client"
-    else:
-        return "movie_domain.client"
-
-
-@pytest.fixture
-def client_name() -> str:
-    return "MovieClient"
-
-
-@pytest.fixture
-def sdk_generator(movie_model, top_level_package, client_name) -> SDKGenerator:
-    return SDKGenerator(top_level_package, client_name, movie_model)
-
-
-@pytest.fixture
-def multi_api_generator(
-    movie_model: dm.DataModel[dm.View], top_level_package: str, pygen_config: PygenConfig
-) -> MultiAPIGenerator:
-    return MultiAPIGenerator(
-        top_level_package, "MovieClient", movie_model.views, movie_model.space, config=pygen_config
-    )
-
-
-@pytest.fixture()
-def person_api_generator(multi_api_generator: MultiAPIGenerator, person_view: dm.View) -> APIGenerator:
-    api_generator = multi_api_generator[person_view.as_id()]
-    assert api_generator is not None, "Could not find API generator for actor view"
-    return api_generator
-
-
-@pytest.fixture()
-def actor_api_generator(multi_api_generator: MultiAPIGenerator, actor_view: dm.View) -> APIGenerator:
-    api_generator = multi_api_generator[actor_view.as_id()]
-    assert api_generator is not None, "Could not find API generator for actor view"
-    return api_generator
 
 
 def test_create_list_method(person_view: dm.View, pygen_config: PygenConfig) -> None:
