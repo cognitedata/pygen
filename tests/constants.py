@@ -231,7 +231,7 @@ APM_SDK = ExampleSDK(
     data_model_ids=[DataModelId("tutorial_apm_simple", "ApmSimple", "6")],
     _top_level_package="tutorial_apm_simple.client",
     client_name="ApmSimpleClient",
-    generate_sdk=True,
+    generate_sdk=False,
 )
 
 PUMP_SDK = ExampleSDK(
