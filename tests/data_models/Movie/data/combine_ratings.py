@@ -5,7 +5,7 @@ import pandas as pd
 
 def main():
     # Get all CSV files in the current directory
-    csv_files = [f for f in Path(".").iterdir() if f.suffix == ".csv"]
+    csv_files = [f for f in Path("../../../../examples/movie_domain/data").iterdir() if f.suffix == ".csv"]
 
     combined_data = []
 
