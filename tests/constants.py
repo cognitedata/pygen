@@ -176,6 +176,17 @@ OMNI_SDK = ExampleSDK(
 )
 
 
+MULTI_MODEL_SDK = ExampleSDK(
+    data_model_ids=[
+        DataModelId("pygen-models", "Omni", "1"),
+        DataModelId("power-models", "Windmill", "1"),
+    ],
+    _top_level_package="multi_model",
+    client_name="MultiModelClient",
+    generate_sdk=False,
+    _instance_space="omni-instances",
+)
+
 # This uses connections that are not supported by the UI, so it will not be shown there.
 OMNIUM_CONNECTION_SDK = ExampleSDK(
     data_model_ids=[DataModelId("pygen-models", "OmniConnection", "1")],

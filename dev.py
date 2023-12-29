@@ -24,7 +24,7 @@ from pydantic.version import VERSION as PYDANTIC_VERSION
 
 from cognite.pygen._generator import SDKGenerator, write_sdk_to_disk
 from cognite.pygen.utils.cdf import _user_options, load_cognite_client_from_toml
-from tests.constants import EXAMPLE_SDKS, EXAMPLES_DIR, REPO_ROOT
+from tests.constants import EXAMPLE_SDKS, EXAMPLES_DIR, MULTI_MODEL_SDK, REPO_ROOT
 
 app = typer.Typer(
     add_completion=False,
@@ -78,6 +78,17 @@ def generate_sdks(
         else:
             typer.echo("All files updated! Including files assumed to be manually maintained.")
         typer.echo("\n")
+
+    # Special case for the Multi-Model SDK, here we only want the _api_client.py file.
+    typer.echo(f"Generating {MULTI_MODEL_SDK.client_name} '_api_client.py' file ...")
+    generator = SDKGenerator(
+        MULTI_MODEL_SDK.top_level_package,
+        MULTI_MODEL_SDK.client_name,
+        MULTI_MODEL_SDK.load_data_models(),
+        logger=typer.echo,
+    )
+    _api_client_file = generator._generate_api_client_file()
+    (EXAMPLES_DIR / "multi_model_api_client.py").write_text(_api_client_file)
     typer.echo("All SDKs Created!")
 
 

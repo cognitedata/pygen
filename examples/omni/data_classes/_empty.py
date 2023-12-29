@@ -60,6 +60,7 @@ class Empty(DomainModel):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    type: dm.DirectRelationReference = dm.DirectRelationReference("pygen-models", "Empty")
     boolean: Optional[bool] = None
     date: Optional[datetime.date] = None
     float_32: Optional[float] = Field(None, alias="float32")
@@ -111,6 +112,7 @@ class EmptyApply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    type: dm.DirectRelationReference = dm.DirectRelationReference("pygen-models", "Empty")
     boolean: Optional[bool] = None
     date: Optional[datetime.date] = None
     float_32: Optional[float] = Field(None, alias="float32")
@@ -168,6 +170,7 @@ class EmptyApply(DomainModelApply):
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
+                type=self.type,
                 sources=[
                     dm.NodeOrEdgeData(
                         source=write_view,
