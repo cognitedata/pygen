@@ -57,3 +57,41 @@ def test_node_without_properties(omni_client: OmniClient, cognite_client: Cognit
                 created.nodes.as_ids(),
                 created.edges.as_ids(),
             )
+
+
+@pytest.mark.skip("Known bug, logged as an issue")
+def test_person_apply_multiple_requests(movie_client: OmniClient) -> None:
+    # Arrange
+    person = dc.PersonApply(
+        external_id="person1",
+        name="Person 1",
+        birth_year=1990,
+        roles=[
+            dc.RoleApply(
+                external_id="actor1",
+                person="person1",
+                won_oscar=True,
+                movies=[
+                    dc.MovieApply(
+                        external_id="movie1",
+                        title="Movie 1",
+                        release_year=2020,
+                        actors=["actor1"],
+                        run_time_minutes=120,
+                    )
+                ],
+            ),
+        ],
+    )
+
+    limit = movie_client.person._client.data_modeling.instances._CREATE_LIMIT
+    try:
+        movie_client.person._client.data_modeling.instances._CREATE_LIMIT = 1
+
+        # Act
+        movie_client.person.apply(person)
+    finally:
+        movie_client.person._client.data_modeling.instances._CREATE_LIMIT = limit
+
+    instances = person.to_instances_apply()
+    movie_client.person._client.data_modeling.instances.delete(instances.nodes.as_ids(), instances.edges.as_ids())

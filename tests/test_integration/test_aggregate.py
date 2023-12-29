@@ -1,0 +1,35 @@
+from __future__ import annotations
+
+from tests.constants import IS_PYDANTIC_V2
+
+if IS_PYDANTIC_V2:
+    from omni import OmniClient
+else:
+    from omni_pydantic_v1 import OmniClient
+
+
+def test_aggregate_count(omni_client: OmniClient) -> None:
+    # Act
+    result = omni_client.primitive_required.aggregate("count")
+
+    # Assert
+    assert result[0].value > 0
+
+
+def test_aggregate_count_with_group_by(omni_client: OmniClient) -> None:
+    # Act
+    result = omni_client.primitive_required.aggregate("count", group_by="boolean")
+
+    # Assert
+    assert len(result) == 2
+    assert result[0].aggregates[0].value > 0
+    assert result[1].aggregates[0].value > 0
+
+
+def test_histogram(omni_client: OmniClient) -> None:
+    # Act
+    result = omni_client.primitive_required.histogram("float_32", interval=10.0)
+
+    # Assert
+    assert len(result.buckets) > 0
+    assert result.buckets[0].count > 0

@@ -70,3 +70,18 @@ def test_filter_range(omni_client: OmniClient) -> None:
     assert not (
         is_below := [item for item in filtered_items if item.int_32 < items[2].int_32]
     ), f"Fount items below: {is_below}"
+
+
+def test_list_above_5000_items(omni_client: OmniClient) -> None:
+    # Arrange
+    items = [
+        dc.Implementation2Apply(external_id=f"implementation2_5000:{i}", mainValue=f"Implementation2 {i}")
+        for i in range(5001)
+    ]
+    omni_client.implementation_2.apply(items)
+
+    # Act
+    items = omni_client.implementation_2.list(limit=-1, external_id_prefix="implementation2_5000:")
+
+    # Assert
+    assert len(items) == 5001
