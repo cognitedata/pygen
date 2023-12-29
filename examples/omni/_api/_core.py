@@ -80,7 +80,7 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
     def __init__(
         self,
         client: CogniteClient,
-        sources: dm.ViewIdentifier | Sequence[dm.ViewIdentifier] | dm.View | Sequence[dm.View],
+        sources: dm.ViewIdentifier | Sequence[dm.ViewIdentifier] | dm.View | Sequence[dm.View] | None,
         class_type: type[T_DomainModel],
         class_apply_type: type[T_DomainModelApply],
         class_list: type[T_DomainModelList],

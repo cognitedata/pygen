@@ -37,7 +37,7 @@ class ConnectionItemCAPI(NodeAPI[ConnectionItemC, ConnectionItemCApply, Connecti
         view_id = view_by_write_class[ConnectionItemCApply]
         super().__init__(
             client=client,
-            sources=view_id,
+            sources=None,
             class_type=ConnectionItemC,
             class_apply_type=ConnectionItemCApply,
             class_list=ConnectionItemCList,
