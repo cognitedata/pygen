@@ -62,7 +62,7 @@ class TestCRUDOperations:
         api_name = omni_data_classes[view_id].api_name
         write_class = omni_data_classes[view_id].write
         view = omni_data_classes[view_id].view
-        mock_nodes = generate_mock_data(view, 2, faker).node
+        mock_nodes = generate_mock_data(view, 2, 0, faker).node
         domain_nodes = [write_class.from_instance(node) for node in mock_nodes]
         external_ids = [node.external_id for node in domain_nodes]
         api: DomainAPI = getattr(omni_client, api_name)

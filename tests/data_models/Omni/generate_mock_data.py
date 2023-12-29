@@ -41,7 +41,7 @@ def main():
     ]
 
     for component in connected_views(views):
-        mock_data = generate_mock_data(component, node_count=5, faker=faker)
+        mock_data = generate_mock_data(component, node_count=5, edge_count=3, faker=faker)
 
         for data in mock_data:
             for field_ in fields(data):
@@ -110,7 +110,7 @@ class Data:
     file: FileMetadataList = field(default_factory=lambda: FileMetadataList([]))
 
 
-def generate_mock_data(views: list[dm.View], node_count: int, faker: Faker) -> list[Data]:
+def generate_mock_data(views: list[dm.View], node_count: int, edge_count: int, faker: Faker) -> list[Data]:
     outputs: dict[dm.ViewId, Data] = {}
     for view in views:
         view_id = view.as_id()
@@ -121,26 +121,28 @@ def generate_mock_data(views: list[dm.View], node_count: int, faker: Faker) -> l
             if isinstance(v, dm.MappedProperty) and not isinstance(v.type, dm.DirectRelation)
         }
 
-        if not mapped_properties:
-            continue
         node_type: Union[dm.DirectRelationReference, None] = None
         if isinstance(view.filter, dm.filters.Equals):
             node_type = dm.DirectRelationReference.load(view.filter.dump()["equals"]["value"])
         for _ in range(node_count):
-            properties, external = generate_mock_values(mapped_properties, faker, view_id)
-            output.file.extend(external.file)
-            output.timeseries.extend(external.timeseries)
-            output.sequence.extend(external.sequence)
-
-            node = dm.NodeApply(
-                space=OMNI_SDK.instance_space,
-                external_id=f"{view.external_id}:{faker.unique.first_name()}",
-                sources=[
+            if mapped_properties:
+                properties, external = generate_mock_values(mapped_properties, faker, view_id)
+                output.file.extend(external.file)
+                output.timeseries.extend(external.timeseries)
+                output.sequence.extend(external.sequence)
+                sources = [
                     dm.NodeOrEdgeData(
                         source=view.as_id(),
                         properties=properties,
                     )
-                ],
+                ]
+            else:
+                sources = []
+
+            node = dm.NodeApply(
+                space=OMNI_SDK.instance_space,
+                external_id=f"{view.external_id}:{faker.unique.first_name()}",
+                sources=sources,
                 type=node_type,
             )
 
@@ -155,8 +157,49 @@ def generate_mock_data(views: list[dm.View], node_count: int, faker: Faker) -> l
         }
         if not connection_properties:
             continue
-        for _ in range(faker.random.randint(0, node_count)):
-            raise NotImplementedError()
+        for node in outputs[view_id].node:
+            for name, connection in connection_properties.items():
+                if isinstance(connection, MultiEdgeConnection):
+                    sources = outputs[connection.source].node.as_ids()
+                    for _ in range(faker.random.randint(0, edge_count)):
+                        start_node = node.as_id()
+                        end_node = faker.random.choice(sources)
+                        if connection.direction == "inwards":
+                            start_node, end_node = end_node, start_node
+
+                        edge = dm.EdgeApply(
+                            space=OMNI_SDK.instance_space,
+                            external_id=f"{view.external_id}:{faker.unique.first_name()}",
+                            type=connection.type,
+                            start_node=(start_node.space, start_node.external_id),
+                            end_node=(end_node.space, end_node.external_id),
+                        )
+                        outputs[view_id].edge.append(edge)
+                elif (
+                    isinstance(connection, dm.MappedProperty)
+                    and isinstance(connection.type, dm.DirectRelation)
+                    and connection.source
+                ):
+                    if faker.random.random() < 0.25 and (sources := outputs[connection.source].node.as_ids()):
+                        other_node = faker.random.choice(sources)
+                        for source in node.sources:
+                            if source.source == view_id:
+                                source.properties[name] = {
+                                    "space": other_node.space,
+                                    "externalId": other_node.external_id,
+                                }
+                                break
+                        else:
+                            node.sources.append(
+                                dm.NodeOrEdgeData(
+                                    source=view_id,
+                                    properties={
+                                        name: {"space": other_node.space, "externalId": other_node.external_id}
+                                    },
+                                )
+                            )
+                else:
+                    raise NotImplementedError(f"Connection {type(connection)} not implemented")
 
     return list(outputs.values())
 

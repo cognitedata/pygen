@@ -1,0 +1,70 @@
+- instanceType: node
+  space: omni-instances
+  externalId: ConnectionItemB:Karen
+  sources:
+  - properties:
+      name: Quite boy those.
+    source:
+      space: pygen-models
+      externalId: ConnectionItemB
+      version: '1'
+      type: view
+  type:
+    space: pygen-models
+    externalId: ConnectionItemB
+- instanceType: node
+  space: omni-instances
+  externalId: ConnectionItemB:Vincent
+  sources:
+  - properties:
+      name: Born itself law west then enjoy.
+    source:
+      space: pygen-models
+      externalId: ConnectionItemB
+      version: '1'
+      type: view
+  type:
+    space: pygen-models
+    externalId: ConnectionItemB
+- instanceType: node
+  space: omni-instances
+  externalId: ConnectionItemB:Rita
+  sources:
+  - properties:
+      name: null
+    source:
+      space: pygen-models
+      externalId: ConnectionItemB
+      version: '1'
+      type: view
+  type:
+    space: pygen-models
+    externalId: ConnectionItemB
+- instanceType: node
+  space: omni-instances
+  externalId: ConnectionItemB:Stephanie
+  sources:
+  - properties:
+      name: Success medical current hear claim.
+    source:
+      space: pygen-models
+      externalId: ConnectionItemB
+      version: '1'
+      type: view
+  type:
+    space: pygen-models
+    externalId: ConnectionItemB
+- instanceType: node
+  space: omni-instances
+  externalId: ConnectionItemB:Tricia
+  sources:
+  - properties:
+      name: Out major born.
+    source:
+      space: pygen-models
+      externalId: ConnectionItemB
+      version: '1'
+      type: view
+  type:
+    space: pygen-models
+    externalId: ConnectionItemB
