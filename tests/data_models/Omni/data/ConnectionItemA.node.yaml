@@ -4,9 +4,6 @@
   sources:
   - properties:
       name: null
-      selfDirect:
-        space: omni-instances
-        externalId: ConnectionItemA:Eric
     source:
       space: pygen-models
       externalId: ConnectionItemA
@@ -21,6 +18,9 @@
   sources:
   - properties:
       name: null
+      otherDirect:
+        space: omni-instances
+        externalId: ConnectionItemC:Amanda
     source:
       space: pygen-models
       externalId: ConnectionItemA
@@ -35,9 +35,6 @@
   sources:
   - properties:
       name: null
-      otherDirect:
-        space: omni-instances
-        externalId: ConnectionItemC:John
     source:
       space: pygen-models
       externalId: ConnectionItemA
@@ -52,6 +49,12 @@
   sources:
   - properties:
       name: Gun young catch management sense technology.
+      otherDirect:
+        space: omni-instances
+        externalId: ConnectionItemC:Tiffany
+      selfDirect:
+        space: omni-instances
+        externalId: ConnectionItemA:Erin
     source:
       space: pygen-models
       externalId: ConnectionItemA
@@ -66,9 +69,9 @@
   sources:
   - properties:
       name: null
-      otherDirect:
+      selfDirect:
         space: omni-instances
-        externalId: ConnectionItemC:Candace
+        externalId: ConnectionItemA:Joseph
     source:
       space: pygen-models
       externalId: ConnectionItemA

@@ -36,9 +36,11 @@ def main():
     views = [
         view
         for view in data_model.views
-        # The empty view is used for testing and should not have mock data, neither interfaces and non-writable views
-        if view.external_id != "Empty" or not view.writable or view.as_id() in interfaces
+        # The empty view is used for testing and should not have mock data, neither should interfaces
+        if view.external_id != "Empty" and view.as_id() not in interfaces
     ]
+    # Not writeable views need to be included as they might be used in connections (edges)
+    not_writeable = {view.as_id() for view in data_model.views if not view.writable}
 
     for component in connected_views(views):
         mock_data = generate_mock_data(component, node_count=5, edge_count=3, faker=faker)
@@ -46,6 +48,8 @@ def main():
         for data in mock_data:
             for field_ in fields(data):
                 if field_.name == "view_id":
+                    continue
+                if field_.name == "node" and data.view_id in not_writeable:
                     continue
                 resources = getattr(data, field_.name)
                 if not resources:

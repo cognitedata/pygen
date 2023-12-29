@@ -209,13 +209,28 @@ def deploy():
 
         # Nodes
         nodes = example_sdk.load_nodes(data_model_id, isoformat_dates=True)
-        result = client.data_modeling.instances.apply(nodes=nodes)
-        changed = [node for node in result.nodes if node.was_modified]
-        unchanged = [node for node in result.nodes if not node.was_modified]
-        for node in changed:
-            typer.echo(f"Created node {node.as_id()}")
+        if with_sources := [node for node in nodes if node.sources]:
+            result = client.data_modeling.instances.apply(nodes=with_sources, auto_create_direct_relations=True)
+            changed = [node for node in result.nodes if node.was_modified]
+            unchanged = [node for node in result.nodes if not node.was_modified]
+            for node in changed:
+                typer.echo(f"Created node {node.as_id()}")
+            if unchanged:
+                typer.echo(f"{len(unchanged)} nodes are unchanged")
+        else:
+            typer.echo("No nodes to create")
+
+        # Edges
+        edges = example_sdk.load_edges(data_model_id)
+        result = client.data_modeling.instances.apply(
+            edges=edges, auto_create_start_nodes=True, auto_create_end_nodes=True
+        )
+        changed = [edge for edge in result.edges if edge.was_modified]
+        unchanged = [edge for edge in result.edges if not edge.was_modified]
+        for edge in changed:
+            typer.echo(f"Created edge {edge.as_id()}")
         if unchanged:
-            typer.echo(f"{len(unchanged)} nodes are unchanged")
+            typer.echo(f"{len(unchanged)} edges are unchanged")
 
 
 @app.command("list", help="List all example files which are expected to be changed manually")

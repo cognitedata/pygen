@@ -1,6 +1,6 @@
 - instanceType: edge
   space: omni-instances
-  externalId: ConnectionItemA:Ashley
+  externalId: ConnectionItemA:Sarah
   type:
     space: pygen-models
     externalId: bidirectional
@@ -9,46 +9,34 @@
     externalId: ConnectionItemA:Joseph
   endNode:
     space: omni-instances
-    externalId: ConnectionItemB:Karen
+    externalId: ConnectionItemB:Teresa
 - instanceType: edge
   space: omni-instances
-  externalId: ConnectionItemA:Donna
+  externalId: ConnectionItemA:Raymond
   type:
     space: pygen-models
     externalId: bidirectional
   startNode:
     space: omni-instances
-    externalId: ConnectionItemA:Anna
+    externalId: ConnectionItemA:Joseph
   endNode:
     space: omni-instances
-    externalId: ConnectionItemB:Vincent
+    externalId: ConnectionItemB:Teresa
 - instanceType: edge
   space: omni-instances
-  externalId: ConnectionItemA:Sarah
+  externalId: ConnectionItemA:Samuel
   type:
     space: pygen-models
     externalId: bidirectional
   startNode:
     space: omni-instances
-    externalId: ConnectionItemA:Brenda
+    externalId: ConnectionItemA:Joseph
   endNode:
     space: omni-instances
-    externalId: ConnectionItemB:Vincent
+    externalId: ConnectionItemB:Amber
 - instanceType: edge
   space: omni-instances
-  externalId: ConnectionItemA:Jennifer
-  type:
-    space: pygen-models
-    externalId: bidirectional
-  startNode:
-    space: omni-instances
-    externalId: ConnectionItemA:Brenda
-  endNode:
-    space: omni-instances
-    externalId: ConnectionItemB:Vincent
-- instanceType: edge
-  space: omni-instances
-  externalId: ConnectionItemA:Wanda
+  externalId: ConnectionItemA:Chad
   type:
     space: pygen-models
     externalId: bidirectional
@@ -57,10 +45,10 @@
     externalId: ConnectionItemA:Brenda
   endNode:
     space: omni-instances
-    externalId: ConnectionItemB:Stephanie
+    externalId: ConnectionItemB:Ashley
 - instanceType: edge
   space: omni-instances
-  externalId: ConnectionItemA:Caleb
+  externalId: ConnectionItemA:Willie
   type:
     space: pygen-models
     externalId: bidirectional
@@ -69,10 +57,10 @@
     externalId: ConnectionItemA:Eric
   endNode:
     space: omni-instances
-    externalId: ConnectionItemB:Karen
+    externalId: ConnectionItemB:Jennifer
 - instanceType: edge
   space: omni-instances
-  externalId: ConnectionItemA:Brianna
+  externalId: ConnectionItemA:Jason
   type:
     space: pygen-models
     externalId: bidirectional
@@ -81,16 +69,16 @@
     externalId: ConnectionItemA:Eric
   endNode:
     space: omni-instances
-    externalId: ConnectionItemB:Karen
+    externalId: ConnectionItemB:Amber
 - instanceType: edge
   space: omni-instances
-  externalId: ConnectionItemA:Adrian
+  externalId: ConnectionItemA:Lindsey
   type:
     space: pygen-models
     externalId: bidirectional
   startNode:
     space: omni-instances
-    externalId: ConnectionItemA:Eric
+    externalId: ConnectionItemA:Erin
   endNode:
     space: omni-instances
-    externalId: ConnectionItemB:Vincent
+    externalId: ConnectionItemB:John
