@@ -5,9 +5,11 @@ from tests.constants import IS_PYDANTIC_V2
 if IS_PYDANTIC_V2:
     from omni import OmniClient
     from omni import data_classes as dc
+    from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 else:
     from omni_pydantic_v1 import OmniClient
     from omni_pydantic_v1 import data_classes as dc
+    from omni_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
 
 
 def test_list_empty_to_pandas(omni_client: OmniClient) -> None:
@@ -43,3 +45,28 @@ def test_filter_on_direct_edge(omni_client: OmniClient) -> None:
 
     assert len(items) > 0
     assert expected.external_id in [item.external_id for item in items]
+
+
+def test_filter_on_space(omni_client: OmniClient) -> None:
+    # Act
+    no_items = []  # omni_client.primitive_nullable.list(space="Non-existing space")
+    some_items = omni_client.primitive_nullable.list(space=DEFAULT_INSTANCE_SPACE)
+
+    # Assert
+    assert len(no_items) == 0
+    assert len(some_items) > 0
+
+
+def test_filter_range(omni_client: OmniClient) -> None:
+    # Arrange
+    items = omni_client.primitive_required.list(limit=5)
+    items = sorted(items, key=lambda item: item.int_32)
+
+    # Act
+    filtered_items = omni_client.primitive_required.list(min_int_32=items[2].int_32, limit=-1)
+
+    # Assert
+    assert len(filtered_items) > 0
+    assert not (
+        is_below := [item for item in filtered_items if item.int_32 < items[2].int_32]
+    ), f"Fount items below: {is_below}"

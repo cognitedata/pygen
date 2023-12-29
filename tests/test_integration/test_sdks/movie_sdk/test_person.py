@@ -10,14 +10,6 @@ else:
     from movie_domain.client import data_classes as movie
 
 
-def test_person_list_born_before_1960(movie_client: MovieClient) -> None:
-    persons = movie_client.person.list(max_birth_year=1960, limit=-1)
-
-    assert len(persons) > 0
-    people_born_after_1960 = [person for person in persons if person.birth_year > 1960]
-    assert not people_born_after_1960, "Found people born after 1960"
-
-
 @pytest.mark.skip("Known bug, logged as an issue")
 def test_person_apply_multiple_requests(movie_client: MovieClient) -> None:
     # Arrange
@@ -107,13 +99,3 @@ def test_histogram_birth_year(movie_client: MovieClient) -> None:
     assert len(result.buckets) > 0
     assert result.buckets[0].count > 0
     assert result.buckets[0].start == 1900
-
-
-def test_list_filter_on_space(movie_client: MovieClient) -> None:
-    # Act
-    no_people = []  # movie_client.person.list(space="Non-existing space")
-    some_people = movie_client.person.list(space="IntegrationTestsImmutable")
-
-    # Assert
-    assert len(no_people) == 0
-    assert len(some_people) > 0
