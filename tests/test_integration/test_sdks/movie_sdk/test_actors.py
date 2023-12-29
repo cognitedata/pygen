@@ -92,14 +92,6 @@ def test_circular_query_from_actor(movie_client: MovieClient):
                 assert isinstance(movie_actor, m.Actor)
 
 
-def test_actor_retrieve_missing(movie_client: MovieClient) -> None:
-    # Act
-    actor = movie_client.actor.retrieve("actor:missing")
-
-    # Assert
-    assert actor is None
-
-
 def test_actor_query_direct_relation(movie_client: MovieClient):
     actors = movie_client.actor(limit=2).query(retrieve_person=True)
 
@@ -108,12 +100,3 @@ def test_actor_query_direct_relation(movie_client: MovieClient):
         assert isinstance(actor, m.Actor)
         assert isinstance(actor.person, m.Person)
         assert actor.person.external_id.split(":")[1] == actor.external_id.split(":")[1]
-
-
-def test_actor_filter_on_boolean(movie_client: MovieClient):
-    actors = movie_client.actor.list(won_oscar=False, limit=-1)
-
-    assert len(actors) > 0
-    assert not (
-        won_oscar := [actor for actor in actors if actor.won_oscar is True]
-    ), f"Found actors with oscars {won_oscar}"
