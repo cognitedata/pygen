@@ -13,9 +13,8 @@ from cognite.pygen._core.models import (
     FilterParameter,
     NodeDataClass,
 )
-from cognite.pygen._generator import CodeFormatter
 from cognite.pygen.config import PygenConfig
-from tests.constants import IS_PYDANTIC_V1, MovieSDKFiles
+from tests.constants import IS_PYDANTIC_V1
 
 
 @pytest.fixture
@@ -57,34 +56,6 @@ def actor_api_generator(multi_api_generator: MultiAPIGenerator, actor_view: dm.V
     api_generator = multi_api_generator[actor_view.as_id()]
     assert api_generator is not None, "Could not find API generator for actor view"
     return api_generator
-
-
-def test_create_query_api_actors(
-    actor_api_generator: APIGenerator, top_level_package: str, client_name: str, code_formatter: CodeFormatter
-):
-    # Arrange
-    expected = MovieSDKFiles.actor_query_api.read_text()
-
-    # Act
-    actual = actor_api_generator.generate_api_query_file(top_level_package, client_name)
-    actual = code_formatter.format_code(actual)
-
-    # Assert
-    assert actual == expected
-
-
-def test_generate_actor_movie_edge_api(
-    actor_api_generator: APIGenerator, top_level_package: str, client_name: str, code_formatter: CodeFormatter
-):
-    # Arrange
-    expected = MovieSDKFiles.actor_movies_api.read_text()
-
-    # Act
-    _, actual = next(actor_api_generator.generate_edge_api_files(top_level_package, client_name))
-    actual = code_formatter.format_code(actual)
-
-    # Assert
-    assert actual == expected
 
 
 def test_create_list_method(person_view: dm.View, pygen_config: PygenConfig) -> None:
