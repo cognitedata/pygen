@@ -207,7 +207,8 @@ def _create_connection_item_a_filter(
     if other_direct and isinstance(other_direct, str):
         filters.append(
             dm.filters.Equals(
-                view_id.as_property_ref("otherDirect"), value={"space": "pygen-models", "externalId": other_direct}
+                view_id.as_property_ref("otherDirect"),
+                value={"space": DEFAULT_INSTANCE_SPACE, "externalId": other_direct},
             )
         )
     if other_direct and isinstance(other_direct, tuple):
@@ -220,7 +221,7 @@ def _create_connection_item_a_filter(
         filters.append(
             dm.filters.In(
                 view_id.as_property_ref("otherDirect"),
-                values=[{"space": "pygen-models", "externalId": item} for item in other_direct],
+                values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in other_direct],
             )
         )
     if other_direct and isinstance(other_direct, list) and isinstance(other_direct[0], tuple):
@@ -233,7 +234,8 @@ def _create_connection_item_a_filter(
     if self_direct and isinstance(self_direct, str):
         filters.append(
             dm.filters.Equals(
-                view_id.as_property_ref("selfDirect"), value={"space": "pygen-models", "externalId": self_direct}
+                view_id.as_property_ref("selfDirect"),
+                value={"space": DEFAULT_INSTANCE_SPACE, "externalId": self_direct},
             )
         )
     if self_direct and isinstance(self_direct, tuple):
@@ -246,7 +248,7 @@ def _create_connection_item_a_filter(
         filters.append(
             dm.filters.In(
                 view_id.as_property_ref("selfDirect"),
-                values=[{"space": "pygen-models", "externalId": item} for item in self_direct],
+                values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in self_direct],
             )
         )
     if self_direct and isinstance(self_direct, list) and isinstance(self_direct[0], tuple):
