@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from cognite.client import CogniteClient
-from cognite.client import data_modeling as dm
 
 from tests.constants import IS_PYDANTIC_V2
 
@@ -37,7 +36,7 @@ def test_node_without_properties(omni_client: OmniClient, cognite_client: Cognit
         created = omni_client.connection_item_c.apply(new_connection_c)
 
         # Assert
-        assert len(created.nodes) == 2
+        assert len(created.nodes) == 3
         assert len(created.edges) == 2
 
         # Act
@@ -50,6 +49,6 @@ def test_node_without_properties(omni_client: OmniClient, cognite_client: Cognit
     finally:
         if created is not None:
             cognite_client.data_modeling.instances.delete(
-                [*created.nodes.as_ids(), dm.NodeId(new_connection_c.space, new_connection_c.external_id)],
+                created.nodes.as_ids(),
                 created.edges.as_ids(),
             )

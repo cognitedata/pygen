@@ -99,9 +99,13 @@ class ConnectionItemCApply(DomainModelApply):
             return resources
         cache.add(self.as_tuple_id())
 
-        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
-            "pygen-models", "ConnectionItemC", "1"
+        this_node = dm.NodeApply(
+            space=self.space,
+            external_id=self.external_id,
+            type=self.type,
+            sources=None,
         )
+        resources.nodes.append(this_node)
 
         edge_type = dm.DirectRelationReference("pygen-models", "unidirectional")
         for connection_item_a in self.connection_item_a or []:
