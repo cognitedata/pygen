@@ -203,7 +203,7 @@ MOVIE_SDK = ExampleSDK(
     data_model_ids=[DataModelId("IntegrationTestsImmutable", "Movie", "4")],
     _top_level_package="movie_domain.client",
     client_name="MovieClient",
-    generate_sdk=True,
+    generate_sdk=False,
 )
 
 
