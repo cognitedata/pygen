@@ -111,7 +111,7 @@ def test_load_windmills_from_json(
         if IS_PYDANTIC_V2:
             windmills = TypeAdapter(list[WindmillApply]).validate_json(raw_json)
         else:
-            windmills = parse_obj_as(list[WindmillApply], raw_json)
+            windmills = parse_obj_as(list[WindmillApply], loaded_json)
         created = ResourcesApply()
         for item in windmills:
             created.extend(item.to_instances_apply())
