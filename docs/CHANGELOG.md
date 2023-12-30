@@ -31,6 +31,8 @@ Changes are grouped as follows
   `None` instead of an empty list. This is now fixed.
 * When filtering on a direct relation in the generated SDK with an `external_id`, the `space` of the model was used
   and not the `DEFAULT_INSTANCE_SPACE` was used. This is now fixed.
+* When `quering` and including a direct relation in the generated SDK, the property name and the field name was
+  assumed to be the same. This is now fixed.
 
 ## [0.32.5] - 21-12-23
 ### Fixed

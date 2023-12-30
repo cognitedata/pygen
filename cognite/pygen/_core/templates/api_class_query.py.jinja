@@ -121,7 +121,7 @@ class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
                 expression=dm.query.NodeResultSetExpression(
                     filter=dm.filters.HasData(views=[view_id]),
                     from_=from_,
-                    through=self._view_by_write_class[{{ data_class.write_name }}].as_property_ref("{{ field.name }}"),
+                    through=self._view_by_write_class[{{ data_class.write_name }}].as_property_ref("{{ field.prop_name }}"),
                     direction="outwards",
                 ),
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
