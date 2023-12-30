@@ -220,6 +220,9 @@ def deploy():
 
         # Nodes
         nodes = example_sdk.load_nodes(data_model_id, isoformat_dates=True)
+        for node in nodes:
+            # Bug in SDK. Should not be necessary to set to None
+            node.sources = node.sources or None
         result = client.data_modeling.instances.apply(nodes=nodes)
         changed = [node for node in result.nodes if node.was_modified]
         unchanged = [node for node in result.nodes if not node.was_modified]
