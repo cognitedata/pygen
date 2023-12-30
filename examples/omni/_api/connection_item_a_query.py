@@ -124,7 +124,7 @@ class ConnectionItemAQueryAPI(QueryAPI[T_DomainModelList]):
                 expression=dm.query.NodeResultSetExpression(
                     filter=dm.filters.HasData(views=[view_id]),
                     from_=from_,
-                    through=self._view_by_write_class[ConnectionItemAApply].as_property_ref("other_direct"),
+                    through=self._view_by_write_class[ConnectionItemAApply].as_property_ref("otherDirect"),
                     direction="outwards",
                 ),
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
@@ -141,7 +141,7 @@ class ConnectionItemAQueryAPI(QueryAPI[T_DomainModelList]):
                 expression=dm.query.NodeResultSetExpression(
                     filter=dm.filters.HasData(views=[view_id]),
                     from_=from_,
-                    through=self._view_by_write_class[ConnectionItemAApply].as_property_ref("self_direct"),
+                    through=self._view_by_write_class[ConnectionItemAApply].as_property_ref("selfDirect"),
                     direction="outwards",
                 ),
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
