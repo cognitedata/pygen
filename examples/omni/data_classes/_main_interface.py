@@ -49,7 +49,6 @@ class MainInterface(DomainModel):
         version: The version of the main interface node.
     """
 
-    space: str = DEFAULT_INSTANCE_SPACE
     main_value: Optional[str] = Field(None, alias="mainValue")
 
     def as_apply(self) -> MainInterfaceApply:

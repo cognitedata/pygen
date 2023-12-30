@@ -15,6 +15,8 @@ from ._core import (
     ResourcesApply,
 )
 
+from ._sub_interface import SubInterface, SubInterfaceApply
+
 
 __all__ = [
     "Implementation1",
@@ -37,7 +39,7 @@ _IMPLEMENTATION1_PROPERTIES_BY_FIELD = {
 }
 
 
-class Implementation1(DomainModel):
+class Implementation1(SubInterface):
     """This represents the reading version of implementation 1.
 
     It is used to when data is retrieved from CDF.
@@ -55,10 +57,7 @@ class Implementation1(DomainModel):
         version: The version of the implementation 1 node.
     """
 
-    space: str = DEFAULT_INSTANCE_SPACE
     type: dm.DirectRelationReference = dm.DirectRelationReference("pygen-models", "Implementation1")
-    main_value: Optional[str] = Field(None, alias="mainValue")
-    sub_value: Optional[str] = Field(None, alias="subValue")
     value_1: Optional[str] = Field(None, alias="value1")
     value_2: Optional[str] = Field(None, alias="value2")
 
@@ -74,7 +73,7 @@ class Implementation1(DomainModel):
         )
 
 
-class Implementation1Apply(DomainModelApply):
+class Implementation1Apply(SubInterfaceApply):
     """This represents the writing version of implementation 1.
 
     It is used to when data is sent to CDF.
@@ -92,10 +91,7 @@ class Implementation1Apply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = DEFAULT_INSTANCE_SPACE
     type: dm.DirectRelationReference = dm.DirectRelationReference("pygen-models", "Implementation1")
-    main_value: Optional[str] = Field(None, alias="mainValue")
-    sub_value: Optional[str] = Field(None, alias="subValue")
     value_1: Optional[str] = Field(None, alias="value1")
     value_2: str = Field(alias="value2")
 

@@ -14,6 +14,7 @@ from ._core import (
     DomainRelationApply,
     ResourcesApply,
 )
+from ._main_interface import MainInterface, MainInterfaceApply
 
 
 __all__ = [
@@ -35,7 +36,7 @@ _SUBINTERFACE_PROPERTIES_BY_FIELD = {
 }
 
 
-class SubInterface(DomainModel):
+class SubInterface(MainInterface):
     """This represents the reading version of sub interface.
 
     It is used to when data is retrieved from CDF.
@@ -51,8 +52,6 @@ class SubInterface(DomainModel):
         version: The version of the sub interface node.
     """
 
-    space: str = DEFAULT_INSTANCE_SPACE
-    main_value: Optional[str] = Field(None, alias="mainValue")
     sub_value: Optional[str] = Field(None, alias="subValue")
 
     def as_apply(self) -> SubInterfaceApply:
@@ -65,7 +64,7 @@ class SubInterface(DomainModel):
         )
 
 
-class SubInterfaceApply(DomainModelApply):
+class SubInterfaceApply(MainInterfaceApply):
     """This represents the writing version of sub interface.
 
     It is used to when data is sent to CDF.
@@ -81,8 +80,6 @@ class SubInterfaceApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = DEFAULT_INSTANCE_SPACE
-    main_value: Optional[str] = Field(None, alias="mainValue")
     sub_value: Optional[str] = Field(None, alias="subValue")
 
     def _to_instances_apply(
