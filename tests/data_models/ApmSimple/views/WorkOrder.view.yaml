@@ -1,0 +1,179 @@
+space: tutorial_apm_simple
+externalId: WorkOrder
+description: '@name Work order'
+name: Work order
+version: 6f36e59c3c4896
+properties:
+  actualHours:
+    container:
+      space: tutorial_apm_simple
+      externalId: WorkOrder
+      type: container
+    containerPropertyIdentifier: actualHours
+    name: actual (hours)
+    description: '@name actual (hours)'
+  createdDate:
+    container:
+      space: tutorial_apm_simple
+      externalId: WorkOrder
+      type: container
+    containerPropertyIdentifier: createdDate
+    name: created date
+    description: '@name created date'
+  description:
+    container:
+      space: tutorial_apm_simple
+      externalId: WorkOrder
+      type: container
+    containerPropertyIdentifier: description
+    name: description
+  dueDate:
+    container:
+      space: tutorial_apm_simple
+      externalId: WorkOrder
+      type: container
+    containerPropertyIdentifier: dueDate
+    name: due date
+    description: '@name due date'
+  durationHours:
+    container:
+      space: tutorial_apm_simple
+      externalId: WorkOrder
+      type: container
+    containerPropertyIdentifier: durationHours
+    name: duration (hours)
+    description: '@name duration (hours)'
+  endTime:
+    container:
+      space: tutorial_apm_simple
+      externalId: WorkOrder
+      type: container
+    containerPropertyIdentifier: endTime
+    name: end time
+    description: '@name end time'
+  isActive:
+    container:
+      space: tutorial_apm_simple
+      externalId: WorkOrder
+      type: container
+    containerPropertyIdentifier: isActive
+    name: active
+    description: '@name active'
+  isCancelled:
+    container:
+      space: tutorial_apm_simple
+      externalId: WorkOrder
+      type: container
+    containerPropertyIdentifier: isCancelled
+    name: cancelled
+    description: '@name cancelled'
+  isCompleted:
+    container:
+      space: tutorial_apm_simple
+      externalId: WorkOrder
+      type: container
+    containerPropertyIdentifier: isCompleted
+    name: completed
+    description: '@name completed'
+  isSafetyCritical:
+    container:
+      space: tutorial_apm_simple
+      externalId: WorkOrder
+      type: container
+    containerPropertyIdentifier: isSafetyCritical
+    name: safety critical
+    description: '@name safety critical'
+  linkedAssets:
+    type:
+      space: tutorial_apm_simple
+      externalId: WorkOrder.linkedAssets
+    source:
+      space: tutorial_apm_simple
+      externalId: Asset
+      version: beb2bebdcbb4ad
+      type: view
+    direction: outwards
+    name: linkedAssets
+    connectionType: multi_edge_connection
+  percentageProgress:
+    container:
+      space: tutorial_apm_simple
+      externalId: WorkOrder
+      type: container
+    containerPropertyIdentifier: percentageProgress
+    name: percentage progress
+    description: '@name percentage progress'
+  plannedStart:
+    container:
+      space: tutorial_apm_simple
+      externalId: WorkOrder
+      type: container
+    containerPropertyIdentifier: plannedStart
+    name: planned start
+    description: '@name planned start'
+  priorityDescription:
+    container:
+      space: tutorial_apm_simple
+      externalId: WorkOrder
+      type: container
+    containerPropertyIdentifier: priorityDescription
+    name: priority description
+    description: '@name priority description'
+  programNumber:
+    container:
+      space: tutorial_apm_simple
+      externalId: WorkOrder
+      type: container
+    containerPropertyIdentifier: programNumber
+    name: program number
+    description: '@name program number'
+  startTime:
+    container:
+      space: tutorial_apm_simple
+      externalId: WorkOrder
+      type: container
+    containerPropertyIdentifier: startTime
+    name: start time
+    description: '@name start time'
+  status:
+    container:
+      space: tutorial_apm_simple
+      externalId: WorkOrder
+      type: container
+    containerPropertyIdentifier: status
+    name: status
+  title:
+    container:
+      space: tutorial_apm_simple
+      externalId: WorkOrder
+      type: container
+    containerPropertyIdentifier: title
+    name: title
+  workItems:
+    type:
+      space: tutorial_apm_simple
+      externalId: WorkOrder.workItems
+    source:
+      space: tutorial_apm_simple
+      externalId: WorkItem
+      version: 18ac48abbe96aa
+      type: view
+    direction: outwards
+    name: workItems
+    connectionType: multi_edge_connection
+  workOrderNumber:
+    container:
+      space: tutorial_apm_simple
+      externalId: WorkOrder
+      type: container
+    containerPropertyIdentifier: workOrderNumber
+    name: work order number
+    description: '@name work order number'
+  workPackageNumber:
+    container:
+      space: tutorial_apm_simple
+      externalId: WorkOrder
+      type: container
+    containerPropertyIdentifier: workPackageNumber
+    name: work package number
+    description: '@name work package number'

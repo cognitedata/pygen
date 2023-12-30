@@ -1,0 +1,20 @@
+space: power-models
+externalId: Blade
+name: Blade
+usedFor: node
+properties:
+  name:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: name
+  is_damaged:
+    type:
+      list: false
+      type: boolean
+    nullable: true
+    autoIncrement: false
+    name: is_damaged

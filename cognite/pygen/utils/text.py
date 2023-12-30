@@ -64,7 +64,7 @@ def to_camel(string: str, pluralize: bool = False, singularize: bool = False) ->
         pascal_splits = [string]
     string_split = []
     for part in pascal_splits:
-        string_split.extend(re.findall(r"[A-Z][a-z]*", part))
+        string_split.extend(re.findall(r"[A-Z][a-z0-9]*", part))
     if not string_split:
         string_split = [string]
     if pluralize and singularize:
@@ -240,15 +240,22 @@ def as_plural(noun: str) -> str:
         >>> as_plural('activity')
         'activities'
     """
+    numbers = re.findall(r"\d+$", noun)
+    noun = noun[: -len(numbers[0])] if numbers else noun
+
     if noun.lower() in _S_EXCEPTIONS:
-        return f"{noun}s" if noun[-1] != "s" else noun
-    if noun.lower() in _SINGULAR_BY_PLURAL:
+        noun = f"{noun}s" if noun[-1] != "s" else noun
+    elif noun.lower() in _SINGULAR_BY_PLURAL:
+        ...
+    elif noun.lower() in _PLURAL_BY_SINGULAR:
+        noun = _PLURAL_BY_SINGULAR[noun.lower()]
+    elif noun and _Inflect.engine().singular_noun(noun) is False:
+        noun = _Inflect.engine().plural_noun(noun)
+
+    if numbers:
+        return f"{noun}{numbers[0]}"
+    else:
         return noun
-    if noun.lower() in _PLURAL_BY_SINGULAR:
-        return _PLURAL_BY_SINGULAR[noun.lower()]
-    if _Inflect.engine().singular_noun(noun) is False:
-        return _Inflect.engine().plural_noun(noun)
-    return noun
 
 
 def as_singular(noun: str) -> str:
@@ -267,13 +274,18 @@ def as_singular(noun: str) -> str:
         >>> as_singular('role')
         'role'
     """
+    numbers = re.findall(r"\d+$", noun)
+    noun = noun[: -len(numbers[0])] if numbers else noun
     if noun.lower() in _S_EXCEPTIONS:
-        return noun[:-1] if noun[-1] == "s" else noun
-    if noun.lower() in _PLURAL_BY_SINGULAR:
-        return noun
-    if noun.lower() in _SINGULAR_BY_PLURAL:
-        return _SINGULAR_BY_PLURAL[noun.lower()]
-    if (singular := _Inflect.engine().singular_noun(noun)) is False:
-        return noun
+        noun = noun[:-1] if noun[-1] == "s" else noun
+    elif noun.lower() in _PLURAL_BY_SINGULAR:
+        ...
+    elif noun.lower() in _SINGULAR_BY_PLURAL:
+        noun = _SINGULAR_BY_PLURAL[noun.lower()]
+    elif noun and isinstance(singular := _Inflect.engine().singular_noun(noun), str):
+        noun = singular
 
-    return singular
+    if numbers:
+        return f"{noun}{numbers[0]}"
+    else:
+        return noun

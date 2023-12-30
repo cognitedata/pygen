@@ -1,7 +1,7 @@
 from __future__ import annotations
 {% if data_class.has_primitive_field_of_type((dm.Timestamp, dm.Date)) %}
 import datetime{% endif %}
-{% if data_class.has_field_of_type(ft.EdgeField) %}from typing import TYPE_CHECKING, Literal, Optional, Union{% else %}from typing import Literal, Optional{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}, Union{% endif %}{% endif %}{% if not data_class.use_optional_type %}  # noqa: F401{% endif %}
+{% if data_class.has_field_of_type(ft.EdgeField) %}from typing import TYPE_CHECKING, Literal, Optional, Union{% else %}from typing import Literal, Optional{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}, Union{% endif %}{% endif %}{% if not data_class.use_optional_type %}{% endif %}
 
 from cognite.client import data_modeling as dm{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}
 from cognite.client.data_classes import TimeSeries{% if is_pydantic_v2 %} as CogniteTimeSeries{% endif %}{% endif %}{% if data_class.use_pydantic_field %}
@@ -47,7 +47,8 @@ class {{ data_class.read_name }}(DomainModel):
         deleted_time: If present, the deleted time of the {{ data_class.doc_name }} node.
         version: The version of the {{ data_class.doc_name }} node.
     """
-    space: str = DEFAULT_INSTANCE_SPACE{% for field in data_class %}
+    space: str = DEFAULT_INSTANCE_SPACE{% if data_class.node_type %}
+    type: dm.DirectRelationReference = dm.DirectRelationReference("{{ data_class.node_type.space }}", "{{ data_class.node_type.external_id }}"){% endif %}{% for field in data_class %}
     {{ field.name }}: {{ field.as_read_type_hint() }}{% endfor %}
 
     def as_apply(self) -> {{ data_class.write_name }}:
@@ -73,7 +74,8 @@ class {{ data_class.write_name }}(DomainModelApply):
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
-    space: str = DEFAULT_INSTANCE_SPACE{% for field in data_class %}
+    space: str = DEFAULT_INSTANCE_SPACE{% if data_class.node_type %}
+    type: dm.DirectRelationReference = dm.DirectRelationReference("{{ data_class.node_type.space }}", "{{ data_class.node_type.external_id }}"){% endif %}{% for field in data_class %}
     {{ field.name }}: {{ field.as_write_type_hint() }}{% endfor %}
 
     def _to_instances_apply(
@@ -86,11 +88,21 @@ class {{ data_class.write_name }}(DomainModelApply):
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
             return resources{% if data_class.is_all_fields_of_type(ft.EdgeOneToMany) %}
-        cache.add(self.as_tuple_id()){% endif %}
+        cache.add(self.as_tuple_id())
+
+        this_node = dm.NodeApply(
+            space=self.space,
+            external_id=self.external_id,
+            existing_version=self.existing_version,{% if data_class.node_type %}
+            type=self.type,{% endif %}
+            sources=None,
+        )
+        resources.nodes.append(this_node)
+        {% else %}
 
         write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
             "{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}"
-        )
+        ){% endif %}
 {% if not data_class.is_all_fields_of_type(ft.EdgeOneToMany) %}
         properties = {}
         {% for field in data_class.fields_of_type((ft.PrimitiveFieldCore, ft.EdgeOneToOne)) %}
@@ -106,8 +118,14 @@ class {{ data_class.write_name }}(DomainModelApply):
             properties["{{ field.prop_name }}"] = [
                 value if isinstance(value, str) else value.external_id for value in self.{{ field.name }}
             ]
+            {% elif field.is_time_field and field.is_list %}
+            properties["{{ field.prop_name }}"] = [
+                {{ field.variable }}.isoformat({% if field.is_timestamp %}timespec="milliseconds"{% endif %}) for {{ field.variable }} in self.{{ field.name }}
+            ]
+            {% elif field.is_time_field %}
+            properties["{{ field.prop_name }}"] = self.{{ field.name }}.isoformat({% if field.is_timestamp %}timespec="milliseconds"{% endif %})
             {% else %}
-            properties["{{ field.prop_name }}"] = self.{{ field.name }}{% if field.is_time_field %}.isoformat({% if field.is_timestamp %}timespec="milliseconds"{% endif %}){% endif %}
+            properties["{{ field.prop_name }}"] = self.{{ field.name }}
             {% endif %}
         {% endfor %}
 
@@ -116,7 +134,7 @@ class {{ data_class.write_name }}(DomainModelApply):
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,{% if data_class.node_type %}
-                type=dm.DirectRelationReference("{{ data_class.node_type.space }}", "{{ data_class.node_type.external_id }}"),{% endif %}
+                type=self.type,{% endif %}
                 sources=[
                     dm.NodeOrEdgeData(
                         source=write_view,

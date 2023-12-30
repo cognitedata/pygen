@@ -1,0 +1,87 @@
+- instanceType: node
+  space: omni-instances
+  externalId: CDFExternalReferencesListed:Brandon
+  sources:
+  - properties:
+      files: []
+      sequences:
+      - sequence_david
+      - sequence_sandra
+      - sequence_christian
+      - sequence_kelly
+      timeseries:
+      - timeseries_barbara
+      - timeseries_janet
+    source:
+      space: pygen-models
+      externalId: CDFExternalReferencesListed
+      version: '1'
+      type: view
+- instanceType: node
+  space: omni-instances
+  externalId: CDFExternalReferencesListed:Jesse
+  sources:
+  - properties:
+      files: null
+      sequences: null
+      timeseries: null
+    source:
+      space: pygen-models
+      externalId: CDFExternalReferencesListed
+      version: '1'
+      type: view
+- instanceType: node
+  space: omni-instances
+  externalId: CDFExternalReferencesListed:Elizabeth
+  sources:
+  - properties:
+      files: null
+      sequences: null
+      timeseries:
+      - timeseries_francisco
+      - timeseries_michael
+    source:
+      space: pygen-models
+      externalId: CDFExternalReferencesListed
+      version: '1'
+      type: view
+- instanceType: node
+  space: omni-instances
+  externalId: CDFExternalReferencesListed:Linda
+  sources:
+  - properties:
+      files:
+      - file_deborah
+      - file_chelsea
+      - file_george
+      - file_jessica
+      - file_frank
+      sequences: null
+      timeseries:
+      - timeseries_hailey
+      - timeseries_mark
+      - timeseries_kayla
+      - timeseries_brian
+      - timeseries_lydia
+    source:
+      space: pygen-models
+      externalId: CDFExternalReferencesListed
+      version: '1'
+      type: view
+- instanceType: node
+  space: omni-instances
+  externalId: CDFExternalReferencesListed:Robin
+  sources:
+  - properties:
+      files: null
+      sequences: null
+      timeseries:
+      - timeseries_nancy
+      - timeseries_leonard
+      - timeseries_diana
+      - timeseries_randall
+    source:
+      space: pygen-models
+      externalId: CDFExternalReferencesListed
+      version: '1'
+      type: view

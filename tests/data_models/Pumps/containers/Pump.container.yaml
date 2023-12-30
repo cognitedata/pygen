@@ -1,0 +1,13 @@
+space: IntegrationTestsImmutable
+externalId: Pump
+name: Pump
+usedFor: node
+properties:
+  name:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: false
+    autoIncrement: false
+    name: name

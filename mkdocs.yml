@@ -19,10 +19,15 @@ nav:
         - Data Migration: quickstart/migration.ipynb
     - Installation: installation.md
     - CLI: cli.md
-    - Examples:
-        - Movie: examples/movie_domain.ipynb
-        - Working with Time Series: examples/timeseries.ipynb
-        - Working with Edges: examples/edge_properties.ipynb
+    - Usage:
+        - Generation of SDK: usage/generation.ipynb
+        - Listing, filtering, and retrieving: usage/listing_filtering_retrieving.ipynb
+        - Searching: usage/searching.ipynb
+        - Aggregation: usage/aggregation.ipynb
+        - Querying: usage/querying.ipynb
+        - Creating and Deleting: usage/creating_deleting.ipynb
+        - Working with Time Series: usage/timeseries.ipynb
+        - Working with Edges: usage/edge_properties.ipynb
     - Pygen Config:
         - Home: config/index.md
         - Naming: config/naming.md

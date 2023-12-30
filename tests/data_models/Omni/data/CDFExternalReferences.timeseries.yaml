@@ -1,0 +1,8 @@
+- externalId: timeseries_amy
+  name: timeseries_amy
+  isString: false
+  isStep: false
+- externalId: timeseries_helen
+  name: timeseries_helen
+  isString: false
+  isStep: false

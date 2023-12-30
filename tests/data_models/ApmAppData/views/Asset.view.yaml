@@ -1,0 +1,53 @@
+space: IntegrationTestsImmutable
+externalId: Asset
+version: v1
+properties:
+  description:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Asset
+      type: container
+    containerPropertyIdentifier: description
+    description: Long description of the node
+  labels:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Asset
+      type: container
+    containerPropertyIdentifier: labels
+    description: Text based labels for generic use
+  parent:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Asset
+      type: container
+    containerPropertyIdentifier: parent
+    description: Parent of this asset
+  root:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Asset
+      type: container
+    containerPropertyIdentifier: root
+    description: Root location - asset at the top of the hierarchy.
+  source:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Asset
+      type: container
+    containerPropertyIdentifier: source
+    description: Name of the source system node comes from
+  sourceId:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Asset
+      type: container
+    containerPropertyIdentifier: sourceId
+    description: ID as the node appears in the Source system
+  title:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: Asset
+      type: container
+    containerPropertyIdentifier: title
+    description: Title or name of the node

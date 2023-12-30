@@ -1,0 +1,115 @@
+space: IntegrationTestsImmutable
+externalId: Checklist
+usedFor: node
+properties:
+  sourceId:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    description: ID as the node appears in the Source system
+  source:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    description: Name of the source system node comes from
+  title:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    description: Title or name of the node
+  description:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    description: Long description of the node
+  labels:
+    type:
+      list: true
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    description: Text based labels for generic use
+  startTime:
+    type:
+      list: false
+      type: timestamp
+    nullable: true
+    autoIncrement: false
+    description: Start time of node
+  endTime:
+    type:
+      list: false
+      type: timestamp
+    nullable: true
+    autoIncrement: false
+    description: End time of node
+  visibility:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    description: Visibility of node (PUBLIC, PRIVATE, PROTECTED)
+  createdBy:
+    type:
+      type: direct
+    nullable: true
+    autoIncrement: false
+    description: Who created this node?
+  updatedBy:
+    type:
+      type: direct
+    nullable: true
+    autoIncrement: false
+    description: Who was the last person to update this node?
+  isArchived:
+    type:
+      list: false
+      type: boolean
+    nullable: true
+    autoIncrement: false
+    description: Is this item archived, and therefore hidden from most UIs?
+  type:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    description: The type of the checklist, eg Maintenance, Inspection, etc.
+  status:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    description: The status of the checklist
+  rootLocation:
+    type:
+      type: direct
+    nullable: true
+    autoIncrement: false
+    description: External ID of the root location associated with the checklist
+  assignedTo:
+    type:
+      list: true
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    description: List of users or disciplines assigned to the checklist

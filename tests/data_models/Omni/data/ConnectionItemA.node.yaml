@@ -1,0 +1,82 @@
+- instanceType: node
+  space: omni-instances
+  externalId: ConnectionItemA:Joseph
+  sources:
+  - properties:
+      name: null
+    source:
+      space: pygen-models
+      externalId: ConnectionItemA
+      version: '1'
+      type: view
+  type:
+    space: pygen-models
+    externalId: ConnectionItemA
+- instanceType: node
+  space: omni-instances
+  externalId: ConnectionItemA:Anna
+  sources:
+  - properties:
+      name: null
+      otherDirect:
+        space: omni-instances
+        externalId: ConnectionItemC:Amanda
+    source:
+      space: pygen-models
+      externalId: ConnectionItemA
+      version: '1'
+      type: view
+  type:
+    space: pygen-models
+    externalId: ConnectionItemA
+- instanceType: node
+  space: omni-instances
+  externalId: ConnectionItemA:Brenda
+  sources:
+  - properties:
+      name: null
+    source:
+      space: pygen-models
+      externalId: ConnectionItemA
+      version: '1'
+      type: view
+  type:
+    space: pygen-models
+    externalId: ConnectionItemA
+- instanceType: node
+  space: omni-instances
+  externalId: ConnectionItemA:Eric
+  sources:
+  - properties:
+      name: Gun young catch management sense technology.
+      otherDirect:
+        space: omni-instances
+        externalId: ConnectionItemC:Tiffany
+      selfDirect:
+        space: omni-instances
+        externalId: ConnectionItemA:Erin
+    source:
+      space: pygen-models
+      externalId: ConnectionItemA
+      version: '1'
+      type: view
+  type:
+    space: pygen-models
+    externalId: ConnectionItemA
+- instanceType: node
+  space: omni-instances
+  externalId: ConnectionItemA:Erin
+  sources:
+  - properties:
+      name: null
+      selfDirect:
+        space: omni-instances
+        externalId: ConnectionItemA:Joseph
+    source:
+      space: pygen-models
+      externalId: ConnectionItemA
+      version: '1'
+      type: view
+  type:
+    space: pygen-models
+    externalId: ConnectionItemA

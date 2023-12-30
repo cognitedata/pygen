@@ -1,0 +1,27 @@
+space: cdf_3d_schema
+externalId: Cdf3dModel
+version: '1'
+properties:
+  entities:
+    type:
+      space: cdf_3d_schema
+      externalId: cdf3dEntityConnection
+    source:
+      space: cdf_3d_schema
+      externalId: Cdf3dEntity
+      version: '1'
+      type: view
+    direction: inwards
+    description: Collection of Cdf3dEntity that are part of this Cdf3dModel
+    edgeSource:
+      space: cdf_3d_schema
+      externalId: Cdf3dConnectionProperties
+      version: '1'
+      type: view
+    connectionType: multi_edge_connection
+  name:
+    container:
+      space: cdf_3d_schema
+      externalId: Cdf3dModel
+      type: container
+    containerPropertyIdentifier: name

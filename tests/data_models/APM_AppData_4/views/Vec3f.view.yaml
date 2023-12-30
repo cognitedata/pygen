@@ -1,0 +1,26 @@
+space: APM_AppData_4
+externalId: Vec3f
+name: Vec3f
+version: '7'
+properties:
+  x:
+    container:
+      space: APM_AppData_4
+      externalId: Vec3f
+      type: container
+    containerPropertyIdentifier: x
+    name: x
+  y:
+    container:
+      space: APM_AppData_4
+      externalId: Vec3f
+      type: container
+    containerPropertyIdentifier: y
+    name: y
+  z:
+    container:
+      space: APM_AppData_4
+      externalId: Vec3f
+      type: container
+    containerPropertyIdentifier: z
+    name: z

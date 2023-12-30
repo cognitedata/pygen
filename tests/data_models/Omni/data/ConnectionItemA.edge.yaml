@@ -1,0 +1,84 @@
+- instanceType: edge
+  space: omni-instances
+  externalId: ConnectionItemA:Sarah
+  type:
+    space: pygen-models
+    externalId: bidirectional
+  startNode:
+    space: omni-instances
+    externalId: ConnectionItemA:Joseph
+  endNode:
+    space: omni-instances
+    externalId: ConnectionItemB:Teresa
+- instanceType: edge
+  space: omni-instances
+  externalId: ConnectionItemA:Raymond
+  type:
+    space: pygen-models
+    externalId: bidirectional
+  startNode:
+    space: omni-instances
+    externalId: ConnectionItemA:Joseph
+  endNode:
+    space: omni-instances
+    externalId: ConnectionItemB:Teresa
+- instanceType: edge
+  space: omni-instances
+  externalId: ConnectionItemA:Samuel
+  type:
+    space: pygen-models
+    externalId: bidirectional
+  startNode:
+    space: omni-instances
+    externalId: ConnectionItemA:Joseph
+  endNode:
+    space: omni-instances
+    externalId: ConnectionItemB:Amber
+- instanceType: edge
+  space: omni-instances
+  externalId: ConnectionItemA:Chad
+  type:
+    space: pygen-models
+    externalId: bidirectional
+  startNode:
+    space: omni-instances
+    externalId: ConnectionItemA:Brenda
+  endNode:
+    space: omni-instances
+    externalId: ConnectionItemB:Ashley
+- instanceType: edge
+  space: omni-instances
+  externalId: ConnectionItemA:Willie
+  type:
+    space: pygen-models
+    externalId: bidirectional
+  startNode:
+    space: omni-instances
+    externalId: ConnectionItemA:Eric
+  endNode:
+    space: omni-instances
+    externalId: ConnectionItemB:Jennifer
+- instanceType: edge
+  space: omni-instances
+  externalId: ConnectionItemA:Jason
+  type:
+    space: pygen-models
+    externalId: bidirectional
+  startNode:
+    space: omni-instances
+    externalId: ConnectionItemA:Eric
+  endNode:
+    space: omni-instances
+    externalId: ConnectionItemB:Amber
+- instanceType: edge
+  space: omni-instances
+  externalId: ConnectionItemA:Lindsey
+  type:
+    space: pygen-models
+    externalId: bidirectional
+  startNode:
+    space: omni-instances
+    externalId: ConnectionItemA:Erin
+  endNode:
+    space: omni-instances
+    externalId: ConnectionItemB:John

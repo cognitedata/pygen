@@ -1,16 +1,17 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import date, datetime
 from pathlib import Path
 
 from cognite.client import data_modeling as dm
-from cognite.client.data_classes.data_modeling import DataModelId
-from yaml import safe_load
+from cognite.client.data_classes import FileMetadataList, SequenceList, TimeSeriesList
+from cognite.client.data_classes.data_modeling import DataModelId, SpaceApply, SpaceApplyList
 
 from cognite.pygen.utils.helper import get_pydantic_version
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-DMS_DATA_MODELS = REPO_ROOT / "tests" / "dms_data_models"
+DATA_MODELS = REPO_ROOT / "tests" / "data_models"
 
 _pydantic_version = get_pydantic_version()
 IS_PYDANTIC_V1 = _pydantic_version == "v1"
@@ -26,54 +27,54 @@ _EXAMPLES_DIR_V2 = REPO_ROOT / "examples"
 
 @dataclass
 class ExampleSDK:
-    data_models: list[DataModelId]
+    data_model_ids: list[DataModelId]
     client_name: str
     _top_level_package: str
-    download_only: bool = False  # Used to example SDK that only trigger validation error.
-    has_container_file: bool = False  # Used to example SDK that has container file.
+    generate_sdk: bool
+    download_nodes: bool = False
+    _instance_space: str | None = None
     manual_files: list[Path] = field(default_factory=list, init=False)
 
     @property
-    def dms_files(self) -> list[Path]:
-        return [
-            DMS_DATA_MODELS / f"{model_id.space}-{model_id.external_id}-{model_id.version}.yaml"
-            for model_id in self.data_models
-        ]
-
-    def load_containers(self) -> dm.ContainerApplyList:
-        if self.has_container_file:
-            containers = []
-            for dms_file in self.dms_files:
-                container_file = dms_file.parent / f"{dms_file.stem}-containers.yaml"
-                loaded = dm.ContainerApplyList._load(safe_load(container_file.read_text()))
-                containers.extend(loaded)
-            return dm.ContainerApplyList(containers)
-        raise ValueError(f"Expected {self.client_dir} to have containers.yaml")
+    def instance_space(self) -> str:
+        return self._instance_space or self.data_model_ids[0].space
 
     @property
     def top_level_package(self) -> str:
         if IS_PYDANTIC_V1:
-            first, *rest = self._top_level_package.split(".")
-            return f"{first}_pydantic_v1." + ".".join(rest)
+            if "." in self._top_level_package:
+                first, *rest = self._top_level_package.split(".")
+                return f"{first}_pydantic_v1." + ".".join(rest)
+            else:
+                return f"{self._top_level_package}_pydantic_v1"
         return self._top_level_package
-
-    @property
-    def data_dir(self) -> Path:
-        first, *_ = self._top_level_package.split(".", maxsplit=1)
-        return _EXAMPLES_DIR_V2 / first / "data"
 
     @property
     def client_dir(self) -> Path:
         return EXAMPLES_DIR / self.top_level_package.replace(".", "/")
 
-    def load_data_models(self) -> dm.DataModelList[dm.DataModel[dm.View]]:
+    @staticmethod
+    def model_dir(model_id: DataModelId) -> Path:
+        return DATA_MODELS / model_id.external_id
+
+    @classmethod
+    def read_model_path(cls, model_id: DataModelId) -> Path:
+        return cls.model_dir(model_id) / "model.yaml"
+
+    @classmethod
+    def read_node_path(cls, model_id: DataModelId) -> Path:
+        return cls.model_dir(model_id) / "nodes.yaml"
+
+    def load_data_models(self) -> dm.DataModelList[dm.View]:
         models = []
-        for dms_file in self.dms_files:
-            raw = safe_load(dms_file.read_text())
-            if isinstance(raw, list):
-                raw = raw[0]
-            models.append(dm.DataModel.load(raw))
-        return dm.DataModelList(models)
+        for model_id in self.data_model_ids:
+            data_model_file = self.read_model_path(model_id)
+
+            if not data_model_file.is_file():
+                raise FileNotFoundError(f"Data model file {data_model_file} not found")
+            data_model = dm.DataModel[dm.View].load(data_model_file.read_text())
+            models.append(data_model)
+        return dm.DataModelList[dm.View](models)
 
     def load_data_model(self) -> dm.DataModel[dm.View]:
         models = self.load_data_models()
@@ -86,121 +87,162 @@ class ExampleSDK:
             if isinstance(var, Path) and var.is_file():
                 self.manual_files.append(var)
 
+    def load_spaces(self) -> SpaceApplyList:
+        spaces = list({model.space for model in self.data_model_ids})
+        if self.instance_space not in spaces:
+            spaces.append(self.instance_space)
+        return SpaceApplyList([SpaceApply(space) for space in spaces])
 
-MARKET_SDK = ExampleSDK(
-    data_models=[DataModelId("market", "CogPool", "3"), DataModelId("market", "PygenPool", "3")],
-    _top_level_package="markets.client",
-    client_name="MarketClient",
+    @classmethod
+    def load_views(cls, data_model_id: dm.DataModelId) -> dm.ViewApplyList:
+        view_files = list((cls.model_dir(data_model_id) / "views").glob("*.view.yaml"))
+        return dm.ViewApplyList([dm.ViewApply.load(view_file.read_text()) for view_file in view_files])
+
+    @classmethod
+    def load_containers(cls, data_model_id: dm.DataModelId) -> dm.ContainerApplyList:
+        container_files = list((cls.model_dir(data_model_id) / "containers").glob("*.container.yaml"))
+        return dm.ContainerApplyList(
+            [dm.ContainerApply.load(container_file.read_text()) for container_file in container_files]
+        )
+
+    def load_write_model(self, data_model_id: dm.DataModelId) -> dm.DataModelApply:
+        views = self.load_views(data_model_id).as_ids()
+        return dm.DataModelApply(
+            space=data_model_id.space,
+            external_id=data_model_id.external_id,
+            version=data_model_id.version,
+            description="",
+            name=data_model_id.external_id,
+            views=views,
+        )
+
+    def load_timeseries(self, data_model_id: dm.DataModelId) -> TimeSeriesList:
+        timeseries_files = list(self.model_dir(data_model_id).glob("**/*timeseries.yaml"))
+        return TimeSeriesList([ts for filepath in timeseries_files for ts in TimeSeriesList.load(filepath.read_text())])
+
+    def load_sequences(self, data_model_id: dm.DataModelId) -> SequenceList:
+        sequence_files = list(self.model_dir(data_model_id).glob("**/*sequence.yaml"))
+        return SequenceList([seq for filepath in sequence_files for seq in SequenceList.load(filepath.read_text())])
+
+    def load_filemetadata(self, data_model_id: dm.DataModelId) -> FileMetadataList:
+        filemetadata_files = list(self.model_dir(data_model_id).glob("**/*file.yaml"))
+        return FileMetadataList(
+            [f for filepath in filemetadata_files for f in FileMetadataList.load(filepath.read_text())]
+        )
+
+    def load_nodes(self, data_model_id: dm.DataModelId, isoformat_dates: bool = False) -> dm.NodeApplyList:
+        node_files = list(self.model_dir(data_model_id).glob("**/*node.yaml"))
+        nodes = dm.NodeApplyList([n for filepath in node_files for n in dm.NodeApplyList.load(filepath.read_text())])
+        if not isoformat_dates:
+            return nodes
+        for node in nodes:
+            for source in node.sources:
+                for name in list(source.properties):
+                    if isinstance(source.properties[name], date):
+                        source.properties[name] = source.properties[name].isoformat()
+                    elif isinstance(source.properties[name], datetime):
+                        source.properties[name] = source.properties[name].isoformat(timespec="milliseconds")
+                    if isinstance(source.properties[name], list):
+                        for i, value in enumerate(source.properties[name]):
+                            if isinstance(value, date):
+                                source.properties[name][i] = value.isoformat()
+                            elif isinstance(value, datetime):
+                                source.properties[name][i] = value.isoformat(timespec="milliseconds")
+        return nodes
+
+    def load_edges(self, data_model_id: dm.DataModelId) -> dm.EdgeApplyList:
+        edge_files = list(self.model_dir(data_model_id).glob("**/*edge.yaml"))
+        return dm.EdgeApplyList([e for filepath in edge_files for e in dm.EdgeApplyList.load(filepath.read_text())])
+
+    def load_read_nodes(self, data_model_id: dm.DataModelId) -> dm.NodeList:
+        return dm.NodeList.load(self.read_node_path(data_model_id).read_text())
+
+
+WINDMILL_SDK = ExampleSDK(
+    data_model_ids=[DataModelId("power-models", "Windmill", "1")],
+    _top_level_package="windmill.client",
+    client_name="WindmillClient",
+    generate_sdk=True,
+    _instance_space="windmill-instances",
 )
 
-SHOP_SDK = ExampleSDK(
-    data_models=[DataModelId("IntegrationTestsImmutable", "SHOP_Model", "2")],
-    _top_level_package="shop.client",
-    client_name="ShopClient",
+OMNI_SDK = ExampleSDK(
+    data_model_ids=[DataModelId("pygen-models", "Omni", "1")],
+    _top_level_package="omni",
+    client_name="OmniClient",
+    generate_sdk=True,
+    _instance_space="omni-instances",
+    download_nodes=True,
 )
 
-MOVIE_SDK = ExampleSDK(
-    data_models=[DataModelId("IntegrationTestsImmutable", "Movie", "4")],
-    _top_level_package="movie_domain.client",
-    client_name="MovieClient",
+# This is used for testing the multi model functionality,
+# when calling python dev.py generate, the full SDK will not be generated, however,
+# the '_api_client.py` file will be generated.
+MULTI_MODEL_SDK = ExampleSDK(
+    data_model_ids=[
+        DataModelId("pygen-models", "Omni", "1"),
+        DataModelId("power-models", "Windmill", "1"),
+    ],
+    _top_level_package="multi_model",
+    client_name="MultiModelClient",
+    generate_sdk=False,
+    _instance_space="omni-instances",
 )
 
-OSDU_SDK = ExampleSDK(
-    data_models=[DataModelId("IntegrationTestsImmutable", "OSDUWells", "1")],
-    _top_level_package="osdu_wells.client",
-    client_name="OSDUClient",
+# This uses connections that are not supported by the UI, so it will not be shown there.
+OMNIUM_CONNECTION_SDK = ExampleSDK(
+    data_model_ids=[DataModelId("pygen-models", "OmniConnection", "1")],
+    _top_level_package="omni_connection",
+    client_name="OmniConnectionClient",
+    generate_sdk=False,
+    _instance_space="omni-instances",
 )
 
 APM_SDK = ExampleSDK(
-    data_models=[DataModelId("tutorial_apm_simple", "ApmSimple", "6")],
+    data_model_ids=[DataModelId("tutorial_apm_simple", "ApmSimple", "6")],
     _top_level_package="tutorial_apm_simple.client",
     client_name="ApmSimpleClient",
+    generate_sdk=False,
 )
 
 PUMP_SDK = ExampleSDK(
-    data_models=[DataModelId("IntegrationTestsImmutable", "Pumps", "1")],
+    data_model_ids=[DataModelId("IntegrationTestsImmutable", "Pumps", "1")],
     _top_level_package="pump.client",
     client_name="PumpClient",
-    download_only=True,
+    generate_sdk=False,
 )
 
 SCENARIO_INSTANCE_SDK = ExampleSDK(
-    data_models=[DataModelId("IntegrationTestsImmutable", "ScenarioInstance", "1")],
+    data_model_ids=[DataModelId("IntegrationTestsImmutable", "ScenarioInstance", "1")],
     _top_level_package="scenario_instance.client",
     client_name="ScenarioInstanceClient",
+    generate_sdk=True,
 )
 
 APM_APP_DATA_SOURCE = ExampleSDK(
-    data_models=[DataModelId("APM_AppData_4", "APM_AppData_4", "7")],
+    data_model_ids=[DataModelId("APM_AppData_4", "APM_AppData_4", "7")],
     _top_level_package="apm_domain.client",
     client_name="ApmClient",
-    download_only=True,
-    has_container_file=True,
+    generate_sdk=False,
 )
 
 APM_APP_DATA_SINK = ExampleSDK(
-    data_models=[DataModelId("IntegrationTestsImmutable", "ApmAppData", "v3")],
+    data_model_ids=[DataModelId("IntegrationTestsImmutable", "ApmAppData", "v3")],
     _top_level_package="sysdm_domain.client",
     client_name="SysDMClient",
-    download_only=True,
-    has_container_file=True,
+    generate_sdk=False,
 )
 
 EQUIPMENT_UNIT_SDK = ExampleSDK(
-    data_models=[DataModelId("IntegrationTestsImmutable", "EquipmentUnit", "2")],
+    data_model_ids=[DataModelId("IntegrationTestsImmutable", "EquipmentUnit", "2")],
     _top_level_package="equipment_unit.client",
     client_name="EquipmentUnitClient",
+    generate_sdk=True,
 )
 
 
-# The following files are manually controlled and should not be overwritten by the generator by default.
-
-
-class MarketSDKFiles:
-    client_dir = MARKET_SDK.client_dir
-    client = client_dir / "_api_client.py"
-    date_transformation_pair_data = client_dir / "data_classes" / "_date_transformation_pair.py"
-    date_transformation_pair_api = client_dir / "_api" / "date_transformation_pair.py"
-    date_transformation_pair_query_api = client_dir / "_api" / "date_transformation_pair_query.py"
-
-
-MARKET_SDK.append_manual_files(MarketSDKFiles)
-
-
-class ShopSDKFiles:
-    client_dir = SHOP_SDK.client_dir
-    data_classes = client_dir / "data_classes"
-    api = client_dir / "_api"
-    cases_data = data_classes / "_case.py"
-    command_configs_data = data_classes / "_command_config.py"
-    data_init = data_classes / "__init__.py"
-    command_configs_api = api / "command_config.py"
-
-
-SHOP_SDK.append_manual_files(ShopSDKFiles)
-
-
-class MovieSDKFiles:
-    client_dir = MOVIE_SDK.client_dir
-
-    data_classes = client_dir / "data_classes"
-    persons_data = data_classes / "_person.py"
-    actors_data = data_classes / "_actor.py"
-
-    api = client_dir / "_api"
-    core_api = api / "_core.py"
-    persons_api = api / "person.py"
-    actors_api = api / "actor.py"
-    actor_query_api = api / "actor_query.py"
-    actor_movies_api = api / "actor_movies.py"
-
-    client = client_dir / "_api_client.py"
-    client_init = client_dir / "__init__.py"
-    data_init = data_classes / "__init__.py"
-    api_init = api / "__init__.py"
-
-
-MOVIE_SDK.append_manual_files(MovieSDKFiles)
+# The following files are manually maintained (they are used to implement new functionality,
+# and are thus nod overwritten by the `python dev.py generate` command)
 
 
 class EquipmentSDKFiles:
@@ -234,14 +276,63 @@ class ScenarioInstanceFiles:
     scenario_instance_api = api / "scenario_instance.py"
 
 
-class OSDUWellsFiles:
-    client_dir = OSDU_SDK.client_dir
+SCENARIO_INSTANCE_SDK.append_manual_files(ScenarioInstanceFiles)
 
+
+class OmniFiles:
+    client_dir = OMNI_SDK.client_dir
+    client = client_dir / "_api_client.py"
+    data_classes = client_dir / "data_classes"
+    core_data = data_classes / "_core.py"
+    data_init = data_classes / "__init__.py"
+    api = client_dir / "_api"
+    core_api = api / "_core.py"
+    client_init = client_dir / "__init__.py"
+    cdf_external_data = data_classes / "_cdf_external_references.py"
+    cdf_external_list_data = data_classes / "_cdf_external_references_listed.py"
+    primitive_nullable_data = data_classes / "_primitive_nullable.py"
+    primitive_nullable_list_data = data_classes / "_primitive_nullable_listed.py"
+    primitive_with_defaults_data = data_classes / "_primitive_with_defaults.py"
+    primitive_required_data = data_classes / "_primitive_required.py"
+    primitive_required_list_data = data_classes / "_primitive_required_listed.py"
+    implementation_1_data = data_classes / "_implementation_1.py"
+    connection_item_a_data = data_classes / "_connection_item_a.py"
+    connection_item_c_data = data_classes / "_connection_item_c.py"
+
+    cdf_external_api = api / "cdf_external_references.py"
+    cdf_external_list_api = api / "cdf_external_references_listed.py"
+    primitive_nullable_api = api / "primitive_nullable.py"
+    primitive_nullable_list_api = api / "primitive_nullable_listed.py"
+    primitive_with_defaults_api = api / "primitive_with_defaults.py"
+    primitive_required_api = api / "primitive_required.py"
+    primitive_required_list_api = api / "primitive_required_listed.py"
+    implementation_1_api = api / "implementation_1.py"
+
+    connection_item_a_api = api / "connection_item_a.py"
+    connection_item_b_api = api / "connection_item_b.py"
+    connection_item_c_api = api / "connection_item_c.py"
+
+    connection_item_a_edge_apis = (api / "connection_item_a_outwards.py",)
+    connection_item_b_edge_apis = (api / "connection_item_b_inwards.py", api / "connection_item_b_self_edge.py")
+    connection_item_c_edge_apis = (
+        api / "connection_item_c_connection_item_a.py",
+        api / "connection_item_c_connection_item_b.py",
+    )
+    connection_item_a_query = api / "connection_item_a_query.py"
+    connection_item_b_query = api / "connection_item_b_query.py"
+    connection_item_c_query = api / "connection_item_c_query.py"
+
+
+OMNI_SDK.append_manual_files(OmniFiles)
+
+
+class MultiModelFiles:
+    api_client = EXAMPLES_DIR / "multi_model_api_client.py"
+
+
+class WindMillFiles:
     class Data:
-        data_dir = OSDU_SDK.data_dir
-        well = data_dir / "osdu-master-well_1.3.0.patched.json"
-        wellbore = data_dir / "osdu-master-wellbore_1.5.0.patched.json"
-        wellbore_trajectory = data_dir / "osdu-work-product-component-wellboretrajectory_1.3.0.patched.json"
+        wind_mill_json = DATA_MODELS / "WindMill" / "data" / "data.json"
 
 
 EXAMPLE_SDKS = [var for var in locals().values() if isinstance(var, ExampleSDK)]

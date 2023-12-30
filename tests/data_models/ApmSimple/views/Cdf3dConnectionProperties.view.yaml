@@ -1,0 +1,16 @@
+space: cdf_3d_schema
+externalId: Cdf3dConnectionProperties
+version: '1'
+properties:
+  revisionId:
+    container:
+      space: cdf_3d_schema
+      externalId: Cdf3dConnectionProperties
+      type: container
+    containerPropertyIdentifier: revisionId
+  revisionNodeId:
+    container:
+      space: cdf_3d_schema
+      externalId: Cdf3dConnectionProperties
+      type: container
+    containerPropertyIdentifier: revisionNodeId

@@ -1,0 +1,56 @@
+space: IntegrationTestsImmutable
+externalId: Asset
+usedFor: node
+properties:
+  sourceId:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    description: ID as the node appears in the Source system
+  source:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    description: Name of the source system node comes from
+  title:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    description: Title or name of the node
+  description:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    description: Long description of the node
+  labels:
+    type:
+      list: true
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    description: Text based labels for generic use
+  parent:
+    type:
+      type: direct
+    nullable: true
+    autoIncrement: false
+    description: Parent of this asset
+  root:
+    type:
+      type: direct
+    nullable: true
+    autoIncrement: false
+    description: Root location - asset at the top of the hierarchy.

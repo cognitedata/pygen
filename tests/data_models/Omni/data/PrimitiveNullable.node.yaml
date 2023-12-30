@@ -1,0 +1,96 @@
+- instanceType: node
+  space: omni-instances
+  externalId: PrimitiveNullable:Karen
+  sources:
+  - properties:
+      boolean: null
+      date: null
+      float32: null
+      float64: null
+      int32: null
+      int64: null
+      json: null
+      text: Toward once receive task she herself.
+      timestamp: null
+    source:
+      space: pygen-models
+      externalId: PrimitiveNullable
+      version: '1'
+      type: view
+- instanceType: node
+  space: omni-instances
+  externalId: PrimitiveNullable:Samantha
+  sources:
+  - properties:
+      boolean: false
+      date: 2023-10-13
+      float32: 206.51
+      float64: null
+      int32: null
+      int64: null
+      json: null
+      text: null
+      timestamp: 2023-06-07 00:30:16
+    source:
+      space: pygen-models
+      externalId: PrimitiveNullable
+      version: '1'
+      type: view
+- instanceType: node
+  space: omni-instances
+  externalId: PrimitiveNullable:Nichole
+  sources:
+  - properties:
+      boolean: false
+      date: null
+      float32: null
+      float64: -8.501254047844578e+307
+      int32: -1564658807
+      int64: -8295784259780228318
+      json: null
+      text: null
+      timestamp: null
+    source:
+      space: pygen-models
+      externalId: PrimitiveNullable
+      version: '1'
+      type: view
+- instanceType: node
+  space: omni-instances
+  externalId: PrimitiveNullable:Elijah
+  sources:
+  - properties:
+      boolean: null
+      date: 2023-06-13
+      float32: null
+      float64: null
+      int32: null
+      int64: 8336446979399349638
+      json: null
+      text: Senior wear current.
+      timestamp: null
+    source:
+      space: pygen-models
+      externalId: PrimitiveNullable
+      version: '1'
+      type: view
+- instanceType: node
+  space: omni-instances
+  externalId: PrimitiveNullable:Tonya
+  sources:
+  - properties:
+      boolean: null
+      date: 2023-08-08
+      float32: -69.93
+      float64: null
+      int32: null
+      int64: 4573421089479676408
+      json:
+        Blue agent find quality when.: Walk cup option store drug recent.
+      text: null
+      timestamp: 2023-11-09 20:03:53
+    source:
+      space: pygen-models
+      externalId: PrimitiveNullable
+      version: '1'
+      type: view

@@ -1,0 +1,26 @@
+space: IntegrationTestsImmutable
+externalId: WorkOrder
+name: WorkOrder
+version: c5543fb2b1bc81
+properties:
+  description:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WorkOrder
+      type: container
+    containerPropertyIdentifier: description
+    name: description
+  performedBy:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WorkOrder
+      type: container
+    containerPropertyIdentifier: performedBy
+    name: performedBy
+  type:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: WorkOrder
+      type: container
+    containerPropertyIdentifier: type
+    name: type

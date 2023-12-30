@@ -1,0 +1,26 @@
+space: power-models
+externalId: HighSpeedShaft
+name: HighSpeedShaft
+usedFor: node
+properties:
+  torque:
+    type:
+      list: false
+      type: timeseries
+    nullable: true
+    autoIncrement: false
+    name: torque
+  bending_monent_x:
+    type:
+      list: false
+      type: timeseries
+    nullable: true
+    autoIncrement: false
+    name: bending_monent_x
+  bending_moment_y:
+    type:
+      list: false
+      type: timeseries
+    nullable: true
+    autoIncrement: false
+    name: bending_moment_y

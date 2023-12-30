@@ -1,0 +1,18 @@
+space: IntegrationTestsImmutable
+externalId: CDF_UserPreferences
+version: v1
+properties:
+  apmAppConfig:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: CDF_UserPreferences
+      type: container
+    containerPropertyIdentifier: apmAppConfig
+    description: User preferences related to APM apps, like selected config
+  language:
+    container:
+      space: IntegrationTestsImmutable
+      externalId: CDF_UserPreferences
+      type: container
+    containerPropertyIdentifier: language
+    description: The users selected language

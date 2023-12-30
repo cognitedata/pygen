@@ -1,0 +1,29 @@
+space: IntegrationTestsImmutable
+externalId: WorkOrder
+name: WorkOrder
+usedFor: node
+properties:
+  type:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: type
+  description:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: description
+  performedBy:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    name: performedBy

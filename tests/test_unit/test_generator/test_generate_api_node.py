@@ -1,0 +1,174 @@
+from cognite.client import data_modeling as dm
+
+from cognite.pygen._core.generators import MultiAPIGenerator
+from cognite.pygen._generator import CodeFormatter
+from tests.constants import OmniFiles
+
+
+def test_generate_primitive_nullable(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
+    # Arrange
+    api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "PrimitiveNullable", "1")]
+    expected = OmniFiles.primitive_nullable_api.read_text()
+
+    # Act
+    actual = api_generator.generate_api_file(
+        omni_multi_api_generator.top_level_package, omni_multi_api_generator.client_name
+    )
+    actual = code_formatter.format_code(actual)
+
+    # Assert
+    assert actual == expected
+
+
+def test_generate_primitive_required(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
+    # Arrange
+    api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "PrimitiveRequired", "1")]
+    expected = OmniFiles.primitive_required_api.read_text()
+
+    # Act
+    actual = api_generator.generate_api_file(
+        omni_multi_api_generator.top_level_package, omni_multi_api_generator.client_name
+    )
+    actual = code_formatter.format_code(actual)
+
+    # Assert
+    assert actual == expected
+
+
+def test_generate_primitive_nullable_list(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
+    # Arrange
+    api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "PrimitiveNullableListed", "1")]
+    expected = OmniFiles.primitive_nullable_list_api.read_text()
+
+    # Act
+    actual = api_generator.generate_api_file(
+        omni_multi_api_generator.top_level_package, omni_multi_api_generator.client_name
+    )
+    actual = code_formatter.format_code(actual)
+
+    # Assert
+    assert actual == expected
+
+
+def test_generate_primitive_required_list(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
+    # Arrange
+    api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "PrimitiveRequiredListed", "1")]
+    expected = OmniFiles.primitive_required_list_api.read_text()
+
+    # Act
+    actual = api_generator.generate_api_file(
+        omni_multi_api_generator.top_level_package, omni_multi_api_generator.client_name
+    )
+    actual = code_formatter.format_code(actual)
+
+    # Assert
+    assert actual == expected
+
+
+def test_generate_primitive_with_defaults(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
+    # Arrange
+    api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "PrimitiveWithDefaults", "1")]
+    expected = OmniFiles.primitive_with_defaults_api.read_text()
+
+    # Act
+    actual = api_generator.generate_api_file(
+        omni_multi_api_generator.top_level_package, omni_multi_api_generator.client_name
+    )
+    actual = code_formatter.format_code(actual)
+
+    # Assert
+    assert actual == expected
+
+
+def test_generate_cdf_external_references(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
+    # Arrange
+    api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "CDFExternalReferences", "1")]
+    expected = OmniFiles.cdf_external_api.read_text()
+
+    # Act
+    actual = api_generator.generate_api_file(
+        omni_multi_api_generator.top_level_package, omni_multi_api_generator.client_name
+    )
+    actual = code_formatter.format_code(actual)
+
+    # Assert
+    assert actual == expected
+
+
+def test_generate_cdf_external_references_list(
+    omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter
+):
+    # Arrange
+    api_generator = omni_multi_api_generator.api_by_view_id[
+        dm.ViewId("pygen-models", "CDFExternalReferencesListed", "1")
+    ]
+    expected = OmniFiles.cdf_external_list_api.read_text()
+
+    # Act
+    actual = api_generator.generate_api_file(
+        omni_multi_api_generator.top_level_package, omni_multi_api_generator.client_name
+    )
+    actual = code_formatter.format_code(actual)
+
+    # Assert
+    assert actual == expected
+
+
+def test_generate_implementation1(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
+    # Arrange
+    api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "Implementation1", "1")]
+    expected = OmniFiles.implementation_1_api.read_text()
+
+    # Act
+    actual = api_generator.generate_api_file(
+        omni_multi_api_generator.top_level_package, omni_multi_api_generator.client_name
+    )
+    actual = code_formatter.format_code(actual)
+
+    # Assert
+    assert actual == expected
+
+
+def test_generate_connection_item_a(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
+    # Arrange
+    api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "ConnectionItemA", "1")]
+    expected = OmniFiles.connection_item_a_api.read_text()
+
+    # Act
+    actual = api_generator.generate_api_file(
+        omni_multi_api_generator.top_level_package, omni_multi_api_generator.client_name
+    )
+    actual = code_formatter.format_code(actual)
+
+    # Assert
+    assert actual == expected
+
+
+def test_generate_connection_item_b(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
+    # Arrange
+    api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "ConnectionItemB", "1")]
+    expected = OmniFiles.connection_item_b_api.read_text()
+
+    # Act
+    actual = api_generator.generate_api_file(
+        omni_multi_api_generator.top_level_package, omni_multi_api_generator.client_name
+    )
+    actual = code_formatter.format_code(actual)
+
+    # Assert
+    assert actual == expected
+
+
+def test_generate_connection_item_c(omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter):
+    # Arrange
+    api_generator = omni_multi_api_generator.api_by_view_id[dm.ViewId("pygen-models", "ConnectionItemC", "1")]
+    expected = OmniFiles.connection_item_c_api.read_text()
+
+    # Act
+    actual = api_generator.generate_api_file(
+        omni_multi_api_generator.top_level_package, omni_multi_api_generator.client_name
+    )
+    actual = code_formatter.format_code(actual)
+
+    # Assert
+    assert actual == expected

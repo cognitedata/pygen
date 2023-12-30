@@ -6,7 +6,15 @@ from pathlib import Path
 import pytest
 import toml
 from cognite.client import ClientConfig, CogniteClient
+from cognite.client import data_modeling as dm
 from cognite.client.credentials import OAuthClientCredentials
+
+from tests.constants import IS_PYDANTIC_V2, OMNI_SDK
+
+if IS_PYDANTIC_V2:
+    from omni import OmniClient
+else:
+    from omni_pydantic_v1 import OmniClient
 
 
 @pytest.fixture(scope="session")
@@ -32,6 +40,17 @@ def create_cognite_client_config(
     )
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def cognite_client(client_config) -> CogniteClient:
     return CogniteClient(create_cognite_client_config(**client_config))
+
+
+@pytest.fixture(scope="session")
+def omni_client(cognite_client: CogniteClient) -> OmniClient:
+    return OmniClient(cognite_client)
+
+
+@pytest.fixture(scope="session")
+def omni_views_by_external_id(omni_client: OmniClient) -> dict[str, dm.View]:
+    data_model = OMNI_SDK.load_data_model()
+    return {view.external_id: view for view in data_model.views}

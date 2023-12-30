@@ -1,0 +1,32 @@
+space: pygen-models
+externalId: Root
+name: Root
+version: '1'
+properties:
+  name:
+    container:
+      space: pygen-models
+      externalId: ConnectionItem
+      type: container
+    containerPropertyIdentifier: name
+    name: Name
+  children:
+    connectionType: multi_edge_connection
+    name: Children
+    type:
+      space: pygen-models
+      externalId: ConnectionItem
+    source:
+      type: view
+      space: pygen-models
+      externalId: Item
+      version: '1'
+    direction: outwards
+filter:
+  equals:
+    property:
+     - node
+     - type
+    value:
+      space: pygen-models
+      externalId: Root

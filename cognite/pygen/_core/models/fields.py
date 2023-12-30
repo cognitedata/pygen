@@ -117,6 +117,7 @@ class Field(ABC):
                     is_nullable=prop.nullable,
                     description=prop.description,
                     pydantic_field=pydantic_field,
+                    variable=variable,
                 )
             else:
                 return PrimitiveListField(
@@ -127,6 +128,7 @@ class Field(ABC):
                     is_nullable=prop.nullable,
                     pydantic_field=pydantic_field,
                     description=prop.description,
+                    variable=variable,
                 )
         elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.CDFExternalIdReference):
             # Note: these are only CDF External Fields that are not listable. Listable CDF External Fields
@@ -261,6 +263,8 @@ class ListFieldCore(PrimitiveFieldCore):
     list[datetime.datetime], list[datetime.date].
     """
 
+    variable: str
+
     def as_read_type_hint(self) -> str:
         if self.need_alias:
             return f'Optional[list[{self.type_as_string}]] = {self.pydantic_field}(None, alias="{self.prop_name}")'
@@ -287,22 +291,33 @@ class PrimitiveField(PrimitiveFieldCore):
 
     default: str | int | dict | None = None
 
+    @property
+    def default_code(self) -> str:
+        if self.default is None:
+            return "None"
+        elif isinstance(self.default, str):
+            return f'"{self.default}"'
+        elif isinstance(self.default, dict):
+            return f"{self.default}"
+        else:
+            return f"{self.default}"
+
     def as_read_type_hint(self) -> str:
         if self.need_alias:
-            return f'Optional[{self.type_as_string}] = {self.pydantic_field}({self.default}, alias="{self.prop_name}")'
+            return f"Optional[{self.type_as_string}] = {self.pydantic_field}" f'(None, alias="{self.prop_name}")'
         else:
-            return f"Optional[{self.type_as_string}] = {self.default}"
+            return f"Optional[{self.type_as_string}] = None"
 
     def as_write_type_hint(self) -> str:
         out_type = self.type_as_string
         if self.is_nullable and self.need_alias:
-            out_type = f'Optional[{out_type}] = {self.pydantic_field}({self.default}, alias="{self.prop_name}")'
+            out_type = f'Optional[{out_type}] = {self.pydantic_field}({self.default_code}, alias="{self.prop_name}")'
         elif self.need_alias:
             out_type = f'{out_type} = {self.pydantic_field}(alias="{self.prop_name}")'
         elif self.is_nullable:
             out_type = f"Optional[{out_type}] = None"
         elif self.default is not None or self.is_nullable:
-            out_type = f"{out_type} = {self.default}"
+            out_type = f"{out_type} = {self.default_code}"
         return out_type
 
 
@@ -312,6 +327,10 @@ class PrimitiveListField(ListFieldCore):
     This represents a list of basic types such as list[str], list[int], list[float], list[bool],
     list[datetime.datetime], list[datetime.date].
     """
+
+    @property
+    def is_list(self) -> bool:
+        return True
 
 
 @dataclass(frozen=True)
@@ -347,21 +366,41 @@ class CDFExternalListField(ListFieldCore, CDFExternalField):
     """
 
     def as_read_type_hint(self) -> str:
-        if self.need_alias:
-            return f'Optional[list[{self.type_as_string}]] = {self.pydantic_field}(None, alias="{self.prop_name}")'
+        type = self.type_as_string
+        if type != "str":
+            if self.need_alias:
+                return (
+                    f"Union[list[{self.type_as_string}], list[str], None] = "
+                    f'{self.pydantic_field}(None, alias="{self.prop_name}")'
+                )
+            else:
+                return f"Union[list[{self.type_as_string}], list[str], None] = None"
         else:
-            return f"Optional[list[{self.type_as_string}]] = None"
+            if self.need_alias:
+                return f'Optional[list[str]] = {self.pydantic_field}(None, alias="{self.prop_name}")'
+            else:
+                return "Optional[list[str]] = None"
 
     def as_write_type_hint(self) -> str:
         type_ = self.type_as_string
-        if self.is_nullable and self.need_alias:
-            return f'Optional[list[{type_}]] = {self.pydantic_field}(None, alias="{self.prop_name}")'
-        elif self.need_alias:
-            return f'list[{type_}] = {self.pydantic_field}(alias="{self.prop_name}")'
-        elif self.is_nullable:
-            return f"Optional[list[{type_}]] = None"
-        else:  # not self.is_nullable and not self.need_alias
-            return f"list[{type_}]"
+        if type_ != "str":
+            if self.is_nullable and self.need_alias:
+                return f'Union[list[{type_}], list[str], None] = {self.pydantic_field}(None, alias="{self.prop_name}")'
+            elif self.need_alias:
+                return f'Union[list[{type_}], list[str]] = {self.pydantic_field}(alias="{self.prop_name}")'
+            elif self.is_nullable:
+                return f"Union[list[{type_}], list[str], None] = None"
+            else:  # not self.is_nullable and not self.need_alias
+                return f"Union[list[{type_}], list[str]]"
+        else:
+            if self.is_nullable and self.need_alias:
+                return f'Optional[list[str]] = {self.pydantic_field}(None, alias="{self.prop_name}")'
+            elif self.need_alias:
+                return f'list[str] = {self.pydantic_field}(alias="{self.prop_name}")'
+            elif self.is_nullable:
+                return "Optional[list[str]] = None"
+            else:
+                return "list[str]"
 
 
 @dataclass(frozen=True)

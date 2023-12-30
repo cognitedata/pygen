@@ -1,0 +1,25 @@
+space: pygen-models
+externalId: Object
+name: Object
+version: '1'
+properties:
+  subjects:
+    connectionType: multi_edge_connection
+    name: Subjects
+    type:
+      space: pygen-models
+      externalId: predicate
+    source:
+      type: view
+      space: pygen-models
+      externalId: Subject
+      version: '1'
+    direction: inwards
+filter:
+  equals:
+    property:
+     - node
+     - type
+    value:
+      space: pygen-models
+      externalId: object

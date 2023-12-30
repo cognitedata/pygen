@@ -1,0 +1,112 @@
+space: APM_AppData_4
+externalId: APM_Observation
+name: APM_Observation
+version: '7'
+properties:
+  assetExternalId:
+    container:
+      space: APM_AppData_4
+      externalId: APM_Observation
+      type: container
+    containerPropertyIdentifier: assetExternalId
+    name: assetExternalId
+    description: Contextualization
+  createdByExternalId:
+    container:
+      space: APM_AppData_4
+      externalId: APM_Observation
+      type: container
+    containerPropertyIdentifier: createdByExternalId
+    name: createdByExternalId
+  description:
+    container:
+      space: APM_AppData_4
+      externalId: APM_Observation
+      type: container
+    containerPropertyIdentifier: description
+    name: description
+    description: Observation data
+  fileExternalIds:
+    container:
+      space: APM_AppData_4
+      externalId: APM_Observation
+      type: container
+    containerPropertyIdentifier: fileExternalIds
+    name: fileExternalIds
+  files:
+    container:
+      space: APM_AppData_4
+      externalId: APM_Observation
+      type: container
+    containerPropertyIdentifier: files
+    name: files
+  isArchived:
+    container:
+      space: APM_AppData_4
+      externalId: APM_Observation
+      type: container
+    containerPropertyIdentifier: isArchived
+    name: isArchived
+    description: System data
+  measurements:
+    type:
+      space: APM_AppData_4
+      externalId: APM_Observation.measurements
+    source:
+      space: APM_AppData_4
+      externalId: APM_Measurement
+      version: '7'
+      type: view
+    direction: outwards
+    name: measurements
+    connectionType: multi_edge_connection
+  position:
+    container:
+      space: APM_AppData_4
+      externalId: APM_Observation
+      type: container
+    containerPropertyIdentifier: position
+    name: position
+  priority:
+    container:
+      space: APM_AppData_4
+      externalId: APM_Observation
+      type: container
+    containerPropertyIdentifier: priority
+    name: priority
+  sourceId:
+    container:
+      space: APM_AppData_4
+      externalId: APM_Observation
+      type: container
+    containerPropertyIdentifier: sourceId
+    name: sourceId
+    description: Basic information
+  status:
+    container:
+      space: APM_AppData_4
+      externalId: APM_Observation
+      type: container
+    containerPropertyIdentifier: status
+    name: status
+  troubleshooting:
+    container:
+      space: APM_AppData_4
+      externalId: APM_Observation
+      type: container
+    containerPropertyIdentifier: troubleshooting
+    name: troubleshooting
+  type:
+    container:
+      space: APM_AppData_4
+      externalId: APM_Observation
+      type: container
+    containerPropertyIdentifier: type
+    name: type
+  updatedByExternalId:
+    container:
+      space: APM_AppData_4
+      externalId: APM_Observation
+      type: container
+    containerPropertyIdentifier: updatedByExternalId
+    name: updatedByExternalId

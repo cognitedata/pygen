@@ -1,0 +1,850 @@
+space: power-models
+externalId: Windmill
+description: ''
+name: Windmill
+version: '1'
+views:
+- space: power-models
+  externalId: Blade
+  name: Blade
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    is_damaged:
+      container:
+        space: power-models
+        externalId: Blade
+      containerPropertyIdentifier: is_damaged
+      type:
+        list: false
+        type: boolean
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: is_damaged
+      description: null
+    name:
+      container:
+        space: power-models
+        externalId: Blade
+      containerPropertyIdentifier: name
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: name
+      description: null
+    sensor_positions:
+      type:
+        space: power-models
+        externalId: Blade.sensor_positions
+      source:
+        space: power-models
+        externalId: SensorPosition
+        version: '1'
+        type: view
+      name: sensor_positions
+      description: null
+      edgeSource: null
+      direction: outwards
+      connectionType: multi_edge_connection
+  lastUpdatedTime: 1703508218266
+  createdTime: 1703508218266
+- space: power-models
+  externalId: Gearbox
+  name: Gearbox
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    displacement_x:
+      container:
+        space: power-models
+        externalId: Gearbox
+      containerPropertyIdentifier: displacement_x
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: displacement_x
+      description: null
+    displacement_y:
+      container:
+        space: power-models
+        externalId: Gearbox
+      containerPropertyIdentifier: displacement_y
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: displacement_y
+      description: null
+    displacement_z:
+      container:
+        space: power-models
+        externalId: Gearbox
+      containerPropertyIdentifier: displacement_z
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: displacement_z
+      description: null
+  lastUpdatedTime: 1703508218266
+  createdTime: 1703508218266
+- space: power-models
+  externalId: Generator
+  name: Generator
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    generator_speed_controller:
+      container:
+        space: power-models
+        externalId: Generator
+      containerPropertyIdentifier: generator_speed_controller
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: generator_speed_controller
+      description: null
+    generator_speed_controller_reference:
+      container:
+        space: power-models
+        externalId: Generator
+      containerPropertyIdentifier: generator_speed_controller_reference
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: generator_speed_controller_reference
+      description: null
+  lastUpdatedTime: 1703508218266
+  createdTime: 1703508218266
+- space: power-models
+  externalId: HighSpeedShaft
+  name: HighSpeedShaft
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    bending_moment_y:
+      container:
+        space: power-models
+        externalId: HighSpeedShaft
+      containerPropertyIdentifier: bending_moment_y
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: bending_moment_y
+      description: null
+    bending_monent_x:
+      container:
+        space: power-models
+        externalId: HighSpeedShaft
+      containerPropertyIdentifier: bending_monent_x
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: bending_monent_x
+      description: null
+    torque:
+      container:
+        space: power-models
+        externalId: HighSpeedShaft
+      containerPropertyIdentifier: torque
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: torque
+      description: null
+  lastUpdatedTime: 1703508218266
+  createdTime: 1703508218266
+- space: power-models
+  externalId: MainShaft
+  name: MainShaft
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    bending_x:
+      container:
+        space: power-models
+        externalId: MainShaft
+      containerPropertyIdentifier: bending_x
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: bending_x
+      description: null
+    bending_y:
+      container:
+        space: power-models
+        externalId: MainShaft
+      containerPropertyIdentifier: bending_y
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: bending_y
+      description: null
+    calculated_tilt_moment:
+      container:
+        space: power-models
+        externalId: MainShaft
+      containerPropertyIdentifier: calculated_tilt_moment
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: calculated_tilt_moment
+      description: null
+    calculated_yaw_moment:
+      container:
+        space: power-models
+        externalId: MainShaft
+      containerPropertyIdentifier: calculated_yaw_moment
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: calculated_yaw_moment
+      description: null
+    torque:
+      container:
+        space: power-models
+        externalId: MainShaft
+      containerPropertyIdentifier: torque
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: torque
+      description: null
+  lastUpdatedTime: 1703508218266
+  createdTime: 1703508218266
+- space: power-models
+  externalId: Metmast
+  name: Metmast
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    position:
+      container:
+        space: power-models
+        externalId: Metmast
+      containerPropertyIdentifier: position
+      type:
+        list: false
+        type: float64
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: position
+      description: null
+    temperature:
+      container:
+        space: power-models
+        externalId: Metmast
+      containerPropertyIdentifier: temperature
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: temperature
+      description: null
+    tilt_angle:
+      container:
+        space: power-models
+        externalId: Metmast
+      containerPropertyIdentifier: tilt_angle
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: tilt_angle
+      description: null
+    wind_speed:
+      container:
+        space: power-models
+        externalId: Metmast
+      containerPropertyIdentifier: wind_speed
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: wind_speed
+      description: null
+  lastUpdatedTime: 1703508218266
+  createdTime: 1703508218266
+- space: power-models
+  externalId: Nacelle
+  name: Nacelle
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    acc_from_back_side_x:
+      container:
+        space: power-models
+        externalId: Nacelle
+      containerPropertyIdentifier: acc_from_back_side_x
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: acc_from_back_side_x
+      description: null
+    acc_from_back_side_y:
+      container:
+        space: power-models
+        externalId: Nacelle
+      containerPropertyIdentifier: acc_from_back_side_y
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: acc_from_back_side_y
+      description: null
+    acc_from_back_side_z:
+      container:
+        space: power-models
+        externalId: Nacelle
+      containerPropertyIdentifier: acc_from_back_side_z
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: acc_from_back_side_z
+      description: null
+    gearbox:
+      container:
+        space: power-models
+        externalId: Nacelle
+      containerPropertyIdentifier: gearbox
+      type:
+        type: direct
+        source:
+          space: power-models
+          externalId: Gearbox
+          version: '1'
+      nullable: true
+      autoIncrement: false
+      defaultValue: null
+      name: gearbox
+      description: null
+    generator:
+      container:
+        space: power-models
+        externalId: Nacelle
+      containerPropertyIdentifier: generator
+      type:
+        type: direct
+        source:
+          space: power-models
+          externalId: Generator
+          version: '1'
+      nullable: true
+      autoIncrement: false
+      defaultValue: null
+      name: generator
+      description: null
+    high_speed_shaft:
+      container:
+        space: power-models
+        externalId: Nacelle
+      containerPropertyIdentifier: high_speed_shaft
+      type:
+        type: direct
+        source:
+          space: power-models
+          externalId: HighSpeedShaft
+          version: '1'
+      nullable: true
+      autoIncrement: false
+      defaultValue: null
+      name: high_speed_shaft
+      description: null
+    main_shaft:
+      container:
+        space: power-models
+        externalId: Nacelle
+      containerPropertyIdentifier: main_shaft
+      type:
+        type: direct
+        source:
+          space: power-models
+          externalId: MainShaft
+          version: '1'
+      nullable: true
+      autoIncrement: false
+      defaultValue: null
+      name: main_shaft
+      description: null
+    power_inverter:
+      container:
+        space: power-models
+        externalId: Nacelle
+      containerPropertyIdentifier: power_inverter
+      type:
+        type: direct
+        source:
+          space: power-models
+          externalId: PowerInverter
+          version: '1'
+      nullable: true
+      autoIncrement: false
+      defaultValue: null
+      name: power_inverter
+      description: null
+    yaw_direction:
+      container:
+        space: power-models
+        externalId: Nacelle
+      containerPropertyIdentifier: yaw_direction
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: yaw_direction
+      description: null
+    yaw_error:
+      container:
+        space: power-models
+        externalId: Nacelle
+      containerPropertyIdentifier: yaw_error
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: yaw_error
+      description: null
+  lastUpdatedTime: 1703508218266
+  createdTime: 1703508218266
+- space: power-models
+  externalId: PowerInverter
+  name: PowerInverter
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    active_power_total:
+      container:
+        space: power-models
+        externalId: PowerInverter
+      containerPropertyIdentifier: active_power_total
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: active_power_total
+      description: null
+    apparent_power_total:
+      container:
+        space: power-models
+        externalId: PowerInverter
+      containerPropertyIdentifier: apparent_power_total
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: apparent_power_total
+      description: null
+    reactive_power_total:
+      container:
+        space: power-models
+        externalId: PowerInverter
+      containerPropertyIdentifier: reactive_power_total
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: reactive_power_total
+      description: null
+  lastUpdatedTime: 1703508218266
+  createdTime: 1703508218266
+- space: power-models
+  externalId: Rotor
+  name: Rotor
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    rotor_speed_controller:
+      container:
+        space: power-models
+        externalId: Rotor
+      containerPropertyIdentifier: rotor_speed_controller
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: rotor_speed_controller
+      description: null
+    rpm_low_speed_shaft:
+      container:
+        space: power-models
+        externalId: Rotor
+      containerPropertyIdentifier: rpm_low_speed_shaft
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: rpm_low_speed_shaft
+      description: null
+  lastUpdatedTime: 1703508218266
+  createdTime: 1703508218266
+- space: power-models
+  externalId: SensorPosition
+  name: SensorPosition
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    edgewise_bend_mom_crosstalk_corrected:
+      container:
+        space: power-models
+        externalId: SensorPosition
+      containerPropertyIdentifier: edgewise_bend_mom_crosstalk_corrected
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: edgewise_bend_mom_crosstalk_corrected
+      description: null
+    edgewise_bend_mom_offset:
+      container:
+        space: power-models
+        externalId: SensorPosition
+      containerPropertyIdentifier: edgewise_bend_mom_offset
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: edgewise_bend_mom_offset
+      description: null
+    edgewise_bend_mom_offset_crosstalk_corrected:
+      container:
+        space: power-models
+        externalId: SensorPosition
+      containerPropertyIdentifier: edgewise_bend_mom_offset_crosstalk_corrected
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: edgewise_bend_mom_offset_crosstalk_corrected
+      description: null
+    edgewisewise_bend_mom:
+      container:
+        space: power-models
+        externalId: SensorPosition
+      containerPropertyIdentifier: edgewisewise_bend_mom
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: edgewisewise_bend_mom
+      description: null
+    flapwise_bend_mom:
+      container:
+        space: power-models
+        externalId: SensorPosition
+      containerPropertyIdentifier: flapwise_bend_mom
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: flapwise_bend_mom
+      description: null
+    flapwise_bend_mom_crosstalk_corrected:
+      container:
+        space: power-models
+        externalId: SensorPosition
+      containerPropertyIdentifier: flapwise_bend_mom_crosstalk_corrected
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: flapwise_bend_mom_crosstalk_corrected
+      description: null
+    flapwise_bend_mom_offset:
+      container:
+        space: power-models
+        externalId: SensorPosition
+      containerPropertyIdentifier: flapwise_bend_mom_offset
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: flapwise_bend_mom_offset
+      description: null
+    flapwise_bend_mom_offset_crosstalk_corrected:
+      container:
+        space: power-models
+        externalId: SensorPosition
+      containerPropertyIdentifier: flapwise_bend_mom_offset_crosstalk_corrected
+      type:
+        list: false
+        type: timeseries
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: flapwise_bend_mom_offset_crosstalk_corrected
+      description: null
+    position:
+      container:
+        space: power-models
+        externalId: SensorPosition
+      containerPropertyIdentifier: position
+      type:
+        list: false
+        type: float64
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: position
+      description: null
+  lastUpdatedTime: 1703508218266
+  createdTime: 1703508218266
+- space: power-models
+  externalId: Windmill
+  name: Windmill
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    blades:
+      type:
+        space: power-models
+        externalId: Windmill.blades
+      source:
+        space: power-models
+        externalId: Blade
+        version: '1'
+        type: view
+      name: blades
+      description: null
+      edgeSource: null
+      direction: outwards
+      connectionType: multi_edge_connection
+    capacity:
+      container:
+        space: power-models
+        externalId: Windmill
+      containerPropertyIdentifier: capacity
+      type:
+        list: false
+        type: float64
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: capacity
+      description: null
+    metmast:
+      type:
+        space: power-models
+        externalId: Windmill.metmast
+      source:
+        space: power-models
+        externalId: Metmast
+        version: '1'
+        type: view
+      name: metmast
+      description: null
+      edgeSource: null
+      direction: outwards
+      connectionType: multi_edge_connection
+    nacelle:
+      container:
+        space: power-models
+        externalId: Windmill
+      containerPropertyIdentifier: nacelle
+      type:
+        type: direct
+        source:
+          space: power-models
+          externalId: Nacelle
+          version: '1'
+      nullable: true
+      autoIncrement: false
+      defaultValue: null
+      name: nacelle
+      description: null
+    name:
+      container:
+        space: power-models
+        externalId: Windmill
+      containerPropertyIdentifier: name
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: name
+      description: null
+    rotor:
+      container:
+        space: power-models
+        externalId: Windmill
+      containerPropertyIdentifier: rotor
+      type:
+        type: direct
+        source:
+          space: power-models
+          externalId: Rotor
+          version: '1'
+      nullable: true
+      autoIncrement: false
+      defaultValue: null
+      name: rotor
+      description: null
+    windfarm:
+      container:
+        space: power-models
+        externalId: Windmill
+      containerPropertyIdentifier: windfarm
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: windfarm
+      description: null
+  lastUpdatedTime: 1703508218266
+  createdTime: 1703508218266
+isGlobal: false
+lastUpdatedTime: 1703508242349
+createdTime: 1703508219198

@@ -1,0 +1,22 @@
+space: cdf_3d_schema
+externalId: Cdf3dConnectionProperties
+usedFor: edge
+properties:
+  revisionId:
+    type:
+      list: false
+      type: int64
+    nullable: false
+    autoIncrement: false
+  revisionNodeId:
+    type:
+      list: false
+      type: int64
+    nullable: false
+    autoIncrement: false
+constraints:
+  uniqueNodeRevisionConstraint:
+    properties:
+    - revisionId
+    - revisionNodeId
+    constraintType: uniqueness
