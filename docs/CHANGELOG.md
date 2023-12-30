@@ -14,7 +14,7 @@ Changes are grouped as follows
 - `Security` in case of vulnerabilities.
 
 
-## [0.TBD] - TBD-12-23
+## [0.32.6] - 30-12-23
 ### Added
 * Setting `type` on nodes.
 
