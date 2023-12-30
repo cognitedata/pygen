@@ -14,6 +14,11 @@ Changes are grouped as follows
 - `Security` in case of vulnerabilities.
 
 
+## [0.TBD] - TBD
+### Added
+* The generated data classes now are inherited if the view is implementing another view.
+
+
 ## [0.32.6] - 30-12-23
 ### Added
 * Setting `type` on nodes.
