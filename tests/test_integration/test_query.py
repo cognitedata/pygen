@@ -22,3 +22,17 @@ def test_query_with_direct_relation(omni_client: OmniClient) -> None:
         assert (
             isinstance(item.self_direct, dc.ConnectionItemA) or item.self_direct is None
         ), f"Direct relation should either be set or not exist, got {item.self_direct}"
+
+
+def test_query_circular(omni_client: OmniClient) -> None:
+    b_items = omni_client.connection_item_b(limit=5).inwards(limit=-1).outwards(limit=-1).query()
+
+    assert len(b_items) > 0
+    for b_item in b_items:
+        assert isinstance(b_item, dc.ConnectionItemB)
+        assert len(b_item.inwards or []) > 0
+        for a_item in b_item.inwards:
+            assert isinstance(a_item, dc.ConnectionItemA)
+            assert len(a_item.outwards or []) > 0
+            for b_item_circular in a_item.outwards:
+                assert isinstance(b_item_circular, dc.ConnectionItemB)
