@@ -15,7 +15,6 @@ from tests.constants import IS_PYDANTIC_V2, OMNI_SDK, WindMillFiles
 from tests.omni_constants import OmniClasses
 
 if IS_PYDANTIC_V2:
-    from movie_domain.client import data_classes as movie
     from pydantic import TypeAdapter
     from windmill.client.data_classes import DomainModelApply as WindmillDomainModelApply
     from windmill.client.data_classes import ResourcesApply, WindmillApply
@@ -28,8 +27,6 @@ else:
         ResourcesApply,
         WindmillApply,
     )
-
-    from movie_domain_pydantic_v1.client import data_classes as movie
 
 
 def omni_nodes_with_view():
@@ -49,6 +46,7 @@ class TestToFromInstances:
 
         domain_node = read_cls.from_instance(node)
         domain_apply_node = domain_node.as_apply()
+        domain_apply_node.to_pandas()
 
         resources = domain_apply_node.to_instances_apply()
         if not node.properties[view_id]:
@@ -75,6 +73,7 @@ class TestToFromInstances:
         # Bug in SDK that skips the type
         node_apply.type = node.type
         domain_apply_node = read_cls.from_instance(node_apply)
+        domain_apply_node.to_pandas()
 
         resources = domain_apply_node.to_instances_apply()
         if not node.properties[view_id]:
@@ -82,48 +81,6 @@ class TestToFromInstances:
         assert len(resources.nodes) == 1
 
         assert node_apply.dump() == resources.nodes[0].dump()
-
-
-class TestToInstancesApply:
-    def test_to_instances_with_recursive(self) -> None:
-        # Arrange
-        person = movie.PersonApply(external_id="person:anders", name="Anders", birth_year=0, roles=[])
-        actor = movie.ActorApply(external_id="actor:anders", movies=[], nomination=[], person=person, won_oscar=False)
-        person.roles.append(actor)
-
-        # Act
-        instances = person.to_instances_apply()
-
-        # Assert
-        assert len(instances.nodes) == 2
-        assert len(instances.edges) == 1
-
-
-class TestToPandas:
-    def test_person_to_pandas(self):
-        # Arrange
-        node = dm.Node.load(
-            {
-                "instanceType": "node",
-                "space": "IntegrationTestsImmutable",
-                "externalId": "person:christoph_waltz",
-                "version": 1,
-                "lastUpdatedTime": 1684170308732,
-                "createdTime": 1684170308732,
-                "properties": {
-                    "IntegrationTestsImmutable": {"Person/2": {"name": "Christoph Waltz", "birthYear": 1956}}
-                },
-            }
-        )
-        person = movie.Person.from_instance(node)
-        persons = movie.PersonList([person])
-
-        # Act
-        df = persons.to_pandas()
-
-        # Assert
-        assert not df.empty
-        assert len(df) == 1
 
 
 @pytest.mark.parametrize(

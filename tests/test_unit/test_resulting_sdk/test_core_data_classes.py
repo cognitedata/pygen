@@ -5,15 +5,14 @@ from typing import Optional
 
 import pytest
 from cognite.client.data_classes.data_modeling.instances import Properties
-from movie_domain.client.data_classes._core import unpack_properties
 from pydantic import Field
 
 from tests.constants import IS_PYDANTIC_V1
 
 if IS_PYDANTIC_V1:
-    from omni.data_classes._core import DomainModel
+    from omni.data_classes._core import DomainModel, unpack_properties
 else:
-    from omni_pydantic_v1.data_classes._core import DomainModel
+    from omni_pydantic_v1.data_classes._core import DomainModel, unpack_properties
 
 
 class TestDomainModel:

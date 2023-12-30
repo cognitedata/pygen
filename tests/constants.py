@@ -198,15 +198,6 @@ OMNIUM_CONNECTION_SDK = ExampleSDK(
     _instance_space="omni-instances",
 )
 
-
-MOVIE_SDK = ExampleSDK(
-    data_model_ids=[DataModelId("IntegrationTestsImmutable", "Movie", "4")],
-    _top_level_package="movie_domain.client",
-    client_name="MovieClient",
-    generate_sdk=False,
-)
-
-
 APM_SDK = ExampleSDK(
     data_model_ids=[DataModelId("tutorial_apm_simple", "ApmSimple", "6")],
     _top_level_package="tutorial_apm_simple.client",
@@ -252,29 +243,6 @@ EQUIPMENT_UNIT_SDK = ExampleSDK(
 
 # The following files are manually maintained (they are used to implement new functionality,
 # and are thus nod overwritten by the `python dev.py generate` command)
-
-
-class MovieSDKFiles:
-    client_dir = MOVIE_SDK.client_dir
-
-    data_classes = client_dir / "data_classes"
-    persons_data = data_classes / "_person.py"
-    actors_data = data_classes / "_actor.py"
-
-    api = client_dir / "_api"
-    core_api = api / "_core.py"
-    persons_api = api / "person.py"
-    actors_api = api / "actor.py"
-    actor_query_api = api / "actor_query.py"
-    actor_movies_api = api / "actor_movies.py"
-
-    client = client_dir / "_api_client.py"
-    client_init = client_dir / "__init__.py"
-    data_init = data_classes / "__init__.py"
-    api_init = api / "__init__.py"
-
-
-MOVIE_SDK.append_manual_files(MovieSDKFiles)
 
 
 class EquipmentSDKFiles:
