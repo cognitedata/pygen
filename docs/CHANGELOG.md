@@ -21,18 +21,20 @@ Changes are grouped as follows
 ### Fixed
 * Bug in `pygen` with views ending in numbers. The number was removed from the name of the resulting data class.
   This is now fixed.
-* Bug in `pygen` when having a list of `TimeSeries` caused `pydantic` to raise a `ValidationError` when retrieving
+* Bug in `pygen` when retrieving a list of `TimeSeries` caused `pydantic` to raise a `ValidationError` when retrieving
   data from CDF. This is now fixed.
-* Bug in `pygen` when having a list of `timestamps` or `dates`. This is now fixed.
+* Bug in `pygen` when creating nodes for a view with a list of `timestamps` or `dates`. This is now fixed.
 * Bug in `pygen` when default values are set, the read class should have `None` and not the default values.
   This is now fixed.
 * Bug in `DomainModelApply.from_instance()` raised `AttributeError` when called. This is now fixed.
-* Bug when getting passing in a sequence and getting empty response on `.retrieve` in the generated SDK you got an
+* Bug when getting in a sequence and getting an empty response on `.retrieve` in the generated SDK you got an
   `None` instead of an empty list. This is now fixed.
-* When filtering on a direct relation in the generated SDK with an `external_id`, the `space` of the model was used
-  and not the `DEFAULT_INSTANCE_SPACE` was used. This is now fixed.
-* When `quering` and including a direct relation in the generated SDK, the property name and the field name was
+* When filtering on a direct relation in the generated SDK with an `external_id`, the `space` of the view was used
+  and not the `DEFAULT_INSTANCE_SPACE`. This is now fixed.
+* When `quering` and including a direct relation in the generated SDK, the property name and the field name were
   assumed to be the same. This is now fixed.
+* When retrieving a direct relations with a different space than the source node, the `space` was not set correctly
+  in the generated SDK. This is now fixed.
 
 ## [0.32.5] - 21-12-23
 ### Fixed
