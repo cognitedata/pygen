@@ -95,3 +95,61 @@ def test_person_apply_multiple_requests(movie_client: OmniClient) -> None:
 
     instances = person.to_instances_apply()
     movie_client.person._client.data_modeling.instances.delete(instances.nodes.as_ids(), instances.edges.as_ids())
+
+
+def test_apply_recursive(omni_client: OmniClient, cognite_client: CogniteClient) -> None:
+    # Arrange
+    test_name = "integration_test:ApplyRecursive"
+    new_connection_a = dc.ConnectionItemAApply(
+        external_id=f"{test_name}:Connection:A",
+        name="Connection:A",
+        other_direct=dc.ConnectionItemCApply(
+            external_id=f"{test_name}:Connection:C",
+            connection_item_a=[],
+            connection_item_b=[],
+        ),
+        self_direct=dc.ConnectionItemAApply(
+            external_id=f"{test_name}:Connection:OtherA",
+            name="Connection:OtherA",
+        ),
+        outwards=[
+            dc.ConnectionItemBApply(
+                external_id=f"{test_name}:Connection:B1",
+                name="Connection:B1",
+                self_edge=[
+                    dc.ConnectionItemBApply(
+                        external_id=f"{test_name}:Connection:B3",
+                        name="Connection:B3",
+                    ),
+                ],
+            ),
+            dc.ConnectionItemBApply(
+                external_id=f"{test_name}:Connection:B2",
+                name="Connection:B2",
+            ),
+        ],
+    )
+
+    resources = new_connection_a.to_instances_apply()
+    node_ids = resources.nodes.as_ids()
+    edge_ids = resources.edges.as_ids()
+
+    try:
+        # Act
+        created = omni_client.connection_item_a.apply(new_connection_a)
+
+        # Assert
+        assert len(created.nodes) == 6
+        assert len(created.edges) == 3
+
+        # Act
+        retrieved = omni_client.connection_item_a.retrieve(new_connection_a.external_id)
+
+        # Assert
+        assert retrieved.external_id == new_connection_a.external_id
+        assert retrieved.name == new_connection_a.name
+        assert retrieved.other_direct == new_connection_a.other_direct.external_id
+        assert retrieved.self_direct == new_connection_a.self_direct.external_id
+        assert len(retrieved.outwards) == 2
+    finally:
+        cognite_client.data_modeling.instances.delete(nodes=node_ids, edges=edge_ids)
