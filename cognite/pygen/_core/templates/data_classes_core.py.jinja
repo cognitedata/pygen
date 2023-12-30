@@ -157,7 +157,16 @@ class DomainModelApply(DomainModelCore{% if is_pydantic_v2 %}, extra=Extra.forbi
         sources = data.pop("sources", [])
         properties = {}
         for source in sources:
-            properties.update(source["properties"])
+            for prop_name, prop_value in source["properties"].items():
+                if isinstance(prop_value, dict) and "externalId" in prop_value and "space" in prop_value:
+                    if prop_value["space"] == DEFAULT_INSTANCE_SPACE:
+                        properties[prop_name] = prop_value["externalId"]
+                    else:
+                        properties[prop_name] = dm.NodeId(
+                            space=prop_value["space"], external_id=prop_value["externalId"]
+                        )
+                else:
+                    properties[prop_name] = prop_value
         return cls(**{**data, **properties})
 
 
@@ -374,7 +383,10 @@ def unpack_properties(properties: Properties) -> Mapping[str, PropertyValue]:
     for view_properties in properties.values():
         for prop_name, prop_value in view_properties.items():
             if isinstance(prop_value, dict) and "externalId" in prop_value and "space" in prop_value:
-                unpacked[prop_name] = prop_value["externalId"]
+                if prop_value["space"] == DEFAULT_INSTANCE_SPACE:
+                    unpacked[prop_name] = prop_value["externalId"]
+                else:
+                    unpacked[prop_name] = dm.NodeId(space=prop_value["space"], external_id=prop_value["externalId"])
             else:
                 unpacked[prop_name] = prop_value
     return unpacked
