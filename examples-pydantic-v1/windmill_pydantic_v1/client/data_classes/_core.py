@@ -21,7 +21,13 @@ from typing import (
 import pandas as pd
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList
-from cognite.client.data_classes.data_modeling.instances import Instance, Properties, PropertyValue
+from cognite.client.data_classes.data_modeling.instances import (
+    Instance,
+    InstanceApply,
+    InstanceCore,
+    Properties,
+    PropertyValue,
+)
 from pydantic import BaseModel, Extra, Field, root_validator
 
 
@@ -74,9 +80,9 @@ class DomainModelCore(Core):
         return dm.DirectRelationReference(space=self.space, external_id=self.external_id)
 
     @classmethod
-    def from_instance(cls: type[T_DomainModelCore], instance: Instance) -> T_DomainModelCore:
-        data = instance.dump(camel_case=False)
-        return cls(**{**data, **unpack_properties(instance.properties)})
+    @abstractmethod
+    def from_instance(cls: type[T_DomainModelCore], instance: InstanceCore) -> T_DomainModelCore:
+        raise NotImplementedError()
 
 
 T_DomainModelCore = TypeVar("T_DomainModelCore", bound=DomainModelCore)
@@ -90,6 +96,11 @@ class DomainModel(DomainModelCore):
 
     def as_id(self) -> dm.NodeId:
         return dm.NodeId(space=self.space, external_id=self.external_id)
+
+    @classmethod
+    def from_instance(cls: type[T_DomainModel], instance: Instance) -> T_DomainModel:
+        data = instance.dump(camel_case=False)
+        return cls(**{**data, **unpack_properties(instance.properties)})
 
 
 T_DomainModel = TypeVar("T_DomainModel", bound=DomainModel)
@@ -121,6 +132,25 @@ class DomainModelApply(DomainModelCore):
         if isinstance(data, dict) and cls.external_id_factory is not None:
             data["external_id"] = cls.external_id_factory(cls, data)
         return data
+
+    @classmethod
+    def from_instance(cls: type[T_DomainModelApply], instance: InstanceApply) -> T_DomainModelApply:
+        data = instance.dump(camel_case=False)
+        data.pop("instance_type", None)
+        sources = data.pop("sources", [])
+        properties = {}
+        for source in sources:
+            for prop_name, prop_value in source["properties"].items():
+                if isinstance(prop_value, dict) and "externalId" in prop_value and "space" in prop_value:
+                    if prop_value["space"] == DEFAULT_INSTANCE_SPACE:
+                        properties[prop_name] = prop_value["externalId"]
+                    else:
+                        properties[prop_name] = dm.NodeId(
+                            space=prop_value["space"], external_id=prop_value["externalId"]
+                        )
+                else:
+                    properties[prop_name] = prop_value
+        return cls(**{**data, **properties})
 
 
 T_DomainModelApply = TypeVar("T_DomainModelApply", bound=DomainModelApply)
@@ -221,6 +251,11 @@ class DomainRelation(DomainModelCore):
     last_updated_time: datetime.datetime
     created_time: datetime.datetime
     deleted_time: Optional[datetime.datetime] = None
+
+    @classmethod
+    def from_instance(cls: type[T_DomainRelation], instance: Instance) -> T_DomainRelation:
+        data = instance.dump(camel_case=False)
+        return cls(**{**data, **unpack_properties(instance.properties)})
 
 
 T_DomainRelation = TypeVar("T_DomainRelation", bound=DomainRelation)
@@ -331,7 +366,10 @@ def unpack_properties(properties: Properties) -> Mapping[str, PropertyValue]:
     for view_properties in properties.values():
         for prop_name, prop_value in view_properties.items():
             if isinstance(prop_value, dict) and "externalId" in prop_value and "space" in prop_value:
-                unpacked[prop_name] = prop_value["externalId"]
+                if prop_value["space"] == DEFAULT_INSTANCE_SPACE:
+                    unpacked[prop_name] = prop_value["externalId"]
+                else:
+                    unpacked[prop_name] = dm.NodeId(space=prop_value["space"], external_id=prop_value["externalId"])
             else:
                 unpacked[prop_name] = prop_value
     return unpacked

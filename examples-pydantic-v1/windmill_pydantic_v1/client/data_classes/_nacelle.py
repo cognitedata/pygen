@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal, Optional, Union  # noqa: F401
+from typing import TYPE_CHECKING, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeries
@@ -299,7 +299,7 @@ def _create_nacelle_filter(
     if gearbox and isinstance(gearbox, str):
         filters.append(
             dm.filters.Equals(
-                view_id.as_property_ref("gearbox"), value={"space": "power-models", "externalId": gearbox}
+                view_id.as_property_ref("gearbox"), value={"space": DEFAULT_INSTANCE_SPACE, "externalId": gearbox}
             )
         )
     if gearbox and isinstance(gearbox, tuple):
@@ -310,7 +310,7 @@ def _create_nacelle_filter(
         filters.append(
             dm.filters.In(
                 view_id.as_property_ref("gearbox"),
-                values=[{"space": "power-models", "externalId": item} for item in gearbox],
+                values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in gearbox],
             )
         )
     if gearbox and isinstance(gearbox, list) and isinstance(gearbox[0], tuple):
@@ -323,7 +323,7 @@ def _create_nacelle_filter(
     if generator and isinstance(generator, str):
         filters.append(
             dm.filters.Equals(
-                view_id.as_property_ref("generator"), value={"space": "power-models", "externalId": generator}
+                view_id.as_property_ref("generator"), value={"space": DEFAULT_INSTANCE_SPACE, "externalId": generator}
             )
         )
     if generator and isinstance(generator, tuple):
@@ -336,7 +336,7 @@ def _create_nacelle_filter(
         filters.append(
             dm.filters.In(
                 view_id.as_property_ref("generator"),
-                values=[{"space": "power-models", "externalId": item} for item in generator],
+                values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in generator],
             )
         )
     if generator and isinstance(generator, list) and isinstance(generator[0], tuple):
@@ -350,7 +350,7 @@ def _create_nacelle_filter(
         filters.append(
             dm.filters.Equals(
                 view_id.as_property_ref("high_speed_shaft"),
-                value={"space": "power-models", "externalId": high_speed_shaft},
+                value={"space": DEFAULT_INSTANCE_SPACE, "externalId": high_speed_shaft},
             )
         )
     if high_speed_shaft and isinstance(high_speed_shaft, tuple):
@@ -364,7 +364,7 @@ def _create_nacelle_filter(
         filters.append(
             dm.filters.In(
                 view_id.as_property_ref("high_speed_shaft"),
-                values=[{"space": "power-models", "externalId": item} for item in high_speed_shaft],
+                values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in high_speed_shaft],
             )
         )
     if high_speed_shaft and isinstance(high_speed_shaft, list) and isinstance(high_speed_shaft[0], tuple):
@@ -377,7 +377,7 @@ def _create_nacelle_filter(
     if main_shaft and isinstance(main_shaft, str):
         filters.append(
             dm.filters.Equals(
-                view_id.as_property_ref("main_shaft"), value={"space": "power-models", "externalId": main_shaft}
+                view_id.as_property_ref("main_shaft"), value={"space": DEFAULT_INSTANCE_SPACE, "externalId": main_shaft}
             )
         )
     if main_shaft and isinstance(main_shaft, tuple):
@@ -390,7 +390,7 @@ def _create_nacelle_filter(
         filters.append(
             dm.filters.In(
                 view_id.as_property_ref("main_shaft"),
-                values=[{"space": "power-models", "externalId": item} for item in main_shaft],
+                values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in main_shaft],
             )
         )
     if main_shaft and isinstance(main_shaft, list) and isinstance(main_shaft[0], tuple):
@@ -403,7 +403,8 @@ def _create_nacelle_filter(
     if power_inverter and isinstance(power_inverter, str):
         filters.append(
             dm.filters.Equals(
-                view_id.as_property_ref("power_inverter"), value={"space": "power-models", "externalId": power_inverter}
+                view_id.as_property_ref("power_inverter"),
+                value={"space": DEFAULT_INSTANCE_SPACE, "externalId": power_inverter},
             )
         )
     if power_inverter and isinstance(power_inverter, tuple):
@@ -417,7 +418,7 @@ def _create_nacelle_filter(
         filters.append(
             dm.filters.In(
                 view_id.as_property_ref("power_inverter"),
-                values=[{"space": "power-models", "externalId": item} for item in power_inverter],
+                values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in power_inverter],
             )
         )
     if power_inverter and isinstance(power_inverter, list) and isinstance(power_inverter[0], tuple):

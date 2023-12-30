@@ -52,6 +52,7 @@ class Implementation2(DomainModel):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    type: dm.DirectRelationReference = dm.DirectRelationReference("pygen-models", "Implementation2")
     main_value: Optional[str] = Field(None, alias="mainValue")
     sub_value: Optional[str] = Field(None, alias="subValue")
 
@@ -82,6 +83,7 @@ class Implementation2Apply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    type: dm.DirectRelationReference = dm.DirectRelationReference("pygen-models", "Implementation2")
     main_value: Optional[str] = Field(None, alias="mainValue")
     sub_value: Optional[str] = Field(None, alias="subValue")
 
@@ -111,7 +113,7 @@ class Implementation2Apply(DomainModelApply):
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                type=dm.DirectRelationReference("pygen-models", "Implementation2"),
+                type=self.type,
                 sources=[
                     dm.NodeOrEdgeData(
                         source=write_view,

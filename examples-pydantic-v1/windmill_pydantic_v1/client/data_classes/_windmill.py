@@ -224,7 +224,7 @@ def _create_windmill_filter(
     if nacelle and isinstance(nacelle, str):
         filters.append(
             dm.filters.Equals(
-                view_id.as_property_ref("nacelle"), value={"space": "power-models", "externalId": nacelle}
+                view_id.as_property_ref("nacelle"), value={"space": DEFAULT_INSTANCE_SPACE, "externalId": nacelle}
             )
         )
     if nacelle and isinstance(nacelle, tuple):
@@ -235,7 +235,7 @@ def _create_windmill_filter(
         filters.append(
             dm.filters.In(
                 view_id.as_property_ref("nacelle"),
-                values=[{"space": "power-models", "externalId": item} for item in nacelle],
+                values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in nacelle],
             )
         )
     if nacelle and isinstance(nacelle, list) and isinstance(nacelle[0], tuple):
@@ -253,7 +253,9 @@ def _create_windmill_filter(
         filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
     if rotor and isinstance(rotor, str):
         filters.append(
-            dm.filters.Equals(view_id.as_property_ref("rotor"), value={"space": "power-models", "externalId": rotor})
+            dm.filters.Equals(
+                view_id.as_property_ref("rotor"), value={"space": DEFAULT_INSTANCE_SPACE, "externalId": rotor}
+            )
         )
     if rotor and isinstance(rotor, tuple):
         filters.append(
@@ -263,7 +265,7 @@ def _create_windmill_filter(
         filters.append(
             dm.filters.In(
                 view_id.as_property_ref("rotor"),
-                values=[{"space": "power-models", "externalId": item} for item in rotor],
+                values=[{"space": DEFAULT_INSTANCE_SPACE, "externalId": item} for item in rotor],
             )
         )
     if rotor and isinstance(rotor, list) and isinstance(rotor[0], tuple):

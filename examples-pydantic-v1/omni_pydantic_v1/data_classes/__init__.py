@@ -13,13 +13,31 @@ from ._cdf_external_references import (
     CDFExternalReferencesFields,
     CDFExternalReferencesList,
 )
-from ._cdf_external_references_list import (
-    CDFExternalReferencesList,
-    CDFExternalReferencesListApply,
-    CDFExternalReferencesListApplyList,
-    CDFExternalReferencesListFields,
-    CDFExternalReferencesListList,
+from ._cdf_external_references_listed import (
+    CDFExternalReferencesListed,
+    CDFExternalReferencesListedApply,
+    CDFExternalReferencesListedApplyList,
+    CDFExternalReferencesListedFields,
+    CDFExternalReferencesListedList,
 )
+from ._connection_item_a import (
+    ConnectionItemA,
+    ConnectionItemAApply,
+    ConnectionItemAApplyList,
+    ConnectionItemAFields,
+    ConnectionItemAList,
+    ConnectionItemATextFields,
+)
+from ._connection_item_b import (
+    ConnectionItemB,
+    ConnectionItemBApply,
+    ConnectionItemBApplyList,
+    ConnectionItemBFields,
+    ConnectionItemBList,
+    ConnectionItemBTextFields,
+)
+from ._connection_item_c import ConnectionItemC, ConnectionItemCApply, ConnectionItemCApplyList, ConnectionItemCList
+from ._empty import Empty, EmptyApply, EmptyApplyList, EmptyFields, EmptyList, EmptyTextFields
 from ._implementation_1 import (
     Implementation1,
     Implementation1Apply,
@@ -60,13 +78,13 @@ from ._primitive_nullable import (
     PrimitiveNullableList,
     PrimitiveNullableTextFields,
 )
-from ._primitive_nullable_list import (
-    PrimitiveNullableList,
-    PrimitiveNullableListApply,
-    PrimitiveNullableListApplyList,
-    PrimitiveNullableListFields,
-    PrimitiveNullableListList,
-    PrimitiveNullableListTextFields,
+from ._primitive_nullable_listed import (
+    PrimitiveNullableListed,
+    PrimitiveNullableListedApply,
+    PrimitiveNullableListedApplyList,
+    PrimitiveNullableListedFields,
+    PrimitiveNullableListedList,
+    PrimitiveNullableListedTextFields,
 )
 from ._primitive_required import (
     PrimitiveRequired,
@@ -76,13 +94,13 @@ from ._primitive_required import (
     PrimitiveRequiredList,
     PrimitiveRequiredTextFields,
 )
-from ._primitive_required_list import (
-    PrimitiveRequiredList,
-    PrimitiveRequiredListApply,
-    PrimitiveRequiredListApplyList,
-    PrimitiveRequiredListFields,
-    PrimitiveRequiredListList,
-    PrimitiveRequiredListTextFields,
+from ._primitive_required_listed import (
+    PrimitiveRequiredListed,
+    PrimitiveRequiredListedApply,
+    PrimitiveRequiredListedApplyList,
+    PrimitiveRequiredListedFields,
+    PrimitiveRequiredListedList,
+    PrimitiveRequiredListedTextFields,
 )
 from ._primitive_with_defaults import (
     PrimitiveWithDefaults,
@@ -102,6 +120,35 @@ from ._sub_interface import (
 )
 
 
+ConnectionItemA.update_forward_refs(
+    ConnectionItemA=ConnectionItemA,
+    ConnectionItemB=ConnectionItemB,
+    ConnectionItemC=ConnectionItemC,
+)
+ConnectionItemAApply.update_forward_refs(
+    ConnectionItemAApply=ConnectionItemAApply,
+    ConnectionItemBApply=ConnectionItemBApply,
+    ConnectionItemCApply=ConnectionItemCApply,
+)
+
+ConnectionItemB.update_forward_refs(
+    ConnectionItemA=ConnectionItemA,
+    ConnectionItemB=ConnectionItemB,
+)
+ConnectionItemBApply.update_forward_refs(
+    ConnectionItemAApply=ConnectionItemAApply,
+    ConnectionItemBApply=ConnectionItemBApply,
+)
+
+ConnectionItemC.update_forward_refs(
+    ConnectionItemA=ConnectionItemA,
+    ConnectionItemB=ConnectionItemB,
+)
+ConnectionItemCApply.update_forward_refs(
+    ConnectionItemAApply=ConnectionItemAApply,
+    ConnectionItemBApply=ConnectionItemBApply,
+)
+
 __all__ = [
     "ResourcesApply",
     "DomainModel",
@@ -114,11 +161,33 @@ __all__ = [
     "CDFExternalReferencesList",
     "CDFExternalReferencesApplyList",
     "CDFExternalReferencesFields",
-    "CDFExternalReferencesList",
-    "CDFExternalReferencesListApply",
-    "CDFExternalReferencesListList",
-    "CDFExternalReferencesListApplyList",
-    "CDFExternalReferencesListFields",
+    "CDFExternalReferencesListed",
+    "CDFExternalReferencesListedApply",
+    "CDFExternalReferencesListedList",
+    "CDFExternalReferencesListedApplyList",
+    "CDFExternalReferencesListedFields",
+    "ConnectionItemA",
+    "ConnectionItemAApply",
+    "ConnectionItemAList",
+    "ConnectionItemAApplyList",
+    "ConnectionItemAFields",
+    "ConnectionItemATextFields",
+    "ConnectionItemB",
+    "ConnectionItemBApply",
+    "ConnectionItemBList",
+    "ConnectionItemBApplyList",
+    "ConnectionItemBFields",
+    "ConnectionItemBTextFields",
+    "ConnectionItemC",
+    "ConnectionItemCApply",
+    "ConnectionItemCList",
+    "ConnectionItemCApplyList",
+    "Empty",
+    "EmptyApply",
+    "EmptyList",
+    "EmptyApplyList",
+    "EmptyFields",
+    "EmptyTextFields",
     "Implementation1",
     "Implementation1Apply",
     "Implementation1List",
@@ -149,24 +218,24 @@ __all__ = [
     "PrimitiveNullableApplyList",
     "PrimitiveNullableFields",
     "PrimitiveNullableTextFields",
-    "PrimitiveNullableList",
-    "PrimitiveNullableListApply",
-    "PrimitiveNullableListList",
-    "PrimitiveNullableListApplyList",
-    "PrimitiveNullableListFields",
-    "PrimitiveNullableListTextFields",
+    "PrimitiveNullableListed",
+    "PrimitiveNullableListedApply",
+    "PrimitiveNullableListedList",
+    "PrimitiveNullableListedApplyList",
+    "PrimitiveNullableListedFields",
+    "PrimitiveNullableListedTextFields",
     "PrimitiveRequired",
     "PrimitiveRequiredApply",
     "PrimitiveRequiredList",
     "PrimitiveRequiredApplyList",
     "PrimitiveRequiredFields",
     "PrimitiveRequiredTextFields",
-    "PrimitiveRequiredList",
-    "PrimitiveRequiredListApply",
-    "PrimitiveRequiredListList",
-    "PrimitiveRequiredListApplyList",
-    "PrimitiveRequiredListFields",
-    "PrimitiveRequiredListTextFields",
+    "PrimitiveRequiredListed",
+    "PrimitiveRequiredListedApply",
+    "PrimitiveRequiredListedList",
+    "PrimitiveRequiredListedApplyList",
+    "PrimitiveRequiredListedFields",
+    "PrimitiveRequiredListedTextFields",
     "PrimitiveWithDefaults",
     "PrimitiveWithDefaultsApply",
     "PrimitiveWithDefaultsList",

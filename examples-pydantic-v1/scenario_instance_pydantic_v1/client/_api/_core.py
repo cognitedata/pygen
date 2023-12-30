@@ -80,7 +80,7 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
     def __init__(
         self,
         client: CogniteClient,
-        sources: dm.ViewIdentifier | Sequence[dm.ViewIdentifier] | dm.View | Sequence[dm.View],
+        sources: dm.ViewIdentifier | Sequence[dm.ViewIdentifier] | dm.View | Sequence[dm.View] | None,
         class_type: type[T_DomainModel],
         class_apply_type: type[T_DomainModelApply],
         class_list: type[T_DomainModelList],
@@ -172,10 +172,10 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
         if retrieve_edges and nodes:
             self._retrieve_and_set_edge_types(nodes, edge_api_name_type_direction_quad)
 
-        if not nodes:
-            return None
-        elif is_multiple:
+        if is_multiple:
             return nodes
+        elif not nodes:
+            return None
         else:
             return nodes[0]
 
