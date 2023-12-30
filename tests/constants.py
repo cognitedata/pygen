@@ -199,20 +199,6 @@ OMNIUM_CONNECTION_SDK = ExampleSDK(
 )
 
 
-MARKET_SDK = ExampleSDK(
-    data_model_ids=[DataModelId("market", "CogPool", "3"), DataModelId("market", "PygenPool", "3")],
-    _top_level_package="markets.client",
-    client_name="MarketClient",
-    generate_sdk=False,
-)
-
-SHOP_SDK = ExampleSDK(
-    data_model_ids=[DataModelId("IntegrationTestsImmutable", "SHOP_Model", "2")],
-    _top_level_package="shop.client",
-    client_name="ShopClient",
-    generate_sdk=False,
-)
-
 MOVIE_SDK = ExampleSDK(
     data_model_ids=[DataModelId("IntegrationTestsImmutable", "Movie", "4")],
     _top_level_package="movie_domain.client",
@@ -220,12 +206,6 @@ MOVIE_SDK = ExampleSDK(
     generate_sdk=True,
 )
 
-OSDU_SDK = ExampleSDK(
-    data_model_ids=[DataModelId("IntegrationTestsImmutable", "OSDUWells", "1")],
-    _top_level_package="osdu_wells.client",
-    client_name="OSDUClient",
-    generate_sdk=False,
-)
 
 APM_SDK = ExampleSDK(
     data_model_ids=[DataModelId("tutorial_apm_simple", "ApmSimple", "6")],
@@ -272,30 +252,6 @@ EQUIPMENT_UNIT_SDK = ExampleSDK(
 
 # The following files are manually maintained (they are used to implement new functionality,
 # and are thus nod overwritten by the `python dev.py generate` command)
-
-
-class MarketSDKFiles:
-    client_dir = MARKET_SDK.client_dir
-    client = client_dir / "_api_client.py"
-    date_transformation_pair_data = client_dir / "data_classes" / "_date_transformation_pair.py"
-    date_transformation_pair_api = client_dir / "_api" / "date_transformation_pair.py"
-    date_transformation_pair_query_api = client_dir / "_api" / "date_transformation_pair_query.py"
-
-
-MARKET_SDK.append_manual_files(MarketSDKFiles)
-
-
-class ShopSDKFiles:
-    client_dir = SHOP_SDK.client_dir
-    data_classes = client_dir / "data_classes"
-    api = client_dir / "_api"
-    cases_data = data_classes / "_case.py"
-    command_configs_data = data_classes / "_command_config.py"
-    data_init = data_classes / "__init__.py"
-    command_configs_api = api / "command_config.py"
-
-
-SHOP_SDK.append_manual_files(ShopSDKFiles)
 
 
 class MovieSDKFiles:
