@@ -59,9 +59,7 @@ class OmniClient:
             data_classes.ConnectionItemCApply: dm.ViewId("pygen-models", "ConnectionItemC", "1"),
             data_classes.EmptyApply: dm.ViewId("pygen-models", "Empty", "1"),
             data_classes.Implementation1Apply: dm.ViewId("pygen-models", "Implementation1", "1"),
-            data_classes.Implementation1NonWriteableApply: dm.ViewId(
-                "pygen-models", "Implementation1NonWriteable", "1"
-            ),
+            data_classes.Implementation1NonWriteable: dm.ViewId("pygen-models", "Implementation1NonWriteable", "1"),
             data_classes.Implementation2Apply: dm.ViewId("pygen-models", "Implementation2", "1"),
             data_classes.MainInterfaceApply: dm.ViewId("pygen-models", "MainInterface", "1"),
             data_classes.PrimitiveNullableApply: dm.ViewId("pygen-models", "PrimitiveNullable", "1"),

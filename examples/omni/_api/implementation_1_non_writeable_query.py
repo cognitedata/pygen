@@ -8,7 +8,6 @@ from cognite.client import data_modeling as dm, CogniteClient
 from omni.data_classes import (
     DomainModelApply,
     Implementation1NonWriteable,
-    Implementation1NonWriteableApply,
 )
 from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
 
@@ -31,9 +30,7 @@ class Implementation1NonWriteableQueryAPI(QueryAPI[T_DomainModelList]):
                     from_=self._builder[-1].name if self._builder else None,
                     filter=filter_,
                 ),
-                select=dm.query.Select(
-                    [dm.query.SourceSelector(self._view_by_write_class[Implementation1NonWriteableApply], ["*"])]
-                ),
+                select=dm.query.Select([dm.query.SourceSelector(self._view_by_write_class[None], ["*"])]),
                 result_cls=Implementation1NonWriteable,
                 max_retrieve_limit=limit,
             )

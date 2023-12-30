@@ -12,10 +12,8 @@ from omni.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
     Implementation1NonWriteable,
-    Implementation1NonWriteableApply,
     Implementation1NonWriteableFields,
     Implementation1NonWriteableList,
-    Implementation1NonWriteableApplyList,
     Implementation1NonWriteableTextFields,
 )
 from omni.data_classes._implementation_1_non_writeable import (
@@ -34,21 +32,18 @@ from ._core import (
 from .implementation_1_non_writeable_query import Implementation1NonWriteableQueryAPI
 
 
-class Implementation1NonWriteableAPI(
-    NodeAPI[Implementation1NonWriteable, Implementation1NonWriteableApply, Implementation1NonWriteableList]
-):
+class Implementation1NonWriteableAPI(NodeAPI[Implementation1NonWriteable, None, Implementation1NonWriteableList]):
     def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
-        view_id = view_by_write_class[Implementation1NonWriteableApply]
         super().__init__(
             client=client,
-            sources=view_id,
+            sources=None,
             class_type=Implementation1NonWriteable,
-            class_apply_type=Implementation1NonWriteableApply,
+            class_apply_type=None,
             class_list=Implementation1NonWriteableList,
-            class_apply_list=Implementation1NonWriteableApplyList,
+            class_apply_list=None,
             view_by_write_class=view_by_write_class,
         )
-        self._view_id = view_id
+        self._view_id = None
 
     def __call__(
         self,
