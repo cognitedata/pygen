@@ -4,12 +4,13 @@ import datetime
 from typing import Optional
 
 import pytest
+from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Properties
 from pydantic import Field
 
-from tests.constants import IS_PYDANTIC_V1
+from tests.constants import IS_PYDANTIC_V2
 
-if IS_PYDANTIC_V1:
+if IS_PYDANTIC_V2:
     from omni.data_classes._core import DomainModel, unpack_properties
 else:
     from omni_pydantic_v1.data_classes._core import DomainModel, unpack_properties
@@ -92,7 +93,7 @@ def unpack_properties_test_cases():
             }
         }
     }
-    expected = {"person": "person:ethan_coen", "wonOscar": True}
+    expected = {"person": dm.NodeId("IntegrationTestsImmutable", "person:ethan_coen"), "wonOscar": True}
     yield pytest.param(properties, expected, id="Actor")
 
 
