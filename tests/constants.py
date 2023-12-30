@@ -372,6 +372,7 @@ class OmniFiles:
     primitive_required_data = data_classes / "_primitive_required.py"
     primitive_required_list_data = data_classes / "_primitive_required_listed.py"
     implementation_1_data = data_classes / "_implementation_1.py"
+    connection_item_a_data = data_classes / "_connection_item_a.py"
     connection_item_c_data = data_classes / "_connection_item_c.py"
 
     cdf_external_api = api / "cdf_external_references.py"

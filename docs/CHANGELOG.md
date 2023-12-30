@@ -29,6 +29,8 @@ Changes are grouped as follows
 * Bug in `DomainModelApply.from_instance()` raised `AttributeError` when called. This is now fixed.
 * Bug when getting passing in a sequence and getting empty response on `.retrieve` in the generated SDK you got an
   `None` instead of an empty list. This is now fixed.
+* When filtering on a direct relation in the generated SDK with an `external_id`, the `space` of the model was used
+  and not the `DEFAULT_INSTANCE_SPACE` was used. This is now fixed.
 
 ## [0.32.5] - 21-12-23
 ### Fixed

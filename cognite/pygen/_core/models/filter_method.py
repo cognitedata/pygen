@@ -22,7 +22,6 @@ class FilterParameter:
     type_: str
     description: str
     default: str | None = None
-    space: str | None = None
     is_nullable: bool = True
 
     def __post_init__(self):
@@ -114,11 +113,13 @@ class FilterConditionOnetoOneEdge(FilterCondition):
         filter_args: list[str] = []
         for keyword, arg in self.keyword_arguments.items():
             if self.instance_type is str and self.filter is dm.filters.Equals:
-                filter_args.append(f'{keyword}={{"space": "{arg.space}", "externalId": {arg.name}}}')
+                filter_args.append(f'{keyword}={{"space": DEFAULT_INSTANCE_SPACE, "externalId": {arg.name}}}')
             elif self.instance_type is tuple and self.filter is dm.filters.Equals:
                 filter_args.append(f'{keyword}={{"space": {arg.name}[0], "externalId": {arg.name}[1]}}')
             elif self.instance_type is str and self.filter is dm.filters.In:
-                filter_args.append(f'{keyword}=[{{"space": "{arg.space}", "externalId": item}} for item in {arg.name}]')
+                filter_args.append(
+                    f'{keyword}=[{{"space": DEFAULT_INSTANCE_SPACE, "externalId": item}} for item in {arg.name}]'
+                )
             elif self.instance_type is tuple and self.filter is dm.filters.In:
                 filter_args.append(f'{keyword}=[{{"space": item[0], "externalId": item[1]}} for item in {arg.name}]')
             else:
@@ -226,7 +227,6 @@ class FilterMethod:
                             parameter = FilterParameter(
                                 name=field_.name,
                                 type_="str | tuple[str, str]",
-                                space=field_.data_class.view_id.space,
                                 description=f"The {field_.doc_name} to filter on.",
                             )
                             parameters_by_name[parameter.name] = parameter
@@ -251,7 +251,6 @@ class FilterMethod:
                             parameter = FilterParameter(
                                 name=field_.name,
                                 type_="list[str] | list[tuple[str, str]]",
-                                space=field_.data_class.view_id.space,
                                 description=f"The {field_.doc_name} to filter on.",
                             )
                             parameters_by_name[parameter.name] = parameter

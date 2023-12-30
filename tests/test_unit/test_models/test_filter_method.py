@@ -92,13 +92,11 @@ def test_create_list_method_connection_item_a(
             "other_direct",
             "str | tuple[str, str] | list[str] | list[tuple[str, str]]",
             description="The other direct to filter on.",
-            space="pygen-models",
         ),
         FilterParameter(
             "self_direct",
             "str | tuple[str, str] | list[str] | list[tuple[str, str]]",
             description="The self direct to filter on.",
-            space="pygen-models",
         ),
         FilterParameter("external_id_prefix", "str", description="The prefix of the external ID to filter on."),
         FilterParameter("space", "str | list[str]", description="The space to filter on."),
