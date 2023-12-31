@@ -13,10 +13,8 @@ from omni.data_classes import (
     DomainModelApply,
     ResourcesApplyResult,
     Implementation1NonWriteable,
-    Implementation1NonWriteableApply,
     Implementation1NonWriteableFields,
     Implementation1NonWriteableList,
-    Implementation1NonWriteableApplyList,
     Implementation1NonWriteableTextFields,
 )
 from omni.data_classes._implementation_1_non_writeable import (
@@ -27,7 +25,7 @@ from ._core import (
     DEFAULT_LIMIT_READ,
     DEFAULT_QUERY_LIMIT,
     Aggregations,
-    NodeAPI,
+    NodeReadAPI,
     SequenceNotStr,
     QueryStep,
     QueryBuilder,
@@ -35,17 +33,14 @@ from ._core import (
 from .implementation_1_non_writeable_query import Implementation1NonWriteableQueryAPI
 
 
-class Implementation1NonWriteableAPI(
-    NodeAPI[Implementation1NonWriteable, Implementation1NonWriteableApply, Implementation1NonWriteableList]
-):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelApply], dm.ViewId]):
+class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Implementation1NonWriteableList]):
+    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[Implementation1NonWriteable]
         super().__init__(
             client=client,
             sources=view_id,
             class_type=Implementation1NonWriteable,
             class_list=Implementation1NonWriteableList,
-            class_apply_list=Implementation1NonWriteableApplyList,
             view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
@@ -96,33 +91,6 @@ class Implementation1NonWriteableAPI(
         )
         builder = QueryBuilder(Implementation1NonWriteableList)
         return Implementation1NonWriteableQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
-
-    def apply(
-        self,
-        implementation_1_non_writeable: Implementation1NonWriteableApply | Sequence[Implementation1NonWriteableApply],
-        replace: bool = False,
-    ) -> ResourcesApplyResult:
-        """Add or update (upsert) implementation 1 non writeables.
-
-        Args:
-            implementation_1_non_writeable: Implementation 1 non writeable or sequence of implementation 1 non writeables to upsert.
-            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
-                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
-        Returns:
-            Created instance(s), i.e., nodes, edges, and time series.
-
-        Examples:
-
-            Create a new implementation_1_non_writeable:
-
-                >>> from omni import OmniClient
-                >>> from omni.data_classes import Implementation1NonWriteableApply
-                >>> client = OmniClient()
-                >>> implementation_1_non_writeable = Implementation1NonWriteableApply(external_id="my_implementation_1_non_writeable", ...)
-                >>> result = client.implementation_1_non_writeable.apply(implementation_1_non_writeable)
-
-        """
-        return self._apply(implementation_1_non_writeable, replace)
 
     def delete(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
