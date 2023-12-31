@@ -20,6 +20,7 @@ from ._scenario_instance import (
 __all__ = [
     "ResourcesApply",
     "DomainModel",
+    "DomainModelCore",
     "DomainModelApply",
     "DomainModelList",
     "DomainRelationApply",

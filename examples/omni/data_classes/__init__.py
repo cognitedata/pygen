@@ -128,6 +128,7 @@ ConnectionItemCApply.model_rebuild()
 __all__ = [
     "ResourcesApply",
     "DomainModel",
+    "DomainModelCore",
     "DomainModelApply",
     "DomainModelList",
     "DomainRelationApply",
@@ -171,9 +172,7 @@ __all__ = [
     "Implementation1Fields",
     "Implementation1TextFields",
     "Implementation1NonWriteable",
-    "Implementation1NonWriteableApply",
     "Implementation1NonWriteableList",
-    "Implementation1NonWriteableApplyList",
     "Implementation1NonWriteableFields",
     "Implementation1NonWriteableTextFields",
     "Implementation2",
