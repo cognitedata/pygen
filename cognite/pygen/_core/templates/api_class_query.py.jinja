@@ -7,8 +7,7 @@ from cognite.client import data_modeling as dm, CogniteClient
 
 from {{ top_level_package }}.data_classes import (
     DomainModelApply,
-    {{ data_class.read_name }},
-    {{ data_class.write_name }},{% for class_ in unique_edge_data_classes %}
+    {{ data_class.read_name }},{% for class_ in unique_edge_data_classes %}
     {{ class_.read_name }},
     {{ class_.write_name }},{% endfor %}{% for field in data_class.fields_of_type(ft.EdgeOneToOne) %}
     {{ field.data_class.read_name }},
@@ -29,11 +28,11 @@ class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
         self,
         client: CogniteClient,
         builder: QueryBuilder[T_DomainModelList],
-        view_by_write_class: dict[type[DomainModelApply], dm.ViewId],
+        view_by_read_class: dict[type[DomainModelApply], dm.ViewId],
         filter_: dm.filters.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
     ):
-        super().__init__(client, builder, view_by_write_class)
+        super().__init__(client, builder, view_by_read_class)
 
         self._builder.append(
             QueryStep(
@@ -42,7 +41,7 @@ class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
                     from_=self._builder[-1].name if self._builder else None,
                     filter=filter_,
                 ),
-                select=dm.query.Select([dm.query.SourceSelector(self._view_by_write_class[{{ data_class.write_name }}], ["*"])]),
+                select=dm.query.Select([dm.query.SourceSelector(self._view_by_read_class[{{ data_class.read_name }}], ["*"])]),
                 result_cls={{ data_class.read_name }},
                 max_retrieve_limit=limit,
             )
@@ -69,7 +68,7 @@ class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
 
         from_ = self._builder[-1].name
 {% if edge_api.has_edge_class %}
-        edge_view = self._view_by_write_class[{{ edge_api.edge_class.write_name }}]{% endif %}
+        edge_view = self._view_by_read_class[{{ edge_api.edge_class.read_name }}]{% endif %}
         edge_filter = {% if edge_api.has_edge_class %}{{ edge_api.edge_class.filter_name }}{% else %}_create_edge_filter{% endif %}(
             dm.DirectRelationReference("{{ edge_api.type.space }}", "{{ edge_api.type.external_id }}"),
             {% if edge_api.has_edge_class %}edge_view,{% endif %}{% for parm in edge_api.filter_parameters(False) %}
@@ -93,7 +92,7 @@ class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
         ){% for field in data_class.fields_of_type(ft.EdgeOneToOne) %}
         if retrieve_{{ field.name }}:
             self._query_append_{{ field.name }}(from_){% endfor %}
-        return {{ edge_api.query.name }}(self._client, self._builder, self._view_by_write_class, None, limit)
+        return {{ edge_api.query.name }}(self._client, self._builder, self._view_by_read_class, None, limit)
     {% endfor %}
     def query(
         self,{% for field in data_class.fields_of_type(ft.EdgeOneToOne) %}
@@ -114,14 +113,14 @@ class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
         return self._query()
 {% for field in data_class.fields_of_type(ft.EdgeOneToOne) %}
     def _query_append_{{ field.name }}(self, from_: str) -> None:
-        view_id = self._view_by_write_class[{{ field.data_class.write_name }}]
+        view_id = self._view_by_read_class[{{ field.data_class.read_name }}]
         self._builder.append(
             QueryStep(
                 name=self._builder.next_name("{{ field.name }}"),
                 expression=dm.query.NodeResultSetExpression(
                     filter=dm.filters.HasData(views=[view_id]),
                     from_=from_,
-                    through=self._view_by_write_class[{{ data_class.write_name }}].as_property_ref("{{ field.prop_name }}"),
+                    through=self._view_by_read_class[{{ data_class.read_name }}].as_property_ref("{{ field.prop_name }}"),
                     direction="outwards",
                 ),
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),

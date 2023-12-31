@@ -95,7 +95,7 @@ class {{ data_class.write_name }}(DomainModelApply):
             space=self.space,
             external_id=self.external_id,
             existing_version=self.existing_version,{% if data_class.node_type %}
-            type=self.type,{% endif %}
+            type=self.node_type,{% endif %}
             sources=None,
         )
         resources.nodes.append(this_node)
