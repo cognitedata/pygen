@@ -38,7 +38,7 @@ from .cdf_external_references_listed_query import CDFExternalReferencesListedQue
 class CDFExternalReferencesListedAPI(
     NodeAPI[CDFExternalReferencesListed, CDFExternalReferencesListedApply, CDFExternalReferencesListedList]
 ):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelApply], dm.ViewId]):
+    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[CDFExternalReferencesListed]
         super().__init__(
             client=client,

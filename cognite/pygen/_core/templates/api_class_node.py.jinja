@@ -13,10 +13,10 @@ from {{ top_level_package }}.data_classes import (
     DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
-    {{ data_class.read_name }},{% if data_class.is_writeable %} }
+    {{ data_class.read_name }},{% if data_class.is_writable %}
     {{ data_class.write_name }},{% endif %}{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}
     {{ data_class.field_names }},{% endif %}
-    {{ data_class.read_list_name }},{% if data_class.is_writeable %}
+    {{ data_class.read_list_name }},{% if data_class.is_writable %}
     {{ data_class.write_list_name }},{% endif %}{% if data_class.has_primitive_field_of_type(dm.Text) %}
     {{ data_class.text_field_names }},{% endif %}{% for edge_data_class in edge_data_classes %}
     {{ edge_data_class.read_name }},
@@ -27,20 +27,20 @@ from {{ top_level_package }}.data_classes.{{ data_class.file_name }} import ({% 
     {{ data_class.properties_dict_name }},{%  endif %}
     {{ data_class.filter_name }},
 )
-from ._core import DEFAULT_LIMIT_READ, DEFAULT_QUERY_LIMIT, Aggregations, {% if data_class.is_writeable %}NodeAPI{% else %}NodeReadAPI{% endif %}, SequenceNotStr, QueryStep, QueryBuilder{% for class_ in edge_apis %}
+from ._core import DEFAULT_LIMIT_READ, DEFAULT_QUERY_LIMIT, Aggregations, {% if data_class.is_writable %}NodeAPI{% else %}NodeReadAPI{% endif %}, SequenceNotStr, QueryStep, QueryBuilder{% for class_ in edge_apis %}
 from .{{ class_.file_name }} import {{ class_.name }}{% endfor %}{% for class_ in timeseries_apis %}
 from .{{ class_.file_name }} import {{ class_.name }}{% endfor %}
 from .{{ query_api.file_name }} import {{ query_api.name }}
 
 
-class {{ api_class.name }}({% if data_class.is_writeable %}NodeAPI{% else %}NodeReadAPI{% endif %}[{{ data_class.read_name }}{% if data_class.is_writeable %}, {{ data_class.write_name }}{% endif %}, {{ data_class.read_list_name }}]):
+class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeReadAPI{% endif %}[{{ data_class.read_name }}{% if data_class.is_writable %}, {{ data_class.write_name }}{% endif %}, {{ data_class.read_list_name }}]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[{{ data_class.read_name }}]
         super().__init__(
             client=client,
             sources={% if data_class.is_all_fields_of_type(ft.EdgeOneToMany) %}None{% else %}view_id{% endif %},
             class_type={{ data_class.read_name }},
-            class_list={{ data_class.read_list_name }},{% if data_class.is_writeable %}
+            class_list={{ data_class.read_list_name }},{% if data_class.is_writable %}
             class_apply_list={{ data_class.write_list_name }},{% endif %}
             view_by_read_class=view_by_read_class,
         )
@@ -76,7 +76,7 @@ class {{ api_class.name }}({% if data_class.is_writeable %}NodeAPI{% else %}Node
         builder = QueryBuilder({{ data_class.read_list_name }})
         return {{ query_api.name }}(self._client, builder, self._view_by_write_class, filter_, limit)
 
-{% if data_class.is_writeable %}
+{% if data_class.is_writable %}
     def apply(self, {{ data_class.variable }}: {{ data_class.write_name }} | Sequence[{{ data_class.write_name }}], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) {{data_class.doc_list_name}}.{% if data_class.has_field_of_type(ft.EdgeOneToMany) %}
 

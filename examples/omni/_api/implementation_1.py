@@ -36,7 +36,7 @@ from .implementation_1_query import Implementation1QueryAPI
 
 
 class Implementation1API(NodeAPI[Implementation1, Implementation1Apply, Implementation1List]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelApply], dm.ViewId]):
+    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[Implementation1]
         super().__init__(
             client=client,

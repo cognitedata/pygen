@@ -37,7 +37,7 @@ from .primitive_required_query import PrimitiveRequiredQueryAPI
 
 
 class PrimitiveRequiredAPI(NodeAPI[PrimitiveRequired, PrimitiveRequiredApply, PrimitiveRequiredList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelApply], dm.ViewId]):
+    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[PrimitiveRequired]
         super().__init__(
             client=client,

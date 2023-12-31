@@ -37,7 +37,7 @@ from .primitive_nullable_query import PrimitiveNullableQueryAPI
 
 
 class PrimitiveNullableAPI(NodeAPI[PrimitiveNullable, PrimitiveNullableApply, PrimitiveNullableList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelApply], dm.ViewId]):
+    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[PrimitiveNullable]
         super().__init__(
             client=client,

@@ -34,7 +34,7 @@ from .connection_item_c_query import ConnectionItemCQueryAPI
 
 
 class ConnectionItemCAPI(NodeAPI[ConnectionItemC, ConnectionItemCApply, ConnectionItemCList]):
-    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelApply], dm.ViewId]):
+    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
         view_id = view_by_read_class[ConnectionItemC]
         super().__init__(
             client=client,
