@@ -34,11 +34,11 @@ class {{ client_name }}:
         # The client name is used for aggregated logging of Pygen Usage
         client.config.client_name = "CognitePygen:{{ pygen_version }}"
 
-        view_by_write_class = {% raw %}{{% endraw %}{% for view_id, api in api_by_view_id.items() %}
+        view_by_read_class = {% raw %}{{% endraw %}{% for view_id, api in api_by_view_id.items() %}
             data_classes.{{ api.data_class.write_name }}: dm.ViewId("{{ view_id.space }}", "{{ view_id.external_id }}", "{{ view_id.version }}"),{% endfor %}
         {% raw %}}{% endraw %}
         {% for api in api_by_view_id.values() %}{% if not api.data_class.is_edge_class %}
-        self.{{ api.api_class.parent_attribute }} = {{ api.api_class.name }}(client, view_by_write_class){% endif %}{% endfor %}
+        self.{{ api.api_class.parent_attribute }} = {{ api.api_class.name }}(client, view_by_read_class){% endif %}{% endfor %}
 
     @classmethod
     def azure_project(

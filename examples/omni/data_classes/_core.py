@@ -120,7 +120,7 @@ class DomainModelApply(DomainModelCore, extra=Extra.forbid, populate_by_name=Tru
     existing_version: Optional[int] = None
 
     def to_instances_apply(
-        self, view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None = None
+        self, view_by_write_class: dict[type[DomainModelCore], dm.ViewId] | None = None
     ) -> ResourcesApply:
         return self._to_instances_apply(set(), view_by_write_class)
 
@@ -128,7 +128,7 @@ class DomainModelApply(DomainModelCore, extra=Extra.forbid, populate_by_name=Tru
     def _to_instances_apply(
         self,
         cache: set[tuple[str, str]],
-        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+        view_by_write_class: dict[type[DomainModelCore], dm.ViewId] | None,
     ) -> ResourcesApply:
         raise NotImplementedError()
 

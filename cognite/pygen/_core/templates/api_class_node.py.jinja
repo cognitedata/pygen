@@ -10,6 +10,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from {{ top_level_package }}.data_classes._core import DEFAULT_INSTANCE_SPACE
 from {{ top_level_package }}.data_classes import (
+    DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
     {{ data_class.read_name }},
@@ -33,20 +34,19 @@ from .{{ query_api.file_name }} import {{ query_api.name }}
 
 
 class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.write_name }}, {{ data_class.read_list_name }}]):
-    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
-        view_id = view_by_write_class[{{ data_class.write_name }}]
+    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_read_class[{{ data_class.write_name }}]
         super().__init__(
             client=client,
             sources={% if data_class.is_all_fields_of_type(ft.EdgeOneToMany) %}None{% else %}view_id{% endif %},
             class_type={{ data_class.read_name }},
-            class_apply_type={{ data_class.write_name }},
             class_list={{ data_class.read_list_name }},
             class_apply_list={{ data_class.write_list_name }},
-            view_by_write_class=view_by_write_class,
+            view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id{% for edge_api in edge_apis %}
         self.{{ edge_api.parent_attribute }} = {{ edge_api.name }}(
-            client{% if edge_api.has_edge_class %}, view_by_write_class, {{ edge_api.edge_class.read_name }}, {{ edge_api.edge_class.write_name }}, {{ edge_api.edge_class.read_list_name }}{% endif %}
+            client{% if edge_api.has_edge_class %}, view_by_read_class, {{ edge_api.edge_class.read_name }}, {{ edge_api.edge_class.write_name }}, {{ edge_api.edge_class.read_list_name }}{% endif %}
         ){% endfor %}{% for timeseries_api in timeseries_apis %}
         self.{{ timeseries_api.parent_attribute }} = {{ timeseries_api.name }}(client, view_id){% endfor %}
 
