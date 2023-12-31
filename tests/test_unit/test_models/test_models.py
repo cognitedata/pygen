@@ -237,6 +237,9 @@ def load_data_classes_test_cases():
             file_name="_series",
             fields=[],
             node_type=None,
+            is_interface=False,
+            is_writable=True,
+            implements=[],
         ),
         id="DataClass variable and variable_list the same.",
     )
@@ -449,6 +452,9 @@ def create_fields_test_cases():
         view_id=dm.ViewId("IntegrationTestsImmutable", "Role", "2"),
         fields=[],
         node_type=None,
+        is_interface=True,
+        is_writable=True,
+        implements=[],
     )
     data_class_by_view_id = {dm.ViewId("IntegrationTestsImmutable", "Role", "2"): data_class}
     yield pytest.param(
@@ -530,6 +536,9 @@ def create_fields_test_cases():
         variable_list="persons",
         fields=[],
         node_type=None,
+        is_interface=False,
+        is_writable=True,
+        implements=[],
     )
     data_class_by_view_id = {dm.ViewId("IntegrationTestsImmutable", "Person", "2"): data_class}
 
