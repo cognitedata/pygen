@@ -364,6 +364,9 @@ class APIGenerator:
             return NotImplemented
         return (self.base_name, self.view_id) < (other.base_name, other.view_id)
 
+    def __repr__(self):
+        return f"APIGenerator({self.base_name}, {self.view_id})"
+
     @property
     def view_id(self) -> dm.ViewId:
         return self.view.as_id()
