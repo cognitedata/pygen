@@ -8,6 +8,7 @@ from pydantic import Field
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
     DomainModel,
+    DomainModelCore,
     DomainModelApply,
     DomainModelApplyList,
     DomainModelList,
@@ -49,6 +50,7 @@ class MainInterface(DomainModel):
         version: The version of the main interface node.
     """
 
+    space: str = DEFAULT_INSTANCE_SPACE
     main_value: Optional[str] = Field(None, alias="mainValue")
 
     def as_apply(self) -> MainInterfaceApply:
@@ -81,15 +83,13 @@ class MainInterfaceApply(DomainModelApply):
     def _to_instances_apply(
         self,
         cache: set[tuple[str, str]],
-        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
             return resources
 
-        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
-            "pygen-models", "MainInterface", "1"
-        )
+        write_view = (view_by_read_class or {}).get(MainInterface, dm.ViewId("pygen-models", "MainInterface", "1"))
 
         properties = {}
 

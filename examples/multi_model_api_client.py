@@ -47,31 +47,31 @@ class WindmillAPIs:
     """
 
     def __init__(self, client: CogniteClient):
-        view_by_write_class = {
-            data_classes.BladeApply: dm.ViewId("power-models", "Blade", "1"),
-            data_classes.GearboxApply: dm.ViewId("power-models", "Gearbox", "1"),
-            data_classes.GeneratorApply: dm.ViewId("power-models", "Generator", "1"),
-            data_classes.HighSpeedShaftApply: dm.ViewId("power-models", "HighSpeedShaft", "1"),
-            data_classes.MainShaftApply: dm.ViewId("power-models", "MainShaft", "1"),
-            data_classes.MetmastApply: dm.ViewId("power-models", "Metmast", "1"),
-            data_classes.NacelleApply: dm.ViewId("power-models", "Nacelle", "1"),
-            data_classes.PowerInverterApply: dm.ViewId("power-models", "PowerInverter", "1"),
-            data_classes.RotorApply: dm.ViewId("power-models", "Rotor", "1"),
-            data_classes.SensorPositionApply: dm.ViewId("power-models", "SensorPosition", "1"),
-            data_classes.WindmillApply: dm.ViewId("power-models", "Windmill", "1"),
+        view_by_read_class = {
+            data_classes.Blade: dm.ViewId("power-models", "Blade", "1"),
+            data_classes.Gearbox: dm.ViewId("power-models", "Gearbox", "1"),
+            data_classes.Generator: dm.ViewId("power-models", "Generator", "1"),
+            data_classes.HighSpeedShaft: dm.ViewId("power-models", "HighSpeedShaft", "1"),
+            data_classes.MainShaft: dm.ViewId("power-models", "MainShaft", "1"),
+            data_classes.Metmast: dm.ViewId("power-models", "Metmast", "1"),
+            data_classes.Nacelle: dm.ViewId("power-models", "Nacelle", "1"),
+            data_classes.PowerInverter: dm.ViewId("power-models", "PowerInverter", "1"),
+            data_classes.Rotor: dm.ViewId("power-models", "Rotor", "1"),
+            data_classes.SensorPosition: dm.ViewId("power-models", "SensorPosition", "1"),
+            data_classes.Windmill: dm.ViewId("power-models", "Windmill", "1"),
         }
 
-        self.blade = BladeAPI(client, view_by_write_class)
-        self.gearbox = GearboxAPI(client, view_by_write_class)
-        self.generator = GeneratorAPI(client, view_by_write_class)
-        self.high_speed_shaft = HighSpeedShaftAPI(client, view_by_write_class)
-        self.main_shaft = MainShaftAPI(client, view_by_write_class)
-        self.metmast = MetmastAPI(client, view_by_write_class)
-        self.nacelle = NacelleAPI(client, view_by_write_class)
-        self.power_inverter = PowerInverterAPI(client, view_by_write_class)
-        self.rotor = RotorAPI(client, view_by_write_class)
-        self.sensor_position = SensorPositionAPI(client, view_by_write_class)
-        self.windmill = WindmillAPI(client, view_by_write_class)
+        self.blade = BladeAPI(client, view_by_read_class)
+        self.gearbox = GearboxAPI(client, view_by_read_class)
+        self.generator = GeneratorAPI(client, view_by_read_class)
+        self.high_speed_shaft = HighSpeedShaftAPI(client, view_by_read_class)
+        self.main_shaft = MainShaftAPI(client, view_by_read_class)
+        self.metmast = MetmastAPI(client, view_by_read_class)
+        self.nacelle = NacelleAPI(client, view_by_read_class)
+        self.power_inverter = PowerInverterAPI(client, view_by_read_class)
+        self.rotor = RotorAPI(client, view_by_read_class)
+        self.sensor_position = SensorPositionAPI(client, view_by_read_class)
+        self.windmill = WindmillAPI(client, view_by_read_class)
 
 
 class OmniAPIs:
@@ -86,45 +86,41 @@ class OmniAPIs:
     """
 
     def __init__(self, client: CogniteClient):
-        view_by_write_class = {
-            data_classes.CDFExternalReferencesApply: dm.ViewId("pygen-models", "CDFExternalReferences", "1"),
-            data_classes.CDFExternalReferencesListedApply: dm.ViewId(
-                "pygen-models", "CDFExternalReferencesListed", "1"
-            ),
-            data_classes.ConnectionItemAApply: dm.ViewId("pygen-models", "ConnectionItemA", "1"),
-            data_classes.ConnectionItemBApply: dm.ViewId("pygen-models", "ConnectionItemB", "1"),
-            data_classes.ConnectionItemCApply: dm.ViewId("pygen-models", "ConnectionItemC", "1"),
-            data_classes.EmptyApply: dm.ViewId("pygen-models", "Empty", "1"),
-            data_classes.Implementation1Apply: dm.ViewId("pygen-models", "Implementation1", "1"),
-            data_classes.Implementation1NonWriteableApply: dm.ViewId(
-                "pygen-models", "Implementation1NonWriteable", "1"
-            ),
-            data_classes.Implementation2Apply: dm.ViewId("pygen-models", "Implementation2", "1"),
-            data_classes.MainInterfaceApply: dm.ViewId("pygen-models", "MainInterface", "1"),
-            data_classes.PrimitiveNullableApply: dm.ViewId("pygen-models", "PrimitiveNullable", "1"),
-            data_classes.PrimitiveNullableListedApply: dm.ViewId("pygen-models", "PrimitiveNullableListed", "1"),
-            data_classes.PrimitiveRequiredApply: dm.ViewId("pygen-models", "PrimitiveRequired", "1"),
-            data_classes.PrimitiveRequiredListedApply: dm.ViewId("pygen-models", "PrimitiveRequiredListed", "1"),
-            data_classes.PrimitiveWithDefaultsApply: dm.ViewId("pygen-models", "PrimitiveWithDefaults", "1"),
-            data_classes.SubInterfaceApply: dm.ViewId("pygen-models", "SubInterface", "1"),
+        view_by_read_class = {
+            data_classes.CDFExternalReferences: dm.ViewId("pygen-models", "CDFExternalReferences", "1"),
+            data_classes.CDFExternalReferencesListed: dm.ViewId("pygen-models", "CDFExternalReferencesListed", "1"),
+            data_classes.ConnectionItemA: dm.ViewId("pygen-models", "ConnectionItemA", "1"),
+            data_classes.ConnectionItemB: dm.ViewId("pygen-models", "ConnectionItemB", "1"),
+            data_classes.ConnectionItemC: dm.ViewId("pygen-models", "ConnectionItemC", "1"),
+            data_classes.Empty: dm.ViewId("pygen-models", "Empty", "1"),
+            data_classes.Implementation1: dm.ViewId("pygen-models", "Implementation1", "1"),
+            data_classes.Implementation1NonWriteable: dm.ViewId("pygen-models", "Implementation1NonWriteable", "1"),
+            data_classes.Implementation2: dm.ViewId("pygen-models", "Implementation2", "1"),
+            data_classes.MainInterface: dm.ViewId("pygen-models", "MainInterface", "1"),
+            data_classes.PrimitiveNullable: dm.ViewId("pygen-models", "PrimitiveNullable", "1"),
+            data_classes.PrimitiveNullableListed: dm.ViewId("pygen-models", "PrimitiveNullableListed", "1"),
+            data_classes.PrimitiveRequired: dm.ViewId("pygen-models", "PrimitiveRequired", "1"),
+            data_classes.PrimitiveRequiredListed: dm.ViewId("pygen-models", "PrimitiveRequiredListed", "1"),
+            data_classes.PrimitiveWithDefaults: dm.ViewId("pygen-models", "PrimitiveWithDefaults", "1"),
+            data_classes.SubInterface: dm.ViewId("pygen-models", "SubInterface", "1"),
         }
 
-        self.cdf_external_references = CDFExternalReferencesAPI(client, view_by_write_class)
-        self.cdf_external_references_listed = CDFExternalReferencesListedAPI(client, view_by_write_class)
-        self.connection_item_a = ConnectionItemAAPI(client, view_by_write_class)
-        self.connection_item_b = ConnectionItemBAPI(client, view_by_write_class)
-        self.connection_item_c = ConnectionItemCAPI(client, view_by_write_class)
-        self.empty = EmptyAPI(client, view_by_write_class)
-        self.implementation_1 = Implementation1API(client, view_by_write_class)
-        self.implementation_1_non_writeable = Implementation1NonWriteableAPI(client, view_by_write_class)
-        self.implementation_2 = Implementation2API(client, view_by_write_class)
-        self.main_interface = MainInterfaceAPI(client, view_by_write_class)
-        self.primitive_nullable = PrimitiveNullableAPI(client, view_by_write_class)
-        self.primitive_nullable_listed = PrimitiveNullableListedAPI(client, view_by_write_class)
-        self.primitive_required = PrimitiveRequiredAPI(client, view_by_write_class)
-        self.primitive_required_listed = PrimitiveRequiredListedAPI(client, view_by_write_class)
-        self.primitive_with_defaults = PrimitiveWithDefaultsAPI(client, view_by_write_class)
-        self.sub_interface = SubInterfaceAPI(client, view_by_write_class)
+        self.cdf_external_references = CDFExternalReferencesAPI(client, view_by_read_class)
+        self.cdf_external_references_listed = CDFExternalReferencesListedAPI(client, view_by_read_class)
+        self.connection_item_a = ConnectionItemAAPI(client, view_by_read_class)
+        self.connection_item_b = ConnectionItemBAPI(client, view_by_read_class)
+        self.connection_item_c = ConnectionItemCAPI(client, view_by_read_class)
+        self.empty = EmptyAPI(client, view_by_read_class)
+        self.implementation_1 = Implementation1API(client, view_by_read_class)
+        self.implementation_1_non_writeable = Implementation1NonWriteableAPI(client, view_by_read_class)
+        self.implementation_2 = Implementation2API(client, view_by_read_class)
+        self.main_interface = MainInterfaceAPI(client, view_by_read_class)
+        self.primitive_nullable = PrimitiveNullableAPI(client, view_by_read_class)
+        self.primitive_nullable_listed = PrimitiveNullableListedAPI(client, view_by_read_class)
+        self.primitive_required = PrimitiveRequiredAPI(client, view_by_read_class)
+        self.primitive_required_listed = PrimitiveRequiredListedAPI(client, view_by_read_class)
+        self.primitive_with_defaults = PrimitiveWithDefaultsAPI(client, view_by_read_class)
+        self.sub_interface = SubInterfaceAPI(client, view_by_read_class)
 
 
 class MultiModelClient:
@@ -132,7 +128,7 @@ class MultiModelClient:
     MultiModelClient
 
     Generated with:
-        pygen = 0.32.5
+        pygen = 0.32.6
         cognite-sdk = 7.8.5
         pydantic = 2.5.3
 
@@ -146,7 +142,7 @@ class MultiModelClient:
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = "CognitePygen:0.32.5"
+        client.config.client_name = "CognitePygen:0.32.6"
 
         self.windmill = WindmillAPIs(client)
         self.omni = OmniAPIs(client)

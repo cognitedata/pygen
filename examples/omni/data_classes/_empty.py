@@ -9,6 +9,7 @@ from pydantic import Field
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
     DomainModel,
+    DomainModelCore,
     DomainModelApply,
     DomainModelApplyList,
     DomainModelList,
@@ -112,7 +113,7 @@ class EmptyApply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    type: dm.DirectRelationReference = dm.DirectRelationReference("pygen-models", "Empty")
+    node_type: dm.DirectRelationReference = dm.DirectRelationReference("pygen-models", "Empty")
     boolean: Optional[bool] = None
     date: Optional[datetime.date] = None
     float_32: Optional[float] = Field(None, alias="float32")
@@ -126,15 +127,13 @@ class EmptyApply(DomainModelApply):
     def _to_instances_apply(
         self,
         cache: set[tuple[str, str]],
-        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
             return resources
 
-        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
-            "pygen-models", "Empty", "1"
-        )
+        write_view = (view_by_read_class or {}).get(Empty, dm.ViewId("pygen-models", "Empty", "1"))
 
         properties = {}
 

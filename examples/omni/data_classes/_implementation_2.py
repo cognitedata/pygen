@@ -1,10 +1,14 @@
 from __future__ import annotations
 
-from typing import Literal
+from typing import Literal, Optional
 
 from cognite.client import data_modeling as dm
+from pydantic import Field
 
 from ._core import (
+    DEFAULT_INSTANCE_SPACE,
+    DomainModel,
+    DomainModelCore,
     DomainModelApply,
     DomainModelApplyList,
     DomainModelList,
@@ -82,15 +86,13 @@ class Implementation2Apply(SubInterfaceApply):
     def _to_instances_apply(
         self,
         cache: set[tuple[str, str]],
-        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
             return resources
 
-        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
-            "pygen-models", "Implementation2", "1"
-        )
+        write_view = (view_by_read_class or {}).get(Implementation2, dm.ViewId("pygen-models", "Implementation2", "1"))
 
         properties = {}
 

@@ -10,6 +10,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni.data_classes import (
+    DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
     Empty,
@@ -36,16 +37,15 @@ from .empty_query import EmptyQueryAPI
 
 
 class EmptyAPI(NodeAPI[Empty, EmptyApply, EmptyList]):
-    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
-        view_id = view_by_write_class[EmptyApply]
+    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_read_class[Empty]
         super().__init__(
             client=client,
             sources=view_id,
             class_type=Empty,
-            class_apply_type=EmptyApply,
             class_list=EmptyList,
             class_apply_list=EmptyApplyList,
-            view_by_write_class=view_by_write_class,
+            view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
 

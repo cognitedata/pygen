@@ -10,6 +10,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni.data_classes import (
     DomainModelCore,
+    DomainModelApply,
     ResourcesApplyResult,
     CDFExternalReferences,
     CDFExternalReferencesApply,
@@ -35,15 +36,15 @@ from .cdf_external_references_query import CDFExternalReferencesQueryAPI
 
 
 class CDFExternalReferencesAPI(NodeAPI[CDFExternalReferences, CDFExternalReferencesApply, CDFExternalReferencesList]):
-    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelCore], dm.ViewId]):
-        view_id = view_by_write_class[CDFExternalReferencesApply]
+    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_read_class[CDFExternalReferences]
         super().__init__(
             client=client,
             sources=view_id,
             class_type=CDFExternalReferences,
             class_list=CDFExternalReferencesList,
             class_apply_list=CDFExternalReferencesApplyList,
-            view_by_write_class=view_by_write_class,
+            view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
         self.timeseries = CDFExternalReferencesTimeseriesAPI(client, view_id)

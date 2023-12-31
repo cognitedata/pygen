@@ -9,6 +9,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni.data_classes import (
+    DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
     MainInterface,
@@ -35,16 +36,15 @@ from .main_interface_query import MainInterfaceQueryAPI
 
 
 class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceApply, MainInterfaceList]):
-    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
-        view_id = view_by_write_class[MainInterfaceApply]
+    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_read_class[MainInterface]
         super().__init__(
             client=client,
             sources=view_id,
             class_type=MainInterface,
-            class_apply_type=MainInterfaceApply,
             class_list=MainInterfaceList,
             class_apply_list=MainInterfaceApplyList,
-            view_by_write_class=view_by_write_class,
+            view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
 

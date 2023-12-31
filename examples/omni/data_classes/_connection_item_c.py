@@ -8,6 +8,7 @@ from pydantic import Field
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
     DomainModel,
+    DomainModelCore,
     DomainModelApply,
     DomainModelApplyList,
     DomainModelList,
@@ -81,7 +82,7 @@ class ConnectionItemCApply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    type: dm.DirectRelationReference = dm.DirectRelationReference("pygen-models", "ConnectionItemC")
+    node_type: dm.DirectRelationReference = dm.DirectRelationReference("pygen-models", "ConnectionItemC")
     connection_item_a: Union[list[ConnectionItemAApply], list[str], None] = Field(
         default=None, repr=False, alias="connectionItemA"
     )
@@ -92,7 +93,7 @@ class ConnectionItemCApply(DomainModelApply):
     def _to_instances_apply(
         self,
         cache: set[tuple[str, str]],
-        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
@@ -115,7 +116,7 @@ class ConnectionItemCApply(DomainModelApply):
                 start_node=self,
                 end_node=connection_item_a,
                 edge_type=edge_type,
-                view_by_write_class=view_by_write_class,
+                view_by_read_class=view_by_read_class,
             )
             resources.extend(other_resources)
 
@@ -126,7 +127,7 @@ class ConnectionItemCApply(DomainModelApply):
                 start_node=self,
                 end_node=connection_item_b,
                 edge_type=edge_type,
-                view_by_write_class=view_by_write_class,
+                view_by_read_class=view_by_read_class,
             )
             resources.extend(other_resources)
 

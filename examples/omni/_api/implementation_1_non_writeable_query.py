@@ -30,7 +30,9 @@ class Implementation1NonWriteableQueryAPI(QueryAPI[T_DomainModelList]):
                     from_=self._builder[-1].name if self._builder else None,
                     filter=filter_,
                 ),
-                select=dm.query.Select([dm.query.SourceSelector(self._view_by_write_class[None], ["*"])]),
+                select=dm.query.Select(
+                    [dm.query.SourceSelector(self._view_by_write_class[Implementation1NonWriteableApply], ["*"])]
+                ),
                 result_cls=Implementation1NonWriteable,
                 max_retrieve_limit=limit,
             )

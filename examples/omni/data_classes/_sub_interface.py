@@ -8,13 +8,13 @@ from pydantic import Field
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
     DomainModel,
+    DomainModelCore,
     DomainModelApply,
     DomainModelApplyList,
     DomainModelList,
     DomainRelationApply,
     ResourcesApply,
 )
-from ._main_interface import MainInterface, MainInterfaceApply
 
 
 __all__ = [
@@ -36,7 +36,7 @@ _SUBINTERFACE_PROPERTIES_BY_FIELD = {
 }
 
 
-class SubInterface(MainInterface):
+class SubInterface(DomainModel):
     """This represents the reading version of sub interface.
 
     It is used to when data is retrieved from CDF.
@@ -52,6 +52,8 @@ class SubInterface(MainInterface):
         version: The version of the sub interface node.
     """
 
+    space: str = DEFAULT_INSTANCE_SPACE
+    main_value: Optional[str] = Field(None, alias="mainValue")
     sub_value: Optional[str] = Field(None, alias="subValue")
 
     def as_apply(self) -> SubInterfaceApply:
@@ -64,7 +66,7 @@ class SubInterface(MainInterface):
         )
 
 
-class SubInterfaceApply(MainInterfaceApply):
+class SubInterfaceApply(DomainModelApply):
     """This represents the writing version of sub interface.
 
     It is used to when data is sent to CDF.
@@ -80,20 +82,20 @@ class SubInterfaceApply(MainInterfaceApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
+    space: str = DEFAULT_INSTANCE_SPACE
+    main_value: Optional[str] = Field(None, alias="mainValue")
     sub_value: Optional[str] = Field(None, alias="subValue")
 
     def _to_instances_apply(
         self,
         cache: set[tuple[str, str]],
-        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
             return resources
 
-        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
-            "pygen-models", "SubInterface", "1"
-        )
+        write_view = (view_by_read_class or {}).get(SubInterface, dm.ViewId("pygen-models", "SubInterface", "1"))
 
         properties = {}
 

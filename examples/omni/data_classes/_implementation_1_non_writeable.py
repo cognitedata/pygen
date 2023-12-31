@@ -8,7 +8,12 @@ from pydantic import Field
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
     DomainModel,
+    DomainModelCore,
+    DomainModelApply,
+    DomainModelApplyList,
     DomainModelList,
+    DomainRelationApply,
+    ResourcesApply,
 )
 from ._sub_interface import SubInterface
 

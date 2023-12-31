@@ -10,6 +10,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni.data_classes import (
+    DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
     PrimitiveRequiredListed,
@@ -38,16 +39,15 @@ from .primitive_required_listed_query import PrimitiveRequiredListedQueryAPI
 class PrimitiveRequiredListedAPI(
     NodeAPI[PrimitiveRequiredListed, PrimitiveRequiredListedApply, PrimitiveRequiredListedList]
 ):
-    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
-        view_id = view_by_write_class[PrimitiveRequiredListedApply]
+    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_read_class[PrimitiveRequiredListed]
         super().__init__(
             client=client,
             sources=view_id,
             class_type=PrimitiveRequiredListed,
-            class_apply_type=PrimitiveRequiredListedApply,
             class_list=PrimitiveRequiredListedList,
             class_apply_list=PrimitiveRequiredListedApplyList,
-            view_by_write_class=view_by_write_class,
+            view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
 

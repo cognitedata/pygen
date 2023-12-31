@@ -9,6 +9,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni.data_classes import (
+    DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
     Implementation2,
@@ -35,16 +36,15 @@ from .implementation_2_query import Implementation2QueryAPI
 
 
 class Implementation2API(NodeAPI[Implementation2, Implementation2Apply, Implementation2List]):
-    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
-        view_id = view_by_write_class[Implementation2Apply]
+    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_read_class[Implementation2]
         super().__init__(
             client=client,
             sources=view_id,
             class_type=Implementation2,
-            class_apply_type=Implementation2Apply,
             class_list=Implementation2List,
             class_apply_list=Implementation2ApplyList,
-            view_by_write_class=view_by_write_class,
+            view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
 

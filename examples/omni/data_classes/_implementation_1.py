@@ -7,6 +7,7 @@ from pydantic import Field
 
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
+    DomainModel,
     DomainModelCore,
     DomainModelApply,
     DomainModelApplyList,
@@ -98,13 +99,13 @@ class Implementation1Apply(SubInterfaceApply):
     def _to_instances_apply(
         self,
         cache: set[tuple[str, str]],
-        view_by_write_class: dict[type[DomainModelCore], dm.ViewId] | None,
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
             return resources
 
-        write_view = (view_by_write_class or {}).get(Implementation1, dm.ViewId("pygen-models", "Implementation1", "1"))
+        write_view = (view_by_read_class or {}).get(Implementation1, dm.ViewId("pygen-models", "Implementation1", "1"))
 
         properties = {}
 

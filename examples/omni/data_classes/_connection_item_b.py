@@ -8,6 +8,7 @@ from pydantic import Field
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
     DomainModel,
+    DomainModelCore,
     DomainModelApply,
     DomainModelApplyList,
     DomainModelList,
@@ -93,7 +94,7 @@ class ConnectionItemBApply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    type: dm.DirectRelationReference = dm.DirectRelationReference("pygen-models", "ConnectionItemB")
+    node_type: dm.DirectRelationReference = dm.DirectRelationReference("pygen-models", "ConnectionItemB")
     inwards: Union[list[ConnectionItemAApply], list[str], None] = Field(default=None, repr=False)
     name: Optional[str] = None
     self_edge: Union[list[ConnectionItemBApply], list[str], None] = Field(default=None, repr=False, alias="selfEdge")
@@ -101,15 +102,13 @@ class ConnectionItemBApply(DomainModelApply):
     def _to_instances_apply(
         self,
         cache: set[tuple[str, str]],
-        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
             return resources
 
-        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
-            "pygen-models", "ConnectionItemB", "1"
-        )
+        write_view = (view_by_read_class or {}).get(ConnectionItemB, dm.ViewId("pygen-models", "ConnectionItemB", "1"))
 
         properties = {}
 
@@ -135,14 +134,14 @@ class ConnectionItemBApply(DomainModelApply):
         edge_type = dm.DirectRelationReference("pygen-models", "bidirectional")
         for inward in self.inwards or []:
             other_resources = DomainRelationApply.from_edge_to_resources(
-                cache, start_node=inward, end_node=self, edge_type=edge_type, view_by_write_class=view_by_write_class
+                cache, start_node=inward, end_node=self, edge_type=edge_type, view_by_read_class=view_by_read_class
             )
             resources.extend(other_resources)
 
         edge_type = dm.DirectRelationReference("pygen-models", "reflexive")
         for self_edge in self.self_edge or []:
             other_resources = DomainRelationApply.from_edge_to_resources(
-                cache, start_node=self, end_node=self_edge, edge_type=edge_type, view_by_write_class=view_by_write_class
+                cache, start_node=self, end_node=self_edge, edge_type=edge_type, view_by_read_class=view_by_read_class
             )
             resources.extend(other_resources)
 

@@ -49,7 +49,7 @@ class OmniClient:
         # The client name is used for aggregated logging of Pygen Usage
         client.config.client_name = "CognitePygen:0.32.6"
 
-        view_by_write_class: dict[type[data_classes.DomainModelCore], dm.ViewId] = {
+        view_by_read_class = {
             data_classes.CDFExternalReferences: dm.ViewId("pygen-models", "CDFExternalReferences", "1"),
             data_classes.CDFExternalReferencesListed: dm.ViewId("pygen-models", "CDFExternalReferencesListed", "1"),
             data_classes.ConnectionItemA: dm.ViewId("pygen-models", "ConnectionItemA", "1"),
@@ -68,22 +68,22 @@ class OmniClient:
             data_classes.SubInterface: dm.ViewId("pygen-models", "SubInterface", "1"),
         }
 
-        self.cdf_external_references = CDFExternalReferencesAPI(client, view_by_write_class)
-        self.cdf_external_references_listed = CDFExternalReferencesListedAPI(client, view_by_write_class)
-        self.connection_item_a = ConnectionItemAAPI(client, view_by_write_class)
-        self.connection_item_b = ConnectionItemBAPI(client, view_by_write_class)
-        self.connection_item_c = ConnectionItemCAPI(client, view_by_write_class)
-        self.empty = EmptyAPI(client, view_by_write_class)
-        self.implementation_1 = Implementation1API(client, view_by_write_class)
-        self.implementation_1_non_writeable = Implementation1NonWriteableAPI(client, view_by_write_class)
-        self.implementation_2 = Implementation2API(client, view_by_write_class)
-        self.main_interface = MainInterfaceAPI(client, view_by_write_class)
-        self.primitive_nullable = PrimitiveNullableAPI(client, view_by_write_class)
-        self.primitive_nullable_listed = PrimitiveNullableListedAPI(client, view_by_write_class)
-        self.primitive_required = PrimitiveRequiredAPI(client, view_by_write_class)
-        self.primitive_required_listed = PrimitiveRequiredListedAPI(client, view_by_write_class)
-        self.primitive_with_defaults = PrimitiveWithDefaultsAPI(client, view_by_write_class)
-        self.sub_interface = SubInterfaceAPI(client, view_by_write_class)
+        self.cdf_external_references = CDFExternalReferencesAPI(client, view_by_read_class)
+        self.cdf_external_references_listed = CDFExternalReferencesListedAPI(client, view_by_read_class)
+        self.connection_item_a = ConnectionItemAAPI(client, view_by_read_class)
+        self.connection_item_b = ConnectionItemBAPI(client, view_by_read_class)
+        self.connection_item_c = ConnectionItemCAPI(client, view_by_read_class)
+        self.empty = EmptyAPI(client, view_by_read_class)
+        self.implementation_1 = Implementation1API(client, view_by_read_class)
+        self.implementation_1_non_writeable = Implementation1NonWriteableAPI(client, view_by_read_class)
+        self.implementation_2 = Implementation2API(client, view_by_read_class)
+        self.main_interface = MainInterfaceAPI(client, view_by_read_class)
+        self.primitive_nullable = PrimitiveNullableAPI(client, view_by_read_class)
+        self.primitive_nullable_listed = PrimitiveNullableListedAPI(client, view_by_read_class)
+        self.primitive_required = PrimitiveRequiredAPI(client, view_by_read_class)
+        self.primitive_required_listed = PrimitiveRequiredListedAPI(client, view_by_read_class)
+        self.primitive_with_defaults = PrimitiveWithDefaultsAPI(client, view_by_read_class)
+        self.sub_interface = SubInterfaceAPI(client, view_by_read_class)
 
     @classmethod
     def azure_project(

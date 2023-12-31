@@ -9,6 +9,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni.data_classes import (
+    DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
     ConnectionItemB,
@@ -37,16 +38,15 @@ from .connection_item_b_query import ConnectionItemBQueryAPI
 
 
 class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBApply, ConnectionItemBList]):
-    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
-        view_id = view_by_write_class[ConnectionItemBApply]
+    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelApply], dm.ViewId]):
+        view_id = view_by_read_class[ConnectionItemB]
         super().__init__(
             client=client,
             sources=view_id,
             class_type=ConnectionItemB,
-            class_apply_type=ConnectionItemBApply,
             class_list=ConnectionItemBList,
             class_apply_list=ConnectionItemBApplyList,
-            view_by_write_class=view_by_write_class,
+            view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
         self.inwards_edge = ConnectionItemBInwardsAPI(client)

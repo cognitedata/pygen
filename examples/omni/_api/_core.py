@@ -14,6 +14,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from omni.data_classes._core import (
     DomainModel,
+    DomainModelCore,
     DomainModelApply,
     DomainRelationApply,
     ResourcesApplyResult,
@@ -83,23 +84,23 @@ class NodeAPI(Generic[T_DomainModel, Union[T_DomainModelApply, None], T_DomainMo
         sources: dm.ViewIdentifier | Sequence[dm.ViewIdentifier] | dm.View | Sequence[dm.View] | None,
         class_type: type[T_DomainModel],
         class_list: type[T_DomainModelList],
-        class_apply_list: type[T_DomainModelApplyList] | None,
-        view_by_write_class: dict[type[DomainModelCore], dm.ViewId],
+        class_apply_list: type[T_DomainModelApplyList],
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId],
     ):
         self._client = client
         self._sources = sources
         self._class_type = class_type
         self._class_list = class_list
         self._class_apply_list = class_apply_list
-        self._view_by_write_class = view_by_write_class
+        self._view_by_read_class = view_by_read_class
 
     def _apply(
         self, item: T_DomainModelApply | Sequence[T_DomainModelApply], replace: bool = False
     ) -> ResourcesApplyResult:
         if isinstance(item, DomainModelApply):
-            instances = item.to_instances_apply(self._view_by_write_class)
+            instances = item.to_instances_apply(self._view_by_read_class)
         else:
-            instances = self._class_apply_list(item).to_instances_apply(self._view_by_write_class)
+            instances = self._class_apply_list(item).to_instances_apply(self._view_by_read_class)
         result = self._client.data_modeling.instances.apply(
             nodes=instances.nodes,
             edges=instances.edges,
