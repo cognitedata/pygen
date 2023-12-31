@@ -35,7 +35,7 @@ from .{{ query_api.file_name }} import {{ query_api.name }}
 
 class {{ api_class.name }}(NodeAPI[{{ data_class.read_name }}, {{ data_class.write_name }}, {{ data_class.read_list_name }}]):
     def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelApply], dm.ViewId]):
-        view_id = view_by_read_class[{{ data_class.write_name }}]
+        view_id = view_by_read_class[{{ data_class.read_name }}]
         super().__init__(
             client=client,
             sources={% if data_class.is_all_fields_of_type(ft.EdgeOneToMany) %}None{% else %}view_id{% endif %},
