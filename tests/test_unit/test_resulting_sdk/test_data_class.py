@@ -68,6 +68,10 @@ class TestToFromInstances:
             # This is intentional, as write note should give hints to the user
             return
 
+        if omni_data_classes[view_id].write is not None:
+            # If there is no write class, then there is nothing to test
+            return
+
         read_cls = omni_data_classes[view_id].write
         node_apply = node.as_apply(None, None)
         # Bug in SDK that skips the type
