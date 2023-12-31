@@ -44,6 +44,9 @@ class DataClass:
     file_name: str
     view_id: dm.ViewId
     fields: list[Field]
+    implements: list[DataClass]
+    is_writable: bool
+    is_interface: bool
 
     def __lt__(self, other: DataClass):
         if isinstance(other, DataClass):
@@ -95,6 +98,9 @@ class DataClass:
             file_name=file_name,
             view_id=view.as_id(),
             fields=[],
+            implements=[],
+            is_writable=view.writable,
+            is_interface=False,
         )
 
         if used_for == "node":
@@ -124,6 +130,27 @@ class DataClass:
                 pydantic_field=pydantic_field,
             )
             self.fields.append(field_)
+
+    def update_implements(
+        self, interfaces: set[dm.ViewId], data_class_by_view_id: dict[dm.ViewId, DataClass], view: dm.View
+    ):
+        self.is_interface = self.view_id in interfaces
+        for interface in view.implements or []:
+            self.implements.append(data_class_by_view_id[interface])
+
+    @property
+    def read_base_class(self) -> str:
+        if self.implements:
+            return ", ".join(f"{interface.read_name}" for interface in self.implements)
+        else:
+            return "DomainModel"
+
+    @property
+    def write_base_class(self) -> str:
+        if self.implements:
+            return ", ".join(f"{interface.write_name}" for interface in self.implements)
+        else:
+            return "DomainModelApply"
 
     @property
     def text_field_names(self) -> str:
@@ -157,6 +184,11 @@ class DataClass:
 
     def __iter__(self) -> Iterator[Field]:
         return iter(self.fields)
+
+    @property
+    def non_parent_fields(self) -> Iterator[Field]:
+        parent_fields = {field.prop_name for parent in self.implements for field in parent}
+        return (field for field in self if field.prop_name not in parent_fields)
 
     @overload
     def fields_of_type(self, field_type: type[T_Field]) -> Iterator[T_Field]:

@@ -139,11 +139,14 @@ class MultiAPIGenerator:
         self._pydantic_version = pydantic_version
         self._logger = logger or print
         self.api_by_view_id = self.create_api_by_view_id(list(views), default_instance_space, config)
+        view_by_view_id = {view.as_id(): view for view in views}
         data_class_by_view_id = {view_id: api.data_class for view_id, api in self.api_by_view_id.items()}
         query_class_by_view_id = {view_id: api.query_api for view_id, api in self.api_by_view_id.items()}
-
+        interfaces = {parent for view in views for parent in view.implements or []}
         for api in self.unique_apis:
             api.data_class.update_fields(api.view.properties, data_class_by_view_id, list(views), config)
+            api.data_class.update_implements(interfaces, data_class_by_view_id, view_by_view_id[api.view_id])
+
         # All data classes have been updated, before we can create edge APIs.
         for api in self.unique_apis:
             api.create_edge_apis(query_class_by_view_id)
