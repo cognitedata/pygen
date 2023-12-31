@@ -41,7 +41,7 @@ class ConnectionItemC(DomainModel):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    type: dm.DirectRelationReference = dm.DirectRelationReference("pygen-models", "ConnectionItemC")
+    node_type: dm.DirectRelationReference = dm.DirectRelationReference("pygen-models", "ConnectionItemC")
     connection_item_a: Union[list[ConnectionItemA], list[str], None] = Field(
         default=None, repr=False, alias="connectionItemA"
     )
@@ -104,7 +104,7 @@ class ConnectionItemCApply(DomainModelApply):
             space=self.space,
             external_id=self.external_id,
             existing_version=self.existing_version,
-            type=self.type,
+            type=self.node_type,
             sources=None,
         )
         resources.nodes.append(this_node)

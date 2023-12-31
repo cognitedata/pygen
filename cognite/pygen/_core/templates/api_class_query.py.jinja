@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from cognite.client import data_modeling as dm, CogniteClient
 
 from {{ top_level_package }}.data_classes import (
-    DomainModelApply,
+    DomainModelCore,
     {{ data_class.read_name }},{% for class_ in unique_edge_data_classes %}
     {{ class_.read_name }},
     {{ class_.write_name }},{% endfor %}{% for field in data_class.fields_of_type(ft.EdgeOneToOne) %}
@@ -28,7 +28,7 @@ class {{ query_api.name }}(QueryAPI[T_DomainModelList]):
         self,
         client: CogniteClient,
         builder: QueryBuilder[T_DomainModelList],
-        view_by_read_class: dict[type[DomainModelApply], dm.ViewId],
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId],
         filter_: dm.filters.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
     ):

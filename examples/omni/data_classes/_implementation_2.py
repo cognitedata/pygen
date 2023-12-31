@@ -53,7 +53,7 @@ class Implementation2(SubInterface):
         version: The version of the implementation 2 node.
     """
 
-    type: dm.DirectRelationReference = dm.DirectRelationReference("pygen-models", "Implementation2")
+    node_type: dm.DirectRelationReference = dm.DirectRelationReference("pygen-models", "Implementation2")
 
     def as_apply(self) -> Implementation2Apply:
         """Convert this read version of implementation 2 to the writing version."""
@@ -81,7 +81,7 @@ class Implementation2Apply(SubInterfaceApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    type: dm.DirectRelationReference = dm.DirectRelationReference("pygen-models", "Implementation2")
+    node_type: dm.DirectRelationReference = dm.DirectRelationReference("pygen-models", "Implementation2")
 
     def _to_instances_apply(
         self,

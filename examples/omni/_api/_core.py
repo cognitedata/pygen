@@ -617,11 +617,11 @@ class QueryAPI(Generic[T_DomainModelList]):
         self,
         client: CogniteClient,
         builder: QueryBuilder[T_DomainModelList],
-        view_by_write_class: dict[type[DomainModelApply], dm.ViewId],
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId],
     ):
         self._client = client
         self._builder = builder
-        self._view_by_write_class = view_by_write_class
+        self._view_by_read_class = view_by_read_class
 
     def _query(self) -> T_DomainModelList:
         self._builder.reset()

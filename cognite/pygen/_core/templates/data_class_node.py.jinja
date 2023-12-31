@@ -49,7 +49,7 @@ class {{ data_class.read_name }}(DomainModel):
         version: The version of the {{ data_class.doc_name }} node.
     """
     space: str = DEFAULT_INSTANCE_SPACE{% if data_class.node_type %}
-    type: dm.DirectRelationReference = dm.DirectRelationReference("{{ data_class.node_type.space }}", "{{ data_class.node_type.external_id }}"){% endif %}{% for field in data_class %}
+    node_type: dm.DirectRelationReference = dm.DirectRelationReference("{{ data_class.node_type.space }}", "{{ data_class.node_type.external_id }}"){% endif %}{% for field in data_class %}
     {{ field.name }}: {{ field.as_read_type_hint() }}{% endfor %}
 
     def as_apply(self) -> {{ data_class.write_name }}:

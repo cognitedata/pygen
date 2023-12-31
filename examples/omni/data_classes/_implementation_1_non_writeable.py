@@ -53,7 +53,7 @@ class Implementation1NonWriteable(SubInterface):
         version: The version of the implementation 1 non writeable node.
     """
 
-    type: dm.DirectRelationReference = dm.DirectRelationReference("pygen-models", "Implementation1")
+    node_type: dm.DirectRelationReference = dm.DirectRelationReference("pygen-models", "Implementation1")
     value_1: Optional[str] = Field(None, alias="value1")
 
 

@@ -58,7 +58,7 @@ class Implementation1(SubInterface):
         version: The version of the implementation 1 node.
     """
 
-    type: dm.DirectRelationReference = dm.DirectRelationReference("pygen-models", "Implementation1")
+    node_type: dm.DirectRelationReference = dm.DirectRelationReference("pygen-models", "Implementation1")
     value_1: Optional[str] = Field(None, alias="value1")
     value_2: Optional[str] = Field(None, alias="value2")
 
@@ -74,7 +74,7 @@ class Implementation1(SubInterface):
         )
 
 
-class Implementation1Apply(SubInterfaceApply):
+class Implementation1Apply(DomainModelApply):
     """This represents the writing version of implementation 1.
 
     It is used to when data is sent to CDF.
@@ -92,7 +92,10 @@ class Implementation1Apply(SubInterfaceApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
+    space: str = DEFAULT_INSTANCE_SPACE
     node_type: dm.DirectRelationReference = dm.DirectRelationReference("pygen-models", "Implementation1")
+    main_value: Optional[str] = Field(None, alias="mainValue")
+    sub_value: Optional[str] = Field(None, alias="subValue")
     value_1: Optional[str] = Field(None, alias="value1")
     value_2: str = Field(alias="value2")
 
