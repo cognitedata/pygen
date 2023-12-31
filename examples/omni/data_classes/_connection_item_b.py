@@ -120,7 +120,7 @@ class ConnectionItemBApply(DomainModelApply):
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                type=self.type,
+                type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(
                         source=write_view,

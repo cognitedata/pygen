@@ -135,8 +135,8 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}):
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
-                existing_version=self.existing_version,{% if data_class.node_type %}
-                type=self.type,{% endif %}
+                existing_version=self.existing_version,
+                type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(
                         source=write_view,
