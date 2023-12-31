@@ -9,6 +9,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from windmill.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from windmill.client.data_classes import (
+    DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
     HighSpeedShaft,
@@ -37,16 +38,15 @@ from .high_speed_shaft_query import HighSpeedShaftQueryAPI
 
 
 class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftApply, HighSpeedShaftList]):
-    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
-        view_id = view_by_write_class[HighSpeedShaftApply]
+    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
+        view_id = view_by_read_class[HighSpeedShaft]
         super().__init__(
             client=client,
             sources=view_id,
             class_type=HighSpeedShaft,
-            class_apply_type=HighSpeedShaftApply,
             class_list=HighSpeedShaftList,
             class_apply_list=HighSpeedShaftApplyList,
-            view_by_write_class=view_by_write_class,
+            view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
         self.bending_moment_y = HighSpeedShaftBendingMomentYAPI(client, view_id)

@@ -9,6 +9,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from windmill.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from windmill.client.data_classes import (
+    DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
     Nacelle,
@@ -39,16 +40,15 @@ from .nacelle_query import NacelleQueryAPI
 
 
 class NacelleAPI(NodeAPI[Nacelle, NacelleApply, NacelleList]):
-    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
-        view_id = view_by_write_class[NacelleApply]
+    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
+        view_id = view_by_read_class[Nacelle]
         super().__init__(
             client=client,
             sources=view_id,
             class_type=Nacelle,
-            class_apply_type=NacelleApply,
             class_list=NacelleList,
             class_apply_list=NacelleApplyList,
-            view_by_write_class=view_by_write_class,
+            view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
         self.acc_from_back_side_x = NacelleAccFromBackSideXAPI(client, view_id)

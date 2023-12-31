@@ -1,5 +1,6 @@
 from ._core import (
     DomainModel,
+    DomainModelCore,
     DomainModelApply,
     DomainModelList,
     DomainRelationApply,

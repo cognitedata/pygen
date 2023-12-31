@@ -6,9 +6,8 @@ from typing import TYPE_CHECKING
 from cognite.client import data_modeling as dm, CogniteClient
 
 from windmill.client.data_classes import (
-    DomainModelApply,
+    DomainModelCore,
     Nacelle,
-    NacelleApply,
     Gearbox,
     GearboxApply,
     Generator,
@@ -28,11 +27,11 @@ class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
         self,
         client: CogniteClient,
         builder: QueryBuilder[T_DomainModelList],
-        view_by_write_class: dict[type[DomainModelApply], dm.ViewId],
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId],
         filter_: dm.filters.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
     ):
-        super().__init__(client, builder, view_by_write_class)
+        super().__init__(client, builder, view_by_read_class)
 
         self._builder.append(
             QueryStep(
@@ -41,7 +40,7 @@ class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
                     from_=self._builder[-1].name if self._builder else None,
                     filter=filter_,
                 ),
-                select=dm.query.Select([dm.query.SourceSelector(self._view_by_write_class[NacelleApply], ["*"])]),
+                select=dm.query.Select([dm.query.SourceSelector(self._view_by_read_class[Nacelle], ["*"])]),
                 result_cls=Nacelle,
                 max_retrieve_limit=limit,
             )
@@ -82,14 +81,14 @@ class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
         return self._query()
 
     def _query_append_gearbox(self, from_: str) -> None:
-        view_id = self._view_by_write_class[GearboxApply]
+        view_id = self._view_by_read_class[Gearbox]
         self._builder.append(
             QueryStep(
                 name=self._builder.next_name("gearbox"),
                 expression=dm.query.NodeResultSetExpression(
                     filter=dm.filters.HasData(views=[view_id]),
                     from_=from_,
-                    through=self._view_by_write_class[NacelleApply].as_property_ref("gearbox"),
+                    through=self._view_by_read_class[Nacelle].as_property_ref("gearbox"),
                     direction="outwards",
                 ),
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
@@ -99,14 +98,14 @@ class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
         )
 
     def _query_append_generator(self, from_: str) -> None:
-        view_id = self._view_by_write_class[GeneratorApply]
+        view_id = self._view_by_read_class[Generator]
         self._builder.append(
             QueryStep(
                 name=self._builder.next_name("generator"),
                 expression=dm.query.NodeResultSetExpression(
                     filter=dm.filters.HasData(views=[view_id]),
                     from_=from_,
-                    through=self._view_by_write_class[NacelleApply].as_property_ref("generator"),
+                    through=self._view_by_read_class[Nacelle].as_property_ref("generator"),
                     direction="outwards",
                 ),
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
@@ -116,14 +115,14 @@ class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
         )
 
     def _query_append_high_speed_shaft(self, from_: str) -> None:
-        view_id = self._view_by_write_class[HighSpeedShaftApply]
+        view_id = self._view_by_read_class[HighSpeedShaft]
         self._builder.append(
             QueryStep(
                 name=self._builder.next_name("high_speed_shaft"),
                 expression=dm.query.NodeResultSetExpression(
                     filter=dm.filters.HasData(views=[view_id]),
                     from_=from_,
-                    through=self._view_by_write_class[NacelleApply].as_property_ref("high_speed_shaft"),
+                    through=self._view_by_read_class[Nacelle].as_property_ref("high_speed_shaft"),
                     direction="outwards",
                 ),
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
@@ -133,14 +132,14 @@ class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
         )
 
     def _query_append_main_shaft(self, from_: str) -> None:
-        view_id = self._view_by_write_class[MainShaftApply]
+        view_id = self._view_by_read_class[MainShaft]
         self._builder.append(
             QueryStep(
                 name=self._builder.next_name("main_shaft"),
                 expression=dm.query.NodeResultSetExpression(
                     filter=dm.filters.HasData(views=[view_id]),
                     from_=from_,
-                    through=self._view_by_write_class[NacelleApply].as_property_ref("main_shaft"),
+                    through=self._view_by_read_class[Nacelle].as_property_ref("main_shaft"),
                     direction="outwards",
                 ),
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),
@@ -150,14 +149,14 @@ class NacelleQueryAPI(QueryAPI[T_DomainModelList]):
         )
 
     def _query_append_power_inverter(self, from_: str) -> None:
-        view_id = self._view_by_write_class[PowerInverterApply]
+        view_id = self._view_by_read_class[PowerInverter]
         self._builder.append(
             QueryStep(
                 name=self._builder.next_name("power_inverter"),
                 expression=dm.query.NodeResultSetExpression(
                     filter=dm.filters.HasData(views=[view_id]),
                     from_=from_,
-                    through=self._view_by_write_class[NacelleApply].as_property_ref("power_inverter"),
+                    through=self._view_by_read_class[Nacelle].as_property_ref("power_inverter"),
                     direction="outwards",
                 ),
                 select=dm.query.Select([dm.query.SourceSelector(view_id, ["*"])]),

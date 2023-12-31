@@ -9,6 +9,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from windmill.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from windmill.client.data_classes import (
+    DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
     PowerInverter,
@@ -37,16 +38,15 @@ from .power_inverter_query import PowerInverterQueryAPI
 
 
 class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterApply, PowerInverterList]):
-    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
-        view_id = view_by_write_class[PowerInverterApply]
+    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
+        view_id = view_by_read_class[PowerInverter]
         super().__init__(
             client=client,
             sources=view_id,
             class_type=PowerInverter,
-            class_apply_type=PowerInverterApply,
             class_list=PowerInverterList,
             class_apply_list=PowerInverterApplyList,
-            view_by_write_class=view_by_write_class,
+            view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
         self.active_power_total = PowerInverterActivePowerTotalAPI(client, view_id)

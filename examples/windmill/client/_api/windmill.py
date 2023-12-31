@@ -9,6 +9,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from windmill.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from windmill.client.data_classes import (
+    DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
     Windmill,
@@ -37,16 +38,15 @@ from .windmill_query import WindmillQueryAPI
 
 
 class WindmillAPI(NodeAPI[Windmill, WindmillApply, WindmillList]):
-    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
-        view_id = view_by_write_class[WindmillApply]
+    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
+        view_id = view_by_read_class[Windmill]
         super().__init__(
             client=client,
             sources=view_id,
             class_type=Windmill,
-            class_apply_type=WindmillApply,
             class_list=WindmillList,
             class_apply_list=WindmillApplyList,
-            view_by_write_class=view_by_write_class,
+            view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
         self.blades_edge = WindmillBladesAPI(client)

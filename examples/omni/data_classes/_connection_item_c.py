@@ -41,7 +41,7 @@ class ConnectionItemC(DomainModel):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    node_type: dm.DirectRelationReference = dm.DirectRelationReference("pygen-models", "ConnectionItemC")
+    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemC")
     connection_item_a: Union[list[ConnectionItemA], list[str], None] = Field(
         default=None, repr=False, alias="connectionItemA"
     )
@@ -82,7 +82,7 @@ class ConnectionItemCApply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    node_type: dm.DirectRelationReference = dm.DirectRelationReference("pygen-models", "ConnectionItemC")
+    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemC")
     connection_item_a: Union[list[ConnectionItemAApply], list[str], None] = Field(
         default=None, repr=False, alias="connectionItemA"
     )

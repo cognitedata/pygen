@@ -9,6 +9,7 @@ from pydantic import Field
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
     DomainModel,
+    DomainModelCore,
     DomainModelApply,
     DomainModelApplyList,
     DomainModelList,
@@ -58,6 +59,7 @@ class EquipmentModule(DomainModel):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    node_type: Union[dm.DirectRelationReference, None] = None
     description: Optional[str] = None
     name: Optional[str] = None
     sensor_value: Union[TimeSeries, str, None] = None
@@ -94,6 +96,7 @@ class EquipmentModuleApply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    node_type: Union[dm.DirectRelationReference, None] = None
     description: Optional[str] = None
     name: Optional[str] = None
     sensor_value: Union[TimeSeries, str, None] = None
@@ -102,14 +105,14 @@ class EquipmentModuleApply(DomainModelApply):
     def _to_instances_apply(
         self,
         cache: set[tuple[str, str]],
-        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
             return resources
 
-        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
-            "IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33"
+        write_view = (view_by_read_class or {}).get(
+            EquipmentModule, dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33")
         )
 
         properties = {}

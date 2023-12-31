@@ -56,6 +56,7 @@ class CDFExternalReferencesListed(DomainModel):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    node_type: Union[dm.DirectRelationReference, None] = None
     files: Optional[list[str]] = None
     sequences: Optional[list[str]] = None
     timeseries: Union[list[TimeSeries], list[str], None] = None
@@ -89,6 +90,7 @@ class CDFExternalReferencesListedApply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    node_type: Union[dm.DirectRelationReference, None] = None
     files: Optional[list[str]] = None
     sequences: Optional[list[str]] = None
     timeseries: Union[list[TimeSeries], list[str], None] = None

@@ -10,6 +10,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from scenario_instance.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from scenario_instance.client.data_classes import (
+    DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
     ScenarioInstance,
@@ -37,16 +38,15 @@ from .scenario_instance_query import ScenarioInstanceQueryAPI
 
 
 class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceApply, ScenarioInstanceList]):
-    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
-        view_id = view_by_write_class[ScenarioInstanceApply]
+    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
+        view_id = view_by_read_class[ScenarioInstance]
         super().__init__(
             client=client,
             sources=view_id,
             class_type=ScenarioInstance,
-            class_apply_type=ScenarioInstanceApply,
             class_list=ScenarioInstanceList,
             class_apply_list=ScenarioInstanceApplyList,
-            view_by_write_class=view_by_write_class,
+            view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
         self.price_forecast = ScenarioInstancePriceForecastAPI(client, view_id)

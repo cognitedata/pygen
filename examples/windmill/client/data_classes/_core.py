@@ -120,15 +120,15 @@ class DomainModelApply(DomainModelCore, extra=Extra.forbid, populate_by_name=Tru
     existing_version: Optional[int] = None
 
     def to_instances_apply(
-        self, view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None = None
+        self, view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None
     ) -> ResourcesApply:
-        return self._to_instances_apply(set(), view_by_write_class)
+        return self._to_instances_apply(set(), view_by_read_class)
 
     @abstractmethod
     def _to_instances_apply(
         self,
         cache: set[tuple[str, str]],
-        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
     ) -> ResourcesApply:
         raise NotImplementedError()
 
@@ -145,7 +145,16 @@ class DomainModelApply(DomainModelCore, extra=Extra.forbid, populate_by_name=Tru
         sources = data.pop("sources", [])
         properties = {}
         for source in sources:
-            properties.update(source["properties"])
+            for prop_name, prop_value in source["properties"].items():
+                if isinstance(prop_value, dict) and "externalId" in prop_value and "space" in prop_value:
+                    if prop_value["space"] == DEFAULT_INSTANCE_SPACE:
+                        properties[prop_name] = prop_value["externalId"]
+                    else:
+                        properties[prop_name] = dm.NodeId(
+                            space=prop_value["space"], external_id=prop_value["externalId"]
+                        )
+                else:
+                    properties[prop_name] = prop_value
         return cls(**{**data, **properties})
 
 
@@ -227,12 +236,12 @@ class DomainModelApplyList(DomainModelList[T_DomainModelApply]):
     _PARENT_CLASS = DomainModelApply
 
     def to_instances_apply(
-        self, view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None = None
+        self, view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None
     ) -> ResourcesApply:
         cache: set[tuple[str, str]] = set()
         domains = ResourcesApply()
         for node in self:
-            result = node._to_instances_apply(cache, view_by_write_class)
+            result = node._to_instances_apply(cache, view_by_read_class)
             domains.extend(result)
         return domains
 
@@ -278,7 +287,7 @@ class DomainRelationApply(BaseModel, extra=Extra.forbid, populate_by_name=True):
         cache: set[tuple[str, str]],
         start_node: DomainModelApply,
         edge_type: dm.DirectRelationReference,
-        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
     ) -> ResourcesApply:
         raise NotImplementedError()
 
@@ -322,7 +331,7 @@ class DomainRelationApply(BaseModel, extra=Extra.forbid, populate_by_name=True):
         start_node: DomainModelApply | str,
         end_node: DomainModelApply | str,
         edge_type: dm.DirectRelationReference,
-        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None = None,
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         edge = DomainRelationApply.create_edge(start_node, end_node, edge_type)
@@ -331,10 +340,10 @@ class DomainRelationApply(BaseModel, extra=Extra.forbid, populate_by_name=True):
             cache.add((edge.space, edge.external_id))
 
         if isinstance(end_node, DomainModelApply):
-            other_resources = end_node._to_instances_apply(cache, view_by_write_class)
+            other_resources = end_node._to_instances_apply(cache, view_by_read_class)
             resources.extend(other_resources)
         if isinstance(start_node, DomainModelApply):
-            other_resources = start_node._to_instances_apply(cache, view_by_write_class)
+            other_resources = start_node._to_instances_apply(cache, view_by_read_class)
             resources.extend(other_resources)
 
         return resources
@@ -358,7 +367,10 @@ def unpack_properties(properties: Properties) -> Mapping[str, PropertyValue]:
     for view_properties in properties.values():
         for prop_name, prop_value in view_properties.items():
             if isinstance(prop_value, dict) and "externalId" in prop_value and "space" in prop_value:
-                unpacked[prop_name] = prop_value["externalId"]
+                if prop_value["space"] == DEFAULT_INSTANCE_SPACE:
+                    unpacked[prop_name] = prop_value["externalId"]
+                else:
+                    unpacked[prop_name] = dm.NodeId(space=prop_value["space"], external_id=prop_value["externalId"])
             else:
                 unpacked[prop_name] = prop_value
     return unpacked

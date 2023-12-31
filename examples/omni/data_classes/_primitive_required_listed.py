@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import Literal, Optional
+from typing import Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -70,6 +70,7 @@ class PrimitiveRequiredListed(DomainModel):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    node_type: Union[dm.DirectRelationReference, None] = None
     boolean: Optional[list[bool]] = None
     date: Optional[list[datetime.date]] = None
     float_32: Optional[list[float]] = Field(None, alias="float32")
@@ -121,6 +122,7 @@ class PrimitiveRequiredListedApply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    node_type: Union[dm.DirectRelationReference, None] = None
     boolean: list[bool]
     date: list[datetime.date]
     float_32: list[float] = Field(alias="float32")

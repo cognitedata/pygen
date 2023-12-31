@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import Literal, Optional
+from typing import Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -61,7 +61,7 @@ class Empty(DomainModel):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    node_type: dm.DirectRelationReference = dm.DirectRelationReference("pygen-models", "Empty")
+    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "Empty")
     boolean: Optional[bool] = None
     date: Optional[datetime.date] = None
     float_32: Optional[float] = Field(None, alias="float32")
@@ -113,7 +113,7 @@ class EmptyApply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    node_type: dm.DirectRelationReference = dm.DirectRelationReference("pygen-models", "Empty")
+    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "Empty")
     boolean: Optional[bool] = None
     date: Optional[datetime.date] = None
     float_32: Optional[float] = Field(None, alias="float32")

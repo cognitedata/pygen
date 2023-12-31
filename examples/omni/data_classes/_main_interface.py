@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, Optional
+from typing import Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -51,6 +51,7 @@ class MainInterface(DomainModel):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    node_type: Union[dm.DirectRelationReference, None] = None
     main_value: Optional[str] = Field(None, alias="mainValue")
 
     def as_apply(self) -> MainInterfaceApply:
@@ -78,6 +79,7 @@ class MainInterfaceApply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    node_type: Union[dm.DirectRelationReference, None] = None
     main_value: Optional[str] = Field(None, alias="mainValue")
 
     def _to_instances_apply(

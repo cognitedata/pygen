@@ -4,7 +4,7 @@ import re
 from collections import Counter, defaultdict, UserList
 from collections.abc import Sequence, Collection
 from dataclasses import dataclass, field
-from typing import Generic, Literal, Any, Iterator, Protocol, SupportsIndex, TypeVar, overload, cast
+from typing import Generic, Literal, Any, Iterator, Protocol, SupportsIndex, TypeVar, overload, cast, Union
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -14,6 +14,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from windmill.client.data_classes._core import (
     DomainModel,
+    DomainModelCore,
     DomainModelApply,
     DomainRelationApply,
     ResourcesApplyResult,
@@ -76,44 +77,20 @@ class SequenceNotStr(Protocol[_T_co]):
         ...
 
 
-class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
+class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList]):
     def __init__(
         self,
         client: CogniteClient,
-        sources: dm.ViewIdentifier | Sequence[dm.ViewIdentifier] | dm.View | Sequence[dm.View],
+        sources: dm.ViewIdentifier | Sequence[dm.ViewIdentifier] | dm.View | Sequence[dm.View] | None,
         class_type: type[T_DomainModel],
-        class_apply_type: type[T_DomainModelApply],
         class_list: type[T_DomainModelList],
-        class_apply_list: type[T_DomainModelApplyList],
-        view_by_write_class: dict[type[DomainModelApply], dm.ViewId],
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId],
     ):
         self._client = client
         self._sources = sources
         self._class_type = class_type
-        self._class_apply_type = class_apply_type
         self._class_list = class_list
-        self._class_apply_list = class_apply_list
-        self._view_by_write_class = view_by_write_class
-
-    def _apply(
-        self, item: T_DomainModelApply | Sequence[T_DomainModelApply], replace: bool = False
-    ) -> ResourcesApplyResult:
-        if isinstance(item, DomainModelApply):
-            instances = item.to_instances_apply(self._view_by_write_class)
-        else:
-            instances = self._class_apply_list(item).to_instances_apply(self._view_by_write_class)
-        result = self._client.data_modeling.instances.apply(
-            nodes=instances.nodes,
-            edges=instances.edges,
-            auto_create_start_nodes=True,
-            auto_create_end_nodes=True,
-            replace=replace,
-        )
-        time_series = []
-        if instances.time_series:
-            time_series = self._client.time_series.upsert(instances.time_series, mode="patch")
-
-        return ResourcesApplyResult(result.nodes, result.edges, TimeSeriesList(time_series))
+        self._view_by_read_class = view_by_read_class
 
     def _delete(self, external_id: str | Sequence[str], space: str) -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):
@@ -394,6 +371,42 @@ class NodeAPI(Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList]):
                 )
 
 
+class NodeAPI(
+    Generic[T_DomainModel, T_DomainModelApply, T_DomainModelList], NodeReadAPI[T_DomainModel, T_DomainModelList]
+):
+    def __init__(
+        self,
+        client: CogniteClient,
+        sources: dm.ViewIdentifier | Sequence[dm.ViewIdentifier] | dm.View | Sequence[dm.View] | None,
+        class_type: type[T_DomainModel],
+        class_list: type[T_DomainModelList],
+        class_apply_list: type[T_DomainModelApplyList],
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId],
+    ):
+        super().__init__(client, sources, class_type, class_list, view_by_read_class)
+        self._class_apply_list = class_apply_list
+
+    def _apply(
+        self, item: T_DomainModelApply | Sequence[T_DomainModelApply], replace: bool = False
+    ) -> ResourcesApplyResult:
+        if isinstance(item, DomainModelApply):
+            instances = item.to_instances_apply(self._view_by_read_class)
+        else:
+            instances = self._class_apply_list(item).to_instances_apply(self._view_by_read_class)
+        result = self._client.data_modeling.instances.apply(
+            nodes=instances.nodes,
+            edges=instances.edges,
+            auto_create_start_nodes=True,
+            auto_create_end_nodes=True,
+            replace=replace,
+        )
+        time_series = []
+        if instances.time_series:
+            time_series = self._client.time_series.upsert(instances.time_series, mode="patch")
+
+        return ResourcesApplyResult(result.nodes, result.edges, TimeSeriesList(time_series))
+
+
 class EdgeAPI:
     def __init__(self, client: CogniteClient):
         self._client = client
@@ -618,11 +631,11 @@ class QueryAPI(Generic[T_DomainModelList]):
         self,
         client: CogniteClient,
         builder: QueryBuilder[T_DomainModelList],
-        view_by_write_class: dict[type[DomainModelApply], dm.ViewId],
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId],
     ):
         self._client = client
         self._builder = builder
-        self._view_by_write_class = view_by_write_class
+        self._view_by_read_class = view_by_read_class
 
     def _query(self) -> T_DomainModelList:
         self._builder.reset()
