@@ -131,12 +131,13 @@ class DataClass:
             )
             self.fields.append(field_)
 
-    def update_implements(
+    def update_implements_interface_and_writable(
         self, interfaces: set[dm.ViewId], data_class_by_view_id: dict[dm.ViewId, DataClass], view: dm.View
     ):
         self.is_interface = self.view_id in interfaces
         for interface in view.implements or []:
             self.implements.append(data_class_by_view_id[interface])
+        self.is_writable = self.is_writable or self.is_all_fields_of_type(EdgeOneToMany)
 
     @property
     def read_base_class(self) -> str:

@@ -145,7 +145,9 @@ class MultiAPIGenerator:
         interfaces = {parent for view in views for parent in view.implements or []}
         for api in self.unique_apis:
             api.data_class.update_fields(api.view.properties, data_class_by_view_id, list(views), config)
-            api.data_class.update_implements(interfaces, data_class_by_view_id, view_by_view_id[api.view_id])
+            api.data_class.update_implements_interface_and_writable(
+                interfaces, data_class_by_view_id, view_by_view_id[api.view_id]
+            )
 
         # All data classes have been updated, before we can create edge APIs.
         for api in self.unique_apis:
