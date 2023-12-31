@@ -176,7 +176,12 @@ class DataClass:
 
     @property
     def init_import(self) -> str:
-        import_classes = [self.read_name, self.write_name, self.read_list_name, self.write_list_name]
+        import_classes = [self.read_name]
+        if self.is_writable:
+            import_classes.append(self.write_name)
+        import_classes.append(self.read_list_name)
+        if self.is_writable:
+            import_classes.append(self.write_list_name)
         if self.has_field_of_type(PrimitiveFieldCore):
             import_classes.append(self.field_names)
         if self.has_primitive_field_of_type(dm.Text):
