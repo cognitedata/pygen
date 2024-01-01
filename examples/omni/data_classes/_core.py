@@ -121,15 +121,16 @@ class DomainModelApply(DomainModelCore, extra=Extra.forbid, populate_by_name=Tru
     existing_version: Optional[int] = None
 
     def to_instances_apply(
-        self, view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None
+        self, view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None, write_none: bool = False
     ) -> ResourcesApply:
-        return self._to_instances_apply(set(), view_by_read_class)
+        return self._to_instances_apply(set(), view_by_read_class, write_none)
 
     @abstractmethod
     def _to_instances_apply(
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
+        write_none: bool = False,
     ) -> ResourcesApply:
         raise NotImplementedError()
 
@@ -238,12 +239,12 @@ class DomainModelApplyList(DomainModelList[T_DomainModelApply]):
     _PARENT_CLASS = DomainModelApply
 
     def to_instances_apply(
-        self, view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None
+        self, view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None = None, write_none: bool = False
     ) -> ResourcesApply:
         cache: set[tuple[str, str]] = set()
         domains = ResourcesApply()
         for node in self:
-            result = node._to_instances_apply(cache, view_by_read_class)
+            result = node._to_instances_apply(cache, view_by_read_class, write_none)
             domains.extend(result)
         return domains
 
