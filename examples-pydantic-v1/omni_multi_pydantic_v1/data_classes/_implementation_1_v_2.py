@@ -56,7 +56,7 @@ class Implementation1v2(SubInterface):
     """
 
     node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "Implementation1")
-    value_2: Optional[str] = Field(None, alias="value2")
+    value_2: str = Field(alias="value2")
 
     def as_apply(self) -> Implementation1v2Apply:
         """Convert this read version of implementation 1 v 2 to the writing version."""
