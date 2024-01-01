@@ -109,7 +109,7 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}):
 {% if not data_class.is_all_fields_of_type(ft.EdgeOneToMany) %}
         properties = {}
         {% for field in data_class.fields_of_type((ft.PrimitiveFieldCore, ft.EdgeOneToOne)) %}
-        if self.{{ field.name }} is not None{% if {{ field.is_nullable }} %} or write_none{% endif %}:
+        if self.{{ field.name }} is not None{% if field.is_nullable %} or write_none{% endif %}:
             {% if field.is_edge %}
             properties["{{ field.prop_name }}"] = {
                 "space":  self.space if isinstance(self.{{ field.name }}, str) else self.{{ field.name }}.space,
@@ -126,7 +126,7 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}):
                 {{ field.variable }}.isoformat({% if field.is_timestamp %}timespec="milliseconds"{% endif %}) for {{ field.variable }} in self.{{ field.name }}
             ]
             {% elif field.is_time_field %}
-            properties["{{ field.prop_name }}"] = self.{{ field.name }}.isoformat({% if field.is_timestamp %}timespec="milliseconds"{% endif %}) if {{ field.name }} else None
+            properties["{{ field.prop_name }}"] = self.{{ field.name }}.isoformat({% if field.is_timestamp %}timespec="milliseconds"{% endif %}) if self.{{ field.name }} else None
             {% else %}
             properties["{{ field.prop_name }}"] = self.{{ field.name }}
             {% endif %}

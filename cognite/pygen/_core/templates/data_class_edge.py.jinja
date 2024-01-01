@@ -94,7 +94,7 @@ class {{ data_class.write_name }}(DomainRelationApply):
 
         properties = {}
         {% for field in data_class.fields_of_type((ft.PrimitiveFieldCore, ft.EdgeOneToOne)) %}
-        if self.{{ field.name }} is not None{% if {{ field.is_nullable }} %} or write_none{% endif %}:
+        if self.{{ field.name }} is not None{% if field.is_nullable %} or write_none{% endif %}:
             {% if field.is_edge %}
             properties["{{ field.prop_name }}"] = {
                 "space":  self.space if isinstance(self.{{ field.name }}, str) else self.{{ field.name }}.space,

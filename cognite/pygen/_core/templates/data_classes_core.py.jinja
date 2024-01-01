@@ -137,7 +137,7 @@ class DomainModelApply(DomainModelCore{% if is_pydantic_v2 %}, extra=Extra.forbi
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
-        write_none: bool = False
+        write_none: bool = False,
     ) -> ResourcesApply:
         raise NotImplementedError()
 {% if is_pydantic_v2 %}
