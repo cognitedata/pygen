@@ -136,6 +136,9 @@ class DataClass:
     ):
         self.is_interface = self.view_id in interfaces
         for interface in view.implements or []:
+            if interface not in data_class_by_view_id:
+                # The interface is not part of the data model
+                continue
             self.implements.append(data_class_by_view_id[interface])
         self.is_writable = self.is_writable or self.is_all_fields_of_type(EdgeOneToMany)
 
