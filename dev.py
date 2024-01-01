@@ -248,6 +248,9 @@ def deploy():
         if unchanged:
             typer.echo(f"{len(unchanged)} edges are unchanged")
 
+    # After deployment, we should download the read version of the data model
+    download()
+
 
 @app.command("list", help="List all example files which are expected to be changed manually")
 def list_manual_files():

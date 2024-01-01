@@ -88,9 +88,13 @@ class ExampleSDK:
                 self.manual_files.append(var)
 
     def load_spaces(self) -> SpaceApplyList:
-        spaces = list({model.space for model in self.data_model_ids})
+        spaces = {model.space for model in self.data_model_ids}
+        for model in self.data_model_ids:
+            views = self.load_views(model)
+            spaces |= {view.space for view in views}
+
         if self.instance_space not in spaces:
-            spaces.append(self.instance_space)
+            spaces.add(self.instance_space)
         return SpaceApplyList([SpaceApply(space) for space in spaces])
 
     @classmethod
