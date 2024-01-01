@@ -179,19 +179,19 @@ OMNI_SDK = ExampleSDK(
     download_nodes=True,
 )
 
-# This is used for testing the multi model functionality,
-# when calling python dev.py generate, the full SDK will not be generated, however,
-# the '_api_client.py` file will be generated.
-MULTI_MODEL_SDK = ExampleSDK(
+OMNI_MULTI_SDK = ExampleSDK(
     data_model_ids=[
-        DataModelId("pygen-models", "Omni", "1"),
-        DataModelId("power-models", "Windmill", "1"),
+        DataModelId("pygen-models", "OmniMultiA", "1"),
+        DataModelId("pygen-models", "OmniMultiB", "1"),
+        DataModelId("pygen-models", "OmniMultiC", "1"),
     ],
-    _top_level_package="multi_model",
-    client_name="MultiModelClient",
-    generate_sdk=False,
+    _top_level_package="omni_multi",
+    client_name="OmniMultiClient",
+    generate_sdk=True,
     _instance_space="omni-instances",
+    download_nodes=False,
 )
+
 
 # This uses connections that are not supported by the UI, so it will not be shown there.
 OMNIUM_CONNECTION_SDK = ExampleSDK(
