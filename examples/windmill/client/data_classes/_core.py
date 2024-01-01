@@ -109,7 +109,7 @@ class DomainModel(DomainModelCore):
     @classmethod
     def from_instance(cls: type[T_DomainModel], instance: Instance) -> T_DomainModel:
         data = instance.dump(camel_case=False)
-        data["node_type"] = data.pop("type")
+        data["node_type"] = data.pop("type", None)
         return cls(**{**data, **unpack_properties(instance.properties)})
 
 
@@ -143,7 +143,7 @@ class DomainModelApply(DomainModelCore, extra=Extra.forbid, populate_by_name=Tru
     def from_instance(cls: type[T_DomainModelApply], instance: InstanceApply) -> T_DomainModelApply:
         data = instance.dump(camel_case=False)
         data.pop("instance_type", None)
-        data["node_type"] = data.pop("type")
+        data["node_type"] = data.pop("type", None)
         sources = data.pop("sources", [])
         properties = {}
         for source in sources:
@@ -262,7 +262,7 @@ class DomainRelation(DomainModelCore):
     @classmethod
     def from_instance(cls: type[T_DomainRelation], instance: Instance) -> T_DomainRelation:
         data = instance.dump(camel_case=False)
-        data["edge_type"] = data.pop("type")
+        data["edge_type"] = data.pop("type", None)
         return cls(**{**data, **unpack_properties(instance.properties)})
 
 
