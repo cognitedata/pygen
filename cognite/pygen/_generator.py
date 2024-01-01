@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib
+import shutil
 import sys
 import tempfile
 from collections.abc import Sequence
@@ -16,11 +17,48 @@ from typing_extensions import TypeAlias
 
 from ._core.generators import SDKGenerator
 from ._settings import _load_pyproject_toml
+from ._version import __version__
 from .config import PygenConfig
 from .exceptions import DataModelNotFound
 from .utils.text import to_pascal, to_snake
 
 DataModel: TypeAlias = Union[DataModelIdentifier, dm.DataModel[dm.View]]
+
+
+@overload
+def generate_sdk(  # type: ignore[overload-overlap]
+    model_id: DataModel | Sequence[DataModel],
+    client: Optional[CogniteClient] = None,
+    top_level_package: Optional[str] = None,
+    client_name: Optional[str] = None,
+    default_instance_space: str | None = None,
+    output_dir: Optional[Path] = None,
+    logger: Optional[Callable[[str], None]] = None,
+    pydantic_version: Literal["v1", "v2", "infer"] = "infer",
+    overwrite: bool = False,
+    format_code: bool = True,
+    config: Optional[PygenConfig] = None,
+    return_sdk_files: Literal[False] = False,
+) -> None:
+    ...
+
+
+@overload
+def generate_sdk(
+    model_id: DataModel | Sequence[DataModel],
+    client: Optional[CogniteClient] = None,
+    top_level_package: Optional[str] = None,
+    client_name: Optional[str] = None,
+    default_instance_space: str | None = None,
+    output_dir: Optional[Path] = None,
+    logger: Optional[Callable[[str], None]] = None,
+    pydantic_version: Literal["v1", "v2", "infer"] = "infer",
+    overwrite: bool = False,
+    format_code: bool = True,
+    config: Optional[PygenConfig] = None,
+    return_sdk_files: Literal[True] = False,  # type: ignore[assignment]
+) -> dict[Path, str]:
+    ...
 
 
 def generate_sdk(
@@ -35,7 +73,8 @@ def generate_sdk(
     overwrite: bool = False,
     format_code: bool = True,
     config: Optional[PygenConfig] = None,
-) -> None:
+    return_sdk_files: Literal[True, False] = False,
+) -> None | dict[Path, str]:
     """
     Generates a Python SDK tailored to the given Data Model(s).
 
@@ -59,6 +98,8 @@ def generate_sdk(
         overwrite: Whether to overwrite the output directory if it already exists. Defaults to False.
         format_code: Whether to format the generated code using black. Defaults to True.
         config: The configuration used to control how to generate the SDK.
+        return_sdk_files: Whether to return the generated SDK files as a dictionary. Defaults to False.
+            This is useful for granular control of how to write the SDK to disk.
     """
     logger = logger or print
     data_model = _get_data_model(model_id, client, logger)
@@ -80,10 +121,13 @@ def generate_sdk(
         config or PygenConfig(),
     )
     sdk = sdk_generator.generate_sdk()
+    if return_sdk_files:
+        return sdk
     output_dir = output_dir or Path.cwd()
     logger(f"Writing SDK to {output_dir}")
     write_sdk_to_disk(sdk, output_dir, overwrite, format_code)
     logger("Done!")
+    return None
 
 
 def generate_sdk_notebook(
@@ -93,6 +137,7 @@ def generate_sdk_notebook(
     client_name: Optional[str] = None,
     default_instance_space: str | None = None,
     config: Optional[PygenConfig] = None,
+    clean_pygen_temp_dir: bool = True,
 ) -> Any:
     """
     Generates a Python SDK tailored to the given Data Model(s) and imports it into the current Python session.
@@ -120,11 +165,21 @@ def generate_sdk_notebook(
         default_instance_space: The default instance space to use for the generated SDK. Defaults to the
             instance space of the first data model given.
         config: The configuration used to control how to generate the SDK.
+        clean_pygen_temp_dir: Whether to clean the temporary directory used to store the generated SDK.
+            Defaults to True.
 
     Returns:
         The instantiated generated client class.
     """
     output_dir = Path(tempfile.gettempdir()) / "pygen"
+    if clean_pygen_temp_dir and output_dir.exists():
+        try:
+            shutil.rmtree(output_dir)
+        except Exception as e:
+            print(f"Failed to clean temporary directory {output_dir}: {e}")
+        else:
+            print(f"Cleaned temporary directory {output_dir}")
+
     data_model = _get_data_model(model_id, client, print)
     external_id = _extract_external_id(data_model)
     if top_level_package is None:
@@ -203,11 +258,16 @@ def _load_data_model(
     client: CogniteClient, model_id: DataModelIdentifier | Sequence[DataModelIdentifier], logger: Callable[[str], None]
 ) -> dm.DataModel[dm.View] | dm.DataModelList[dm.View]:
     identifier = _load_data_model_identifier(model_id)
+    current_client_name = client.config.client_name
+    # The client name is used for aggregated logging of Pygen Usage
+    client.config.client_name = f"CognitePygen:{__version__}:GenerateSDK"
     try:
         data_models = client.data_modeling.data_models.retrieve(model_id, inline_views=True)
     except CogniteAPIError as e:
         logger(f"Error retrieving data model(s): {e}")
         raise e
+    finally:
+        client.config.client_name = current_client_name
     if len(data_models) == 1 == len(identifier):
         return data_models[0]
     elif len(data_models) == len(identifier):

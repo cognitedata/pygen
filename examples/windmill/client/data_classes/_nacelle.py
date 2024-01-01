@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal, Optional, Union
+from typing import TYPE_CHECKING, Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
@@ -145,6 +145,7 @@ class NacelleApply(DomainModelApply):
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
+        write_none: bool = False,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
@@ -152,28 +153,25 @@ class NacelleApply(DomainModelApply):
 
         write_view = (view_by_read_class or {}).get(Nacelle, dm.ViewId("power-models", "Nacelle", "1"))
 
-        properties = {}
+        properties: dict[str, Any] = {}
 
-        if self.acc_from_back_side_x is not None:
-            properties["acc_from_back_side_x"] = (
-                self.acc_from_back_side_x
-                if isinstance(self.acc_from_back_side_x, str)
-                else self.acc_from_back_side_x.external_id
-            )
+        if self.acc_from_back_side_x is not None or write_none:
+            if isinstance(self.acc_from_back_side_x, str) or self.acc_from_back_side_x is None:
+                properties["acc_from_back_side_x"] = self.acc_from_back_side_x
+            else:
+                properties["acc_from_back_side_x"] = self.acc_from_back_side_x.external_id
 
-        if self.acc_from_back_side_y is not None:
-            properties["acc_from_back_side_y"] = (
-                self.acc_from_back_side_y
-                if isinstance(self.acc_from_back_side_y, str)
-                else self.acc_from_back_side_y.external_id
-            )
+        if self.acc_from_back_side_y is not None or write_none:
+            if isinstance(self.acc_from_back_side_y, str) or self.acc_from_back_side_y is None:
+                properties["acc_from_back_side_y"] = self.acc_from_back_side_y
+            else:
+                properties["acc_from_back_side_y"] = self.acc_from_back_side_y.external_id
 
-        if self.acc_from_back_side_z is not None:
-            properties["acc_from_back_side_z"] = (
-                self.acc_from_back_side_z
-                if isinstance(self.acc_from_back_side_z, str)
-                else self.acc_from_back_side_z.external_id
-            )
+        if self.acc_from_back_side_z is not None or write_none:
+            if isinstance(self.acc_from_back_side_z, str) or self.acc_from_back_side_z is None:
+                properties["acc_from_back_side_z"] = self.acc_from_back_side_z
+            else:
+                properties["acc_from_back_side_z"] = self.acc_from_back_side_z.external_id
 
         if self.gearbox is not None:
             properties["gearbox"] = {
@@ -209,13 +207,17 @@ class NacelleApply(DomainModelApply):
                 else self.power_inverter.external_id,
             }
 
-        if self.yaw_direction is not None:
-            properties["yaw_direction"] = (
-                self.yaw_direction if isinstance(self.yaw_direction, str) else self.yaw_direction.external_id
-            )
+        if self.yaw_direction is not None or write_none:
+            if isinstance(self.yaw_direction, str) or self.yaw_direction is None:
+                properties["yaw_direction"] = self.yaw_direction
+            else:
+                properties["yaw_direction"] = self.yaw_direction.external_id
 
-        if self.yaw_error is not None:
-            properties["yaw_error"] = self.yaw_error if isinstance(self.yaw_error, str) else self.yaw_error.external_id
+        if self.yaw_error is not None or write_none:
+            if isinstance(self.yaw_error, str) or self.yaw_error is None:
+                properties["yaw_error"] = self.yaw_error
+            else:
+                properties["yaw_error"] = self.yaw_error.external_id
 
         if properties:
             this_node = dm.NodeApply(

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import Literal, Optional, Union
+from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -71,15 +71,15 @@ class PrimitiveRequired(DomainModel):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
-    boolean: Optional[bool] = None
-    date: Optional[datetime.date] = None
-    float_32: Optional[float] = Field(None, alias="float32")
-    float_64: Optional[float] = Field(None, alias="float64")
-    int_32: Optional[int] = Field(None, alias="int32")
-    int_64: Optional[int] = Field(None, alias="int64")
-    json_: Optional[dict] = Field(None, alias="json")
-    text: Optional[str] = None
-    timestamp: Optional[datetime.datetime] = None
+    boolean: bool
+    date: datetime.date
+    float_32: float = Field(alias="float32")
+    float_64: float = Field(alias="float64")
+    int_32: int = Field(alias="int32")
+    int_64: int = Field(alias="int64")
+    json_: dict = Field(alias="json")
+    text: str
+    timestamp: datetime.datetime
 
     def as_apply(self) -> PrimitiveRequiredApply:
         """Convert this read version of primitive required to the writing version."""
@@ -137,6 +137,7 @@ class PrimitiveRequiredApply(DomainModelApply):
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
+        write_none: bool = False,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
@@ -146,13 +147,13 @@ class PrimitiveRequiredApply(DomainModelApply):
             PrimitiveRequired, dm.ViewId("pygen-models", "PrimitiveRequired", "1")
         )
 
-        properties = {}
+        properties: dict[str, Any] = {}
 
         if self.boolean is not None:
             properties["boolean"] = self.boolean
 
         if self.date is not None:
-            properties["date"] = self.date.isoformat()
+            properties["date"] = self.date.isoformat() if self.date else None
 
         if self.float_32 is not None:
             properties["float32"] = self.float_32
@@ -173,7 +174,7 @@ class PrimitiveRequiredApply(DomainModelApply):
             properties["text"] = self.text
 
         if self.timestamp is not None:
-            properties["timestamp"] = self.timestamp.isoformat(timespec="milliseconds")
+            properties["timestamp"] = self.timestamp.isoformat(timespec="milliseconds") if self.timestamp else None
 
         if properties:
             this_node = dm.NodeApply(

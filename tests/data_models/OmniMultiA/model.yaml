@@ -1,0 +1,172 @@
+space: pygen-models
+externalId: OmniMultiA
+description: ''
+name: OmniMultiA
+version: '1'
+views:
+- space: pygen-models
+  externalId: Implementation1
+  name: Implementation1
+  filter:
+    equals:
+      property:
+      - node
+      - type
+      value:
+        space: pygen-models
+        externalId: Implementation1
+  implements:
+  - space: pygen-models
+    externalId: SubInterface
+    version: '1'
+    type: view
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    mainValue:
+      container:
+        space: pygen-models
+        externalId: MainInterface
+      containerPropertyIdentifier: mainValue
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: MainValue
+      description: null
+    subValue:
+      container:
+        space: pygen-models
+        externalId: SubInterface
+      containerPropertyIdentifier: subValue
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: SubValue
+      description: null
+    value1:
+      container:
+        space: pygen-models
+        externalId: Implementation1
+      containerPropertyIdentifier: implementation1Value
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: Value1
+      description: null
+    value2:
+      container:
+        space: pygen-models
+        externalId: Implementation1
+      containerPropertyIdentifier: requiredImplementation1Value
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: Value2
+      description: null
+  lastUpdatedTime: 1703845437017
+  createdTime: 1703845437017
+- space: pygen-models
+  externalId: MainInterface
+  name: MainInterface
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    mainValue:
+      container:
+        space: pygen-models
+        externalId: MainInterface
+      containerPropertyIdentifier: mainValue
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: MainValue
+      description: null
+  lastUpdatedTime: 1703845437017
+  createdTime: 1703845437017
+- space: pygen-models
+  externalId: SubInterface
+  name: SubInterface
+  filter:
+    in:
+      property:
+      - node
+      - type
+      values:
+      - space: pygen-models
+        externalId: Implementation1
+      - space: pygen-models
+        externalId: Implementation2
+  implements:
+  - space: pygen-models
+    externalId: MainInterface
+    version: '1'
+    type: view
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    mainValue:
+      container:
+        space: pygen-models
+        externalId: MainInterface
+      containerPropertyIdentifier: mainValue
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: MainValue
+      description: null
+    subValue:
+      container:
+        space: pygen-models
+        externalId: SubInterface
+      containerPropertyIdentifier: subValue
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: SubValue
+      description: null
+  lastUpdatedTime: 1703845437017
+  createdTime: 1703845437017
+isGlobal: false
+lastUpdatedTime: 1704114712870
+createdTime: 1704114712870

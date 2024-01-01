@@ -14,6 +14,23 @@ Changes are grouped as follows
 - `Security` in case of vulnerabilities.
 
 
+## [0.34.0] - TBD-01-24
+### Added
+* Option for returning generated SDK as a `dict[Path, str]` instead of writing to disk when calling `generate_sdk`.
+* Option for cleaning the `pygen` temporary directly when calling `generate_sdk_notebook`. This is useful to ensure
+  that previous generated SDKs are not interfering with the current SDK by accident.
+* Option `write_none` to the generated `.apply()` methods. This is useful when you want to set a property to `None`.
+  By default, `pygen` will ignore properties set to `None` in the `.apply()` methods.
+### Fixed
+* `pygen` now handles views with the same `external_id` in different spaces and versions. Note that this can only occur if
+  `pygen` is used with multiple data models.
+* When using `pydantic` `v1` with a view that has a dependency on a non-writable view, importing the generate client
+  raised `NameError`. This is now fixed.
+### Changed
+* The generated `read` classes now reflects whether properties are required or not. Earlier, all read properties
+  were optional. The motivation for this change is to make it easier to use `mypy` with the generated SDK.
+
+
 ## [0.33.0] - 01-01-24
 ### Added
 * The generated data classes now are inherited if the view is implementing another view.

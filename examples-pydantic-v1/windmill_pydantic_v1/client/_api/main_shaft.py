@@ -87,7 +87,10 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftApply, MainShaftList]):
         return MainShaftQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(
-        self, main_shaft: MainShaftApply | Sequence[MainShaftApply], replace: bool = False
+        self,
+        main_shaft: MainShaftApply | Sequence[MainShaftApply],
+        replace: bool = False,
+        write_none: bool = False,
     ) -> ResourcesApplyResult:
         """Add or update (upsert) main shafts.
 
@@ -95,6 +98,8 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftApply, MainShaftList]):
             main_shaft: Main shaft or sequence of main shafts to upsert.
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): This method, will by default, skip properties that are set to None. However, if you want to set properties to None,
+                you can set this parameter to True. Note this only applies to properties that are nullable.
         Returns:
             Created instance(s), i.e., nodes, edges, and time series.
 
@@ -109,7 +114,7 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftApply, MainShaftList]):
                 >>> result = client.main_shaft.apply(main_shaft)
 
         """
-        return self._apply(main_shaft, replace)
+        return self._apply(main_shaft, replace, write_none)
 
     def delete(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE

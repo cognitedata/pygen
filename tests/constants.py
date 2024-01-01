@@ -88,9 +88,13 @@ class ExampleSDK:
                 self.manual_files.append(var)
 
     def load_spaces(self) -> SpaceApplyList:
-        spaces = list({model.space for model in self.data_model_ids})
+        spaces = {model.space for model in self.data_model_ids}
+        for model in self.data_model_ids:
+            views = self.load_views(model)
+            spaces |= {view.space for view in views}
+
         if self.instance_space not in spaces:
-            spaces.append(self.instance_space)
+            spaces.add(self.instance_space)
         return SpaceApplyList([SpaceApply(space) for space in spaces])
 
     @classmethod
@@ -175,19 +179,19 @@ OMNI_SDK = ExampleSDK(
     download_nodes=True,
 )
 
-# This is used for testing the multi model functionality,
-# when calling python dev.py generate, the full SDK will not be generated, however,
-# the '_api_client.py` file will be generated.
-MULTI_MODEL_SDK = ExampleSDK(
+OMNI_MULTI_SDK = ExampleSDK(
     data_model_ids=[
-        DataModelId("pygen-models", "Omni", "1"),
-        DataModelId("power-models", "Windmill", "1"),
+        DataModelId("pygen-models", "OmniMultiA", "1"),
+        DataModelId("pygen-models", "OmniMultiB", "1"),
+        DataModelId("pygen-models", "OmniMultiC", "1"),
     ],
-    _top_level_package="multi_model",
-    client_name="MultiModelClient",
-    generate_sdk=False,
+    _top_level_package="omni_multi",
+    client_name="OmniMultiClient",
+    generate_sdk=True,
     _instance_space="omni-instances",
+    download_nodes=False,
 )
+
 
 # This uses connections that are not supported by the UI, so it will not be shown there.
 OMNIUM_CONNECTION_SDK = ExampleSDK(
@@ -328,8 +332,12 @@ class OmniFiles:
 OMNI_SDK.append_manual_files(OmniFiles)
 
 
-class MultiModelFiles:
-    api_client = EXAMPLES_DIR / "multi_model_api_client.py"
+class OmniMultiFiles:
+    client_dir = OMNI_MULTI_SDK.client_dir
+    api_client = client_dir / "_api_client.py"
+
+
+OMNI_MULTI_SDK.append_manual_files(OmniMultiFiles)
 
 
 class WindMillFiles:

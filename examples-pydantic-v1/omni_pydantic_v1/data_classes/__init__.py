@@ -38,6 +38,14 @@ from ._connection_item_b import (
     ConnectionItemBTextFields,
 )
 from ._connection_item_c import ConnectionItemC, ConnectionItemCApply, ConnectionItemCApplyList, ConnectionItemCList
+from ._dependent_on_non_writable import (
+    DependentOnNonWritable,
+    DependentOnNonWritableApply,
+    DependentOnNonWritableApplyList,
+    DependentOnNonWritableFields,
+    DependentOnNonWritableList,
+    DependentOnNonWritableTextFields,
+)
 from ._empty import Empty, EmptyApply, EmptyApplyList, EmptyFields, EmptyList, EmptyTextFields
 from ._implementation_1 import (
     Implementation1,
@@ -148,6 +156,11 @@ ConnectionItemCApply.update_forward_refs(
     ConnectionItemBApply=ConnectionItemBApply,
 )
 
+DependentOnNonWritable.update_forward_refs(
+    Implementation1NonWriteable=Implementation1NonWriteable,
+)
+DependentOnNonWritableApply.update_forward_refs()
+
 __all__ = [
     "ResourcesApply",
     "DomainModel",
@@ -182,6 +195,12 @@ __all__ = [
     "ConnectionItemCApply",
     "ConnectionItemCList",
     "ConnectionItemCApplyList",
+    "DependentOnNonWritable",
+    "DependentOnNonWritableApply",
+    "DependentOnNonWritableList",
+    "DependentOnNonWritableApplyList",
+    "DependentOnNonWritableFields",
+    "DependentOnNonWritableTextFields",
     "Empty",
     "EmptyApply",
     "EmptyList",

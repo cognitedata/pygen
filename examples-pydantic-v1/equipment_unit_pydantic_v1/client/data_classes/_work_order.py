@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, Optional, Union
+from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -98,6 +98,7 @@ class WorkOrderApply(DomainModelApply):
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
+        write_none: bool = False,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
@@ -107,15 +108,15 @@ class WorkOrderApply(DomainModelApply):
             WorkOrder, dm.ViewId("IntegrationTestsImmutable", "WorkOrder", "c5543fb2b1bc81")
         )
 
-        properties = {}
+        properties: dict[str, Any] = {}
 
-        if self.description is not None:
+        if self.description is not None or write_none:
             properties["description"] = self.description
 
-        if self.performed_by is not None:
+        if self.performed_by is not None or write_none:
             properties["performedBy"] = self.performed_by
 
-        if self.type_ is not None:
+        if self.type_ is not None or write_none:
             properties["type"] = self.type_
 
         if properties:

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal, Optional, Union
+from typing import TYPE_CHECKING, Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -110,6 +110,7 @@ class ConnectionItemAApply(DomainModelApply):
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
+        write_none: bool = False,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
@@ -117,9 +118,9 @@ class ConnectionItemAApply(DomainModelApply):
 
         write_view = (view_by_read_class or {}).get(ConnectionItemA, dm.ViewId("pygen-models", "ConnectionItemA", "1"))
 
-        properties = {}
+        properties: dict[str, Any] = {}
 
-        if self.name is not None:
+        if self.name is not None or write_none:
             properties["name"] = self.name
 
         if self.other_direct is not None:
