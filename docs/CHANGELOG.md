@@ -20,6 +20,9 @@ Changes are grouped as follows
   `pygen` is used with multiple data models.
 * When using `pydantic` `v1` with a view that has a dependency on a non-writable view, importing the generate client
   raised `NameError`. This is now fixed.
+### Changed
+* The generated `read` classes now reflects whether properties are required or not. Earlier, all read properties
+  were optional. The motivation for this change is to make it easier to use `mypy` with the generated SDK.
 
 ## [0.33.0] - 01-01-24
 ### Added

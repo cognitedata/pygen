@@ -62,7 +62,7 @@ class PrimitiveWithDefaults(DomainModel):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
-    auto_increment_int_32: Optional[int] = Field(None, alias="autoIncrementInt32")
+    auto_increment_int_32: int = Field(alias="autoIncrementInt32")
     default_boolean: Optional[bool] = Field(None, alias="defaultBoolean")
     default_float_32: Optional[float] = Field(None, alias="defaultFloat32")
     default_object: Optional[dict] = Field(None, alias="defaultObject")

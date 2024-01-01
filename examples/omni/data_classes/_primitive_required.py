@@ -71,15 +71,15 @@ class PrimitiveRequired(DomainModel):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
-    boolean: Optional[bool] = None
-    date: Optional[datetime.date] = None
-    float_32: Optional[float] = Field(None, alias="float32")
-    float_64: Optional[float] = Field(None, alias="float64")
-    int_32: Optional[int] = Field(None, alias="int32")
-    int_64: Optional[int] = Field(None, alias="int64")
-    json_: Optional[dict] = Field(None, alias="json")
-    text: Optional[str] = None
-    timestamp: Optional[datetime.datetime] = None
+    boolean: bool
+    date: datetime.date
+    float_32: float = Field(alias="float32")
+    float_64: float = Field(alias="float64")
+    int_32: int = Field(alias="int32")
+    int_64: int = Field(alias="int64")
+    json_: dict = Field(alias="json")
+    text: str
+    timestamp: datetime.datetime
 
     def as_apply(self) -> PrimitiveRequiredApply:
         """Convert this read version of primitive required to the writing version."""
