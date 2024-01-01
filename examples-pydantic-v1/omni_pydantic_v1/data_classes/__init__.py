@@ -159,9 +159,7 @@ ConnectionItemCApply.update_forward_refs(
 DependentOnNonWritable.update_forward_refs(
     Implementation1NonWriteable=Implementation1NonWriteable,
 )
-DependentOnNonWritableApply.update_forward_refs(
-    Implementation1NonWriteableApply=Implementation1NonWriteableApply,
-)
+DependentOnNonWritableApply.update_forward_refs()
 
 __all__ = [
     "ResourcesApply",

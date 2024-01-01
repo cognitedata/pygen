@@ -15,8 +15,8 @@ from ._core import (
 {{ read_name }}.update_forward_refs({% for dependency in dependencies %}
     {{ dependency.read_name }}={{ dependency.read_name }},{%  endfor %}
 )
-{{ write_name }}.update_forward_refs({% for dependency in dependencies %}
-    {{ dependency.write_name }}={{ dependency.write_name }},{%  endfor %}
+{{ write_name }}.update_forward_refs({% for dependency in dependencies %}{% if dependency.is_writable or dependency.is_interface %}
+    {{ dependency.write_name }}={{ dependency.write_name }},{% endif %}{%  endfor %}
 )
 {% endfor %}{% endif %}
 __all__ = [
