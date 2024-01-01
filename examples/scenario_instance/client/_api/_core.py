@@ -601,7 +601,7 @@ class QueryBuilder(UserList, Generic[T_DomainModelList]):
                 setattr(node, node_attribute, relations_by_start_node.get(node.as_tuple_id(), []))
             for relations in relations_by_start_node.values():
                 for relation in relations:
-                    edge_name = relation.type.external_id.split(".")[-1]
+                    edge_name = relation.edge_type.external_id.split(".")[-1]
                     if (nodes := nodes_by_type.get(edge_name)) and (
                         node := nodes.get((relation.end_node.space, relation.end_node.external_id))
                     ):

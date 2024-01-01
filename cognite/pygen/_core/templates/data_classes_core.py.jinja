@@ -264,7 +264,7 @@ T_DomainModelApplyList = TypeVar("T_DomainModelApplyList", bound=DomainModelAppl
 
 
 class DomainRelation(DomainModelCore):
-    type: dm.DirectRelationReference
+    edge_type: dm.DirectRelationReference
     start_node: dm.DirectRelationReference
     version: int
     last_updated_time: datetime.datetime
@@ -272,9 +272,9 @@ class DomainRelation(DomainModelCore):
     deleted_time: Optional[datetime.datetime] = None
 
     @classmethod
-    def from_instance(cls: type[T_DomainRelation], instance: Instance) -> T_DomainRelation:
+    def from_instance(cls: type[T_DomainRelation], instance: dm.Edge) -> T_DomainRelation:
         data = instance.dump(camel_case=False)
-        data["edge_type"] = data.pop("type", None)
+        data["edge_type"] = data.pop("type")
         return cls(**{**data, **unpack_properties(instance.properties)})
 
 
