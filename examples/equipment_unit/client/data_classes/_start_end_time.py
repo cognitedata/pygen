@@ -90,6 +90,7 @@ class StartEndTimeApply(DomainRelationApply):
         start_node: DomainModelApply,
         edge_type: dm.DirectRelationReference,
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
+        write_none: bool = False,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.external_id and (self.space, self.external_id) in cache:
@@ -114,10 +115,10 @@ class StartEndTimeApply(DomainRelationApply):
 
         properties = {}
 
-        if self.end_time is not None:
+        if self.end_time is not None or write_none:
             properties["end_time"] = self.end_time.isoformat(timespec="milliseconds")
 
-        if self.start_time is not None:
+        if self.start_time is not None or write_none:
             properties["start_time"] = self.start_time.isoformat(timespec="milliseconds")
 
         if properties:

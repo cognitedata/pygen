@@ -92,6 +92,7 @@ class GearboxApply(DomainModelApply):
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
+        write_none: bool = False,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
@@ -101,17 +102,17 @@ class GearboxApply(DomainModelApply):
 
         properties = {}
 
-        if self.displacement_x is not None:
+        if self.displacement_x is not None or write_none:
             properties["displacement_x"] = (
                 self.displacement_x if isinstance(self.displacement_x, str) else self.displacement_x.external_id
             )
 
-        if self.displacement_y is not None:
+        if self.displacement_y is not None or write_none:
             properties["displacement_y"] = (
                 self.displacement_y if isinstance(self.displacement_y, str) else self.displacement_y.external_id
             )
 
-        if self.displacement_z is not None:
+        if self.displacement_z is not None or write_none:
             properties["displacement_z"] = (
                 self.displacement_z if isinstance(self.displacement_z, str) else self.displacement_z.external_id
             )

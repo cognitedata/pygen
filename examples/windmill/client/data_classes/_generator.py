@@ -93,6 +93,7 @@ class GeneratorApply(DomainModelApply):
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
+        write_none: bool = False,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
@@ -102,14 +103,14 @@ class GeneratorApply(DomainModelApply):
 
         properties = {}
 
-        if self.generator_speed_controller is not None:
+        if self.generator_speed_controller is not None or write_none:
             properties["generator_speed_controller"] = (
                 self.generator_speed_controller
                 if isinstance(self.generator_speed_controller, str)
                 else self.generator_speed_controller.external_id
             )
 
-        if self.generator_speed_controller_reference is not None:
+        if self.generator_speed_controller_reference is not None or write_none:
             properties["generator_speed_controller_reference"] = (
                 self.generator_speed_controller_reference
                 if isinstance(self.generator_speed_controller_reference, str)

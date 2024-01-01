@@ -98,6 +98,7 @@ class WorkOrderApply(DomainModelApply):
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
+        write_none: bool = False,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
@@ -109,13 +110,13 @@ class WorkOrderApply(DomainModelApply):
 
         properties = {}
 
-        if self.description is not None:
+        if self.description is not None or write_none:
             properties["description"] = self.description
 
-        if self.performed_by is not None:
+        if self.performed_by is not None or write_none:
             properties["performedBy"] = self.performed_by
 
-        if self.type_ is not None:
+        if self.type_ is not None or write_none:
             properties["type"] = self.type_
 
         if properties:

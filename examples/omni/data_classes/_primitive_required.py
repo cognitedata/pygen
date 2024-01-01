@@ -137,6 +137,7 @@ class PrimitiveRequiredApply(DomainModelApply):
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
+        write_none: bool = False,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
@@ -152,7 +153,7 @@ class PrimitiveRequiredApply(DomainModelApply):
             properties["boolean"] = self.boolean
 
         if self.date is not None:
-            properties["date"] = self.date.isoformat()
+            properties["date"] = self.date.isoformat() if self.date else None
 
         if self.float_32 is not None:
             properties["float32"] = self.float_32
@@ -173,7 +174,7 @@ class PrimitiveRequiredApply(DomainModelApply):
             properties["text"] = self.text
 
         if self.timestamp is not None:
-            properties["timestamp"] = self.timestamp.isoformat(timespec="milliseconds")
+            properties["timestamp"] = self.timestamp.isoformat(timespec="milliseconds") if self.timestamp else None
 
         if properties:
             this_node = dm.NodeApply(

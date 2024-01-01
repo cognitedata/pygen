@@ -102,6 +102,7 @@ class PrimitiveWithDefaultsAPI(NodeAPI[PrimitiveWithDefaults, PrimitiveWithDefau
         self,
         primitive_with_default: PrimitiveWithDefaultsApply | Sequence[PrimitiveWithDefaultsApply],
         replace: bool = False,
+        write_none: bool = False,
     ) -> ResourcesApplyResult:
         """Add or update (upsert) primitive with defaults.
 
@@ -109,6 +110,8 @@ class PrimitiveWithDefaultsAPI(NodeAPI[PrimitiveWithDefaults, PrimitiveWithDefau
             primitive_with_default: Primitive with default or sequence of primitive with defaults to upsert.
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): Should we write None values to the API? If False, None values will be ignored. If True, None values will be written to the API.
+                Note this only applies to properties that are nullable.
         Returns:
             Created instance(s), i.e., nodes, edges, and time series.
 
@@ -123,7 +126,7 @@ class PrimitiveWithDefaultsAPI(NodeAPI[PrimitiveWithDefaults, PrimitiveWithDefau
                 >>> result = client.primitive_with_defaults.apply(primitive_with_default)
 
         """
-        return self._apply(primitive_with_default, replace)
+        return self._apply(primitive_with_default, replace, write_none)
 
     def delete(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE

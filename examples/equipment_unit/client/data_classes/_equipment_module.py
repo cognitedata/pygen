@@ -106,6 +106,7 @@ class EquipmentModuleApply(DomainModelApply):
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
+        write_none: bool = False,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
@@ -117,18 +118,18 @@ class EquipmentModuleApply(DomainModelApply):
 
         properties = {}
 
-        if self.description is not None:
+        if self.description is not None or write_none:
             properties["description"] = self.description
 
-        if self.name is not None:
+        if self.name is not None or write_none:
             properties["name"] = self.name
 
-        if self.sensor_value is not None:
+        if self.sensor_value is not None or write_none:
             properties["sensor_value"] = (
                 self.sensor_value if isinstance(self.sensor_value, str) else self.sensor_value.external_id
             )
 
-        if self.type_ is not None:
+        if self.type_ is not None or write_none:
             properties["type"] = self.type_
 
         if properties:

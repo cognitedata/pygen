@@ -86,6 +86,7 @@ class RotorApply(DomainModelApply):
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
+        write_none: bool = False,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
@@ -95,14 +96,14 @@ class RotorApply(DomainModelApply):
 
         properties = {}
 
-        if self.rotor_speed_controller is not None:
+        if self.rotor_speed_controller is not None or write_none:
             properties["rotor_speed_controller"] = (
                 self.rotor_speed_controller
                 if isinstance(self.rotor_speed_controller, str)
                 else self.rotor_speed_controller.external_id
             )
 
-        if self.rpm_low_speed_shaft is not None:
+        if self.rpm_low_speed_shaft is not None or write_none:
             properties["rpm_low_speed_shaft"] = (
                 self.rpm_low_speed_shaft
                 if isinstance(self.rpm_low_speed_shaft, str)

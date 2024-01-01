@@ -105,6 +105,7 @@ class UnitProcedureApply(DomainModelApply):
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
+        write_none: bool = False,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
@@ -116,10 +117,10 @@ class UnitProcedureApply(DomainModelApply):
 
         properties = {}
 
-        if self.name is not None:
+        if self.name is not None or write_none:
             properties["name"] = self.name
 
-        if self.type_ is not None:
+        if self.type_ is not None or write_none:
             properties["type"] = self.type_
 
         if properties:

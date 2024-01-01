@@ -89,6 +89,7 @@ class SubInterfaceApply(MainInterfaceApply):
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
+        write_none: bool = False,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
@@ -98,10 +99,10 @@ class SubInterfaceApply(MainInterfaceApply):
 
         properties = {}
 
-        if self.main_value is not None:
+        if self.main_value is not None or write_none:
             properties["mainValue"] = self.main_value
 
-        if self.sub_value is not None:
+        if self.sub_value is not None or write_none:
             properties["subValue"] = self.sub_value
 
         if properties:

@@ -99,6 +99,7 @@ class HighSpeedShaftApply(DomainModelApply):
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
+        write_none: bool = False,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
@@ -108,17 +109,17 @@ class HighSpeedShaftApply(DomainModelApply):
 
         properties = {}
 
-        if self.bending_moment_y is not None:
+        if self.bending_moment_y is not None or write_none:
             properties["bending_moment_y"] = (
                 self.bending_moment_y if isinstance(self.bending_moment_y, str) else self.bending_moment_y.external_id
             )
 
-        if self.bending_monent_x is not None:
+        if self.bending_monent_x is not None or write_none:
             properties["bending_monent_x"] = (
                 self.bending_monent_x if isinstance(self.bending_monent_x, str) else self.bending_monent_x.external_id
             )
 
-        if self.torque is not None:
+        if self.torque is not None or write_none:
             properties["torque"] = self.torque if isinstance(self.torque, str) else self.torque.external_id
 
         if properties:

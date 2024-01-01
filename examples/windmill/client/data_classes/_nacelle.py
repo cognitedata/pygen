@@ -145,6 +145,7 @@ class NacelleApply(DomainModelApply):
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
+        write_none: bool = False,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
@@ -154,21 +155,21 @@ class NacelleApply(DomainModelApply):
 
         properties = {}
 
-        if self.acc_from_back_side_x is not None:
+        if self.acc_from_back_side_x is not None or write_none:
             properties["acc_from_back_side_x"] = (
                 self.acc_from_back_side_x
                 if isinstance(self.acc_from_back_side_x, str)
                 else self.acc_from_back_side_x.external_id
             )
 
-        if self.acc_from_back_side_y is not None:
+        if self.acc_from_back_side_y is not None or write_none:
             properties["acc_from_back_side_y"] = (
                 self.acc_from_back_side_y
                 if isinstance(self.acc_from_back_side_y, str)
                 else self.acc_from_back_side_y.external_id
             )
 
-        if self.acc_from_back_side_z is not None:
+        if self.acc_from_back_side_z is not None or write_none:
             properties["acc_from_back_side_z"] = (
                 self.acc_from_back_side_z
                 if isinstance(self.acc_from_back_side_z, str)
@@ -209,12 +210,12 @@ class NacelleApply(DomainModelApply):
                 else self.power_inverter.external_id,
             }
 
-        if self.yaw_direction is not None:
+        if self.yaw_direction is not None or write_none:
             properties["yaw_direction"] = (
                 self.yaw_direction if isinstance(self.yaw_direction, str) else self.yaw_direction.external_id
             )
 
-        if self.yaw_error is not None:
+        if self.yaw_error is not None or write_none:
             properties["yaw_error"] = self.yaw_error if isinstance(self.yaw_error, str) else self.yaw_error.external_id
 
         if properties:

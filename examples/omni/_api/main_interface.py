@@ -84,7 +84,10 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceApply, MainInterfaceL
         return MainInterfaceQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(
-        self, main_interface: MainInterfaceApply | Sequence[MainInterfaceApply], replace: bool = False
+        self,
+        main_interface: MainInterfaceApply | Sequence[MainInterfaceApply],
+        replace: bool = False,
+        write_none: bool = False,
     ) -> ResourcesApplyResult:
         """Add or update (upsert) main interfaces.
 
@@ -92,6 +95,8 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceApply, MainInterfaceL
             main_interface: Main interface or sequence of main interfaces to upsert.
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): Should we write None values to the API? If False, None values will be ignored. If True, None values will be written to the API.
+                Note this only applies to properties that are nullable.
         Returns:
             Created instance(s), i.e., nodes, edges, and time series.
 
@@ -106,7 +111,7 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceApply, MainInterfaceL
                 >>> result = client.main_interface.apply(main_interface)
 
         """
-        return self._apply(main_interface, replace)
+        return self._apply(main_interface, replace, write_none)
 
     def delete(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE

@@ -98,6 +98,7 @@ class Implementation1sPygenModelsOtherApply(DomainModelApply):
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
+        write_none: bool = False,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
@@ -109,10 +110,10 @@ class Implementation1sPygenModelsOtherApply(DomainModelApply):
 
         properties = {}
 
-        if self.main_value is not None:
+        if self.main_value is not None or write_none:
             properties["mainValue"] = self.main_value
 
-        if self.value_1 is not None:
+        if self.value_1 is not None or write_none:
             properties["value1"] = self.value_1
 
         if self.value_2 is not None:

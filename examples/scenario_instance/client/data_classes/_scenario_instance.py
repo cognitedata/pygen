@@ -133,6 +133,7 @@ class ScenarioInstanceApply(DomainModelApply):
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
+        write_none: bool = False,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
@@ -144,31 +145,31 @@ class ScenarioInstanceApply(DomainModelApply):
 
         properties = {}
 
-        if self.aggregation is not None:
+        if self.aggregation is not None or write_none:
             properties["aggregation"] = self.aggregation
 
-        if self.country is not None:
+        if self.country is not None or write_none:
             properties["country"] = self.country
 
-        if self.instance is not None:
-            properties["instance"] = self.instance.isoformat(timespec="milliseconds")
+        if self.instance is not None or write_none:
+            properties["instance"] = self.instance.isoformat(timespec="milliseconds") if self.instance else None
 
-        if self.market is not None:
+        if self.market is not None or write_none:
             properties["market"] = self.market
 
-        if self.price_area is not None:
+        if self.price_area is not None or write_none:
             properties["priceArea"] = self.price_area
 
-        if self.price_forecast is not None:
+        if self.price_forecast is not None or write_none:
             properties["priceForecast"] = (
                 self.price_forecast if isinstance(self.price_forecast, str) else self.price_forecast.external_id
             )
 
-        if self.scenario is not None:
+        if self.scenario is not None or write_none:
             properties["scenario"] = self.scenario
 
-        if self.start is not None:
-            properties["start"] = self.start.isoformat(timespec="milliseconds")
+        if self.start is not None or write_none:
+            properties["start"] = self.start.isoformat(timespec="milliseconds") if self.start else None
 
         if properties:
             this_node = dm.NodeApply(

@@ -111,6 +111,7 @@ class MainShaftApply(DomainModelApply):
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
+        write_none: bool = False,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
@@ -120,27 +121,27 @@ class MainShaftApply(DomainModelApply):
 
         properties = {}
 
-        if self.bending_x is not None:
+        if self.bending_x is not None or write_none:
             properties["bending_x"] = self.bending_x if isinstance(self.bending_x, str) else self.bending_x.external_id
 
-        if self.bending_y is not None:
+        if self.bending_y is not None or write_none:
             properties["bending_y"] = self.bending_y if isinstance(self.bending_y, str) else self.bending_y.external_id
 
-        if self.calculated_tilt_moment is not None:
+        if self.calculated_tilt_moment is not None or write_none:
             properties["calculated_tilt_moment"] = (
                 self.calculated_tilt_moment
                 if isinstance(self.calculated_tilt_moment, str)
                 else self.calculated_tilt_moment.external_id
             )
 
-        if self.calculated_yaw_moment is not None:
+        if self.calculated_yaw_moment is not None or write_none:
             properties["calculated_yaw_moment"] = (
                 self.calculated_yaw_moment
                 if isinstance(self.calculated_yaw_moment, str)
                 else self.calculated_yaw_moment.external_id
             )
 
-        if self.torque is not None:
+        if self.torque is not None or write_none:
             properties["torque"] = self.torque if isinstance(self.torque, str) else self.torque.external_id
 
         if properties:

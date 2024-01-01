@@ -137,6 +137,7 @@ class PrimitiveNullableListedApply(DomainModelApply):
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
+        write_none: bool = False,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
@@ -148,31 +149,31 @@ class PrimitiveNullableListedApply(DomainModelApply):
 
         properties = {}
 
-        if self.boolean is not None:
+        if self.boolean is not None or write_none:
             properties["boolean"] = self.boolean
 
-        if self.date is not None:
+        if self.date is not None or write_none:
             properties["date"] = [date.isoformat() for date in self.date]
 
-        if self.float_32 is not None:
+        if self.float_32 is not None or write_none:
             properties["float32"] = self.float_32
 
-        if self.float_64 is not None:
+        if self.float_64 is not None or write_none:
             properties["float64"] = self.float_64
 
-        if self.int_32 is not None:
+        if self.int_32 is not None or write_none:
             properties["int32"] = self.int_32
 
-        if self.int_64 is not None:
+        if self.int_64 is not None or write_none:
             properties["int64"] = self.int_64
 
-        if self.json_ is not None:
+        if self.json_ is not None or write_none:
             properties["json"] = self.json_
 
-        if self.text is not None:
+        if self.text is not None or write_none:
             properties["text"] = self.text
 
-        if self.timestamp is not None:
+        if self.timestamp is not None or write_none:
             properties["timestamp"] = [timestamp.isoformat(timespec="milliseconds") for timestamp in self.timestamp]
 
         if properties:

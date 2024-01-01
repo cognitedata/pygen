@@ -96,6 +96,7 @@ class BladeApply(DomainModelApply):
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
+        write_none: bool = False,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
@@ -105,10 +106,10 @@ class BladeApply(DomainModelApply):
 
         properties = {}
 
-        if self.is_damaged is not None:
+        if self.is_damaged is not None or write_none:
             properties["is_damaged"] = self.is_damaged
 
-        if self.name is not None:
+        if self.name is not None or write_none:
             properties["name"] = self.name
 
         if properties:

@@ -99,6 +99,7 @@ class CDFExternalReferencesListedApply(DomainModelApply):
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
+        write_none: bool = False,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
@@ -110,13 +111,13 @@ class CDFExternalReferencesListedApply(DomainModelApply):
 
         properties = {}
 
-        if self.files is not None:
+        if self.files is not None or write_none:
             properties["files"] = self.files
 
-        if self.sequences is not None:
+        if self.sequences is not None or write_none:
             properties["sequences"] = self.sequences
 
-        if self.timeseries is not None:
+        if self.timeseries is not None or write_none:
             properties["timeseries"] = [
                 value if isinstance(value, str) else value.external_id for value in self.timeseries
             ]

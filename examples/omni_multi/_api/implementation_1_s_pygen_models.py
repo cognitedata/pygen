@@ -107,6 +107,7 @@ class Implementation1sPygenModelsAPI(
         self,
         implementation_1_s_pygen_model: Implementation1sPygenModelsApply | Sequence[Implementation1sPygenModelsApply],
         replace: bool = False,
+        write_none: bool = False,
     ) -> ResourcesApplyResult:
         """Add or update (upsert) implementation 1 s pygen models.
 
@@ -114,6 +115,8 @@ class Implementation1sPygenModelsAPI(
             implementation_1_s_pygen_model: Implementation 1 s pygen model or sequence of implementation 1 s pygen models to upsert.
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): Should we write None values to the API? If False, None values will be ignored. If True, None values will be written to the API.
+                Note this only applies to properties that are nullable.
         Returns:
             Created instance(s), i.e., nodes, edges, and time series.
 
@@ -128,7 +131,7 @@ class Implementation1sPygenModelsAPI(
                 >>> result = client.implementation_1_s_pygen_models.apply(implementation_1_s_pygen_model)
 
         """
-        return self._apply(implementation_1_s_pygen_model, replace)
+        return self._apply(implementation_1_s_pygen_model, replace, write_none)
 
     def delete(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE

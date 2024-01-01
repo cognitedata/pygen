@@ -99,6 +99,7 @@ class PowerInverterApply(DomainModelApply):
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
+        write_none: bool = False,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
@@ -108,21 +109,21 @@ class PowerInverterApply(DomainModelApply):
 
         properties = {}
 
-        if self.active_power_total is not None:
+        if self.active_power_total is not None or write_none:
             properties["active_power_total"] = (
                 self.active_power_total
                 if isinstance(self.active_power_total, str)
                 else self.active_power_total.external_id
             )
 
-        if self.apparent_power_total is not None:
+        if self.apparent_power_total is not None or write_none:
             properties["apparent_power_total"] = (
                 self.apparent_power_total
                 if isinstance(self.apparent_power_total, str)
                 else self.apparent_power_total.external_id
             )
 
-        if self.reactive_power_total is not None:
+        if self.reactive_power_total is not None or write_none:
             properties["reactive_power_total"] = (
                 self.reactive_power_total
                 if isinstance(self.reactive_power_total, str)
