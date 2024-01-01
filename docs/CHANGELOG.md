@@ -16,7 +16,7 @@ Changes are grouped as follows
 
 ## [0.TBD] - TBD-01-24
 ### Fixed
-* `pygen` now handles views with the same `external_id` in different spaces and versions. This can only occur if
+* `pygen` now handles views with the same `external_id` in different spaces and versions. Note that this can only occur if
   `pygen` is used with multiple data models.
 
 ## [0.33.0] - 01-01-24
