@@ -56,7 +56,11 @@ def to_camel(string: str, pluralize: bool = False, singularize: bool = False) ->
     if "_" in string:
         # Could be a combination of snake and pascal/camel case
         parts = string.split("_")
-        pascal_splits = [to_pascal(part) for part in parts]
+        pascal_splits = [to_pascal(subpart) for part in parts for subpart in part.split("-") if subpart]
+    elif "-" in string:
+        # Could be a combination of kebab and pascal/camel case
+        parts = string.split("-")
+        pascal_splits = [to_pascal(subpart) for part in parts for subpart in part.split("_") if subpart]
     else:
         # Assume is pascal/camel case
         # Ensure pascal

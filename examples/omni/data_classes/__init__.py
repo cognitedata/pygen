@@ -38,6 +38,14 @@ from ._connection_item_b import (
     ConnectionItemBTextFields,
 )
 from ._connection_item_c import ConnectionItemC, ConnectionItemCApply, ConnectionItemCApplyList, ConnectionItemCList
+from ._dependent_on_non_writable import (
+    DependentOnNonWritable,
+    DependentOnNonWritableApply,
+    DependentOnNonWritableApplyList,
+    DependentOnNonWritableFields,
+    DependentOnNonWritableList,
+    DependentOnNonWritableTextFields,
+)
 from ._empty import Empty, EmptyApply, EmptyApplyList, EmptyFields, EmptyList, EmptyTextFields
 from ._implementation_1 import (
     Implementation1,
@@ -124,6 +132,8 @@ ConnectionItemB.model_rebuild()
 ConnectionItemBApply.model_rebuild()
 ConnectionItemC.model_rebuild()
 ConnectionItemCApply.model_rebuild()
+DependentOnNonWritable.model_rebuild()
+DependentOnNonWritableApply.model_rebuild()
 
 __all__ = [
     "ResourcesApply",
@@ -159,6 +169,12 @@ __all__ = [
     "ConnectionItemCApply",
     "ConnectionItemCList",
     "ConnectionItemCApplyList",
+    "DependentOnNonWritable",
+    "DependentOnNonWritableApply",
+    "DependentOnNonWritableList",
+    "DependentOnNonWritableApplyList",
+    "DependentOnNonWritableFields",
+    "DependentOnNonWritableTextFields",
     "Empty",
     "EmptyApply",
     "EmptyList",

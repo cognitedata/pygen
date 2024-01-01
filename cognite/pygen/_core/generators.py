@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import itertools
-import json
 from collections import defaultdict
 from collections.abc import Iterator, Sequence
 from functools import total_ordering
@@ -138,7 +137,17 @@ class MultiAPIGenerator:
         self.default_instance_space = default_instance_space
         self._pydantic_version = pydantic_version
         self._logger = logger or print
-        self.api_by_view_id = self.create_api_by_view_id(list(views), default_instance_space, config)
+        self.api_by_view_id = self.create_api_by_view_id(
+            list(views),
+            default_instance_space,
+            config,
+            base_name_functions=[
+                DataClass.to_base_name,
+                DataClass.to_base_name_with_version,
+                DataClass.to_base_name_with_space,
+                DataClass.to_base_name_with_space_and_version,
+            ],
+        )
         view_by_view_id = {view.as_id(): view for view in views}
         data_class_by_view_id = {view_id: api.data_class for view_id, api in self.api_by_view_id.items()}
         query_class_by_view_id = {view_id: api.query_api for view_id, api in self.api_by_view_id.items()}
@@ -169,93 +178,36 @@ class MultiAPIGenerator:
 
     @classmethod
     def create_api_by_view_id(
-        cls, views: list[dm.View], default_instance_space: str, config: PygenConfig
+        cls,
+        views: list[dm.View],
+        default_instance_space: str,
+        config: PygenConfig,
+        base_name_functions: list[Callable[[dm.View], str]],
+        selected_function: int = 0,
     ) -> dict[dm.ViewId, APIGenerator]:
-        def dependent_base_names(prop: dm.ConnectionDefinition | dm.MappedProperty) -> set[str]:
-            if isinstance(prop, dm.SingleHopConnectionDefinition):
-                return {DataClass.to_base_name(view_by_id[prop.edge_source or prop.source])}
-            elif isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation) and prop.source:
-                return {DataClass.to_base_name(view_by_id[prop.source])}
-            else:
-                return set()
+        try:
+            base_name_fun = base_name_functions[selected_function]
+        except IndexError as e:
+            raise ValueError("Failed to Generate SDK. Failed to find an unique data class name for each view.") from e
 
         view_by_id = {view.as_id(): view for view in views}
         api_by_view_id: dict[dm.ViewId, APIGenerator] = {}
-        dependencies_by_base_name: dict[str, set[str]] = defaultdict(set)
-        identical_base_names = set()
-        views_by_base_name: dict[str, list[dm.View]] = {}
         for base_name, view_group in itertools.groupby(
-            sorted(((DataClass.to_base_name(view), view) for view in views), key=lambda pair: pair[0]),
+            sorted(((base_name_fun(view), view) for view in view_by_id.values()), key=lambda pair: pair[0]),
             key=lambda pair: pair[0],
         ):
-            view_set = [pair[1] for pair in view_group]
-            if len(view_set) == 1 or len({view.as_id() for view in view_set}) == 1:
-                view = view_set[0]
+            views_with_base_name = [view for _, view in view_group]
+            if len(views_with_base_name) == 1:
+                view = views_with_base_name[0]
                 api_by_view_id[view.as_id()] = APIGenerator(view, default_instance_space, config, base_name)
                 continue
 
-            # We have multiple views with the same name, so we need to check if they can share API.
-            properties_set = set()
-            for view in view_set:
-                independent_properties: dict[str, Any] = {}
-                for prop_name, prop in view.properties.items():
-                    dependency = dependent_base_names(prop)
-                    if dependency:
-                        dependencies_by_base_name[base_name].update(dependency)
-                    else:
-                        independent_properties[prop_name] = prop.dump()
-                properties_set.add(json.dumps(independent_properties, sort_keys=True))
-
-            if len(properties_set) == 1 and len(dependencies_by_base_name[base_name]) == 0:
-                identical_base_names.add(base_name)
-                view = max(view_set, key=lambda v: v.created_time)
-                # All properties are the same, so we can share the API for these views.
-                api = APIGenerator(view, default_instance_space, config, base_name)
-                for view in view_set:
-                    api_by_view_id[view.as_id()] = api
-                continue
-            elif len(properties_set) != 1:
-                spaces = {view.space for view in view_set}
-                # The properties are not the same, so we cannot share the API for these views.
-                for view in view_set:
-                    space_suffix = ""
-                    if len(spaces) > 1:
-                        space_suffix = f"_{view.space}"
-                    api_by_view_id[view.as_id()] = APIGenerator(
-                        view, default_instance_space, config, f"{base_name}{view.version}{space_suffix}"
-                    )
-                continue
-            else:
-                # The properties are the same, but there are dependencies, so we need to process all views before
-                # we can determine if we can share the API.
-                views_by_base_name[base_name] = view_set
-                continue
-
-        if views_by_base_name:
-            # We have views with the same name, but with dependencies, so we need to process them again.
-            while True:
-                last_len = len(views_by_base_name)
-                for base_name in list(views_by_base_name):
-                    if all(d in identical_base_names for d in dependencies_by_base_name[base_name]):
-                        view_set = views_by_base_name.pop(base_name)
-                        view = max(view_set, key=lambda v: v.created_time)
-                        api = APIGenerator(view, default_instance_space, config, base_name)
-                        for view in view_set:
-                            api_by_view_id[view.as_id()] = api
-                        views_by_base_name.pop(base_name, None)
-                        identical_base_names.add(base_name)
-                if len(views_by_base_name) == last_len:
-                    break
-            # Todo Handle circular dependencies.
-            for base_name, view_set in views_by_base_name.items():
-                spaces = {view.space for view in view_set}
-                for view in view_set:
-                    space_suffix = ""
-                    if len(spaces) > 1:
-                        space_suffix = f"_{view.space}"
-                    api_by_view_id[view.as_id()] = APIGenerator(
-                        view, default_instance_space, config, f"{base_name}{view.version}{space_suffix}"
-                    )
+            # The base name is not unique, so we need to try another base name function to separate the views.
+            api_by_view_id.update(
+                cls.create_api_by_view_id(
+                    views_with_base_name, default_instance_space, config, base_name_functions, selected_function + 1
+                )
+            )
 
         return api_by_view_id
 

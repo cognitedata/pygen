@@ -14,6 +14,13 @@ Changes are grouped as follows
 - `Security` in case of vulnerabilities.
 
 
+## [0.TBD] - TBD-01-24
+### Fixed
+* `pygen` now handles views with the same `external_id` in different spaces and versions. Note that this can only occur if
+  `pygen` is used with multiple data models.
+* When using `pydantic` `v1` with a view that has a dependency on a non-writable view, importing the generate client
+  raised `NameError`. This is now fixed.
+
 ## [0.33.0] - 01-01-24
 ### Added
 * The generated data classes now are inherited if the view is implementing another view.
