@@ -118,12 +118,10 @@ class CDFExternalReferencesApply(DomainModelApply):
             properties["sequence"] = self.sequence
 
         if self.timeseries is not None or write_none:
-            if isinstance(self.timeseries, str):
+            if isinstance(self.timeseries, str) or self.timeseries is None:
                 properties["timeseries"] = self.timeseries
-            elif isinstance(self.timeseries, CogniteTimeSeries):
-                properties["timeseries"] = self.timeseries.external_id
             else:
-                properties["timeseries"] = None
+                properties["timeseries"] = self.timeseries.external_id
 
         if properties:
             this_node = dm.NodeApply(
