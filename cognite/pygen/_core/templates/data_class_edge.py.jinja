@@ -134,6 +134,10 @@ class {{ data_class.read_list_name }}(DomainRelationList[{{ data_class.read_name
 
     _INSTANCE = {{ data_class.read_name }}
 
+    def as_apply(self) -> {{ data_class.write_list_name }}:
+        """Convert this read version of {{ data_class.doc_name }} list to the writing version."""
+        return {{ data_class.write_list_name }}([edge.as_apply() for edge in self])
+
 
 class {{ data_class.write_list_name }}(DomainRelationList[{{ data_class.write_name }}]):
     """List of {{ data_class.doc_list_name }} in the writing version."""

@@ -150,6 +150,10 @@ class StartEndTimeList(DomainRelationList[StartEndTime]):
 
     _INSTANCE = StartEndTime
 
+    def as_apply(self) -> StartEndTimeApplyList:
+        """Convert this read version of start end time list to the writing version."""
+        return StartEndTimeApplyList([edge.as_apply() for edge in self])
+
 
 class StartEndTimeApplyList(DomainRelationList[StartEndTimeApply]):
     """List of start end times in the writing version."""

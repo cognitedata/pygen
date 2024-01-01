@@ -423,14 +423,14 @@ class EdgePropertyAPI(EdgeAPI, Generic[T_DomainRelation, T_DomainRelationApply, 
     def __init__(
         self,
         client: CogniteClient,
-        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId],
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId],
         class_type: type[T_DomainRelation],
         class_apply_type: type[T_DomainRelationApply],
         class_list: type[T_DomainRelationList],
     ):
         super().__init__(client)
-        self._view_by_write_class = view_by_write_class
-        self._view_id = view_by_write_class[class_apply_type]
+        self._view_by_read_class = view_by_read_class
+        self._view_id = view_by_read_class[class_apply_type]
         self._class_type = class_type
         self._class_apply_type = class_apply_type
         self._class_list = class_list
