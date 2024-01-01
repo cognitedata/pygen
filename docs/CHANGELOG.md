@@ -19,6 +19,8 @@ Changes are grouped as follows
 * Option for returning generated SDK as a `dict[Path, str]` instead of writing to disk when calling `generate_sdk`.
 * Option for cleaning the `pygen` temporary directly when calling `generate_sdk_notebook`. This is useful to ensure
   that previous generated SDKs are not interfering with the current SDK by accident.
+* Option `write_none` to the generated `.apply()` methods. This is useful when you want to set a property to `None`.
+  By default, `pygen` will ignore properties set to `None` in the `.apply()` methods.
 ### Fixed
 * `pygen` now handles views with the same `external_id` in different spaces and versions. Note that this can only occur if
   `pygen` is used with multiple data models.
