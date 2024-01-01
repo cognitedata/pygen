@@ -16,6 +16,7 @@ from typing_extensions import TypeAlias
 
 from ._core.generators import SDKGenerator
 from ._settings import _load_pyproject_toml
+from ._version import __version__
 from .config import PygenConfig
 from .exceptions import DataModelNotFound
 from .utils.text import to_pascal, to_snake
@@ -203,11 +204,16 @@ def _load_data_model(
     client: CogniteClient, model_id: DataModelIdentifier | Sequence[DataModelIdentifier], logger: Callable[[str], None]
 ) -> dm.DataModel[dm.View] | dm.DataModelList[dm.View]:
     identifier = _load_data_model_identifier(model_id)
+    current_client_name = client.config.client_name
+    # The client name is used for aggregated logging of Pygen Usage
+    client.config.client_name = f"CognitePygen:{__version__}:GenerateSDK"
     try:
         data_models = client.data_modeling.data_models.retrieve(model_id, inline_views=True)
     except CogniteAPIError as e:
         logger(f"Error retrieving data model(s): {e}")
         raise e
+    finally:
+        client.config.client_name = current_client_name
     if len(data_models) == 1 == len(identifier):
         return data_models[0]
     elif len(data_models) == len(identifier):
