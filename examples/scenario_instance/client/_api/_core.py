@@ -430,7 +430,7 @@ class EdgePropertyAPI(EdgeAPI, Generic[T_DomainRelation, T_DomainRelationApply, 
     ):
         super().__init__(client)
         self._view_by_read_class = view_by_read_class
-        self._view_id = view_by_read_class[class_apply_type]
+        self._view_id = view_by_read_class[class_type]
         self._class_type = class_type
         self._class_apply_type = class_apply_type
         self._class_list = class_list
