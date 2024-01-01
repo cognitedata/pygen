@@ -59,7 +59,7 @@ def test_single_unit_procedure_to_pandas(unit_procedure_list: UnitProcedureList)
     procedure = unit_procedure_list[0]
 
     series = procedure.to_pandas()
-    assert len(series) == 5, "We only have the four properties and the external id"
+    assert len(series) == 6, "We only have the four properties + the external id and node type"
 
 
 def test_filter_start_end_time_edges(start_end_time_edges: StartEndTimeList, workorder: EquipmentUnitClient) -> None:
