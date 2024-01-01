@@ -332,8 +332,12 @@ class OmniFiles:
 OMNI_SDK.append_manual_files(OmniFiles)
 
 
-class MultiModelFiles:
-    api_client = EXAMPLES_DIR / "multi_model_api_client.py"
+class OmniMultiFiles:
+    client_dir = OMNI_MULTI_SDK.client_dir
+    api_client = client_dir / "_api_client.py"
+
+
+OMNI_MULTI_SDK.append_manual_files(OmniMultiFiles)
 
 
 class WindMillFiles:

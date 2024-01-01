@@ -4,7 +4,7 @@ import pytest
 
 from cognite.pygen._core.generators import SDKGenerator
 from cognite.pygen._generator import CodeFormatter
-from tests.constants import MULTI_MODEL_SDK, MultiModelFiles
+from tests.constants import OMNI_MULTI_SDK, OmniMultiFiles
 
 
 @pytest.mark.skipif(
@@ -14,11 +14,11 @@ from tests.constants import MULTI_MODEL_SDK, MultiModelFiles
 def test_generate_api_client(code_formatter: CodeFormatter):
     # Arrange
     sdk_generator = SDKGenerator(
-        MULTI_MODEL_SDK.top_level_package,
-        MULTI_MODEL_SDK.client_name,
-        MULTI_MODEL_SDK.load_data_models(),
+        OMNI_MULTI_SDK.top_level_package,
+        OMNI_MULTI_SDK.client_name,
+        OMNI_MULTI_SDK.load_data_models(),
     )
-    expected = MultiModelFiles.api_client.read_text()
+    expected = OmniMultiFiles.api_client.read_text()
 
     # Act
     actual = sdk_generator._generate_api_client_file()
