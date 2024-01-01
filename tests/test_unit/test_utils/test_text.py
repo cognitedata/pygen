@@ -12,6 +12,11 @@ from cognite.pygen.utils.text import to_pascal, to_snake
         ("Implementation1", False, False, "Implementation1"),
         ("Implementation1", False, True, "Implementations1"),
         ("Implementations1", True, False, "Implementation1"),
+        ("pygen-models", True, False, "PygenModel"),
+        ("pygen_models", False, False, "PygenModels"),
+        ("pygen_model-power", False, False, "PygenModelPower"),
+        ("pygen-model_power", False, False, "PygenModelPower"),
+        ("1", False, False, "1"),
     ],
 )
 def test_to_pascal(word: str, singularize: bool, pluralize: bool, expected: str):
@@ -28,6 +33,7 @@ def test_to_pascal(word: str, singularize: bool, pluralize: bool, expected: str)
         ("APM_Activity", False, True, "apm_activities"),
         ("APM_Material", False, True, "apm_materials"),
         ("Implementation1", False, False, "implementation_1"),
+        ("power-models", False, False, "power_models"),
     ],
 )
 def test_to_snake(word: str, singularize: bool, pluralize: bool, expected: str):

@@ -11,7 +11,7 @@ from cognite.client.data_classes import data_modeling as dm
 
 from cognite.pygen import config as pygen_config
 from cognite.pygen.config.reserved_words import is_reserved_word
-from cognite.pygen.utils.text import create_name, to_words
+from cognite.pygen.utils.text import create_name, to_pascal, to_words
 
 from .fields import (
     CDFExternalField,
@@ -63,6 +63,18 @@ class DataClass:
     @staticmethod
     def to_base_name(view: dm.View) -> str:
         return (view.name or view.external_id).replace(" ", "_")
+
+    @classmethod
+    def to_base_name_with_version(cls, view: dm.View) -> str:
+        return f"{cls.to_base_name(view)}v{to_pascal(view.version)}".replace(" ", "_")
+
+    @classmethod
+    def to_base_name_with_space(cls, view: dm.View) -> str:
+        return f"{cls.to_base_name(view)}s{to_pascal(view.space)}".replace(" ", "_")
+
+    @classmethod
+    def to_base_name_with_space_and_version(cls, view: dm.View) -> str:
+        return f"{cls.to_base_name(view)}v{to_pascal(view.version)}s{to_pascal(view.space)}".replace(" ", "_")
 
     @classmethod
     def from_view(cls, view: dm.View, base_name: str, data_class: pygen_config.DataClassNaming) -> DataClass:
