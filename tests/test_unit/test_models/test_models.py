@@ -427,7 +427,7 @@ def create_fields_test_cases():
             default=None,
             pydantic_field="Field",
         ),
-        "Optional[str] = None",
+        "str",
         "str",
         id="String property",
     )

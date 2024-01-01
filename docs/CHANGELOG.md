@@ -15,6 +15,8 @@ Changes are grouped as follows
 
 
 ## [0.TBD] - TBD-01-24
+### Added
+* Option for returning generated SDK as a `dict[Path, str]` instead of writing to disk when calling `generate_sdk`.
 ### Fixed
 * `pygen` now handles views with the same `external_id` in different spaces and versions. Note that this can only occur if
   `pygen` is used with multiple data models.
@@ -23,6 +25,7 @@ Changes are grouped as follows
 ### Changed
 * The generated `read` classes now reflects whether properties are required or not. Earlier, all read properties
   were optional. The motivation for this change is to make it easier to use `mypy` with the generated SDK.
+
 
 ## [0.33.0] - 01-01-24
 ### Added
