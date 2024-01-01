@@ -14,7 +14,7 @@ Changes are grouped as follows
 - `Security` in case of vulnerabilities.
 
 
-## [0.TBD] - TBD-01-24
+## [0.34.0] - TBD-01-24
 ### Added
 * Option for returning generated SDK as a `dict[Path, str]` instead of writing to disk when calling `generate_sdk`.
 * Option for cleaning the `pygen` temporary directly when calling `generate_sdk_notebook`. This is useful to ensure
