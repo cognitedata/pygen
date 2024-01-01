@@ -14,6 +14,11 @@ Changes are grouped as follows
 - `Security` in case of vulnerabilities.
 
 
+## [0.TBD] - TBD-01-24
+### Fixed
+* `pygen` now handles views with the same `external_id` in different spaces and versions. This can only occur if
+  `pygen` is used with multiple data models.
+
 ## [0.33.0] - 01-01-24
 ### Added
 * The generated data classes now are inherited if the view is implementing another view.

@@ -1,0 +1,444 @@
+from __future__ import annotations
+
+from collections.abc import Sequence
+from typing import overload
+
+from cognite.client import CogniteClient
+from cognite.client import data_modeling as dm
+from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
+
+from omni_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
+from omni_pydantic_v1.data_classes import (
+    DomainModelCore,
+    DomainModelApply,
+    ResourcesApplyResult,
+    DependentOnNonWritable,
+    DependentOnNonWritableApply,
+    DependentOnNonWritableFields,
+    DependentOnNonWritableList,
+    DependentOnNonWritableApplyList,
+    DependentOnNonWritableTextFields,
+)
+from omni_pydantic_v1.data_classes._dependent_on_non_writable import (
+    _DEPENDENTONNONWRITABLE_PROPERTIES_BY_FIELD,
+    _create_dependent_on_non_writable_filter,
+)
+from ._core import (
+    DEFAULT_LIMIT_READ,
+    DEFAULT_QUERY_LIMIT,
+    Aggregations,
+    NodeAPI,
+    SequenceNotStr,
+    QueryStep,
+    QueryBuilder,
+)
+from .dependent_on_non_writable_to_non_writable import DependentOnNonWritableToNonWritableAPI
+from .dependent_on_non_writable_query import DependentOnNonWritableQueryAPI
+
+
+class DependentOnNonWritableAPI(
+    NodeAPI[DependentOnNonWritable, DependentOnNonWritableApply, DependentOnNonWritableList]
+):
+    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
+        view_id = view_by_read_class[DependentOnNonWritable]
+        super().__init__(
+            client=client,
+            sources=view_id,
+            class_type=DependentOnNonWritable,
+            class_list=DependentOnNonWritableList,
+            class_apply_list=DependentOnNonWritableApplyList,
+            view_by_read_class=view_by_read_class,
+        )
+        self._view_id = view_id
+        self.to_non_writable_edge = DependentOnNonWritableToNonWritableAPI(client)
+
+    def __call__(
+        self,
+        a_value: str | list[str] | None = None,
+        a_value_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_QUERY_LIMIT,
+        filter: dm.Filter | None = None,
+    ) -> DependentOnNonWritableQueryAPI[DependentOnNonWritableList]:
+        """Query starting at dependent on non writables.
+
+        Args:
+            a_value: The a value to filter on.
+            a_value_prefix: The prefix of the a value to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of dependent on non writables to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            A query API for dependent on non writables.
+
+        """
+        has_data = dm.filters.HasData(views=[self._view_id])
+        filter_ = _create_dependent_on_non_writable_filter(
+            self._view_id,
+            a_value,
+            a_value_prefix,
+            external_id_prefix,
+            space,
+            (filter and dm.filters.And(filter, has_data)) or has_data,
+        )
+        builder = QueryBuilder(DependentOnNonWritableList)
+        return DependentOnNonWritableQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
+
+    def apply(
+        self,
+        dependent_on_non_writable: DependentOnNonWritableApply | Sequence[DependentOnNonWritableApply],
+        replace: bool = False,
+    ) -> ResourcesApplyResult:
+        """Add or update (upsert) dependent on non writables.
+
+        Note: This method iterates through all nodes and timeseries linked to dependent_on_non_writable and creates them including the edges
+        between the nodes. For example, if any of `to_non_writable` are set, then these
+        nodes as well as any nodes linked to them, and all the edges linking these nodes will be created.
+
+        Args:
+            dependent_on_non_writable: Dependent on non writable or sequence of dependent on non writables to upsert.
+            replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
+                Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+        Returns:
+            Created instance(s), i.e., nodes, edges, and time series.
+
+        Examples:
+
+            Create a new dependent_on_non_writable:
+
+                >>> from omni_pydantic_v1 import OmniClient
+                >>> from omni_pydantic_v1.data_classes import DependentOnNonWritableApply
+                >>> client = OmniClient()
+                >>> dependent_on_non_writable = DependentOnNonWritableApply(external_id="my_dependent_on_non_writable", ...)
+                >>> result = client.dependent_on_non_writable.apply(dependent_on_non_writable)
+
+        """
+        return self._apply(dependent_on_non_writable, replace)
+
+    def delete(
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> dm.InstancesDeleteResult:
+        """Delete one or more dependent on non writable.
+
+        Args:
+            external_id: External id of the dependent on non writable to delete.
+            space: The space where all the dependent on non writable are located.
+
+        Returns:
+            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
+
+        Examples:
+
+            Delete dependent_on_non_writable by id:
+
+                >>> from omni_pydantic_v1 import OmniClient
+                >>> client = OmniClient()
+                >>> client.dependent_on_non_writable.delete("my_dependent_on_non_writable")
+        """
+        return self._delete(external_id, space)
+
+    @overload
+    def retrieve(self, external_id: str, space: str = DEFAULT_INSTANCE_SPACE) -> DependentOnNonWritable | None:
+        ...
+
+    @overload
+    def retrieve(
+        self, external_id: SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> DependentOnNonWritableList:
+        ...
+
+    def retrieve(
+        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
+    ) -> DependentOnNonWritable | DependentOnNonWritableList | None:
+        """Retrieve one or more dependent on non writables by id(s).
+
+        Args:
+            external_id: External id or list of external ids of the dependent on non writables.
+            space: The space where all the dependent on non writables are located.
+
+        Returns:
+            The requested dependent on non writables.
+
+        Examples:
+
+            Retrieve dependent_on_non_writable by id:
+
+                >>> from omni_pydantic_v1 import OmniClient
+                >>> client = OmniClient()
+                >>> dependent_on_non_writable = client.dependent_on_non_writable.retrieve("my_dependent_on_non_writable")
+
+        """
+        return self._retrieve(
+            external_id,
+            space,
+            retrieve_edges=True,
+            edge_api_name_type_direction_quad=[
+                (
+                    self.to_non_writable_edge,
+                    "to_non_writable",
+                    dm.DirectRelationReference("pygen-models", "toNonWritable"),
+                    "outwards",
+                ),
+            ],
+        )
+
+    def search(
+        self,
+        query: str,
+        properties: DependentOnNonWritableTextFields | Sequence[DependentOnNonWritableTextFields] | None = None,
+        a_value: str | list[str] | None = None,
+        a_value_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> DependentOnNonWritableList:
+        """Search dependent on non writables
+
+        Args:
+            query: The search query,
+            properties: The property to search, if nothing is passed all text fields will be searched.
+            a_value: The a value to filter on.
+            a_value_prefix: The prefix of the a value to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of dependent on non writables to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Search results dependent on non writables matching the query.
+
+        Examples:
+
+           Search for 'my_dependent_on_non_writable' in all text properties:
+
+                >>> from omni_pydantic_v1 import OmniClient
+                >>> client = OmniClient()
+                >>> dependent_on_non_writables = client.dependent_on_non_writable.search('my_dependent_on_non_writable')
+
+        """
+        filter_ = _create_dependent_on_non_writable_filter(
+            self._view_id,
+            a_value,
+            a_value_prefix,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        return self._search(
+            self._view_id, query, _DEPENDENTONNONWRITABLE_PROPERTIES_BY_FIELD, properties, filter_, limit
+        )
+
+    @overload
+    def aggregate(
+        self,
+        aggregations: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: DependentOnNonWritableFields | Sequence[DependentOnNonWritableFields] | None = None,
+        group_by: None = None,
+        query: str | None = None,
+        search_properties: DependentOnNonWritableTextFields | Sequence[DependentOnNonWritableTextFields] | None = None,
+        a_value: str | list[str] | None = None,
+        a_value_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> list[dm.aggregations.AggregatedNumberedValue]:
+        ...
+
+    @overload
+    def aggregate(
+        self,
+        aggregations: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: DependentOnNonWritableFields | Sequence[DependentOnNonWritableFields] | None = None,
+        group_by: DependentOnNonWritableFields | Sequence[DependentOnNonWritableFields] = None,
+        query: str | None = None,
+        search_properties: DependentOnNonWritableTextFields | Sequence[DependentOnNonWritableTextFields] | None = None,
+        a_value: str | list[str] | None = None,
+        a_value_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> InstanceAggregationResultList:
+        ...
+
+    def aggregate(
+        self,
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | Sequence[Aggregations]
+        | Sequence[dm.aggregations.MetricAggregation],
+        property: DependentOnNonWritableFields | Sequence[DependentOnNonWritableFields] | None = None,
+        group_by: DependentOnNonWritableFields | Sequence[DependentOnNonWritableFields] | None = None,
+        query: str | None = None,
+        search_property: DependentOnNonWritableTextFields | Sequence[DependentOnNonWritableTextFields] | None = None,
+        a_value: str | list[str] | None = None,
+        a_value_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> list[dm.aggregations.AggregatedNumberedValue] | InstanceAggregationResultList:
+        """Aggregate data across dependent on non writables
+
+        Args:
+            aggregate: The aggregation to perform.
+            property: The property to perform aggregation on.
+            group_by: The property to group by when doing the aggregation.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            a_value: The a value to filter on.
+            a_value_prefix: The prefix of the a value to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of dependent on non writables to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Aggregation results.
+
+        Examples:
+
+            Count dependent on non writables in space `my_space`:
+
+                >>> from omni_pydantic_v1 import OmniClient
+                >>> client = OmniClient()
+                >>> result = client.dependent_on_non_writable.aggregate("count", space="my_space")
+
+        """
+
+        filter_ = _create_dependent_on_non_writable_filter(
+            self._view_id,
+            a_value,
+            a_value_prefix,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        return self._aggregate(
+            self._view_id,
+            aggregate,
+            _DEPENDENTONNONWRITABLE_PROPERTIES_BY_FIELD,
+            property,
+            group_by,
+            query,
+            search_property,
+            limit,
+            filter_,
+        )
+
+    def histogram(
+        self,
+        property: DependentOnNonWritableFields,
+        interval: float,
+        query: str | None = None,
+        search_property: DependentOnNonWritableTextFields | Sequence[DependentOnNonWritableTextFields] | None = None,
+        a_value: str | list[str] | None = None,
+        a_value_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+    ) -> dm.aggregations.HistogramValue:
+        """Produces histograms for dependent on non writables
+
+        Args:
+            property: The property to use as the value in the histogram.
+            interval: The interval to use for the histogram bins.
+            query: The query to search for in the text field.
+            search_property: The text field to search in.
+            a_value: The a value to filter on.
+            a_value_prefix: The prefix of the a value to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of dependent on non writables to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+
+        Returns:
+            Bucketed histogram results.
+
+        """
+        filter_ = _create_dependent_on_non_writable_filter(
+            self._view_id,
+            a_value,
+            a_value_prefix,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        return self._histogram(
+            self._view_id,
+            property,
+            interval,
+            _DEPENDENTONNONWRITABLE_PROPERTIES_BY_FIELD,
+            query,
+            search_property,
+            limit,
+            filter_,
+        )
+
+    def list(
+        self,
+        a_value: str | list[str] | None = None,
+        a_value_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = DEFAULT_LIMIT_READ,
+        filter: dm.Filter | None = None,
+        retrieve_edges: bool = True,
+    ) -> DependentOnNonWritableList:
+        """List/filter dependent on non writables
+
+        Args:
+            a_value: The a value to filter on.
+            a_value_prefix: The prefix of the a value to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            limit: Maximum number of dependent on non writables to return. Defaults to 25. Set to -1, float("inf") or None to return all items.
+            filter: (Advanced) If the filtering available in the above is not sufficient, you can write your own filtering which will be ANDed with the filter above.
+            retrieve_edges: Whether to retrieve `to_non_writable` external ids for the dependent on non writables. Defaults to True.
+
+        Returns:
+            List of requested dependent on non writables
+
+        Examples:
+
+            List dependent on non writables and limit to 5:
+
+                >>> from omni_pydantic_v1 import OmniClient
+                >>> client = OmniClient()
+                >>> dependent_on_non_writables = client.dependent_on_non_writable.list(limit=5)
+
+        """
+        filter_ = _create_dependent_on_non_writable_filter(
+            self._view_id,
+            a_value,
+            a_value_prefix,
+            external_id_prefix,
+            space,
+            filter,
+        )
+
+        return self._list(
+            limit=limit,
+            filter=filter_,
+            retrieve_edges=retrieve_edges,
+            edge_api_name_type_direction_quad=[
+                (
+                    self.to_non_writable_edge,
+                    "to_non_writable",
+                    dm.DirectRelationReference("pygen-models", "toNonWritable"),
+                    "outwards",
+                ),
+            ],
+        )
