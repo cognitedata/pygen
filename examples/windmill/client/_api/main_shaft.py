@@ -84,7 +84,7 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftApply, MainShaftList]):
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(MainShaftList)
-        return MainShaftQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
+        return MainShaftQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(
         self, main_shaft: MainShaftApply | Sequence[MainShaftApply], replace: bool = False

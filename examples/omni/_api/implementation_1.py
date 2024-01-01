@@ -99,7 +99,7 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Apply, Implemen
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(Implementation1List)
-        return Implementation1QueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
+        return Implementation1QueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(
         self, implementation_1: Implementation1Apply | Sequence[Implementation1Apply], replace: bool = False

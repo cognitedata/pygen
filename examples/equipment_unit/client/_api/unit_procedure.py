@@ -98,7 +98,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(UnitProcedureList)
-        return UnitProcedureQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
+        return UnitProcedureQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(
         self, unit_procedure: UnitProcedureApply | Sequence[UnitProcedureApply], replace: bool = False

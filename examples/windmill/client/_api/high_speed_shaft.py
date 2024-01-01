@@ -80,7 +80,7 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftApply, HighSpeedSh
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(HighSpeedShaftList)
-        return HighSpeedShaftQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
+        return HighSpeedShaftQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(
         self, high_speed_shaft: HighSpeedShaftApply | Sequence[HighSpeedShaftApply], replace: bool = False

@@ -99,7 +99,7 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleApply, NacelleList]):
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(NacelleList)
-        return NacelleQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
+        return NacelleQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(self, nacelle: NacelleApply | Sequence[NacelleApply], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) nacelles.

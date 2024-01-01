@@ -78,7 +78,7 @@ class RotorAPI(NodeAPI[Rotor, RotorApply, RotorList]):
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(RotorList)
-        return RotorQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
+        return RotorQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(self, rotor: RotorApply | Sequence[RotorApply], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) rotors.

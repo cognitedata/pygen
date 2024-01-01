@@ -95,7 +95,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleApply, Equipmen
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(EquipmentModuleList)
-        return EquipmentModuleQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
+        return EquipmentModuleQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(
         self, equipment_module: EquipmentModuleApply | Sequence[EquipmentModuleApply], replace: bool = False

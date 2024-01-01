@@ -8,8 +8,7 @@ from cognite.client import data_modeling as dm, CogniteClient
 from {{ top_level_package }}.data_classes import (
     DomainModelCore,
     {{ data_class.read_name }},{% for class_ in unique_edge_data_classes %}
-    {{ class_.read_name }},
-    {{ class_.write_name }},{% endfor %}{% for field in data_class.fields_of_type(ft.EdgeOneToOne) %}
+    {{ class_.read_name }},{% endfor %}{% for field in data_class.fields_of_type(ft.EdgeOneToOne) %}
     {{ field.data_class.read_name }},
     {{ field.data_class.write_name }},{% endfor %}
 )

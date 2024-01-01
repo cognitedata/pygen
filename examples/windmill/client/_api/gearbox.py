@@ -80,7 +80,7 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxApply, GearboxList]):
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(GearboxList)
-        return GearboxQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
+        return GearboxQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(self, gearbox: GearboxApply | Sequence[GearboxApply], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) gearboxes.

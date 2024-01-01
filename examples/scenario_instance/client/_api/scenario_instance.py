@@ -120,7 +120,7 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(ScenarioInstanceList)
-        return ScenarioInstanceQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
+        return ScenarioInstanceQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(
         self, scenario_instance: ScenarioInstanceApply | Sequence[ScenarioInstanceApply], replace: bool = False

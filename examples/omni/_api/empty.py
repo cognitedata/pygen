@@ -121,7 +121,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyApply, EmptyList]):
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(EmptyList)
-        return EmptyQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
+        return EmptyQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(self, empty: EmptyApply | Sequence[EmptyApply], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) empties.

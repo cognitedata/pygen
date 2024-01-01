@@ -93,7 +93,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(WorkOrderList)
-        return WorkOrderQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
+        return WorkOrderQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(
         self, work_order: WorkOrderApply | Sequence[WorkOrderApply], replace: bool = False

@@ -85,7 +85,7 @@ class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBApply, Connecti
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(ConnectionItemBList)
-        return ConnectionItemBQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
+        return ConnectionItemBQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(
         self, connection_item_b: ConnectionItemBApply | Sequence[ConnectionItemBApply], replace: bool = False

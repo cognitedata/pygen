@@ -87,7 +87,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceApply, SubInterfaceList]
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(SubInterfaceList)
-        return SubInterfaceQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
+        return SubInterfaceQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(
         self, sub_interface: SubInterfaceApply | Sequence[SubInterfaceApply], replace: bool = False
