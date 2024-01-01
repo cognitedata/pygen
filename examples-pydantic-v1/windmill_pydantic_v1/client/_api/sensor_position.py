@@ -9,6 +9,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from windmill_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from windmill_pydantic_v1.client.data_classes import (
+    DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
     SensorPosition,
@@ -46,16 +47,15 @@ from .sensor_position_query import SensorPositionQueryAPI
 
 
 class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionApply, SensorPositionList]):
-    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
-        view_id = view_by_write_class[SensorPositionApply]
+    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
+        view_id = view_by_read_class[SensorPosition]
         super().__init__(
             client=client,
             sources=view_id,
             class_type=SensorPosition,
-            class_apply_type=SensorPositionApply,
             class_list=SensorPositionList,
             class_apply_list=SensorPositionApplyList,
-            view_by_write_class=view_by_write_class,
+            view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
         self.edgewise_bend_mom_crosstalk_corrected = SensorPositionEdgewiseBendMomCrosstalkCorrectedAPI(client, view_id)
@@ -104,7 +104,7 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionApply, SensorPosit
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(SensorPositionList)
-        return SensorPositionQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
+        return SensorPositionQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(
         self, sensor_position: SensorPositionApply | Sequence[SensorPositionApply], replace: bool = False

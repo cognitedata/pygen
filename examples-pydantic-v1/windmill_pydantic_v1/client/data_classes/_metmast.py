@@ -8,6 +8,7 @@ from cognite.client.data_classes import TimeSeries
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
     DomainModel,
+    DomainModelCore,
     DomainModelApply,
     DomainModelApplyList,
     DomainModelList,
@@ -49,6 +50,7 @@ class Metmast(DomainModel):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    node_type: Union[dm.DirectRelationReference, None] = None
     position: Optional[float] = None
     temperature: Union[TimeSeries, str, None] = None
     tilt_angle: Union[TimeSeries, str, None] = None
@@ -85,6 +87,7 @@ class MetmastApply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    node_type: Union[dm.DirectRelationReference, None] = None
     position: Optional[float] = None
     temperature: Union[TimeSeries, str, None] = None
     tilt_angle: Union[TimeSeries, str, None] = None
@@ -93,15 +96,13 @@ class MetmastApply(DomainModelApply):
     def _to_instances_apply(
         self,
         cache: set[tuple[str, str]],
-        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
             return resources
 
-        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
-            "power-models", "Metmast", "1"
-        )
+        write_view = (view_by_read_class or {}).get(Metmast, dm.ViewId("power-models", "Metmast", "1"))
 
         properties = {}
 
@@ -128,6 +129,7 @@ class MetmastApply(DomainModelApply):
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
+                type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(
                         source=write_view,

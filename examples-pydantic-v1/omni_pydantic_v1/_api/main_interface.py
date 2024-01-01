@@ -9,6 +9,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from omni_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni_pydantic_v1.data_classes import (
+    DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
     MainInterface,
@@ -35,16 +36,15 @@ from .main_interface_query import MainInterfaceQueryAPI
 
 
 class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceApply, MainInterfaceList]):
-    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
-        view_id = view_by_write_class[MainInterfaceApply]
+    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
+        view_id = view_by_read_class[MainInterface]
         super().__init__(
             client=client,
             sources=view_id,
             class_type=MainInterface,
-            class_apply_type=MainInterfaceApply,
             class_list=MainInterfaceList,
             class_apply_list=MainInterfaceApplyList,
-            view_by_write_class=view_by_write_class,
+            view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
 
@@ -81,7 +81,7 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceApply, MainInterfaceL
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(MainInterfaceList)
-        return MainInterfaceQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
+        return MainInterfaceQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(
         self, main_interface: MainInterfaceApply | Sequence[MainInterfaceApply], replace: bool = False

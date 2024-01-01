@@ -34,13 +34,11 @@ class ScenarioInstanceClient:
         # The client name is used for aggregated logging of Pygen Usage
         client.config.client_name = "CognitePygen:0.32.6"
 
-        view_by_write_class = {
-            data_classes.ScenarioInstanceApply: dm.ViewId(
-                "IntegrationTestsImmutable", "ScenarioInstance", "ee2b79fd98b5bb"
-            ),
+        view_by_read_class = {
+            data_classes.ScenarioInstance: dm.ViewId("IntegrationTestsImmutable", "ScenarioInstance", "ee2b79fd98b5bb"),
         }
 
-        self.scenario_instance = ScenarioInstanceAPI(client, view_by_write_class)
+        self.scenario_instance = ScenarioInstanceAPI(client, view_by_read_class)
 
     @classmethod
     def azure_project(

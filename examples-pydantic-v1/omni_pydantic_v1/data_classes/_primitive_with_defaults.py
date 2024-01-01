@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, Optional
+from typing import Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -8,6 +8,7 @@ from pydantic import Field
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
     DomainModel,
+    DomainModelCore,
     DomainModelApply,
     DomainModelApplyList,
     DomainModelList,
@@ -60,6 +61,7 @@ class PrimitiveWithDefaults(DomainModel):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    node_type: Union[dm.DirectRelationReference, None] = None
     auto_increment_int_32: Optional[int] = Field(None, alias="autoIncrementInt32")
     default_boolean: Optional[bool] = Field(None, alias="defaultBoolean")
     default_float_32: Optional[float] = Field(None, alias="defaultFloat32")
@@ -99,6 +101,7 @@ class PrimitiveWithDefaultsApply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    node_type: Union[dm.DirectRelationReference, None] = None
     auto_increment_int_32: int = Field(alias="autoIncrementInt32")
     default_boolean: Optional[bool] = Field(True, alias="defaultBoolean")
     default_float_32: Optional[float] = Field(0.42, alias="defaultFloat32")
@@ -108,14 +111,14 @@ class PrimitiveWithDefaultsApply(DomainModelApply):
     def _to_instances_apply(
         self,
         cache: set[tuple[str, str]],
-        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
             return resources
 
-        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
-            "pygen-models", "PrimitiveWithDefaults", "1"
+        write_view = (view_by_read_class or {}).get(
+            PrimitiveWithDefaults, dm.ViewId("pygen-models", "PrimitiveWithDefaults", "1")
         )
 
         properties = {}
@@ -140,6 +143,7 @@ class PrimitiveWithDefaultsApply(DomainModelApply):
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
+                type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(
                         source=write_view,

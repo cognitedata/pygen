@@ -9,6 +9,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from omni_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni_pydantic_v1.data_classes import (
+    DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
     ConnectionItemA,
@@ -36,16 +37,15 @@ from .connection_item_a_query import ConnectionItemAQueryAPI
 
 
 class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAApply, ConnectionItemAList]):
-    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
-        view_id = view_by_write_class[ConnectionItemAApply]
+    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
+        view_id = view_by_read_class[ConnectionItemA]
         super().__init__(
             client=client,
             sources=view_id,
             class_type=ConnectionItemA,
-            class_apply_type=ConnectionItemAApply,
             class_list=ConnectionItemAList,
             class_apply_list=ConnectionItemAApplyList,
-            view_by_write_class=view_by_write_class,
+            view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
         self.outwards_edge = ConnectionItemAOutwardsAPI(client)
@@ -89,7 +89,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAApply, Connecti
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(ConnectionItemAList)
-        return ConnectionItemAQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
+        return ConnectionItemAQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(
         self, connection_item_a: ConnectionItemAApply | Sequence[ConnectionItemAApply], replace: bool = False

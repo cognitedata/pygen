@@ -9,6 +9,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from omni_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni_pydantic_v1.data_classes import (
+    DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
     PrimitiveWithDefaults,
@@ -35,16 +36,15 @@ from .primitive_with_defaults_query import PrimitiveWithDefaultsQueryAPI
 
 
 class PrimitiveWithDefaultsAPI(NodeAPI[PrimitiveWithDefaults, PrimitiveWithDefaultsApply, PrimitiveWithDefaultsList]):
-    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
-        view_id = view_by_write_class[PrimitiveWithDefaultsApply]
+    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
+        view_id = view_by_read_class[PrimitiveWithDefaults]
         super().__init__(
             client=client,
             sources=view_id,
             class_type=PrimitiveWithDefaults,
-            class_apply_type=PrimitiveWithDefaultsApply,
             class_list=PrimitiveWithDefaultsList,
             class_apply_list=PrimitiveWithDefaultsApplyList,
-            view_by_write_class=view_by_write_class,
+            view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
 
@@ -96,7 +96,7 @@ class PrimitiveWithDefaultsAPI(NodeAPI[PrimitiveWithDefaults, PrimitiveWithDefau
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(PrimitiveWithDefaultsList)
-        return PrimitiveWithDefaultsQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
+        return PrimitiveWithDefaultsQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(
         self,

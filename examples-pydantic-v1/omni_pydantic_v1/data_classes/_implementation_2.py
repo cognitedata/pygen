@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, Optional
+from typing import Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -8,12 +8,14 @@ from pydantic import Field
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
     DomainModel,
+    DomainModelCore,
     DomainModelApply,
     DomainModelApplyList,
     DomainModelList,
     DomainRelationApply,
     ResourcesApply,
 )
+from ._sub_interface import SubInterface, SubInterfaceApply
 
 
 __all__ = [
@@ -35,7 +37,7 @@ _IMPLEMENTATION2_PROPERTIES_BY_FIELD = {
 }
 
 
-class Implementation2(DomainModel):
+class Implementation2(SubInterface):
     """This represents the reading version of implementation 2.
 
     It is used to when data is retrieved from CDF.
@@ -51,10 +53,7 @@ class Implementation2(DomainModel):
         version: The version of the implementation 2 node.
     """
 
-    space: str = DEFAULT_INSTANCE_SPACE
-    type: dm.DirectRelationReference = dm.DirectRelationReference("pygen-models", "Implementation2")
-    main_value: Optional[str] = Field(None, alias="mainValue")
-    sub_value: Optional[str] = Field(None, alias="subValue")
+    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "Implementation2")
 
     def as_apply(self) -> Implementation2Apply:
         """Convert this read version of implementation 2 to the writing version."""
@@ -66,7 +65,7 @@ class Implementation2(DomainModel):
         )
 
 
-class Implementation2Apply(DomainModelApply):
+class Implementation2Apply(SubInterfaceApply):
     """This represents the writing version of implementation 2.
 
     It is used to when data is sent to CDF.
@@ -82,23 +81,18 @@ class Implementation2Apply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = DEFAULT_INSTANCE_SPACE
-    type: dm.DirectRelationReference = dm.DirectRelationReference("pygen-models", "Implementation2")
-    main_value: Optional[str] = Field(None, alias="mainValue")
-    sub_value: Optional[str] = Field(None, alias="subValue")
+    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "Implementation2")
 
     def _to_instances_apply(
         self,
         cache: set[tuple[str, str]],
-        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
             return resources
 
-        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
-            "pygen-models", "Implementation2", "1"
-        )
+        write_view = (view_by_read_class or {}).get(Implementation2, dm.ViewId("pygen-models", "Implementation2", "1"))
 
         properties = {}
 
@@ -113,7 +107,7 @@ class Implementation2Apply(DomainModelApply):
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                type=self.type,
+                type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(
                         source=write_view,

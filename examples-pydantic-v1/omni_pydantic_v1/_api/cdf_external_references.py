@@ -9,6 +9,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from omni_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni_pydantic_v1.data_classes import (
+    DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
     CDFExternalReferences,
@@ -35,16 +36,15 @@ from .cdf_external_references_query import CDFExternalReferencesQueryAPI
 
 
 class CDFExternalReferencesAPI(NodeAPI[CDFExternalReferences, CDFExternalReferencesApply, CDFExternalReferencesList]):
-    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
-        view_id = view_by_write_class[CDFExternalReferencesApply]
+    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
+        view_id = view_by_read_class[CDFExternalReferences]
         super().__init__(
             client=client,
             sources=view_id,
             class_type=CDFExternalReferences,
-            class_apply_type=CDFExternalReferencesApply,
             class_list=CDFExternalReferencesList,
             class_apply_list=CDFExternalReferencesApplyList,
-            view_by_write_class=view_by_write_class,
+            view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
         self.timeseries = CDFExternalReferencesTimeseriesAPI(client, view_id)
@@ -76,7 +76,7 @@ class CDFExternalReferencesAPI(NodeAPI[CDFExternalReferences, CDFExternalReferen
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(CDFExternalReferencesList)
-        return CDFExternalReferencesQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
+        return CDFExternalReferencesQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(
         self,

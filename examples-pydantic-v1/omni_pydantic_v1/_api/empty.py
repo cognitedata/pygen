@@ -10,6 +10,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from omni_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni_pydantic_v1.data_classes import (
+    DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
     Empty,
@@ -36,16 +37,15 @@ from .empty_query import EmptyQueryAPI
 
 
 class EmptyAPI(NodeAPI[Empty, EmptyApply, EmptyList]):
-    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
-        view_id = view_by_write_class[EmptyApply]
+    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
+        view_id = view_by_read_class[Empty]
         super().__init__(
             client=client,
             sources=view_id,
             class_type=Empty,
-            class_apply_type=EmptyApply,
             class_list=EmptyList,
             class_apply_list=EmptyApplyList,
-            view_by_write_class=view_by_write_class,
+            view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
 
@@ -121,7 +121,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyApply, EmptyList]):
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(EmptyList)
-        return EmptyQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
+        return EmptyQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(self, empty: EmptyApply | Sequence[EmptyApply], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) empties.

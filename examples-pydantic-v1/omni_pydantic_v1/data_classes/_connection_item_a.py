@@ -8,6 +8,7 @@ from pydantic import Field
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
     DomainModel,
+    DomainModelCore,
     DomainModelApply,
     DomainModelApplyList,
     DomainModelList,
@@ -58,7 +59,7 @@ class ConnectionItemA(DomainModel):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    type: dm.DirectRelationReference = dm.DirectRelationReference("pygen-models", "ConnectionItemA")
+    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemA")
     name: Optional[str] = None
     other_direct: Union[ConnectionItemC, str, dm.NodeId, None] = Field(None, repr=False, alias="otherDirect")
     outwards: Union[list[ConnectionItemB], list[str], None] = Field(default=None, repr=False)
@@ -99,7 +100,7 @@ class ConnectionItemAApply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
-    type: dm.DirectRelationReference = dm.DirectRelationReference("pygen-models", "ConnectionItemA")
+    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "ConnectionItemA")
     name: Optional[str] = None
     other_direct: Union[ConnectionItemCApply, str, dm.NodeId, None] = Field(None, repr=False, alias="otherDirect")
     outwards: Union[list[ConnectionItemBApply], list[str], None] = Field(default=None, repr=False)
@@ -108,15 +109,13 @@ class ConnectionItemAApply(DomainModelApply):
     def _to_instances_apply(
         self,
         cache: set[tuple[str, str]],
-        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
             return resources
 
-        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
-            "pygen-models", "ConnectionItemA", "1"
-        )
+        write_view = (view_by_read_class or {}).get(ConnectionItemA, dm.ViewId("pygen-models", "ConnectionItemA", "1"))
 
         properties = {}
 
@@ -142,7 +141,7 @@ class ConnectionItemAApply(DomainModelApply):
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
-                type=self.type,
+                type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(
                         source=write_view,
@@ -156,16 +155,16 @@ class ConnectionItemAApply(DomainModelApply):
         edge_type = dm.DirectRelationReference("pygen-models", "bidirectional")
         for outward in self.outwards or []:
             other_resources = DomainRelationApply.from_edge_to_resources(
-                cache, start_node=self, end_node=outward, edge_type=edge_type, view_by_write_class=view_by_write_class
+                cache, start_node=self, end_node=outward, edge_type=edge_type, view_by_read_class=view_by_read_class
             )
             resources.extend(other_resources)
 
         if isinstance(self.other_direct, DomainModelApply):
-            other_resources = self.other_direct._to_instances_apply(cache, view_by_write_class)
+            other_resources = self.other_direct._to_instances_apply(cache, view_by_read_class)
             resources.extend(other_resources)
 
         if isinstance(self.self_direct, DomainModelApply):
-            other_resources = self.self_direct._to_instances_apply(cache, view_by_write_class)
+            other_resources = self.self_direct._to_instances_apply(cache, view_by_read_class)
             resources.extend(other_resources)
 
         return resources

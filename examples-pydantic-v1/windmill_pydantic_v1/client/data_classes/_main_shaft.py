@@ -8,6 +8,7 @@ from cognite.client.data_classes import TimeSeries
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
     DomainModel,
+    DomainModelCore,
     DomainModelApply,
     DomainModelApplyList,
     DomainModelList,
@@ -58,6 +59,7 @@ class MainShaft(DomainModel):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    node_type: Union[dm.DirectRelationReference, None] = None
     bending_x: Union[TimeSeries, str, None] = None
     bending_y: Union[TimeSeries, str, None] = None
     calculated_tilt_moment: Union[TimeSeries, str, None] = None
@@ -97,6 +99,7 @@ class MainShaftApply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    node_type: Union[dm.DirectRelationReference, None] = None
     bending_x: Union[TimeSeries, str, None] = None
     bending_y: Union[TimeSeries, str, None] = None
     calculated_tilt_moment: Union[TimeSeries, str, None] = None
@@ -106,15 +109,13 @@ class MainShaftApply(DomainModelApply):
     def _to_instances_apply(
         self,
         cache: set[tuple[str, str]],
-        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
             return resources
 
-        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
-            "power-models", "MainShaft", "1"
-        )
+        write_view = (view_by_read_class or {}).get(MainShaft, dm.ViewId("power-models", "MainShaft", "1"))
 
         properties = {}
 
@@ -146,6 +147,7 @@ class MainShaftApply(DomainModelApply):
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
+                type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(
                         source=write_view,
