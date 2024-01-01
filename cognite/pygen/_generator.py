@@ -177,6 +177,8 @@ def generate_sdk_notebook(
             shutil.rmtree(output_dir)
         except Exception as e:
             print(f"Failed to clean temporary directory {output_dir}: {e}")
+        else:
+            print(f"Cleaned temporary directory {output_dir}")
 
     data_model = _get_data_model(model_id, client, print)
     external_id = _extract_external_id(data_model)
