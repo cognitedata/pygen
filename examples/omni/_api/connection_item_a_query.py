@@ -9,9 +9,7 @@ from omni.data_classes import (
     DomainModelCore,
     ConnectionItemA,
     ConnectionItemC,
-    ConnectionItemCApply,
     ConnectionItemA,
-    ConnectionItemAApply,
 )
 from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
 

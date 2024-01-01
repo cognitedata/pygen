@@ -9,9 +9,7 @@ from windmill_pydantic_v1.client.data_classes import (
     DomainModelCore,
     Windmill,
     Nacelle,
-    NacelleApply,
     Rotor,
-    RotorApply,
 )
 from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
 

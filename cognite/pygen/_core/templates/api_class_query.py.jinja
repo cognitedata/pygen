@@ -9,8 +9,7 @@ from {{ top_level_package }}.data_classes import (
     DomainModelCore,
     {{ data_class.read_name }},{% for class_ in unique_edge_data_classes %}
     {{ class_.read_name }},{% endfor %}{% for field in data_class.fields_of_type(ft.EdgeOneToOne) %}
-    {{ field.data_class.read_name }},
-    {{ field.data_class.write_name }},{% endfor %}
+    {{ field.data_class.read_name }},{% endfor %}
 )
 from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList{% if not query_api.is_only_one_to_many_edges  %}, _create_edge_filter{% endif %}
 {% for class_ in unique_edge_data_classes %}

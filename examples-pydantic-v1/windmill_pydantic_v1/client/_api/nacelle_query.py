@@ -9,15 +9,10 @@ from windmill_pydantic_v1.client.data_classes import (
     DomainModelCore,
     Nacelle,
     Gearbox,
-    GearboxApply,
     Generator,
-    GeneratorApply,
     HighSpeedShaft,
-    HighSpeedShaftApply,
     MainShaft,
-    MainShaftApply,
     PowerInverter,
-    PowerInverterApply,
 )
 from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
 
