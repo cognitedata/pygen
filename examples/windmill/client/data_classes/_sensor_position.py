@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, Optional, Union
+from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
@@ -154,6 +154,7 @@ class SensorPositionApply(DomainModelApply):
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
+        write_none: bool = False,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
@@ -161,65 +162,81 @@ class SensorPositionApply(DomainModelApply):
 
         write_view = (view_by_read_class or {}).get(SensorPosition, dm.ViewId("power-models", "SensorPosition", "1"))
 
-        properties = {}
+        properties: dict[str, Any] = {}
 
-        if self.edgewise_bend_mom_crosstalk_corrected is not None:
-            properties["edgewise_bend_mom_crosstalk_corrected"] = (
-                self.edgewise_bend_mom_crosstalk_corrected
-                if isinstance(self.edgewise_bend_mom_crosstalk_corrected, str)
-                else self.edgewise_bend_mom_crosstalk_corrected.external_id
-            )
+        if self.edgewise_bend_mom_crosstalk_corrected is not None or write_none:
+            if (
+                isinstance(self.edgewise_bend_mom_crosstalk_corrected, str)
+                or self.edgewise_bend_mom_crosstalk_corrected is None
+            ):
+                properties["edgewise_bend_mom_crosstalk_corrected"] = self.edgewise_bend_mom_crosstalk_corrected
+            else:
+                properties[
+                    "edgewise_bend_mom_crosstalk_corrected"
+                ] = self.edgewise_bend_mom_crosstalk_corrected.external_id
 
-        if self.edgewise_bend_mom_offset is not None:
-            properties["edgewise_bend_mom_offset"] = (
-                self.edgewise_bend_mom_offset
-                if isinstance(self.edgewise_bend_mom_offset, str)
-                else self.edgewise_bend_mom_offset.external_id
-            )
+        if self.edgewise_bend_mom_offset is not None or write_none:
+            if isinstance(self.edgewise_bend_mom_offset, str) or self.edgewise_bend_mom_offset is None:
+                properties["edgewise_bend_mom_offset"] = self.edgewise_bend_mom_offset
+            else:
+                properties["edgewise_bend_mom_offset"] = self.edgewise_bend_mom_offset.external_id
 
-        if self.edgewise_bend_mom_offset_crosstalk_corrected is not None:
-            properties["edgewise_bend_mom_offset_crosstalk_corrected"] = (
-                self.edgewise_bend_mom_offset_crosstalk_corrected
-                if isinstance(self.edgewise_bend_mom_offset_crosstalk_corrected, str)
-                else self.edgewise_bend_mom_offset_crosstalk_corrected.external_id
-            )
+        if self.edgewise_bend_mom_offset_crosstalk_corrected is not None or write_none:
+            if (
+                isinstance(self.edgewise_bend_mom_offset_crosstalk_corrected, str)
+                or self.edgewise_bend_mom_offset_crosstalk_corrected is None
+            ):
+                properties[
+                    "edgewise_bend_mom_offset_crosstalk_corrected"
+                ] = self.edgewise_bend_mom_offset_crosstalk_corrected
+            else:
+                properties[
+                    "edgewise_bend_mom_offset_crosstalk_corrected"
+                ] = self.edgewise_bend_mom_offset_crosstalk_corrected.external_id
 
-        if self.edgewisewise_bend_mom is not None:
-            properties["edgewisewise_bend_mom"] = (
-                self.edgewisewise_bend_mom
-                if isinstance(self.edgewisewise_bend_mom, str)
-                else self.edgewisewise_bend_mom.external_id
-            )
+        if self.edgewisewise_bend_mom is not None or write_none:
+            if isinstance(self.edgewisewise_bend_mom, str) or self.edgewisewise_bend_mom is None:
+                properties["edgewisewise_bend_mom"] = self.edgewisewise_bend_mom
+            else:
+                properties["edgewisewise_bend_mom"] = self.edgewisewise_bend_mom.external_id
 
-        if self.flapwise_bend_mom is not None:
-            properties["flapwise_bend_mom"] = (
-                self.flapwise_bend_mom
-                if isinstance(self.flapwise_bend_mom, str)
-                else self.flapwise_bend_mom.external_id
-            )
+        if self.flapwise_bend_mom is not None or write_none:
+            if isinstance(self.flapwise_bend_mom, str) or self.flapwise_bend_mom is None:
+                properties["flapwise_bend_mom"] = self.flapwise_bend_mom
+            else:
+                properties["flapwise_bend_mom"] = self.flapwise_bend_mom.external_id
 
-        if self.flapwise_bend_mom_crosstalk_corrected is not None:
-            properties["flapwise_bend_mom_crosstalk_corrected"] = (
-                self.flapwise_bend_mom_crosstalk_corrected
-                if isinstance(self.flapwise_bend_mom_crosstalk_corrected, str)
-                else self.flapwise_bend_mom_crosstalk_corrected.external_id
-            )
+        if self.flapwise_bend_mom_crosstalk_corrected is not None or write_none:
+            if (
+                isinstance(self.flapwise_bend_mom_crosstalk_corrected, str)
+                or self.flapwise_bend_mom_crosstalk_corrected is None
+            ):
+                properties["flapwise_bend_mom_crosstalk_corrected"] = self.flapwise_bend_mom_crosstalk_corrected
+            else:
+                properties[
+                    "flapwise_bend_mom_crosstalk_corrected"
+                ] = self.flapwise_bend_mom_crosstalk_corrected.external_id
 
-        if self.flapwise_bend_mom_offset is not None:
-            properties["flapwise_bend_mom_offset"] = (
-                self.flapwise_bend_mom_offset
-                if isinstance(self.flapwise_bend_mom_offset, str)
-                else self.flapwise_bend_mom_offset.external_id
-            )
+        if self.flapwise_bend_mom_offset is not None or write_none:
+            if isinstance(self.flapwise_bend_mom_offset, str) or self.flapwise_bend_mom_offset is None:
+                properties["flapwise_bend_mom_offset"] = self.flapwise_bend_mom_offset
+            else:
+                properties["flapwise_bend_mom_offset"] = self.flapwise_bend_mom_offset.external_id
 
-        if self.flapwise_bend_mom_offset_crosstalk_corrected is not None:
-            properties["flapwise_bend_mom_offset_crosstalk_corrected"] = (
-                self.flapwise_bend_mom_offset_crosstalk_corrected
-                if isinstance(self.flapwise_bend_mom_offset_crosstalk_corrected, str)
-                else self.flapwise_bend_mom_offset_crosstalk_corrected.external_id
-            )
+        if self.flapwise_bend_mom_offset_crosstalk_corrected is not None or write_none:
+            if (
+                isinstance(self.flapwise_bend_mom_offset_crosstalk_corrected, str)
+                or self.flapwise_bend_mom_offset_crosstalk_corrected is None
+            ):
+                properties[
+                    "flapwise_bend_mom_offset_crosstalk_corrected"
+                ] = self.flapwise_bend_mom_offset_crosstalk_corrected
+            else:
+                properties[
+                    "flapwise_bend_mom_offset_crosstalk_corrected"
+                ] = self.flapwise_bend_mom_offset_crosstalk_corrected.external_id
 
-        if self.position is not None:
+        if self.position is not None or write_none:
             properties["position"] = self.position
 
         if properties:

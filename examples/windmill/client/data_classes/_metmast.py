@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, Optional, Union
+from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
@@ -98,6 +98,7 @@ class MetmastApply(DomainModelApply):
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
+        write_none: bool = False,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
@@ -105,25 +106,28 @@ class MetmastApply(DomainModelApply):
 
         write_view = (view_by_read_class or {}).get(Metmast, dm.ViewId("power-models", "Metmast", "1"))
 
-        properties = {}
+        properties: dict[str, Any] = {}
 
-        if self.position is not None:
+        if self.position is not None or write_none:
             properties["position"] = self.position
 
-        if self.temperature is not None:
-            properties["temperature"] = (
-                self.temperature if isinstance(self.temperature, str) else self.temperature.external_id
-            )
+        if self.temperature is not None or write_none:
+            if isinstance(self.temperature, str) or self.temperature is None:
+                properties["temperature"] = self.temperature
+            else:
+                properties["temperature"] = self.temperature.external_id
 
-        if self.tilt_angle is not None:
-            properties["tilt_angle"] = (
-                self.tilt_angle if isinstance(self.tilt_angle, str) else self.tilt_angle.external_id
-            )
+        if self.tilt_angle is not None or write_none:
+            if isinstance(self.tilt_angle, str) or self.tilt_angle is None:
+                properties["tilt_angle"] = self.tilt_angle
+            else:
+                properties["tilt_angle"] = self.tilt_angle.external_id
 
-        if self.wind_speed is not None:
-            properties["wind_speed"] = (
-                self.wind_speed if isinstance(self.wind_speed, str) else self.wind_speed.external_id
-            )
+        if self.wind_speed is not None or write_none:
+            if isinstance(self.wind_speed, str) or self.wind_speed is None:
+                properties["wind_speed"] = self.wind_speed
+            else:
+                properties["wind_speed"] = self.wind_speed.external_id
 
         if properties:
             this_node = dm.NodeApply(

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, Optional, Union
+from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeries
@@ -110,6 +110,7 @@ class MainShaftApply(DomainModelApply):
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
+        write_none: bool = False,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
@@ -117,30 +118,37 @@ class MainShaftApply(DomainModelApply):
 
         write_view = (view_by_read_class or {}).get(MainShaft, dm.ViewId("power-models", "MainShaft", "1"))
 
-        properties = {}
+        properties: dict[str, Any] = {}
 
-        if self.bending_x is not None:
-            properties["bending_x"] = self.bending_x if isinstance(self.bending_x, str) else self.bending_x.external_id
+        if self.bending_x is not None or write_none:
+            if isinstance(self.bending_x, str) or self.bending_x is None:
+                properties["bending_x"] = self.bending_x
+            else:
+                properties["bending_x"] = self.bending_x.external_id
 
-        if self.bending_y is not None:
-            properties["bending_y"] = self.bending_y if isinstance(self.bending_y, str) else self.bending_y.external_id
+        if self.bending_y is not None or write_none:
+            if isinstance(self.bending_y, str) or self.bending_y is None:
+                properties["bending_y"] = self.bending_y
+            else:
+                properties["bending_y"] = self.bending_y.external_id
 
-        if self.calculated_tilt_moment is not None:
-            properties["calculated_tilt_moment"] = (
-                self.calculated_tilt_moment
-                if isinstance(self.calculated_tilt_moment, str)
-                else self.calculated_tilt_moment.external_id
-            )
+        if self.calculated_tilt_moment is not None or write_none:
+            if isinstance(self.calculated_tilt_moment, str) or self.calculated_tilt_moment is None:
+                properties["calculated_tilt_moment"] = self.calculated_tilt_moment
+            else:
+                properties["calculated_tilt_moment"] = self.calculated_tilt_moment.external_id
 
-        if self.calculated_yaw_moment is not None:
-            properties["calculated_yaw_moment"] = (
-                self.calculated_yaw_moment
-                if isinstance(self.calculated_yaw_moment, str)
-                else self.calculated_yaw_moment.external_id
-            )
+        if self.calculated_yaw_moment is not None or write_none:
+            if isinstance(self.calculated_yaw_moment, str) or self.calculated_yaw_moment is None:
+                properties["calculated_yaw_moment"] = self.calculated_yaw_moment
+            else:
+                properties["calculated_yaw_moment"] = self.calculated_yaw_moment.external_id
 
-        if self.torque is not None:
-            properties["torque"] = self.torque if isinstance(self.torque, str) else self.torque.external_id
+        if self.torque is not None or write_none:
+            if isinstance(self.torque, str) or self.torque is None:
+                properties["torque"] = self.torque
+            else:
+                properties["torque"] = self.torque.external_id
 
         if properties:
             this_node = dm.NodeApply(

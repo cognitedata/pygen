@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import datetime
+
 import pytest
 from cognite.client import CogniteClient
 
@@ -155,3 +157,52 @@ def test_apply_recursive(omni_client: OmniClient, cognite_client: CogniteClient)
         assert len(retrieved.outwards) == 2
     finally:
         cognite_client.data_modeling.instances.delete(nodes=node_ids, edges=edge_ids)
+
+
+@pytest.fixture()
+def primitive_nullable_node(omni_client: OmniClient, cognite_client: CogniteClient) -> dc.PrimitiveNullableApply:
+    node = dc.PrimitiveNullableApply(
+        external_id="integration_test:PrimitiveNullable",
+        text="string",
+        int_32=1,
+        int_64=2,
+        float_32=1.1,
+        float_64=-1.0,
+        boolean=True,
+        timestamp=datetime.datetime.fromisoformat("2021-01-01T00:00:00+00:00"),
+        date=datetime.date.fromisoformat("2021-01-01"),
+        json_={"a": 1, "b": 2},
+    )
+    try:
+        omni_client.primitive_nullable.apply(node)
+        yield node
+    finally:
+        cognite_client.data_modeling.instances.delete(nodes=node.as_tuple_id())
+
+
+def test_update_to_null(
+    omni_client: OmniClient, cognite_client: CogniteClient, primitive_nullable_node: dc.PrimitiveNullableApply
+) -> None:
+    update = primitive_nullable_node.model_copy()
+    update.text = None
+    update.int_32 = None
+    update.int_64 = None
+    update.float_32 = None
+    update.float_64 = None
+    update.boolean = None
+    update.timestamp = None
+    update.date = None
+    update.json_ = None
+
+    omni_client.primitive_nullable.apply(update, write_none=True)
+
+    retrieved = omni_client.primitive_nullable.retrieve(primitive_nullable_node.external_id)
+    assert retrieved.text is None
+    assert retrieved.int_32 is None
+    assert retrieved.int_64 is None
+    assert retrieved.float_32 is None
+    assert retrieved.float_64 is None
+    assert retrieved.boolean is None
+    assert retrieved.timestamp is None
+    assert retrieved.date is None
+    assert retrieved.json_ is None

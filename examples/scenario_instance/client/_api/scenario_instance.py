@@ -123,7 +123,10 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
         return ScenarioInstanceQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(
-        self, scenario_instance: ScenarioInstanceApply | Sequence[ScenarioInstanceApply], replace: bool = False
+        self,
+        scenario_instance: ScenarioInstanceApply | Sequence[ScenarioInstanceApply],
+        replace: bool = False,
+        write_none: bool = False,
     ) -> ResourcesApplyResult:
         """Add or update (upsert) scenario instances.
 
@@ -131,6 +134,8 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
             scenario_instance: Scenario instance or sequence of scenario instances to upsert.
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): This method, will by default, skip properties that are set to None. However, if you want to set properties to None,
+                you can set this parameter to True. Note this only applies to properties that are nullable.
         Returns:
             Created instance(s), i.e., nodes, edges, and time series.
 
@@ -145,7 +150,7 @@ class ScenarioInstanceAPI(NodeAPI[ScenarioInstance, ScenarioInstanceApply, Scena
                 >>> result = client.scenario_instance.apply(scenario_instance)
 
         """
-        return self._apply(scenario_instance, replace)
+        return self._apply(scenario_instance, replace, write_none)
 
     def delete(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE

@@ -83,7 +83,10 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftApply, HighSpeedSh
         return HighSpeedShaftQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(
-        self, high_speed_shaft: HighSpeedShaftApply | Sequence[HighSpeedShaftApply], replace: bool = False
+        self,
+        high_speed_shaft: HighSpeedShaftApply | Sequence[HighSpeedShaftApply],
+        replace: bool = False,
+        write_none: bool = False,
     ) -> ResourcesApplyResult:
         """Add or update (upsert) high speed shafts.
 
@@ -91,6 +94,8 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftApply, HighSpeedSh
             high_speed_shaft: High speed shaft or sequence of high speed shafts to upsert.
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): This method, will by default, skip properties that are set to None. However, if you want to set properties to None,
+                you can set this parameter to True. Note this only applies to properties that are nullable.
         Returns:
             Created instance(s), i.e., nodes, edges, and time series.
 
@@ -105,7 +110,7 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftApply, HighSpeedSh
                 >>> result = client.high_speed_shaft.apply(high_speed_shaft)
 
         """
-        return self._apply(high_speed_shaft, replace)
+        return self._apply(high_speed_shaft, replace, write_none)
 
     def delete(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE

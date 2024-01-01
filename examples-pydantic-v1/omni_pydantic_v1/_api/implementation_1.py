@@ -102,7 +102,10 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Apply, Implemen
         return Implementation1QueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(
-        self, implementation_1: Implementation1Apply | Sequence[Implementation1Apply], replace: bool = False
+        self,
+        implementation_1: Implementation1Apply | Sequence[Implementation1Apply],
+        replace: bool = False,
+        write_none: bool = False,
     ) -> ResourcesApplyResult:
         """Add or update (upsert) implementation 1.
 
@@ -110,6 +113,8 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Apply, Implemen
             implementation_1: Implementation 1 or sequence of implementation 1 to upsert.
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): This method, will by default, skip properties that are set to None. However, if you want to set properties to None,
+                you can set this parameter to True. Note this only applies to properties that are nullable.
         Returns:
             Created instance(s), i.e., nodes, edges, and time series.
 
@@ -124,7 +129,7 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Apply, Implemen
                 >>> result = client.implementation_1.apply(implementation_1)
 
         """
-        return self._apply(implementation_1, replace)
+        return self._apply(implementation_1, replace, write_none)
 
     def delete(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE

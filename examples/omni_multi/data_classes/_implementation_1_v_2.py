@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, Optional, Union
+from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -93,6 +93,7 @@ class Implementation1v2Apply(SubInterfaceApply):
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
+        write_none: bool = False,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
@@ -102,12 +103,12 @@ class Implementation1v2Apply(SubInterfaceApply):
             Implementation1v2, dm.ViewId("pygen-models", "Implementation1", "2")
         )
 
-        properties = {}
+        properties: dict[str, Any] = {}
 
-        if self.main_value is not None:
+        if self.main_value is not None or write_none:
             properties["mainValue"] = self.main_value
 
-        if self.sub_value is not None:
+        if self.sub_value is not None or write_none:
             properties["subValue"] = self.sub_value
 
         if self.value_2 is not None:

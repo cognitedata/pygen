@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, Optional, Union
+from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
@@ -99,6 +99,7 @@ class CDFExternalReferencesApply(DomainModelApply):
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
+        write_none: bool = False,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
@@ -108,18 +109,19 @@ class CDFExternalReferencesApply(DomainModelApply):
             CDFExternalReferences, dm.ViewId("pygen-models", "CDFExternalReferences", "1")
         )
 
-        properties = {}
+        properties: dict[str, Any] = {}
 
-        if self.file is not None:
+        if self.file is not None or write_none:
             properties["file"] = self.file
 
-        if self.sequence is not None:
+        if self.sequence is not None or write_none:
             properties["sequence"] = self.sequence
 
-        if self.timeseries is not None:
-            properties["timeseries"] = (
-                self.timeseries if isinstance(self.timeseries, str) else self.timeseries.external_id
-            )
+        if self.timeseries is not None or write_none:
+            if isinstance(self.timeseries, str) or self.timeseries is None:
+                properties["timeseries"] = self.timeseries
+            else:
+                properties["timeseries"] = self.timeseries.external_id
 
         if properties:
             this_node = dm.NodeApply(

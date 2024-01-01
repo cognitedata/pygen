@@ -69,6 +69,7 @@ class {{ data_class.write_name }}(DomainRelationApply):
         start_node: DomainModelApply,
         edge_type: dm.DirectRelationReference,
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
+        write_none: bool = False,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.external_id and (self.space, self.external_id) in cache:
@@ -93,7 +94,7 @@ class {{ data_class.write_name }}(DomainRelationApply):
 
         properties = {}
         {% for field in data_class.fields_of_type((ft.PrimitiveFieldCore, ft.EdgeOneToOne)) %}
-        if self.{{ field.name }} is not None:
+        if self.{{ field.name }} is not None{% if field.is_nullable %} or write_none{% endif %}:
             {% if field.is_edge %}
             properties["{{ field.prop_name }}"] = {
                 "space":  self.space if isinstance(self.{{ field.name }}, str) else self.{{ field.name }}.space,

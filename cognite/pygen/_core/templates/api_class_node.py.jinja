@@ -77,7 +77,12 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         return {{ query_api.name }}(self._client, builder, self._view_by_read_class, filter_, limit)
 
 {% if data_class.is_writable %}
-    def apply(self, {{ data_class.variable }}: {{ data_class.write_name }} | Sequence[{{ data_class.write_name }}], replace: bool = False) -> ResourcesApplyResult:
+    def apply(
+        self,
+        {{ data_class.variable }}: {{ data_class.write_name }} | Sequence[{{ data_class.write_name }}],
+        replace: bool = False,
+        write_none: bool = False,
+    ) -> ResourcesApplyResult:
         """Add or update (upsert) {{data_class.doc_list_name}}.{% if data_class.has_field_of_type(ft.EdgeOneToMany) %}
 
         Note: This method iterates through all nodes and timeseries linked to {{ data_class.variable }} and creates them including the edges
@@ -88,6 +93,8 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             {{ data_class.variable }}: {{ data_class.doc_name.capitalize() }} or sequence of {{ data_class.doc_list_name }} to upsert.
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): This method, will by default, skip properties that are set to None. However, if you want to set properties to None,
+                you can set this parameter to True. Note this only applies to properties that are nullable.
         Returns:
             Created instance(s), i.e., nodes, edges, and time series.
 
@@ -102,7 +109,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                 >>> result = client.{{ api_class.parent_attribute }}.apply({{ data_class.variable }})
 
         """
-        return self._apply({{ data_class.variable }}, replace)
+        return self._apply({{ data_class.variable }}, replace, write_none)
 {% endif %}
     def delete(self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE) -> dm.InstancesDeleteResult:
         """Delete one or more {{ data_class.doc_name }}.
