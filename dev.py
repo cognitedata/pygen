@@ -22,9 +22,9 @@ from cognite.client.data_classes import (
 from cognite.client.data_classes.data_modeling import ViewApplyList
 from pydantic.version import VERSION as PYDANTIC_VERSION
 
-from cognite.pygen._generator import CodeFormatter, SDKGenerator, write_sdk_to_disk
+from cognite.pygen._generator import SDKGenerator, write_sdk_to_disk
 from cognite.pygen.utils.cdf import _user_options, load_cognite_client_from_toml
-from tests.constants import EXAMPLE_SDKS, EXAMPLES_DIR, MULTI_MODEL_SDK, REPO_ROOT, MultiModelFiles
+from tests.constants import EXAMPLE_SDKS, EXAMPLES_DIR, REPO_ROOT
 
 app = typer.Typer(
     add_completion=False,
@@ -79,18 +79,6 @@ def generate_sdks(
             typer.echo("All files updated! Including files assumed to be manually maintained.")
         typer.echo("\n")
 
-    # Special case for the Multi-Model SDK, here we only want the _api_client.py file.
-    typer.echo(f"Generating {MULTI_MODEL_SDK.client_name} '_api_client.py' file...")
-    generator = SDKGenerator(
-        MULTI_MODEL_SDK.top_level_package,
-        MULTI_MODEL_SDK.client_name,
-        MULTI_MODEL_SDK.load_data_models(),
-        logger=typer.echo,
-    )
-    _api_client_file = generator._generate_api_client_file()
-    code_formatter = CodeFormatter(format_code=True, logger=typer.echo)
-    _api_client_file = code_formatter.format_code(_api_client_file)
-    MultiModelFiles.api_client.write_text(_api_client_file)
     typer.echo("All SDKs Created!")
 
 
@@ -101,7 +89,8 @@ def download():
         for data_model_id in example_sdk.data_model_ids:
             data_model = client.data_modeling.data_models.retrieve(data_model_id, inline_views=True)
             if not data_model:
-                raise ValueError(f"Failed to retrieve {data_model_id}")
+                typer.echo(f"Data Model {data_model_id} has not been deployed to CDF, skipping")
+                continue
             file_path = example_sdk.read_model_path(data_model_id)
             latest = data_model.latest_version()
             # Sorting by to make the output deterministic

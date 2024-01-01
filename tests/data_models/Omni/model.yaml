@@ -295,6 +295,53 @@ views:
   lastUpdatedTime: 1703845437017
   createdTime: 1703845437017
 - space: pygen-models
+  externalId: DependentOnNonWritable
+  name: DependentOnNonWritable
+  filter:
+    equals:
+      property:
+      - node
+      - type
+      value:
+        space: pygen-models
+        externalId: DependentOnNonWritable
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    aValue:
+      container:
+        space: pygen-models
+        externalId: MainInterface
+      containerPropertyIdentifier: mainValue
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: aValue
+      description: null
+    toNonWritable:
+      type:
+        space: pygen-models
+        externalId: toNonWritable
+      source:
+        space: pygen-models
+        externalId: Implementation1NonWriteable
+        version: '1'
+        type: view
+      name: outwards
+      description: null
+      edgeSource: null
+      direction: outwards
+      connectionType: multi_edge_connection
+  lastUpdatedTime: 1704113811088
+  createdTime: 1704113811088
+- space: pygen-models
   externalId: Empty
   name: Empty
   filter:
@@ -1354,5 +1401,5 @@ views:
   lastUpdatedTime: 1703845437017
   createdTime: 1703845437017
 isGlobal: false
-lastUpdatedTime: 1703861237240
-createdTime: 1703861237240
+lastUpdatedTime: 1704114630368
+createdTime: 1704114630368
