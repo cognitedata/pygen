@@ -24,6 +24,25 @@ from .utils.text import to_pascal, to_snake
 DataModel: TypeAlias = Union[DataModelIdentifier, dm.DataModel[dm.View]]
 
 
+@overload
+def generate_sdk(  # type: ignore[overload-overlap]
+    model_id: DataModel | Sequence[DataModel],
+    client: Optional[CogniteClient] = None,
+    top_level_package: Optional[str] = None,
+    client_name: Optional[str] = None,
+    default_instance_space: str | None = None,
+    output_dir: Optional[Path] = None,
+    logger: Optional[Callable[[str], None]] = None,
+    pydantic_version: Literal["v1", "v2", "infer"] = "infer",
+    overwrite: bool = False,
+    format_code: bool = True,
+    config: Optional[PygenConfig] = None,
+    return_sdk_files: Literal[False] = False,
+) -> None:
+    ...
+
+
+@overload
 def generate_sdk(
     model_id: DataModel | Sequence[DataModel],
     client: Optional[CogniteClient] = None,
@@ -36,7 +55,25 @@ def generate_sdk(
     overwrite: bool = False,
     format_code: bool = True,
     config: Optional[PygenConfig] = None,
-) -> None:
+    return_sdk_files: Literal[True] = False,  # type: ignore[assignment]
+) -> dict[Path, str]:
+    ...
+
+
+def generate_sdk(
+    model_id: DataModel | Sequence[DataModel],
+    client: Optional[CogniteClient] = None,
+    top_level_package: Optional[str] = None,
+    client_name: Optional[str] = None,
+    default_instance_space: str | None = None,
+    output_dir: Optional[Path] = None,
+    logger: Optional[Callable[[str], None]] = None,
+    pydantic_version: Literal["v1", "v2", "infer"] = "infer",
+    overwrite: bool = False,
+    format_code: bool = True,
+    config: Optional[PygenConfig] = None,
+    return_sdk_files: Literal[True, False] = False,
+) -> None | dict[Path, str]:
     """
     Generates a Python SDK tailored to the given Data Model(s).
 
@@ -60,6 +97,8 @@ def generate_sdk(
         overwrite: Whether to overwrite the output directory if it already exists. Defaults to False.
         format_code: Whether to format the generated code using black. Defaults to True.
         config: The configuration used to control how to generate the SDK.
+        return_sdk_files: Whether to return the generated SDK files as a dictionary. Defaults to False.
+            This is useful for granular control of how to write the SDK to disk.
     """
     logger = logger or print
     data_model = _get_data_model(model_id, client, logger)
@@ -81,10 +120,13 @@ def generate_sdk(
         config or PygenConfig(),
     )
     sdk = sdk_generator.generate_sdk()
+    if return_sdk_files:
+        return sdk
     output_dir = output_dir or Path.cwd()
     logger(f"Writing SDK to {output_dir}")
     write_sdk_to_disk(sdk, output_dir, overwrite, format_code)
     logger("Done!")
+    return None
 
 
 def generate_sdk_notebook(
