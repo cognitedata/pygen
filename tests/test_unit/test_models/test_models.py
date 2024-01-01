@@ -84,6 +84,7 @@ def load_field_test_cases():
     data_class = MagicMock(spec=NodeDataClass)
     data_class.write_name = "ModelTemplateApply"
     data_class.read_name = "ModelTemplate"
+    data_class.is_writable = True
 
     yield pytest.param(
         mapped,

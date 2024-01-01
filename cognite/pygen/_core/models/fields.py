@@ -496,7 +496,7 @@ class EdgeOneToEndNode(EdgeField):
 
     def _type_hint(self, data_class_names: list[str]) -> str:
         data_class_names = list(set(data_class_names))
-        data_class_names_hint = {", ".join(sorted(data_class_names))}
+        data_class_names_hint = ", ".join(sorted(data_class_names))
         if data_class_names_hint:
             left_side = f"Union[{data_class_names_hint}, str, dm.NodeId]"
         else:
@@ -507,7 +507,7 @@ class EdgeOneToEndNode(EdgeField):
             return left_side
 
     def as_apply(self) -> str:
-        return f"self.{self.name}.as_apply() " f"if isinstance(self.{self.name}, DomainModel) " f"else self.{self.name}"
+        return f"self.{self.name}.as_apply() if isinstance(self.{self.name}, DomainModel) else self.{self.name}"
 
 
 @dataclass(frozen=True)
