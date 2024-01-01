@@ -1,5 +1,6 @@
 from ._core import (
     DomainModel,
+    DomainModelCore,
     DomainModelApply,
     DomainModelList,
     DomainRelationApply,
@@ -19,6 +20,7 @@ from ._scenario_instance import (
 __all__ = [
     "ResourcesApply",
     "DomainModel",
+    "DomainModelCore",
     "DomainModelApply",
     "DomainModelList",
     "DomainRelationApply",

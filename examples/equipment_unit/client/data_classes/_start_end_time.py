@@ -8,6 +8,7 @@ from cognite.client import data_modeling as dm
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
     DomainModel,
+    DomainModelCore,
     DomainModelApply,
     DomainRelation,
     DomainRelationApply,
@@ -88,7 +89,7 @@ class StartEndTimeApply(DomainRelationApply):
         cache: set[tuple[str, str]],
         start_node: DomainModelApply,
         edge_type: dm.DirectRelationReference,
-        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.external_id and (self.space, self.external_id) in cache:
@@ -107,8 +108,8 @@ class StartEndTimeApply(DomainRelationApply):
 
         self.external_id = external_id = DomainRelationApply.external_id_factory(start_node, end_node, edge_type)
 
-        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
-            "IntegrationTestsImmutable", "StartEndTime", "d416e0ed98186b"
+        write_view = (view_by_read_class or {}).get(
+            StartEndTime, dm.ViewId("IntegrationTestsImmutable", "StartEndTime", "d416e0ed98186b")
         )
 
         properties = {}
@@ -138,7 +139,7 @@ class StartEndTimeApply(DomainRelationApply):
             cache.add((self.space, external_id))
 
         if isinstance(self.end_node, DomainModelApply):
-            other_resources = self.end_node._to_instances_apply(cache, view_by_write_class)
+            other_resources = self.end_node._to_instances_apply(cache, view_by_read_class)
             resources.extend(other_resources)
 
         return resources
@@ -148,6 +149,10 @@ class StartEndTimeList(DomainRelationList[StartEndTime]):
     """List of start end times in the reading version."""
 
     _INSTANCE = StartEndTime
+
+    def as_apply(self) -> StartEndTimeApplyList:
+        """Convert this read version of start end time list to the writing version."""
+        return StartEndTimeApplyList([edge.as_apply() for edge in self])
 
 
 class StartEndTimeApplyList(DomainRelationList[StartEndTimeApply]):

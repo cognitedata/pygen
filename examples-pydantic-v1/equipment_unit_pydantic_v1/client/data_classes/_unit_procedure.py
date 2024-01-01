@@ -8,6 +8,7 @@ from pydantic import Field
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
     DomainModel,
+    DomainModelCore,
     DomainModelApply,
     DomainModelApplyList,
     DomainModelList,
@@ -57,6 +58,7 @@ class UnitProcedure(DomainModel):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    node_type: Union[dm.DirectRelationReference, None] = None
     name: Optional[str] = None
     type_: Optional[str] = Field(None, alias="type")
     work_orders: Optional[list[StartEndTime]] = Field(default=None, repr=False)
@@ -93,6 +95,7 @@ class UnitProcedureApply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    node_type: Union[dm.DirectRelationReference, None] = None
     name: Optional[str] = None
     type_: Optional[str] = Field(None, alias="type")
     work_orders: Optional[list[StartEndTimeApply]] = Field(default=None, repr=False)
@@ -101,14 +104,14 @@ class UnitProcedureApply(DomainModelApply):
     def _to_instances_apply(
         self,
         cache: set[tuple[str, str]],
-        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
             return resources
 
-        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
-            "IntegrationTestsImmutable", "UnitProcedure", "a6e2fea1e1c664"
+        write_view = (view_by_read_class or {}).get(
+            UnitProcedure, dm.ViewId("IntegrationTestsImmutable", "UnitProcedure", "a6e2fea1e1c664")
         )
 
         properties = {}
@@ -124,6 +127,7 @@ class UnitProcedureApply(DomainModelApply):
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
+                type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(
                         source=write_view,
@@ -140,7 +144,7 @@ class UnitProcedureApply(DomainModelApply):
                     cache,
                     self,
                     dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.work_order"),
-                    view_by_write_class,
+                    view_by_read_class,
                 )
                 resources.extend(other_resources)
 
@@ -150,7 +154,7 @@ class UnitProcedureApply(DomainModelApply):
                     cache,
                     self,
                     dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.equipment_module"),
-                    view_by_write_class,
+                    view_by_read_class,
                 )
                 resources.extend(other_resources)
 

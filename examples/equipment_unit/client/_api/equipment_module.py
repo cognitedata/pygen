@@ -9,6 +9,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from equipment_unit.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from equipment_unit.client.data_classes import (
+    DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
     EquipmentModule,
@@ -36,16 +37,15 @@ from .equipment_module_query import EquipmentModuleQueryAPI
 
 
 class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleApply, EquipmentModuleList]):
-    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
-        view_id = view_by_write_class[EquipmentModuleApply]
+    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
+        view_id = view_by_read_class[EquipmentModule]
         super().__init__(
             client=client,
             sources=view_id,
             class_type=EquipmentModule,
-            class_apply_type=EquipmentModuleApply,
             class_list=EquipmentModuleList,
             class_apply_list=EquipmentModuleApplyList,
-            view_by_write_class=view_by_write_class,
+            view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
         self.sensor_value = EquipmentModuleSensorValueAPI(client, view_id)
@@ -95,7 +95,7 @@ class EquipmentModuleAPI(NodeAPI[EquipmentModule, EquipmentModuleApply, Equipmen
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(EquipmentModuleList)
-        return EquipmentModuleQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
+        return EquipmentModuleQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(
         self, equipment_module: EquipmentModuleApply | Sequence[EquipmentModuleApply], replace: bool = False

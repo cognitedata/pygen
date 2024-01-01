@@ -9,6 +9,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni.data_classes import (
+    DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
     SubInterface,
@@ -35,16 +36,15 @@ from .sub_interface_query import SubInterfaceQueryAPI
 
 
 class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceApply, SubInterfaceList]):
-    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
-        view_id = view_by_write_class[SubInterfaceApply]
+    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
+        view_id = view_by_read_class[SubInterface]
         super().__init__(
             client=client,
             sources=view_id,
             class_type=SubInterface,
-            class_apply_type=SubInterfaceApply,
             class_list=SubInterfaceList,
             class_apply_list=SubInterfaceApplyList,
-            view_by_write_class=view_by_write_class,
+            view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
 
@@ -87,7 +87,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceApply, SubInterfaceList]
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(SubInterfaceList)
-        return SubInterfaceQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
+        return SubInterfaceQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(
         self, sub_interface: SubInterfaceApply | Sequence[SubInterfaceApply], replace: bool = False

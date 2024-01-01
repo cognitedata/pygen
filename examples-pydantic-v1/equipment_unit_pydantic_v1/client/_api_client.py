@@ -16,7 +16,7 @@ class EquipmentUnitClient:
     EquipmentUnitClient
 
     Generated with:
-        pygen = 0.32.6
+        pygen = 0.33.0
         cognite-sdk = 7.8.5
         pydantic = 1.10.7
 
@@ -34,20 +34,18 @@ class EquipmentUnitClient:
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = "CognitePygen:0.32.6"
+        client.config.client_name = "CognitePygen:0.33.0"
 
-        view_by_write_class = {
-            data_classes.EquipmentModuleApply: dm.ViewId(
-                "IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33"
-            ),
-            data_classes.StartEndTimeApply: dm.ViewId("IntegrationTestsImmutable", "StartEndTime", "d416e0ed98186b"),
-            data_classes.UnitProcedureApply: dm.ViewId("IntegrationTestsImmutable", "UnitProcedure", "a6e2fea1e1c664"),
-            data_classes.WorkOrderApply: dm.ViewId("IntegrationTestsImmutable", "WorkOrder", "c5543fb2b1bc81"),
+        view_by_read_class = {
+            data_classes.EquipmentModule: dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33"),
+            data_classes.StartEndTime: dm.ViewId("IntegrationTestsImmutable", "StartEndTime", "d416e0ed98186b"),
+            data_classes.UnitProcedure: dm.ViewId("IntegrationTestsImmutable", "UnitProcedure", "a6e2fea1e1c664"),
+            data_classes.WorkOrder: dm.ViewId("IntegrationTestsImmutable", "WorkOrder", "c5543fb2b1bc81"),
         }
 
-        self.equipment_module = EquipmentModuleAPI(client, view_by_write_class)
-        self.unit_procedure = UnitProcedureAPI(client, view_by_write_class)
-        self.work_order = WorkOrderAPI(client, view_by_write_class)
+        self.equipment_module = EquipmentModuleAPI(client, view_by_read_class)
+        self.unit_procedure = UnitProcedureAPI(client, view_by_read_class)
+        self.work_order = WorkOrderAPI(client, view_by_read_class)
 
     @classmethod
     def azure_project(

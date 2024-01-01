@@ -24,7 +24,7 @@ class WindmillClient:
     WindmillClient
 
     Generated with:
-        pygen = 0.32.6
+        pygen = 0.33.0
         cognite-sdk = 7.8.5
         pydantic = 2.5.3
 
@@ -42,33 +42,33 @@ class WindmillClient:
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = "CognitePygen:0.32.6"
+        client.config.client_name = "CognitePygen:0.33.0"
 
-        view_by_write_class = {
-            data_classes.BladeApply: dm.ViewId("power-models", "Blade", "1"),
-            data_classes.GearboxApply: dm.ViewId("power-models", "Gearbox", "1"),
-            data_classes.GeneratorApply: dm.ViewId("power-models", "Generator", "1"),
-            data_classes.HighSpeedShaftApply: dm.ViewId("power-models", "HighSpeedShaft", "1"),
-            data_classes.MainShaftApply: dm.ViewId("power-models", "MainShaft", "1"),
-            data_classes.MetmastApply: dm.ViewId("power-models", "Metmast", "1"),
-            data_classes.NacelleApply: dm.ViewId("power-models", "Nacelle", "1"),
-            data_classes.PowerInverterApply: dm.ViewId("power-models", "PowerInverter", "1"),
-            data_classes.RotorApply: dm.ViewId("power-models", "Rotor", "1"),
-            data_classes.SensorPositionApply: dm.ViewId("power-models", "SensorPosition", "1"),
-            data_classes.WindmillApply: dm.ViewId("power-models", "Windmill", "1"),
+        view_by_read_class = {
+            data_classes.Blade: dm.ViewId("power-models", "Blade", "1"),
+            data_classes.Gearbox: dm.ViewId("power-models", "Gearbox", "1"),
+            data_classes.Generator: dm.ViewId("power-models", "Generator", "1"),
+            data_classes.HighSpeedShaft: dm.ViewId("power-models", "HighSpeedShaft", "1"),
+            data_classes.MainShaft: dm.ViewId("power-models", "MainShaft", "1"),
+            data_classes.Metmast: dm.ViewId("power-models", "Metmast", "1"),
+            data_classes.Nacelle: dm.ViewId("power-models", "Nacelle", "1"),
+            data_classes.PowerInverter: dm.ViewId("power-models", "PowerInverter", "1"),
+            data_classes.Rotor: dm.ViewId("power-models", "Rotor", "1"),
+            data_classes.SensorPosition: dm.ViewId("power-models", "SensorPosition", "1"),
+            data_classes.Windmill: dm.ViewId("power-models", "Windmill", "1"),
         }
 
-        self.blade = BladeAPI(client, view_by_write_class)
-        self.gearbox = GearboxAPI(client, view_by_write_class)
-        self.generator = GeneratorAPI(client, view_by_write_class)
-        self.high_speed_shaft = HighSpeedShaftAPI(client, view_by_write_class)
-        self.main_shaft = MainShaftAPI(client, view_by_write_class)
-        self.metmast = MetmastAPI(client, view_by_write_class)
-        self.nacelle = NacelleAPI(client, view_by_write_class)
-        self.power_inverter = PowerInverterAPI(client, view_by_write_class)
-        self.rotor = RotorAPI(client, view_by_write_class)
-        self.sensor_position = SensorPositionAPI(client, view_by_write_class)
-        self.windmill = WindmillAPI(client, view_by_write_class)
+        self.blade = BladeAPI(client, view_by_read_class)
+        self.gearbox = GearboxAPI(client, view_by_read_class)
+        self.generator = GeneratorAPI(client, view_by_read_class)
+        self.high_speed_shaft = HighSpeedShaftAPI(client, view_by_read_class)
+        self.main_shaft = MainShaftAPI(client, view_by_read_class)
+        self.metmast = MetmastAPI(client, view_by_read_class)
+        self.nacelle = NacelleAPI(client, view_by_read_class)
+        self.power_inverter = PowerInverterAPI(client, view_by_read_class)
+        self.rotor = RotorAPI(client, view_by_read_class)
+        self.sensor_position = SensorPositionAPI(client, view_by_read_class)
+        self.windmill = WindmillAPI(client, view_by_read_class)
 
     @classmethod
     def azure_project(

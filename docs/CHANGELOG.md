@@ -14,6 +14,15 @@ Changes are grouped as follows
 - `Security` in case of vulnerabilities.
 
 
+## [0.33.0] - 01-01-24
+### Added
+* The generated data classes now are inherited if the view is implementing another view.
+* Non-writable (and non-interfaces) data classes are no longer generating a `Apply` (write) classes
+  and `.apply` method in the generated SDK.
+### Changed
+* The field `type` is renamed to `node_type` or `edge_type` in the generated data classes. This is to avoid
+  name collisions with the `type` name in Python.
+
 ## [0.32.6] - 30-12-23
 ### Added
 * Setting `type` on nodes.

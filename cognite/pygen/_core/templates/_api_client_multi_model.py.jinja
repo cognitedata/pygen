@@ -21,11 +21,11 @@ class {{ api.name }}:
     """
 
     def __init__(self, client: CogniteClient):
-        view_by_write_class = {% raw %}{{% endraw %}{% for view_id in api.sub_apis_by_view_id.keys() %}
-            data_classes.{{ api_by_view_id[view_id].data_class.write_name }}: dm.ViewId("{{ view_id.space }}", "{{ view_id.external_id }}", "{{ view_id.version }}"),{% endfor %}
+        view_by_read_class = {% raw %}{{% endraw %}{% for view_id in api.sub_apis_by_view_id.keys() %}
+            data_classes.{{ api_by_view_id[view_id].data_class.read_name }}: dm.ViewId("{{ view_id.space }}", "{{ view_id.external_id }}", "{{ view_id.version }}"),{% endfor %}
         {% raw %}}{% endraw %}
         {% for sub in api.sub_apis_by_view_id.values() %}{% if not sub.is_edge_class %}
-        self.{{ sub.parent_attribute }} = {{ sub.name }}(client, view_by_write_class){% endif %}{% endfor %}
+        self.{{ sub.parent_attribute }} = {{ sub.name }}(client, view_by_read_class){% endif %}{% endfor %}
 
 {% endfor %}
 class {{ client_name }}:

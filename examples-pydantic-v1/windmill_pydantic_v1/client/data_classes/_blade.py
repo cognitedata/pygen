@@ -8,6 +8,7 @@ from pydantic import Field
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
     DomainModel,
+    DomainModelCore,
     DomainModelApply,
     DomainModelApplyList,
     DomainModelList,
@@ -49,6 +50,7 @@ class Blade(DomainModel):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    node_type: Union[dm.DirectRelationReference, None] = None
     is_damaged: Optional[bool] = None
     name: Optional[str] = None
     sensor_positions: Union[list[SensorPosition], list[str], None] = Field(default=None, repr=False)
@@ -85,6 +87,7 @@ class BladeApply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    node_type: Union[dm.DirectRelationReference, None] = None
     is_damaged: Optional[bool] = None
     name: Optional[str] = None
     sensor_positions: Union[list[SensorPositionApply], list[str], None] = Field(default=None, repr=False)
@@ -92,15 +95,13 @@ class BladeApply(DomainModelApply):
     def _to_instances_apply(
         self,
         cache: set[tuple[str, str]],
-        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
             return resources
 
-        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
-            "power-models", "Blade", "1"
-        )
+        write_view = (view_by_read_class or {}).get(Blade, dm.ViewId("power-models", "Blade", "1"))
 
         properties = {}
 
@@ -115,6 +116,7 @@ class BladeApply(DomainModelApply):
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
+                type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(
                         source=write_view,
@@ -132,7 +134,7 @@ class BladeApply(DomainModelApply):
                 start_node=self,
                 end_node=sensor_position,
                 edge_type=edge_type,
-                view_by_write_class=view_by_write_class,
+                view_by_read_class=view_by_read_class,
             )
             resources.extend(other_resources)
 

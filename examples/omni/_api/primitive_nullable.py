@@ -10,6 +10,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni.data_classes import (
+    DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
     PrimitiveNullable,
@@ -36,16 +37,15 @@ from .primitive_nullable_query import PrimitiveNullableQueryAPI
 
 
 class PrimitiveNullableAPI(NodeAPI[PrimitiveNullable, PrimitiveNullableApply, PrimitiveNullableList]):
-    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
-        view_id = view_by_write_class[PrimitiveNullableApply]
+    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
+        view_id = view_by_read_class[PrimitiveNullable]
         super().__init__(
             client=client,
             sources=view_id,
             class_type=PrimitiveNullable,
-            class_apply_type=PrimitiveNullableApply,
             class_list=PrimitiveNullableList,
             class_apply_list=PrimitiveNullableApplyList,
-            view_by_write_class=view_by_write_class,
+            view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
 
@@ -121,7 +121,7 @@ class PrimitiveNullableAPI(NodeAPI[PrimitiveNullable, PrimitiveNullableApply, Pr
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(PrimitiveNullableList)
-        return PrimitiveNullableQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
+        return PrimitiveNullableQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(
         self, primitive_nullable: PrimitiveNullableApply | Sequence[PrimitiveNullableApply], replace: bool = False

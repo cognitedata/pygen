@@ -424,13 +424,17 @@ class EdgeOneToOne(EdgeToOneDataClass):
     """This represents a one-to-one relation, which direct relation."""
 
     def as_read_type_hint(self) -> str:
-        return self._type_hint(self.data_class.read_name)
+        left_side = f"Union[{self.data_class.read_name}, str, dm.NodeId, None] ="
+        return self._type_hint(left_side)
 
     def as_write_type_hint(self) -> str:
-        return self._type_hint(self.data_class.write_name)
+        if self.data_class.is_writable or self.data_class.is_interface:
+            left_side = f"Union[{self.data_class.write_name}, str, dm.NodeId, None] ="
+        else:
+            left_side = "Union[str, dm.NodeId, None] ="
+        return self._type_hint(left_side)
 
-    def _type_hint(self, data_class_name: str) -> str:
-        left_side = f"Union[{data_class_name}, str, dm.NodeId, None] ="
+    def _type_hint(self, left_side: str) -> str:
         # Edge fields are always nullable
         if self.need_alias:
             return f'{left_side} {self.pydantic_field}(None, repr=False, alias="{self.prop_name}")'
@@ -482,18 +486,28 @@ class EdgeOneToEndNode(EdgeField):
         return self._type_hint([data_class.read_name for data_class in self.end_classes])
 
     def as_write_type_hint(self) -> str:
-        return self._type_hint([data_class.write_name for data_class in self.end_classes])
+        return self._type_hint(
+            [
+                data_class.write_name
+                for data_class in self.end_classes
+                if data_class.is_writable or data_class.is_interface
+            ]
+        )
 
     def _type_hint(self, data_class_names: list[str]) -> str:
         data_class_names = list(set(data_class_names))
-        left_side = f"Union[{', '.join(sorted(data_class_names))}, str, dm.NodeId]"
+        data_class_names_hint = ", ".join(sorted(data_class_names))
+        if data_class_names_hint:
+            left_side = f"Union[{data_class_names_hint}, str, dm.NodeId]"
+        else:
+            left_side = "Union[str, dm.NodeId]"
         if self.need_alias:
             return f'{left_side} = {self.pydantic_field}(alias="{self.prop_name}")'
         else:
             return left_side
 
     def as_apply(self) -> str:
-        return f"self.{self.name}.as_apply() " f"if isinstance(self.{self.name}, DomainModel) " f"else self.{self.name}"
+        return f"self.{self.name}.as_apply() if isinstance(self.{self.name}, DomainModel) else self.{self.name}"
 
 
 @dataclass(frozen=True)
@@ -527,13 +541,17 @@ class EdgeOneToManyNodes(EdgeOneToMany):
         )
 
     def as_read_type_hint(self) -> str:
-        return self._type_hint(self.data_class.read_name)
+        left_side = f"Union[list[{self.data_class.read_name}], list[str], None]"
+        return self._type_hint(left_side)
 
     def as_write_type_hint(self) -> str:
-        return self._type_hint(self.data_class.write_name)
+        if self.data_class.is_writable or self.data_class.is_interface:
+            left_side = f"Union[list[{self.data_class.write_name}], list[str], None]"
+        else:
+            left_side = "Union[list[str], None]"
+        return self._type_hint(left_side)
 
-    def _type_hint(self, data_class_name: str) -> str:
-        left_side = f"Union[list[{data_class_name}], list[str], None]"
+    def _type_hint(self, left_side: str) -> str:
         # Edge fields are always nullable
         if self.need_alias:
             return f'{left_side} = {self.pydantic_field}(default=None, repr=False, alias="{self.prop_name}")'

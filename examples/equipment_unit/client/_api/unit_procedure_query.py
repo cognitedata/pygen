@@ -6,11 +6,9 @@ from typing import TYPE_CHECKING
 from cognite.client import data_modeling as dm, CogniteClient
 
 from equipment_unit.client.data_classes import (
-    DomainModelApply,
+    DomainModelCore,
     UnitProcedure,
-    UnitProcedureApply,
     StartEndTime,
-    StartEndTimeApply,
 )
 from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
 
@@ -28,11 +26,11 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
         self,
         client: CogniteClient,
         builder: QueryBuilder[T_DomainModelList],
-        view_by_write_class: dict[type[DomainModelApply], dm.ViewId],
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId],
         filter_: dm.filters.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
     ):
-        super().__init__(client, builder, view_by_write_class)
+        super().__init__(client, builder, view_by_read_class)
 
         self._builder.append(
             QueryStep(
@@ -41,7 +39,7 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
                     from_=self._builder[-1].name if self._builder else None,
                     filter=filter_,
                 ),
-                select=dm.query.Select([dm.query.SourceSelector(self._view_by_write_class[UnitProcedureApply], ["*"])]),
+                select=dm.query.Select([dm.query.SourceSelector(self._view_by_read_class[UnitProcedure], ["*"])]),
                 result_cls=UnitProcedure,
                 max_retrieve_limit=limit,
             )
@@ -76,7 +74,7 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
 
         from_ = self._builder[-1].name
 
-        edge_view = self._view_by_write_class[StartEndTimeApply]
+        edge_view = self._view_by_read_class[StartEndTime]
         edge_filter = _create_start_end_time_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.work_order"),
             edge_view,
@@ -102,7 +100,7 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
                 max_retrieve_limit=limit,
             )
         )
-        return WorkOrderQueryAPI(self._client, self._builder, self._view_by_write_class, None, limit)
+        return WorkOrderQueryAPI(self._client, self._builder, self._view_by_read_class, None, limit)
 
     def work_units(
         self,
@@ -133,7 +131,7 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
 
         from_ = self._builder[-1].name
 
-        edge_view = self._view_by_write_class[StartEndTimeApply]
+        edge_view = self._view_by_read_class[StartEndTime]
         edge_filter = _create_start_end_time_filter(
             dm.DirectRelationReference("IntegrationTestsImmutable", "UnitProcedure.equipment_module"),
             edge_view,
@@ -159,7 +157,7 @@ class UnitProcedureQueryAPI(QueryAPI[T_DomainModelList]):
                 max_retrieve_limit=limit,
             )
         )
-        return EquipmentModuleQueryAPI(self._client, self._builder, self._view_by_write_class, None, limit)
+        return EquipmentModuleQueryAPI(self._client, self._builder, self._view_by_read_class, None, limit)
 
     def query(
         self,

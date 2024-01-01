@@ -9,6 +9,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from windmill_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from windmill_pydantic_v1.client.data_classes import (
+    DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
     Gearbox,
@@ -37,16 +38,15 @@ from .gearbox_query import GearboxQueryAPI
 
 
 class GearboxAPI(NodeAPI[Gearbox, GearboxApply, GearboxList]):
-    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
-        view_id = view_by_write_class[GearboxApply]
+    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
+        view_id = view_by_read_class[Gearbox]
         super().__init__(
             client=client,
             sources=view_id,
             class_type=Gearbox,
-            class_apply_type=GearboxApply,
             class_list=GearboxList,
             class_apply_list=GearboxApplyList,
-            view_by_write_class=view_by_write_class,
+            view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
         self.displacement_x = GearboxDisplacementXAPI(client, view_id)
@@ -80,7 +80,7 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxApply, GearboxList]):
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(GearboxList)
-        return GearboxQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
+        return GearboxQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(self, gearbox: GearboxApply | Sequence[GearboxApply], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) gearboxes.

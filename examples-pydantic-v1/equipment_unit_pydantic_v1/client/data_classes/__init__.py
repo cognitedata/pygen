@@ -1,5 +1,6 @@
 from ._core import (
     DomainModel,
+    DomainModelCore,
     DomainModelApply,
     DomainModelList,
     DomainRelationApply,
@@ -58,6 +59,7 @@ UnitProcedureApply.update_forward_refs(
 __all__ = [
     "ResourcesApply",
     "DomainModel",
+    "DomainModelCore",
     "DomainModelApply",
     "DomainModelList",
     "DomainRelationApply",

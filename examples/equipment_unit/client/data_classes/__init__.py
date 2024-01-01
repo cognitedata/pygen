@@ -1,5 +1,6 @@
 from ._core import (
     DomainModel,
+    DomainModelCore,
     DomainModelApply,
     DomainModelList,
     DomainRelationApply,
@@ -46,6 +47,7 @@ UnitProcedureApply.model_rebuild()
 __all__ = [
     "ResourcesApply",
     "DomainModel",
+    "DomainModelCore",
     "DomainModelApply",
     "DomainModelList",
     "DomainRelationApply",

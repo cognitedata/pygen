@@ -296,6 +296,7 @@ class OmniFiles:
     primitive_required_data = data_classes / "_primitive_required.py"
     primitive_required_list_data = data_classes / "_primitive_required_listed.py"
     implementation_1_data = data_classes / "_implementation_1.py"
+    implementation_1_non_writeable_data = data_classes / "_implementation_1_non_writeable.py"
     connection_item_a_data = data_classes / "_connection_item_a.py"
     connection_item_c_data = data_classes / "_connection_item_c.py"
 
@@ -307,6 +308,7 @@ class OmniFiles:
     primitive_required_api = api / "primitive_required.py"
     primitive_required_list_api = api / "primitive_required_listed.py"
     implementation_1_api = api / "implementation_1.py"
+    implementation_1_non_writeable_api = api / "implementation_1_non_writeable.py"
 
     connection_item_a_api = api / "connection_item_a.py"
     connection_item_b_api = api / "connection_item_b.py"

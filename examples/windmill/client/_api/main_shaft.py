@@ -9,6 +9,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from windmill.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from windmill.client.data_classes import (
+    DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
     MainShaft,
@@ -39,16 +40,15 @@ from .main_shaft_query import MainShaftQueryAPI
 
 
 class MainShaftAPI(NodeAPI[MainShaft, MainShaftApply, MainShaftList]):
-    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
-        view_id = view_by_write_class[MainShaftApply]
+    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
+        view_id = view_by_read_class[MainShaft]
         super().__init__(
             client=client,
             sources=view_id,
             class_type=MainShaft,
-            class_apply_type=MainShaftApply,
             class_list=MainShaftList,
             class_apply_list=MainShaftApplyList,
-            view_by_write_class=view_by_write_class,
+            view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
         self.bending_x = MainShaftBendingXAPI(client, view_id)
@@ -84,7 +84,7 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftApply, MainShaftList]):
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(MainShaftList)
-        return MainShaftQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
+        return MainShaftQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(
         self, main_shaft: MainShaftApply | Sequence[MainShaftApply], replace: bool = False

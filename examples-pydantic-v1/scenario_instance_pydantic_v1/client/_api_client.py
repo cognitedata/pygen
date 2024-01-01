@@ -14,7 +14,7 @@ class ScenarioInstanceClient:
     ScenarioInstanceClient
 
     Generated with:
-        pygen = 0.32.6
+        pygen = 0.33.0
         cognite-sdk = 7.8.5
         pydantic = 1.10.7
 
@@ -32,15 +32,13 @@ class ScenarioInstanceClient:
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = "CognitePygen:0.32.6"
+        client.config.client_name = "CognitePygen:0.33.0"
 
-        view_by_write_class = {
-            data_classes.ScenarioInstanceApply: dm.ViewId(
-                "IntegrationTestsImmutable", "ScenarioInstance", "ee2b79fd98b5bb"
-            ),
+        view_by_read_class = {
+            data_classes.ScenarioInstance: dm.ViewId("IntegrationTestsImmutable", "ScenarioInstance", "ee2b79fd98b5bb"),
         }
 
-        self.scenario_instance = ScenarioInstanceAPI(client, view_by_write_class)
+        self.scenario_instance = ScenarioInstanceAPI(client, view_by_read_class)
 
     @classmethod
     def azure_project(

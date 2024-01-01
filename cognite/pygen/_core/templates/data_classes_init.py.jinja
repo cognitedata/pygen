@@ -1,5 +1,6 @@
 from ._core import (
     DomainModel,
+    DomainModelCore,
     DomainModelApply,
     DomainModelList,
     DomainRelationApply,
@@ -21,14 +22,15 @@ from ._core import (
 __all__ = [
     "ResourcesApply",
     "DomainModel",
+    "DomainModelCore",
     "DomainModelApply",
     "DomainModelList",
     "DomainRelationApply",
     "ResourcesApplyResult",{% for class_ in classes %}
-    "{{ class_.read_name }}",
-    "{{ class_.write_name }}",
-    "{{ class_.read_list_name }}",
-    "{{ class_.write_list_name }}",{% if class_.has_field_of_type(ft.PrimitiveFieldCore) %}
+    "{{ class_.read_name }}",{% if class_.is_writable or class_.is_interface %}
+    "{{ class_.write_name }}",{% endif %}
+    "{{ class_.read_list_name }}",{% if class_.is_writable or class_.is_interface %}
+    "{{ class_.write_list_name }}",{% endif %}{% if class_.has_field_of_type(ft.PrimitiveFieldCore) %}
     "{{ class_.field_names }}",{% endif %}{% if class_.has_primitive_field_of_type(dm.Text) %}
     "{{ class_.text_field_names }}", {% endif %}{% endfor %}
 ]

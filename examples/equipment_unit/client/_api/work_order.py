@@ -9,6 +9,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from equipment_unit.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from equipment_unit.client.data_classes import (
+    DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
     WorkOrder,
@@ -35,16 +36,15 @@ from .work_order_query import WorkOrderQueryAPI
 
 
 class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
-    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
-        view_id = view_by_write_class[WorkOrderApply]
+    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
+        view_id = view_by_read_class[WorkOrder]
         super().__init__(
             client=client,
             sources=view_id,
             class_type=WorkOrder,
-            class_apply_type=WorkOrderApply,
             class_list=WorkOrderList,
             class_apply_list=WorkOrderApplyList,
-            view_by_write_class=view_by_write_class,
+            view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
 
@@ -93,7 +93,7 @@ class WorkOrderAPI(NodeAPI[WorkOrder, WorkOrderApply, WorkOrderList]):
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(WorkOrderList)
-        return WorkOrderQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
+        return WorkOrderQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(
         self, work_order: WorkOrderApply | Sequence[WorkOrderApply], replace: bool = False

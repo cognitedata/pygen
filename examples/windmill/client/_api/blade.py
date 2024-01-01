@@ -9,6 +9,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from windmill.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from windmill.client.data_classes import (
+    DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
     Blade,
@@ -36,16 +37,15 @@ from .blade_query import BladeQueryAPI
 
 
 class BladeAPI(NodeAPI[Blade, BladeApply, BladeList]):
-    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
-        view_id = view_by_write_class[BladeApply]
+    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
+        view_id = view_by_read_class[Blade]
         super().__init__(
             client=client,
             sources=view_id,
             class_type=Blade,
-            class_apply_type=BladeApply,
             class_list=BladeList,
             class_apply_list=BladeApplyList,
-            view_by_write_class=view_by_write_class,
+            view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
         self.sensor_positions_edge = BladeSensorPositionsAPI(client)
@@ -86,7 +86,7 @@ class BladeAPI(NodeAPI[Blade, BladeApply, BladeList]):
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(BladeList)
-        return BladeQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
+        return BladeQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(self, blade: BladeApply | Sequence[BladeApply], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) blades.

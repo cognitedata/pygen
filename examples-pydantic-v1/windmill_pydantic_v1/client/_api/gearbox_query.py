@@ -6,9 +6,8 @@ from typing import TYPE_CHECKING
 from cognite.client import data_modeling as dm, CogniteClient
 
 from windmill_pydantic_v1.client.data_classes import (
-    DomainModelApply,
+    DomainModelCore,
     Gearbox,
-    GearboxApply,
 )
 from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
 
@@ -18,11 +17,11 @@ class GearboxQueryAPI(QueryAPI[T_DomainModelList]):
         self,
         client: CogniteClient,
         builder: QueryBuilder[T_DomainModelList],
-        view_by_write_class: dict[type[DomainModelApply], dm.ViewId],
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId],
         filter_: dm.filters.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
     ):
-        super().__init__(client, builder, view_by_write_class)
+        super().__init__(client, builder, view_by_read_class)
 
         self._builder.append(
             QueryStep(
@@ -31,7 +30,7 @@ class GearboxQueryAPI(QueryAPI[T_DomainModelList]):
                     from_=self._builder[-1].name if self._builder else None,
                     filter=filter_,
                 ),
-                select=dm.query.Select([dm.query.SourceSelector(self._view_by_write_class[GearboxApply], ["*"])]),
+                select=dm.query.Select([dm.query.SourceSelector(self._view_by_read_class[Gearbox], ["*"])]),
                 result_cls=Gearbox,
                 max_retrieve_limit=limit,
             )

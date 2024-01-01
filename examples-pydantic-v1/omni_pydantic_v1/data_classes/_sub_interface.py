@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, Optional
+from typing import Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -8,12 +8,14 @@ from pydantic import Field
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
     DomainModel,
+    DomainModelCore,
     DomainModelApply,
     DomainModelApplyList,
     DomainModelList,
     DomainRelationApply,
     ResourcesApply,
 )
+from ._main_interface import MainInterface, MainInterfaceApply
 
 
 __all__ = [
@@ -35,7 +37,7 @@ _SUBINTERFACE_PROPERTIES_BY_FIELD = {
 }
 
 
-class SubInterface(DomainModel):
+class SubInterface(MainInterface):
     """This represents the reading version of sub interface.
 
     It is used to when data is retrieved from CDF.
@@ -51,8 +53,7 @@ class SubInterface(DomainModel):
         version: The version of the sub interface node.
     """
 
-    space: str = DEFAULT_INSTANCE_SPACE
-    main_value: Optional[str] = Field(None, alias="mainValue")
+    node_type: Union[dm.DirectRelationReference, None] = None
     sub_value: Optional[str] = Field(None, alias="subValue")
 
     def as_apply(self) -> SubInterfaceApply:
@@ -65,7 +66,7 @@ class SubInterface(DomainModel):
         )
 
 
-class SubInterfaceApply(DomainModelApply):
+class SubInterfaceApply(MainInterfaceApply):
     """This represents the writing version of sub interface.
 
     It is used to when data is sent to CDF.
@@ -81,22 +82,19 @@ class SubInterfaceApply(DomainModelApply):
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
     """
 
-    space: str = DEFAULT_INSTANCE_SPACE
-    main_value: Optional[str] = Field(None, alias="mainValue")
+    node_type: Union[dm.DirectRelationReference, None] = None
     sub_value: Optional[str] = Field(None, alias="subValue")
 
     def _to_instances_apply(
         self,
         cache: set[tuple[str, str]],
-        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
             return resources
 
-        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
-            "pygen-models", "SubInterface", "1"
-        )
+        write_view = (view_by_read_class or {}).get(SubInterface, dm.ViewId("pygen-models", "SubInterface", "1"))
 
         properties = {}
 
@@ -111,6 +109,7 @@ class SubInterfaceApply(DomainModelApply):
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
+                type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(
                         source=write_view,

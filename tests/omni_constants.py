@@ -15,6 +15,6 @@ else:
 @dataclass
 class OmniClasses:
     read: type[DomainModel]
-    write: type[DomainModelApply]
+    write: type[DomainModelApply] | None
     api_name: str
     view: dm.View

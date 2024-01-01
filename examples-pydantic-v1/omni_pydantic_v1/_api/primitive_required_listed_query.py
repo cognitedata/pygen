@@ -6,9 +6,8 @@ from typing import TYPE_CHECKING
 from cognite.client import data_modeling as dm, CogniteClient
 
 from omni_pydantic_v1.data_classes import (
-    DomainModelApply,
+    DomainModelCore,
     PrimitiveRequiredListed,
-    PrimitiveRequiredListedApply,
 )
 from ._core import DEFAULT_QUERY_LIMIT, QueryBuilder, QueryStep, QueryAPI, T_DomainModelList, _create_edge_filter
 
@@ -18,11 +17,11 @@ class PrimitiveRequiredListedQueryAPI(QueryAPI[T_DomainModelList]):
         self,
         client: CogniteClient,
         builder: QueryBuilder[T_DomainModelList],
-        view_by_write_class: dict[type[DomainModelApply], dm.ViewId],
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId],
         filter_: dm.filters.Filter | None = None,
         limit: int = DEFAULT_QUERY_LIMIT,
     ):
-        super().__init__(client, builder, view_by_write_class)
+        super().__init__(client, builder, view_by_read_class)
 
         self._builder.append(
             QueryStep(
@@ -32,7 +31,7 @@ class PrimitiveRequiredListedQueryAPI(QueryAPI[T_DomainModelList]):
                     filter=filter_,
                 ),
                 select=dm.query.Select(
-                    [dm.query.SourceSelector(self._view_by_write_class[PrimitiveRequiredListedApply], ["*"])]
+                    [dm.query.SourceSelector(self._view_by_read_class[PrimitiveRequiredListed], ["*"])]
                 ),
                 result_cls=PrimitiveRequiredListed,
                 max_retrieve_limit=limit,

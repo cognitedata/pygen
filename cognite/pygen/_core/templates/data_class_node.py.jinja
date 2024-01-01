@@ -1,7 +1,7 @@
 from __future__ import annotations
 {% if data_class.has_primitive_field_of_type((dm.Timestamp, dm.Date)) %}
 import datetime{% endif %}
-{% if data_class.has_field_of_type(ft.EdgeField) %}from typing import TYPE_CHECKING, Literal, Optional, Union{% else %}from typing import Literal, Optional{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}, Union{% endif %}{% endif %}{% if not data_class.use_optional_type %}{% endif %}
+{% if data_class.has_field_of_type(ft.EdgeField) %}from typing import TYPE_CHECKING, Literal, Optional, Union{% else %}from typing import Literal, Optional, Union{% endif %}{% if not data_class.use_optional_type %}{% endif %}
 
 from cognite.client import data_modeling as dm{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) %}
 from cognite.client.data_classes import TimeSeries{% if is_pydantic_v2 %} as CogniteTimeSeries{% endif %}{% endif %}{% if data_class.use_pydantic_field %}
@@ -10,19 +10,21 @@ from cognite.client.data_classes import TimeSeries{% if is_pydantic_v2 %} as Cog
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
     DomainModel,
+    DomainModelCore,
     DomainModelApply,
     DomainModelApplyList,
     DomainModelList,
     DomainRelationApply,
     ResourcesApply,{% if data_class.has_primitive_field_of_type(dm.TimeSeriesReference) and is_pydantic_v2 %}
     TimeSeries,{% endif %}
-)
+){% if data_class.implements %}{% for implements in data_class.implements %}
+from .{{ implements.file_name }} import {{ implements.read_name }}{% if data_class.is_writable or data_class.is_interface %}, {{ implements.write_name }}{% endif %}{% endfor %}{% endif %}
 {% if data_class.has_field_of_type(ft.EdgeField) %}
 if TYPE_CHECKING:{% for dependency_class in data_class.dependencies %}
-    from .{{ dependency_class.file_name }} import {{ dependency_class.read_name }}, {{ dependency_class.write_name }}{% endfor %}
+    from .{{ dependency_class.file_name }} import {{ dependency_class.read_name }}{% if dependency_class.is_writable or dependency_class.is_interface %}, {{ dependency_class.write_name }}{% endif %}{% endfor %}
 {% endif %}
 
-__all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data_class.read_list_name }}", "{{ data_class.write_list_name }}"{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}, "{{ data_class.field_names }}"{% endif %}{% if data_class.has_primitive_field_of_type((dm.Text, dm.CDFExternalIdReference)) %}, "{{ data_class.text_field_names }}"{% endif %}]
+__all__ = ["{{ data_class.read_name }}"{% if data_class.is_writable or data_class.is_interface %}, "{{ data_class.write_name }}"{% endif %}, "{{ data_class.read_list_name }}"{% if data_class.is_writable or data_class.is_interface %}, "{{ data_class.write_list_name }}"{% endif %}{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}, "{{ data_class.field_names }}"{% endif %}{% if data_class.has_primitive_field_of_type((dm.Text, dm.CDFExternalIdReference)) %}, "{{ data_class.text_field_names }}"{% endif %}]
 {% if data_class.has_primitive_field_of_type((dm.Text, dm.CDFExternalIdReference)) %}
 
 {{ data_class.text_field_names }} = Literal[{{ data_class.text_fields_literals }}]{% endif %}{% if data_class.has_field_of_type(ft.PrimitiveFieldCore) %}
@@ -33,7 +35,7 @@ __all__ = ["{{ data_class.read_name }}", "{{ data_class.write_name }}", "{{ data
 {% raw %}}{% endraw %}{% endif %}
 
 
-class {{ data_class.read_name }}(DomainModel):
+class {{ data_class.read_name }}({{ data_class.read_base_class }}):
     """This represents the reading version of {{ data_class.doc_name }}.
 
     It is used to when data is retrieved from CDF.
@@ -46,11 +48,11 @@ class {{ data_class.read_name }}(DomainModel):
         last_updated_time: The last updated time of the {{ data_class.doc_name }} node.
         deleted_time: If present, the deleted time of the {{ data_class.doc_name }} node.
         version: The version of the {{ data_class.doc_name }} node.
-    """
-    space: str = DEFAULT_INSTANCE_SPACE{% if data_class.node_type %}
-    type: dm.DirectRelationReference = dm.DirectRelationReference("{{ data_class.node_type.space }}", "{{ data_class.node_type.external_id }}"){% endif %}{% for field in data_class %}
+    """{% if not data_class.implements %}
+    space: str = DEFAULT_INSTANCE_SPACE{% endif %}
+    node_type: Union[dm.DirectRelationReference, None] = {% if data_class.node_type %}dm.DirectRelationReference("{{ data_class.node_type.space }}", "{{ data_class.node_type.external_id }}"){% else %}None{% endif %}{% for field in data_class.non_parent_fields %}
     {{ field.name }}: {{ field.as_read_type_hint() }}{% endfor %}
-
+{% if data_class.is_writable or data_class.is_interface %}
     def as_apply(self) -> {{ data_class.write_name }}:
         """Convert this read version of {{ data_class.doc_name }} to the writing version."""
         return {{ data_class.write_name }}(
@@ -60,7 +62,7 @@ class {{ data_class.read_name }}(DomainModel):
         )
 
 
-class {{ data_class.write_name }}(DomainModelApply):
+class {{ data_class.write_name }}({{ data_class.write_base_class }}):
     """This represents the writing version of {{ data_class.doc_name }}.
 
     It is used to when data is sent to CDF.
@@ -73,15 +75,15 @@ class {{ data_class.write_name }}(DomainModelApply):
             If no existingVersion is specified, the ingestion will always overwrite any existing data for the edge (for the specified container or instance).
             If existingVersion is set to 0, the upsert will behave as an insert, so it will fail the bulk if the item already exists.
             If skipOnVersionConflict is set on the ingestion request, then the item will be skipped instead of failing the ingestion request.
-    """
-    space: str = DEFAULT_INSTANCE_SPACE{% if data_class.node_type %}
-    type: dm.DirectRelationReference = dm.DirectRelationReference("{{ data_class.node_type.space }}", "{{ data_class.node_type.external_id }}"){% endif %}{% for field in data_class %}
+    """{% if not data_class.implements %}
+    space: str = DEFAULT_INSTANCE_SPACE{% endif %}
+    node_type: Union[dm.DirectRelationReference, None] = {% if data_class.node_type %}dm.DirectRelationReference("{{ data_class.node_type.space }}", "{{ data_class.node_type.external_id }}"){% else %}None{% endif %}{% for field in data_class.non_parent_fields %}
     {{ field.name }}: {{ field.as_write_type_hint() }}{% endfor %}
 
     def _to_instances_apply(
         self,
         cache: set[tuple[str, str]],
-        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
     ) -> ResourcesApply:{% if data_class.has_edge_with_property %}{% for dependency_class in data_class.dependencies_edges %}
         from .{{ dependency_class.file_name }} import {{ dependency_class.write_name }}{% endfor %}
 {% endif %}
@@ -94,15 +96,15 @@ class {{ data_class.write_name }}(DomainModelApply):
             space=self.space,
             external_id=self.external_id,
             existing_version=self.existing_version,{% if data_class.node_type %}
-            type=self.type,{% endif %}
+            type=self.node_type,{% endif %}
             sources=None,
         )
         resources.nodes.append(this_node)
         {% else %}
 
-        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
+        write_view = (view_by_read_class or {}).get({{ data_class.read_name }}, dm.ViewId(
             "{{ data_class.view_id.space }}", "{{ data_class.view_id.external_id }}", "{{ data_class.view_id.version }}"
-        ){% endif %}
+        )){% endif %}
 {% if not data_class.is_all_fields_of_type(ft.EdgeOneToMany) %}
         properties = {}
         {% for field in data_class.fields_of_type((ft.PrimitiveFieldCore, ft.EdgeOneToOne)) %}
@@ -133,8 +135,8 @@ class {{ data_class.write_name }}(DomainModelApply):
             this_node = dm.NodeApply(
                 space=self.space,
                 external_id=self.external_id,
-                existing_version=self.existing_version,{% if data_class.node_type %}
-                type=self.type,{% endif %}
+                existing_version=self.existing_version,
+                type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(
                         source=write_view,
@@ -152,22 +154,22 @@ class {{ data_class.write_name }}(DomainModelApply):
                     cache,
                     self,
                     dm.DirectRelationReference("{{ field.edge_type.space }}", "{{ field.edge_type.external_id }}"),
-                    view_by_write_class
+                    view_by_read_class
 )
                 resources.extend(other_resources)
 {% endfor %}{% for field in data_class.fields_of_type(ft.EdgeOneToManyNodes) %}
         edge_type = dm.DirectRelationReference("{{ field.edge_type.space }}", "{{ field.edge_type.external_id }}")
         for {{ field.variable }} in self.{{ field.name }} or []:{% if field.edge_direction == 'outwards' %}
             other_resources = DomainRelationApply.from_edge_to_resources(
-                cache, start_node=self, end_node={{field.variable}}, edge_type=edge_type, view_by_write_class=view_by_write_class
+                cache, start_node=self, end_node={{field.variable}}, edge_type=edge_type, view_by_read_class=view_by_read_class
             ){% else %}
             other_resources = DomainRelationApply.from_edge_to_resources(
-                cache, start_node={{field.variable}}, end_node=self, edge_type=edge_type, view_by_write_class=view_by_write_class
+                cache, start_node={{field.variable}}, end_node=self, edge_type=edge_type, view_by_read_class=view_by_read_class
             ){% endif %}
             resources.extend(other_resources)
 {% endfor %}{% for field in data_class.fields_of_type(ft.EdgeOneToOne) %}
         if isinstance(self.{{ field.name }}, DomainModelApply):
-            other_resources = self.{{ field.name }}._to_instances_apply(cache, view_by_write_class)
+            other_resources = self.{{ field.name }}._to_instances_apply(cache, view_by_read_class)
             resources.extend(other_resources)
 {% endfor %}{% for field in data_class.primitive_fields_of_type(dm.TimeSeriesReference) %}
         if isinstance(self.{{ field.name }}, {% if is_pydantic_v2 %}CogniteTimeSeries{% else %}TimeSeries{% endif %}):
@@ -175,12 +177,12 @@ class {{ data_class.write_name }}(DomainModelApply):
 {% endfor %}
         return resources
 
-
+{% endif %}
 class {{ data_class.read_list_name }}(DomainModelList[{{ data_class.read_name }}]):
     """List of {{ data_class.doc_list_name }} in the read version."""
 
     _INSTANCE = {{ data_class.read_name }}
-
+{% if data_class.is_writable or data_class.is_interface %}
     def as_apply(self) -> {{ data_class.write_list_name }}:
         """Convert these read versions of {{ data_class.doc_name }} to the writing versions."""
         return {{ data_class.write_list_name }}([node.as_apply() for node in self.data])
@@ -190,7 +192,7 @@ class {{ data_class.write_list_name }}(DomainModelApplyList[{{ data_class.write_
     """List of {{ data_class.doc_list_name }} in the writing version."""
 
     _INSTANCE = {{ data_class.write_name }}
-
+{% endif %}
 
 def {{ data_class.filter_name }}(
     view_id: dm.ViewId,{% for parm in list_method.parameters %}

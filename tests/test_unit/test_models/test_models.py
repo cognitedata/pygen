@@ -84,6 +84,7 @@ def load_field_test_cases():
     data_class = MagicMock(spec=NodeDataClass)
     data_class.write_name = "ModelTemplateApply"
     data_class.read_name = "ModelTemplate"
+    data_class.is_writable = True
 
     yield pytest.param(
         mapped,
@@ -237,6 +238,9 @@ def load_data_classes_test_cases():
             file_name="_series",
             fields=[],
             node_type=None,
+            is_interface=False,
+            is_writable=True,
+            implements=[],
         ),
         id="DataClass variable and variable_list the same.",
     )
@@ -449,6 +453,9 @@ def create_fields_test_cases():
         view_id=dm.ViewId("IntegrationTestsImmutable", "Role", "2"),
         fields=[],
         node_type=None,
+        is_interface=True,
+        is_writable=True,
+        implements=[],
     )
     data_class_by_view_id = {dm.ViewId("IntegrationTestsImmutable", "Role", "2"): data_class}
     yield pytest.param(
@@ -530,6 +537,9 @@ def create_fields_test_cases():
         variable_list="persons",
         fields=[],
         node_type=None,
+        is_interface=False,
+        is_writable=True,
+        implements=[],
     )
     data_class_by_view_id = {dm.ViewId("IntegrationTestsImmutable", "Person", "2"): data_class}
 
@@ -686,12 +696,14 @@ def field_type_hints_test_cases():
     site_apply1 = MagicMock(spec=NodeDataClass)
     site_apply1.read_name = "Site"
     site_apply1.write_name = "SiteApply"
+    site_apply1.is_writable = True
     site_apply_edge.end_class = site_apply1
 
     site_apply_edge2 = MagicMock(spec=EdgeClasses)
     site_apply2 = MagicMock(spec=NodeDataClass)
     site_apply2.read_name = "Site"
     site_apply2.write_name = "SiteApply"
+    site_apply2.is_writable = True
     site_apply_edge2.end_class = site_apply2
 
     field = EdgeOneToEndNode(

@@ -9,6 +9,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from windmill.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from windmill.client.data_classes import (
+    DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
     Rotor,
@@ -36,16 +37,15 @@ from .rotor_query import RotorQueryAPI
 
 
 class RotorAPI(NodeAPI[Rotor, RotorApply, RotorList]):
-    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
-        view_id = view_by_write_class[RotorApply]
+    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
+        view_id = view_by_read_class[Rotor]
         super().__init__(
             client=client,
             sources=view_id,
             class_type=Rotor,
-            class_apply_type=RotorApply,
             class_list=RotorList,
             class_apply_list=RotorApplyList,
-            view_by_write_class=view_by_write_class,
+            view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
         self.rotor_speed_controller = RotorRotorSpeedControllerAPI(client, view_id)
@@ -78,7 +78,7 @@ class RotorAPI(NodeAPI[Rotor, RotorApply, RotorList]):
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(RotorList)
-        return RotorQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
+        return RotorQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(self, rotor: RotorApply | Sequence[RotorApply], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) rotors.

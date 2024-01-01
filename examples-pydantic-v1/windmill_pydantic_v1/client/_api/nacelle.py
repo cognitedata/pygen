@@ -9,6 +9,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from windmill_pydantic_v1.client.data_classes._core import DEFAULT_INSTANCE_SPACE
 from windmill_pydantic_v1.client.data_classes import (
+    DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
     Nacelle,
@@ -39,16 +40,15 @@ from .nacelle_query import NacelleQueryAPI
 
 
 class NacelleAPI(NodeAPI[Nacelle, NacelleApply, NacelleList]):
-    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
-        view_id = view_by_write_class[NacelleApply]
+    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
+        view_id = view_by_read_class[Nacelle]
         super().__init__(
             client=client,
             sources=view_id,
             class_type=Nacelle,
-            class_apply_type=NacelleApply,
             class_list=NacelleList,
             class_apply_list=NacelleApplyList,
-            view_by_write_class=view_by_write_class,
+            view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
         self.acc_from_back_side_x = NacelleAccFromBackSideXAPI(client, view_id)
@@ -99,7 +99,7 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleApply, NacelleList]):
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(NacelleList)
-        return NacelleQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
+        return NacelleQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(self, nacelle: NacelleApply | Sequence[NacelleApply], replace: bool = False) -> ResourcesApplyResult:
         """Add or update (upsert) nacelles.

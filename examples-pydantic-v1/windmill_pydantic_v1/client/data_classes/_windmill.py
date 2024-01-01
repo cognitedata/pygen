@@ -8,6 +8,7 @@ from pydantic import Field
 from ._core import (
     DEFAULT_INSTANCE_SPACE,
     DomainModel,
+    DomainModelCore,
     DomainModelApply,
     DomainModelApplyList,
     DomainModelList,
@@ -57,6 +58,7 @@ class Windmill(DomainModel):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    node_type: Union[dm.DirectRelationReference, None] = None
     blades: Union[list[Blade], list[str], None] = Field(default=None, repr=False)
     capacity: Optional[float] = None
     metmast: Union[list[Metmast], list[str], None] = Field(default=None, repr=False)
@@ -104,6 +106,7 @@ class WindmillApply(DomainModelApply):
     """
 
     space: str = DEFAULT_INSTANCE_SPACE
+    node_type: Union[dm.DirectRelationReference, None] = None
     blades: Union[list[BladeApply], list[str], None] = Field(default=None, repr=False)
     capacity: Optional[float] = None
     metmast: Union[list[MetmastApply], list[str], None] = Field(default=None, repr=False)
@@ -115,15 +118,13 @@ class WindmillApply(DomainModelApply):
     def _to_instances_apply(
         self,
         cache: set[tuple[str, str]],
-        view_by_write_class: dict[type[DomainModelApply | DomainRelationApply], dm.ViewId] | None,
+        view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
             return resources
 
-        write_view = (view_by_write_class and view_by_write_class.get(type(self))) or dm.ViewId(
-            "power-models", "Windmill", "1"
-        )
+        write_view = (view_by_read_class or {}).get(Windmill, dm.ViewId("power-models", "Windmill", "1"))
 
         properties = {}
 
@@ -153,6 +154,7 @@ class WindmillApply(DomainModelApply):
                 space=self.space,
                 external_id=self.external_id,
                 existing_version=self.existing_version,
+                type=self.node_type,
                 sources=[
                     dm.NodeOrEdgeData(
                         source=write_view,
@@ -166,23 +168,23 @@ class WindmillApply(DomainModelApply):
         edge_type = dm.DirectRelationReference("power-models", "Windmill.blades")
         for blade in self.blades or []:
             other_resources = DomainRelationApply.from_edge_to_resources(
-                cache, start_node=self, end_node=blade, edge_type=edge_type, view_by_write_class=view_by_write_class
+                cache, start_node=self, end_node=blade, edge_type=edge_type, view_by_read_class=view_by_read_class
             )
             resources.extend(other_resources)
 
         edge_type = dm.DirectRelationReference("power-models", "Windmill.metmast")
         for metmast in self.metmast or []:
             other_resources = DomainRelationApply.from_edge_to_resources(
-                cache, start_node=self, end_node=metmast, edge_type=edge_type, view_by_write_class=view_by_write_class
+                cache, start_node=self, end_node=metmast, edge_type=edge_type, view_by_read_class=view_by_read_class
             )
             resources.extend(other_resources)
 
         if isinstance(self.nacelle, DomainModelApply):
-            other_resources = self.nacelle._to_instances_apply(cache, view_by_write_class)
+            other_resources = self.nacelle._to_instances_apply(cache, view_by_read_class)
             resources.extend(other_resources)
 
         if isinstance(self.rotor, DomainModelApply):
-            other_resources = self.rotor._to_instances_apply(cache, view_by_write_class)
+            other_resources = self.rotor._to_instances_apply(cache, view_by_read_class)
             resources.extend(other_resources)
 
         return resources

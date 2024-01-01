@@ -10,6 +10,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from omni_pydantic_v1.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni_pydantic_v1.data_classes import (
+    DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
     PrimitiveNullableListed,
@@ -38,16 +39,15 @@ from .primitive_nullable_listed_query import PrimitiveNullableListedQueryAPI
 class PrimitiveNullableListedAPI(
     NodeAPI[PrimitiveNullableListed, PrimitiveNullableListedApply, PrimitiveNullableListedList]
 ):
-    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
-        view_id = view_by_write_class[PrimitiveNullableListedApply]
+    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
+        view_id = view_by_read_class[PrimitiveNullableListed]
         super().__init__(
             client=client,
             sources=view_id,
             class_type=PrimitiveNullableListed,
-            class_apply_type=PrimitiveNullableListedApply,
             class_list=PrimitiveNullableListedList,
             class_apply_list=PrimitiveNullableListedApplyList,
-            view_by_write_class=view_by_write_class,
+            view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
 
@@ -78,7 +78,7 @@ class PrimitiveNullableListedAPI(
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(PrimitiveNullableListedList)
-        return PrimitiveNullableListedQueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
+        return PrimitiveNullableListedQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(
         self,

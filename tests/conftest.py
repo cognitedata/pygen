@@ -25,6 +25,6 @@ def omni_data_classes(omni_data_model: dm.DataModel[dm.View]) -> dict[dm.ViewId,
         write_name = read_name + "Apply"
         api_name = to_snake(view.external_id)
         read_class = available_data_classes[read_name]
-        write_class = available_data_classes[write_name]
+        write_class = available_data_classes.get(write_name)
         output[view.as_id()] = OmniClasses(read_class, write_class, api_name, view)
     return output

@@ -9,6 +9,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni.data_classes import (
+    DomainModelCore,
     DomainModelApply,
     ResourcesApplyResult,
     Implementation1,
@@ -35,16 +36,15 @@ from .implementation_1_query import Implementation1QueryAPI
 
 
 class Implementation1API(NodeAPI[Implementation1, Implementation1Apply, Implementation1List]):
-    def __init__(self, client: CogniteClient, view_by_write_class: dict[type[DomainModelApply], dm.ViewId]):
-        view_id = view_by_write_class[Implementation1Apply]
+    def __init__(self, client: CogniteClient, view_by_read_class: dict[type[DomainModelCore], dm.ViewId]):
+        view_id = view_by_read_class[Implementation1]
         super().__init__(
             client=client,
             sources=view_id,
             class_type=Implementation1,
-            class_apply_type=Implementation1Apply,
             class_list=Implementation1List,
             class_apply_list=Implementation1ApplyList,
-            view_by_write_class=view_by_write_class,
+            view_by_read_class=view_by_read_class,
         )
         self._view_id = view_id
 
@@ -99,7 +99,7 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Apply, Implemen
             (filter and dm.filters.And(filter, has_data)) or has_data,
         )
         builder = QueryBuilder(Implementation1List)
-        return Implementation1QueryAPI(self._client, builder, self._view_by_write_class, filter_, limit)
+        return Implementation1QueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(
         self, implementation_1: Implementation1Apply | Sequence[Implementation1Apply], replace: bool = False
