@@ -92,7 +92,10 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAApply, Connecti
         return ConnectionItemAQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(
-        self, connection_item_a: ConnectionItemAApply | Sequence[ConnectionItemAApply], replace: bool = False
+        self,
+        connection_item_a: ConnectionItemAApply | Sequence[ConnectionItemAApply],
+        replace: bool = False,
+        write_none: bool = False,
     ) -> ResourcesApplyResult:
         """Add or update (upsert) connection item as.
 
@@ -104,6 +107,8 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAApply, Connecti
             connection_item_a: Connection item a or sequence of connection item as to upsert.
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): Should we write None values to the API? If False, None values will be ignored. If True, None values will be written to the API.
+                Note this only applies to properties that are nullable.
         Returns:
             Created instance(s), i.e., nodes, edges, and time series.
 
@@ -118,7 +123,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAApply, Connecti
                 >>> result = client.connection_item_a.apply(connection_item_a)
 
         """
-        return self._apply(connection_item_a, replace)
+        return self._apply(connection_item_a, replace, write_none)
 
     def delete(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE

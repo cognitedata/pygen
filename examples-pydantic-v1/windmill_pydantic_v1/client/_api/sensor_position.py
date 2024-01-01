@@ -107,7 +107,10 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionApply, SensorPosit
         return SensorPositionQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(
-        self, sensor_position: SensorPositionApply | Sequence[SensorPositionApply], replace: bool = False
+        self,
+        sensor_position: SensorPositionApply | Sequence[SensorPositionApply],
+        replace: bool = False,
+        write_none: bool = False,
     ) -> ResourcesApplyResult:
         """Add or update (upsert) sensor positions.
 
@@ -115,6 +118,8 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionApply, SensorPosit
             sensor_position: Sensor position or sequence of sensor positions to upsert.
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): Should we write None values to the API? If False, None values will be ignored. If True, None values will be written to the API.
+                Note this only applies to properties that are nullable.
         Returns:
             Created instance(s), i.e., nodes, edges, and time series.
 
@@ -129,7 +134,7 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionApply, SensorPosit
                 >>> result = client.sensor_position.apply(sensor_position)
 
         """
-        return self._apply(sensor_position, replace)
+        return self._apply(sensor_position, replace, write_none)
 
     def delete(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE

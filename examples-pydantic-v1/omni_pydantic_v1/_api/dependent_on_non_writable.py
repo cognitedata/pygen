@@ -91,6 +91,7 @@ class DependentOnNonWritableAPI(
         self,
         dependent_on_non_writable: DependentOnNonWritableApply | Sequence[DependentOnNonWritableApply],
         replace: bool = False,
+        write_none: bool = False,
     ) -> ResourcesApplyResult:
         """Add or update (upsert) dependent on non writables.
 
@@ -102,6 +103,8 @@ class DependentOnNonWritableAPI(
             dependent_on_non_writable: Dependent on non writable or sequence of dependent on non writables to upsert.
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): Should we write None values to the API? If False, None values will be ignored. If True, None values will be written to the API.
+                Note this only applies to properties that are nullable.
         Returns:
             Created instance(s), i.e., nodes, edges, and time series.
 
@@ -116,7 +119,7 @@ class DependentOnNonWritableAPI(
                 >>> result = client.dependent_on_non_writable.apply(dependent_on_non_writable)
 
         """
-        return self._apply(dependent_on_non_writable, replace)
+        return self._apply(dependent_on_non_writable, replace, write_none)
 
     def delete(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE

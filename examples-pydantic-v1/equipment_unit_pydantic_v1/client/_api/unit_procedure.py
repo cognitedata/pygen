@@ -101,7 +101,10 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
         return UnitProcedureQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
     def apply(
-        self, unit_procedure: UnitProcedureApply | Sequence[UnitProcedureApply], replace: bool = False
+        self,
+        unit_procedure: UnitProcedureApply | Sequence[UnitProcedureApply],
+        replace: bool = False,
+        write_none: bool = False,
     ) -> ResourcesApplyResult:
         """Add or update (upsert) unit procedures.
 
@@ -113,6 +116,8 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
             unit_procedure: Unit procedure or sequence of unit procedures to upsert.
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): Should we write None values to the API? If False, None values will be ignored. If True, None values will be written to the API.
+                Note this only applies to properties that are nullable.
         Returns:
             Created instance(s), i.e., nodes, edges, and time series.
 
@@ -127,7 +132,7 @@ class UnitProcedureAPI(NodeAPI[UnitProcedure, UnitProcedureApply, UnitProcedureL
                 >>> result = client.unit_procedure.apply(unit_procedure)
 
         """
-        return self._apply(unit_procedure, replace)
+        return self._apply(unit_procedure, replace, write_none)
 
     def delete(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE

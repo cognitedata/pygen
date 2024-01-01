@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, Optional, Union
+from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeries
@@ -85,6 +85,7 @@ class RotorApply(DomainModelApply):
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
+        write_none: bool = False,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
@@ -92,21 +93,19 @@ class RotorApply(DomainModelApply):
 
         write_view = (view_by_read_class or {}).get(Rotor, dm.ViewId("power-models", "Rotor", "1"))
 
-        properties = {}
+        properties: dict[str, Any] = {}
 
-        if self.rotor_speed_controller is not None:
-            properties["rotor_speed_controller"] = (
-                self.rotor_speed_controller
-                if isinstance(self.rotor_speed_controller, str)
-                else self.rotor_speed_controller.external_id
-            )
+        if self.rotor_speed_controller is not None or write_none:
+            if isinstance(self.rotor_speed_controller, str) or self.rotor_speed_controller is None:
+                properties["rotor_speed_controller"] = self.rotor_speed_controller
+            else:
+                properties["rotor_speed_controller"] = self.rotor_speed_controller.external_id
 
-        if self.rpm_low_speed_shaft is not None:
-            properties["rpm_low_speed_shaft"] = (
-                self.rpm_low_speed_shaft
-                if isinstance(self.rpm_low_speed_shaft, str)
-                else self.rpm_low_speed_shaft.external_id
-            )
+        if self.rpm_low_speed_shaft is not None or write_none:
+            if isinstance(self.rpm_low_speed_shaft, str) or self.rpm_low_speed_shaft is None:
+                properties["rpm_low_speed_shaft"] = self.rpm_low_speed_shaft
+            else:
+                properties["rpm_low_speed_shaft"] = self.rpm_low_speed_shaft.external_id
 
         if properties:
             this_node = dm.NodeApply(

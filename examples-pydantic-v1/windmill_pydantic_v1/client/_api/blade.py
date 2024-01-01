@@ -88,7 +88,12 @@ class BladeAPI(NodeAPI[Blade, BladeApply, BladeList]):
         builder = QueryBuilder(BladeList)
         return BladeQueryAPI(self._client, builder, self._view_by_read_class, filter_, limit)
 
-    def apply(self, blade: BladeApply | Sequence[BladeApply], replace: bool = False) -> ResourcesApplyResult:
+    def apply(
+        self,
+        blade: BladeApply | Sequence[BladeApply],
+        replace: bool = False,
+        write_none: bool = False,
+    ) -> ResourcesApplyResult:
         """Add or update (upsert) blades.
 
         Note: This method iterates through all nodes and timeseries linked to blade and creates them including the edges
@@ -99,6 +104,8 @@ class BladeAPI(NodeAPI[Blade, BladeApply, BladeList]):
             blade: Blade or sequence of blades to upsert.
             replace (bool): How do we behave when a property value exists? Do we replace all matching and existing values with the supplied values (true)?
                 Or should we merge in new values for properties together with the existing values (false)? Note: This setting applies for all nodes or edges specified in the ingestion call.
+            write_none (bool): Should we write None values to the API? If False, None values will be ignored. If True, None values will be written to the API.
+                Note this only applies to properties that are nullable.
         Returns:
             Created instance(s), i.e., nodes, edges, and time series.
 
@@ -113,7 +120,7 @@ class BladeAPI(NodeAPI[Blade, BladeApply, BladeList]):
                 >>> result = client.blade.apply(blade)
 
         """
-        return self._apply(blade, replace)
+        return self._apply(blade, replace, write_none)
 
     def delete(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE

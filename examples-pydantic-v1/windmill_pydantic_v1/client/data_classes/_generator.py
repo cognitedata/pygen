@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, Optional, Union
+from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeries
@@ -92,6 +92,7 @@ class GeneratorApply(DomainModelApply):
         self,
         cache: set[tuple[str, str]],
         view_by_read_class: dict[type[DomainModelCore], dm.ViewId] | None,
+        write_none: bool = False,
     ) -> ResourcesApply:
         resources = ResourcesApply()
         if self.as_tuple_id() in cache:
@@ -99,21 +100,24 @@ class GeneratorApply(DomainModelApply):
 
         write_view = (view_by_read_class or {}).get(Generator, dm.ViewId("power-models", "Generator", "1"))
 
-        properties = {}
+        properties: dict[str, Any] = {}
 
-        if self.generator_speed_controller is not None:
-            properties["generator_speed_controller"] = (
-                self.generator_speed_controller
-                if isinstance(self.generator_speed_controller, str)
-                else self.generator_speed_controller.external_id
-            )
+        if self.generator_speed_controller is not None or write_none:
+            if isinstance(self.generator_speed_controller, str) or self.generator_speed_controller is None:
+                properties["generator_speed_controller"] = self.generator_speed_controller
+            else:
+                properties["generator_speed_controller"] = self.generator_speed_controller.external_id
 
-        if self.generator_speed_controller_reference is not None:
-            properties["generator_speed_controller_reference"] = (
-                self.generator_speed_controller_reference
-                if isinstance(self.generator_speed_controller_reference, str)
-                else self.generator_speed_controller_reference.external_id
-            )
+        if self.generator_speed_controller_reference is not None or write_none:
+            if (
+                isinstance(self.generator_speed_controller_reference, str)
+                or self.generator_speed_controller_reference is None
+            ):
+                properties["generator_speed_controller_reference"] = self.generator_speed_controller_reference
+            else:
+                properties[
+                    "generator_speed_controller_reference"
+                ] = self.generator_speed_controller_reference.external_id
 
         if properties:
             this_node = dm.NodeApply(
