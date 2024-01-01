@@ -14,9 +14,11 @@ Changes are grouped as follows
 - `Security` in case of vulnerabilities.
 
 
-## [0.TBD] - TBD-01-24
+## [0.34.0] - TBD-01-24
 ### Added
 * Option for returning generated SDK as a `dict[Path, str]` instead of writing to disk when calling `generate_sdk`.
+* Option for cleaning the `pygen` temporary directly when calling `generate_sdk_notebook`. This is useful to ensure
+  that previous generated SDKs are not interfering with the current SDK by accident.
 ### Fixed
 * `pygen` now handles views with the same `external_id` in different spaces and versions. Note that this can only occur if
   `pygen` is used with multiple data models.

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib
+import shutil
 import sys
 import tempfile
 from collections.abc import Sequence
@@ -136,6 +137,7 @@ def generate_sdk_notebook(
     client_name: Optional[str] = None,
     default_instance_space: str | None = None,
     config: Optional[PygenConfig] = None,
+    clean_pygen_temp_dir: bool = True,
 ) -> Any:
     """
     Generates a Python SDK tailored to the given Data Model(s) and imports it into the current Python session.
@@ -163,11 +165,21 @@ def generate_sdk_notebook(
         default_instance_space: The default instance space to use for the generated SDK. Defaults to the
             instance space of the first data model given.
         config: The configuration used to control how to generate the SDK.
+        clean_pygen_temp_dir: Whether to clean the temporary directory used to store the generated SDK.
+            Defaults to True.
 
     Returns:
         The instantiated generated client class.
     """
     output_dir = Path(tempfile.gettempdir()) / "pygen"
+    if clean_pygen_temp_dir and output_dir.exists():
+        try:
+            shutil.rmtree(output_dir)
+        except Exception as e:
+            print(f"Failed to clean temporary directory {output_dir}: {e}")
+        else:
+            print(f"Cleaned temporary directory {output_dir}")
+
     data_model = _get_data_model(model_id, client, print)
     external_id = _extract_external_id(data_model)
     if top_level_package is None:
