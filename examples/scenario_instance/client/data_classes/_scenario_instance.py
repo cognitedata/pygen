@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import Literal, Optional, Union
+from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
@@ -143,7 +143,7 @@ class ScenarioInstanceApply(DomainModelApply):
             ScenarioInstance, dm.ViewId("IntegrationTestsImmutable", "ScenarioInstance", "ee2b79fd98b5bb")
         )
 
-        properties = {}
+        properties: dict[str, Any] = {}
 
         if self.aggregation is not None or write_none:
             properties["aggregation"] = self.aggregation
@@ -161,9 +161,10 @@ class ScenarioInstanceApply(DomainModelApply):
             properties["priceArea"] = self.price_area
 
         if self.price_forecast is not None or write_none:
-            properties["priceForecast"] = (
-                self.price_forecast if isinstance(self.price_forecast, str) else self.price_forecast.external_id
-            )
+            if isinstance(self.price_forecast, str) or self.price_forecast is None:
+                properties["priceForecast"] = self.price_forecast
+            else:
+                properties["priceForecast"] = self.price_forecast.external_id
 
         if self.scenario is not None or write_none:
             properties["scenario"] = self.scenario

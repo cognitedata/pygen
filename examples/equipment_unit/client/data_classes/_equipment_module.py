@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, Optional, Union
+from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
@@ -116,7 +116,7 @@ class EquipmentModuleApply(DomainModelApply):
             EquipmentModule, dm.ViewId("IntegrationTestsImmutable", "EquipmentModule", "b1cd4bf14a7a33")
         )
 
-        properties = {}
+        properties: dict[str, Any] = {}
 
         if self.description is not None or write_none:
             properties["description"] = self.description
@@ -125,9 +125,10 @@ class EquipmentModuleApply(DomainModelApply):
             properties["name"] = self.name
 
         if self.sensor_value is not None or write_none:
-            properties["sensor_value"] = (
-                self.sensor_value if isinstance(self.sensor_value, str) else self.sensor_value.external_id
-            )
+            if isinstance(self.sensor_value, str) or self.sensor_value is None:
+                properties["sensor_value"] = self.sensor_value
+            else:
+                properties["sensor_value"] = self.sensor_value.external_id
 
         if self.type_ is not None or write_none:
             properties["type"] = self.type_

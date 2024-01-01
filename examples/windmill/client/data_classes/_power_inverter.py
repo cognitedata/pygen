@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, Optional, Union
+from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeries as CogniteTimeSeries
@@ -107,28 +107,25 @@ class PowerInverterApply(DomainModelApply):
 
         write_view = (view_by_read_class or {}).get(PowerInverter, dm.ViewId("power-models", "PowerInverter", "1"))
 
-        properties = {}
+        properties: dict[str, Any] = {}
 
         if self.active_power_total is not None or write_none:
-            properties["active_power_total"] = (
-                self.active_power_total
-                if isinstance(self.active_power_total, str)
-                else self.active_power_total.external_id
-            )
+            if isinstance(self.active_power_total, str) or self.active_power_total is None:
+                properties["active_power_total"] = self.active_power_total
+            else:
+                properties["active_power_total"] = self.active_power_total.external_id
 
         if self.apparent_power_total is not None or write_none:
-            properties["apparent_power_total"] = (
-                self.apparent_power_total
-                if isinstance(self.apparent_power_total, str)
-                else self.apparent_power_total.external_id
-            )
+            if isinstance(self.apparent_power_total, str) or self.apparent_power_total is None:
+                properties["apparent_power_total"] = self.apparent_power_total
+            else:
+                properties["apparent_power_total"] = self.apparent_power_total.external_id
 
         if self.reactive_power_total is not None or write_none:
-            properties["reactive_power_total"] = (
-                self.reactive_power_total
-                if isinstance(self.reactive_power_total, str)
-                else self.reactive_power_total.external_id
-            )
+            if isinstance(self.reactive_power_total, str) or self.reactive_power_total is None:
+                properties["reactive_power_total"] = self.reactive_power_total
+            else:
+                properties["reactive_power_total"] = self.reactive_power_total.external_id
 
         if properties:
             this_node = dm.NodeApply(

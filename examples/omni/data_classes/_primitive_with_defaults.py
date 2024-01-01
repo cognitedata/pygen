@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, Optional, Union
+from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -122,7 +122,7 @@ class PrimitiveWithDefaultsApply(DomainModelApply):
             PrimitiveWithDefaults, dm.ViewId("pygen-models", "PrimitiveWithDefaults", "1")
         )
 
-        properties = {}
+        properties: dict[str, Any] = {}
 
         if self.auto_increment_int_32 is not None:
             properties["autoIncrementInt32"] = self.auto_increment_int_32

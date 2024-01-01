@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import Literal, Optional, Union
+from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -147,7 +147,7 @@ class PrimitiveNullableListedApply(DomainModelApply):
             PrimitiveNullableListed, dm.ViewId("pygen-models", "PrimitiveNullableListed", "1")
         )
 
-        properties = {}
+        properties: dict[str, Any] = {}
 
         if self.boolean is not None or write_none:
             properties["boolean"] = self.boolean

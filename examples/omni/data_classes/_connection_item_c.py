@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal, Optional, Union
+from typing import TYPE_CHECKING, Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field

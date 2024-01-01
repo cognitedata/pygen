@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, Optional, Union
+from typing import Any, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm
 from pydantic import Field
@@ -95,7 +95,7 @@ class Implementation2Apply(SubInterfaceApply):
 
         write_view = (view_by_read_class or {}).get(Implementation2, dm.ViewId("pygen-models", "Implementation2", "1"))
 
-        properties = {}
+        properties: dict[str, Any] = {}
 
         if self.main_value is not None or write_none:
             properties["mainValue"] = self.main_value
