@@ -6,6 +6,9 @@ implements:
   - space: pygen-models
     externalId: SubInterface
     version: '1'
+  - space: pygen-models
+    externalId: MainInterface
+    version: '1'
 properties:
   value1:
     container:
