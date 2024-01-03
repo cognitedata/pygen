@@ -315,7 +315,7 @@ views:
       defaultValue: null
       name: null
       description: null
-  lastUpdatedTime: 1702380697012
+  lastUpdatedTime: 1704190918843
   createdTime: 1690467703871
 - space: cdf_3d_schema
   externalId: Cdf3dEntity
@@ -342,7 +342,7 @@ views:
         type: view
       direction: outwards
       connectionType: multi_edge_connection
-  lastUpdatedTime: 1702380697012
+  lastUpdatedTime: 1704190918843
   createdTime: 1690467703871
 - space: cdf_3d_schema
   externalId: Cdf3dModel
@@ -384,7 +384,7 @@ views:
       defaultValue: null
       name: null
       description: null
-  lastUpdatedTime: 1702380697012
+  lastUpdatedTime: 1704190918843
   createdTime: 1690467703871
 - space: tutorial_apm_simple
   externalId: WorkItem

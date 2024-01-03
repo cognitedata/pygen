@@ -2,8 +2,8 @@
   space: omni-instances
   externalId: CDFExternalReferences:Anthony
   version: 1
-  lastUpdatedTime: 1704114631223
-  createdTime: 1704114631223
+  lastUpdatedTime: 1704274900614
+  createdTime: 1704274900614
   properties:
     pygen-models:
       CDFExternalReferences/1:
@@ -23,8 +23,8 @@
   space: omni-instances
   externalId: CDFExternalReferences:Jill
   version: 1
-  lastUpdatedTime: 1704114631223
-  createdTime: 1704114631223
+  lastUpdatedTime: 1704274900614
+  createdTime: 1704274900614
   properties:
     pygen-models:
       CDFExternalReferences/1:
@@ -84,8 +84,8 @@
   space: omni-instances
   externalId: CDFExternalReferencesListed:Jesse
   version: 1
-  lastUpdatedTime: 1704114631223
-  createdTime: 1704114631223
+  lastUpdatedTime: 1704274900614
+  createdTime: 1704274900614
   properties:
     pygen-models:
       CDFExternalReferencesListed/1: {}
