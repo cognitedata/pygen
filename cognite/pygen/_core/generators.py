@@ -120,6 +120,12 @@ class SDKGenerator:
         )
 
 
+def to_parents_by_view_id(
+    views: Sequence[dm.View], data_class_by_view_id: dict[dm.ViewId, DataClass], interfaces: set[dm.ViewId]
+) -> dict[dm.ViewId, list[DataClass]]:
+    return {view.as_id(): [data_class_by_view_id[interface] for interface in view.implements or []] for view in views}
+
+
 class MultiAPIGenerator:
     def __init__(
         self,
@@ -152,9 +158,7 @@ class MultiAPIGenerator:
         data_class_by_view_id = {view_id: api.data_class for view_id, api in self.api_by_view_id.items()}
         query_class_by_view_id = {view_id: api.query_api for view_id, api in self.api_by_view_id.items()}
         interfaces = {parent for view in views for parent in view.implements or []}
-        parents_by_view_id = {
-            view.as_id(): [data_class_by_view_id[interface] for interface in view.implements or []] for view in views
-        }
+        parents_by_view_id = to_parents_by_view_id(views, data_class_by_view_id, interfaces)
         for api in self.unique_apis:
             api.data_class.update_fields(api.view.properties, data_class_by_view_id, list(views), config)
             api.data_class.update_implements_interface_and_writable(
