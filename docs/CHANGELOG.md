@@ -14,7 +14,13 @@ Changes are grouped as follows
 - `Security` in case of vulnerabilities.
 
 
-## [0.34.0] - TBD-01-24
+## [0.34.1] - 03-01-24
+### Fixed
+* Bug in `pygen` when generating SDKs from views which implements another view that is also implemented by that
+  parent views as well. For example, if you have a view `A` which implements `B` and `C`, and `B` also implements `C`,
+  then `pygen` would raise a `TypeError: Cannot create a consistent method resolution`. This is now fixed.
+
+## [0.34.0] - 01-01-24
 ### Added
 * Option for returning generated SDK as a `dict[Path, str]` instead of writing to disk when calling `generate_sdk`.
 * Option for cleaning the `pygen` temporary directly when calling `generate_sdk_notebook`. This is useful to ensure

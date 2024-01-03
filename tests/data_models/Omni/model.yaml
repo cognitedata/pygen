@@ -502,6 +502,10 @@ views:
     externalId: SubInterface
     version: '1'
     type: view
+  - space: pygen-models
+    externalId: MainInterface
+    version: '1'
+    type: view
   version: '1'
   writable: true
   usedFor: node
@@ -567,8 +571,8 @@ views:
       defaultValue: null
       name: Value2
       description: null
-  lastUpdatedTime: 1703845437017
-  createdTime: 1703845437017
+  lastUpdatedTime: 1704274897575
+  createdTime: 1704274897575
 - space: pygen-models
   externalId: Implementation1NonWriteable
   name: Implementation1NonWriteable
@@ -1401,5 +1405,5 @@ views:
   lastUpdatedTime: 1703845437017
   createdTime: 1703845437017
 isGlobal: false
-lastUpdatedTime: 1704114630368
-createdTime: 1704114630368
+lastUpdatedTime: 1704274898601
+createdTime: 1704274898601

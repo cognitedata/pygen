@@ -4,6 +4,7 @@ import itertools
 from collections import defaultdict
 from collections.abc import Iterator, Sequence
 from functools import total_ordering
+from graphlib import TopologicalSorter
 from pathlib import Path
 from typing import Any, Callable, Literal, cast
 
@@ -120,6 +121,25 @@ class SDKGenerator:
         )
 
 
+def to_unique_parents_by_view_id(views: Sequence[dm.View]) -> dict[dm.ViewId, list[dm.ViewId]]:
+    parents_by_view_id: dict[dm.ViewId, set[dm.ViewId]] = {
+        view.as_id(): {parent for parent in view.implements or []} for view in views
+    }
+    ancestors_by_view_id: dict[dm.ViewId, set[dm.ViewId]] = defaultdict(set)
+    for view_id in TopologicalSorter(parents_by_view_id).static_order():
+        ancestors_by_view_id[view_id] = parents_by_view_id[view_id].union(
+            *(ancestors_by_view_id[parent] for parent in parents_by_view_id[view_id])
+        )
+
+    unique_parents_by_view_id: dict[dm.ViewId, list[dm.ViewId]] = {}
+    for view in views:
+        ancestors = {grand_parent for parent in view.implements or [] for grand_parent in ancestors_by_view_id[parent]}
+        unique_parents_by_view_id[view.as_id()] = [
+            parent for parent in view.implements or [] if parent not in ancestors
+        ]
+    return unique_parents_by_view_id
+
+
 class MultiAPIGenerator:
     def __init__(
         self,
@@ -148,14 +168,21 @@ class MultiAPIGenerator:
                 DataClass.to_base_name_with_space_and_version,
             ],
         )
-        view_by_view_id = {view.as_id(): view for view in views}
+
         data_class_by_view_id = {view_id: api.data_class for view_id, api in self.api_by_view_id.items()}
         query_class_by_view_id = {view_id: api.query_api for view_id, api in self.api_by_view_id.items()}
         interfaces = {parent for view in views for parent in view.implements or []}
+        parents_by_view_id = to_unique_parents_by_view_id(views)
         for api in self.unique_apis:
             api.data_class.update_fields(api.view.properties, data_class_by_view_id, list(views), config)
             api.data_class.update_implements_interface_and_writable(
-                interfaces, data_class_by_view_id, view_by_view_id[api.view_id]
+                [
+                    parent_class
+                    for parent in parents_by_view_id[api.view_id]
+                    # If the interface is not in the data model, then, we cannot inherit from it.
+                    if (parent_class := data_class_by_view_id.get(parent))
+                ],
+                api.view_id in interfaces,
             )
 
         # All data classes have been updated, before we can create edge APIs.

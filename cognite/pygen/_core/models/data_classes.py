@@ -143,15 +143,9 @@ class DataClass:
             )
             self.fields.append(field_)
 
-    def update_implements_interface_and_writable(
-        self, interfaces: set[dm.ViewId], data_class_by_view_id: dict[dm.ViewId, DataClass], view: dm.View
-    ):
-        self.is_interface = self.view_id in interfaces
-        for interface in view.implements or []:
-            if interface not in data_class_by_view_id:
-                # The interface is not part of the data model
-                continue
-            self.implements.append(data_class_by_view_id[interface])
+    def update_implements_interface_and_writable(self, parents: list[DataClass], is_interface: bool):
+        self.is_interface = is_interface
+        self.implements.extend(parents)
         self.is_writable = self.is_writable or self.is_all_fields_of_type(EdgeOneToMany)
 
     @property
